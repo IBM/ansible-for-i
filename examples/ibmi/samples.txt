@@ -1,0 +1,385 @@
+# ansible --version will tell the module search path, put the ibmi_* mudules under this path.
+ansible --version
+Output:
+ansible 2.9.1
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = ['/Users/changle/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/ansible
+  executable location = /Library/Frameworks/Python.framework/Versions/3.8/bin/ansible
+  python version = 3.8.0 (v3.8.0:fa919fdf25, Oct 14 2019, 10:23:27) [Clang 6.0 (clang-600.0.57)]
+
+
+# hosts file example
+[server1]
+SERVER1.RCH.STGLABS.IBM.COM ansible_python_interpreter=/QOpenSys/pkgs/bin/python2 ansible_ssh_user=username ansible_ssh_pass=password
+[server2]
+SERVER2.RCH.STGLABS.IBM.COM ansible_python_interpreter=/QOpenSys/pkgs/bin/python2 ansible_ssh_user= username ansible_ssh_pass=password
+
+# Display the doc of module
+ansible-doc -s  moudle
+#Note: detailed see the source file of the module
+
+
+# Usage of ibmi_cl_command module
+#Create a library
+Case 1: create library success
+ansible db2mb1pa -m ibmi_cl_command -a "cmd=‘crtlib lib(C1)’”
+Output:
+DB2MB1PA.RCH.STGLABS.IBM.COM | SUCCESS => {
+    "changed": false,
+    "cmd": "crtlib lib(C2)",
+    "delta": "0:00:00.386441",
+    "end": "2019-12-11 11:55:42.627733",
+    "joblog": false,
+    "rc": 0,
+    "rc_msg": "Success",
+    "start": "2019-12-11 11:55:42.241292",
+    "stderr": "",
+    "stderr_lines": [],
+    "stdout": "CPC2102: Library C1 created.\n",
+    "stdout_lines": [
+        "CPC2102: Library C1 created."
+    ]
+}
+
+Case 2: create library failed with simple msg
+ansible db2mb1pa -m ibmi_cl_command -a "cmd=‘crtlib lib(C1)’”
+Output:
+DB2MB1PA.RCH.STGLABS.IBM.COM | FAILED! => {
+    "changed": false,
+    "cmd": "crtlib lib(C1)",
+    "delta": "0:00:00.474560",
+    "end": "2019-12-11 11:53:45.904711",
+    "joblog": false,
+    "msg": "non-zero return code",
+    "rc": 255,
+    "rc_msg": "Generic failure",
+    "start": "2019-12-11 11:53:45.430151",
+    "stderr": "CPF2111: Library C1 already exists.\n",
+    "stderr_lines": [
+        "CPF2111: Library C1 already exists."
+    ],
+    "stdout": "",
+    "stdout_lines": []
+}
+
+Case 3: create library failed with detailed msg(with job log)
+ansible db2mb1pa -m ibmi_cl_command -a "cmd=‘crtlib lib(C1)’ joblog=true"
+Output:
+DB2MB1PA.RCH.STGLABS.IBM.COM | FAILED! => {
+    "changed": false,
+    "cmd": "crtlib lib(C1)",
+    "delta": "0:00:01.168726",
+    "end": "2019-12-11 11:54:36.732644",
+    "joblog": true,
+    "msg": "non-zero return code",
+    "rc": 255,
+    "rc_msg": "Generic failure",
+    "start": "2019-12-11 11:54:35.563918",
+    "stderr_lines": [
+        "5770SS1 V7R4M0 190621                        Display Job Log                       DB2MB1PA  12/11/19  11:54:36 CST     Page    1",
+        "  Job name . . . . . . . . . . :   QSQSRVR         User  . . . . . . :   QUSER        Number . . . . . . . . . . . :   937841",
+        "  Job description  . . . . . . :   QDFTSVR         Library . . . . . :   QGPL",
+        "MSGID      TYPE                    SEV  DATE      TIME             FROM PGM     LIBRARY     INST     TO PGM      LIBRARY     INST",
+        "CPF1124    Information             00   12/11/19  00:00:02.530823  QWTPIIPP     QSYS        04CC     *EXT                    *N",
+        "                                     Message . . . . :   Job 937841/QUSER/QSQSRVR started on 12/11/19 at 00:00:02",
+        "                                       in subsystem QSYSWRK in QSYS. Job entered system on 12/11/19 at 00:00:02.",
+        "CPD0912    Diagnostic              20   12/11/19  11:54:35.711808  QWTCHGJB     QSYS        31A6     QSQSRVR     QSYS        *STMT",
+        "                                     From user . . . . . . . . . :   CHANGLE",
+        "                                     To module . . . . . . . . . :   QSQSRVR",
+        "                                     To procedure  . . . . . . . :   QSQSRVR",
+        "                                     Statement . . . . . . . . . :   9387",
+        "                                     Message . . . . :   Printer device PRT01 not found.",
+        "                                     Cause . . . . . :   The printer device was not found. Recovery  . . . :",
+        "                                       Either create the printer device (CRTDEVPRT command) or if the printer",
+        "                                       device name is not correct, change the printer device name and then try the",
+        "                                       command again.",
+        "CPD1672    Diagnostic              00   12/11/19  11:54:35.712324  QWTCHGJB     QSYS        31A6     QSQSRVR     QSYS        *STMT",
+        "                                     From user . . . . . . . . . :   CHANGLE",
+        "                                     To module . . . . . . . . . :   QSQSRVR",
+        "                                     To procedure  . . . . . . . :   QSQSRVR",
+        "                                     Statement . . . . . . . . . :   9387",
+        "                                     Message . . . . :   Job changed successfully; however errors occurred.",
+        "                                     Cause . . . . . :   The request to change the job attributes completed",
+        "                                       successfully, however errors occurred during processing. Recovery  . . . :",
+        "                                       See previously listed messages for details.",
+        "CPF1301    Information             30   12/11/19  11:54:35.712416  QWTCHGJB     QSYS        11F3     QSQSRVR     QSYS        *STMT",
+        "                                     From user . . . . . . . . . :   CHANGLE",
+        "                                     To module . . . . . . . . . :   QSQSRVR",
+        "                                     To procedure  . . . . . . . :   QSQSRVR",
+        "                                     Statement . . . . . . . . . :   9394",
+        "                                     Message . . . . :   ACGDTA for 937841/QUSER/QSQSRVR not journaled; reason 1.",
+        "                                     Cause . . . . . :   Job resource accounting data for job 937841/QUSER/QSQSRVR",
+        "                                       was not journaled to the system accounting journal QSYS/QACGJRN. -- Reason",
+        "                                       codes and their meanings follow: -- 1-The accounting level system value",
+        "                                       (QACGLVL) indicated that this level of resource accounting was not to be",
+        "                                       done when the job entered the system. -- 2-The accounting journal",
+        "                                       QSYS/QACGJRN is unable to receive the data.  The accounting data was sent to",
+        "                                       the history log (QHST) as the text of a CPF1303 message.  See CPF1302 in the",
+        "                                       history log (QHST) for recovery action. -- 3-The accounting journal",
+        "                                       QSYS/QACGJRN  was allocated to another job.  The accounting data was sent to",
+        "                                       the history log (QHST) as the text of a CPF1303 message.",
+        "*NONE      Completion                   12/11/19  11:54:35.712450  QSQSRVR      QSYS        *STMT    QSQSRVR     QSYS        *STMT",
+        "                                     From user . . . . . . . . . :   CHANGLE",
+        "                                     From module . . . . . . . . :   QSQSRVR",
+        "                                     From procedure  . . . . . . :   QSQSRVR",
+        "                                     Statement . . . . . . . . . :   9485",
+        "                                     To module . . . . . . . . . :   QSQSRVR",
+        "                                     To procedure  . . . . . . . :   QSQSRVR",
+        "                                     Statement . . . . . . . . . :   9485",
+        "                                     Message . . . . :   User Profile = CHANGLE",
+        "CPF9898    Completion              40   12/11/19  11:54:35.712544  QSQSRVR      QSYS        *STMT    QSQSRVR     QSYS        *STMT",
+        "                                     From user . . . . . . . . . :   CHANGLE",
+        "                                     From module . . . . . . . . :   QSQSRVR",
+        "                                     From procedure  . . . . . . :   QSQSRVR",
+        "                                     Statement . . . . . . . . . :   9576",
+        " 5770SS1 V7R4M0 190621                        Display Job Log                       DB2MB1PA  12/11/19  11:54:36 CST     Page    2",
+        "  Job name . . . . . . . . . . :   QSQSRVR         User  . . . . . . :   QUSER        Number . . . . . . . . . . . :   937841",
+        "  Job description  . . . . . . :   QDFTSVR         Library . . . . . :   QGPL",
+        "MSGID      TYPE                    SEV  DATE      TIME             FROM PGM     LIBRARY     INST     TO PGM      LIBRARY     INST",
+        "                                     To module . . . . . . . . . :   QSQSRVR",
+        "                                     To procedure  . . . . . . . :   QSQSRVR",
+        "                                     Statement . . . . . . . . . :   9576",
+        "                                     Message . . . . :   SERVER MODE CONNECTING JOB IS 937943/QSECOFR/QP0ZSPWP.",
+        "                                     Cause . . . . . :   This message is used by application programs as a general",
+        "                                       escape message.",
+        "CPF2111    Escape                  40   12/11/19  11:54:35.786846  QLICRLIB     QSYS        105A     XMLSTOREDP  QXMLSERV    *STMT",
+        "                                     From user . . . . . . . . . :   CHANGLE",
+        "                                     To module . . . . . . . . . :   PLUGILE",
+        "                                     To procedure  . . . . . . . :   ILECMDEXC",
+        "                                     Statement . . . . . . . . . :   5833",
+        "                                     Message . . . . :   Library C1 already exists.",
+        "                                     Recovery  . . . :   Before creating or renaming this library, change the new",
+        "                                       library name or delete the existing library (DLTLIB command). -- Use DSPLIB",
+        "                                       ASPDEV(*ALLAVL) to search for the library. If the library is not found and",
+        "                                       you are authorized to all auxiliary storage pool (ASP) devices, a library",
+        "                                       recovery object exists. To remove the library recovery object, either run",
+        "                                       Reclaim Storage, Initial Program Load (IPL) the machine, or, if the library",
+        "                                       exists in a primary or secondary ASP, vary off then vary on the ASP device."
+    ],
+    "stdout": "",
+    "stdout_lines": []
+}
+
+# Usage of ibmi_sql_query module
+Case 1: Query all the result set
+ansible db2mb1pa -m ibmi_sql_query -a "sql=\"select * from persons\""
+Output:
+DB2MB1PA.RCH.STGLABS.IBM.COM | SUCCESS => {
+    "actual_row_count": 7,
+    "changed": false,
+    "check_row_count": false,
+    "delta": "0:00:04.013742",
+    "end": "2019-12-09 12:51:18.736042",
+    "expected_row_count": -1,
+    "rc": 0,
+    "rc_msg": "Success",
+    "row": [
+        {
+            "ADDRESS": "Ring Building",
+            "CITY": "Beijing",
+            "FIRSTNAME": "Chang",
+            "ID_P": "919665",
+            "LASTNAME": "Le"
+        },
+        {
+            "ADDRESS": "Ring Building",
+            "CITY": "Shanhai",
+            "FIRSTNAME": "Zhang",
+            "ID_P": "919689",
+            "LASTNAME": "Li"
+        },
+        {
+            "ADDRESS": "Town Building",
+            "CITY": "GuangZhou",
+            "FIRSTNAME": "Wang",
+            "ID_P": "919778",
+            "LASTNAME": "ShuangHong"
+        },
+        {
+            "ADDRESS": "ZZZ road",
+            "CITY": "HangZhou",
+            "FIRSTNAME": "Yang",
+            "ID_P": "919978",
+            "LASTNAME": "bin"
+        },
+        {
+            "ADDRESS": "XXX road",
+            "CITY": "HangZhou",
+            "FIRSTNAME": "Chen",
+            "ID_P": "919979",
+            "LASTNAME": "bin"
+        },
+        {
+            "ADDRESS": "YYY road",
+            "CITY": "HangZhou",
+            "FIRSTNAME": "Chen",
+            "ID_P": "919990",
+            "LASTNAME": "Yun"
+        },
+        {
+            "ADDRESS": "SSS road",
+            "CITY": "ShenZhen",
+            "FIRSTNAME": "Wang",
+            "ID_P": "919990",
+            "LASTNAME": "Yun"
+        }
+    ],
+    "sql": "select * from persons",
+    "start": "2019-12-09 12:51:14.722300"
+}
+
+
+Case 2: Query the result set with check_row_count and wrong expected_row_count
+ansible db2mb1pa -m ibmi_sql_query -a "sql=\"select * from persons\" check_row_count=true expected_row_count=6"
+Output:
+DB2MB1PA.RCH.STGLABS.IBM.COM | FAILED! => {
+    "actual_row_count": 7,
+    "changed": false,
+    "check_row_count": true,
+    "delta": "0:00:00.946843",
+    "end": "2019-12-09 12:50:37.330347",
+    "expected_row_count": 6,
+    "rc": 258,
+    "rc_msg": "Unexpected row count returned",
+    "row": [
+        {
+            "ADDRESS": "Ring Building",
+            "CITY": "Beijing",
+            "FIRSTNAME": "Chang",
+            "ID_P": "919665",
+            "LASTNAME": "Le"
+        },
+        {
+            "ADDRESS": "Ring Building",
+            "CITY": "Shanhai",
+            "FIRSTNAME": "Zhang",
+            "ID_P": "919689",
+            "LASTNAME": "Li"
+        },
+        {
+            "ADDRESS": "Town Building",
+            "CITY": "GuangZhou",
+            "FIRSTNAME": "Wang",
+            "ID_P": "919778",
+            "LASTNAME": "ShuangHong"
+        },
+        {
+            "ADDRESS": "ZZZ road",
+            "CITY": "HangZhou",
+            "FIRSTNAME": "Yang",
+            "ID_P": "919978",
+            "LASTNAME": "bin"
+        },
+        {
+            "ADDRESS": "XXX road",
+            "CITY": "HangZhou",
+            "FIRSTNAME": "Chen",
+            "ID_P": "919979",
+            "LASTNAME": "bin"
+        },
+        {
+            "ADDRESS": "YYY road",
+            "CITY": "HangZhou",
+            "FIRSTNAME": "Chen",
+            "ID_P": "919990",
+            "LASTNAME": "Yun"
+        },
+        {
+            "ADDRESS": "SSS road",
+            "CITY": "ShenZhen",
+            "FIRSTNAME": "Wang",
+            "ID_P": "919990",
+            "LASTNAME": "Yun"
+        }
+    ],
+    "sql": "select * from persons",
+    "start": "2019-12-09 12:50:36.383504"
+}
+
+Case 3: Query the result set with check_row_count and correct expected_row_count
+
+ansible db2mb1pa -m ibmi_sql_query -a "sql=\"select * from persons\" check_row_count=true expected_row_count=7"
+DB2MB1PA.RCH.STGLABS.IBM.COM | SUCCESS => {
+    "actual_row_count": 7,
+    "changed": false,
+    "check_row_count": true,
+    "delta": "0:00:01.023440",
+    "end": "2019-12-09 12:50:57.867951",
+    "expected_row_count": 7,
+    "rc": 0,
+    "rc_msg": "Success",
+    "row": [
+        {
+            "ADDRESS": "Ring Building",
+            "CITY": "Beijing",
+            "FIRSTNAME": "Chang",
+            "ID_P": "919665",
+            "LASTNAME": "Le"
+        },
+        {
+            "ADDRESS": "Ring Building",
+            "CITY": "Shanhai",
+            "FIRSTNAME": "Zhang",
+            "ID_P": "919689",
+            "LASTNAME": "Li"
+        },
+        {
+            "ADDRESS": "Town Building",
+            "CITY": "GuangZhou",
+            "FIRSTNAME": "Wang",
+            "ID_P": "919778",
+            "LASTNAME": "ShuangHong"
+        },
+        {
+            "ADDRESS": "ZZZ road",
+            "CITY": "HangZhou",
+            "FIRSTNAME": "Yang",
+            "ID_P": "919978",
+            "LASTNAME": "bin"
+        },
+        {
+            "ADDRESS": "XXX road",
+            "CITY": "HangZhou",
+            "FIRSTNAME": "Chen",
+            "ID_P": "919979",
+            "LASTNAME": "bin"
+        },
+        {
+            "ADDRESS": "YYY road",
+            "CITY": "HangZhou",
+            "FIRSTNAME": "Chen",
+            "ID_P": "919990",
+            "LASTNAME": "Yun"
+        },
+        {
+            "ADDRESS": "SSS road",
+            "CITY": "ShenZhen",
+            "FIRSTNAME": "Wang",
+            "ID_P": "919990",
+            "LASTNAME": "Yun"
+        }
+    ],
+    "sql": "select * from persons",
+    "start": "2019-12-09 12:50:56.844511"
+}
+
+# Usage of ibmi_sql_execute module
+Case 1: insert a record
+ansible db2mb1pa -m ibmi_sql_execute.py -a “sql=\"INSERT INTO Persons VALUES('919178', 'ShuangHong', 'Tang', 'Town Building', 'GuangZhou')\""
+Output:
+DB2MB1PA.RCH.STGLABS.IBM.COM | SUCCESS => {
+    "changed": false,
+    "delta": "0:00:00.591640",
+    "end": "2019-12-11 12:10:42.859533",
+    "rc": 0,
+    "rc_msg": "Success",
+    "sql": "INSERT INTO Persons VALUES('919178', 'ShuangHong', 'Tang', 'Town Building', 'GuangZhou')",
+    "start": "2019-12-11 12:10:42.267893",
+    "stderr": "",
+    "stderr_lines": [],
+    "stdout": "+++ success INSERT INTO Persons VALUES('919178', 'ShuangHong', 'Tang', 'Town Building', 'GuangZhou')",
+    "stdout_lines": [
+        "+++ success INSERT INTO Persons VALUES('919178', 'ShuangHong', 'Tang', 'Town Building', 'GuangZhou')"
+    ]
+}
