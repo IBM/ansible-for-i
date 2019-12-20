@@ -15,6 +15,7 @@ Copy the folder lib/ansible/modules/ibmi to the modules path of the Ansible serv
 3. Python
 4. itoolkit
 5. ibm_db
+
 Note: Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to examples/ibmi/playbooks/ibmi-install-yum.yml.
 
 <b>License: </b><br>
