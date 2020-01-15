@@ -5,9 +5,11 @@ Ansible is a radically simple IT automation system. It handles configuration man
 
 IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i support on Ansible, like providing more IBM i modules and examples to manage IBM i nodes. 
 
-<b>How to setup IBM i modules on Ansible server: </b> <br>
-
-Copy the folder lib/ansible/modules/ibmi to the modules path of the Ansible server, for example, /usr/lib/python2.7/site-packages/ansible/modules.
+<b>How to enable ansible server and IBM i nodes? </b> <br>
+1. Install ansible server. For example, run "yum install ansible" on a supported platform.
+2. Clone this repository to your Ansible server.
+3. Create your inventory file, an example can be found here "examples/ibmi/hosts_ibmi.ini"
+4. Run "ansible-playbook -i examples/ibmi/your_inventory_file examples/ibmi/playbooks/enable-ansible-for-i/setup.yml"</br>
 
 <b>Dependencies on IBM i node: </b>
 1. 5733SC1 Base and Option 1
