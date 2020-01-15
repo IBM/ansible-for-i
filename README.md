@@ -8,8 +8,8 @@ IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i s
 <b>How to enable ansible server and IBM i nodes? </b> <br>
 1. Install ansible server. For example, run "yum install ansible" on a supported platform.
 2. Clone this repository to your Ansible server.
-3. Create your inventory file, an example can be found here "examples/ibmi/hosts_ibmi.ini"
-4. Run "ansible-playbook -i examples/ibmi/your_inventory_file examples/ibmi/playbooks/enable-ansible-for-i/setup.yml"</br>
+3. Create your inventory file under examples/ibmi, an example can be found here "examples/ibmi/hosts_ibmi.ini"
+4. Run "ansible-playbook -i your_inventory_file playbooks/enable-ansible-for-i/setup.yml"</br>
 
 <b>Dependencies on IBM i node: </b>
 1. 5733SC1 Base and Option 1
