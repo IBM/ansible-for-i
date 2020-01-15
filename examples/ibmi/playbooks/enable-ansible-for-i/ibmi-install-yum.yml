@@ -55,7 +55,7 @@ CL:QSH CMD('touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstra
     failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
 
   - name: Run /QOpensys/pkgs/bin/yum to confirm yum has been installed properly
-    raw: /QOpensys/pkgs/bin/yum
+    raw: ls -l /QOpensys/pkgs/bin/yum
     args:
       executable: /qopensys/usr/bin/qsh
     register: output_of_yum

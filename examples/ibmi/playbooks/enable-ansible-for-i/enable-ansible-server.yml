@@ -1,0 +1,24 @@
+- hosts: localhost
+  vars:
+    modules_path:
+  tasks:
+    - name: Find the ansible modules path
+      command: ansible --version
+      register: ansible_output     
+    
+    - set_fact: "modules_path={{((item.split('='))[-1]).replace(' ','')}}"
+      when: item is search("ansible python module location")
+      with_list: "{{ansible_output.stdout_lines}}"
+
+    - name: Create a directory for IBM i module
+      file: 
+        path: '{{modules_path}}/modules/ibmi'
+        mode: 0755
+        state: directory
+ 
+    - name: Move ibmi module to modules path
+      copy: 
+        src: ../../../../lib/ansible/modules/ibmi 
+        dest: '{{modules_path}}/modules/'
+        force: no
+        mode: 0644

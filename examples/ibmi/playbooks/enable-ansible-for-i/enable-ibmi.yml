@@ -1,0 +1,26 @@
+---
+- import_playbook: ibmi-install-yum.yml
+
+- hosts: ibmi 
+  gather_facts: no 
+
+  vars:
+    required_rpms: [python2, python2-itoolkit, python2-ibm_db]
+
+  tasks:
+  - include_tasks: ibmi-install-rpm.yml
+    with_list: "{{required_rpms}}"
+
+  - name: Verify 5770DG1
+    command: system "DSPSFWRSC"
+    register: installed_native_products
+
+  - name: Promote message if 5770DG1 is not installed
+    fail:
+      msg: 5770DG1 is not installed
+    when: '"5770DG1     *BASE      5050" not in installed_native_products.stdout'
+
+  - name: IBM i is now available for being managed by Ansible
+    debug:
+      msg: "The IBM i node is ready for Ansible."
+    when: '"5770DG1     *BASE      5050" in installed_native_products.stdout'
