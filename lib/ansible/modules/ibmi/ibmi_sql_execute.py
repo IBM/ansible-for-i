@@ -10,9 +10,9 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.0',
+ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'status': ['preview'],
-                    'supported_by': 'IBMi'}
+                    'supported_by': 'community'}
 
 DOCUMENTATION = r'''
 ---
@@ -28,18 +28,20 @@ options:
     description:
       - The C(ibmi_sql_execute) module takes a IBM i SQL non-DQL(Data Query Language) statement to run.
     type: str
-    required: yes  
+    required: yes
 notes:
     - Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-see also:
+seealso:
 - module: IBMi_sql_query
+
 author:
-    - Le Chang (changle@cn.ibm.com)
+- Chang Le(@changlexc)
 '''
 
 EXAMPLES = r'''
 - name: Insert one record to table Persons
-  sql: "INSERT INTO Persons VALUES('919665', 'Le', 'Chang', 'Ring Building', 'Beijing')"
+  ibmi_sql_execute:
+    sql: "INSERT INTO Persons VALUES('919665', 'Le', 'Chang', 'Ring Building', 'Beijing')"
 '''
 
 RETURN = r'''
@@ -78,11 +80,6 @@ rc:
     returned: always
     type: int
     sample: 0
-rc_msg:
-    description: Meaning of the return code 
-    returned: always
-    type: str
-    sample: 'Generic failure'
 stdout_lines:
     description: The sql statement standard output split in lines
     returned: When rc as non-zero(failure)
@@ -96,12 +93,24 @@ stderr_lines:
 '''
 
 import datetime
-
-from itoolkit import *
-from itoolkit.db2.idb2call import *
-import ibm_db_dbi as dbi
-
 from ansible.module_utils.basic import AnsibleModule
+
+HAS_ITOOLKIT = True
+HAS_IBM_DB = True
+
+try:
+    from itoolkit import iToolKit
+    from itoolkit import iSqlFree
+    from itoolkit import iSqlQuery
+    # from itoolkit.db2.idb2call import iDB2Call
+    from itoolkit.transport import DatabaseTransport
+except ImportError:
+    HAS_ITOOLKIT = False
+
+try:
+    import ibm_db_dbi as dbi
+except ImportError:
+    HAS_IBM_DB = False
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -127,7 +136,8 @@ def interpret_return_code(rc):
 
 def itoolkit_sql_callproc(sql):
     conn = dbi.connect()
-    itransport = iDB2Call(conn)
+    # itransport = iDB2Call(conn)
+    itransport = DatabaseTransport(conn)
     itool = iToolKit(iparm=1)
 
     itool.add(iSqlQuery('query', sql, {'error': 'on'}))
@@ -168,6 +178,12 @@ def main():
         supports_check_mode=True,
     )
 
+    if HAS_ITOOLKIT is False:
+        module.fail_json(msg="itoolkit package is required")
+
+    if HAS_IBM_DB is False:
+        module.fail_json(msg="ibm_db package is required")
+
     sql = module.params['sql']
 
     startd = datetime.datetime.now()
@@ -184,7 +200,6 @@ def main():
         stdout=out,
         stderr=err,
         rc=rc,
-        rc_msg=rc_msg,
         start=str(startd),
         end=str(endd),
         delta=str(delta),
@@ -192,7 +207,8 @@ def main():
     )
 
     if rc != IBMi_COMMAND_RC_SUCCESS:
-        module.fail_json(msg='non-zero return code', **result)
+        message = 'non-zero return code:{rc},{rc_msg}'.format(rc=rc, rc_msg=rc_msg)
+        module.fail_json(msg=message, **result)
 
     module.exit_json(**result)
 

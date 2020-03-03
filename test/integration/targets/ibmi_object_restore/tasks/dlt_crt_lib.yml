@@ -1,0 +1,7 @@
+- name: cleanup the library
+  ibmi_cl_command:
+    cmd: "DLTLIB LIB(SAVRST)"
+
+- name: create libraries 
+  ibmi_cl_command: 
+    cmd: "crtlib lib(SAVRST)"

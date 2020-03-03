@@ -11,20 +11,20 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.0',
+ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'status': ['preview'],
-                    'supported_by': 'IBMi'}
+                    'supported_by': 'community'}
 
 DOCUMENTATION = r'''
 ---
 module: ibmi_cl_command
 short_description: Executes a CL command on a remote IBMi node
-version_added: 1.0
+version_added: 2.10
 description:
-     - The C(ibmi_cl_command) module takes the CL command name followed by a list of space-delimited arguments.
-     - The given CL command will be executed on all selected nodes.
-     - For Pase or Qshell(Unix/Linux-liked) commands run on IBMi targets, like 'ls'，'chmod' etc, use the M(command) module instead.
-     - Only run one command at a time.
+  - The C(ibmi_cl_command) module takes the CL command name followed by a list of space-delimited arguments.
+  - The given CL command will be executed on all selected nodes.
+  - For Pase or Qshell(Unix/Linux-liked) commands run on IBMi targets, like 'ls'，'chmod' etc, use the M(command) module instead.
+  - Only run one command at a time.
 options:
   cmd:
     description:
@@ -36,23 +36,26 @@ options:
       - If set to C(true), append JOBLOG to stderr/stderr_lines.
     type: bool
     default: false
-  
+
 notes:
     - Please do not set joblog to true for IBM i CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
     - With joblog as false, the available message text together with message ID will be dumped to stderr/stderr_lines.
-    - With joblog as true, the available message text together with message ID and the available message help information which includes the Cause and Recovery part will be dumped to stderr/stderr_lines.
+    - With joblog as true, the available message text together with message ID and the available message help information which includes
+      the Cause and Recovery part will be dumped to stderr/stderr_lines.
     - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-see also:
+
+seealso:
 - module: command
 
 author:
-    - Le Chang (changle@cn.ibm.com)
+- Chang Le(@changlexc)
 '''
 
 EXAMPLES = r'''
 - name: Create a library by using CL command CRTLIB
-  command: 'CRTLIB LIB(TESTLIB)'
-  joblog: false
+  ibmi_cl_command:
+    command: 'CRTLIB LIB(TESTLIB)'
+    joblog: false
 '''
 
 RETURN = r'''
@@ -96,11 +99,6 @@ rc:
     returned: always
     type: int
     sample: 255
-rc_msg:
-    description: Meaning of the return code 
-    returned: always
-    type: str
-    sample: 'Generic failure'
 stdout_lines:
     description: The command standard output split in lines
     returned: always
@@ -118,12 +116,23 @@ stderr_lines:
 '''
 
 import datetime
-
-from itoolkit import *
-from itoolkit.db2.idb2call import *
-import ibm_db_dbi as dbi
-
 from ansible.module_utils.basic import AnsibleModule
+
+HAS_ITOOLKIT = True
+HAS_IBM_DB = True
+
+try:
+    from itoolkit import iToolKit
+    from itoolkit import iCmd
+    # from itoolkit.db2.idb2call import iDB2Call
+    from itoolkit.transport import DatabaseTransport
+except ImportError:
+    HAS_ITOOLKIT = False
+
+try:
+    import ibm_db_dbi as dbi
+except ImportError:
+    HAS_IBM_DB = False
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -149,7 +158,8 @@ def interpret_return_code(rc):
 
 def itoolkit_run_command(command):
     conn = dbi.connect()
-    itransport = iDB2Call(conn)
+    # itransport = iDB2Call(conn)
+    itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
@@ -158,7 +168,7 @@ def itoolkit_run_command(command):
     out = ''
     err = ''
 
-    command_output = itool.dict_out('cmd')
+    command_output = itool.dict_out('command')
 
     if 'success' in command_output:
         rc = IBMi_COMMAND_RC_SUCCESS
@@ -195,6 +205,12 @@ def main():
     startd = datetime.datetime.now()
 
     if joblog:
+        if HAS_ITOOLKIT is False:
+            module.fail_json(msg="itoolkit package is required")
+
+        if HAS_IBM_DB is False:
+            module.fail_json(msg="ibm_db package is required")
+
         rc, out, err = itoolkit_run_command(command)
     else:
         args = ['system', command]
@@ -211,7 +227,6 @@ def main():
         stdout=out,
         stderr=err,
         rc=rc,
-        rc_msg=rc_msg,
         start=str(startd),
         end=str(endd),
         delta=str(delta),
@@ -219,7 +234,8 @@ def main():
     )
 
     if rc != IBMi_COMMAND_RC_SUCCESS:
-        module.fail_json(msg='non-zero return code', **result)
+        message = 'non-zero return code:{rc},{rc_msg}'.format(rc=rc, rc_msg=rc_msg)
+        module.fail_json(msg=message, **result)
 
     module.exit_json(**result)
 

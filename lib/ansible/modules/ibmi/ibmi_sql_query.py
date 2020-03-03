@@ -10,9 +10,9 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.0',
+ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'status': ['preview'],
-                    'supported_by': 'IBMi'}
+                    'supported_by': 'community'}
 
 DOCUMENTATION = r'''
 ---
@@ -28,28 +28,26 @@ options:
     description:
       - The C(ibmi_sql_query) module takes a IBM i SQL DQL(Data Query Language) statement to run.
     type: str
-    required: yes 
-  check_row_count:
-    description:
-      - If set to C(true), check if the actual row count returned from the query statement is matched with the expected row count
-    type: bool
-    default: false
+    required: yes
   expected_row_count:
     description:
       - The expected row count
+      - If it is equal or greater than 0, check if the actual row count returned from the query statement is matched with the expected row count
+      - If it is less than 0, do not check if the actual row count returned from the query statement is matched with the expected row counit
     type: int
-    required: if expected_row_count set to C(true)
+    default: -1
 notes:
     - Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-see also:
+seealso:
 - module: ibmi_sql_execute
 author:
-    - Le Chang (changle@cn.ibm.com)
+- Chang Le(@changlexc)
 '''
 
 EXAMPLES = r'''
 - name: Query the data of table Persons
-  sql: 'select * from Persons'
+  ibmi_sql_query:
+    sql: 'select * from Persons'
 '''
 
 RETURN = r'''
@@ -71,7 +69,7 @@ delta:
 row:
     description: The sql query statement result
     returned: when rc as 0(success)
-    type: json array(more than one rows) or json object(only one row)
+    type: list
     sample: [
         {
             "ADDRESS": "Ring Building",
@@ -109,7 +107,7 @@ rc:
     type: int
     sample: 0
 rc_msg:
-    description: Meaning of the return code 
+    description: Meaning of the return code
     returned: always
     type: str
     sample: 'Generic failure'
@@ -127,11 +125,25 @@ stderr_lines:
 
 import datetime
 
-from itoolkit import *
-from itoolkit.db2.idb2call import *
-import ibm_db_dbi as dbi
-
 from ansible.module_utils.basic import AnsibleModule
+
+HAS_ITOOLKIT = True
+HAS_IBM_DB = True
+
+try:
+    from itoolkit import iToolKit
+    from itoolkit import iSqlFree
+    from itoolkit import iSqlFetch
+    from itoolkit import iSqlQuery
+    # from itoolkit.db2.idb2call import iDB2Call
+    from itoolkit.transport import DatabaseTransport
+except ImportError:
+    HAS_ITOOLKIT = False
+
+try:
+    import ibm_db_dbi as dbi
+except ImportError:
+    HAS_IBM_DB = False
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -159,7 +171,8 @@ def interpret_return_code(rc):
 
 def itoolkit_run_sql(sql):
     conn = dbi.connect()
-    itransport = iDB2Call(conn)
+    # itransport = iDB2Call(conn)
+    itransport = DatabaseTransport(conn)
     itool = iToolKit()
 
     itool.add(iSqlQuery('query', sql, {'error': 'on'}))
@@ -171,6 +184,7 @@ def itoolkit_run_sql(sql):
     command_output = itool.dict_out('fetch')
 
     rc = IBMi_COMMAND_RC_UNEXPECTED
+    out_list = []
     out = ''
     err = ''
     if 'error' in command_output:
@@ -182,35 +196,39 @@ def itoolkit_run_sql(sql):
             # should not be here, must xmlservice has internal error
             rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
             err = "iToolKit result dict does not have key 'joblog', the output is %s" % command_output
+            if 'Row not found' in err:
+                rc = 0  # treat as success but also indicate the Row not found message in stderr
     else:
         rc = IBMi_COMMAND_RC_SUCCESS
         out = command_output['row']
+        if isinstance(out, dict):
+            out_list.append(out)
+        elif isinstance(out, list):
+            out_list = out
 
-    return rc, out, err
+    return rc, out_list, err
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             sql=dict(type='str', required=True),
-            check_row_count=dict(type='bool', default=False),
             expected_row_count=dict(type='int', default=-1),
         ),
         supports_check_mode=True,
     )
 
+    if HAS_ITOOLKIT is False:
+        module.fail_json(msg="itoolkit package is required")
+
+    if HAS_IBM_DB is False:
+        module.fail_json(msg="ibm_db package is required")
+
     sql = module.params['sql']
-    check_row_count = module.params['check_row_count']
+    check_row_count = False
     expected_row_count = module.params['expected_row_count']
-    if check_row_count and expected_row_count <= 0:
-        module.fail_json(
-            sql=sql,
-            rc=IBMi_COMMAND_RC_INVALID_EXPECTED_ROW_COUNT,
-            msg='Invalid expected_row_count',
-            rc_msg='When check_row_count is true, expected_row_count(default as -1) must be an integer not less than 0',
-            check_row_count=check_row_count,
-            expected_row_count=expected_row_count,
-        )
+    if expected_row_count >= 0:
+        check_row_count = True
 
     startd = datetime.datetime.now()
 
@@ -227,34 +245,29 @@ def main():
             stdout=out,
             stderr=err,
             rc=rc,
-            rc_msg=rc_msg,
             start=str(startd),
             end=str(endd),
             delta=str(delta),
-            heck_row_count=check_row_count,
-            expected_row_count=expected_row_count,
             # changed=True,
         )
-        module.fail_json(msg='non-zero return code', **result_failed)
+        message = 'non-zero return code:{rc},{rc_msg}'.format(rc=rc, rc_msg=rc_msg)
+        module.fail_json(msg=message, **result_failed)
     else:
-        actual_row_count = -999
-        if isinstance(out, dict):
-            actual_row_count = 1
-        elif isinstance(out, list):
-            actual_row_count = len(out)
+        row_count = -999
+        if isinstance(out, list):
+            row_count = len(out)
 
-        if check_row_count and expected_row_count != actual_row_count:
+        if check_row_count and expected_row_count != row_count:
             result_check_row_fail = dict(
                 sql=sql,
                 row=out,
                 rc=IBMi_COMMAND_RC_UNEXPECTED_ROW_COUNT,
-                rc_msg="Unexpected row count returned",
+                msg="Unexpected row count returned",
                 start=str(startd),
                 end=str(endd),
                 delta=str(delta),
-                check_row_count=check_row_count,
                 expected_row_count=expected_row_count,
-                actual_row_count=actual_row_count,
+                row_count=row_count,
                 # changed=True,
             )
             module.exit_json(**result_check_row_fail)
@@ -263,13 +276,10 @@ def main():
                 sql=sql,
                 row=out,
                 rc=rc,
-                rc_msg=rc_msg,
                 start=str(startd),
                 end=str(endd),
                 delta=str(delta),
-                check_row_count=check_row_count,
-                expected_row_count=expected_row_count,
-                actual_row_count=actual_row_count,
+                row_count=row_count,
                 # changed=True,
             )
             module.exit_json(**result_success)
