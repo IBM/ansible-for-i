@@ -17,15 +17,9 @@
       when: item is search("ansible python module location")
       with_list: "{{ansible_output.stdout_lines}}"
 
-    - name: Create a directory for IBM i module
-      file: 
-        path: '{{modules_path}}/modules/ibmi'
-        mode: 0755
-        state: directory
- 
     - name: Move ibmi module to modules path
-      copy: 
-        src: ../../../../lib/ansible/modules/ibmi 
-        dest: '{{modules_path}}/modules/'
+      copy:
+        src: ../../../../lib/ansible/
+        dest: '{{modules_path}}'
         force: no
         mode: 0644
