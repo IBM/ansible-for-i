@@ -137,7 +137,8 @@ object_list:
             "IASP_NUMBER": 0,
             "LAST_RESET_TIMESTAMP": null,
             "LAST_USED_TIMESTAMP": null,
-            "OBJSIZE": 131072
+            "OBJSIZE": 131072,
+            "OBJATTRIBUTE": "SAVF"
         },
         {
             "OBJLIB": "TESTLIB",
@@ -150,7 +151,8 @@ object_list:
             "IASP_NUMBER": 0,
             "LAST_RESET_TIMESTAMP": null,
             "LAST_USED_TIMESTAMP": null,
-            "OBJSIZE": 131072
+            "OBJSIZE": 131072,
+            "OBJATTRIBUTE": "SAVF"
         }
     ]
 stdout:
@@ -458,14 +460,14 @@ def main():
     if input_use_regex:
         obj_stats_expression = " SELECT OBJNAME, OBJTYPE, OBJOWNER, OBJDEFINER, OBJCREATED," \
                                " TEXT, OBJLIB, IASP_NUMBER, LAST_USED_TIMESTAMP, LAST_RESET_TIMESTAMP," \
-                               " BIGINT(OBJSIZE) AS OBJSIZE " \
+                               " BIGINT(OBJSIZE) AS OBJSIZE, OBJATTRIBUTE " \
                                " FROM TABLE (QSYS2.OBJECT_STATISTICS('" + input_lib + "','" + \
                                input_object_type + "','*ALL')) X "
         sql_where_stmt_regex = " AND REGEXP_LIKE(A.OBJNAME, '" + input_obj_name + "') "
     else:
         obj_stats_expression = " SELECT OBJNAME, OBJTYPE, OBJOWNER, OBJDEFINER, OBJCREATED," \
                                " TEXT, OBJLIB, IASP_NUMBER, LAST_USED_TIMESTAMP, LAST_RESET_TIMESTAMP," \
-                               " BIGINT(OBJSIZE) AS OBJSIZE " \
+                               " BIGINT(OBJSIZE) AS OBJSIZE, OBJATTRIBUTE " \
                                " FROM TABLE (QSYS2.OBJECT_STATISTICS('" + input_lib + "','" + \
                                input_object_type + "','" + input_obj_name + "')) X "
         sql_where_stmt_regex = ""
@@ -515,7 +517,7 @@ def main():
                           "OBJCREATED": result[4], "TEXT": result[5],
                           "OBJLIB": result[6], "IASP_NUMBER": result[7],
                           "LAST_USED_TIMESTAMP": result[8], "LAST_RESET_TIMESTAMP": result[9],
-                          "OBJSIZE": result[10]
+                          "OBJSIZE": result[10], "OBJATTRIBUTE": result[11]
                           }
             out.append(result_map)
 
