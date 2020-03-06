@@ -3,38 +3,50 @@
 ---
 - hosts: ibmi 
   gather_facts: no
-
-  vars:
-    demo_file_with_path_on_local:
-    temp_dir_on_target: 
-  
-  environment:
-    QIBM_MULTI_THREADED: 'Y'
+  vars: 
+    checkout_dir: 'tmp_nodejs'
 
   tasks:
   - name: Install Node js
     command: /QOpensys/pkgs/bin/yum install nodejs10 -y
     ignore_errors: True
 
-  - name: copy file to target IFS directory
-    copy: src='{{ demo_file_with_path_on_local }}' dest={{ temp_dir_on_target }}
-    ignore_errors: True
-    when: "'CPF3606' not in check_prodct_result.stderr"
+  - name: verify git has been installed
+    stat:
+      path: /QOpensys/pkgs/bin/git
+    register: git_stat
 
-  - name: Put the demo application code
-    command: tar -xf {{temp_dir_on_target }}/mynodeapp.tar -C {{ temp_dir_on_target }} 
+  - name: Install git if it is not there
+    command: /QOpensys/pkgs/bin/yum install git -y
+    when: git_stat.stat.exists == false
+
+  - name: upgrade yum in case EC_POINT_copy error
+    command: /QOpensys/pkgs/bin/yum upgrade -y
+
+  - name: create symlink for git command to use git module
+    command: ln -fs /QOpensys/pkgs/bin/git /usr/bin/git
+    ignore_errors: true
+    
+  - name: set http.sslVerify for git
+    command: 'git config --global http.sslVerify false'
+    ignore_errors: true 
+
+  - name: clone repo
+    git:
+      repo: 'https://github.com/IBM/ibmi-oss-examples.git'
+      dest: '{{ checkout_dir }}'
 
   - name: npm i
     shell: "(/QOpensys/pkgs/lib/nodejs10/bin/npm  i  --scripts-prepend-node-path)"
     args:
       warn: False
-      chdir: {{temp_dir_on_target }}/mynodeapp
+      chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
       executable: /usr/bin/sh
 
   - name: Start the demo application
-    shell: "(nohup /QOpensys/pkgs/lib/nodejs10/bin/node {{temp_dir_on_target }}/mynodeapp/index.js >/dev/null 2>&1 &)"
+    shell: "(nohup /QOpensys/pkgs/lib/nodejs10/bin/node index.js >/dev/null 2>&1 &)"
     args:
       warn: False
-      chdir: /home/Ansible/mynodeapp
+      chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
       executable: /usr/bin/sh
     async: 10
