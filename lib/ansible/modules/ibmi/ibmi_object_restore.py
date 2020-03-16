@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) International Business Machines Corp. 2019
-# All Rights Reserved
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
 
@@ -143,6 +141,11 @@ format:
     returned: always
     type: str
     sample: '*SAVF'
+command:
+    description: The last excuted command.
+    returned: always
+    type: str
+    sample: 'RSTOBJ OBJ(OBJA) SAVLIB(TESTLIB) DEV(*SAVF) OBJTYPE(*ALL) SAVF(TEST/ARCHLIB)'
 joblog:
     description: Append JOBLOG to stderr/stderr_lines or not.
     returned: always

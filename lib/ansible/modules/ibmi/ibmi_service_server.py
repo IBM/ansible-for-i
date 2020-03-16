@@ -1,8 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright (c) International Business Machines Corp. 2019
+# All Rights Reserved
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Yi Fan Jin <jinyifan@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -15,45 +17,45 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 ---
-module: ibmi_cl_command
-short_description: Executes a CL command on a remote IBMi node
+module: ibmi_service_server
+short_description: Manage service server on a remote IBMi node
 version_added: 2.10
 description:
-  - The C(ibmi_cl_command) module takes the CL command name followed by a list of space-delimited arguments.
-  - The given CL command will be executed on all selected nodes.
-  - For Pase or Qshell(Unix/Linux-liked) commands run on IBMi targets, like 'ls'，'chmod' etc, use the M(command) module instead.
-  - Only run one command at a time.
+  - Manage and query IBMi services.
+  - For non-IBMi targets, use the M(service) module instead.
 options:
-  cmd:
+  server_type:
     description:
-      - The IBM i CL command to run.
+      - The type of the service server
+    type: str
+    choices: [ host, tcp ]
+  name:
+    description:
+      - The name of the service server
     type: str
     required: yes
-  joblog:
+  state:
     description:
-      - If set to C(true), append JOBLOG to stderr/stderr_lines.
-    type: bool
-    default: false
-
-notes:
-    - Please do not set joblog to true for IBM i CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
-    - With joblog as false, the available message text together with message ID will be dumped to stderr/stderr_lines.
-    - With joblog as true, the available message text together with message ID and the available message help information which includes
-      the Cause and Recovery part will be dumped to stderr/stderr_lines.
-    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+      - C(started)/C(stopped) are idempotent actions that will not run
+        commands unless necessary.
+      - C(restarted) will always bounce the service.
+      - B(At least one of state and enabled are required.)
+    type: str
+    choices: [ started, stopped ]
 
 seealso:
-- module: command
+- module: service
 
 author:
-- Chang Le(@changlexc)
+- Jin Yi Fan(@jinyifan)
 '''
 
 EXAMPLES = r'''
-- name: Create a library by using CL command CRTLIB
-  ibmi_cl_command:
-    command: 'CRTLIB LIB(TESTLIB)'
-    joblog: false
+- name: restart tcp http server
+  ibmi_service_server:
+    server_type: tcp
+    name: http
+    state: restarted
 '''
 
 RETURN = r'''
@@ -97,6 +99,11 @@ rc:
     returned: always
     type: int
     sample: 255
+rc_msg:
+    description: Meaning of the return code
+    returned: always
+    type: str
+    sample: 'Generic failure'
 stdout_lines:
     description: The command standard output split in lines
     returned: always
@@ -120,10 +127,11 @@ HAS_ITOOLKIT = True
 HAS_IBM_DB = True
 
 try:
+    # from itoolkit import *
+    # from itoolkit.db2.idb2call import *
     from itoolkit import iToolKit
     from itoolkit import iCmd
-    # from itoolkit.db2.idb2call import iDB2Call
-    from itoolkit.transport import DatabaseTransport
+    from itoolkit.db2.idb2call import iDB2Call
 except ImportError:
     HAS_ITOOLKIT = False
 
@@ -137,6 +145,10 @@ IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
 IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG = 256
 IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR = 257
+IBMi_STRHOSTSVR = "STRHOSTSVR"
+IBMi_ENDHOSTSVR = "ENDHOSTSVR"
+IBMi_STRTCPSVR = "STRTCPSVR"
+IBMi_ENDTCPTSVR = "ENDTCPTSVR"
 
 
 def interpret_return_code(rc):
@@ -156,8 +168,7 @@ def interpret_return_code(rc):
 
 def itoolkit_run_command(command):
     conn = dbi.connect()
-    # itransport = iDB2Call(conn)
-    itransport = DatabaseTransport(conn)
+    itransport = iDB2Call(conn)
     itool = iToolKit()
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
@@ -191,17 +202,33 @@ def itoolkit_run_command(command):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            cmd=dict(type='str', required=True),
-            joblog=dict(type='bool', default=False),
+            server_type=dict(type='str', choices=['tcp', 'host']),
+            name=dict(type='str', required=True),
+            state=dict(type='str', choices=['started', 'stopped']),
+
         ),
         supports_check_mode=True,
     )
 
-    command = module.params['cmd']
-    joblog = module.params['joblog']
+    server_type = module.params['server_type']
+    name = module.params['name']
+    state = module.params['state']
+    command = ""
+    joblog = False
 
     startd = datetime.datetime.now()
+    if state == 'started':
+        if server_type == 'tcp':
+            command = IBMi_STRTCPSVR
+        if server_type == 'host':
+            command = IBMi_STRHOSTSVR
+    if state == 'stoppe':
+        if server_type == 'tcp':
+            command = IBMi_ENDTCPTSVR
+        if server_type == 'host':
+            command = IBMi_ENDHOSTSVR
 
+    command = command + " SERVER(*" + name + ")"
     if joblog:
         if HAS_ITOOLKIT is False:
             module.fail_json(msg="itoolkit package is required")
@@ -225,6 +252,7 @@ def main():
         stdout=out,
         stderr=err,
         rc=rc,
+        rc_msg=rc_msg,
         start=str(startd),
         end=str(endd),
         delta=str(delta),
@@ -232,8 +260,7 @@ def main():
     )
 
     if rc != IBMi_COMMAND_RC_SUCCESS:
-        message = 'non-zero return code:{rc},{rc_msg}'.format(rc=rc, rc_msg=rc_msg)
-        module.fail_json(msg=message, **result)
+        module.fail_json(msg='non-zero return code', **result)
 
     module.exit_json(**result)
 

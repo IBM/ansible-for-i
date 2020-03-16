@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Yi Fan Jin <jinyifan@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -15,45 +15,53 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 ---
-module: ibmi_cl_command
-short_description: Executes a CL command on a remote IBMi node
+module: ibmi_host_server_service
+short_description: Manage host server on a remote IBMi node
 version_added: 2.10
 description:
-  - The C(ibmi_cl_command) module takes the CL command name followed by a list of space-delimited arguments.
-  - The given CL command will be executed on all selected nodes.
-  - For Pase or Qshell(Unix/Linux-liked) commands run on IBMi targets, like 'ls'，'chmod' etc, use the M(command) module instead.
-  - Only run one command at a time.
+  - Manage and query IBMi host server service.
+  - For non-IBMi targets, use the M(service) module instead.
 options:
-  cmd:
+  name_list:
     description:
-      - The IBM i CL command to run.
-    type: str
+      - The name of the host server service.
+        The valid value are "*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP".
+    type: list
+    elements: str
     required: yes
+  state:
+    description:
+      - C(started)/C(stopped) are idempotent actions that will not run
+        commands unless necessary.
+      - C(restarted) will always bounce the service.
+      - B(At least one of state and enabled are required.)
+    type: str
+    choices: [ "started", "stopped"]
+    required: yes
+  extra_parameters:
+    description:
+      - extra parameter is appended at the end of host server service command
+    type: str
+    default: ' '
   joblog:
     description:
       - If set to C(true), append JOBLOG to stderr/stderr_lines.
     type: bool
     default: false
 
-notes:
-    - Please do not set joblog to true for IBM i CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
-    - With joblog as false, the available message text together with message ID will be dumped to stderr/stderr_lines.
-    - With joblog as true, the available message text together with message ID and the available message help information which includes
-      the Cause and Recovery part will be dumped to stderr/stderr_lines.
-    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-
 seealso:
-- module: command
+- module: service
 
 author:
-- Chang Le(@changlexc)
+- Jin Yi Fan(@jinyifan)
 '''
 
 EXAMPLES = r'''
-- name: Create a library by using CL command CRTLIB
-  ibmi_cl_command:
-    command: 'CRTLIB LIB(TESTLIB)'
-    joblog: false
+- name: start host server service
+  ibmi_host_server_service:
+    name_list: ['*CENTRAL', '*DATABASE']
+    state: 'started'
+    joblog: True
 '''
 
 RETURN = r'''
@@ -81,7 +89,7 @@ stdout:
     description: The command standard output
     returned: always
     type: str
-    sample: 'CPC2102: Library TESTLIB created'
+    sample: '+++ success STRHOSTSVR SERVER(*ALL)'
 stderr:
     description: The command standard error
     returned: always
@@ -91,18 +99,23 @@ cmd:
     description: The command executed by the task
     returned: always
     type: str
-    sample: 'CRTLIB LIB(TESTLIB)'
+    sample: 'STRHOSTSVR SERVER(*ALL)'
 rc:
     description: The command return code (0 means success, non-zero means failure)
     returned: always
     type: int
     sample: 255
+rc_msg:
+    description: Meaning of the return code
+    returned: always
+    type: str
+    sample: 'Generic failure'
 stdout_lines:
     description: The command standard output split in lines
     returned: always
     type: list
     sample: [
-        "CPC2102: Library TESTLIB created."
+        "+++ success STRHOSTSVR SERVER(*ALL)"
     ]
 stderr_lines:
     description: The command standard error split in lines
@@ -120,10 +133,11 @@ HAS_ITOOLKIT = True
 HAS_IBM_DB = True
 
 try:
+    # from itoolkit import *
+    # from itoolkit.db2.idb2call import *
     from itoolkit import iToolKit
     from itoolkit import iCmd
-    # from itoolkit.db2.idb2call import iDB2Call
-    from itoolkit.transport import DatabaseTransport
+    from itoolkit.db2.idb2call import iDB2Call
 except ImportError:
     HAS_ITOOLKIT = False
 
@@ -137,6 +151,10 @@ IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
 IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG = 256
 IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR = 257
+IBMi_PARAM_NOT_VALID = 259
+IBMi_STRSVR = "STRHOSTSVR"
+IBMi_ENDSVR = "ENDHOSTSVR"
+IBMi_HOST_SERVER_LIST = ["*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP"]
 
 
 def interpret_return_code(rc):
@@ -156,8 +174,7 @@ def interpret_return_code(rc):
 
 def itoolkit_run_command(command):
     conn = dbi.connect()
-    # itransport = iDB2Call(conn)
-    itransport = DatabaseTransport(conn)
+    itransport = iDB2Call(conn)
     itool = iToolKit()
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
@@ -191,16 +208,41 @@ def itoolkit_run_command(command):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            cmd=dict(type='str', required=True),
+            name_list=dict(type='list', elements='str', required=True),
+            state=dict(type='str', choices=['started', 'stopped'], required=True),
+            extra_parameters=dict(type='str', default=' '),
             joblog=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
 
-    command = module.params['cmd']
+    name_list = module.params['name_list']
+    state = module.params['state']
+    extra_parameters = module.params['extra_parameters']
     joblog = module.params['joblog']
 
     startd = datetime.datetime.now()
+    if state == 'started':
+        command = IBMi_STRSVR + " SERVER(" + " ".join(i for i in name_list) + ") " + extra_parameters
+    if state == 'stopped':
+        command = IBMi_ENDSVR + " SERVER(" + " ".join(i for i in name_list) + ") " + extra_parameters
+
+    if set(name_list) < set(IBMi_HOST_SERVER_LIST):
+        # this is expected
+        pass
+    else:
+        rc = IBMi_PARAM_NOT_VALID
+        result_failed_parameter_check = dict(
+            # size=input_size,
+            # age=input_age,
+            # age_stamp=input_age_stamp,
+            stderr="Parameter passed is not valid. ",
+            rc=rc,
+            command=command,
+            # changed=True,
+        )
+        module.fail_json(msg='Value specified for name_list is not valid. Valid values are ' +
+                             ", ".join(i for i in IBMi_HOST_SERVER_LIST), **result_failed_parameter_check)
 
     if joblog:
         if HAS_ITOOLKIT is False:
@@ -225,15 +267,14 @@ def main():
         stdout=out,
         stderr=err,
         rc=rc,
+        rc_msg=rc_msg,
         start=str(startd),
         end=str(endd),
         delta=str(delta),
-        # changed=True,
     )
 
     if rc != IBMi_COMMAND_RC_SUCCESS:
-        message = 'non-zero return code:{rc},{rc_msg}'.format(rc=rc, rc_msg=rc_msg)
-        module.fail_json(msg=message, **result)
+        module.fail_json(msg='non-zero return code', **result)
 
     module.exit_json(**result)
 
