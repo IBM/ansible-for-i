@@ -1,0 +1,20 @@
+---
+- name: Install opts
+  ibmi_cl_command:
+    cmd: 'RSTLICPGM LICPGM(5770JV1) DEV(*SAVF) OPTION(*BASE) LNG(2924) SAVF(JV1/OPTBASE)'
+
+- name: Install opts
+  ibmi_cl_command:
+    cmd: 'RSTLICPGM LICPGM(5770JV1) DEV(*SAVF) OPTION(*BASE) LNG(2962) SAVF(JV1/BASE2962)'
+
+- name: Install opts
+  ibmi_cl_command:
+    cmd: 'RSTLICPGM LICPGM(5770JV1) DEV(*SAVF) OPTION(*BASE) LNG(2989) SAVF(JV1/BASE2989)'
+
+- name: Install opts
+  ibmi_cl_command:
+    cmd: 'RSTLICPGM LICPGM(5770JV1) DEV(*SAVF) OPTION(17) RSTOBJ(*ALL) LNG(2989) SAVF(JV1/OPT17)'
+
+- name: Install opts
+  ibmi_cl_command:
+    cmd: 'RSTLICPGM LICPGM(5770JV1) DEV(*SAVF) OPTION(16) RSTOBJ(*ALL) LNG(2989) SAVF(JV1/OPT16)'

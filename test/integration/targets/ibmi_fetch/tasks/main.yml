@@ -1,0 +1,75 @@
+######################################################
+# The content of the fetch74.file
+# Opt  Object      Type      Library     Attribute   Text                       
+#      PGM1        *PGM      SAVRST      CPPLE                                  
+#      PGM2        *PGM      SAVRST      CPPLE                                  
+#      ANSIJSNRC1  *JRNRCV   SAVRST                  JOURNAL RECEIVER FOR ANSIBL
+#      ANSIJSNRC2  *JRNRCV   SAVRST                  JOURNAL RECEIVER FOR ANSIBL
+#      PF1         *FILE     SAVRST      PF          LICKEYFILE to install from 
+#      PF2         *FILE     SAVRST      PF          PTF Cover Letter File      
+#      PGM1        *FILE     SAVRST      SAVF                                   
+#      SAVF1       *FILE     SAVRST      SAVF                                   
+#######################################################
+- hosts: testhost
+  gather_facts: no
+
+  tasks:
+  - name: setup remote tmp dir
+    import_role:
+      name: ../../setup_remote_tmp_dir
+
+  - block: 
+      ## Setup - Create libraries and objects on test systems
+      - name: put a SAVF containing 6 objects to remote node 
+        copy: src="../files/FETCH74.file" dest={{ remote_tmp_dir }}/
+
+      - set_fact:
+          output_dir: "/tmp/ibmi_fetch/files/test"
+
+      - name: create libraries 
+        ibmi_cl_command: 
+          cmd: "crtlib lib({{item}})"
+        with_items: 
+          - SAVRST
+          - ARCHLIB
+
+      - name: copy file to library
+        command: 'mv {{ remote_tmp_dir }}/FETCH74.FILE /QSYS.LIB/ARCHLIB.LIB/'
+
+      - name: restore objects to library
+        ibmi_object_restore:
+          object_lib: 'SAVRST'
+          savefile_name: 'FETCH74'
+          savefile_lib: 'ARCHLIB'
+    
+      - include: negative_case.yml
+
+      - include: ibmi_fetch.yml
+
+    always:
+      - name: remove copied file
+        command: 'rm -rf {{ remote_tmp_dir }}'
+
+      - name: delete libraries 
+        ibmi_cl_command: 
+          cmd: "dltlib lib({{item}})"
+          joblog: 'true'
+        with_items: 
+          - SAVRST
+          - ARCHLIB
+        ignore_errors: true
+      
+      - name: Remove a local temporary directory
+        shell: rm -rf {{ output_dir }}
+        delegate_to: localhost
+        ignore_errors: true 
+
+      - name: Remove a local temporary directory
+        shell: rm -rf ~/test
+        delegate_to: localhost
+        ignore_errors: true 
+
+      - name: Remove a local temporary directory
+        shell: rm -rf testhost 
+        delegate_to: localhost
+        ignore_errors: true 
