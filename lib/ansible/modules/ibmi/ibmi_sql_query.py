@@ -27,6 +27,12 @@ options:
       - The C(ibmi_sql_query) module takes a IBM i SQL DQL(Data Query Language) statement to run.
     type: str
     required: yes
+  database:
+    description:
+      - Specified database name, usually, its the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries
+      - Default to use the '*LOCAL' entry
+    type: str
+    default: ''
   expected_row_count:
     description:
       - The expected row count
@@ -133,7 +139,6 @@ try:
     from itoolkit import iSqlFree
     from itoolkit import iSqlFetch
     from itoolkit import iSqlQuery
-    # from itoolkit.db2.idb2call import iDB2Call
     from itoolkit.transport import DatabaseTransport
 except ImportError:
     HAS_ITOOLKIT = False
@@ -167,21 +172,27 @@ def interpret_return_code(rc):
         return "Unknown error"
 
 
-def itoolkit_run_sql(sql):
-    conn = dbi.connect()
-    # itransport = iDB2Call(conn)
+def itoolkit_run_sql(sql, db):
+    if db.strip() != '':
+        try:
+            conn = dbi.connect(database='{db_pattern}'.format(db_pattern=db))
+        except Exception as e:
+            out_list = []
+            err = "%s, most likely the database does not exist on the system" % str(e)
+            rc = IBMi_COMMAND_RC_UNEXPECTED
+            return rc, out_list, err
+    else:
+        conn = dbi.connect()
+
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
-
     itool.add(iSqlQuery('query', sql, {'error': 'on'}))
     itool.add(iSqlFetch('fetch'))
     itool.add(iSqlFree('free'))
-
     itool.call(itransport)
 
     command_output = itool.dict_out('fetch')
 
-    rc = IBMi_COMMAND_RC_UNEXPECTED
     out_list = []
     out = ''
     err = ''
@@ -211,6 +222,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             sql=dict(type='str', required=True),
+            database=dict(type='str', default=''),
             expected_row_count=dict(type='int', default=-1),
         ),
         supports_check_mode=True,
@@ -223,6 +235,7 @@ def main():
         module.fail_json(msg="ibm_db package is required")
 
     sql = module.params['sql']
+    database = module.params['database'].upper()
     check_row_count = False
     expected_row_count = module.params['expected_row_count']
     if expected_row_count >= 0:
@@ -230,7 +243,7 @@ def main():
 
     startd = datetime.datetime.now()
 
-    rc, out, err = itoolkit_run_sql(sql)
+    rc, out, err = itoolkit_run_sql(sql, database)
 
     endd = datetime.datetime.now()
     delta = endd - startd
@@ -246,7 +259,6 @@ def main():
             start=str(startd),
             end=str(endd),
             delta=str(delta),
-            # changed=True,
         )
         message = 'non-zero return code:{rc},{rc_msg}'.format(rc=rc, rc_msg=rc_msg)
         module.fail_json(msg=message, **result_failed)
@@ -266,7 +278,6 @@ def main():
                 delta=str(delta),
                 expected_row_count=expected_row_count,
                 row_count=row_count,
-                # changed=True,
             )
             module.exit_json(**result_check_row_fail)
         else:
@@ -278,7 +289,6 @@ def main():
                 end=str(endd),
                 delta=str(delta),
                 row_count=row_count,
-                # changed=True,
             )
             module.exit_json(**result_success)
 
