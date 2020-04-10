@@ -67,9 +67,9 @@ options:
   iasp_name:
     description:
       - The auxiliary storage pool (ASP) where storage is allocated for the object.
+      - The default value is "*SYSBAS".
+      - If an IASP name is specified, objects in this ASP group will be returned, including both SYSBAS and IASP.
     default: "*SYSBAS"
-    choices: ["*SYSBAS"]
-    required: false
     type: str
   use_regex:
     description:
@@ -101,6 +101,20 @@ EXAMPLES = r'''
     object_type_list: '*ALL'
     lib_name: '*ALL'
     use_regex: true
+
+- name: find library WYTEST in sysbas
+  ibmi_object_find:
+    lib_name: 'QSYS'
+    iasp_name: '*SYSBAS'
+    object_name: 'WYTEST'
+    object_type_list: "*LIB"
+
+- name: find object OBJABC in asp group WYTEST2
+  ibmi_object_find:
+    lib_name: '*ALL'
+    iasp_name: 'WYTEST2'
+    object_type_list: "*FILE"
+    object_name: 'OBJABC'
 '''
 
 RETURN = r'''
@@ -227,77 +241,6 @@ def interpret_return_code(rc):
         return "Unknown error"
 
 
-# def ibm_dbi_sql_query(sql):
-#
-#     out = []
-#     # Attempt To Establish A Connection To The Database Specified
-#     connection_id = None
-#     try:
-#         connection_id = dbi.connect()
-#     except Exception:
-#         pass
-#
-#     if connection_id is None:
-#         print("\nERROR: Unable to connect to the database.")
-#         err = "ERROR: Unable to connect to the database."
-#         return out, err
-#     else:
-#         print("Done!\n")
-#
-#     if connection_id is not None:
-#         cursor_id = connection_id.cursor()
-#
-#     try:
-#         result_set = cursor_id.execute(sql)
-#     except Exception:
-#         pass
-#
-#     if result_set is False:
-#         print("\nERROR: Unable to execute the SQL statement specified.\n")
-#         connection_id.close()
-#         err = "ERROR: Unable to execute the SQL statement specified."
-#         return out, err
-#     else:
-#         print("Done!\n")
-#
-#     try:
-#         result_set = cursor_id.fetchall()
-#     except Exception:
-#         pass
-#
-#     if result_set is None:
-#         print("\nERROR: Unable to obtain the results desired.\n")
-#         connection_id.close()
-#         err = "ERROR: Unable to obtain the results desired."
-#         return out, err
-#     else:
-#         print("Done!\n")
-#
-#     # for result in result_set:
-#     #     result_map = {"OBJNAME": result[0], "OBJTYPE": result[1], "OBJOWNER": result[2], "OBJCREATED": result[3]}
-#     #     out.append(result_map)
-#     out = result_set
-#
-#     if connection_id is not None:
-#         print("Disconnecting from the database ... ")
-#         try:
-#             return_code = connection_id.close()
-#         except Exception:
-#             return_code = False
-#             pass
-#
-#         if return_code is False:
-#             print("\nERROR: Unable to disconnect from the database.")
-#             err = "ERROR: Unable to disconnect from the database."
-#             return out, err
-#
-#         else:
-#             print("Done!\n")
-#
-#     err = None
-#     return out, err
-
-
 def itoolkit_run_sql(sql, asp):
     conn = dbi.connect()
     db_itransport = DatabaseTransport(conn)
@@ -401,7 +344,7 @@ def main():
             lib_name=dict(type='str', default='*ALLUSR'),
             object_name=dict(type='str', default='*ALL'),
             size=dict(default=None, type='str'),
-            iasp_name=dict(type='str', default='*SYSBAS', choices=['*SYSBAS']),
+            iasp_name=dict(type='str', default='*SYSBAS'),
             use_regex=dict(default=False, type='bool'),
         ),
         supports_check_mode=True,
@@ -425,10 +368,17 @@ def main():
     startd = datetime.datetime.now()
 
     connection_id = None
-    try:
-        connection_id = dbi.connect()
-    except Exception as e_db_connect:
-        module.fail_json(msg="Exception when connecting to IBM i Db2. " + str(e_db_connect))
+
+    if input_iasp_name.strip() != '*SYSBAS':
+        try:
+            connection_id = dbi.connect(database='{db_pattern}'.format(db_pattern=input_iasp_name))
+        except Exception as e_db_connect:
+            module.fail_json(msg="Exception when trying to use IASP. " + str(e_db_connect))
+    else:
+        try:
+            connection_id = dbi.connect()
+        except Exception as e_db_connect:
+            module.fail_json(msg="Exception when connecting to IBM i Db2. " + str(e_db_connect))
 
     # generate age where stmt
     if input_age is None:
@@ -448,12 +398,14 @@ def main():
             module.fail_json(msg="failed to process size: " + input_size)
 
     # generate iasp where stmt
-    if input_iasp_name == "*SYSBAS":
-        sql_where_stmt_iasp = " AND IASP_NUMBER = 0 "
-    else:
-        # try to find the IASP number basing on the iasp name
-        sql_where_stmt_iasp = " AND A.IASP_NUMBER = (SELECT ASP_NUMBER FROM QSYS2.ASP_INFO " \
-                              " WHERE UPPER(DEVICE_DESCRIPTION_NAME) = '" + input_iasp_name.upper() + "') "
+    # Comment out below items to support IASP. The returned result already considers IASP in sql service.
+    # No need to do IASP filter again.
+    # if input_iasp_name == "*SYSBAS":
+    #     sql_where_stmt_iasp = " AND IASP_NUMBER = 0 "
+    # else:
+    #     # try to find the IASP number basing on the iasp name
+    #     sql_where_stmt_iasp = " AND A.IASP_NUMBER = (SELECT ASP_NUMBER FROM QSYS2.ASP_INFO " \
+    #                           " WHERE UPPER(DEVICE_DESCRIPTION_NAME) = '" + input_iasp_name.upper() + "') "
 
     if input_use_regex:
         obj_stats_expression = " SELECT OBJNAME, OBJTYPE, OBJOWNER, OBJDEFINER, OBJCREATED," \
@@ -473,7 +425,6 @@ def main():
     sql = "select * from (" + obj_stats_expression + ") A WHERE 1 = 1 " + \
           sql_where_stmt_age + \
           sql_where_stmt_size + \
-          sql_where_stmt_iasp + \
           sql_where_stmt_regex
 
     # rc, out, err = itoolkit_run_sql(sql, input_iasp_name)

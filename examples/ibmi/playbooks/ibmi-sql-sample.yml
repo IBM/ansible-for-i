@@ -32,11 +32,6 @@
       sql: "select * from ansible"
     register: sql_query_result
 
-  - name: assert the count of row is 1
-    assert:
-      that:
-        - "sql_query_result.actual_row_count == 1"
-
   - name: run the SQL command to insert the row again
     ibmi_sql_execute:
       sql: "INSERT INTO ansible VALUES('2', 'User2', 'Male')"
@@ -44,14 +39,13 @@
   - name: run the SQL command to query the table and check row count
     ibmi_sql_query:
       sql: "select * from ansible"
-      check_row_count: true
       expected_row_count: 2
 
   - name: end journal
     ibmi_cl_command: 
       cmd: QSYS/ENDJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN) 
  
-  - name: run the CL command to create the library again
+  - name: run sql to drop the table
     ibmi_sql_execute:
       sql: "drop table ansible"
 
