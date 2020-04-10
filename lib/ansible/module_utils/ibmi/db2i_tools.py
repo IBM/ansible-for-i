@@ -93,3 +93,20 @@ def ibm_dbi_sql_query(connection_id, sql):
 
     err = None
     return out, err
+
+
+def get_job_log(connection_id, job_name):
+    sql = "SELECT MESSAGE_ID, MESSAGE_TYPE, MESSAGE_TEXT, MESSAGE_SECOND_LEVEL_TEXT" \
+          " FROM TABLE(QSYS2.JOBLOG_INFO('" + job_name + "')) A"
+    out_result_set, err = ibm_dbi_sql_query(connection_id, sql)
+
+    out = []
+    if (out_result_set is None) and (err is None):
+        err = "Job not found."
+    else:
+        for result in out_result_set:
+            result_map = {"MESSAGE_ID": result[0], "MESSAGE_TYPE": result[1],
+                          "MESSAGE_TEXT": result[2]
+                          }
+            out.append(result_map)
+    return out, err
