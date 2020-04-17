@@ -1,0 +1,60 @@
+---
+# Install PTFs from image catalog
+- hosts: ibmi
+  vars:
+    #Required parameters
+    fix_repo_directory: "/home/wangyun"
+    fix_name: "S2018V01.BIN"
+    fix_install_path: "/home/ansiblePTFInstallTemp/"
+    product_id: '5733SC1'
+  tasks:
+    - block:
+      - name: Create symlink for python
+        file:
+          state: link
+          src: /QOpensys/pkgs/bin/python2
+          path: /usr/bin/python
+        ignore_errors: true
+      - name: Create a directory that will be used by image catalog.
+        file:
+          path: "{{ fix_install_path }}"
+          state: "directory"
+        ignore_errors: True
+
+      - name: Copy virtual image to the image catalog directory.
+        command: "cp -f {{ fix_repo_directory }}/{{ fix_name }} {{ fix_install_path }}"
+        ignore_errors: True
+
+      - name: Install a list of PTFs of LPP 5733SC1 from image catalog by ibmi_fix module.
+        ibmi_fix:
+          product_id: '{{ product_id }}'
+          format: 'virtual_image'
+          operation: 'install_fix'
+          path: '{{ fix_install_path }}'
+
+      - name: Check if there are any PTFs of {{ product_id }} that need IPL by ibmi_sql_query module.
+        ibmi_sql_query:
+          sql: "select count(*) as ptf_need_ipl_count from qsys2.ptf_info where ptf_ipl_action <> 'NONE'
+                and ptf_product_id = '{{ product_id }}'"
+          expected_row_count: 1
+        register: ptf_status_result
+
+      - name: Show PTF status after install.
+        debug: var=ptf_status_result verbosity=0
+
+      - name: Reboot the IBM i system by ibmi_reboot module
+        ibmi_reboot:
+          pre_reboot_delay: 10
+          post_reboot_delay: 60
+          reboot_timeout: 1000
+          connect_timeout: 1000
+
+      - name: Check if all the PTFs of {{ product_id }} have been applied after IPL by ibmi_sql_query module.
+        ibmi_sql_query:
+          sql: "select PTF_IDENTIFIER as ptf_need_ipl_count from qsys2.ptf_info where ptf_ipl_action <> 'NONE'
+                and ptf_product_id = '{{ product_id }}'"
+          expected_row_count: 0
+        register: ptf_status_result2
+
+      - name: Show PTF status after IPL returned by ibmi_sql_query module.
+        debug: var=ptf_status_result2 verbosity=0

@@ -1,0 +1,59 @@
+#ibmi-install-nodejs.yml 
+#Refer to https://bitbucket.org/ibmi/opensource/src/master/docs/yum/ to get more details about IBM i opensource.  
+---
+- hosts: ibmi 
+  gather_facts: no
+  vars: 
+    checkout_dir: 'tmp_nodejs'
+
+  tasks:
+  - name: Install Node js version 10
+    command: /QOpensys/pkgs/bin/yum install nodejs10 -y
+    ignore_errors: True
+
+  - name: Verify git has been installed on IBM i
+    stat:
+      path: /QOpensys/pkgs/bin/git
+    register: git_stat
+
+  - name: Install git if it is not installed
+    command:
+      cmd: /QOpensys/pkgs/bin/yum install git -y
+      warn: false
+    when: git_stat.stat.exists == false
+
+  - name: Upgrade yum to get the latest open source software manager
+    command:
+      cmd: /QOpensys/pkgs/bin/yum upgrade -y
+      warn: false
+
+  - name: Create symlink for git command to use git module
+    file:
+      state: link
+      src: /QOpensys/pkgs/bin/git
+      path: /usr/bin/git
+    ignore_errors: true
+    
+  - name: Set http.sslVerify for git
+    command: 'git config --global http.sslVerify false'
+    ignore_errors: true 
+
+  - name: Clone Node js sample application from github to IBM i
+    git:
+      repo: 'https://github.com/IBM/ibmi-oss-examples.git'
+      dest: '{{ checkout_dir }}'
+
+  - name: Install the sample application
+    shell: "(/QOpensys/pkgs/lib/nodejs10/bin/npm  i  --scripts-prepend-node-path)"
+    args:
+      warn: False
+      chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
+      executable: /usr/bin/sh
+
+  - name: Start the sample application
+    shell: "(nohup /QOpensys/pkgs/lib/nodejs10/bin/node index.js >/dev/null 2>&1 &)"
+    args:
+      warn: False
+      chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
+      executable: /usr/bin/sh
+    async: 10
