@@ -1,23 +1,23 @@
 #Test dependent packages 
-- block: 
-    - name: run the CL command to delete the library
-      command: system dltlib ansible1
-      register: dltlib_result
-      failed_when: "dltlib_result.stderr != '' and 'CPF2110' not in dltlib_result.stderr"
+# - block: 
+#     - name: run the CL command to delete the library
+#       command: system dltlib ansible1
+#       register: dltlib_result
+#       failed_when: "dltlib_result.stderr != '' and 'CPF2110' not in dltlib_result.stderr"
     
-    - include: install_rpm.yml 
-      vars: 
-        python: "{{python_version}}"
-      with_list: "{{required_rpms}}"     
+#     - include: install_rpm.yml 
+#       vars: 
+#         python: "{{python_version}}"
+#       with_list: "{{required_rpms}}"     
     
-    - include: check_rpm.yml
-      vars: 
-        python: "{{python_version}}"
-      with_list: "{{required_rpms}}"  
+#     - include: check_rpm.yml
+#       vars: 
+#         python: "{{python_version}}"
+#       with_list: "{{required_rpms}}"  
      
-  vars:
-    required_rpms: [itoolkit, ibm_db]
-    python_version: "{{ansible_python_interpreter.split('/')[-1]}}"   
+#   vars:
+#     required_rpms: [itoolkit, ibm_db]
+#     python_version: "{{ansible_python_interpreter.split('/')[-1]}}"   
 
 # Test when all dependent packages are in place  
 - name: run CL command module with joblog = False
@@ -174,3 +174,5 @@
     cmd: dltlib ansible1
   register: dltlib_result_2
   failed_when: "dltlib_result_2.stderr != '' and 'CPF2110' not in dltlib_result_2.stderr"
+
+- include: iasp.yml

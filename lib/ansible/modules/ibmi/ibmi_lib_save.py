@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) International Business Machines Corp. 2019
-# All Rights Reserved
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
 
@@ -141,6 +139,11 @@ target_release:
     returned: always
     type: str
     sample: 'V7R2M0'
+command:
+    description: The last excuted command.
+    returned: always
+    type: str
+    sample: 'SAVLIB LIB(TEST) DEV(*SAVF) SAVF(TEST/ARCHLIB) TGTRLS(V7R2M0)'
 rc:
     description: The save action return code (0 means success, non-zero means failure)
     returned: always

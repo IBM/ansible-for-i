@@ -1,0 +1,75 @@
+#  Opt  Object      Type      Library     Attribute   Tex
+#       BASE2962    *FILE     JV1         SAVF           
+#       BASE2989    *FILE     JV1         SAVF           
+#       OPTBASE     *FILE     JV1         SAVF           
+#       OPT16       *FILE     JV1         SAVF           
+#       OPT17       *FILE     JV1         SAVF           
+
+- block:
+
+    # - copy: src="JV1.FILE" dest="/tmp/"
+    
+    # - name: create libraries 
+    #   ibmi_cl_command: 
+    #     cmd: "crtlib lib({{item}})"
+    #   with_items: 
+    #     - JV1
+    #     - ARCHLIB
+
+    # - name: restore library
+    #   ibmi_lib_restore:
+    #     saved_lib: 'JV1'
+    #     savefile_name: 'JV1'
+    #     savefile_lib: 'ARCHLIB' 
+
+    - name: Verify product installed or not
+      command: system "DSPSFWRSC"
+      register: installed_native_products
+    
+    - name: uninstall the product with default values
+      ibmi_uninstall_product:
+        product: '5770JV1'
+      when: "'5770JV1   ' in installed_native_products.stdout"
+
+    - name: accept license
+      ibmi_cl_command:
+       cmd: "CALL PGM(QLPACAGR) PARM('5770JV1' 'V7r4m0' '0000' '*')"
+
+  
+    - include: special_case.yml  
+
+    - include: install_negative_case.yml
+
+    - include: install_product.yml
+
+    - include: save_negative_case.yml
+
+    - include: save_product.yml
+
+      vars:
+        libname: 'JV1'
+
+    - name: uninstall the product with default values
+      ibmi_uninstall_product:
+        product: '5770JV1'
+
+    - include: save_product.yml
+      
+
+    - include: install_product.yml 
+
+  always:
+    # - name: remove copied file
+    #   command: 'rm -rf /tmp/JV1.FILE'
+
+    - name: delete libraries 
+      ibmi_cl_command: 
+        cmd: "dltlib lib({{item}})"
+        joblog: 'true'
+      with_items: 
+        # - JV1
+        # - ARCHLIB
+        - SRVJV1
+        - SRVJV11
+      ignore_errors: true
+

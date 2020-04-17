@@ -1,0 +1,321 @@
+# Test when all dependent packages are in place  
+- name: Query the iASP existing
+  ibmi_sql_query:
+    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+  register: iasp_list
+
+- block:
+  
+    - name: run CL command module with asp_group
+      ibmi_cl_command:
+        cmd: CRTLIB LIB({{item}}) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        joblog: true
+      with_items:
+        - TEMPLIB
+        - REFLIB
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF {{item}}/ANSIOBJ1
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      with_items:
+        - TEMPLIB
+        - REFLIB
+
+    - name: create dataarea for testing
+      ibmi_cl_command: 
+        cmd: CRTDTAARA DTAARA({{item}}/ANSIOBJ1) TYPE(*DEC)
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      with_items:
+        - TEMPLIB
+        - REFLIB
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF QGPL/ANSIOBJ1
+
+    - name: grant 1 users 1 authority to a single object
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        user: "{{new_user[0]}}"
+        authority:
+          - "*OBJEXIST"
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      register: authority_result
+
+    - name: assert the returned options of display
+      assert:
+        that:
+          - authority_result.rc == 0
+          - authority_result.stdout is defined
+          - authority_result.stdout_lines is defined
+          - authority_result.stderr is not defined
+          - authority_result.stderr_lines is not defined
+          - authority_result.object_authority_list is not defined 
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        object_type: '*FILE'
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['OBJECT_AUTHORITY'] == 'USER DEFINED'
+          - item['DATA_ADD'] == 'NO'
+          - item['DATA_DELETE'] == 'NO'
+          - item['DATA_EXECUTE']== 'NO'
+          - item['DATA_READ'] == 'NO'
+          - item['DATA_UPDATE'] == 'NO'
+          - item['OBJECT_ALTER'] == 'NO'
+          - item['OBJECT_EXISTENCE'] == 'YES'
+          - item['OBJECT_MANAGEMENT'] == 'NO'
+          - item['OBJECT_OPERATIONAL'] == 'NO'
+          - item['OBJECT_REFERENCE'] == 'NO'
+      when: item['AUTHORIZATION_NAME'] == new_user[0]
+      loop: "{{authority_result.object_authority_list }}"
+
+    - name: revoke 1 users 1 authority to a single object
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        user: "{{new_user[0]}}"
+        authority:
+          - "*OBJEXIST"
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        object_type: '*FILE'
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['OBJECT_AUTHORITY'] == 'USER DEFINED'
+          - item['DATA_ADD'] == 'NO'
+          - item['DATA_DELETE'] == 'NO'
+          - item['DATA_EXECUTE']== 'NO'
+          - item['DATA_READ'] == 'NO'
+          - item['DATA_UPDATE'] == 'NO'
+          - item['OBJECT_ALTER'] == 'NO'
+          - item['OBJECT_EXISTENCE'] == 'NO'
+          - item['OBJECT_MANAGEMENT'] == 'NO'
+          - item['OBJECT_OPERATIONAL'] == 'NO'
+          - item['OBJECT_REFERENCE'] == 'NO'
+      when: item['AUTHORIZATION_NAME'] == '{{new_user[0].upper()}}'
+      loop: "{{authority_result.object_authority_list }}"
+
+    - name: grant 1 users 1 AUL to a single object
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        authorization_list: "{{au_list[0]}}"
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+      register: authority_result
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
+      loop: "{{authority_result.object_authority_list }}"
+
+    - name: revoke 2 authorities to user
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['AUTHORIZATION_LIST'] == ''
+      loop: "{{authority_result.object_authority_list }}"
+
+    - name: grant 1 users 1 AUL to a single object
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'REFLIB'
+        object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        authorization_list: "{{au_list[0]}}"
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+      register: authority_result
+
+    - name: grant refaut to a single object
+      ibmi_object_authority:
+        operation: 'grant_ref'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        ref_object_name: ANSIOBJ1
+        ref_object_library: REFLIB
+        ref_object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        ref_asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"  
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
+      loop: "{{authority_result.object_authority_list }}"
+
+    - name: grant 1 users 1 authority to a single object
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'QGPL'
+        object_type: '*FILE'
+        user: "{{new_user[0]}}"
+        authority:
+          - "*OBJEXIST"
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      register: authority_result
+
+    - name: grant refaut to a single object
+      ibmi_object_authority:
+        operation: 'grant_ref'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        ref_object_name: ANSIOBJ1
+        ref_object_library: QGPL
+        ref_object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        object_type: '*FILE'
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['OBJECT_AUTHORITY'] == 'USER DEFINED'
+          - item['DATA_ADD'] == 'NO'
+          - item['DATA_DELETE'] == 'NO'
+          - item['DATA_EXECUTE']== 'NO'
+          - item['DATA_READ'] == 'NO'
+          - item['DATA_UPDATE'] == 'NO'
+          - item['OBJECT_ALTER'] == 'NO'
+          - item['OBJECT_EXISTENCE'] == 'YES'
+          - item['OBJECT_MANAGEMENT'] == 'NO'
+          - item['OBJECT_OPERATIONAL'] == 'NO'
+          - item['OBJECT_REFERENCE'] == 'NO'
+      when: item['AUTHORIZATION_NAME'] == '{{new_user[0].upper()}}'
+      loop: "{{authority_result.object_authority_list }}"
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        object_type: '*FILE'
+        asp_group: "ABC"
+      register: authority_result
+      ignore_errors: true
+  
+    - name: grant 1 users 1 authority to a single object missing asp_group
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        user: "{{new_user[0]}}"
+        authority:
+          - "*OBJEXIST"
+        asp_group: "ABC"
+      register: authority_result
+      failed_when: "'Device ABC not found' not in authority_result.stderr"
+
+    - name: grant 1 users 1 authority to a single object missing asp_group
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        asp_device: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+        user: "{{new_user[0]}}"
+        authority:
+          - "*OBJEXIST"
+      register: authority_result
+
+  when: iasp_list.row_count != 0
+
+  always:
+    - name: delete library
+      ibmi_cl_command: 
+        cmd: dltlib lib({{item}})
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      with_items:
+        - TEMPLIB
+        - REFLIB
+
+    - name: delete object
+      ibmi_cl_command:
+         cmd: DLTOBJ OBJ(QGPL/ANSIOBJ1) OBJTYPE(*FILE)

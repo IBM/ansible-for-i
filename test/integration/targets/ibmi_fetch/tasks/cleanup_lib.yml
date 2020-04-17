@@ -1,0 +1,13 @@
+- name: dltlib
+  ibmi_cl_command:
+    cmd: dltlib SAVRST
+
+- name: create lib
+  ibmi_cl_command:
+    cmd: crtlib SAVRST
+
+- name: restore the object
+  ibmi_object_restore:
+    object_lib: 'SAVRST'
+    savefile_name: "{{ savefile_name.split('.')[0] }}"
+    savefile_lib: 'ARCHLIB'

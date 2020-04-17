@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) International Business Machines Corp. 2019
-# All Rights Reserved
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Author, Le Chang <changle@cn.ibm.com>
 
@@ -31,6 +29,12 @@ options:
       - The IBM i CL command to run.
     type: str
     required: yes
+  asp_group:
+    description:
+      - Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
+      - The ASP group name is the name of the primary ASP device within the ASP group.
+    type: str
+    default: ''
   joblog:
     description:
       - If set to C(true), append JOBLOG to stderr/stderr_lines.
@@ -118,14 +122,20 @@ stderr_lines:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 
+try:
+    from shlex import quote
+except ImportError:
+    from pipes import quote
+
 HAS_ITOOLKIT = True
 HAS_IBM_DB = True
 
 try:
     from itoolkit import iToolKit
     from itoolkit import iCmd
-    # from itoolkit.db2.idb2call import iDB2Call
+    from itoolkit import iCmd5250
     from itoolkit.transport import DatabaseTransport
+    from itoolkit.transport import DirectTransport
 except ImportError:
     HAS_ITOOLKIT = False
 
@@ -156,19 +166,23 @@ def interpret_return_code(rc):
         return "Unknown error"
 
 
-def itoolkit_run_command(command):
+def itoolkit_run_command(command, asp_group):
     conn = dbi.connect()
-    # itransport = iDB2Call(conn)
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
+    if asp_group != '':
+        itransport = DirectTransport()
+        itool.add(iCmd('command', "SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group), {'error': 'on'}))
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
 
-    rc = IBMi_COMMAND_RC_UNEXPECTED
     out = ''
     err = ''
 
-    command_output = itool.dict_out('command')
+    if asp_group != '' and isinstance(itool.dict_out('command'), list) and len(itool.dict_out('command')) > 1:
+        command_output = itool.dict_out('command')[1]
+    else:
+        command_output = itool.dict_out('command')
 
     if 'success' in command_output:
         rc = IBMi_COMMAND_RC_SUCCESS
@@ -194,24 +208,26 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             cmd=dict(type='str', required=True),
+            asp_group=dict(type='str', default=''),
             joblog=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
 
     command = module.params['cmd']
+    asp_group = module.params['asp_group']
     joblog = module.params['joblog']
 
     startd = datetime.datetime.now()
 
-    if joblog:
+    if joblog or asp_group.strip():
         if HAS_ITOOLKIT is False:
             module.fail_json(msg="itoolkit package is required")
 
         if HAS_IBM_DB is False:
             module.fail_json(msg="ibm_db package is required")
 
-        rc, out, err = itoolkit_run_command(command)
+        rc, out, err = itoolkit_run_command(command, asp_group.strip().upper())
     else:
         args = ['system', command]
         rc, out, err = module.run_command(args, use_unsafe_shell=False)
@@ -230,7 +246,6 @@ def main():
         start=str(startd),
         end=str(endd),
         delta=str(delta),
-        # changed=True,
     )
 
     if rc != IBMi_COMMAND_RC_SUCCESS:

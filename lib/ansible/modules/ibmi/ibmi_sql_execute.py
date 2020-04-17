@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) International Business Machines Corp. 2019
-# All Rights Reserved
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Author, Le Chang <changle@cn.ibm.com>
 
@@ -29,6 +27,12 @@ options:
       - The C(ibmi_sql_execute) module takes a IBM i SQL non-DQL(Data Query Language) statement to run.
     type: str
     required: yes
+  database:
+    description:
+      - Specified database name, usually, its the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries
+      - Default to use the '*LOCAL' entry
+    type: str
+    default: ''
 notes:
     - Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 seealso:
@@ -102,7 +106,6 @@ try:
     from itoolkit import iToolKit
     from itoolkit import iSqlFree
     from itoolkit import iSqlQuery
-    # from itoolkit.db2.idb2call import iDB2Call
     from itoolkit.transport import DatabaseTransport
 except ImportError:
     HAS_ITOOLKIT = False
@@ -134,20 +137,26 @@ def interpret_return_code(rc):
         return "Unknown error"
 
 
-def itoolkit_sql_callproc(sql):
-    conn = dbi.connect()
-    # itransport = iDB2Call(conn)
+def itoolkit_sql_callproc(sql, db):
+    if db.strip() != '':
+        try:
+            conn = dbi.connect(database='{db_pattern}'.format(db_pattern=db))
+        except Exception as e:
+            out_list = []
+            err = "%s, most likely the database does not exist on the system" % str(e)
+            rc = IBMi_COMMAND_RC_UNEXPECTED
+            return rc, out_list, err
+    else:
+        conn = dbi.connect()
+
     itransport = DatabaseTransport(conn)
     itool = iToolKit(iparm=1)
-
     itool.add(iSqlQuery('query', sql, {'error': 'on'}))
     itool.add(iSqlFree('free'))
-
     itool.call(itransport)
 
     command_output = itool.dict_out('query')
 
-    rc = IBMi_COMMAND_RC_UNEXPECTED
     out = ''
     err = ''
     if 'success' in command_output:
@@ -174,6 +183,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             sql=dict(type='str', required=True),
+            database=dict(type='str', default=''),
         ),
         supports_check_mode=True,
     )
@@ -185,10 +195,11 @@ def main():
         module.fail_json(msg="ibm_db package is required")
 
     sql = module.params['sql']
+    database = module.params['database'].upper()
 
     startd = datetime.datetime.now()
 
-    rc, out, err = itoolkit_sql_callproc(sql)
+    rc, out, err = itoolkit_sql_callproc(sql, database)
 
     endd = datetime.datetime.now()
     delta = endd - startd
@@ -203,7 +214,6 @@ def main():
         start=str(startd),
         end=str(endd),
         delta=str(delta),
-        # changed=True,
     )
 
     if rc != IBMi_COMMAND_RC_SUCCESS:

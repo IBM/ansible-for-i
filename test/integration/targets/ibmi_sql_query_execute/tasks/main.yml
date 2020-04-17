@@ -1,6 +1,6 @@
 #Test dependent packages 
 - block: 
-
+      
     - include: install_rpm.yml 
       vars: 
         python: "{{python_version}}"
@@ -210,7 +210,8 @@ AS next_ipl_indicator FROM abnormal;"
       assert:
         that:
           - "'Unsupported parameters' in ibmi_sql_execute_5.msg"
-
+    
+    - include: iasp.yml
 
   vars:
     required_rpms: [itoolkit, ibm_db]
