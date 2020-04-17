@@ -21,57 +21,61 @@
 #       PGM1        *FILE     SAVRST      SAVF     
 #       SAVF1       *FILE     SAVRST      SAVF     
 ###################################################
+- hosts: testhost
+  gather_facts: no
 
-- block:
+  tasks:
+  - block:
 
-    - name: Create a local temporary directory
-      shell: mktemp -d /tmp/ansible_test.XXXXXXXXX
-      register: tempfile_result
-      delegate_to: localhost
+      - name: Create a local temporary directory
+        shell: mktemp -d /tmp/ansible_test.XXXXXXXXX
+        register: tempfile_result
+        delegate_to: localhost
 
-    - name: setup remote temporary dir
-      import_role:
-        name: ../../setup_remote_tmp_dir
+      - name: setup remote temporary dir
+        import_role:
+          name: ../../setup_remote_tmp_dir
 
-    - set_fact:
-        local_temp_dir: '{{ tempfile_result.stdout }}'
-        remote_dir: '{{ remote_tmp_dir }}'
-        remote_temp_lib: 'ARCHLIB'
-        remote_restored_lib: 'SAVRST'
-        savf_name: 'FETCH74.file'
-        txt_name: 'foo.txt'
+      - set_fact:
+          local_temp_dir: '{{ tempfile_result.stdout }}'
+          remote_dir: '{{ remote_tmp_dir }}'
+          remote_temp_lib: 'ARCHLIB'
+          remote_restored_lib: 'SAVRST'
+          savf_name: 'SAVRST.FILE'
+          try_same_name_savf: 'ANSIJSNRC1.FILE'
+          try_backup_savf_name: 'PF.FILE'
+          archive_savf_name: 'ARCHLIB.FILE'
+          txt_name: 'foo.txt'
 
-    - name: copy the testing files to local tempoarary directory
-      shell: cp -r ../files/* {{ tempfile_result.stdout }}/
-      delegate_to: localhost 
+      - name: copy the testing files to local tempoarary directory
+        shell: cp -r ../files/* {{ local_temp_dir }}/
+        delegate_to: localhost 
 
-    - name: create libraries 
-      ibmi_cl_command: 
-        cmd: "crtlib lib({{item}})"
-      with_items: 
-        - '{{ remote_temp_lib }}'
-        - '{{ remote_restored_lib }}'
+      # - name: copy the testing files to local tempoarary directory
+      #   shell: cp -r * {{ tempfile_result.stdout }}/
+      #   delegate_to: localhost
 
-    - include: ibmi_copy.yml
+      - name: create libraries 
+        ibmi_cl_command: 
+          cmd: "crtlib lib({{item}})"
+        with_items: 
+          - '{{ remote_temp_lib }}'
+          - '{{ remote_restored_lib }}'
 
-  always:
-    - name: Cleaning
-      file:
-        path: '{{ local_temp_dir }}'
-        state: absent
-      delegate_to: localhost
+      - include: ibmi_copy.yml
 
-    - name: Remote unprivileged remote user
-      user:
-        name: '{{ remote_unprivileged_user }}'
-        state: absent
-        remove: yes
+    always:
+      - name: Cleaning
+        file:
+          path: '{{ local_temp_dir }}'
+          state: absent
+        delegate_to: localhost
 
-    - name: delete libraries 
-      ibmi_cl_command: 
-        cmd: "dltlib lib({{item}})"
-        joblog: 'true'
-      with_items: 
-        - '{{ remote_temp_lib }}'
-        - '{{ remote_restored_lib }}'
+      - name: delete libraries 
+        ibmi_cl_command: 
+          cmd: "dltlib lib({{item}})"
+          joblog: 'true'
+        with_items: 
+          - '{{ remote_temp_lib }}'
+          - '{{ remote_restored_lib }}'
         ignore_errors: true

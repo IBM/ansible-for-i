@@ -1,0 +1,55 @@
+# Need put the a fix on remote IBM i before the testing.
+#SI72305 - Immediate apply
+#MF67068 - Immediate apply
+#SI71691 - require SI70931
+#SI67856 - UME PTF
+#SI70544 - delay PTF
+- hosts: testhost
+  gather_facts: no
+
+  tasks:
+    - block:
+        - name: setup remote temporary dir
+          import_role:
+            name: ../../setup_remote_tmp_dir
+        - set_fact:
+            remote_dir: '{{ remote_tmp_dir }}'
+            immed_ptf: {'SI72305':'5770SS1', 'MF67068':'5770999'}
+            immed_ptf_with_requisite:  {'SI71691':'5770SS1'}
+            requisite_ptf: {'SI70931':'5770SS1'}
+            ptf_for_product_not_installed: {'SI67856':'5770UME'}
+            delay_ptf: {'SI70544': '5770SS1'}
+
+        # - name: copy the testing files to local tempoarary directory
+        #   shell: cp -r {{ remote_image_dir }} {{ remote_dir}}
+        #   args:
+        #     executable: /usr/bin/qsh
+
+        # CRTDEVOPT DEVD(ANSIOPTDEV) RSRCNAME(*VRT) LCLINTNETA(*N) ONLINE(*YES)
+        # CRTIMGCLG IMGCLG(ANSICATLG1) DIR('/home/zhulj/fix_1') ADDVRTVOL(*DIR)
+        # QSYS/VRYCFG CFGOBJ(ANSIOPTDEV) CFGTYPE(*DEV) STATUS(*ON)
+        # LODIMGCLG IMGCLG(ANSICATLG1) DEV(ANSIOPTDEV)  OPTION(*LOAD)
+        # VFYIMGCLG IMGCLG(ANSICATLG1) TYPE(*PTF) SORT(*YES)
+        # INSPTF LICPGM((*ALL)) DEV(ANSIOPTDEV) INSTYP(*IMMONLY)
+        - ibmi_cl_command:
+            cmd: CRTLIB ARCHLIB
+
+        - name: copy SAVF to remote lib
+          ibmi_copy: 
+            src: '../files/Q{{item}}.FILE'
+            lib_name: 'ARCHLIB'
+          with_items:
+            #- "{{immed_ptf.keys()}}"
+            - "{{immed_ptf_with_requisite.keys()}}"
+            - "{{requisite_ptf.keys()}}"
+            #- "{{delay_ptf.keys()}}"
+            #- "{{ptf_for_product_not_installed.keys()}}"
+
+        #- include: ibmi_fix.yml
+        - include: ibmi_fix has_requisites.yml
+        #- include: negative_case.yml
+        #- include: ibmi_fix_delayed.yml
+
+      always:
+          - ibmi_cl_command:
+              cmd: DLTLIB ARCHLIB

@@ -61,6 +61,12 @@ options:
       - If set to C(true), append JOBLOG to stderr/stderr_lines.
     type: bool
     default: False
+  asp_group:
+     description:
+       - Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
+       - The ASP group name is the name of the primary ASP device within the ASP group.
+     type: str
+     default: ''
   parameters:
     description:
       - The parameters that RSTOBJ command will take. Other than options above, all other parameters need to be specified here.
@@ -176,6 +182,11 @@ import datetime
 
 from ansible.module_utils.basic import AnsibleModule
 
+try:
+    from shlex import quote
+except ImportError:
+    from pipes import quote
+
 HAS_ITOOLKIT = True
 HAS_IBM_DB = True
 
@@ -185,6 +196,8 @@ try:
     from itoolkit import iSqlFetch
     from itoolkit import iSqlQuery
     from itoolkit import iCmd
+    from itoolkit import iCmd5250
+    from itoolkit.transport import DatabaseTransport
     from itoolkit.transport import DirectTransport
 except ImportError:
     HAS_ITOOLKIT = False
@@ -201,18 +214,24 @@ IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG = 256
 IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR = 257
 
 
-def itoolkit_run_command(command):
+def itoolkit_run_command(command, asp_group):
     conn = dbi.connect()
-    itransport = DirectTransport()
+    itransport = DatabaseTransport(conn)
     itool = iToolKit()
+    if asp_group != '':
+        itransport = DirectTransport()
+        itool.add(iCmd('command', "SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group), {'error': 'on'}))
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
 
-    rc = IBMi_COMMAND_RC_UNEXPECTED
     out = ''
     err = ''
 
-    command_output = itool.dict_out('command')
+    if asp_group != '' and isinstance(itool.dict_out('command'), list) and len(itool.dict_out('command')) > 1:
+        command_output = itool.dict_out('command')[1]
+    else:
+        command_output = itool.dict_out('command')
+
     if 'success' in command_output:
         rc = IBMi_COMMAND_RC_SUCCESS
         out = command_output['success']
@@ -236,9 +255,9 @@ def itoolkit_run_command(command):
     return rc, out, err
 
 
-def run_command(module, command, joblog):
-    if joblog is True:
-        rc, out, err = itoolkit_run_command(command)
+def run_command(module, command, joblog, asp_group):
+    if joblog or asp_group.strip():
+        rc, out, err = itoolkit_run_command(command, asp_group.strip().upper())
     else:
         rc, out, err = module.run_command(['system', command], use_unsafe_shell=False)
     return rc, out, err
@@ -254,6 +273,7 @@ def main():
             savefile_lib=dict(type='str', required=True),
             format=dict(type='str', default='*SAVF', choices=['*SAVF']),
             joblog=dict(type='bool', default=False),
+            asp_group=dict(type='str', default=''),
             parameters=dict(type='str', default=' '),
         ),
         supports_check_mode=True,
@@ -272,6 +292,7 @@ def main():
     savefile_lib = module.params['savefile_lib']
     format = module.params['format']
     joblog = module.params['joblog']
+    asp_group = module.params['asp_group']
     parameters = module.params['parameters']
 
     startd = datetime.datetime.now()
@@ -279,7 +300,7 @@ def main():
     command = 'RSTOBJ OBJ(%s) SAVLIB(%s) DEV(%s) OBJTYPE(%s) SAVF(%s/%s) %s' % (object_names, object_lib, format,
                                                                                 object_types, savefile_lib, savefile_name,
                                                                                 parameters)
-    rc, out, err = run_command(module, command, joblog)
+    rc, out, err = run_command(module, command, joblog, asp_group)
 
     endd = datetime.datetime.now()
     delta = endd - startd

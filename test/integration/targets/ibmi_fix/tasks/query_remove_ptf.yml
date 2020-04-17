@@ -1,0 +1,34 @@
+- name: verify the ptf has been installed
+  ibmi_sql_query:
+    sql: "SELECT PTF_PRODUCT_ID, PTF_IPL_ACTION, PTF_IDENTIFIER, PTF_LOADED_STATUS, A.*
+    FROM QSYS2.PTF_INFO A
+    WHERE PTF_IDENTIFIER = '{{item.key}}';"
+  register: ptf_result
+
+- ibmi_cl_command:
+    cmd: "RMVPTF LICPGM({{item.value}}) SELECT({{item.key}}) RMV(*PERM)"
+    joblog: true
+  register: remove_result
+  when: 
+    - ptf_result.row | length != 0
+    - ptf_result.row[0]['PTF_LOADED_STATUS'] == 'APPLIED' or ptf_result.row[0]['PTF_LOADED_STATUS']== 'LOADED'
+    - ptf_result.row[0]['PTF_IPL_REQUIRED'] == 'IMMEDIATE'
+    - ptf_result.row[0]['PTF_LOADED_STATUS'] != 'PERMANENTLY APPLIED'
+
+- ibmi_cl_command:
+    cmd: "RMVPTF LICPGM({{item.value}}) SELECT({{item.key}}) RMV(*PERM)  DELAYED(*YES)"
+    joblog: true      
+  when: 
+    - ptf_result.row | length != 0
+    - "'APPLIED' in ptf_result.row[0]['PTF_LOADED_STATUS'] or 'LOADED' in ptf_result.row[0]['PTF_LOADED_STATUS']"
+    - ptf_result.row[0]['PTF_IPL_REQUIRED'] == 'DELAYED'
+    - ptf_result.row[0]['PTF_LOADED_STATUS'] != 'PERMANENTLY APPLIED'
+
+- name: IPL the system to verify the PTF are applied.
+  ibmi_reboot:
+    how_to_end: '*IMMED' 
+  when:
+    - ptf_result.row | length != 0
+    - "'APPLIED' in ptf_result.row[0]['PTF_LOADED_STATUS'] or 'LOADED' in ptf_result.row[0]['PTF_LOADED_STATUS']" 
+    - ptf_result.row[0]['PTF_IPL_REQUIRED'] == 'DELAYED'
+    - ptf_result.row[0]['PTF_LOADED_STATUS'] != 'PERMANENTLY APPLIED'

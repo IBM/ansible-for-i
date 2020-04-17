@@ -74,12 +74,7 @@
   ibmi_object_find: 
      iasp_name: "IASP1"
   register: neg_result
-  ignore_errors: true
-
-- name: assert failure result with invalid iasp_name  
-  assert:
-    that:
-      - "'value of iasp_name must be one of: *SYSBAS, got: IASP1' in neg_result.msg"
+  failed_when: "'Exception when trying to use IASP.' not in neg_result.msg"
 
 - name: find objects with invalid use_regex 
   ibmi_object_find: 
@@ -119,13 +114,15 @@
 - block: 
     ## Setup - Create libraries and objects on test systems
     - copy: src="findobj.FILE" dest="/tmp/"
+
+    - name: copy file to library
+      command: 'mv /tmp/findobj.FILE /QSYS.LIB/QGPL.LIB/'
+
+    - include: iasp.yml
     
     - name: create libraries 
       ibmi_cl_command: 
         cmd: "crtlib lib(findlib)"
-
-    - name: copy file to library
-      command: 'mv /tmp/findobj.FILE /QSYS.LIB/QGPL.LIB/'
     
     - name: restore object to library
       ibmi_cl_command: 

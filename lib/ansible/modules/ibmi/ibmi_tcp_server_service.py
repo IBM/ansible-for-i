@@ -62,7 +62,7 @@ author:
 EXAMPLES = r'''
 - name: start tcp server service
   ibmi_tcp_server_service:
-    name: ['*SSH', '*HTTP']
+    name_list: ['*SSH', '*HTTP']
     state: 'started'
     joblog: True
 '''

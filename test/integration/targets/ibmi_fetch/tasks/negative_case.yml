@@ -14,14 +14,14 @@
   #failed_when: "'missing required arguments: lib_name' not in fetch_result.msg"
   failed_when: "'lib_name and dest are required' not in fetch_result.msg"
 
-# Test with an invalid option
-- name: Fetch objects with an invalid option
-  ibmi_fetch:
-    lib_name: 'SAVRST'
-    dest: '{{ output_dir }}/fetched'
-    abc: 'abc'
-  register: fetch_result
-  failed_when: "'Unsupported parameters' not in fetch_result.msg"
+# # Test with an invalid option
+# - name: Fetch objects with an invalid option
+#   ibmi_fetch:
+#     lib_name: 'SAVRST'
+#     dest: '{{ output_dir }}/fetched'
+#     abc: 'abc'
+#   register: fetch_result
+#   failed_when: "'Unsupported parameters' not in fetch_result.msg"
 
 # Test with an invalid object_names
 - name: Fetch objects with invalid object_names
@@ -30,7 +30,7 @@
     lib_name: 'SAVRST'
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
-  #failed_when: "'ABC not found' not in fetch_result.stderr"
+  failed_when: "'Create SAVF failed. See stderr or stdout for more information' not in fetch_result.msg"
 
 # Test positive cases of fail_on_missing
 - name: Fetch objects with fail_on_missing
@@ -48,6 +48,8 @@
     fail_on_missing: false
     validate_checksum: true
     flat: false
+  register: fetch_result
+  failed_when: "'Create SAVF failed. See stderr or stdout for more information' not in fetch_result.msg"
 
 - name: Fetch objects with duplicated object names
   ibmi_fetch:
