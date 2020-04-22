@@ -32,13 +32,13 @@ Note, you can create new pull request to merge the changes in this repository in
 <b>Directory structure: </b>
 
 ```
-└── ├── action_plugins - Only applicable for Ansible tower. In where copies of lib/ansible/plugins/action/ are kept.
-    ├── examples - Ansible playbook examples.
-    ├── lib - Source code of IBM i new modules and plugins. Copy the folder to the module path on ansible server.
-    ├── library - Only applicable for Ansible tower. In where copies of lib/ansible/modules/ibmi/ are kept. 
-    ├── module_utils - Only applicable for Ansible tower. In where copies of lib/ansible/module_utils/ are kept.  
-    ├── test - Integration test code of IBM i new modules and plugins.
-    ├── ibmi_try_tower_structure.yml. Only applicable for Ansible tower. 
+├── action_plugins - Only applicable to Ansible tower. In where copies of lib/ansible/plugins/action/ are kept.
+├── examples - Ansible playbook examples.
+├── lib - Source code of IBM i new modules and plugins. Copy the folder to the module path on ansible server.
+├── library - Only applicable to Ansible tower. In where copies of lib/ansible/modules/ibmi/ are kept. 
+├── module_utils - Only applicable to Ansible tower. In where copies of lib/ansible/module_utils/ are kept.  
+├── test - Integration test code of IBM i new modules and plugins.
+├── ibmi_try_tower_structure.yml. Only applicable to Ansible tower. 
 ```
 
 <b>License: </b><br>
