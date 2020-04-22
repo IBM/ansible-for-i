@@ -53,3 +53,9 @@
       - name: Reboot the IBM i system by ibmi_reboot module
         ibmi_reboot:
           how_to_end: '*IMMED'
+
+    always: 
+      - name: Delete 
+        ibmi_cl_command:
+          cmd: DLTLIB LIB({{lib_name}})
+        ignore_errors: true
