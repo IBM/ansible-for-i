@@ -56,7 +56,7 @@
 
       - debug: 
           msg: '{{ansible_facts}}'
-          
+
       - name: assert facts
         assert:
           that:
@@ -65,10 +65,11 @@
       - name: Create library
         ibmi_cl_command:
           cmd: CRTLIB LIB({{lib_name}})
+        ignore_errors: true
 
       - name: Create savf
         ibmi_cl_command:
-          cmd: CRTSAVF SAVF({{lib_name}}/{{savf_name}})
+          cmd: CRTSAVF FILE({{lib_name}}/{{savf_name}})
 
       - name: find the created object
         ibmi_object_find: 
@@ -83,3 +84,7 @@
 
       - name: Show found object returned by ibmi_object_find module.
         debug: var=find_result verbosity=0
+
+      - name: Reboot the IBM i system by ibmi_reboot module
+        ibmi_reboot:
+          how_to_end: '*IMMED'
