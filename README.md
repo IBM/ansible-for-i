@@ -30,6 +30,7 @@ Note: 1) Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to
 Note, you can create new pull request to merge the changes in this repository into yours.
 
 <b>Directory structure: </b>
+
 '''
 └── ├── action_plugins - Only applicable for Ansible tower. In where copies of lib/ansible/plugins/action/ are kept.
     ├── examples - Ansible playbook examples.
@@ -39,6 +40,7 @@ Note, you can create new pull request to merge the changes in this repository in
     ├── test - Integration test code of IBM i new modules and plugins.
     ├── ibmi_try_tower_structure.yml. Only applicable for Ansible tower. 
 '''
+
 
 <b>License: </b><br>
 
