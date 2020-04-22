@@ -19,40 +19,48 @@
           path: /usr/bin/python
         ignore_errors: true
 
-      - name: Install a list of PTFs of LPP 5733SC1 from image catalog by ibmi_fix_imgclg module.
-        ibmi_fix_imgclg:
-          src: '{{ fix_repo_directory }}' 
-          virtual_image_name_list: '{{ fix_name }}'
-          use_temp_path: true
-          product_id: '{{ product_id }}'
-          apply_type: "*IMMDLY"
-          hiper_only: false
-          rollback: true
-        register: fix_result
+      # - name: Install a list of PTFs of LPP 5733SC1 from image catalog by ibmi_fix_imgclg module.
+      #   ibmi_fix_imgclg:
+      #     src: '{{ fix_repo_directory }}' 
+      #     virtual_image_name_list: '{{ fix_name }}'
+      #     use_temp_path: true
+      #     product_id: '{{ product_id }}'
+      #     apply_type: "*IMMDLY"
+      #     hiper_only: false
+      #     rollback: true
+      #   register: fix_result
 
-      - name: Check if there are any PTFs of {{ product_id }} that need IPL by ibmi_sql_query module.
-        ibmi_sql_query:
-          sql: "select count(*) as ptf_need_ipl_count from qsys2.ptf_info where ptf_ipl_action <> 'NONE'
-                and ptf_product_id = '{{ product_id }}'"
-          expected_row_count: 1
-        register: ptf_status_result
+      # - name: Check if there are any PTFs of {{ product_id }} that need IPL by ibmi_sql_query module.
+      #   ibmi_sql_query:
+      #     sql: "select count(*) as ptf_need_ipl_count from qsys2.ptf_info where ptf_ipl_action <> 'NONE'
+      #           and ptf_product_id = '{{ product_id }}'"
+      #     expected_row_count: 1
+      #   register: ptf_status_result
 
-      - name: Show PTF status after install.
-        debug: var=ptf_status_result verbosity=0
+      # - name: Show PTF status after install.
+      #   debug: var=ptf_status_result verbosity=0
 
-      - name: Reboot the IBM i system by ibmi_reboot module
-        ibmi_reboot:
-          how_to_end: '*IMMED'
+      # - name: Reboot the IBM i system by ibmi_reboot module
+      #   ibmi_reboot:
+      #     how_to_end: '*IMMED'
 
-      - name: Check if all the PTFs of {{ product_id }} have been applied after IPL by ibmi_sql_query module.
-        ibmi_sql_query:
-          sql: "select PTF_IDENTIFIER as ptf_need_ipl_count from qsys2.ptf_info where ptf_ipl_action <> 'NONE'
-                and ptf_product_id = '{{ product_id }}'"
-          expected_row_count: 0
-        register: ptf_status_result2
+      # - name: Check if all the PTFs of {{ product_id }} have been applied after IPL by ibmi_sql_query module.
+      #   ibmi_sql_query:
+      #     sql: "select PTF_IDENTIFIER as ptf_need_ipl_count from qsys2.ptf_info where ptf_ipl_action <> 'NONE'
+      #           and ptf_product_id = '{{ product_id }}'"
+      #     expected_row_count: 0
+      #   register: ptf_status_result2
 
-      - name: Show PTF status after IPL returned by ibmi_sql_query module.
-        debug: var=ptf_status_result2 verbosity=0
+      # - name: Show PTF status after IPL returned by ibmi_sql_query module.
+      #   debug: var=ptf_status_result2 verbosity=0
+
+      - debug: 
+          msg: '{{ansible_facts}}'
+          
+      - name: assert facts
+        assert:
+          that:
+            - "'{{ansible_system}}' == 'OS400'"
 
       - name: Create library
         ibmi_cl_command:
