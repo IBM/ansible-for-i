@@ -56,7 +56,7 @@
     object_type_list: "*FILE"
     lib_name: "{{remote_temp_lib}}"
     object_name: "{{ savf_name.split('.')[0]}}"
-  register: find_result_org 
+  register: find_result_org
 
 - name: sync a SAVF to remote i with all options
   ibmi_synchronize:

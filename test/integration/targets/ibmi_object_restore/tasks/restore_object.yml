@@ -3,12 +3,13 @@
     object_names: '*ALL'
     object_lib: 'SAVRST'
     object_types: '*ALL'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
     format: '*SAVF'
     joblog: 'false'
     parameters: ''
   register: rstobj_result
+  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
 
 - name: assert the returned parameters of ibmi_object_restore
   assert:
@@ -16,24 +17,22 @@
       - rstobj_result.start != ''
       - rstobj_result.end != ''
       - rstobj_result.delta != ''
-      - "'CPC3703: 6 objects restored from SAVRST to SAVRST' in rstobj_result.stdout" 
-      - rstobj_result.rc == 0
-      - rstobj_result.stdout != ''
-      - rstobj_result.stdout_lines != ''
+      - "'6 objects restored' in rstobj_result.stdout or '6 objects restored' in rstobj_result.stderr" 
 
 - include: dlt_crt_lib.yml
 
 - name: restore objects to library with only required options
   ibmi_object_restore:
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
   register: rstobj_result
+  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
 
 - name: assert the returned parameters of ibmi_object_restore
   assert:
     that:
-      - "'CPC3703: 6 objects restored from SAVRST to SAVRST' in rstobj_result.stdout" 
+      - "'6 objects restored' in rstobj_result.stdout or '6 objects restored' in rstobj_result.stderr" 
     
 - include: dlt_crt_lib.yml
 
@@ -41,18 +40,19 @@
   ibmi_object_restore:
     object_names: 'PGM1'
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
   register: rstobj_result 
+  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
 
 - name: assert the returned parameters of ibmi_object_restore
   assert:
     that:
-      - "'CPC3703: 1 objects restored from SAVRST to SAVRST' in rstobj_result.stdout" 
-
+      - "'1 objects restored' in rstobj_result.stdout or '1 objects restored' in rstobj_result.stderr" 
+  
 - name: verify all objects have been restored
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') );"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
     expected_row_count: 1
   register: sql_query_result
 
@@ -65,14 +65,15 @@
   ibmi_object_restore:
     object_names: 'PGM2 ANSI*'
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
   register: rstobj_result
+  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
 
 - name: assert the returned parameters of ibmi_object_restore
   assert:
     that:
-      - "'CPC3703: 3 objects restored from SAVRST to SAVRST' in rstobj_result.stdout" 
+      - "'3 objects restored' in rstobj_result.stdout or '3 objects restored' in rstobj_result.stderr" 
 
 - include: dlt_crt_lib.yml
 
@@ -80,62 +81,66 @@
   ibmi_object_restore:
     object_names: 'P*'
     object_lib: 'SAVRST'
-    object_types: '*PGM'
-    savefile_name: 'SAVRST74'
+    object_types: '*DTAARA'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
   register: rstobj_result
+  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
 
 - name: assert the returned parameters of ibmi_object_restore
   assert:
     that:
-      - "'CPC3703: 2 objects restored from SAVRST to SAVRST' in rstobj_result.stdout" 
+      - "'2 objects restored' in rstobj_result.stdout or '2 objects restored' in rstobj_result.stderr" 
 
 - name: verify all objects have been restored
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') );"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
     expected_row_count: 2
   register: sql_query_result
 
 - name: assert the object property
   assert:
     that:
-      - sql_query_result.row[0].OBJTYPE == '*PGM'
-      - sql_query_result.row[1].OBJTYPE == '*PGM'
+      - sql_query_result.row[0].OBJTYPE == '*DTAARA'
+      - sql_query_result.row[1].OBJTYPE == '*DTAARA'
 
 - name: restore objects to library with multiple object_types
   ibmi_object_restore:
     object_names: 'A*'
     object_lib: 'SAVRST'
     object_types: '*FILE *JRNRCV'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
     joblog: 'false'
   register: rstobj_result
+  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
 
 - name: assert the returned parameters of ibmi_object_restore
   assert:
     that:
-      - "'CPC3703: 2 objects restored from SAVRST to SAVRST' in rstobj_result.stdout" 
-
+      - "'2 objects restored' in rstobj_result.stdout or '2 objects restored' in rstobj_result.stderr" 
+  
 - include: dlt_crt_lib.yml
 
 - name: restore objects to library with parameters
   ibmi_object_restore:
     object_types: "*FILE"
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
     joblog: 'true'
     parameters: 'OPTION(*NEW) RSTLIB(SAVRST1)'
+  register: rstobj_result
+  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
 
 - name: verify all objects have been restored
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST1', '*ALL') );"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST1', '*ALL') ) AS X;"
     expected_row_count: 2
 
 - name: verify all objects have been restored
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST1', '*FILE') );"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST1', '*FILE') ) AS X;"
     expected_row_count: 2
 
 # Test negitive path
@@ -145,7 +150,7 @@
   ibmi_object_restore:
     object_names: 'ABC123'
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
     joblog: 'true'
   register: rstobj_result
@@ -164,7 +169,7 @@
 - name: restore objects to library with wrong library 
   ibmi_object_restore:
     object_lib: 'ABC'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
   register: rstobj_result
   failed_when: "'CPF3780' not in rstobj_result.stderr or ('CPF3806' not in rstobj_result.stderr)"
@@ -173,7 +178,7 @@
   ibmi_object_restore:
     object_lib: 'SAVRST'
     object_types: 'ABC'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
     joblog: 'true'
   register: rstobj_result
@@ -182,7 +187,7 @@
 - name: restore objects to library from wrong format
   ibmi_object_restore:
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
     format: '*MEDDFN'
     joblog: 'true'
@@ -192,7 +197,7 @@
 - name: restore objects to library with wrong joblog
   ibmi_object_restore:
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
     joblog: 'abc'
   register: rstobj_result
@@ -201,7 +206,7 @@
 - name: restore objects with an invalid parameters
   ibmi_object_restore:
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
     parameters: 'abc'
     joblog: 'true'
@@ -212,14 +217,14 @@
   ibmi_object_restore:
     abc: '==-91'
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
   register: rstobj_result
   failed_when: "'Unsupported parameters' not in rstobj_result.msg"
 
 - name: restore objects without required options
   ibmi_object_restore:
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
   register: rstobj_result
   failed_when: "'missing required arguments: object_lib' not in rstobj_result.msg"
@@ -234,6 +239,6 @@
 - name: restore objects without required options
   ibmi_object_restore:
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
   register: rstobj_result
   failed_when: "'missing required arguments: savefile_lib' not in rstobj_result.msg"

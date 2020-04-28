@@ -1,23 +1,28 @@
+# test code for the ibmi_script module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
 #Test dependent packages 
-# - block: 
-#     - name: run the CL command to delete the library
-#       command: system dltlib ansible1
-#       register: dltlib_result
-#       failed_when: "dltlib_result.stderr != '' and 'CPF2110' not in dltlib_result.stderr"
+- block: 
+    - name: run the CL command to delete the library
+      command: system dltlib ansible1
+      register: dltlib_result
+      failed_when: "dltlib_result.stderr != '' and 'CPF2110' not in dltlib_result.stderr"
     
-#     - include: install_rpm.yml 
-#       vars: 
-#         python: "{{python_version}}"
-#       with_list: "{{required_rpms}}"     
+    - include: install_rpm.yml 
+      vars: 
+        python: "{{python_version}}"
+      with_list: "{{required_rpms}}"     
     
-#     - include: check_rpm.yml
-#       vars: 
-#         python: "{{python_version}}"
-#       with_list: "{{required_rpms}}"  
+    - include: check_rpm.yml
+      vars: 
+        python: "{{python_version}}"
+      with_list: "{{required_rpms}}"  
      
-#   vars:
-#     required_rpms: [itoolkit, ibm_db]
-#     python_version: "{{ansible_python_interpreter.split('/')[-1]}}"   
+  vars:
+    required_rpms: [itoolkit, ibm_db]
+    python_version: "{{ansible_python_interpreter.split('/')[-1]}}"   
 
 # Test when all dependent packages are in place  
 - name: run CL command module with joblog = False
@@ -103,10 +108,6 @@
   assert:
     that:
       - "'missing required arguments: cmd' in crtlib_result_2.msg"
-
-# - name: run CL command with cmd but without joblog. Covered by test output parameter.
-
-# - name: run CL command with cmd and joblog=True. Covered by test output parameter.
 
 - name: run CL command module with an invalid command and joblog=False
   ibmi_cl_command:

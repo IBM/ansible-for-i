@@ -1,0 +1,3 @@
+create table tryiasp1.ansible(id INT not null, name varchar(8), gender varchar(8));
+CL: QSYS/STRJRNPF FILE(TRYIASP1/ANSIBLE) JRN(TRYIASP1/ANSIJSNJRN);
+INSERT INTO tryiasp1.ansible VALUES('1', 'User1', 'Female');

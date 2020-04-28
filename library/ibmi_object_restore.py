@@ -220,7 +220,8 @@ def itoolkit_run_command(command, asp_group):
     itool = iToolKit()
     if asp_group != '':
         itransport = DirectTransport()
-        itool.add(iCmd('command', "SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group), {'error': 'on'}))
+        itool.add(iCmd('command', "QSYS/SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group),
+                       {'error': 'on'}))
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
 
@@ -297,9 +298,9 @@ def main():
 
     startd = datetime.datetime.now()
     # crtsavf
-    command = 'RSTOBJ OBJ(%s) SAVLIB(%s) DEV(%s) OBJTYPE(%s) SAVF(%s/%s) %s' % (object_names, object_lib, format,
-                                                                                object_types, savefile_lib, savefile_name,
-                                                                                parameters)
+    command = 'QSYS/RSTOBJ OBJ(%s) SAVLIB(%s) DEV(%s) OBJTYPE(%s) SAVF(%s/%s) %s' % (object_names, object_lib, format,
+                                                                                     object_types, savefile_lib, savefile_name,
+                                                                                     parameters)
     rc, out, err = run_command(module, command, joblog, asp_group)
 
     endd = datetime.datetime.now()

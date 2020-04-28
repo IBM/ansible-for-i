@@ -7,8 +7,8 @@ import os
 import base64
 import datetime
 
-from ansible.errors import AnsibleError
-from ansible.module_utils._text import to_text
+from ansible.errors import AnsibleError, AnsibleActionFail
+from ansible.module_utils._text import to_text, to_native
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils.six import string_types
 from ansible.module_utils.parsing.convert_bool import boolean
@@ -114,15 +114,15 @@ class ActionModule(ActionBase):
             # validate dest are strings FIXME: use basic.py and module specs
             elif not isinstance(src, string_types):
                 result['msg'] = "Invalid type supplied for src option, it must be a string."
-            else:
-                src = os.path.expanduser(src)
-                src = self._loader.path_dwim(src)
-                if not os.path.isfile(src):
-                    result['msg'] = "src must be a save file, or src doesn't exist."
 
             if result.get('msg'):
                 result['failed'] = True
                 return result
+
+            try:
+                src = self._loader.get_real_file(self._find_needle('files', src))
+            except AnsibleError as e:
+                raise AnsibleActionFail(to_native(e))
 
             lib_name = lib_name.upper()
             startd = datetime.datetime.now()
@@ -142,7 +142,7 @@ class ActionModule(ActionBase):
                             result['failed'] = True
                             return result
                         else:
-                            cmd = "REN OBJ('%s') NEWOBJ(%s.file)" % (savefile_path, rename_savf_name)
+                            cmd = "QSYS/REN OBJ('%s') NEWOBJ(%s.file)" % (savefile_path, rename_savf_name)
                             module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
                             save_result = module_output
                             rc = save_result['rc']
@@ -154,7 +154,7 @@ class ActionModule(ActionBase):
                                 return result
                         display.debug("The original save file is successfully renamed to %s" % (savefile_path))
                     else:
-                        cmd = 'DLTOBJ OBJ(%s/%s) OBJTYPE(*FILE)' % (lib_name, savefile_name)
+                        cmd = 'QSYS/DLTOBJ OBJ(%s/%s) OBJTYPE(*FILE)' % (lib_name, savefile_name)
                         module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
                         save_result = module_output
                         rc = save_result['rc']
@@ -171,7 +171,7 @@ class ActionModule(ActionBase):
                     return result
 
             # Create the save file
-            cmd = 'CRTSAVF FILE(%s/%s)' % (lib_name, savefile_name)
+            cmd = 'QSYS/CRTSAVF FILE(%s/%s)' % (lib_name, savefile_name)
             module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
             save_result = module_output
             rc = save_result['rc']
@@ -210,7 +210,7 @@ class ActionModule(ActionBase):
             return result
         finally:
             if created is True and result['failed'] is True:
-                cmd = 'DLTOBJ OBJ(%s/%s) OBJTYPE(*FILE)' % (lib_name, savefile_name)
+                cmd = 'QSYS/DLTOBJ OBJ(%s/%s) OBJTYPE(*FILE)' % (lib_name, savefile_name)
                 module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
                 save_result = module_output
                 rc = save_result['rc']

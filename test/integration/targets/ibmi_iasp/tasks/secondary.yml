@@ -1,0 +1,129 @@
+# Create an iasp using async mode
+- name: create an iasp with all supported options
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'create'
+    asp_type: '*PRIMARY'
+    primary_asp: 'abc'
+    disks: '{{disk_list[0]}}'
+    synchronous: false
+  register: iasp_result
+
+- name: pause a few minutes to wait for the iasp configured
+  pause:
+    minutes: 10
+
+- name: display the iasp info
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'display'
+  register: iasp_result
+
+- name: create an secondary iasp
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'create'
+    asp_type: '*SECONDARY'
+    primary_asp: '{{new_iasp[0]}}'
+    disks: '{{disk_list[1:3]}}'
+  register: iasp_result
+
+- name: display the iasp info
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'display'
+  register: iasp_result
+
+- name: display the iasp info
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'display'
+  register: iasp_result
+
+- name: assert the returned parameters
+  assert:
+    that: 
+      - iasp_result.asp_info | length == 1
+      - iasp_result.asp_info[0]['ASP_TYPE'] == 'SECONDARY'
+      - iasp_result.asp_info[0]['RESOURCE_NAME'] == '{{new_iasp[1]}}'
+      - iasp_result.asp_info[0]['NUMBER_OF_DISK_UNITS'] == '2' 
+
+- name: query non-configured disks
+  ibmi_get_nonconfigure_disks:
+  register: disk_result
+
+- name: assert the returned parameters
+  assert:
+    that: 
+      - "{{disk_result['disks'].split(' ') | length }} == {{disk_list | length -3 }}"
+
+- name: add disk to the iasp info
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'add_disks'
+    disks: '{{disk_list[3]}}'
+  register: iasp_result
+
+- name: display the iasp info
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'display'
+  register: iasp_result
+  ignore_errors: true
+
+- name: assert the returned parameters
+  assert:
+    that: 
+      - iasp_result.asp_info[0]['NUMBER_OF_DISK_UNITS'] == '3' 
+
+- name: query non-configured disks
+  ibmi_get_nonconfigure_disks:
+  register: disk_result
+
+- name: assert the returned parameters
+  assert:
+    that: 
+      - "{{disk_result['disks'].split(' ') | length }} == {{disk_list | length -4 }}"
+
+- name: vary on the iasp
+  ibmi_device_vary:
+    device_list: '{{new_iasp[0]}}'
+    status: '*ON'
+
+- name: vary on the iasp
+  ibmi_device_vary:
+    device_list: '{{new_iasp[1]}}'
+    status: '*ON'
+
+- name: vary off the iasp
+  ibmi_device_vary:
+    device_list: '{{new_iasp[1]}}'
+    status: '*OFF'
+
+- name: vary off the iasp
+  ibmi_device_vary:
+    device_list: '{{new_iasp[0]}}'
+    status: '*OFF'
+
+- name: delete iasp 
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'delete'
+  register: iasp_result
+  ignore_errors: true
+
+- name: delete iasp 
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'delete'
+  register: iasp_result
+  ignore_errors: true
+
+- name: query non-configured disks
+  ibmi_get_nonconfigure_disks:
+  register: disk_result
+
+- name: assert the returned parameters
+  assert:
+    that: 
+      - "{{disk_result['disks'].split(' ') | length }} == {{disk_list | length }}"

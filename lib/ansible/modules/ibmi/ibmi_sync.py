@@ -57,7 +57,8 @@ options:
 notes:
     - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3
     - Make sure ssh passwordless login works from ibm i node A to ibm i node B
-    - private_key must be a rsa key in the legacy PEM private key format.
+    - private_key must be a rsa key in the legacy PEM private key format
+    - Doesn't support IASP by now
 
 author:
     - Peng Zeng Yu (@pengzengyufish)

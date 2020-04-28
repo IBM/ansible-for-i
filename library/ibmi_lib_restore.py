@@ -192,7 +192,8 @@ def itoolkit_run_command(command, asp_group):
     itool = iToolKit()
     if asp_group != '':
         itransport = DirectTransport()
-        itool.add(iCmd('command', "SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group), {'error': 'on'}))
+        itool.add(iCmd('command', "QSYS/SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group),
+                       {'error': 'on'}))
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
 
@@ -204,7 +205,6 @@ def itoolkit_run_command(command, asp_group):
     else:
         command_output = itool.dict_out('command')
 
-    command_output = itool.dict_out('command')
     if 'success' in command_output:
         rc = IBMi_COMMAND_RC_SUCCESS
         out = command_output['success']
@@ -266,9 +266,9 @@ def main():
 
     startd = datetime.datetime.now()
     # RSTLIB
-    command = 'RSTLIB SAVLIB(%s) DEV(%s) SAVF(%s/%s) %s' % (saved_lib, format,
-                                                            savefile_lib, savefile_name,
-                                                            parameters)
+    command = 'QSYS/RSTLIB SAVLIB(%s) DEV(%s) SAVF(%s/%s) %s' % (saved_lib, format,
+                                                                 savefile_lib, savefile_name,
+                                                                 parameters)
     rc, out, err = run_command(module, command, joblog, asp_group)
 
     endd = datetime.datetime.now()

@@ -8,12 +8,12 @@
         - ARCHLIB
 
     - name: copy file to library
-      command: 'mv /tmp/SAVRST74.FILE /QSYS.LIB/ARCHLIB.LIB/'
+      command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB/'
     
     - name: restore objects to library
       ibmi_object_restore:
         object_lib: 'SAVRST'
-        savefile_name: 'SAVRST74'
+        savefile_name: 'IBMISAVF'
         savefile_lib: 'ARCHLIB'
       register: rstobj_result 
       failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"

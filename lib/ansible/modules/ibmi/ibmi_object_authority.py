@@ -351,7 +351,7 @@ def itoolkit_run_command(command, asp_group):
     itool = iToolKit()
     if asp_group != '':
         itransport = DirectTransport()
-        itool.add(iCmd('command', "SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group), {'error': 'on'}))
+        itool.add(iCmd('command', "QSYS/SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group), {'error': 'on'}))
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
 
@@ -578,7 +578,7 @@ def main():
         module.fail_json(rc=256, msg="Specify authorization_list when the operation is grant_autl or revoke_autl")
 
     if operation == 'GRANT':
-        command = 'GRTOBJAUT OBJ({p_lib}/{p_obj}) \
+        command = 'QSYS/GRTOBJAUT OBJ({p_lib}/{p_obj}) \
             OBJTYPE({p_type}) ASPDEV({p_asp}) USER({p_user}) \
             AUT({p_aut}) REPLACE({p_rep})'.format(
             p_lib=object_library,
@@ -589,7 +589,7 @@ def main():
             p_aut=authorities,
             p_rep=replace)
     elif operation == 'REVOKE':
-        command = 'RVKOBJAUT OBJ({p_lib}/{p_obj}) \
+        command = 'QSYS/RVKOBJAUT OBJ({p_lib}/{p_obj}) \
             OBJTYPE({p_type}) ASPDEV({p_asp}) USER({p_user}) \
             AUT({p_aut})'.format(
             p_lib=object_library,
@@ -599,7 +599,7 @@ def main():
             p_user=users,
             p_aut=authorities)
     elif operation == 'GRANT_AUTL':
-        command = 'GRTOBJAUT OBJ({p_lib}/{p_obj}) \
+        command = 'QSYS/GRTOBJAUT OBJ({p_lib}/{p_obj}) \
             OBJTYPE({p_type}) ASPDEV({p_asp}) \
             AUTL({p_autl})'.format(
             p_lib=object_library,
@@ -608,7 +608,7 @@ def main():
             p_asp=asp_device,
             p_autl=authorization_list)
     elif operation == 'REVOKE_AUTL':
-        command = 'RVKOBJAUT OBJ({p_lib}/{p_obj}) \
+        command = 'QSYS/RVKOBJAUT OBJ({p_lib}/{p_obj}) \
             OBJTYPE({p_type}) ASPDEV({p_asp}) \
             AUTL({p_autl})'.format(
             p_lib=object_library,
@@ -617,7 +617,7 @@ def main():
             p_asp=asp_device,
             p_autl=authorization_list)
     elif operation == 'GRANT_REF':
-        command = 'GRTOBJAUT OBJ({p_lib}/{p_obj}) \
+        command = 'QSYS/GRTOBJAUT OBJ({p_lib}/{p_obj}) \
             OBJTYPE({p_type}) ASPDEV({p_asp}) \
             REFOBJ({p_ref_lib}/{p_ref_obj}) REFOBJTYPE({p_ref_type}) \
             REFASPDEV({p_ref_asp})'.format(

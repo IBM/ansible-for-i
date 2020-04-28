@@ -1,11 +1,14 @@
-#ADDAUTLE AUTL(ZHULJ_AL) USER(QCIUSER) AUT(*AUTLMGT *USE)
-#CHGAUTLE AUTL(ZHULJ_AL) USER(QCIUSER) AUT(*OBJREF)
-
+# test code for the ibmi_script module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#)
 
 - block:
     - set_fact:
         new_user: [ANSIUSER1, ANSIUSER2]
         au_list: [au_list1, au_list2]
+        os_version: "{{ansible_distribution_version}}{{ansible_distribution_release}}"
 
     - name: create two user profiles
       ibmi_cl_command:
@@ -33,8 +36,8 @@
       ibmi_cl_command: 
         cmd: ADDAUTLE AUTL({{au_list[1]}}) USER({{new_user[1]}}) AUT(*EXCLUDE)
 
-    - include: display_object_authority.yml
-    - include: grant_object_authority.yml
+    #- include: display_object_authority.yml
+    #- include: grant_object_authority.yml
     - include: grant_aul_list.yml
     - include: grant_ref.yml
     - include: iasp.yml

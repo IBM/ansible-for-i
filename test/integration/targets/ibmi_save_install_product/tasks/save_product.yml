@@ -82,3 +82,7 @@
     savf_name: 'OPTBASE'
     savf_library: 'SAVJV11'
 
+- name: uninstall the product with default values
+  ibmi_uninstall_product:
+    product: '5770JV1'
+

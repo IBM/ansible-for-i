@@ -86,6 +86,7 @@
         that:
           - item['AUTHORIZATION_LIST'] == '{{au_list[1].upper()}}'
       loop: "{{authority_result.object_authority_list }}"
+      when : os_version | int >= 74
 
     - name: grant grant refaut to 2 objects
       ibmi_object_authority:
@@ -110,6 +111,7 @@
         that:
           - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
       loop: "{{authority_result.object_authority_list }}"
+      when : os_version | int >= 74
 
     - name: grant_ref with an not existing object
       ibmi_object_authority:

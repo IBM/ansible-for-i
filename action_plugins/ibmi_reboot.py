@@ -60,8 +60,8 @@ class ActionModule(RebootActionModule, ActionBase):
         ENDSBSOPT({end_subsystem_option}) \
         TIMOUTOPT({timeout_option}) \
         CONFIRM(*NO) \
-        INSPTFDEV({install_ptf_device})'
-    DEFAULT_SHUTDOWN_COMMAND = 'PWRDWNSYS'
+        {parameters}'
+    DEFAULT_SHUTDOWN_COMMAND = 'QSYS/PWRDWNSYS'
     DEFAULT_PRE_REBOOT_DELAY = 60
     DEFAULT_POST_REBOOT_DELAY = 60
     DEFAULT_REBOOT_TIMEOUT = 1800
@@ -70,13 +70,13 @@ class ActionModule(RebootActionModule, ActionBase):
     DEFAULT_CONNECT_TIMEOUT_SEC = 5
     DEFAULT_TEST_COMMAND = 'uname'
     DEFAULT_MSG = 'Reboot initiated by Ansible'
-    DEFAULT_HOW_TO_END = '*CNTRLD'
+    DEFAULT_HOW_TO_END = '*IMMED'
     DEFAULT_CONTROLLED_END_DELAY_TIME = 600
     DEFAULT_REBOOT_TYPE = '*IPLA'
     DEFAULT_IPL_SOURCE = '*PANEL'
     DEFAULT_END_SUBSYSTEM_OPTION = '*DFT'
     DEFAULT_TIMEOUT_OPTION = '*CONTINUE'
-    DEFAULT_INSTALL_PTF_DEVICE = '*NONE'
+    DEFAULT_PARAMETERS = ''
 
     def __init__(self, *args, **kwargs):
         super(ActionModule, self).__init__(*args, **kwargs)
@@ -152,7 +152,7 @@ class ActionModule(RebootActionModule, ActionBase):
         if timeout_option not in ['*CONTINUE', '*MSD', '*SYSREFCDE']:
             output['msg'] = "Invalid value for timeout_option option, it must be '*CONTINUE', '*MSD' or '*SYSREFCDE'"
 
-        install_ptf_device = self._task.args.get('install_ptf_device', self.DEFAULT_INSTALL_PTF_DEVICE)
+        parameters = self._task.args.get('parameters', self.DEFAULT_PARAMETERS)
 
         if output.get('msg'):
             raise AnsibleError('Invalid options for reboot_commad: {0}'.format(output['msg']).strip())
@@ -164,7 +164,7 @@ class ActionModule(RebootActionModule, ActionBase):
             ipl_source=ipl_source,
             end_subsystem_option=end_subsystem_option,
             timeout_option=timeout_option,
-            install_ptf_device=install_ptf_device
+            parameters=parameters
         )
 
     def perform_reboot(self, task_vars, distribution):
@@ -184,7 +184,7 @@ class ActionModule(RebootActionModule, ActionBase):
         display.vvv("{action}: rebooting server...".format(action=self._task.action))
         delay_time = self._task.args.get('pre_reboot_delay', self.DEFAULT_PRE_REBOOT_DELAY)
         notify_message = self._task.args.get('msg', self.DEFAULT_MSG)
-        send_message_command = "SNDBRKMSG MSG('{notify_message}, system going down in {delay_time} seconds') TOMSGQ(*ALLWS)".format(
+        send_message_command = "QSYS/SNDBRKMSG MSG('{notify_message}, system going down in {delay_time} seconds') TOMSGQ(*ALLWS)".format(
             notify_message=notify_message, delay_time=delay_time)
         self._execute_module(
             module_name='ibmi_cl_command',

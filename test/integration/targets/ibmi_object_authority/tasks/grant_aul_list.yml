@@ -59,6 +59,7 @@
         that:
           - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
       loop: "{{authority_result.object_authority_list }}"
+      when : os_version | int >= 74
 
     - name: grant AUL to 2 objects
       ibmi_object_authority:
@@ -81,6 +82,7 @@
         that:
           - item['AUTHORIZATION_LIST'] == '{{au_list[1].upper()}}'
       loop: "{{authority_result.object_authority_list }}"
+      when : os_version | int >= 74
 
     # Start revoke testing here
     - name: revoke 2 authorities to user
@@ -115,6 +117,7 @@
         that:
           - item['AUTHORIZATION_LIST'] == ''
       loop: "{{authority_result.object_authority_list }}"
+      when : os_version | int >= 74
 
     - name: grant AUL to 2 objects
       ibmi_object_authority:
@@ -145,6 +148,7 @@
         that:
           - item['AUTHORIZATION_LIST'] == ''
       loop: "{{authority_result.object_authority_list }}"
+      when : os_version | int >= 74
 
     - name: grant_autl with an not existing object
       ibmi_object_authority:

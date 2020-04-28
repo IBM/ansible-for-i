@@ -59,7 +59,7 @@ options:
       - Specifies whether the system allows the active subsystem to end processing of active jobs in a controlled manner.
       - or whether the system ends the jobs immediately. In either case, the system does perform certain job-cleanup functions.
     type: str
-    default: '*CNTRLD'
+    default: '*IMMED'
     choices: ['*IMMED', '*CNTRLD']
   controlled_end_delay_time:
     description:
@@ -92,14 +92,18 @@ options:
     type: str
     default: '*CONTINUE'
     choices: ['*CONTINUE', '*MSD', '*SYSREFCDE']
-  install_ptf_device:
+  parameters:
     description:
-      - Specifies whether Program Temporary Fixes (PTFs) should be installed before the system is powered down.
+      - The parameters that PWRDWNSYS command will take.
+      - Other than options above, all other parameters need to be specified here.
+      - The default values of parameters for PWRDWNSYS will be taken if not specified.
+      - Only Install PTF device(INSPTFDEV) is supported now for IBMi 7.3 and above.
     type: str
-    default: '*NONE'
+    default: ''
 notes:
-- ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under[defaults] section
-- OPTION('*CNTRLD') in PWRDWNSYS is not used in the ibmi_reboot module.
+- ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under[defaults] section.
+- Be careful to use '*CNTRLD' for option how_to_end,
+- you need to specify the appropriate value for all the timout options according to the system performance.
 seealso:
 - module: reboot
 author:

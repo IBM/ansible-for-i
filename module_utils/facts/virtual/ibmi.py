@@ -24,6 +24,7 @@ from ansible.module_utils.facts.virtual.base import Virtual, VirtualCollector
 from ansible.module_utils.facts.utils import get_file_content, get_file_lines
 from ansible.module_utils.ibmi import ibmi_util
 
+
 class IBMiVirtual(Virtual):
     """
     This is a IBMi-specific subclass of Virtual.
@@ -34,19 +35,22 @@ class IBMiVirtual(Virtual):
         if ibmi_util.HAS_ITOOLKIT:
             virtual_facts = {}
             connection = ibmi_util.itoolkit_init()
-            rc, rc_msg, out = ibmi_util.itoolkit_run_sql(connection, "SELECT SYSTEM_VALUE_NAME,CURRENT_NUMERIC_VALUE,CURRENT_CHARACTER_VALUE FROM QSYS2.SYSTEM_VALUE_INFO;")
-            system_values={}
+            sql = "SELECT SYSTEM_VALUE_NAME,CURRENT_NUMERIC_VALUE,CURRENT_CHARACTER_VALUE FROM QSYS2.SYSTEM_VALUE_INFO;"
+            rc, rc_msg, out, error = ibmi_util.itoolkit_run_sql(connection, sql)
+            system_values = {}
             for item in out:
                 system_values[item["SYSTEM_VALUE_NAME"]] = item["CURRENT_CHARACTER_VALUE"] if item["CURRENT_CHARACTER_VALUE"] else item["CURRENT_NUMERIC_VALUE"]
-            virtual_facts["OS400_SYSTEM_VALUES"] =  system_values
-            rc, rc_msg, out = ibmi_util.itoolkit_run_sql(connection, "SELECT * FROM QSYS2.SYSCATALOGS;")
+            virtual_facts["OS400_SYSTEM_VALUES"] = system_values
+            rc, rc_msg, out, error = ibmi_util.itoolkit_run_sql(connection, "SELECT * FROM QSYS2.SYSCATALOGS;")
             virtual_facts['OS400_RDBDIRE'] = out
-            rc, rc_msg, out = ibmi_util.itoolkit_run_sql(connection, "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO;")
+            rc, rc_msg, out, error = ibmi_util.itoolkit_run_sql(connection, "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO;")
             virtual_facts['OS400_SYSTEM_STATUS_INFO'] = out
-            rc, rc_msg, out = ibmi_util.itoolkit_run_sql(connection, "SELECT * FROM QSYS2.TCPIP_INFO;")
+            rc, rc_msg, out, error = ibmi_util.itoolkit_run_sql(connection, "SELECT * FROM QSYS2.NETSTAT_INTERFACE_INFO;")
             virtual_facts['OS400_TCPIP_INFO'] = out
-            rc, rc_msg, out = ibmi_util.itoolkit_run_sql(connection, "SELECT * FROM QSYS2.GROUP_PTF_INFO;")
+            rc, rc_msg, out, error = ibmi_util.itoolkit_run_sql(connection, "SELECT * FROM QSYS2.GROUP_PTF_INFO;")
             virtual_facts['OS400_GROUP_PTF_INFO'] = out
+            rc, rc_msg, out, error = ibmi_util.itoolkit_run_sql(connection, "SELECT CAST(data as VARCHAR(100)) FROM QUSRSYS.QATOCTCPIP WHERE KEYWORD='RMTNAMESV'")
+            virtual_facts['dns'] = out
 
             ibmi_util.itoolkti_close_connection(connection)
             return virtual_facts

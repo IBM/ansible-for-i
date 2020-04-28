@@ -1,4 +1,21 @@
+# test code for the ibmi_script module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
 # test negative test cases
+- name: Verify 5770SS1 Option 39
+  command: system "DSPSFWRSC"
+  register: installed_native_products
+
+- set_fact:
+    Option39_installed: false
+
+- name: Promote message if 5770SS1 Option 39 is not installed
+  set_fact:
+    Option39_installed: true
+  when: '"5770SS1     39         5050" in installed_native_products.stdout'
+
 - name: find objects with invalid age
   ibmi_object_find: 
     age: "*1*#"
@@ -109,16 +126,29 @@
   ibmi_object_find: 
     use_regex: true
   register: find_result
-  failed_when: "'ERROR: Regular expression specified is not valid' not in find_result.stderr"
+  ignore_errors: true
+
+- name: assert the error msg with use_regex=true and object_name is *ALL
+  assert:
+    that: 
+      - "'ERROR: Regular expression specified is not valid' in find_result.stderr"
+  when: "Option39_installed == true "
+
+- name: assert the error msg with use_regex=true and object_name is *ALL
+  assert:
+    that: 
+      - "'ibm_db_dbi::ProgrammingError: Statement Execute Failed: QQQSVREG in QSYS type *SRVPGM not found' in find_result.stderr"
+  when: "Option39_installed == false "
+
+- copy: src="findobj.FILE" dest="/tmp/"
+
+- name: copy file to library
+  command: 'mv /tmp/findobj.FILE /QSYS.LIB/QGPL.LIB/'
+
+ - include: iasp.yml
 
 - block: 
     ## Setup - Create libraries and objects on test systems
-    - copy: src="findobj.FILE" dest="/tmp/"
-
-    - name: copy file to library
-      command: 'mv /tmp/findobj.FILE /QSYS.LIB/QGPL.LIB/'
-
-    - include: iasp.yml
     
     - name: create libraries 
       ibmi_cl_command: 
@@ -127,7 +157,8 @@
     - name: restore object to library
       ibmi_cl_command: 
         cmd: "QSYS/RSTOBJ OBJ(*ALL) SAVLIB(FINDLIB) DEV(*SAVF) SAVF(QGPL/FINDOBJ)"
-  
+      register: rstobj_result 
+      failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
 
     # Run positive test cases
     - name: find library
@@ -144,7 +175,7 @@
 
     - name: find objects with object_type_list 
       ibmi_object_find: 
-        object_type_list: "*PGM"
+        object_type_list: "*DTAARA"
         object_name: "OBJECT1"
       register: find_result
   
@@ -233,7 +264,7 @@
 
     - name: find objects with object_type_list lib_name
       ibmi_object_find: 
-        object_type_list: "*PGM"
+        object_type_list: "*DTAARA"
         lib_name: "FINDLIB"
         object_name: "OBJECT1"
       register: find_result
@@ -245,7 +276,7 @@
 
     - name: find objects with multiple object_type_list
       ibmi_object_find: 
-        object_type_list: "*PGM *JRN *FILE"
+        object_type_list: "*DTAARA *JRN *FILE"
         lib_name: "FINDLIB"
         object_name: "OBJECT1"
       register: find_result
@@ -257,7 +288,7 @@
 
     - name: find objects with multiple library_list
       ibmi_object_find: 
-        object_type_list: "*PGM"
+        object_type_list: "*DTAARA"
         lib_name: "FINDLIB FINDLIB1"
         object_name: "OBJECT1"
       register: find_result
@@ -276,7 +307,7 @@
     - name: assert the returned objects 
       assert:
         that:
-          - find_result.object_list | length == 3
+          - find_result.object_list | length >= 1 
 
     - name: find objects with use_regex
       ibmi_object_find: 
@@ -285,11 +316,13 @@
         object_name: "OBJ?ECT2"
         use_regex: true
       register: find_result
+      when: "Option39_installed == true "
 
     - name: assert the returned objects 
       assert:
         that:
           - find_result.object_list | length == 2
+      when: "Option39_installed == true "
 
     - name: find objects with use_regex
       ibmi_object_find: 
@@ -298,11 +331,13 @@
         object_name: "OBJC?ECT3"
         use_regex: true
       register: find_result
+      when: "Option39_installed == true "
 
     - name: assert the returned objects 
       assert:
         that:
           - find_result.object_list | length == 1
+      when: "Option39_installed == true "
 
   always:
     - name: delete library

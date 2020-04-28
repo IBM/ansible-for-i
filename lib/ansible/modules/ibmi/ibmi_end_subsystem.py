@@ -15,7 +15,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 module: ibmi_end_subsystem
-short_description: start a subsystem
+short_description: end a subsystem
 description:
     - the C(ibmi_end_subsystem) module end a subsystem of the target ibmi node.
 version_added: "1.1"

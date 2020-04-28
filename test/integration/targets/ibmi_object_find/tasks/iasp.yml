@@ -22,7 +22,7 @@
 
   - name: find objects with object_type_list 
     ibmi_object_find: 
-      object_type_list: "*PGM"
+      object_type_list: " *DTAARA"
       object_name: "OBJECT1"
       iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
     register: find_result
@@ -51,7 +51,7 @@
 
   - name: find objects with object_type_list 
     ibmi_object_find: 
-      object_type_list: "*PGM"
+      object_type_list: " *DTAARA"
       object_name: "OBJECT1"
       lib_name: "FINDLIB"
       iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
@@ -152,7 +152,7 @@
 
   - name: find objects with object_type_list lib_name
     ibmi_object_find: 
-      object_type_list: "*PGM"
+      object_type_list: " *DTAARA"
       lib_name: "FINDLIB"
       object_name: "OBJECT1"
       iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
@@ -165,7 +165,7 @@
 
   - name: find objects with multiple object_type_list
     ibmi_object_find: 
-      object_type_list: "*PGM *JRN *FILE"
+      object_type_list: " *DTAARA *JRN *FILE"
       lib_name: "FINDLIB"
       object_name: "OBJECT1"
       iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
@@ -178,7 +178,7 @@
 
   - name: find objects with multiple library_list
     ibmi_object_find: 
-      object_type_list: "*PGM"
+      object_type_list: " *DTAARA"
       lib_name: "FINDLIB FINDLIB1"
       object_name: "OBJECT1"
       iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
@@ -187,14 +187,11 @@
   - name: assert the returned objects 
     assert:
       that:
-        - find_result.object_list | length == 0 
+        - find_result.object_list | length == 0
+  when: iasp_list.row_count != 0
 
   always:
     - name: delete library
       ibmi_cl_command: 
         cmd: dltlib lib(FINDLIB)
         asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-
-    - name: delete savf
-      ibmi_cl_command: 
-        cmd: DLTOBJ OBJ(QGPL/FINDOBJ) OBJTYPE(*FILE) 

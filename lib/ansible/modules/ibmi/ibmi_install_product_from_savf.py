@@ -259,7 +259,7 @@ def main():
             acceptance_cmd=acceptance_cmd), **result)
 
     # run the RSTLICPGM command to install the product
-    command = 'RSTLICPGM LICPGM({pattern_product}) DEV(*SAVF) OPTION({pattern_option}) RSTOBJ({pattern_object_type}) \
+    command = 'QSYS/RSTLICPGM LICPGM({pattern_product}) DEV(*SAVF) OPTION({pattern_option}) RSTOBJ({pattern_object_type}) \
         LNG({pattern_language}) RLS({pattern_release}) REPLACERLS({pattern_replace_release}) \
         SAVF({pattern_savf_library}/{pattern_savf_name}) {pattern_parameters}'.format(
         pattern_product=product,

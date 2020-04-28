@@ -24,6 +24,15 @@
     object_lib: 'SAVRST'
     savefile_name: "{{ savefile_name.split('.')[0] }}"
     savefile_lib: 'ARCHLIB'
+  register: restore_result
+  ignore_errors: true
+
+- name: assert the copied savf can be restored
+  assert:
+    that:
+      # The restore may reported user change error CPF3848 and some objects in the SAVF may not be restored CPF3773
+      - "'CPF3848' in restore_result.stderr or 'CPF3773' in restore_result.stderr"
+  when: "restore_result.rc != 0"
 
 - name: get the restored object info
   ibmi_object_find:

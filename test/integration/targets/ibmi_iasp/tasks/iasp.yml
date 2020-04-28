@@ -1,0 +1,64 @@
+# Test when all dependent packages are in place  
+- block:
+
+  - name: run CL command module with asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB(TRYIASP1) ASP(*ASPDEV) ASPDEV({{asp_name}})
+      asp_group: "{{asp_name}}"
+      #joblog: true
+
+  - ibmi_cl_command:
+      cmd: CRTDTAARA DTAARA(TRYIASP1/{{asp_name}}) TYPE(*DEC)
+      asp_group: "{{asp_name}}" 
+      #joblog: false
+
+  - name: check obj with asp_group
+    ibmi_cl_command:
+      cmd: CHKOBJ OBJ(TRYIASP1/{{asp_name}}) OBJTYPE(*DTAARA)
+      asp_group: "{{asp_name}}"
+      joblog: true
+
+  - name: check obj without asp_group
+    ibmi_cl_command:
+      cmd: CHKOBJ OBJ(TRYIASP1/{{asp_name}}) OBJTYPE(*DTAARA) 
+      joblog: false
+    register: cl_result
+    failed_when: cl_result.rc == 0
+
+  - name: run CL command module without asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB(TRYIASP2) ASP(*ASPDEV) ASPDEV({{asp_name}})
+
+  - name: create dataarea with asp_group
+    ibmi_cl_command:
+      cmd: CRTDTAARA DTAARA(TRYIASP2/data2) TYPE(*DEC)
+      asp_group: "{{asp_name}}" 
+      joblog: false
+
+  - name: check obj
+    ibmi_cl_command:
+      cmd: CHKOBJ OBJ(TRYIASP2/data2) OBJTYPE(*DTAARA)
+      asp_group: "{{asp_name}}"
+      joblog: true
+
+  - name: check obj without asp_group
+    ibmi_cl_command:
+      cmd: CHKOBJ OBJ(TRYIASP2/data2) OBJTYPE(*DTAARA) 
+      joblog: false
+    register: cl_result
+    failed_when: cl_result.rc == 0
+
+  always:
+    - name: rmvlib
+      ibmi_cl_command:
+        cmd: dltlib lib(TRYIASP1)
+        asp_group: "{{asp_name}}"
+        joblog: true
+      ignore_errors: true
+    
+    - name: rmvlib
+      ibmi_cl_command:
+        cmd: dltlib lib(TRYIASP2)
+        asp_group: "{{asp_name}}"
+        joblog: true
+      ignore_errors: true

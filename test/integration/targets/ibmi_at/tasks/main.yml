@@ -1,3 +1,8 @@
+# test code for the ibmi_script module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
 - block: 
     - copy: src="at.sh" dest="/tmp/" mode="755"
 
@@ -33,13 +38,13 @@
 
     - name: read file content from at.txt
       set_fact:
-        line_num: '{{line_num + 1}}'
-      with_lines: 'cat /tmp/testhost/tmp/at.txt'  
+        line_num: '{{line_num | int + 1}}'
+      with_lines: 'cat /tmp/{{inventory_hostname}}/tmp/at.txt'  
 
     - name: verify the job has been scheduled and ran
       assert: 
         that: 
-          - "'{{line_num}}'  == '1'"
+          - "{{line_num}}  == 1"
 
     - name: schedule job with all options
       ibmi_at: 
@@ -208,5 +213,9 @@
       ibmi_cl_command:
         cmd: 'RMVJOBSCDE JOB(TESTALL)'
       ignore_errors: true
+
+    - name: delete script local
+      command: "rm -rf /tmp/testhost/tmp/at.txt"
+      delegate_to: localhost
 
  

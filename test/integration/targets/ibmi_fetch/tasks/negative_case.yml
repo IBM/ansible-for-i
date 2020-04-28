@@ -3,7 +3,6 @@
   ibmi_fetch:
     lib_name: 'SAVRST'
   register: fetch_result
-  #failed_when: "'missing required arguments: dest' not in fetch_result.msg"
   failed_when: "'lib_name and dest are required' not in fetch_result.msg"
 
 # Test missing required options 
@@ -11,17 +10,20 @@
   ibmi_fetch:
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
-  #failed_when: "'missing required arguments: lib_name' not in fetch_result.msg"
   failed_when: "'lib_name and dest are required' not in fetch_result.msg"
 
-# # Test with an invalid option
-# - name: Fetch objects with an invalid option
-#   ibmi_fetch:
-#     lib_name: 'SAVRST'
-#     dest: '{{ output_dir }}/fetched'
-#     abc: 'abc'
-#   register: fetch_result
-#   failed_when: "'Unsupported parameters' not in fetch_result.msg"
+# Test with an invalid option
+- name: Fetch objects with an invalid option
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: '{{ output_dir }}/fetched'
+    abc: 'abc'
+  register: fetch_result
+  ignore_errors: true
+
+- assert:
+    that:
+      - "'Invalid options for ibmi_fetch: abc' in fetch_result.msg"
 
 # Test with an invalid object_names
 - name: Fetch objects with invalid object_names
@@ -32,12 +34,11 @@
   register: fetch_result
   failed_when: "'Create SAVF failed. See stderr or stdout for more information' not in fetch_result.msg"
 
-# Test positive cases of fail_on_missing
-- name: Fetch objects with fail_on_missing
+- name: Fetch objects 
   ibmi_fetch:
     object_names: 'ABC'
     lib_name: 'SAVRST'
-    object_types: '*PGM'
+    object_types: '*DTAARA'
     savefile_name: 'ifetch2'
     is_lib: false
     dest: '{{ output_dir }}/fetched'
@@ -45,7 +46,6 @@
     backup: false
     format: '*SAVF'
     target_release: '*CURRENT'
-    fail_on_missing: false
     validate_checksum: true
     flat: false
   register: fetch_result
@@ -55,23 +55,10 @@
   ibmi_fetch:
     object_names: 'PGM1 PGM1'
     lib_name: 'SAVRST'
-    object_types: '*PGM'
+    object_types: '*DTAARA'
     savefile_name: 'ifetch1'
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
-
-- include: copy_object.yml
-  vars:
-    savefile_name: "ifetch1.file" 
-
-- include: cleanup_lib.yml
-  vars:
-    savefile_name: "ifetch1" 
-
-- name: assert 2 objects restored to the library
-  ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') );"
-    expected_row_count: 1
 
 - include: setup_lib.yml
 
@@ -147,15 +134,6 @@
   register: fetch_result
   failed_when: "'is not a valid boolean' not in fetch_result.msg"
 
-# Test with invalid fail_on_missing
-- name: Fetch objects with invalid fail_on_missing
-  ibmi_fetch:
-    lib_name: 'SAVRST'
-    fail_on_missing: abc
-    dest: '{{ output_dir }}/fetched'
-  register: fetch_result
-  failed_when: "'is not a valid boolean' not in fetch_result.msg"
-
 # Test with invalid flat
 - name: Fetch objects with invalid flat
   ibmi_fetch:
@@ -188,16 +166,6 @@
   ibmi_fetch:
     lib_name: 'SAVRST'
     dest: '{{ output_dir }}/abcdefg'
-
-# Test negative cases of target_release
-- name: Fetch objects with invalid target_release
-  ibmi_fetch:
-    lib_name: 'SAVRST'
-    object_types: '*PGM'
-    dest: '{{ output_dir }}/fetched'
-    target_release: 'V7R2M0'
-  register: fetch_result
-  failed_when: "'CPF3770' not in ''.join(fetch_result.stderr)"
   
 - name: dest is an existing directory name without trailing slash and flat=yes
   ibmi_fetch:

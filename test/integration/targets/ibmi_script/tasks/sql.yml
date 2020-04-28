@@ -1,0 +1,100 @@
+- block: 
+    
+    - name: create journal receiver
+      ibmi_cl_command: 
+        cmd: QSYS/CRTJRNRCV JRNRCV(QGPL/ANSIJSNRCV) TEXT('JOURNAL RECEIVER FOR ANSIBLE')
+
+    - name: create journal
+      ibmi_cl_command: 
+        cmd: QSYS/CRTJRN JRN(QGPL/ANSIJSNJRN) JRNRCV(QGPL/ANSIJSNRCV) TEXT('JOURNAL FOR ANSIBLE')   
+
+    - name: run sql script
+      ibmi_script:
+        src: 'sql1.txt'
+        type: 'SQL'
+        parameters: 'USRPRF(*USER)'
+
+    - name: run the SQL command to query a table
+      ibmi_sql_query:
+        sql: "select * from ansible"
+        expected_row_count: 1
+      register: sql_query_result
+
+    - name: run sql script
+      ibmi_script:
+        src: '{{file_path}}/sql2.txt'
+        type: 'SQL'
+        severity_level: 20
+        parameters: 'USRPRF(*USER)'
+      ignore_errors: true
+
+    - name: run the SQL command to query the table and check row count
+      ibmi_sql_query:
+        sql: "select * from ansible"
+        expected_row_count: 1
+
+    - name: run sql script
+      ibmi_script:
+        src: '{{file_path}}/sql2.txt'
+        type: 'SQL'
+        severity_level: 40
+        parameters: 'USRPRF(*USER)'
+
+    - name: run the SQL command to query the table and check row count
+      ibmi_sql_query:
+        sql: "select * from ansible"
+        expected_row_count: 2
+
+    - name: run sql script
+      ibmi_script:
+        src: '{{file_path}}/sql2.txt'
+        type: 'SQL'
+        severity_level: 40
+        parameters: "USRPRF({{ansible_ssh_user}})"
+      register: sql_result
+      failed_when: "'not valid for parameter USRPRF' not in sql_result.stderr"
+
+    - name: run the SQL command to query the table and check row count
+      ibmi_sql_query:
+        sql: "select * from ansible"
+        expected_row_count: 2
+
+    - name: run sql script with unsupported severity
+      ibmi_script:
+        src: '{{file_path}}/sql2.txt'
+        type: 'SQL'
+        severity_level: 50
+        parameters: "USRPRF({{ansible_ssh_user}})"
+      register: sql_result
+      ignore_errors: true
+
+  always:
+    - name: end journal
+      ibmi_cl_command: 
+        cmd: QSYS/ENDJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN)
+      ignore_errors: True
+ 
+    - name: drop the table
+      ibmi_sql_execute:
+        sql: "drop table ansible"
+      ignore_errors: True
+
+    - name: delete journal
+      ibmi_cl_command: 
+        cmd: QSYS/DLTJRN JRN(QGPL/ANSIJSNJRN) 
+      ignore_errors: True
+
+    - name: create default reply list entry for CPA7025
+      ibmi_cl_command: 
+        cmd: ADDRPYLE SEQNBR(9999) MSGID(CPA7025) RPY(I)
+      ignore_errors: True
+
+    - name: delete journal receiver
+      ibmi_cl_command: 
+        cmd: QSYS/DLTOBJ OBJ(QGPL/ANSIJSNRCV) OBJTYPE(*JRNRCV)
+      ignore_errors: True
+
+    - name: remove reply list entry
+      ibmi_cl_command: 
+        cmd: QSYS/RMVRPYLE SEQNBR(9999)
+      ignore_errors: True

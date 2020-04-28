@@ -39,7 +39,6 @@ class ActionModule(ActionBase):
         'target_release',
         'dest',
         'flat',
-        'fail_on_missing',
         'validate_checksum',
     ))
 
@@ -143,7 +142,6 @@ class ActionModule(ActionBase):
             target_release = self._task.args.get('target_release', '*CURRENT')
             dest = self._task.args.get('dest', None)
             flat = boolean(self._task.args.get('flat', False), strict=True)
-            fail_on_missing = boolean(self._task.args.get('fail_on_missing', True), strict=True)
             validate_checksum = boolean(self._task.args.get('validate_checksum', True), strict=True)
 
             # validate dest are strings FIXME: use basic.py and module specs
@@ -182,22 +180,28 @@ class ActionModule(ActionBase):
                         module_args = {'object_name': object_names[0:-1] + '+', 'lib_name': lib_name, 'use_regex': True}
                         module_output = self._execute_module(module_name='ibmi_object_find', module_args=module_args)
                         save_result = module_output
-                        if len(save_result['object_list']) == 1 and save_result['object_list'][0]['OBJTYPE'] == '*FILE' and \
-                           save_result['object_list'][0]['OBJATTRIBUTE'] == 'SAVF':
-                            result['msg'] += "Object is a save file, fetch it directly."
-                            savf_path = self._calculate_savf_path(save_result['object_list'][0]['OBJNAME'], lib_name)
-                            savf_name = save_result['object_list'][0]['OBJNAME']
-                            is_savf = True
+                        if not save_result.get('failed'):
+                            if len(save_result['object_list']) == 1 and save_result['object_list'][0]['OBJTYPE'] == '*FILE' \
+                               and save_result['object_list'][0]['OBJATTRIBUTE'] == 'SAVF':
+                                result['msg'] += "Object is a save file, fetch it directly."
+                                savf_path = self._calculate_savf_path(save_result['object_list'][0]['OBJNAME'], lib_name)
+                                savf_name = save_result['object_list'][0]['OBJNAME']
+                                is_savf = True
                     else:
                         module_args = {'object_name': object_names, 'lib_name': lib_name}
                         module_output = self._execute_module(module_name='ibmi_object_find', module_args=module_args)
                         save_result = module_output
-                        if len(save_result['object_list']) == 1 and save_result['object_list'][0]['OBJTYPE'] == '*FILE' and \
-                           save_result['object_list'][0]['OBJATTRIBUTE'] == 'SAVF':
-                            result['msg'] += "Object is a save file, fetch it directly."
-                            savf_path = self._calculate_savf_path(object_names, lib_name)
-                            savf_name = object_names
-                            is_savf = True
+                        if not save_result.get('failed'):
+                            if len(save_result['object_list']) == 1 and save_result['object_list'][0]['OBJTYPE'] == '*FILE' and \
+                               save_result['object_list'][0]['OBJATTRIBUTE'] == 'SAVF':
+                                result['msg'] += "Object is a save file, fetch it directly."
+                                savf_path = self._calculate_savf_path(object_names, lib_name)
+                                savf_name = object_names
+                                is_savf = True
+
+                    if save_result.get('failed'):
+                        result.update(save_result)
+                        return result
             if is_savf is False:
                 savf_name, savf_path = self._calculate_savf_name(object_names, lib_name, is_lib, savefile_name, task_vars,
                                                                  result)
@@ -224,35 +228,28 @@ class ActionModule(ActionBase):
                     return result
                 created = True
 
-            display.debug("savf_name = %s, savf_path = %s, force_save=%s" % (savf_name, savf_path, force_save))
             source = savf_path
             commandmk = 'mkdir %s' % ifs_dir
             command = 'cp %s %s' % (savf_path, ifs_dir)
 
-            try:
-                module_output = self._execute_module(module_name='command', module_args={'_raw_params': commandmk})
-                save_result = module_output
-                rc = save_result['rc']
-                display.debug("save_result['stderr_lines'] = %s" % (save_result['stderr_lines']))
-                if rc != 0 and ('exists' not in save_result['stderr']):
-                    result['msg'] = save_result['msg']
-                    result['failed'] = True
-                    result['stderr'] = save_result['stderr_lines']
-                    return result
-                module_output = self._execute_module(module_name='command', module_args={'_raw_params': command})
-                save_result = module_output
-                rc = save_result['rc']
-                if rc != 0:
-                    result['msg'] = save_result['msg']
-                    result['failed'] = True
-                    result['stderr'] = save_result['stderr_lines']
-                    result['stdout'] = save_result['stdout_lines']
-                    return result
-                ifs_created = True
-            except Exception as e:
-                result['msg'] = to_text(e)
+            module_output = self._execute_module(module_name='command', module_args={'_raw_params': commandmk})
+            save_result = module_output
+            rc = save_result['rc']
+            if rc != 0 and ('exists' not in save_result['stderr']):
+                result['msg'] = save_result['msg']
                 result['failed'] = True
+                result['stderr'] = save_result['stderr_lines']
                 return result
+            module_output = self._execute_module(module_name='command', module_args={'_raw_params': command})
+            save_result = module_output
+            rc = save_result['rc']
+            if rc != 0:
+                result['msg'] = save_result['msg']
+                result['failed'] = True
+                result['stderr'] = save_result['stderr_lines']
+                result['stdout'] = save_result['stdout_lines']
+                return result
+            ifs_created = True
 
             source = '%s/%s' % (ifs_dir, os.path.basename(savf_path))
 
@@ -272,8 +269,8 @@ class ActionModule(ActionBase):
             if remote_checksum in ('1', '2', None):
                 slurpres = self._execute_module(module_name='slurp', module_args=dict(src=source), task_vars=task_vars)
                 if slurpres.get('failed'):
-                    if not fail_on_missing and (slurpres.get('msg').startswith('file not found') or remote_checksum == '1'):
-                        result['msg'] = "the remote file does not exist, not transferring, ignored"
+                    if (slurpres.get('msg').startswith('file not found') or remote_checksum == '1'):
+                        result['msg'] = "the remote file does not exist, not transferring"
                         result['file'] = source
                         result['changed'] = False
                     else:
@@ -331,16 +328,8 @@ class ActionModule(ActionBase):
                     result['msg'] = "python isn't present on the system.  Unable to compute checksum"
                 elif remote_checksum == '5':
                     result['msg'] = "stdlib json was not found on the remote machine. Only the raw module can work without those installed"
-                # Historically, these don't fail because you may want to transfer
-                # a log file that possibly MAY exist but keep going to fetch other
-                # log files. Today, this is better achieved by adding
-                # ignore_errors or failed_when to the task.  Control the behaviour
-                # via fail_when_missing
-                if fail_on_missing:
-                    result['failed'] = True
-                    del result['changed']
-                else:
-                    result['msg'] += ", not transferring, ignored"
+
+                result['failed'] = True
                 return result
 
             # calculate checksum for the local file
@@ -398,7 +387,7 @@ class ActionModule(ActionBase):
             return result
         finally:
             if ((backup is False and is_savf is False) or result['failed'] is True) and created is True:
-                cmd = 'DLTOBJ OBJ(%s/%s) OBJTYPE(*FILE)' % (lib_name, savf_name)
+                cmd = 'QSYS/DLTOBJ OBJ(%s/%s) OBJTYPE(*FILE)' % (lib_name, savf_name)
                 module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
                 save_result = module_output
                 rc = save_result['rc']

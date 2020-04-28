@@ -67,7 +67,7 @@ stdout_lines:
     description: The standard output split in lines
     type: list
     sample: [
-        "CPF0902: Subsystem QBATCH in library QSYS being started."
+        "CPF0902: Subsystem QINTER in library QSYS being started."
     ]
     returned: always
 stderr_lines:

@@ -1,0 +1,201 @@
+- name: invalid option
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'create'
+    disks: "{{disk_list[0]}}"
+    abc: abc
+  register: neg_result
+  failed_when: "'Unsupported parameters' not in neg_result.msg"
+
+- name: missing required parameters
+  ibmi_iasp:
+    operation: 'create'
+    disks: "{{disk_list[0]}}"
+  register: neg_result
+  failed_when: "'missing required arguments: name' not in neg_result.msg"
+
+- name: missing required parameters
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    disks: "{{disk_list[0]}}"
+  register: neg_result
+  failed_when: "'missing required arguments: operation' not in neg_result.msg"
+
+- name: missing required parameters
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'create'
+  register: neg_result
+  failed_when: "'operation is create but all of the following are missing: disks' not in neg_result.msg"
+
+- name: missing required parameters
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'abc'
+    disks: "{{disk_list[0]}}"
+  register: neg_result
+  failed_when: "'value of operation must be one of' not in neg_result.msg"
+
+- name: missing required parameters
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'create'
+    asp_type: 'abc'
+    disks: "{{disk_list[0]}}"
+  register: neg_result
+  failed_when: "'value of asp_type must be one of' not in neg_result.msg"
+
+- name: create an primary iasp
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'create'
+    disks: "{{disk_list[0]}}"
+    extra_parameters: 'PROTECT(*YES)'
+
+- name: create an secondary iasp with primary asp options
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'create'
+    asp_type: '*SECONDARY'
+    primary_asp: '{{new_iasp[0]}}' 
+    disks: "{{disk_list[1]}}"
+  register: neg_result
+
+- name: add a disk to an not existing-iasp
+  ibmi_iasp:
+    name: 'abc'
+    operation: 'add_disks'
+    disks: "{{disk_list[2]}}"
+  register: neg_result
+  ignore_errors: true
+
+- name: display an not existing-iasp
+  ibmi_iasp:
+    name: 'abc'
+    operation: 'display'
+  register: neg_result
+  ignore_errors: true
+
+- name: assert error
+  assert:
+    that:
+      - "'not exsit' in neg_result.stdout or 'not exsit' in neg_result.stderr" 
+
+- name: create an iasp with existing name
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'create'
+    disks: '{{disk_list[3]}}'
+  register: iasp_result
+  ignore_errors: True
+
+- name: assert error
+  assert:
+    that:
+      - "'already exsit' in iasp_result.stderr or 'already exsit' in iasp_result.stdout"
+
+- name: pause a few minutes to wait for the iasp configured
+  pause:
+    minutes: 3
+
+- name: delete a primary iasp when it has a seconday iasp
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'delete'
+    disks: "{{disk_list[0]}}"
+  register: iasp_result
+  ignore_errors: true 
+
+- name: assert error
+  assert:
+    that:
+      - "'ASP not in correct state for operation' in iasp_result.stderr"
+
+- name: pause a few minutes to wait for the iasp configured
+  pause:
+    minutes: 3
+    
+- name: delete a secondary iasp
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'delete'
+  register: iasp_result
+  ignore_errors: true 
+
+- name: create an primary iasp with in-use disk
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'create'
+    disks: "{{disk_list[0]}}"
+  register: iasp_result
+  ignore_errors: true
+
+- name: assert create an primary iasp with in-use disk fails
+  assert:
+    that:
+      - "iasp_result.rc != 0"
+
+- name: pause a few minutes to wait for the iasp configured
+  pause:
+    minutes: 5
+
+- name: create an secondary iasp with invalid primary asp options
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'create'
+    asp_type: '*SECONDARY'
+    primary_asp: 'abc'
+    disks: "{{disk_list[1]}}"
+  register: iasp_result
+  ignore_errors: true
+
+- name:
+  assert:
+    that:
+      - "'Device description ABC not correct for operation' in iasp_result.stderr"
+
+- name: pause a few minutes to wait for the iasp configured
+  pause:
+    minutes: 5
+
+- name: create an secondary iasp without primary asp options
+  ibmi_iasp:
+    name: '{{new_iasp[1]}}'
+    operation: 'create'
+    asp_type: '*SECONDARY'
+    disks: "{{disk_list[1]}}"
+  register: neg_result
+  ignore_errors: true
+
+- name: assert missing primary_asp
+  assert:
+    that:
+      - "'asp_type is *SECONDARY but all of the following are missing: primary_asp' in neg_result.msg"
+
+- name: pause a few minutes to wait for the iasp configured
+  pause:
+    minutes: 5
+
+- name: delete a primary iasp
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'delete'
+  register: neg_result
+  ignore_errors: true  
+
+- name: create with invalid disks
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'create'
+    disks: "DHP110"
+  register: neg_result
+  ignore_errors: true
+
+- name: assert 
+  assert:
+    that:
+      - "'Disk unit DHP110 not found' in neg_result.stderr"
+
+- name: pause a few minutes to wait for the iasp configured
+  pause:
+    minutes: 5

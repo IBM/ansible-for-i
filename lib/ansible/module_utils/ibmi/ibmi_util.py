@@ -33,6 +33,7 @@ IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG = 256
 IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR = 257
 IBMi_COMMAND_RC_UNEXPECTED_ROW_COUNT = 258
 IBMi_COMMAND_RC_INVALID_EXPECTED_ROW_COUNT = 259
+IBMi_NO_ROW_FOUND_ERROR = 260
 
 
 def interpret_return_code(rc):
@@ -46,6 +47,8 @@ def interpret_return_code(rc):
         return "iToolKit result dict does not have key 'joblog'"
     elif rc == IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR:
         return "iToolKit result dict does not have key 'error'"
+    elif rc == IBMi_NO_ROW_FOUND_ERROR:
+        return "No matched row exists"
     else:
         return "Unknown error"
 
@@ -89,6 +92,8 @@ def itoolkit_run_sql(conn, sql):
         itool.add(iSqlFree('free'))
         itool.call(itransport)
         command_output = itool.dict_out('fetch')
+        command_error = ''
+        error = ''
         out = ''
         if 'error' not in command_output:
             rc = IBMi_COMMAND_RC_SUCCESS
@@ -101,14 +106,18 @@ def itoolkit_run_sql(conn, sql):
             command_error = command_output['error']
             if 'joblog' in command_error:
                 rc = IBMi_COMMAND_RC_ERROR
+                error = command_error['joblog']
+            elif 'xmlhint' in command_output:
+                if "Row not found" in command_output['xmlhint']:
+                    rc = IBMi_COMMAND_RC_SUCCESS
+                    error = command_output['xmlhint']
             else:
                 # should not be here, must xmlservice has internal error
                 rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
-                if 'Row not found' in command_error:
-                    rc = 0  # treat as success but also indicate the Row not found message in stderr
+                error = "iToolKit result dict does not have key 'joblog', the output is %s" % command_output
     except Exception as e_db_connect:
         raise Exception(str(e_db_connect))
-    return rc, interpret_return_code(rc), out_list
+    return rc, interpret_return_code(rc), out_list, error
 
 
 def itoolkti_close_connection(conn):
@@ -122,11 +131,12 @@ def itoolkti_close_connection(conn):
 
 
 def itoolkit_run_command_once(command):
+    conn = None
     try:
         conn = itoolkit_init()
         return itoolkit_rum_command(conn, command)
     except Exception as e_disconnect:
-        raise Exception(e_disconnect)
+        raise Exception(str(e_disconnect))
     finally:
         itoolkti_close_connection(conn)
 
@@ -140,6 +150,8 @@ def itoolkit_rum_command(conn, command):
         rc = ''
         out = ''
         command_output = itool.dict_out('command')
+        command_error = ''
+        error = ''
         if 'success' in command_output:
             rc = IBMi_COMMAND_RC_SUCCESS
             out = command_output['success']
@@ -147,12 +159,19 @@ def itoolkit_rum_command(conn, command):
             command_error = command_output['error']
             if 'joblog' in command_error:
                 rc = IBMi_COMMAND_RC_ERROR
+                error = command_error['joblog']
             else:
                 # should not be here, must xmlservice has internal error
                 rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
+                error = "iToolKit result dict does not have key 'joblog', the output is %s" % command_output
         else:
             # should not be here, must xmlservice has internal error
             rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR
+            error = "iToolKit result dict does not have key 'error', the output is %s" % command_output
     except Exception as e_disconnect:
-        raise Exception(e_disconnect)
-    return rc, interpret_return_code(rc), out
+        raise Exception(str(e_disconnect))
+    return rc, interpret_return_code(rc), out, error
+
+
+def fmtTo10(str):
+    return str.ljust(10) if len(str) <= 10 else str[0:10]

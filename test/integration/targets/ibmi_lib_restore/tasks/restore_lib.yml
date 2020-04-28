@@ -1,8 +1,10 @@
 - name: restore objects to library
   ibmi_object_restore:
     object_lib: 'SAVRST'
-    savefile_name: 'SAVRST74'
+    savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
+  register: rstobj_result
+  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
 
 - ibmi_lib_save:
     lib_name: 'SAVRST'
@@ -62,7 +64,7 @@
 
 - name: verify all objects have been restored
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') );"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
     expected_row_count: 6
 
 # Test negitive path

@@ -88,11 +88,6 @@ options:
       - The release of the operating system on which you intend to restore and use the SAVF.
     type: str
     default: '*CURRENT'
-  fail_on_missing:
-    description:
-      - When set to True, the task will fail if the remote file cannot be read for any reason.
-    type: bool
-    default: True
   validate_checksum:
     description:
       - Verify that the source and destination checksums match after the files are fetched.

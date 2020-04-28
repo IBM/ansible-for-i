@@ -180,6 +180,7 @@ def itoolkit_run_command(command):
     err = ''
 
     command_output = itool.dict_out('command')
+
     if 'success' in command_output:
         rc = IBMi_COMMAND_RC_SUCCESS
         out = command_output['success']

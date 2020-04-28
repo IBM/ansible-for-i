@@ -243,7 +243,8 @@ def itoolkit_run_command(command, asp_group):
     itool = iToolKit()
     if asp_group != '':
         itransport = DirectTransport()
-        itool.add(iCmd('command', "SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group), {'error': 'on'}))
+        itool.add(iCmd('command', "QSYS/SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group),
+                       {'error': 'on'}))
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
 
@@ -324,29 +325,29 @@ def main():
 
     startd = datetime.datetime.now()
     # crtsavf
-    command = 'CRTSAVF FILE(%s/%s)' % (savefile_lib, savefile_name)
+    command = 'QSYS/CRTSAVF FILE(%s/%s)' % (savefile_lib, savefile_name)
     rc, out, err = run_command(module, command, joblog, asp_group)
     if rc == IBMi_COMMAND_RC_SUCCESS:
         # SAVOBJ
-        command = 'SAVOBJ OBJ(%s) LIB(%s) DEV(%s) OBJTYPE(%s) SAVF(%s/%s) TGTRLS(%s) %s' % (object_names, object_lib, format,
-                                                                                            object_types, savefile_lib,
-                                                                                            savefile_name, target_release,
-                                                                                            parameters)
+        command = 'QSYS/SAVOBJ OBJ(%s) LIB(%s) DEV(%s) OBJTYPE(%s) SAVF(%s/%s) TGTRLS(%s) %s' % (object_names, object_lib, format,
+                                                                                                 object_types, savefile_lib,
+                                                                                                 savefile_name, target_release,
+                                                                                                 parameters)
         rc, out, err = run_command(module, command, joblog, asp_group)
     else:
         if 'CPF5813' in err:
             if force_save is True:
                 # CLRSAVF
-                command = 'CLRSAVF FILE(%s/%s)' % (savefile_lib, savefile_name)
+                command = 'QSYS/CLRSAVF FILE(%s/%s)' % (savefile_lib, savefile_name)
                 rc, out, err = run_command(module, command, joblog, asp_group)
                 if rc == IBMi_COMMAND_RC_SUCCESS:
-                    command = 'SAVOBJ OBJ(%s) LIB(%s) DEV(%s) OBJTYPE(%s) SAVF(%s/%s) TGTRLS(%s) %s' % (object_names,
-                                                                                                        object_lib, format,
-                                                                                                        object_types,
-                                                                                                        savefile_lib,
-                                                                                                        savefile_name,
-                                                                                                        target_release,
-                                                                                                        parameters)
+                    command = 'QSYS/SAVOBJ OBJ(%s) LIB(%s) DEV(%s) OBJTYPE(%s) SAVF(%s/%s) TGTRLS(%s) %s' % (object_names,
+                                                                                                             object_lib, format,
+                                                                                                             object_types,
+                                                                                                             savefile_lib,
+                                                                                                             savefile_name,
+                                                                                                             target_release,
+                                                                                                             parameters)
                     rc, out, err = run_command(module, command, joblog, asp_group)
             else:
                 out = 'File %s in library %s already exists. If still need save, please set force_save.' % (savefile_name,

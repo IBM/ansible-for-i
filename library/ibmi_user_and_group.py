@@ -38,7 +38,7 @@ options:
     required: yes
   user:
     description:
-      - Specifies the user profile to be created. A numeric user profile can be specified.
+      - Specifies the user profile to be operated. A numeric user profile can be specified.
       - If the user profile begins with a numeric, it must be prefixed with a Q.
       - If you want to create, display, display group members of a group, this parameter is the group profile name.
     type: str
@@ -47,6 +47,7 @@ options:
     description:
       - Specifies the password that allows the user to sign on the system.
       - If not specify, operation create will use the user name as the password, operation change will not change the password.
+      - Valid only for operation create and change.
     type: str
     default: '*SAME'
   expire:
@@ -54,6 +55,7 @@ options:
       - Specifies whether the password for this user is set to expired.
       - If the password is set to expired, the user is required to change the password to sign on the system.
       - If not specify, '*NO' will be used for operation create, '*SAME' will be used for operation change.
+      - Valid only for operation create and change.
     type: str
     choices: ['*NO', '*YES', '*SAME']
     default: '*SAME'
@@ -61,6 +63,7 @@ options:
     description:
       - Specifies the status of the user profile.
       - If not specify, '*ENABLED' will be used for operation create, '*SAME' will be used for operation change.
+      - Valid only for operation create and change.
     type: str
     choices: ['*ENABLED', '*DISABLED', '*SAME']
     default: '*SAME'
@@ -68,6 +71,7 @@ options:
     description:
       - Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.
       - If not specify, '*USER' will be used for operation create, '*SAME' will be used for operation change.
+      - Valid only for operation create and change.
     type: str
     choices: ['*USER', '*SYSOPR', '*PGMR','*SECADM', '*SECOFR', '*SAME']
     default: '*SAME'
@@ -75,6 +79,7 @@ options:
     description:
       - Specifies the special authorities given to a user.
       - If not specify, '*USRCLS' will be used for operation create, '*SAME' will be used for operation change.
+      - Valid only for operation create and change.
     type: list
     elements: str
     choices: ['*USRCLS', '*NONE', '*SAME',
@@ -85,12 +90,14 @@ options:
       - Specifies the user's group profile name whose authority is used if no specific authority is given for the user.
       - If not specify, operation create is to create an individual user, or else, the new created user will be a member of the group.
       - If not specify, operation change does nothing on the user, or else, the new changed user will be added as a member of the group.
+      - Valid only for operation create and change.
     type: str
     default: '*SAME'
   owner:
     description:
       - Specifies the user that is to be the owner of objects created by this user.
       - If not specify, '*USRPRF' will be used for operation create, '*SAME' will be used for operation change.
+      - Valid only for operation create and change.
     type: str
     choices: ['*USRPRF', '*GRPPRF', '*SAME']
     default: '*SAME'
@@ -98,13 +105,14 @@ options:
     description:
       - Specifies the text that briefly describes the user or group profile.
       - If not specify, 'Create by Ansible' will be used for operation create, '*SAME' will be used for operation change.
+      - Valid only for operation create and change.
     type: str
     default: '*SAME'
   parameters:
     description:
-      - The parameters that CRTUSRPRF or CHGUSRPRF command will take.
+      - The parameters that CRTUSRPRF or CHGUSRPRF or DLTUSRPRF command will take.
       - Other than options above, all other parameters need to be specified here.
-      - The default values of parameters for CRTUSRPRF or CHGUSRPRF will be taken if not specified.
+      - The default values of parameters for CRTUSRPRF or CHGUSRPRF or DLTUSRPRF will be taken if not specified.
       - Supported parameters contain
       - ASTLVL, CURLIB, INLPGM, INLMNU, LMTCPB, TEXT, SPCENV, DSPSGNINF, PWDEXPITV, PWDCHGBLK, LCLPWDMGT, LMTDEVSSN, KBDBUF, MAXSTGLRG, MAXSTG, PTYLMT,
       - GRPAUT, GRPAUTTYP, SUPGRPPRF, ACGCDE, DOCPWD, MSGQ, DLVRY, SEV, PRTDEV, OUTQ, ATNPGM, SRTSEQ, LANGID, CNTRYID, CCSID, CHRIDCTL, SETJOBATR,
@@ -142,7 +150,7 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-sstdout:
+stdout:
     description: The standard output
     returned: when rc as 0(success) and the operation is not display or display_group_members
     type: str
@@ -251,7 +259,7 @@ def itoolkit_run_command(command, asp_group):
     itool = iToolKit()
     if asp_group != '':
         itransport = DirectTransport()
-        itool.add(iCmd('command', "SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group), {'error': 'on'}))
+        itool.add(iCmd('command', "QSYS/SETASPGRP ASPGRP({asp_group_pattern})".format(asp_group_pattern=asp_group), {'error': 'on'}))
     itool.add(iCmd('command', command, {'error': 'on'}))
     itool.call(itransport)
 
@@ -426,7 +434,7 @@ def main():
         if (user_group != '*NONE') and (not group_exist):
             module.fail_json(rc=256, msg="Group profile {p_group} not found".format(p_group=user_group))
 
-        command = "CRTUSRPRF USRPRF({p_user}) PASSWORD({p_password}) PWDEXP({p_expire}) STATUS({p_status})\
+        command = "QSYS/CRTUSRPRF USRPRF({p_user}) PASSWORD({p_password}) PWDEXP({p_expire}) STATUS({p_status})\
             USRCLS({p_class}) SPCAUT({p_special}) GRPPRF({p_group}) OWNER({p_owner}) TEXT('{p_text}') {parameters}".format(
             p_user=user, p_password=password, p_expire=expire, p_status=status,
             p_class=user_class, p_special=authorities, p_group=user_group, p_owner=owner, p_text=text, parameters=parameters)
@@ -437,7 +445,7 @@ def main():
         if (user_group != '*NONE') and (user_group != '*SAME') and (not group_exist):
             module.fail_json(rc=256, msg="Group profile {p_group} not found".format(p_group=user_group))
 
-        command = "CHGUSRPRF USRPRF({p_user}) PASSWORD({p_password}) PWDEXP({p_expire}) STATUS({p_status})\
+        command = "QSYS/CHGUSRPRF USRPRF({p_user}) PASSWORD({p_password}) PWDEXP({p_expire}) STATUS({p_status})\
             USRCLS({p_class}) SPCAUT({p_special}) GRPPRF({p_group}) OWNER({p_owner}) TEXT('{p_text}') {parameters}".format(
             p_user=user, p_password=password, p_expire=expire, p_status=status,
             p_class=user_class, p_special=authorities, p_group=user_group, p_owner=owner, p_text=text, parameters=parameters)
@@ -445,7 +453,7 @@ def main():
     elif operation == 'delete':
         if not user_exist:
             module.fail_json(rc=256, msg="User profile {p_user} not found".format(p_user=user))
-        command = 'DLTUSRPRF USRPRF({p_user}) {parameters}'.format(p_user=user, parameters=parameters)
+        command = 'QSYS/DLTUSRPRF USRPRF({p_user}) {parameters}'.format(p_user=user, parameters=parameters)
 
     elif operation == 'display':
         if not user_exist:
@@ -456,7 +464,7 @@ def main():
         # operation == 'display_group_members'
         if not user_exist:
             module.fail_json(rc=256, msg="Group profile {p_user} not found".format(p_user=user))
-        command = 'SELECT * FROM QSYS2.GROUP_PROFILE_ENTRIES'
+        command = "SELECT * FROM QSYS2.GROUP_PROFILE_ENTRIES WHERE GROUP_PROFILE_NAME = '{p_user}'".format(p_user=user)
 
     if operation == 'display' or operation == 'display_group_members':
         if HAS_ITOOLKIT is False:

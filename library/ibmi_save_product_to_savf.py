@@ -270,7 +270,7 @@ def main():
                 pattern_savf_library=savf_library.strip()), **result)
 
     # run the RSTLICPGM command to install the product
-    command = 'SAVLICPGM LICPGM({pattern_product}) DEV(*SAVF) OPTION({pattern_option}) RLS({pattern_release}) \
+    command = 'QSYS/SAVLICPGM LICPGM({pattern_product}) DEV(*SAVF) OPTION({pattern_option}) RLS({pattern_release}) \
         LNG({pattern_language})  OBJTYPE({pattern_object_type}) SAVF({pattern_savf_library}/{pattern_savf_name}) \
         TGTRLS({pattern_target_release}) CLEAR(*ALL) {pattern_parameters}'.format(
         pattern_product=product,

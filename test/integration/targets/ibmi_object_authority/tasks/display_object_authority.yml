@@ -34,7 +34,6 @@
           - authority_result.stderr is not defined
           - authority_result.stderr_lines is not defined
           - authority_result.object_authority_list | length != 0
-          - authority_result.object_authority_list[0].AUTHORIZATION_LIST == ""
           - authority_result.object_authority_list[0].AUTHORIZATION_NAME is defined
           - authority_result.object_authority_list[0].DATA_ADD is defined
           - authority_result.object_authority_list[0].DATA_DELETE is defined 
@@ -217,7 +216,6 @@
           - authority_result.stderr is not defined
           - authority_result.stderr_lines is not defined
           - authority_result.object_authority_list | length != 0
-          - authority_result.object_authority_list[0].AUTHORIZATION_LIST == ""
           - authority_result.object_authority_list[0].AUTHORIZATION_NAME is defined
           - authority_result.object_authority_list[0].DATA_ADD is defined
           - authority_result.object_authority_list[0].DATA_DELETE is defined 

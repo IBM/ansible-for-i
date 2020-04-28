@@ -9,12 +9,12 @@
     ibmi_cl_command:
       cmd: CRTLIB LIB(TRYIASP1) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
       asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-      joblog: true
+      #joblog: true
 
   - ibmi_cl_command:
       cmd: CRTDTAARA DTAARA(TRYIASP1/{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}) TYPE(*DEC)
       asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
-      joblog: false
+      #joblog: false
 
   - name: check obj with asp_group
     ibmi_cl_command:

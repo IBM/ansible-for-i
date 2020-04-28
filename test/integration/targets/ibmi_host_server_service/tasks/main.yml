@@ -1,3 +1,8 @@
+# test code for the ibmi_script module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
 - block: 
     - name: check whether the host server DTAQ is running
       ibmi_sql_query:
@@ -76,7 +81,7 @@
           - end_result.delta is defined
           - end_result.stdout is defined
           - end_result.stderr is defined
-          - end_result.cmd == 'ENDHOSTSVR SERVER(*DTAQ) '
+          - "'ENDHOSTSVR SERVER(*DTAQ) ' in end_result.cmd"
           - end_result.rc == 0
           - end_result.rc_msg is defined
           - end_result.stdout_lines is defined
@@ -117,7 +122,7 @@
     - name: assert the definedd parameters are returned
       assert:
         that:
-          - start_result.cmd == 'STRHOSTSVR SERVER(*ALL) RQDPCL(*TCP)'
+          - start_result.cmd == 'QSYS/STRHOSTSVR SERVER(*ALL) RQDPCL(*TCP)'
 
     - name: end host server with extra_parameters
       ibmi_host_server_service:
@@ -130,7 +135,7 @@
     - name: assert the definedd parameters are returned
       assert:
         that:
-          - end_result.cmd == 'ENDHOSTSVR SERVER(*ALL) ENDACTCNN(*FILE *DATABASE)'
+          - end_result.cmd == 'QSYS/ENDHOSTSVR SERVER(*ALL) ENDACTCNN(*FILE *DATABASE)'
 
     - name: start host server with multiple host servers
       ibmi_host_server_service:
@@ -142,7 +147,7 @@
     - name: assert the definedd parameters are returned
       assert:
         that:
-          - start_result.cmd == 'STRHOSTSVR SERVER(*DTAQ *DATABASE)  '
+          - start_result.cmd == 'QSYS/STRHOSTSVR SERVER(*DTAQ *DATABASE)  '
 
     - name: end host server with multiple host servers
       ibmi_host_server_service:
@@ -154,7 +159,7 @@
     - name: assert the definedd parameters are returned
       assert:
         that:
-          - end_result.cmd == 'ENDHOSTSVR SERVER(*DTAQ *DATABASE)  '
+          - end_result.cmd == 'QSYS/ENDHOSTSVR SERVER(*DTAQ *DATABASE)  '
 
     # Test negative path
     - name: start host server only required parameters
