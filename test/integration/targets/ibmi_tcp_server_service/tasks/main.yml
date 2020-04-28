@@ -1,3 +1,8 @@
+# test code for the ibmi_script module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
 - block: 
     - name: check whether the QDIRSRV is running
       ibmi_sql_query:
@@ -30,11 +35,15 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
           - start_result.delta is defined
           - start_result.stdout is defined
           - start_result.stderr is defined
-          - "'STRTCPSVR SERVER(*DIRSRV)' in start_result.cmd"
+          - "'QSYS/STRTCPSVR SERVER(*DIRSRV)' in start_result.cmd"
           - start_result.rc == 0
           - start_result.rc_msg is defined
           - start_result.stdout_lines is defined
           - start_result.stderr_lines is defined
+
+    - name: pause 60 seconds to wait for server start
+      pause: 
+        seconds: 200
 
     - name: assert the host server is running
       ibmi_sql_query:
@@ -79,7 +88,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
           - end_result.delta is defined
           - end_result.stdout is defined
           - end_result.stderr is defined
-          - end_result.cmd == 'ENDTCPSVR SERVER(*DIRSRV) '
+          - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV) '
           - end_result.rc == 0
           - end_result.rc_msg is defined
           - end_result.stdout_lines is defined
@@ -126,7 +135,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
     - name: assert the definedd parameters are returned
       assert:
         that:
-          - start_result.cmd == 'STRTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
+          - start_result.cmd == 'QSYS/STRTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
 
     - name: end host server with extra_parameters
       ibmi_tcp_server_service:
@@ -139,7 +148,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
     - name: assert the definedd parameters are returned
       assert:
         that:
-          - end_result.cmd == 'ENDTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
+          - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
 
     - name: start host server with multiple host servers
       ibmi_tcp_server_service:
@@ -151,7 +160,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
     - name: assert the definedd parameters are returned
       assert:
         that:
-          - start_result.cmd == 'STRTCPSVR SERVER(*DIRSRV *HTTP)  '
+          - start_result.cmd == 'QSYS/STRTCPSVR SERVER(*DIRSRV *HTTP)  '
 
     - name: end host server with multiple host servers
       ibmi_tcp_server_service:
@@ -163,7 +172,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
     - name: assert the defined parameters are returned
       assert:
         that:
-          - end_result.cmd == 'ENDTCPSVR SERVER(*DIRSRV *HTTP)  '
+          - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV *HTTP)  '
 
     # Test negative path
     - name: start host server only required parameters
