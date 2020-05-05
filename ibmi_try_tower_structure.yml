@@ -76,7 +76,7 @@
           ignore_errors: true
 
   handlers:
-  - name: remove created temp folder
+  - name: remove the created temp folder
     file:
       state: absent
       path: '{{local_temp_dir}}'
