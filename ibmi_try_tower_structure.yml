@@ -19,8 +19,6 @@
       - name: Create library
         ibmi_cl_command:
           cmd: CRTLIB LIB({{lib_name}})
-        notify:
-          - remove created library
 
       - name: Create savf
         ibmi_cl_command:
