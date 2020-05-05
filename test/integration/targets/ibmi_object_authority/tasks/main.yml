@@ -1,4 +1,4 @@
-# test code for the ibmi_script module and action plugin
+# test code for the ibmi_object_authority module
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
@@ -36,8 +36,8 @@
       ibmi_cl_command: 
         cmd: ADDAUTLE AUTL({{au_list[1]}}) USER({{new_user[1]}}) AUT(*EXCLUDE)
 
-    #- include: display_object_authority.yml
-    #- include: grant_object_authority.yml
+    - include: display_object_authority.yml
+    - include: grant_object_authority.yml
     - include: grant_aul_list.yml
     - include: grant_ref.yml
     - include: iasp.yml

@@ -110,3 +110,18 @@ def get_job_log(connection_id, job_name):
                           }
             out.append(result_map)
     return out, err
+
+
+def get_ibmi_release(connection_id):
+    sql = "SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO"
+    out_result_set, err = ibm_dbi_sql_query(connection_id, sql)
+    release_info = {"version": 7, "release": 0, "version_release": 7.0}
+    if (out_result_set is None) and (err is None):
+        err = "Nothing returned for OS version and release."
+    else:
+        for result in out_result_set:
+            release_info["version"] = int(result[0])
+            release_info["release"] = int(result[1])
+            release_info["version_release"] = float(result[0]) + float(result[1]) / 10.0
+
+    return release_info, err

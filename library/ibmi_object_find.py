@@ -397,27 +397,27 @@ def main():
         if sql_where_stmt_size is None:
             module.fail_json(msg="failed to process size: " + input_size)
 
-    # generate iasp where stmt
-    # Comment out below items to support IASP. The returned result already considers IASP in sql service.
-    # No need to do IASP filter again.
-    # if input_iasp_name == "*SYSBAS":
-    #     sql_where_stmt_iasp = " AND IASP_NUMBER = 0 "
-    # else:
-    #     # try to find the IASP number basing on the iasp name
-    #     sql_where_stmt_iasp = " AND A.IASP_NUMBER = (SELECT ASP_NUMBER FROM QSYS2.ASP_INFO " \
-    #                           " WHERE UPPER(DEVICE_DESCRIPTION_NAME) = '" + input_iasp_name.upper() + "') "
+    # get the version and release info
+    release_info, err = db2i_tools.get_ibmi_release(connection_id)
+
+    if release_info["version_release"] < 7.4:
+        lib_name_label = "(SELECT SYSTEM_SCHEMA_NAME FROM QSYS2.SYSSCHEMAS WHERE SCHEMA_NAME = OBJLONGSCHEMA)"
+    else:
+        lib_name_label = "OBJLIB"
 
     if input_use_regex:
         obj_stats_expression = " SELECT OBJNAME, OBJTYPE, OBJOWNER, OBJDEFINER, OBJCREATED," \
-                               " TEXT, OBJLIB, IASP_NUMBER, LAST_USED_TIMESTAMP, LAST_RESET_TIMESTAMP," \
-                               " BIGINT(OBJSIZE) AS OBJSIZE, OBJATTRIBUTE " \
+                               " TEXT, " + lib_name_label + " AS OBJLIB, IASP_NUMBER, LAST_USED_TIMESTAMP, " \
+                               " LAST_RESET_TIMESTAMP," \
+                               " BIGINT(OBJSIZE) AS OBJSIZE, OBJATTRIBUTE, OBJLONGSCHEMA " \
                                " FROM TABLE (QSYS2.OBJECT_STATISTICS('" + input_lib + "','" + \
                                input_object_type + "','*ALL')) X "
         sql_where_stmt_regex = " AND REGEXP_LIKE(A.OBJNAME, '" + input_obj_name + "') "
     else:
         obj_stats_expression = " SELECT OBJNAME, OBJTYPE, OBJOWNER, OBJDEFINER, OBJCREATED," \
-                               " TEXT, OBJLIB, IASP_NUMBER, LAST_USED_TIMESTAMP, LAST_RESET_TIMESTAMP," \
-                               " BIGINT(OBJSIZE) AS OBJSIZE, OBJATTRIBUTE " \
+                               " TEXT, " + lib_name_label + " AS OBJLIB, IASP_NUMBER, LAST_USED_TIMESTAMP, " \
+                               " LAST_RESET_TIMESTAMP," \
+                               " BIGINT(OBJSIZE) AS OBJSIZE, OBJATTRIBUTE, OBJLONGSCHEMA " \
                                " FROM TABLE (QSYS2.OBJECT_STATISTICS('" + input_lib + "','" + \
                                input_object_type + "','" + input_obj_name + "')) X "
         sql_where_stmt_regex = ""
@@ -466,7 +466,7 @@ def main():
                           "OBJCREATED": result[4], "TEXT": result[5],
                           "OBJLIB": result[6], "IASP_NUMBER": result[7],
                           "LAST_USED_TIMESTAMP": result[8], "LAST_RESET_TIMESTAMP": result[9],
-                          "OBJSIZE": result[10], "OBJATTRIBUTE": result[11]
+                          "OBJSIZE": result[10], "OBJATTRIBUTE": result[11], "OBJLONGSCHEMA": result[12]
                           }
             out.append(result_map)
 

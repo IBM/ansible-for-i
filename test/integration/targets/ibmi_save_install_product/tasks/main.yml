@@ -1,4 +1,4 @@
-# test code for the ibmi_script module and action plugin
+# test code for the ibmi_install_product_from_savf, ibmi_uninstall_product and ibmi_save_product_to_savf module
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )

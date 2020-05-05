@@ -50,7 +50,7 @@ class IBMiVirtual(Virtual):
             rc, rc_msg, out, error = ibmi_util.itoolkit_run_sql(connection, "SELECT * FROM QSYS2.GROUP_PTF_INFO;")
             virtual_facts['OS400_GROUP_PTF_INFO'] = out
             rc, rc_msg, out, error = ibmi_util.itoolkit_run_sql(connection, "SELECT CAST(data as VARCHAR(100)) FROM QUSRSYS.QATOCTCPIP WHERE KEYWORD='RMTNAMESV'")
-            virtual_facts['dns'] = out
+            virtual_facts['OS400_DNS'] = out[0]['00001'].split()
 
             ibmi_util.itoolkti_close_connection(connection)
             return virtual_facts

@@ -273,10 +273,10 @@ def main():
         pattern_parameters=parameters)
 
     if HAS_ITOOLKIT is False:
-        module.fail_json(msg="itoolkit package is required")
+        module.fail_json(rc=999, msg="itoolkit package is required")
 
     if HAS_IBM_DB is False:
-        module.fail_json(msg="ibm_db package is required")
+        module.fail_json(rc=999, msg="ibm_db package is required")
 
     rc, out, err = itoolkit_run_command(command)
 

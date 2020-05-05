@@ -1,0 +1,30 @@
+# test code for the ibmi_message module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+
+- include: no_reply.yml
+- include: qsysopr.yml
+    
+- block: 
+    - set_fact:
+        msgq: ['TRYMSGQ1', 'TRYMSGQ2']
+        msgq_lib: 'ANSITEST'
+        info_msg_text: ["TRY FRIST ANSIBLE INFORMATION MESSAGE", "TRY SECOND ANSIBLE INFORMATION MESSAGE"]
+        inq_msg_text: ["TRY FRIST ANSIBLE INQUIRY MESSAGE", "TRY SECOND ANSIBLE INQUIRY MESSAGE"]
+
+    - name: create a user defined message queue library
+      ibmi_cl_command:
+        cmd: "QSYS/CRTLIB {{msgq_lib}}"
+    
+    - name: create a user defined message queue
+      ibmi_cl_command:
+        cmd: "QSYS/CRTMSGQ MSGQ({{msgq_lib}}/{{item}})"
+      loop: "{{msgq}}"
+
+    - include: message.yml
+
+  always:
+    - name: delete library
+      ibmi_cl_command:
+        cmd: "DLTLIB LIB({{msgq_lib}})"

@@ -1,0 +1,24 @@
+- name: delete the testing ptf immedidately
+  ibmi_cl_command:
+    cmd: "RMVPTF LICPGM({{item.key}}) SELECT({{item.value}}) RMV(*PERM)"
+    joblog: true
+  register: remove_result
+  ignore_errors: true
+
+- name: delete the testing ptf delayed
+  ibmi_cl_command:
+    cmd: "RMVPTF LICPGM({{item.key}}) SELECT({{item.value}}) RMV(*PERM)  DELAYED(*YES)"
+    joblog: true      
+  when: "'CPF3634' in remove_result.stderr"
+  ignore_errors: true
+
+- name: check any PTFs requires a IPL
+  ibmi_sql_query:
+      sql: "SELECT PTF_IDENTIFIER, PTF_IPL_ACTION, A.*
+FROM QSYS2.PTF_INFO A
+WHERE PTF_IPL_ACTION = 'TEMPORARILY REMOVED' or PTF_IPL_ACTION = 'PERMANENTLY REMOVED' and PTF_PRODUCT_ID = '{{item.key}}';"
+  register: sql_query
+
+- set_fact:
+    require_IPL: true
+  when: sql_query.row | length != 0 
