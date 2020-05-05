@@ -64,13 +64,13 @@
         stat:
           path: '{{local_temp_dir}}/{{ inventory_hostname }}/QSYS.LIB/{{lib_name.upper()}}.LIB/{{savf_name}}.FILE'
         delegate_to: localhost
-        register: fetch_file_state
+        register: fetched_file_state
 
       - name: Show fetched object returned by stat module.
-        debug: var=fetch_file_state verbosity=0 
+        debug: var=fetched_file_state verbosity=0 
       
       always:
-        - name: remove created library
+        - name: remove the created library
           ibmi_cl_command:
             cmd: DLTLIB LIB({{lib_name}})
           ignore_errors: true
