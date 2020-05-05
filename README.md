@@ -4,6 +4,12 @@ Ansible is a radically simple IT automation system. It handles configuration man
 
 IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i support on Ansible, like providing more IBM i modules and examples to manage IBM i nodes. 
 
+<b>Getting Started Articles: </b> 
+
+You may want to check out below articles first if you are new to Ansible for IBM i support.
+https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/  <br>
+https://ibm.github.io/cloud-i-blog/
+
 <b>Dependencies on IBM i node: </b>
 1. 5733SC1 Base and Option 1
 2. 5770DG1
