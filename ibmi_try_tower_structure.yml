@@ -55,7 +55,7 @@
           dest: '{{local_temp_dir}}'
         register: fetch_result
 
-      - name: Show found object returned by ibmi_object_find module.
+      - name: Show fetch result returned by ibmi_fetch module.
         debug: var=fetch_result verbosity=0        
 
       - name: Show the fetched file state 
