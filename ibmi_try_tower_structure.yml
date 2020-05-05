@@ -19,8 +19,6 @@
       - name: Create library
         ibmi_cl_command:
           cmd: CRTLIB LIB({{lib_name}})
-        notify:
-          - remove created library
 
       - name: Create savf
         ibmi_cl_command:
@@ -44,7 +42,7 @@
         shell: mktemp -d /tmp/ansible_test.XXXXXXXXX
         register: tempfile_result
         delegate_to: localhost
-        notify: 'remove created temp folder'
+        notify: 'remove the created temp folder'
 
       - set_fact:
           local_temp_dir: '{{ tempfile_result.stdout }}'
