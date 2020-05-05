@@ -1,0 +1,15 @@
+- include: rmvptf.yml
+  when: item.key != '5770999' or item.key != '5770SS1' 
+  with_dict: "{{base_ptf_info}}"
+
+- include: rmvptf.yml
+  with_dict: "{{dict_5770SS1}}"
+  when: has_5770SS1_ptf == true
+
+- include: rmvptf.yml
+  with_dict: "{{dict_5770999}}"
+  when: has_5770999_ptf == true
+
+- name: IPL the system to verify the PTF are applied.
+  ibmi_reboot:
+  when: require_IPL == true

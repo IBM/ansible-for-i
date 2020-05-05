@@ -1,17 +1,22 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Author, Li Jun, Zhu <zhuljbj@126.com>
 ---
-- import_playbook: ibmi-install-yum.yml
 
 - hosts: ibmi 
   gather_facts: no 
 
-  vars:
-    required_rpms: [python2, python2-itoolkit, python2-ibm_db]
-
   tasks:
-  - include_tasks: ibmi-install-rpm.yml
-    with_list: "{{required_rpms}}"
+  - include: ibmi-install-yum.yml
+
+  - block:
+      - include: ibmi-install-rpm.yml 
+        vars: 
+          python: "{{python_version}}"
+        with_list: "{{required_rpms}}"     
+      
+    vars:
+      required_rpms: [itoolkit, ibm_db]
+      python_version: "{{ansible_python_interpreter.split('/')[-1]}}"
 
   - name: Verify 5770DG1
     command: system "DSPSFWRSC"

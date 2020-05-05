@@ -281,7 +281,7 @@ def remove_ptf(connection_id, module, product_id, ptf_selected_list, ptf_omit_li
         ptf_str_to_omit = ' '.join(ptf_omit_list)
         cl_rmv_ptf_map["OMIT"] = ptf_str_to_omit
 
-    cl_rmv_ptf = "RMVPTF"
+    cl_rmv_ptf = "QSYS/RMVPTF"
     for key, value in cl_rmv_ptf_map.items():
         cl_rmv_ptf = cl_rmv_ptf + " " + key + "(" + value + ") "
 
@@ -316,11 +316,11 @@ def install_ptf(connection_id, module, product_id, ptf_list_to_select, ptf_list_
     if device == "*SAVF":
         cl_load_ptf_map["SAVF"] = save_file
 
-    cl_load_ptf = "LODPTF"
+    cl_load_ptf = "QSYS/LODPTF"
     for key, value in cl_load_ptf_map.items():
         cl_load_ptf = cl_load_ptf + " " + key + "(" + value + ") "
 
-    cl_apply_ptf = "APYPTF"
+    cl_apply_ptf = "QSYS/APYPTF"
     for key, value in cl_apply_ptf_map.items():
         cl_apply_ptf = cl_apply_ptf + " " + key + "(" + value + ") "
 
@@ -345,12 +345,20 @@ def return_fix_information(db_connection, product_id, ptf_list):
     if ptf_list is None:
         return None, "PTF list contains no PTF."
 
+    # get the version and release info
+    release_info, err = db2i_tools.get_ibmi_release(db_connection)
+
+    if release_info["version_release"] < 7.3:
+        ptf_temp_apply_time_label = "'NOT SUPPORT'"
+    else:
+        ptf_temp_apply_time_label = "PTF_TEMPORARY_APPLY_TIMESTAMP"
+
     str_ptf_list = "','".join(ptf_list)
     str_ptf_list = str_ptf_list.upper()
     sql = "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_LOADED_STATUS, PTF_SAVE_FILE, PTF_IPL_ACTION," \
           " PTF_ACTION_PENDING, PTF_ACTION_REQUIRED, PTF_IPL_REQUIRED,  " \
-          " PTF_STATUS_TIMESTAMP, PTF_SUPERSEDED_BY_PTF, PTF_CREATION_TIMESTAMP, " \
-          " PTF_TEMPORARY_APPLY_TIMESTAMP FROM QSYS2.PTF_INFO " \
+          " PTF_STATUS_TIMESTAMP, PTF_CREATION_TIMESTAMP, " \
+          " " + ptf_temp_apply_time_label + " FROM QSYS2.PTF_INFO " \
           " WHERE 1 = 1 "
 
     if (ptf_list is None) or ([x.upper() for x in ptf_list] == ["*ALL"]):
@@ -372,8 +380,8 @@ def return_fix_information(db_connection, product_id, ptf_list):
                       "PTF_LOADED_STATUS": result[2], "PTF_SAVE_FILE": result[3],
                       "PTF_IPL_ACTION": result[4], "PTF_ACTION_PENDING": result[5],
                       "PTF_ACTION_REQUIRED": result[6], "PTF_IPL_REQUIRED": result[7],
-                      "PTF_STATUS_TIMESTAMP": result[8], "PTF_SUPERSEDED_BY_PTF": result[9],
-                      "PTF_CREATION_TIMESTAMP": result[10], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[11]
+                      "PTF_STATUS_TIMESTAMP": result[8],
+                      "PTF_CREATION_TIMESTAMP": result[9], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[10]
                       }
         out.append(result_map)
     return out, err
@@ -441,7 +449,9 @@ def main():
     if operation in ['load_and_apply', 'load_only', 'apply_only']:
         operation_bool_map = {'load_and_apply': [False, False], 'load_only': [True, False], 'apply_only': [False, True]}
         # install single or a list of PTFs
-        savf_obj = save_file_lib + "/" + save_file_object
+
+        savf_obj = "" if operation == 'apply_only' else (save_file_lib + "/" + save_file_object)
+
         rc, out, err = install_ptf(connection_id, module, product_id, ptf_list_to_select,
                                    ptf_list_to_omit, "*SAVF", savf_obj, delayed_option, temp_or_perm,
                                    operation_bool_map[operation][0], operation_bool_map[operation][1])

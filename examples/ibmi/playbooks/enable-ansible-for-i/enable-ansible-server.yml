@@ -1,5 +1,5 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Li Jun, Zhu <zhuljbj@126.com>
+# Author, Li Jun, Zhu <zhuljbj@cn.ibm.com>
 
 - hosts: localhost
   vars:
@@ -7,11 +7,6 @@
     checkout_dir: 'ibmi_repo'
 
   tasks:
-    - name: git clone ibm i ansible repo
-      git:
-        repo: 'https://github.com/IBM/ansible-for-i.git'
-        dest: '{{ checkout_dir }}'
-
     - name: Find the ansible modules path
       command: ansible --version
       register: ansible_output     
@@ -22,10 +17,7 @@
 
     - name: Move ibmi module to modules path
       copy:
-        src: '{{ checkout_dir }}/lib/ansible/'
+        src: '../../../../lib/ansible/'
         dest: '{{modules_path}}'
         force: no
         mode: 0644
-
-    - name: delete checkout_dir
-      command: rm -rf {{ checkout_dir }} 

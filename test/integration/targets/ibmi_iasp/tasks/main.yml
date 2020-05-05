@@ -1,4 +1,4 @@
-# test code for the ibmi_script module and action plugin
+# test code for the ibmi_iasp module
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
@@ -29,9 +29,9 @@
           - "{{disk_result['disks'].split(' ') | length }} >= 5" 
         fail_msg: "The IBM i doesn't have enough non-configured disks. It doesn't qualify for the testing."
 
-    #- include: primary.yml
-    #- include: secondary.yml
-    #- include: udfs.yml
+    - include: primary.yml
+    - include: secondary.yml
+    - include: udfs.yml
     - include: negative_case.yml
 
   always:

@@ -286,7 +286,7 @@ def main():
     wait_for_job_status = module.params['status']
     parameters = module.params['parameters']
 
-    cl_sbmjob = "SBMJOB CMD(" + command + ") " + parameters
+    cl_sbmjob = "QSYS/SBMJOB CMD(" + command + ") " + parameters
 
     if set(wait_for_job_status) < set(IBMi_JOB_STATUS_LIST):
         # this is expected
@@ -338,7 +338,6 @@ def main():
 
     sql_get_job_info = "SELECT V_JOB_STATUS as \"job_status\", " \
                        "V_ACTIVE_JOB_STATUS as \"active_job_status\", " \
-                       "V_ACTIVE_JOB_TYPE as \"active_job_type\", " \
                        "V_RUN_PRIORITY as \"run_priority\", " \
                        "V_SBS_NAME as \"sbs_name\", " \
                        "V_CLIENT_IP_ADDRESS as \"ip_address\"" \
@@ -360,7 +359,6 @@ def main():
 
     endd = datetime.datetime.now()
     delta = endd - startd
-
     rc_msg = interpret_return_code(rc)
 
     if rc != IBMi_COMMAND_RC_SUCCESS:

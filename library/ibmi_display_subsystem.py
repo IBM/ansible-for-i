@@ -220,10 +220,10 @@ def main():
         supports_check_mode=True,
     )
     if HAS_ITOOLKIT is False:
-        module.fail_json(msg="itoolkit package is required")
+        module.fail_json(rc=999, msg="itoolkit package is required")
 
     if HAS_IBM_DB is False:
-        module.fail_json(msg="ibm_db package is required")
+        module.fail_json(rc=999, msg="ibm_db package is required")
     subsystem = module.params['subsystem'].upper()
     user = module.params['user'].upper()
     if len(subsystem) > 10:

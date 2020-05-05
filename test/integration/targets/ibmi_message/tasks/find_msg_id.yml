@@ -1,0 +1,8 @@
+- set_fact: 
+    diag: '{{diag}} {{item["MESSAGE_ID"]}}'
+  when: item['MESSAGE_TYPE'] == 'DIAGNOSTIC'
+
+- name: compose the message list
+  set_fact: 
+    comp: '{{comp}} {{item["MESSAGE_ID"]}}'
+  when: item['MESSAGE_TYPE'] == 'COMPLETION'
