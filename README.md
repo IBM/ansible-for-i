@@ -270,7 +270,7 @@ Note, you can create new pull request to merge the changes in this repository in
 				<a href="https://github.com/IBM/ansible-for-i/tree/master/lib/ansible/modules/ibmi/ibmi_message.py">ibmi_message</a><br />
 			</td>
 			<td>
-				Search or reply message on a remote IBMi node<br />
+				Search message on a remote IBMi node<br />
 			</td>
 		</tr>
 		<tr>
