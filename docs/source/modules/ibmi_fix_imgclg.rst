@@ -2,11 +2,13 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_fix_imgclg.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_fix_imgclg.py
 
+.. _ibmi_fix_imgclg_module:
 
 ibmi_fix_imgclg -- Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.
 ========================================================================================================================
+
 
 .. contents::
    :local:
@@ -15,84 +17,111 @@ ibmi_fix_imgclg -- Install fixes such as PTF, PTF Group, Technology refresh to t
 
 Synopsis
 --------
-
-The ``ibmi_fix`` module install fixes to target IBM i system by image catalog.
-
-Single PTF, PTF group and TR PTF are supported.
-
-
-
+- The ``ibmi_fix`` module install fixes to target IBM i system by image catalog.
+- Single PTF, PTF group and TR PTF are supported.
 
 
 
 Parameters
 ----------
 
-  src (True, str, None)
-    The path on the target IBM i system where the fix installation file is located.
 
-    The path is an IFS directory format.
-
-
-  rollback (optional, bool, True)
-    Whether or not rollback if there's failure during the installation of the fixes
+     
+apply_type
+  The fix apply type of the install to perform.
 
 
-  product_id (optional, list, [u'*ALL'])
-    The product ID of the fixes to be installed.
+  | **required**: false
+  | **type**: str
+  | **default**: *DLYALL
+  | **choices**: *DLYALL, *IMMDLY, *IMMONLY
 
 
-  apply_type (optional, str, *DLYALL)
-    The fix apply type of the install to perform.
+     
+fix_omit_list
+  The list of PTFs that will be omitted.
+
+  The key of the dict should be the product ID of the fix that is omitted.
 
 
-  virtual_image_name_list (False, list, [u'*ALL'])
-    The name list of the installation file.
+  | **required**: False
+  | **type**: list
+  | **elements**: dict
 
 
-  hiper_only (optional, bool, False)
-    Whether or not only install the hiper fixes.
+     
+hiper_only
+  Whether or not only install the hiper fixes.
 
-    Specify true if only need to install hiper fixes.
-
-
-  use_temp_path (optional, bool, True)
-    Whether or not to copy the installation file to a temp path.
-
-    If true is chosen, it will copy the installation file to a temp path.
-
-    The temp directory and the installation file copied to the temp directory will be both deleted after the task.
-
-    It is recommended to use temp path to avoid conflicts.
-
-    If false is chosen, the install will directly use the file specified in src option.
-
-    The installation file will not be deleted after install if false is chosen.
+  Specify true if only need to install hiper fixes.
 
 
-  fix_omit_list (False, list, None)
-    The list of PTFs that will be omitted.
-
-    The key of the dict should be the product ID of the fix that is omitted.
+  | **required**: false
+  | **type**: bool
 
 
+     
+product_id
+  The product ID of the fixes to be installed.
 
 
-
-Notes
------
-
-.. note::
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+  | **required**: false
+  | **type**: list
+  | **elements**: str
+  | **default**: [u'*ALL']
 
 
-See Also
---------
+     
+rollback
+  Whether or not rollback if there's failure during the installation of the fixes
 
-.. seealso::
 
-   :ref:`ibmi_fix, ibmi_fix_savf_module`
-      The official documentation on the **ibmi_fix, ibmi_fix_savf** module.
+  | **required**: false
+  | **type**: bool
+  | **default**: True
+
+
+     
+src
+  The path on the target IBM i system where the fix installation file is located.
+
+  The path is an IFS directory format.
+
+
+  | **required**: True
+  | **type**: str
+
+
+     
+use_temp_path
+  Whether or not to copy the installation file to a temp path.
+
+  If true is chosen, it will copy the installation file to a temp path.
+
+  The temp directory and the installation file copied to the temp directory will be both deleted after the task.
+
+  It is recommended to use temp path to avoid conflicts.
+
+  If false is chosen, the install will directly use the file specified in src option.
+
+  The installation file will not be deleted after install if false is chosen.
+
+
+  | **required**: false
+  | **type**: bool
+  | **default**: True
+
+
+     
+virtual_image_name_list
+  The name list of the installation file.
+
+
+  | **required**: False
+  | **type**: list
+  | **elements**: str
+  | **default**: [u'*ALL']
+
 
 
 Examples
@@ -100,80 +129,148 @@ Examples
 
 .. code-block:: yaml+jinja
 
-    
-    - name: Install a list of PTFs of LPP 5733SC1 from image catalog
-      ibmi_fix_imgclg:
-        product_id:
-          - '5733SC1'
-        src: '{{ fix_install_path }}'
-        apply_type: '*DLYALL'
-        hiper_only: False
-        use_temp_path: True
-        rollback: True
-        virtual_image_name_list:
-          - 'S2018V01.BIN'
-        fix_omit_list:
-          - 5733SC1: "SI70819"
+   
+   - name: Install a list of PTFs of LPP 5733SC1 from image catalog
+     ibmi_fix_imgclg:
+       product_id:
+         - '5733SC1'
+       src: '{{ fix_install_path }}'
+       apply_type: '*DLYALL'
+       hiper_only: False
+       use_temp_path: True
+       rollback: True
+       virtual_image_name_list:
+         - 'S2018V01.BIN'
+       fix_omit_list:
+         - 5733SC1: "SI70819"
 
+
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`ibmi_fix, ibmi_fix_savf_module`
 
 
 Return Values
 -------------
 
-  stderr_lines (When error occurs., list, ['CPF2111:Library TESTLIB already exists.'])
-    The task standard error split in lines
 
+   
+                              
+       stderr_lines
+        | The task standard error split in lines
+      
+        | **returned**: When error occurs.
+        | **type**: list      
+        | **sample**:
 
-  end (When rc is zero, str, 2019-12-02 11:07:54.064969)
-    The task execution end time
+              .. code-block::
 
+                       ["CPF2111:Library TESTLIB already exists."]
+            
+      
+      
+                              
+       end
+        | The task execution end time
+      
+        | **returned**: When rc is zero
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
 
-  stdout_lines (When error occurs., list, ["CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT('Created by Ansible for IBM i')", "+++ success CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT('Created by Ansible for IBM i')", "CRTIMGCLG IMGCLG(ANSIBCLG1) DIR('/home/ansiblePTFInstallTemp/') CRTDIR(*YES)"])
-    The task standard output split in lines
+            
+      
+      
+                              
+       stdout_lines
+        | The task standard output split in lines
+      
+        | **returned**: When error occurs.
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
 
-  stdout (When error occurs., str, CPC2102: Library TESTLIB created)
-    The task standard output
+                       ["CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(\u0027Created by Ansible for IBM i\u0027)", "+++ success CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(\u0027Created by Ansible for IBM i\u0027)", "CRTIMGCLG IMGCLG(ANSIBCLG1) DIR(\u0027/home/ansiblePTFInstallTemp/\u0027) CRTDIR(*YES)"]
+            
+      
+      
+                              
+       stdout
+        | The task standard output
+      
+        | **returned**: When error occurs.
+        | **type**: str
+        | **sample**: CPC2102: Library TESTLIB created
 
+            
+      
+      
+                              
+       rc
+        | The task return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
-  rc (always, int, 255)
-    The task return code (0 means success, non-zero means failure)
+            
+      
+      
+                              
+       start
+        | The task execution start time
+      
+        | **returned**: When rc is zero
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
+            
+      
+      
+                              
+       stderr
+        | The task standard error
+      
+        | **returned**: When error occurs.
+        | **type**: str
+        | **sample**: CPF2111:Library TESTLIB already exists
 
-  start (When rc is zero, str, 2019-12-02 11:07:53.757435)
-    The task execution start time
+            
+      
+      
+                              
+       delta
+        | The task execution delta time
+      
+        | **returned**: When rc is zero
+        | **type**: str
+        | **sample**: 0:00:00.307534
 
+            
+      
+      
+                              
+       need_action_ptf_list
+        | The list contains the information of the just installed PTFs that need further IPL actions.
+      
+        | **returned**: When rc is zero.
+        | **type**: list      
+        | **sample**:
 
-  stderr (When error occurs., str, CPF2111:Library TESTLIB already exists)
-    The task standard error
+              .. code-block::
 
-
-  delta (When rc is zero, str, 0:00:00.307534)
-    The task execution delta time
-
-
-  need_action_ptf_list (When rc is zero., list, [{'PTF_ACTION_REQUIRED': 'NONE', 'PTF_IPL_REQUIRED': 'IMMEDIATE', 'PTF_IDENTIFIER': 'SI71746', 'PTF_CREATION_TIMESTAMP': '2019-12-06T01:00:43', 'PTF_PRODUCT_ID': '5733SC1', 'PTF_TEMPORARY_APPLY_TIMESTAMP': None, 'PTF_IPL_ACTION': 'TEMPORARILY APPLIED', 'PTF_SAVE_FILE': 'NO', 'PTF_STATUS_TIMESTAMP': '2020-03-24T09:03:55', 'PTF_LOADED_STATUS': 'LOADED', 'PTF_ACTION_PENDING': 'NO'}])
-    The list contains the information of the just installed PTFs that need further IPL actions.
-
-
-
-
-
-Status
-------
-
-
-
-
-- This module is not guaranteed to have a backwards compatible interface. *[preview]*
-
-
-- This module is maintained by community.
-
-
-
-Authors
-~~~~~~~
-
-- Wang Yun (@airwangyun)
-
+                       [{"PTF_ACTION_PENDING": "NO", "PTF_ACTION_REQUIRED": "NONE", "PTF_CREATION_TIMESTAMP": "2019-12-06T01:00:43", "PTF_IDENTIFIER": "SI71746", "PTF_IPL_ACTION": "TEMPORARILY APPLIED", "PTF_IPL_REQUIRED": "IMMEDIATE", "PTF_LOADED_STATUS": "LOADED", "PTF_PRODUCT_ID": "5733SC1", "PTF_SAVE_FILE": "NO", "PTF_STATUS_TIMESTAMP": "2020-03-24T09:03:55", "PTF_TEMPORARY_APPLY_TIMESTAMP": null}]
+            
+      
+        

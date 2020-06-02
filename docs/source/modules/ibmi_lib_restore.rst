@@ -2,11 +2,13 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_lib_restore.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_lib_restore.py
 
+.. _ibmi_lib_restore_module:
 
 ibmi_lib_restore -- Restore one library on a remote IBMi node
 =============================================================
+
 
 .. contents::
    :local:
@@ -15,60 +17,83 @@ ibmi_lib_restore -- Restore one library on a remote IBMi node
 
 Synopsis
 --------
-
-The ibmi_lib_restore module restore an save file on a remote IBMi nodes
-
-The restored library and save file are on the remote host.
-
-Only support *SAVF as the save file's format by now.
-
-
-
+- The ibmi_lib_restore module restore an save file on a remote IBMi nodes
+- The restored library and save file are on the remote host.
+- Only support *SAVF as the save file's format by now.
 
 
 
 Parameters
 ----------
 
-  saved_lib (True, str, None)
-    The library need to be restored.
+
+     
+asp_group
+  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
+
+  The ASP group name is the name of the primary ASP device within the ASP group.
 
 
-  savefile_name (True, str, None)
-    The save file name.
+  | **required**: false
+  | **type**: str
+  | **default**: *SYSBAS
 
 
-  asp_group (optional, str, *SYSBAS)
-    Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
-
-    The ASP group name is the name of the primary ASP device within the ASP group.
-
-
-  parameters (optional, str,  )
-    The parameters that RSTLIB command will take. Other than options above, all other parameters need to be specified here. The default values of parameters for RSTLIB will be taken if not specified.
+     
+format
+  The save file's format. Only support *SAVF by now.
 
 
-  format (optional, str, *SAVF)
-    The save file's format. Only support *SAVF by now.
+  | **required**: false
+  | **type**: str
+  | **default**: *SAVF
+  | **choices**: *SAVF
 
 
-  joblog (optional, bool, False)
-    If set to ``true``, append JOBLOG to stderr/stderr_lines.
+     
+joblog
+  If set to ``true``, append JOBLOG to stderr/stderr_lines.
 
 
-  savefile_lib (True, str, None)
-    The save file library.
+  | **required**: false
+  | **type**: bool
 
 
+     
+parameters
+  The parameters that RSTLIB command will take. Other than options above, all other parameters need to be specified here. The default values of parameters for RSTLIB will be taken if not specified.
 
 
+  | **required**: false
+  | **type**: str
+  | **default**:  
 
-Notes
------
 
-.. note::
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+     
+saved_lib
+  The library need to be restored.
 
+
+  | **required**: True
+  | **type**: str
+
+
+     
+savefile_lib
+  The save file library.
+
+
+  | **required**: True
+  | **type**: str
+
+
+     
+savefile_name
+  The save file name.
+
+
+  | **required**: True
+  | **type**: str
 
 
 
@@ -77,92 +102,186 @@ Examples
 
 .. code-block:: yaml+jinja
 
-    
-    - name: Restore savedlib libary from archive.savf in archlib libary
-      ibmi_lib_restore:
-        saved_lib: 'savedlib'
-        savefile_name: 'archive'
-        savefile_lib: 'archlib'
+   
+   - name: Restore savedlib libary from archive.savf in archlib libary
+     ibmi_lib_restore:
+       saved_lib: 'savedlib'
+       savefile_name: 'archive'
+       savefile_lib: 'archlib'
+
+
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
 
 
 
 Return Values
 -------------
 
-  saved_lib (always, str, savedlib)
-    The library need to be restored.
 
+   
+                              
+       saved_lib
+        | The library need to be restored.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: savedlib
 
-  savefile_name (always, str, c1)
-    The save file name.
+            
+      
+      
+                              
+       savefile_name
+        | The save file name.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: c1
 
+            
+      
+      
+                              
+       end
+        | The restore execution end time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
 
-  end (always, str, 2019-12-02 11:07:54.064969)
-    The restore execution end time
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'User Profile = TESTER', 'FROM_MODULE': 'QSQSRVR', 'FROM_PROGRAM': 'QSQSRVR', 'MESSAGE_TIMESTAMP': '2020-05-25-12.59.59.966873', 'FROM_USER': 'TESTER', 'TO_INSTRUCTION': '8873', 'MESSAGE_SECOND_LEVEL_TEXT': '', 'MESSAGE_TYPE': 'COMPLETION', 'MESSAGE_ID': '', 'MESSAGE_LIBRARY': '', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '0', 'FROM_PROCEDURE': 'QSQSRVR', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '8873', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '8', 'MESSAGE_FILE': '', 'TO_PROCEDURE': 'QSQSRVR'}]
 
+            
+      
+      
+                              
+       stdout
+        | The restore standard output
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPC3703: 2 objects restored from test to test.
 
-  job_log (always, str, [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'User Profile = TESTER', 'FROM_MODULE': 'QSQSRVR', 'FROM_PROGRAM': 'QSQSRVR', 'MESSAGE_TIMESTAMP': '2020-05-25-12.59.59.966873', 'FROM_USER': 'TESTER', 'TO_INSTRUCTION': '8873', 'MESSAGE_SECOND_LEVEL_TEXT': '', 'MESSAGE_TYPE': 'COMPLETION', 'MESSAGE_ID': '', 'MESSAGE_LIBRARY': '', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '0', 'FROM_PROCEDURE': 'QSQSRVR', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '8873', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '8', 'MESSAGE_FILE': '', 'TO_PROCEDURE': 'QSQSRVR'}])
-    the job_log
+            
+      
+      
+                              
+       format
+        | The save file's format. Only support *SAVF by now.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: *SAVF
 
+            
+      
+      
+                              
+       stderr_lines
+        | The restore standard error split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
 
-  stdout (always, str, CPC3703: 2 objects restored from test to test.)
-    The restore standard output
+              .. code-block::
 
+                       ["CPF3806: Objects from save file archive in archlib not restored.", "CPF3780: Specified file for library test not found."]
+            
+      
+      
+                              
+       start
+        | The restore execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
-  format (always, str, *SAVF)
-    The save file's format. Only support *SAVF by now.
+            
+      
+      
+                              
+       delta
+        | The restore execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
 
+            
+      
+      
+                              
+       command
+        | The last excuted command.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: RSTLIB SAVLIB(TESTLIB) DEV(*SAVF) SAVF(TEST/ARCHLIB) 
 
-  stderr_lines (always, list, ['CPF3806: Objects from save file archive in archlib not restored.', 'CPF3780: Specified file for library test not found.'])
-    The restore standard error split in lines
+            
+      
+      
+                              
+       savefile_lib
+        | The save file library.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: c1lib
 
+            
+      
+      
+                              
+       stderr
+        | The restore standard error
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF3806: Objects from save file archive in archlib not restored.\n
 
-  start (always, str, 2019-12-02 11:07:53.757435)
-    The restore execution start time
+            
+      
+      
+                              
+       rc
+        | The restore action return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
+            
+      
+      
+                              
+       stdout_lines
+        | The restore standard output split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
 
-  delta (always, str, 0:00:00.307534)
-    The restore execution delta time
+              .. code-block::
 
-
-  command (always, str, RSTLIB SAVLIB(TESTLIB) DEV(*SAVF) SAVF(TEST/ARCHLIB) )
-    The last excuted command.
-
-
-  savefile_lib (always, str, c1lib)
-    The save file library.
-
-
-  stderr (always, str, CPF3806: Objects from save file archive in archlib not restored.\n)
-    The restore standard error
-
-
-  rc (always, int, 255)
-    The restore action return code (0 means success, non-zero means failure)
-
-
-  stdout_lines (always, list, ['CPC3703: 2 objects restored from test to test.'])
-    The restore standard output split in lines
-
-
-
-
-
-Status
-------
-
-
-
-
-- This module is not guaranteed to have a backwards compatible interface. *[preview]*
-
-
-- This module is maintained by community.
-
-
-
-Authors
-~~~~~~~
-
-- Peng Zeng Yu (@pengzengyufish)
-
+                       ["CPC3703: 2 objects restored from test to test."]
+            
+      
+        

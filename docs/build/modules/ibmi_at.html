@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_at – Schedule a batch job on a remote IBMi node &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_at – Schedule a batch job on a remote IBMi node &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -93,10 +93,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_at – Schedule a batch job on a remote IBMi node</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL command on a remote IBMi node</a></li>
@@ -152,7 +151,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_at.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_at.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,59 +209,90 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-at-schedule-a-batch-job-on-a-remote-ibmi-node">
-<h1>ibmi_at – Schedule a batch job on a remote IBMi node<a class="headerlink" href="#ibmi-at-schedule-a-batch-job-on-a-remote-ibmi-node" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-at-module"></span><h1>ibmi_at – Schedule a batch job on a remote IBMi node<a class="headerlink" href="#ibmi-at-schedule-a-batch-job-on-a-remote-ibmi-node" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id41">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id42">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id43">Notes</a></li>
-<li><a class="reference internal" href="#examples" id="id44">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id45">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id46">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id47">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id48">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id49">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id50">Notes</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id51">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id41">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The ibmi_at module schedule a batch job on a remote IBMi node</p>
-</div>
-<div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id42">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>parameters (optional, str, )</dt>
-<dd>The parameters that ADDJOBSCDE command will take. Other than options above, all other parameters need to be specified here. The default values of parameters for ADDJOBSCDE will be taken if not specified.</dd>
-<dt>scddate (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>CURRENT)</dt>
-<dd>Specifies the date on which the job is submitted.</dd>
-<dt>cmd (True, str, None)</dt>
-<dd>Specifies the command that runs in the submitted job.</dd>
-<dt>scdday (optional, list, <a href="#id3"><span class="problematic" id="id4">*</span></a>NONE)</dt>
-<dd><p class="first">Specifies the day of the week on which the job is submitted.</p>
-<p class="last">The valid value are ‘<a href="#id5"><span class="problematic" id="id6">*</span></a>NONE’, ‘<a href="#id7"><span class="problematic" id="id8">*</span></a>ALL’, ‘<a href="#id9"><span class="problematic" id="id10">*</span></a>MON’, ‘<a href="#id11"><span class="problematic" id="id12">*</span></a>TUE’, ‘<a href="#id13"><span class="problematic" id="id14">*</span></a>WED’, ‘<a href="#id15"><span class="problematic" id="id16">*</span></a>THU’, ‘<a href="#id17"><span class="problematic" id="id18">*</span></a>FRI’, ‘<a href="#id19"><span class="problematic" id="id20">*</span></a>SAT’, ‘<a href="#id21"><span class="problematic" id="id22">*</span></a>SUN’.</p>
-</dd>
-<dt>frequency (True, str, None)</dt>
-<dd>Specifies how often the job is submitted.</dd>
-<dt>text (optional, str, <a href="#id23"><span class="problematic" id="id24">*</span></a>BLANK)</dt>
-<dd>Specifies text that briefly describes the job schedule entry.</dd>
-<dt>schtime (optional, str, <a href="#id25"><span class="problematic" id="id26">*</span></a>CURRENT)</dt>
-<dd>Specifies the time on the scheduled date at which the job is submitted.</dd>
-<dt>joblog (optional, bool, False)</dt>
-<dd>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, append JOBLOG to stderr/stderr_lines.</dd>
-<dt>job_name (True, str, None)</dt>
-<dd>Specifies the name of the job schedule entry.</dd>
-</dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id43">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
+<h2><a class="toc-backref" href="#id47">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The ibmi_at module schedule a batch job on a remote IBMi node</p></li>
 </ul>
 </div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id48">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>cmd</dt><dd><p>Specifies the command that runs in the submitted job.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>frequency</dt><dd><p>Specifies how often the job is submitted.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>choices</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>ONCE, <a href="#id3"><span class="problematic" id="id4">*</span></a>WEEKLY, <a href="#id5"><span class="problematic" id="id6">*</span></a>MONTHLY</div>
+</div>
+</dd>
+<dt>job_name</dt><dd><p>Specifies the name of the job schedule entry.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, append JOBLOG to stderr/stderr_lines.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>parameters</dt><dd><p>The parameters that ADDJOBSCDE command will take. Other than options above, all other parameters need to be specified here. The default values of parameters for ADDJOBSCDE will be taken if not specified.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>scddate</dt><dd><p>Specifies the date on which the job is submitted.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id7"><span class="problematic" id="id8">*</span></a>CURRENT</div>
+</div>
+</dd>
+<dt>scdday</dt><dd><p>Specifies the day of the week on which the job is submitted.</p>
+<p>The valid value are ‘<a href="#id9"><span class="problematic" id="id10">*</span></a>NONE’, ‘<a href="#id11"><span class="problematic" id="id12">*</span></a>ALL’, ‘<a href="#id13"><span class="problematic" id="id14">*</span></a>MON’, ‘<a href="#id15"><span class="problematic" id="id16">*</span></a>TUE’, ‘<a href="#id17"><span class="problematic" id="id18">*</span></a>WED’, ‘<a href="#id19"><span class="problematic" id="id20">*</span></a>THU’, ‘<a href="#id21"><span class="problematic" id="id22">*</span></a>FRI’, ‘<a href="#id23"><span class="problematic" id="id24">*</span></a>SAT’, ‘<a href="#id25"><span class="problematic" id="id26">*</span></a>SUN’.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id27"><span class="problematic" id="id28">*</span></a>NONE</div>
+</div>
+</dd>
+<dt>schtime</dt><dd><p>Specifies the time on the scheduled date at which the job is submitted.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id29"><span class="problematic" id="id30">*</span></a>CURRENT</div>
+</div>
+</dd>
+<dt>text</dt><dd><p>Specifies text that briefly describes the job schedule entry.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id31"><span class="problematic" id="id32">*</span></a>BLANK</div>
+</div>
+</dd>
+</dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id44">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id49">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Add a job schedule entry test</span>
   <span class="nt">ibmi_at</span><span class="p">:</span>
     <span class="nt">job_name</span><span class="p">:</span> <span class="s">&#39;test&#39;</span>
@@ -273,43 +303,110 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id50">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id45">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id51">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (always, list, [‘CPF5813: File archive in library archlib already exists.’, ‘CPF7302: File archive not created in library archlib.’])</dt>
-<dd>The standard error split in lines</dd>
-<dt>job_log (always, str, [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘User Profile = TESTER’, ‘FROM_MODULE’: ‘QSQSRVR’, ‘FROM_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-25-12.40.00.690270’, ‘FROM_USER’: ‘TESTER’, ‘TO_INSTRUCTION’: ‘8873’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘’, ‘MESSAGE_TYPE’: ‘COMPLETION’, ‘MESSAGE_ID’: ‘’, ‘MESSAGE_LIBRARY’: ‘’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘0’, ‘FROM_PROCEDURE’: ‘QSQSRVR’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘8873’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘8’, ‘MESSAGE_FILE’: ‘’, ‘TO_PROCEDURE’: ‘QSQSRVR’}])</dt>
-<dd>the job_log</dd>
-<dt>stdout (always, str, CPC1238: Job schedule entry TEST number 000074 added.)</dt>
-<dd>The standard output</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The action return code (0 means success, non-zero means failure)</dd>
-<dt>command (always, str, QSYS/ADDJOBSCDE JOB(RUNCOM) CMD(QBLDSYSR/CHGSYSSEC OPTION(<a href="#id27"><span class="problematic" id="id28">*</span></a>CHGPW)) FRQ(<a href="#id29"><span class="problematic" id="id30">*</span></a>WEEKLY) SCDDATE(<a href="#id31"><span class="problematic" id="id32">*</span></a>CURRENT) SCDDAY(<a href="#id33"><span class="problematic" id="id34">*</span></a>NONE) SCDTIME(<a href="#id35"><span class="problematic" id="id36">*</span></a>CURRENT) TEXT(<a href="#id37"><span class="problematic" id="id38">*</span></a>BLANK) )</dt>
-<dd>The execution command</dd>
-<dt>stderr (always, str, CPF5813: File archive in library archlib already exists.nCPF7302: File archive not created in library archlib.n)</dt>
-<dd>The standard error</dd>
-<dt>delta (always, str, 0:00:00.307534)</dt>
-<dd>The execution delta time.</dd>
-<dt>msg (always, str, Either scddate or scdday need to be <a href="#id39"><span class="problematic" id="id40">*</span></a>NONE.)</dt>
-<dd>The execution message.</dd>
-<dt>stdout_lines (always, list, [‘CPC1238: Job schedule entry TEST number 000074 added.’])</dt>
-<dd>The standard output split in lines</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF5813: File archive in library archlib already exists.&quot;</span><span class="p">,</span> <span class="s2">&quot;CPF7302: File archive not created in library archlib.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">the job_log</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘User Profile = TESTER’, ‘FROM_MODULE’: ‘QSQSRVR’, ‘FROM_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-25-12.40.00.690270’, ‘FROM_USER’: ‘TESTER’, ‘TO_INSTRUCTION’: ‘8873’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘’, ‘MESSAGE_TYPE’: ‘COMPLETION’, ‘MESSAGE_ID’: ‘’, ‘MESSAGE_LIBRARY’: ‘’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘0’, ‘FROM_PROCEDURE’: ‘QSQSRVR’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘8873’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘8’, ‘MESSAGE_FILE’: ‘’, ‘TO_PROCEDURE’: ‘QSQSRVR’}]</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPC1238: Job schedule entry TEST number 000074 added.</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The action return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>command</dt><dd><div class="line-block">
+<div class="line">The execution command</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: QSYS/ADDJOBSCDE JOB(RUNCOM) CMD(QBLDSYSR/CHGSYSSEC OPTION(<a href="#id33"><span class="problematic" id="id34">*</span></a>CHGPW)) FRQ(<a href="#id35"><span class="problematic" id="id36">*</span></a>WEEKLY) SCDDATE(<a href="#id37"><span class="problematic" id="id38">*</span></a>CURRENT) SCDDAY(<a href="#id39"><span class="problematic" id="id40">*</span></a>NONE) SCDTIME(<a href="#id41"><span class="problematic" id="id42">*</span></a>CURRENT) TEXT(<a href="#id43"><span class="problematic" id="id44">*</span></a>BLANK)</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF5813: File archive in library archlib already exists.nCPF7302: File archive not created in library archlib.n</div>
+</div>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The execution delta time.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>msg</dt><dd><div class="line-block">
+<div class="line">The execution message.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: Either scddate or scdday need to be <a href="#id45"><span class="problematic" id="id46">*</span></a>NONE.</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPC1238: Job schedule entry TEST number 000074 added.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id46">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Peng Zeng Yu (&#64;pengzengyufish)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -333,11 +430,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_end_subsystem – end a subsystem &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_end_subsystem – end a subsystem &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -99,11 +99,10 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_end_subsystem – end a subsystem</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local</a></li>
@@ -153,7 +152,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -196,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_end_subsystem.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_end_subsystem.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -211,70 +210,76 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-end-subsystem-end-a-subsystem">
-<h1>ibmi_end_subsystem – end a subsystem<a class="headerlink" href="#ibmi-end-subsystem-end-a-subsystem" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-end-subsystem-module"></span><h1>ibmi_end_subsystem – end a subsystem<a class="headerlink" href="#ibmi-end-subsystem-end-a-subsystem" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id7">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id8">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id9">Notes</a></li>
-<li><a class="reference internal" href="#see-also" id="id10">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id11">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id12">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id13">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id17">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id18">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id19">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id20">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id21">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id22">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id7">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>the <code class="docutils literal notranslate"><span class="pre">ibmi_end_subsystem</span></code> module end a subsystem of the target ibmi node.</p>
-</div>
-<div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id8">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>subsystem (True, str, None)</dt>
-<dd>The name of the subsystem description</dd>
-<dt>how_to_end (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>CNTRLD)</dt>
-<dd>Specifies whether jobs in the subsystem are ended in a controlled manner or immediately</dd>
-<dt>end_subsystem_option (optional, list, [u’<a href="#id3"><span class="problematic" id="id4">*</span></a>DFT’])</dt>
-<dd>Specifies the options to take when ending the active subsystems</dd>
-<dt>parameters (optional, str, )</dt>
-<dd><p class="first">The parameters that ENDSBS command will take</p>
-<p>Other than options above, all other parameters need to be specified here</p>
-<p class="last">The default values of parameters for ENDSBS will be taken if not specified</p>
-</dd>
-<dt>joblog (optional, bool, False)</dt>
-<dd>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</dd>
-<dt>controlled_end_delay_time (optional, int, 100000)</dt>
-<dd><p class="first">Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation</p>
-<p>If this amount of time is exceeded and the end operation is not complete,</p>
-<p>any jobs still being processed in the subsystem are ended immediately</p>
-<p class="last">If the value is greater than 99999, ‘<a href="#id5"><span class="problematic" id="id6">*</span></a>NOLIMIT’ will be used in ENDSBS commnad</p>
-</dd>
-</dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id9">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>This module is NOT ALLOWED to end ALL subsystems, use the <code class="docutils literal notranslate"><span class="pre">ibmi_cl_command</span></code> module instead</li>
-<li>This module is non-blocking, the end subsystem may still be in progress, use <code class="docutils literal notranslate"><span class="pre">ibmi_display_subsystem_job</span></code> module to check the status</li>
+<h2><a class="toc-backref" href="#id17">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">ibmi_end_subsystem</span></code> module end a subsystem of the target ibmi node.</p></li>
 </ul>
 </div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id18">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>controlled_end_delay_time</dt><dd><p>Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation</p>
+<p>If this amount of time is exceeded and the end operation is not complete,</p>
+<p>any jobs still being processed in the subsystem are ended immediately</p>
+<p>If the value is greater than 99999, ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>NOLIMIT’ will be used in ENDSBS commnad</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 100000</div>
 </div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id10">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">ibmi_end_subsystem_module</span></dt>
-<dd>The official documentation on the <strong>ibmi_end_subsystem</strong> module.</dd>
+</dd>
+<dt>end_subsystem_option</dt><dd><p>Specifies the options to take when ending the active subsystems</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+<div class="line"><strong>choices</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>DFT, <a href="#id5"><span class="problematic" id="id6">*</span></a>NOJOBLOG, <a href="#id7"><span class="problematic" id="id8">*</span></a>CHGPTY, <a href="#id9"><span class="problematic" id="id10">*</span></a>CHGTSL</div>
+</div>
+</dd>
+<dt>how_to_end</dt><dd><p>Specifies whether jobs in the subsystem are ended in a controlled manner or immediately</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id11"><span class="problematic" id="id12">*</span></a>CNTRLD</div>
+<div class="line"><strong>choices</strong>: <a href="#id13"><span class="problematic" id="id14">*</span></a>IMMED, <a href="#id15"><span class="problematic" id="id16">*</span></a>CNTRLD</div>
+</div>
+</dd>
+<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>parameters</dt><dd><p>The parameters that ENDSBS command will take</p>
+<p>Other than options above, all other parameters need to be specified here</p>
+<p>The default values of parameters for ENDSBS will be taken if not specified</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>subsystem</dt><dd><p>The name of the subsystem description</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
 </dl>
 </div>
-</div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id11">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id19">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">End the subsystem QBATCH</span>
   <span class="nt">ibmi_end_subsystem</span><span class="p">:</span>
     <span class="nt">subsystem</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">QBATCH</span>
@@ -286,37 +291,93 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id20">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This module is NOT ALLOWED to end ALL subsystems, use the <code class="docutils literal notranslate"><span class="pre">ibmi_cl_command</span></code> module instead</p>
+<p>This module is non-blocking, the end subsystem may still be in progress, use <code class="docutils literal notranslate"><span class="pre">ibmi_display_subsystem_job</span></code> module to check the status</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id21">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#ibmi-end-subsystem-module"><span class="std std-ref">ibmi_end_subsystem – end a subsystem</span></a></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id12">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id22">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (always, list, [‘CPF1054: No subsystem MYJOB active.’])</dt>
-<dd>The standard error split in lines</dd>
-<dt>job_log (always, str, [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . <span class="classifier-delimiter">:</span> <span class="classifier">This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}])</span></dt>
-<dd>the job_log</dd>
-<dt>stderr (always, str, CPF1054: No subsystem MYJOB active.)</dt>
-<dd>The standard error the end subsystem command</dd>
-<dt>stdout (always, str, CPF0943: Ending of subsystem QBATCH in progress.)</dt>
-<dd>The standard output of the end subsystem command</dd>
-<dt>stdout_lines (always, list, [‘CPF0943: Ending of subsystem QBATCH in progress.’])</dt>
-<dd>The standard output split in lines</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The task return code (0 means success, non-zero means failure)</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF1054: No subsystem MYJOB active.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">the job_log</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . :   This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}]</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The standard error the end subsystem command</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF1054: No subsystem MYJOB active.</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The standard output of the end subsystem command</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF0943: Ending of subsystem QBATCH in progress.</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF0943: Ending of subsystem QBATCH in progress.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id13">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Chang Le (&#64;changlexc)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -340,11 +401,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

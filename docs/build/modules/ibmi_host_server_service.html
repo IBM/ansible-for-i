@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_host_server_service – Manage host server on a remote IBMi node &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_host_server_service – Manage host server on a remote IBMi node &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -104,10 +104,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_host_server_service – Manage host server on a remote IBMi node</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP on target IBMi node</a></li>
@@ -152,7 +151,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_host_server_service.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_host_server_service.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,52 +209,59 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-host-server-service-manage-host-server-on-a-remote-ibmi-node">
-<h1>ibmi_host_server_service – Manage host server on a remote IBMi node<a class="headerlink" href="#ibmi-host-server-service-manage-host-server-on-a-remote-ibmi-node" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-host-server-service-module"></span><h1>ibmi_host_server_service – Manage host server on a remote IBMi node<a class="headerlink" href="#ibmi-host-server-service-manage-host-server-on-a-remote-ibmi-node" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id25">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id26">Parameters</a></li>
-<li><a class="reference internal" href="#see-also" id="id27">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id28">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id29">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id30">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id23">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id24">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id25">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id26">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id27">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id25">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>Manage and query IBMi host server service.</p>
-<p>For non-IBMi targets, use the <span class="xref std std-ref">service</span> module instead.</p>
+<h2><a class="toc-backref" href="#id23">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Manage and query IBMi host server service.</p></li>
+<li><p>For non-IBMi targets, use the <span class="xref std std-ref">service</span> module instead.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id26">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>extra_parameters (optional, str,  )</dt>
-<dd>extra parameter is appended at the end of host server service command</dd>
-<dt>state (True, str, None)</dt>
-<dd><p class="first"><code class="docutils literal notranslate"><span class="pre">started</span></code>/<code class="docutils literal notranslate"><span class="pre">stopped</span></code> are idempotent actions that will not run commands unless necessary.</p>
-<p><code class="docutils literal notranslate"><span class="pre">restarted</span></code> will always bounce the service.</p>
-<p class="last"><strong>At least one of state and enabled are required.</strong></p>
+<h2><a class="toc-backref" href="#id24">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>extra_parameters</dt><dd><p>extra parameter is appended at the end of host server service command</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>:</div>
+</div>
 </dd>
-<dt>name_list (True, list, None)</dt>
-<dd>The name of the host server service. The valid value are “<a href="#id1"><span class="problematic" id="id2">*</span></a>ALL”, “<a href="#id3"><span class="problematic" id="id4">*</span></a>CENTRAL”, “<a href="#id5"><span class="problematic" id="id6">*</span></a>DATABASE”, “<a href="#id7"><span class="problematic" id="id8">*</span></a>DTAQ”, “<a href="#id9"><span class="problematic" id="id10">*</span></a>FILE”, “<a href="#id11"><span class="problematic" id="id12">*</span></a>NETPRT”, “<a href="#id13"><span class="problematic" id="id14">*</span></a>RMTCMD”, “<a href="#id15"><span class="problematic" id="id16">*</span></a>SIGNON”, “<a href="#id17"><span class="problematic" id="id18">*</span></a>SVRMAP”.</dd>
-<dt>joblog (optional, bool, False)</dt>
-<dd>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, append JOBLOG to stderr/stderr_lines.</dd>
-</dl>
-</div></blockquote>
+<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, append JOBLOG to stderr/stderr_lines.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
 </div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id27">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">service_module</span></dt>
-<dd>The official documentation on the <strong>service</strong> module.</dd>
-</dl>
+</dd>
+<dt>name_list</dt><dd><p>The name of the host server service. The valid value are “<a href="#id1"><span class="problematic" id="id2">*</span></a>ALL”, “<a href="#id3"><span class="problematic" id="id4">*</span></a>CENTRAL”, “<a href="#id5"><span class="problematic" id="id6">*</span></a>DATABASE”, “<a href="#id7"><span class="problematic" id="id8">*</span></a>DTAQ”, “<a href="#id9"><span class="problematic" id="id10">*</span></a>FILE”, “<a href="#id11"><span class="problematic" id="id12">*</span></a>NETPRT”, “<a href="#id13"><span class="problematic" id="id14">*</span></a>RMTCMD”, “<a href="#id15"><span class="problematic" id="id16">*</span></a>SIGNON”, “<a href="#id17"><span class="problematic" id="id18">*</span></a>SVRMAP”.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
 </div>
+</dd>
+<dt>state</dt><dd><p><code class="docutils literal notranslate"><span class="pre">started</span></code>/<code class="docutils literal notranslate"><span class="pre">stopped</span></code> are idempotent actions that will not run commands unless necessary.</p>
+<p><code class="docutils literal notranslate"><span class="pre">restarted</span></code> will always bounce the service.</p>
+<p><strong>At least one of state and enabled are required.</strong></p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>choices</strong>: started, stopped</div>
+</div>
+</dd>
+</dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id28">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id25">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">start host server service</span>
   <span class="nt">ibmi_host_server_service</span><span class="p">:</span>
     <span class="nt">name_list</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;*CENTRAL&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;*DATABASE&#39;</span><span class="p p-Indicator">]</span>
@@ -264,45 +270,121 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id26">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">service_module</span></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id29">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id27">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (always, list, [‘CPF2111:Library TESTLIB already exists.’])</dt>
-<dd>The command standard error split in lines</dd>
-<dt>end (always, str, 2019-12-02 11:07:54.064969)</dt>
-<dd>The command execution end time</dd>
-<dt>job_log (always, str, [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_KEY’: ‘00000379’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘TO_INSTRUCTION’: ‘9369’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘FROM_USER’: ‘CHANGLE’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . <span class="classifier-delimiter">:</span> <span class="classifier">This message is used by application programs as a general escape message.’, ‘FROM_PROCEDURE’: ‘’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘TO_LIBRARY’: ‘QSYS’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}])</span></dt>
-<dd>the job_log</dd>
-<dt>stdout (always, str, +++ success STRHOSTSVR SERVER(<a href="#id19"><span class="problematic" id="id20">*</span></a>ALL))</dt>
-<dd>The command standard output</dd>
-<dt>cmd (always, str, STRHOSTSVR SERVER(<a href="#id21"><span class="problematic" id="id22">*</span></a>ALL))</dt>
-<dd>The command executed by the task</dd>
-<dt>start (always, str, 2019-12-02 11:07:53.757435)</dt>
-<dd>The command execution start time</dd>
-<dt>delta (always, str, 0:00:00.307534)</dt>
-<dd>The command execution delta time</dd>
-<dt>stderr (always, str, CPF2111:Library TESTLIB already exists)</dt>
-<dd>The command standard error</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The command return code (0 means success, non-zero means failure)</dd>
-<dt>stdout_lines (always, list, [‘+++ success STRHOSTSVR SERVER(<a href="#id23"><span class="problematic" id="id24">*</span></a>ALL)’])</dt>
-<dd>The command standard output split in lines</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The command standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>end</dt><dd><div class="line-block">
+<div class="line">The command execution end time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
+</div>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">the job_log</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_KEY’: ‘00000379’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘TO_INSTRUCTION’: ‘9369’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘FROM_USER’: ‘CHANGLE’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . :   This message is used by application programs as a general escape message.’, ‘FROM_PROCEDURE’: ‘’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘TO_LIBRARY’: ‘QSYS’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}]</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The command standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: +++ success STRHOSTSVR SERVER(<a href="#id19"><span class="problematic" id="id20">*</span></a>ALL)</div>
+</div>
+</dd>
+<dt>cmd</dt><dd><div class="line-block">
+<div class="line">The command executed by the task</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: STRHOSTSVR SERVER(<a href="#id21"><span class="problematic" id="id22">*</span></a>ALL)</div>
+</div>
+</dd>
+<dt>start</dt><dd><div class="line-block">
+<div class="line">The command execution start time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
+</div>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The command execution delta time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The command standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF2111:Library TESTLIB already exists</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The command return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The command standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;+++ success STRHOSTSVR SERVER(*ALL)&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id30">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Jin Yi Fan(&#64;jinyifan)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -326,11 +408,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

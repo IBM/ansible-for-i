@@ -41,6 +41,8 @@ Synopsis
      {% set default_str = (spec.default | string | lower ) %}
 {% elif spec.type == 'int' %}
      {% set default_str = (spec.default | string ) %}
+{% elif spec.type == 'list' %}
+     {% set default_str = ("".join(spec.default) ) %}
 {% else %}
      {% set default = ", default: " + spec.default if spec.default else "" %}
 {% endif %}
@@ -53,6 +55,9 @@ Synopsis
 
   {{ "  " * level }}| **required**: {{ spec.required | default("false") }}
   {{ "  " * level }}| **type**: {{ spec.type | default("str") }}
+{%     if spec.elements %}
+  {{ "  " * level }}| **elements**: {{ spec.elements }}
+{%     endif %}
 {%     if spec.default %}
   {{ "  " * level }}| **default**: {{ spec.default }}
 {%     endif %}

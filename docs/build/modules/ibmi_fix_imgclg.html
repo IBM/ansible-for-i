@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog. &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -102,11 +102,10 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks on target IBMi node</a></li>
@@ -153,7 +152,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -196,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_fix_imgclg.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_fix_imgclg.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -211,79 +210,96 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-fix-imgclg-install-fixes-such-as-ptf-ptf-group-technology-refresh-to-the-target-ibm-i-system-by-image-catalog">
-<h1>ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.<a class="headerlink" href="#ibmi-fix-imgclg-install-fixes-such-as-ptf-ptf-group-technology-refresh-to-the-target-ibm-i-system-by-image-catalog" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-fix-imgclg-module"></span><h1>ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.<a class="headerlink" href="#ibmi-fix-imgclg-install-fixes-such-as-ptf-ptf-group-technology-refresh-to-the-target-ibm-i-system-by-image-catalog" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id17">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id18">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id19">Notes</a></li>
-<li><a class="reference internal" href="#see-also" id="id20">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id21">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id22">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id23">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id13">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id14">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id15">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id16">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id17">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id18">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id17">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">ibmi_fix</span></code> module install fixes to target IBM i system by image catalog.</p>
-<p>Single PTF, PTF group and TR PTF are supported.</p>
+<h2><a class="toc-backref" href="#id13">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_fix</span></code> module install fixes to target IBM i system by image catalog.</p></li>
+<li><p>Single PTF, PTF group and TR PTF are supported.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id18">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>src (True, str, None)</dt>
-<dd><p class="first">The path on the target IBM i system where the fix installation file is located.</p>
-<p class="last">The path is an IFS directory format.</p>
+<h2><a class="toc-backref" href="#id14">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>apply_type</dt><dd><p>The fix apply type of the install to perform.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>DLYALL</div>
+<div class="line"><strong>choices</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>DLYALL, <a href="#id5"><span class="problematic" id="id6">*</span></a>IMMDLY, <a href="#id7"><span class="problematic" id="id8">*</span></a>IMMONLY</div>
+</div>
 </dd>
-<dt>rollback (optional, bool, True)</dt>
-<dd>Whether or not rollback if there’s failure during the installation of the fixes</dd>
-<dt>product_id (optional, list, [u’<a href="#id1"><span class="problematic" id="id2">*</span></a>ALL’])</dt>
-<dd>The product ID of the fixes to be installed.</dd>
-<dt>apply_type (optional, str, <a href="#id3"><span class="problematic" id="id4">*</span></a>DLYALL)</dt>
-<dd>The fix apply type of the install to perform.</dd>
-<dt>virtual_image_name_list (False, list, [u’<a href="#id5"><span class="problematic" id="id6">*</span></a>ALL’])</dt>
-<dd>The name list of the installation file.</dd>
-<dt>hiper_only (optional, bool, False)</dt>
-<dd><p class="first">Whether or not only install the hiper fixes.</p>
-<p class="last">Specify true if only need to install hiper fixes.</p>
+<dt>fix_omit_list</dt><dd><p>The list of PTFs that will be omitted.</p>
+<p>The key of the dict should be the product ID of the fix that is omitted.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: dict</div>
+</div>
 </dd>
-<dt>use_temp_path (optional, bool, True)</dt>
-<dd><p class="first">Whether or not to copy the installation file to a temp path.</p>
+<dt>hiper_only</dt><dd><p>Whether or not only install the hiper fixes.</p>
+<p>Specify true if only need to install hiper fixes.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>product_id</dt><dd><p>The product ID of the fixes to be installed.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+<div class="line"><strong>default</strong>: [u’<a href="#id9"><span class="problematic" id="id10">*</span></a>ALL’]</div>
+</div>
+</dd>
+<dt>rollback</dt><dd><p>Whether or not rollback if there’s failure during the installation of the fixes</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
+</div>
+</dd>
+<dt>src</dt><dd><p>The path on the target IBM i system where the fix installation file is located.</p>
+<p>The path is an IFS directory format.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>use_temp_path</dt><dd><p>Whether or not to copy the installation file to a temp path.</p>
 <p>If true is chosen, it will copy the installation file to a temp path.</p>
 <p>The temp directory and the installation file copied to the temp directory will be both deleted after the task.</p>
 <p>It is recommended to use temp path to avoid conflicts.</p>
 <p>If false is chosen, the install will directly use the file specified in src option.</p>
-<p class="last">The installation file will not be deleted after install if false is chosen.</p>
+<p>The installation file will not be deleted after install if false is chosen.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
+</div>
 </dd>
-<dt>fix_omit_list (False, list, None)</dt>
-<dd><p class="first">The list of PTFs that will be omitted.</p>
-<p class="last">The key of the dict should be the product ID of the fix that is omitted.</p>
+<dt>virtual_image_name_list</dt><dd><p>The name list of the installation file.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+<div class="line"><strong>default</strong>: [u’<a href="#id11"><span class="problematic" id="id12">*</span></a>ALL’]</div>
+</div>
 </dd>
 </dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id19">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
-</ul>
-</div>
-</div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id20">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">ibmi_fix, ibmi_fix_savf_module</span></dt>
-<dd>The official documentation on the <strong>ibmi_fix, ibmi_fix_savf</strong> module.</dd>
-</dl>
-</div>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id21">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id15">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Install a list of PTFs of LPP 5733SC1 from image catalog</span>
   <span class="nt">ibmi_fix_imgclg</span><span class="p">:</span>
     <span class="nt">product_id</span><span class="p">:</span>
@@ -300,43 +316,124 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id16">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id17">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">ibmi_fix, ibmi_fix_savf_module</span></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id22">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id18">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (When error occurs., list, [‘CPF2111:Library TESTLIB already exists.’])</dt>
-<dd>The task standard error split in lines</dd>
-<dt>end (When rc is zero, str, 2019-12-02 11:07:54.064969)</dt>
-<dd>The task execution end time</dd>
-<dt>stdout_lines (When error occurs., list, [“CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(<a href="#id7"><span class="problematic" id="id8">*</span></a>VRT) ONLINE(<a href="#id9"><span class="problematic" id="id10">*</span></a>YES) TEXT(‘Created by Ansible for IBM i’)”, “+++ success CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(<a href="#id11"><span class="problematic" id="id12">*</span></a>VRT) ONLINE(<a href="#id13"><span class="problematic" id="id14">*</span></a>YES) TEXT(‘Created by Ansible for IBM i’)”, “CRTIMGCLG IMGCLG(ANSIBCLG1) DIR(‘/home/ansiblePTFInstallTemp/’) CRTDIR(<a href="#id15"><span class="problematic" id="id16">*</span></a>YES)”])</dt>
-<dd>The task standard output split in lines</dd>
-<dt>stdout (When error occurs., str, CPC2102: Library TESTLIB created)</dt>
-<dd>The task standard output</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The task return code (0 means success, non-zero means failure)</dd>
-<dt>start (When rc is zero, str, 2019-12-02 11:07:53.757435)</dt>
-<dd>The task execution start time</dd>
-<dt>stderr (When error occurs., str, CPF2111:Library TESTLIB already exists)</dt>
-<dd>The task standard error</dd>
-<dt>delta (When rc is zero, str, 0:00:00.307534)</dt>
-<dd>The task execution delta time</dd>
-<dt>need_action_ptf_list (When rc is zero., list, [{‘PTF_ACTION_REQUIRED’: ‘NONE’, ‘PTF_IPL_REQUIRED’: ‘IMMEDIATE’, ‘PTF_IDENTIFIER’: ‘SI71746’, ‘PTF_CREATION_TIMESTAMP’: ‘2019-12-06T01:00:43’, ‘PTF_PRODUCT_ID’: ‘5733SC1’, ‘PTF_TEMPORARY_APPLY_TIMESTAMP’: None, ‘PTF_IPL_ACTION’: ‘TEMPORARILY APPLIED’, ‘PTF_SAVE_FILE’: ‘NO’, ‘PTF_STATUS_TIMESTAMP’: ‘2020-03-24T09:03:55’, ‘PTF_LOADED_STATUS’: ‘LOADED’, ‘PTF_ACTION_PENDING’: ‘NO’}])</dt>
-<dd>The list contains the information of the just installed PTFs that need further IPL actions.</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The task standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>end</dt><dd><div class="line-block">
+<div class="line">The task execution end time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The task standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;+++ success CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;CRTIMGCLG IMGCLG(ANSIBCLG1) DIR(</span><span class="se">\u0027</span><span class="s2">/home/ansiblePTFInstallTemp/</span><span class="se">\u0027</span><span class="s2">) CRTDIR(*YES)&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The task standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPC2102: Library TESTLIB created</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>start</dt><dd><div class="line-block">
+<div class="line">The task execution start time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The task standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF2111:Library TESTLIB already exists</div>
+</div>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The task execution delta time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>need_action_ptf_list</dt><dd><div class="line-block">
+<div class="line">The list contains the information of the just installed PTFs that need further IPL actions.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;PTF_ACTION_PENDING&quot;</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_ACTION_REQUIRED&quot;</span><span class="p">:</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_CREATION_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2019-12-06T01:00:43&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IDENTIFIER&quot;</span><span class="p">:</span> <span class="s2">&quot;SI71746&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IPL_ACTION&quot;</span><span class="p">:</span> <span class="s2">&quot;TEMPORARILY APPLIED&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IPL_REQUIRED&quot;</span><span class="p">:</span> <span class="s2">&quot;IMMEDIATE&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_LOADED_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;LOADED&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_PRODUCT_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;5733SC1&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_SAVE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_STATUS_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-03-24T09:03:55&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_TEMPORARY_APPLY_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id23">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Wang Yun (&#64;airwangyun)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -360,11 +457,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

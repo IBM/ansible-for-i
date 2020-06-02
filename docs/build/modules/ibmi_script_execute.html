@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_script_execute – Execute a cl/sql script file on a remote ibm i node. &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_script_execute – Execute a cl/sql script file on a remote ibm i node. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -118,10 +118,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_script_execute – Execute a cl/sql script file on a remote ibm i node.</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sql_execute.html">ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement on a remote IBMi node</a></li>
@@ -152,7 +151,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_script_execute.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_script_execute.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,65 +209,73 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-script-execute-execute-a-cl-sql-script-file-on-a-remote-ibm-i-node">
-<h1>ibmi_script_execute – Execute a cl/sql script file on a remote ibm i node.<a class="headerlink" href="#ibmi-script-execute-execute-a-cl-sql-script-file-on-a-remote-ibm-i-node" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-script-execute-module"></span><h1>ibmi_script_execute – Execute a cl/sql script file on a remote ibm i node.<a class="headerlink" href="#ibmi-script-execute-execute-a-cl-sql-script-file-on-a-remote-ibm-i-node" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id3">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id4">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id5">Notes</a></li>
-<li><a class="reference internal" href="#examples" id="id6">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id7">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id8">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id3">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id4">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id5">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id6">Notes</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id7">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id3">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The ibmi_script_execute module execute a cl/sql script file on a remote ibm i node.</p>
-<p>Only support cl/sql script file by now.</p>
-<p>For sql script, use RUNSQLSTM to process</p>
-<p>For non-cl/sql script, use the script plugin instead.</p>
+<ul class="simple">
+<li><p>The ibmi_script_execute module execute a cl/sql script file on a remote ibm i node.</p></li>
+<li><p>Only support cl/sql script file by now.</p></li>
+<li><p>For sql script, use RUNSQLSTM to process</p></li>
+<li><p>For non-cl/sql script, use the script plugin instead.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
 <h2><a class="toc-backref" href="#id4">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>src (True, path, None)</dt>
-<dd><p class="first">Script file path on the remote ibm i node.</p>
-<p class="last">The path can be absolute or relative.</p>
+<dl>
+<dt>asp_group</dt><dd><p>Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.</p>
+<p>The ASP group name is the name of the primary ASP device within the ASP group.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>SYSBAS</div>
+</div>
 </dd>
-<dt>severity_level (optional, int, 10)</dt>
-<dd><p class="first">When run sql script, specifies whether the processing is successful, based on the severity of the messages generated by the processing of the SQL statements.</p>
-<p>If errors that are greater than the value specified for this parameter occur during processing, no more statements are run and the statements are rolled back if they are running under commitmentcontrol.</p>
-<p class="last">Only works for sql script</p>
-</dd>
-<dt>type (True, str, None)</dt>
-<dd><p class="first">Specify the script file type.</p>
-<p class="last">Only support CL or SQL script by now.</p>
-</dd>
-<dt>asp_group (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>SYSBAS)</dt>
-<dd><p class="first">Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.</p>
-<p class="last">The ASP group name is the name of the primary ASP device within the ASP group.</p>
-</dd>
-<dt>parameters (optional, str,  )</dt>
-<dd><p class="first">The parameters that RUNSQLSTM command will take. All other parameters need to be specified here.</p>
+<dt>parameters</dt><dd><p>The parameters that RUNSQLSTM command will take. All other parameters need to be specified here.</p>
 <p>The default values of parameters for RUNSQLSTM will be taken if not specified.</p>
-<p class="last">Only works for sql script</p>
+<p>Only works for sql script</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>:</div>
+</div>
+</dd>
+<dt>severity_level</dt><dd><p>When run sql script, specifies whether the processing is successful, based on the severity of the messages generated by the processing of the SQL statements.</p>
+<p>If errors that are greater than the value specified for this parameter occur during processing, no more statements are run and the statements are rolled back if they are running under commitmentcontrol.</p>
+<p>Only works for sql script</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 10</div>
+</div>
+</dd>
+<dt>src</dt><dd><p>Script file path on the remote ibm i node.</p>
+<p>The path can be absolute or relative.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: path</div>
+</div>
+</dd>
+<dt>type</dt><dd><p>Specify the script file type.</p>
+<p>Only support CL or SQL script by now.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>choices</strong>: CL, SQL</div>
+</div>
 </dd>
 </dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id5">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
-<li>For cl script, the command supports line breaks. When a command ends, add ‘:’ at the end of each command or empty the next line. Otherwise program will not consider it is the end of a command.</li>
-</ul>
-</div>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id6">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Execute test.cl on a remote ibm i node</span>
   <span class="nt">ibmi_script_execute</span><span class="p">:</span>
     <span class="nt">src</span><span class="p">:</span> <span class="s">&#39;/home/test.cl&#39;</span>
@@ -283,39 +290,93 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id6">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+<p>For cl script, the command supports line breaks. When a command ends, add ‘:’ at the end of each command or empty the next line. Otherwise program will not consider it is the end of a command.</p>
+</div>
+</div>
 <div class="section" id="return-values">
 <h2><a class="toc-backref" href="#id7">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (always, list, [‘Execute command %s failed.’])</dt>
-<dd>The standard error split in lines</dd>
-<dt>job_log (always, str, [{‘TO_MODULE’: ‘PLUGILE’, ‘TO_PROGRAM’: ‘XMLSTOREDP’, ‘MESSAGE_TEXT’: ‘Command ended normally with exit status 0.’, ‘FROM_MODULE’: ‘QZSHRUNC’, ‘FROM_PROGRAM’: ‘QZSHRUNC’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-27-16.17.43.738571’, ‘FROM_USER’: ‘TESTER’, ‘TO_INSTRUCTION’: ‘5829’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘’, ‘MESSAGE_TYPE’: ‘COMPLETION’, ‘MESSAGE_ID’: ‘QSH0005’, ‘MESSAGE_LIBRARY’: ‘QSHELL’, ‘FROM_LIBRARY’: ‘QSHELL’, ‘SEVERITY’: ‘0’, ‘FROM_PROCEDURE’: ‘main’, ‘TO_LIBRARY’: ‘QXMLSERV’, ‘FROM_INSTRUCTION’: ‘149’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘13’, ‘MESSAGE_FILE’: ‘QZSHMSGF’, ‘TO_PROCEDURE’: ‘ILECMDEXC’}])</dt>
-<dd>the job_log</dd>
-<dt>stderr (always, str, Execute command %s failed.)</dt>
-<dd>The standard error</dd>
-<dt>stdout (always, str, Successfully execute script file /home/test.cl)</dt>
-<dd>The standard output</dd>
-<dt>stdout_lines (always, list, [‘Successfully execute script file /home/test.cl’])</dt>
-<dd>The standard output split in lines</dd>
-<dt>delta (always, str, 0:00:00.307534)</dt>
-<dd>The execution delta time.</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The action return code (0 means success, non-zero means failure)</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;Execute command </span><span class="si">%s</span><span class="s2"> failed.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">the job_log</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘TO_MODULE’: ‘PLUGILE’, ‘TO_PROGRAM’: ‘XMLSTOREDP’, ‘MESSAGE_TEXT’: ‘Command ended normally with exit status 0.’, ‘FROM_MODULE’: ‘QZSHRUNC’, ‘FROM_PROGRAM’: ‘QZSHRUNC’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-27-16.17.43.738571’, ‘FROM_USER’: ‘TESTER’, ‘TO_INSTRUCTION’: ‘5829’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘’, ‘MESSAGE_TYPE’: ‘COMPLETION’, ‘MESSAGE_ID’: ‘QSH0005’, ‘MESSAGE_LIBRARY’: ‘QSHELL’, ‘FROM_LIBRARY’: ‘QSHELL’, ‘SEVERITY’: ‘0’, ‘FROM_PROCEDURE’: ‘main’, ‘TO_LIBRARY’: ‘QXMLSERV’, ‘FROM_INSTRUCTION’: ‘149’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘13’, ‘MESSAGE_FILE’: ‘QZSHMSGF’, ‘TO_PROCEDURE’: ‘ILECMDEXC’}]</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: Execute command %s failed.</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: Successfully execute script file /home/test.cl</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;Successfully execute script file /home/test.cl&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The execution delta time.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The action return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id8">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Peng Zeng Yu (&#64;pengzengyufish)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -339,11 +400,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

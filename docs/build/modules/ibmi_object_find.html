@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_object_find – Find specific IBM i object(s). &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_object_find – Find specific IBM i object(s). &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -112,11 +112,10 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_object_find – Find specific IBM i object(s).</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects on a remote IBMi node</a></li>
@@ -153,7 +152,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -196,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_object_find.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_object_find.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -211,69 +210,86 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-object-find-find-specific-ibm-i-object-s">
-<h1>ibmi_object_find – Find specific IBM i object(s).<a class="headerlink" href="#ibmi-object-find-find-specific-ibm-i-object-s" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-object-find-module"></span><h1>ibmi_object_find – Find specific IBM i object(s).<a class="headerlink" href="#ibmi-object-find-find-specific-ibm-i-object-s" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id15">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id16">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id17">Notes</a></li>
-<li><a class="reference internal" href="#see-also" id="id18">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id19">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id20">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id21">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id11">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id12">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id13">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id14">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id15">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id16">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id15">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>Return a list of IBM i objects based on specific criteria. Multiple criteria are AND’d together.</p>
-</div>
-<div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id16">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>age (False, str, None)</dt>
-<dd>Select objects whose age is equal to or greater than the specified time. Use a negative age to find objects equal to or less than the specified time. You can choose seconds, minutes, hours, days, or weeks by specifying the first letter of any of those n words (e.g., “1w”).</dd>
-<dt>age_stamp (False, str, ctime)</dt>
-<dd>Choose the object statistic against which we compare age. Default is ctime which is the object creation time.</dd>
-<dt>object_name (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>ALL)</dt>
-<dd>The name of the object that will be returned. Whether regex can be used for object_name is controlled by <code class="docutils literal notranslate"><span class="pre">use_regex</span></code> option</dd>
-<dt>object_type_list (False, str, <a href="#id3"><span class="problematic" id="id4">*</span></a>ALL)</dt>
-<dd>One or more system object types separated by either a blank or a comma.</dd>
-<dt>iasp_name (optional, str, <a href="#id5"><span class="problematic" id="id6">*</span></a>SYSBAS)</dt>
-<dd><p class="first">The auxiliary storage pool (ASP) where storage is allocated for the object.</p>
-<p>The default value is “<a href="#id7"><span class="problematic" id="id8">*</span></a>SYSBAS”.</p>
-<p class="last">If an IASP name is specified, objects in this ASP group will be returned, including both SYSBAS and IASP.</p>
-</dd>
-<dt>use_regex (optional, bool, False)</dt>
-<dd>Controls whether regex can be used for object_name option. The target IBM i system needs to have the International Components for Unicode (ICU) option installed. It takes time to return result if this option is turned on.</dd>
-<dt>lib_name (False, str, <a href="#id9"><span class="problematic" id="id10">*</span></a>ALLUSR)</dt>
-<dd>The name of the library that returned objects locate in</dd>
-<dt>size (False, str, None)</dt>
-<dd>Select objects whose size is equal to or greater than the specified size. Use a negative size to find objects equal to or less than the specified size. Unqualified values are in bytes but b, k, m, g, and t can be appended to specify bytes, kilobytes, megabytes, gigabytes, and terabytes, respectively.</dd>
-</dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id17">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
+<h2><a class="toc-backref" href="#id11">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Return a list of IBM i objects based on specific criteria. Multiple criteria are AND’d together.</p></li>
 </ul>
 </div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id12">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>age</dt><dd><p>Select objects whose age is equal to or greater than the specified time. Use a negative age to find objects equal to or less than the specified time. You can choose seconds, minutes, hours, days, or weeks by specifying the first letter of any of those n words (e.g., “1w”).</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
 </div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id18">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">find_module</span></dt>
-<dd>The official documentation on the <strong>find</strong> module.</dd>
+</dd>
+<dt>age_stamp</dt><dd><p>Choose the object statistic against which we compare age. Default is ctime which is the object creation time.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: ctime</div>
+<div class="line"><strong>choices</strong>: ctime</div>
+</div>
+</dd>
+<dt>iasp_name</dt><dd><p>The auxiliary storage pool (ASP) where storage is allocated for the object.</p>
+<p>The default value is “<a href="#id1"><span class="problematic" id="id2">*</span></a>SYSBAS”.</p>
+<p>If an IASP name is specified, objects in this ASP group will be returned, including both SYSBAS and IASP.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>SYSBAS</div>
+</div>
+</dd>
+<dt>lib_name</dt><dd><p>The name of the library that returned objects locate in</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>ALLUSR</div>
+</div>
+</dd>
+<dt>object_name</dt><dd><p>The name of the object that will be returned. Whether regex can be used for object_name is controlled by <code class="docutils literal notranslate"><span class="pre">use_regex</span></code> option</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id7"><span class="problematic" id="id8">*</span></a>ALL</div>
+</div>
+</dd>
+<dt>object_type_list</dt><dd><p>One or more system object types separated by either a blank or a comma.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id9"><span class="problematic" id="id10">*</span></a>ALL</div>
+</div>
+</dd>
+<dt>size</dt><dd><p>Select objects whose size is equal to or greater than the specified size. Use a negative size to find objects equal to or less than the specified size. Unqualified values are in bytes but b, k, m, g, and t can be appended to specify bytes, kilobytes, megabytes, gigabytes, and terabytes, respectively.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>use_regex</dt><dd><p>Controls whether regex can be used for object_name option. The target IBM i system needs to have the International Components for Unicode (ICU) option installed. It takes time to return result if this option is turned on.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
 </dl>
 </div>
-</div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id19">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id13">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">Find all journals and journal receivers in library WYTEST.</span>
   <span class="nt">ibmi_object_find</span><span class="p">:</span>
     <span class="nt">object_name</span><span class="p">:</span> <span class="s">&#39;*ALL&#39;</span>
@@ -305,43 +321,121 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id14">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id15">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">find_module</span></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id20">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id16">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (When rc as non-zero(failure), list, [‘’])</dt>
-<dd>The task execution standard error split in lines</dd>
-<dt>end (always, str, 2019-12-02 11:07:54.064969)</dt>
-<dd>The task execution end time</dd>
-<dt>stdout (When rc as non-zero(failure), str, )</dt>
-<dd>The task execution standard output</dd>
-<dt>object_list (when rc as 0(success), list, [{‘OBJLIB’: ‘TESTLIB’, ‘OBJCREATED’: ‘2019-02-18T10:48:41’, ‘OBJOWNER’: ‘WY’, ‘TEXT’: ‘TEST’, ‘OBJDEFINER’: ‘USERADMIN’, ‘IASP_NUMBER’: 0, ‘OBJSIZE’: 131072, ‘OBJNAME’: ‘TESTOBJ1’, ‘OBJATTRIBUTE’: ‘SAVF’, ‘OBJTYPE’: ‘<a href="#id11"><span class="problematic" id="id12">*</span></a>FILE’, ‘LAST_USED_TIMESTAMP’: None, ‘LAST_RESET_TIMESTAMP’: None}, {‘OBJLIB’: ‘TESTLIB’, ‘OBJCREATED’: ‘2019-02-18T10:48:41’, ‘OBJOWNER’: ‘WY’, ‘TEXT’: ‘test’, ‘OBJDEFINER’: ‘USERAPP’, ‘IASP_NUMBER’: 0, ‘OBJSIZE’: 131072, ‘OBJNAME’: ‘RING1’, ‘OBJATTRIBUTE’: ‘SAVF’, ‘OBJTYPE’: ‘<a href="#id13"><span class="problematic" id="id14">*</span></a>FILE’, ‘LAST_USED_TIMESTAMP’: None, ‘LAST_RESET_TIMESTAMP’: None}])</dt>
-<dd>The object list returned</dd>
-<dt>start (always, str, 2019-12-02 11:07:53.757435)</dt>
-<dd>The task execution start time</dd>
-<dt>delta (always, str, 0:00:00.307534)</dt>
-<dd>The task execution delta time</dd>
-<dt>stderr (When rc as non-zero(failure), str, )</dt>
-<dd>The task execution standard error</dd>
-<dt>rc (always, int, 0)</dt>
-<dd>The task execution return code (0 means success)</dd>
-<dt>stdout_lines (When rc as non-zero(failure), list, [‘’])</dt>
-<dd>The task execution standard output split in lines</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The task execution standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>end</dt><dd><div class="line-block">
+<div class="line">The task execution end time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The task execution standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>object_list</dt><dd><div class="line-block">
+<div class="line">The object list returned</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: when rc as 0(success)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;IASP_NUMBER&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;LAST_RESET_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">&quot;LAST_USED_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">&quot;OBJATTRIBUTE&quot;</span><span class="p">:</span> <span class="s2">&quot;SAVF&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJCREATED&quot;</span><span class="p">:</span> <span class="s2">&quot;2019-02-18T10:48:41&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJDEFINER&quot;</span><span class="p">:</span> <span class="s2">&quot;USERADMIN&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJLIB&quot;</span><span class="p">:</span> <span class="s2">&quot;TESTLIB&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJNAME&quot;</span><span class="p">:</span> <span class="s2">&quot;TESTOBJ1&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJOWNER&quot;</span><span class="p">:</span> <span class="s2">&quot;WY&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJSIZE&quot;</span><span class="p">:</span> <span class="mi">131072</span><span class="p">,</span> <span class="s2">&quot;OBJTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;*FILE&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;IASP_NUMBER&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;LAST_RESET_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">&quot;LAST_USED_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">&quot;OBJATTRIBUTE&quot;</span><span class="p">:</span> <span class="s2">&quot;SAVF&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJCREATED&quot;</span><span class="p">:</span> <span class="s2">&quot;2019-02-18T10:48:41&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJDEFINER&quot;</span><span class="p">:</span> <span class="s2">&quot;USERAPP&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJLIB&quot;</span><span class="p">:</span> <span class="s2">&quot;TESTLIB&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJNAME&quot;</span><span class="p">:</span> <span class="s2">&quot;RING1&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJOWNER&quot;</span><span class="p">:</span> <span class="s2">&quot;WY&quot;</span><span class="p">,</span> <span class="s2">&quot;OBJSIZE&quot;</span><span class="p">:</span> <span class="mi">131072</span><span class="p">,</span> <span class="s2">&quot;OBJTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;*FILE&quot;</span><span class="p">,</span> <span class="s2">&quot;TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>start</dt><dd><div class="line-block">
+<div class="line">The task execution start time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
+</div>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The task execution delta time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The task execution standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task execution return code (0 means success)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The task execution standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id21">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Wang Yun(&#64;airwangyun)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -365,11 +459,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

@@ -2,11 +2,13 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_object_authority.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_object_authority.py
 
+.. _ibmi_object_authority_module:
 
 ibmi_object_authority -- Grant, Revoke or Display Object Authority
 ==================================================================
+
 
 .. contents::
    :local:
@@ -15,160 +17,228 @@ ibmi_object_authority -- Grant, Revoke or Display Object Authority
 
 Synopsis
 --------
-
-The ``ibmi_object_authority`` module can do the named object(s) authority management(grant, revoke and display).
-
-
-
+- The ``ibmi_object_authority`` module can do the named object(s) authority management(grant, revoke and display).
 
 
 
 Parameters
 ----------
 
-  asp_device (optional, str, *)
-    Specifies the auxiliary storage pool (ASP) device name where the library that contains the object (OBJ parameter) is located.
 
-    The ASP group name is the name of the primary ASP device within the ASP group.
+     
+asp_device
+  Specifies the auxiliary storage pool (ASP) device name where the library that contains the object (OBJ parameter) is located.
 
-    Valid for all the operations, but operations display will igonre this option.
+  The ASP group name is the name of the primary ASP device within the ASP group.
 
+  Valid for all the operations, but operations display will igonre this option.
 
-  ref_object_type (optional, str, *OBJTYPE)
-    Specify the reference object type of the object for which specific authorities are to be granted, revoked or displayed to the specified users.
 
-    Supported reference object type refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
+  | **required**: false
+  | **type**: str
+  | **default**: *
 
-    Valid only for operation grant_ref
 
+     
+asp_group
+  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
 
-  ref_object_library (optional, str, *LIBL)
-    Specify the name of the library to be searched.
+  The ASP group name is the name of the primary ASP device within the ASP group.
 
-    Valid only for operation grant_ref
+  The different for asp_group and (ref_)asp_device are,
 
+  the asp_group make the current ansible thread run under the asp_group.
 
-  object_type (True, str, None)
-    Specify the object type of the object for which specific authorities are to be granted, revoked or displayed to the specified users.
+  the (ref_)asp_device is the search scope for the object.
 
-    Supported object type refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
+  If you want to searh the (ref_)object in an ASP, the asp_group must be set and varied on,
 
-    Valid for all the operations
+  (ref)asp_device can be set as '*' for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
 
+  Valid for all the operations
 
-  authority (optional, list, [u'*CHANGE'])
-    Specifies the authority to be granted or revoked to the users specified for the Users (USER) parameter.
 
-    Valid only for operations grant and revoke
+  | **required**: false
+  | **type**: str
+  | **default**: *SYSBAS
 
 
-  object_library (optional, str, *LIBL)
-    Specify the name of the library to be searched.
+     
+authority
+  Specifies the authority to be granted or revoked to the users specified for the Users (USER) parameter.
 
-    Valid for all the operations
+  Valid only for operations grant and revoke
 
-    When operation is display, special value as '*LIBL', '*CURLIB', '*ALL', '*ALLUSR', '*USRLIBL', '*ALLAVL', '*ALLUSRAVL' are not supported.
 
-    The special values and value '' will be treate as search all the ASP scope under the current thread.
+  | **required**: false
+  | **type**: list
+  | **elements**: str
+  | **default**: [u'*CHANGE']
+  | **choices**: *CHANGE, *ALL, *USE, *EXCLUDE, *AUTL, *OBJALTER, *OBJEXIST, *OBJMGT, *OBJOPR, *OBJREF, *ADD, *DLT, *READ, *UPD, *EXECUTE
 
 
-  ref_object_name (optional, str, )
-    Specify the name of the reference object for which specific authority is to be granted, revoked or displayed to one or more users.
+     
+authorization_list
+  Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl
 
-    Valid only for operation grant_ref, you must specify a value other than ''
+  Valid only for operations grant_autl and revoke_autl, you must specify a value other than ''
 
 
-  object_name (True, str, None)
-    Specify the name of the object for which specific authority is to be granted, revoked or displayed to one or more users.
+  | **required**: false
+  | **type**: str
 
-    Valid for all the operations
 
+     
+joblog
+  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
 
-  replace_authority (optional, bool, False)
-    Specifies whether the authorities replace the user's current authorities.
 
-    Valid only for operations grant
+  | **required**: false
+  | **type**: bool
 
 
-  user (optional, list, [u''])
-    Specifies one or more users to whom authority for the named object is to be granted or revoked.
+     
+object_library
+  Specify the name of the library to be searched.
 
-    Valid only for operations grant and revoke
+  Valid for all the operations
 
+  When operation is display, special value as '*LIBL', '*CURLIB', '*ALL', '*ALLUSR', '*USRLIBL', '*ALLAVL', '*ALLUSRAVL' are not supported.
 
-  joblog (optional, bool, False)
-    If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  The special values and value '' will be treate as search all the ASP scope under the current thread.
 
 
-  authorization_list (optional, str, )
-    Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl
+  | **required**: false
+  | **type**: str
+  | **default**: *LIBL
 
-    Valid only for operations grant_autl and revoke_autl, you must specify a value other than ''
 
+     
+object_name
+  Specify the name of the object for which specific authority is to be granted, revoked or displayed to one or more users.
 
-  operation (True, str, None)
-    The authority operation.
+  Valid for all the operations
 
-    Valid for all the operations
 
-    Operation grant is to grant user(s) authority(s) to object(s)
+  | **required**: True
+  | **type**: str
 
-    Operation revoke is to revoke user(s) authority(s) from object(s)
 
-    Operation display is to display object(s)'s authority information
+     
+object_type
+  Specify the object type of the object for which specific authorities are to be granted, revoked or displayed to the specified users.
 
-    Operation grant_autl is to grant a authorization list(the authorization list object contains the list of authority) to object(s)
+  Supported object type refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
 
-    Operation revoke_autl is to revoke authorization list from object(s)
+  Valid for all the operations
 
-    Operation grant_ref is to grant the reference object to be queried to obtain authorization information
 
-    for more information about reference object, refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
+  | **required**: True
+  | **type**: str
+  | **choices**: *ALL, *ALRTBL, *BNDDIR, *CFGL, *CHTFMT, *CLD, *CLS, *CMD, *CNNL, *COSD, *CRG, *CRQD, *CSI, *CSPMAP, *CSPTBL, *CTLD, *DEVD, *DTAARA, *DTADCT, *DTAQ, *EDTD, *FCT, *FILE, *FNTRSC, *FNTTBL, *FORMDF, *FTR, *GSS, *IGCDCT, *IGCSRT, *IGCTBL, *IMGCLG, *IPXD, *JOBD, *JOBQ, *JOBSCD, *JRN, *JRNRCV, *LIB, *LIND, *LOCALE, *M36, *M36CFG, *MEDDFN, *MENU, *MGTCOL, *MODD, *MODULE, *MSGF, *MSGQ, *NODGRP, *NODL, *NTBD, *NWID, *NWSCFG, *NWSD, *OUTQ, *OVL, *PAGDFN, *PAGSEG, *PDFMAP, *PDG, *PGM, *PNLGRP, *PRDAVL, *PRDDFN, *PRDLOD, *PSFCFG, *QMFORM, *QMQRY, *QRYDFN, *RCT, *S36, *SBSD, *SCHIDX, *SPADCT, *SQLPKG, *SQLUDT, *SQLXSR, *SRVPGM, *SSND, *SVRSTG, *TBL, *TIMZON, *USRIDX, *USRPRF, *USRQ, *USRSPC, *VLDL, *WSCST
 
 
-  ref_asp_device (optional, str, *)
-    Specifies the auxiliary storage pool (ASP) device name where the library that contains the reference object is located.
+     
+operation
+  The authority operation.
 
-    The ASP group name is the name of the primary ASP device within the ASP group.
+  Valid for all the operations
 
-    Valid only for operation grant_ref
+  Operation grant is to grant user(s) authority(s) to object(s)
 
+  Operation revoke is to revoke user(s) authority(s) from object(s)
 
-  asp_group (optional, str, *SYSBAS)
-    Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
+  Operation display is to display object(s)'s authority information
 
-    The ASP group name is the name of the primary ASP device within the ASP group.
+  Operation grant_autl is to grant a authorization list(the authorization list object contains the list of authority) to object(s)
 
-    The different for asp_group and (ref_)asp_device are,
+  Operation revoke_autl is to revoke authorization list from object(s)
 
-    the asp_group make the current ansible thread run under the asp_group.
+  Operation grant_ref is to grant the reference object to be queried to obtain authorization information
 
-    the (ref_)asp_device is the search scope for the object.
+  for more information about reference object, refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
 
-    If you want to searh the (ref_)object in an ASP, the asp_group must be set and varied on,
 
-    (ref)asp_device can be set as '*' for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
+  | **required**: True
+  | **type**: str
+  | **choices**: grant, revoke, display, grant_autl, revoke_autl, grant_ref
 
-    Valid for all the operations
 
+     
+ref_asp_device
+  Specifies the auxiliary storage pool (ASP) device name where the library that contains the reference object is located.
 
+  The ASP group name is the name of the primary ASP device within the ASP group.
 
+  Valid only for operation grant_ref
 
 
-Notes
------
+  | **required**: false
+  | **type**: str
+  | **default**: *
 
-.. note::
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
+     
+ref_object_library
+  Specify the name of the library to be searched.
 
-See Also
---------
+  Valid only for operation grant_ref
 
-.. seealso::
 
-   :ref:`ibmi_object_find_module`
-      The official documentation on the **ibmi_object_find** module.
+  | **required**: false
+  | **type**: str
+  | **default**: *LIBL
+
+
+     
+ref_object_name
+  Specify the name of the reference object for which specific authority is to be granted, revoked or displayed to one or more users.
+
+  Valid only for operation grant_ref, you must specify a value other than ''
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+ref_object_type
+  Specify the reference object type of the object for which specific authorities are to be granted, revoked or displayed to the specified users.
+
+  Supported reference object type refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
+
+  Valid only for operation grant_ref
+
+
+  | **required**: false
+  | **type**: str
+  | **default**: *OBJTYPE
+  | **choices**: *OBJTYPE, *ALRTBL, *AUTL, *BNDDIR, *CFGL, *CHTFMT, *CLD, *CLS, *CMD, *CNNL, *COSD, *CRG, *CRQD, *CSI, *CSPMAP, *CSPTBL, *CTLD, *DEVD, *DTAARA, *DTADCT, *DTAQ, *EDTD, *FCT, *FILE, *FNTRSC, *FNTTBL, *FORMDF, *FTR, *GSS, *IGCDCT, *IGCSRT, *IGCTBL, *IMGCLG, *IPXD, *JOBD, *JOBQ, *JOBSCD, *JRN, *JRNRCV, *LIB, *LIND, *LOCALE, *M36, *M36CFG, *MEDDFN, *MENU, *MGTCOL, *MODD, *MODULE, *MSGF, *MSGQ, *NODGRP, *NODL, *NTBD, *NWID, *NWSCFG, *NWSD, *OUTQ, *OVL, *PAGDFN, *PAGSEG, *PDFMAP, *PDG, *PGM, *PNLGRP, *PRDDFN, *PRDLOD, *PSFCFG, *QMFORM, *QMQRY, *QRYDFN, *RCT, *S36, *SBSD, *SCHIDX, *SPADCT, *SQLPKG, *SQLUDT, *SQLXSR, *SRVPGM, *SSND, *SVRSTG, *TBL, *TIMZON, *USRIDX, *USRPRF, *USRQ, *USRSPC, *VLDL, *WSCST
+
+
+     
+replace_authority
+  Specifies whether the authorities replace the user's current authorities.
+
+  Valid only for operations grant
+
+
+  | **required**: false
+  | **type**: bool
+
+
+     
+user
+  Specifies one or more users to whom authority for the named object is to be granted or revoked.
+
+  Valid only for operations grant and revoke
+
+
+  | **required**: false
+  | **type**: list
+  | **elements**: str
+  | **default**: [u'']
+
 
 
 Examples
@@ -176,116 +246,170 @@ Examples
 
 .. code-block:: yaml+jinja
 
-    
-    - name: Grant 1 user 1 authority on object
-      ibmi_object_authority:
-        operation: grant
-        object_name: testobj
-        object_library: testlib
-        object_type: '*DTAARA'
-        user: testuser
-        authority: '*ALL'
+   
+   - name: Grant 1 user 1 authority on object
+     ibmi_object_authority:
+       operation: grant
+       object_name: testobj
+       object_library: testlib
+       object_type: '*DTAARA'
+       user: testuser
+       authority: '*ALL'
 
-    - name: Revoke 1 user's 2 authorities on object
-      ibmi_object_authority:
-        operation: 'revoke'
-        object_name: 'ANSIBLE'
-        object_library: 'CHANGLE'
-        user:
-          - 'CHANGLE'
-        authority:
-          - '*READ'
-          - '*DLT'
+   - name: Revoke 1 user's 2 authorities on object
+     ibmi_object_authority:
+       operation: 'revoke'
+       object_name: 'ANSIBLE'
+       object_library: 'CHANGLE'
+       user:
+         - 'CHANGLE'
+       authority:
+         - '*READ'
+         - '*DLT'
 
-    - name: Display the authority
-      ibmi_object_authority:
-        operation: display
-        object_name: testobj
-        object_library: testlib
-        object_type: '*DTAARA'
+   - name: Display the authority
+     ibmi_object_authority:
+       operation: display
+       object_name: testobj
+       object_library: testlib
+       object_type: '*DTAARA'
 
-    - name: Grant the reference object authority
-      ibmi_object_authority:
-        operation: grant_ref
-        object_name: testobj
-        object_library: testlib
-        object_type: '*DTAARA'
-        ref_object: testrefobj
-        ref_object_library: testreflib
-        ref_object_type: '*DTAARA'
+   - name: Grant the reference object authority
+     ibmi_object_authority:
+       operation: grant_ref
+       object_name: testobj
+       object_library: testlib
+       object_type: '*DTAARA'
+       ref_object: testrefobj
+       ref_object_library: testreflib
+       ref_object_type: '*DTAARA'
 
-    - name: Revoke the authority list on object
-      ibmi_object_authority:
-        operation: revoke_autl
-        object_name: testobj
-        object_library: testlib
-        object_type: '*DTAARA'
-        authorization_list: 'MYAUTL'
+   - name: Revoke the authority list on object
+     ibmi_object_authority:
+       operation: revoke_autl
+       object_name: testobj
+       object_library: testlib
+       object_type: '*DTAARA'
+       authorization_list: 'MYAUTL'
 
-    - name: grant user 2 authority on an iasp
-      ibmi_object_authority:
-        operation: 'grant'
-        object_name: 'iasp1'
-        object_library: 'CHANGLE2'
-        object_type: '*DTAARA'
-        asp_group: 'IASP1'
-        user:
-          - 'CHANGLE'
-        authority:
-          - '*READ'
-          - '*DLT'
+   - name: grant user 2 authority on an iasp
+     ibmi_object_authority:
+       operation: 'grant'
+       object_name: 'iasp1'
+       object_library: 'CHANGLE2'
+       object_type: '*DTAARA'
+       asp_group: 'IASP1'
+       user:
+         - 'CHANGLE'
+       authority:
+         - '*READ'
+         - '*DLT'
 
+
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`ibmi_object_find_module`
 
 
 Return Values
 -------------
 
-  stderr_lines (when rc as no-zero(failure), list, ['CPF2209: Library CHANGL not found'])
-    The command standard error split in lines
 
+   
+                              
+       stderr_lines
+        | The command standard error split in lines
+      
+        | **returned**: when rc as no-zero(failure)
+        | **type**: list      
+        | **sample**:
 
-  object_authority_list (When rc as 0(success) and operation is display, list, [{'OBJECT_TYPE': '*DTAARA', 'DATA_READ': 'YES', 'DATA_UPDATE': 'YES', 'SYSTEM_OBJECT_SCHEMA': 'CHANGLE', 'DATA_ADD': 'YES', 'DATA_DELETE': 'YES', 'OBJECT_EXISTENCE': 'NO', 'SQL_OBJECT_TYPE': '', 'AUTHORIZATION_LIST': '', 'OBJECT_AUTHORITY': '*CHANGE', 'AUTHORIZATION_NAME': '*PUBLIC', 'TEXT_DESCRIPTION': '', 'OBJECT_ALTER': 'NO', 'OBJECT_OPERATIONAL': 'YES', 'OBJECT_MANAGEMENT': 'NO', 'OBJECT_NAME': 'ANSIBLE', 'DATA_EXECUTE': 'YES', 'OBJECT_REFERENCE': 'NO', 'OWNER': 'CHANGLE', 'SYSTEM_OBJECT_NAME': 'ANSIBLE', 'OBJECT_SCHEMA': 'CHANGLE'}])
-    The result set of object authority list
+              .. code-block::
 
+                       ["CPF2209: Library CHANGL not found"]
+            
+      
+      
+                              
+       object_authority_list
+        | The result set of object authority list
+      
+        | **returned**: When rc as 0(success) and operation is display
+        | **type**: list      
+        | **sample**:
 
-  job_log (always, str, [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}])
-    the job_log
+              .. code-block::
 
+                       [{"AUTHORIZATION_LIST": "", "AUTHORIZATION_NAME": "*PUBLIC", "DATA_ADD": "YES", "DATA_DELETE": "YES", "DATA_EXECUTE": "YES", "DATA_READ": "YES", "DATA_UPDATE": "YES", "OBJECT_ALTER": "NO", "OBJECT_AUTHORITY": "*CHANGE", "OBJECT_EXISTENCE": "NO", "OBJECT_MANAGEMENT": "NO", "OBJECT_NAME": "ANSIBLE", "OBJECT_OPERATIONAL": "YES", "OBJECT_REFERENCE": "NO", "OBJECT_SCHEMA": "CHANGLE", "OBJECT_TYPE": "*DTAARA", "OWNER": "CHANGLE", "SQL_OBJECT_TYPE": "", "SYSTEM_OBJECT_NAME": "ANSIBLE", "SYSTEM_OBJECT_SCHEMA": "CHANGLE", "TEXT_DESCRIPTION": ""}]
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
 
-  stderr (when rc as no-zero(failure), str, CPF2209: Library CHANGL not found)
-    The standard error
+            
+      
+      
+                              
+       stderr
+        | The standard error
+      
+        | **returned**: when rc as no-zero(failure)
+        | **type**: str
+        | **sample**: CPF2209: Library CHANGL not found
 
+            
+      
+      
+                              
+       stdout
+        | The standard output
+      
+        | **returned**: when rc as 0(success) and the operation is not display
+        | **type**: str
+        | **sample**: CPI2204: Authority given to 1 objects. Not given to 0 objects. Partially given to 0 objects.
 
-  stdout (when rc as 0(success) and the operation is not display, str, CPI2204: Authority given to 1 objects. Not given to 0 objects. Partially given to 0 objects.)
-    The standard output
+            
+      
+      
+                              
+       stdout_lines
+        | The command standard output split in lines
+      
+        | **returned**: when rc as 0(success) and the operation is not display
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
 
-  stdout_lines (when rc as 0(success) and the operation is not display, list, ['CPI2204: Authority given to 1 objects. Not given to 0 objects. Partially given to 0 objects.', 'CPC2201: Object authority granted.'])
-    The command standard output split in lines
+                       ["CPI2204: Authority given to 1 objects. Not given to 0 objects. Partially given to 0 objects.", "CPC2201: Object authority granted."]
+            
+      
+      
+                              
+       rc
+        | The return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
-
-  rc (always, int, 255)
-    The return code (0 means success, non-zero means failure)
-
-
-
-
-
-Status
-------
-
-
-
-
-- This module is not guaranteed to have a backwards compatible interface. *[preview]*
-
-
-- This module is maintained by community.
-
-
-
-Authors
-~~~~~~~
-
-- Chang Le(@changlexc)
-
+            
+      
+        

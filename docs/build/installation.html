@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; Ansible Collection  documentation</title>
+  <title>Installation &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> Ansible Collection
+            <a href="index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -108,7 +108,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Ansible Collection</a>
+          <a href="index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -146,7 +146,7 @@
         
             
             
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/blob/master/docs/source/installation.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/ansible-collections/ansible_for_i/blob/master/docs/source/installation.rst" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -164,33 +164,33 @@
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>There are three options for installing the IBM i collection for Ansible:</p>
 <ul>
-<li><p class="first">Installing using Ansible Galaxy</p>
+<li><p>Installing using Ansible Galaxy</p>
 <p>Ansible Galaxy is the package manager for Ansible. The collection is published to Ansible Galaxy on a regular basis: <a class="reference external" href="https://galaxy.ansible.com/ibm/power_ibmi">https://galaxy.ansible.com/ibm/power_ibmi</a></p>
 <p>In order to install using Ansible Galaxy, you must:</p>
 <ol class="arabic simple">
-<li>Install all of the software listed in <a class="reference internal" href="#requirements"><span class="std std-ref">Requirements</span></a>.</li>
-<li>Follow the instructions for <a class="reference internal" href="#installing-using-ansible-galaxy"><span class="std std-ref">Installing using Ansible Galaxy</span></a>.</li>
+<li><p>Install all of the software listed in <span class="xref std std-ref">Requirements</span>.</p></li>
+<li><p>Follow the instructions for <span class="xref std std-ref">Installing using Ansible Galaxy</span>.</p></li>
 </ol>
 </li>
-<li><p class="first">Installing from source</p>
+<li><p>Installing from source</p>
 <p>You may wish to install the collection from source if you cannot access Ansible Galaxy due to firewall or proxy issues, or if you need to install a version of the collection that has not yet been published.</p>
 <p>In order to install from source, you must:</p>
 <ol class="arabic simple">
-<li>Install all of the software listed in <a class="reference internal" href="#requirements"><span class="std std-ref">Requirements</span></a>.</li>
-<li>Follow the instructions for <a class="reference internal" href="#installing-from-source"><span class="std std-ref">Installing from source</span></a>.</li>
+<li><p>Install all of the software listed in <span class="xref std std-ref">Requirements</span>.</p></li>
+<li><p>Follow the instructions for <span class="xref std std-ref">Installing from source</span>.</p></li>
 </ol>
 </li>
 </ul>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <p>In order to use this Ansible collection, you must have the following pre-requisite software installed and available:</p>
-<p><strong>Python v3.7+</strong></p>
+<p><strong>Python</strong></p>
 <blockquote>
 <div><p>Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc).
 If you install Python from the package manager for your operating system, you must also install the development libraries (usually a package named <code class="docutils literal notranslate"><span class="pre">python3-devel</span></code>), as these are required when installing modules through <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
 <ul class="simple">
-<li>The official Python website: <a class="reference external" href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></li>
-<li>The unofficial Python version manager: <a class="reference external" href="https://github.com/pyenv/pyenv">https://github.com/pyenv/pyenv</a></li>
+<li><p>The official Python website: <a class="reference external" href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></p></li>
+<li><p>The unofficial Python version manager: <a class="reference external" href="https://github.com/pyenv/pyenv">https://github.com/pyenv/pyenv</a></p></li>
 </ul>
 </div></blockquote>
 <p><strong>Ansible v2.8+</strong></p>
@@ -204,7 +204,7 @@ If you install Python from the package manager for your operating system, you mu
 <div class="section" id="installing-using-ansible-galaxy">
 <h2>Installing using Ansible Galaxy<a class="headerlink" href="#installing-using-ansible-galaxy" title="Permalink to this headline">¶</a></h2>
 <p>You can use the <code class="docutils literal notranslate"><span class="pre">ansible-galaxy</span></code> command to install a collection from Ansible Galaxy, the package manager for Ansible:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">iibm</span><span class="o">.</span><span class="n">power_ibmi</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">ibm</span><span class="o">.</span><span class="n">power_ibmi</span>
 </pre></div>
 </div>
 </div>
@@ -212,20 +212,20 @@ If you install Python from the package manager for your operating system, you mu
 <h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
 <p>You can use the <code class="docutils literal notranslate"><span class="pre">ansible-galaxy</span></code> command to install a collection built from source. To build your own collection, follow these steps:</p>
 <ol class="arabic simple">
-<li>Clone the repository:</li>
+<li><p>Clone the repository:</p></li>
 </ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">LiJunBJZhu</span><span class="o">/</span><span class="n">i_collection_core</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">IBM</span><span class="o">/</span><span class="n">ansible</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">i</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
-<li>Build the collection artifact:</li>
+<li><p>Build the collection artifact:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">ansible</span><span class="o">-</span><span class="n">collection</span>
 <span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">build</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
-<li>Install the collection, replacing <code class="docutils literal notranslate"><span class="pre">x.y.z</span></code> with the current version:</li>
+<li><p>Install the collection, replacing <code class="docutils literal notranslate"><span class="pre">x.y.z</span></code> with the current version:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">ibm</span><span class="o">-</span><span class="n">power_ibmi</span><span class="o">-</span><span class="n">x</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
 </pre></div>
@@ -253,11 +253,10 @@ If you install Python from the package manager for your operating system, you mu
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

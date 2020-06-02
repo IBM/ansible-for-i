@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_save_product_to_savf – Save the the licensed program(product) to a save file &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_save_product_to_savf – Save the the licensed program(product) to a save file &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -116,10 +116,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file on a remote ibm i node.</a></li>
@@ -152,7 +151,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_save_product_to_savf.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_save_product_to_savf.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,68 +209,108 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-save-product-to-savf-save-the-the-licensed-program-product-to-a-save-file">
-<h1>ibmi_save_product_to_savf – Save the the licensed program(product) to a save file<a class="headerlink" href="#ibmi-save-product-to-savf-save-the-the-licensed-program-product-to-a-save-file" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-save-product-to-savf-module"></span><h1>ibmi_save_product_to_savf – Save the the licensed program(product) to a save file<a class="headerlink" href="#ibmi-save-product-to-savf-save-the-the-licensed-program-product-to-a-save-file" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id29">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id30">Parameters</a></li>
-<li><a class="reference internal" href="#see-also" id="id31">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id32">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id33">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id34">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id35">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id36">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id37">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id38">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id39">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id29">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>the <code class="docutils literal notranslate"><span class="pre">ibmi_save_product_to_savf</span></code> module save the product to a save file on the target ibmi node.</p>
+<h2><a class="toc-backref" href="#id35">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">ibmi_save_product_to_savf</span></code> module save the product to a save file on the target ibmi node.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id30">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>check_signature (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>SIGNED)</dt>
-<dd>Specifies if the digital signatures of objects being saved with the licensed program are to be checked</dd>
-<dt>product (True, str, None)</dt>
-<dd>Specifies the seven-character identifier of the licensed program that is saved</dd>
-<dt>option (optional, str, <a href="#id3"><span class="problematic" id="id4">*</span></a>BASE)</dt>
-<dd>Specifies the optional parts of the licensed program given in the Product prompt (LICPGM parameter) that are saved</dd>
-<dt>language (optional, str, <a href="#id5"><span class="problematic" id="id6">*</span></a>PRIMARY)</dt>
-<dd><p class="first">Specifies which national language version (NLV) is used for the save operation</p>
+<h2><a class="toc-backref" href="#id36">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>check_signature</dt><dd><p>Specifies if the digital signatures of objects being saved with the licensed program are to be checked</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>SIGNED</div>
+<div class="line"><strong>choices</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>SIGNED, <a href="#id5"><span class="problematic" id="id6">*</span></a>ALL, <a href="#id7"><span class="problematic" id="id8">*</span></a>NONE</div>
+</div>
+</dd>
+<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>language</dt><dd><p>Specifies which national language version (NLV) is used for the save operation</p>
 <p>It’s the IBM-supplied language feature codes, like German is 2924, English is 2924</p>
-<p class="last">This parameter is ignored when object_type(<a href="#id7"><span class="problematic" id="id8">*</span></a>PGM) is specified</p>
+<p>This parameter is ignored when object_type(<a href="#id9"><span class="problematic" id="id10">*</span></a>PGM) is specified</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id11"><span class="problematic" id="id12">*</span></a>PRIMARY</div>
+</div>
 </dd>
-<dt>object_type (optional, str, <a href="#id9"><span class="problematic" id="id10">*</span></a>ALL)</dt>
-<dd>Specifies the type of licensed program objects being saved</dd>
-<dt>target_release (optional, str, <a href="#id11"><span class="problematic" id="id12">*</span></a>CURRENT)</dt>
-<dd>Specifies the release level of the operating system on which you intend to restore and use the product</dd>
-<dt>release (optional, str, <a href="#id13"><span class="problematic" id="id14">*</span></a>ONLY)</dt>
-<dd>Specifies which version, release, and modification level of the licensed program is saved</dd>
-<dt>savf_name (True, str, None)</dt>
-<dd>Specify the name of the save file, if it is not existed, will create it</dd>
-<dt>joblog (optional, bool, False)</dt>
-<dd>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</dd>
-<dt>savf_library (True, str, None)</dt>
-<dd>Specify the name of the library where the save file is located, if it is not existed, will create it</dd>
-<dt>parameters (optional, str,  )</dt>
-<dd><p class="first">The parameters that SAVLICPGM command will take. Other than options above, all other parameters need to be specified here.</p>
+<dt>object_type</dt><dd><p>Specifies the type of licensed program objects being saved</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id13"><span class="problematic" id="id14">*</span></a>ALL</div>
+<div class="line"><strong>choices</strong>: <a href="#id15"><span class="problematic" id="id16">*</span></a>ALL, <a href="#id17"><span class="problematic" id="id18">*</span></a>PGM, <a href="#id19"><span class="problematic" id="id20">*</span></a>LNG</div>
+</div>
+</dd>
+<dt>option</dt><dd><p>Specifies the optional parts of the licensed program given in the Product prompt (LICPGM parameter) that are saved</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id21"><span class="problematic" id="id22">*</span></a>BASE</div>
+</div>
+</dd>
+<dt>parameters</dt><dd><p>The parameters that SAVLICPGM command will take. Other than options above, all other parameters need to be specified here.</p>
 <p>The default values of parameters for SAVLICPGM will be taken if not specified.</p>
-<p class="last">Parameter CLEAR in SAVLICPGM command should not be specified here, ‘CLEAR(<a href="#id15"><span class="problematic" id="id16">*</span></a>ALL)’ already used.</p>
+<p>Parameter CLEAR in SAVLICPGM command should not be specified here, ‘CLEAR(<a href="#id23"><span class="problematic" id="id24">*</span></a>ALL)’ already used.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>:</div>
+</div>
+</dd>
+<dt>product</dt><dd><p>Specifies the seven-character identifier of the licensed program that is saved</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>release</dt><dd><p>Specifies which version, release, and modification level of the licensed program is saved</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id25"><span class="problematic" id="id26">*</span></a>ONLY</div>
+</div>
+</dd>
+<dt>savf_library</dt><dd><p>Specify the name of the library where the save file is located, if it is not existed, will create it</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>savf_name</dt><dd><p>Specify the name of the save file, if it is not existed, will create it</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>target_release</dt><dd><p>Specifies the release level of the operating system on which you intend to restore and use the product</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id27"><span class="problematic" id="id28">*</span></a>CURRENT</div>
+</div>
 </dd>
 </dl>
-</div></blockquote>
-</div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id31">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">ibmi_uninstall_product, ibmi_install_product_from_savf_module</span></dt>
-<dd>The official documentation on the <strong>ibmi_uninstall_product, ibmi_install_product_from_savf</strong> module.</dd>
-</dl>
-</div>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id32">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id37">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Saving Program using Defaults</span>
   <span class="nt">ibmi_save_product_to_savf</span><span class="p">:</span>
     <span class="nt">product</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5770WDS</span>
@@ -287,37 +326,85 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id38">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">ibmi_uninstall_product, ibmi_install_product_from_savf_module</span></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id33">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id39">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (When rc as non-zero(failure), list, [‘CPF9801: Object QNOTE in library L10010125P not found’])</dt>
-<dd>The standard error split in lines</dd>
-<dt>job_log (always, str, [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . <span class="classifier-delimiter">:</span> <span class="classifier">This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}])</span></dt>
-<dd>the job_log</dd>
-<dt>stderr (When rc as non-zero(failure), str, CPF9801: Object QNOTE in library L10010125P not found)</dt>
-<dd>The standard error</dd>
-<dt>stdout (When rc as 0(success), str, +++ success SAVLICPGM LICPGM(5733D10) DEV(<a href="#id17"><span class="problematic" id="id18">*</span></a>SAVF) OPTION(<a href="#id19"><span class="problematic" id="id20">*</span></a>BASE) RSTOBJ(<a href="#id21"><span class="problematic" id="id22">*</span></a>ALL))</dt>
-<dd>The standard output</dd>
-<dt>stdout_lines (When rc as 0(success), list, [‘+++ success SAVLICPGM LICPGM(5733D10) DEV(<a href="#id23"><span class="problematic" id="id24">*</span></a>SAVF) OPTION(<a href="#id25"><span class="problematic" id="id26">*</span></a>BASE) RSTOBJ(<a href="#id27"><span class="problematic" id="id28">*</span></a>ALL)’])</dt>
-<dd>The standard output split in lines</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The task return code (0 means success, non-zero means failure)</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF9801: Object QNOTE in library L10010125P not found&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">the job_log</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . :   This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}]</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF9801: Object QNOTE in library L10010125P not found</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as 0(success)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: +++ success SAVLICPGM LICPGM(5733D10) DEV(<a href="#id29"><span class="problematic" id="id30">*</span></a>SAVF) OPTION(<a href="#id31"><span class="problematic" id="id32">*</span></a>BASE) RSTOBJ(<a href="#id33"><span class="problematic" id="id34">*</span></a>ALL)</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as 0(success)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;+++ success SAVLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id34">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Chang Le (&#64;changlexc)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -341,11 +428,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

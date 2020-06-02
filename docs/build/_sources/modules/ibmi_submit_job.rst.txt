@@ -2,11 +2,13 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_submit_job.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_submit_job.py
 
+.. _ibmi_submit_job_module:
 
 ibmi_submit_job -- Submit a job on IBM i system. This module functions like SBMJOB.
 ===================================================================================
+
 
 .. contents::
    :local:
@@ -15,56 +17,63 @@ ibmi_submit_job -- Submit a job on IBM i system. This module functions like SBMJ
 
 Synopsis
 --------
-
-The ``ibmi_submit_job`` module submits a job on IBM i system.
-
-It waits until the submitted job turns into expected status that is specified.
-
-
-
+- The ``ibmi_submit_job`` module submits a job on IBM i system.
+- It waits until the submitted job turns into expected status that is specified.
 
 
 
 Parameters
 ----------
 
-  status (optional, list, [u'*NONE'])
-    The expect status list. The module will wait for the job to be turned into one of the expected status specified. If one of the expect status specified matches the status of submitted job, it will return. If *NONE is specified, the module will not wait for anything and return right after the job is submitted. The valid options are "*NONE", "*ACTIVE", "*COMPLETE", "*JOBQ", "*OUTQ".
+
+     
+check_interval
+  The time interval between current and next checks of the expected status of the submitted job. This option will be ignored if *NONE is specified for option status.
 
 
-  time_out (False, str, 1m)
-    The max time that the module waits for the submitted job is turned into expected status. It returns if the status of the submitted job is not turned into the expected status within the time_out time. This option will be ignored if *NONE is specified for option status.
+  | **required**: False
+  | **type**: str
+  | **default**: 1m
 
 
-  cmd (True, str, None)
-    A command that runs in the batch job.
+     
+cmd
+  A command that runs in the batch job.
 
 
-  check_interval (False, str, 1m)
-    The time interval between current and next checks of the expected status of the submitted job. This option will be ignored if *NONE is specified for option status.
+  | **required**: True
+  | **type**: str
 
 
-  parameters (False, str, )
-    The parameters that SBMJOB will take. Other than CMD, all other parameters need to be specified here. The default values of parameters for SBMJOB will be taken if not specified.
+     
+parameters
+  The parameters that SBMJOB will take. Other than CMD, all other parameters need to be specified here. The default values of parameters for SBMJOB will be taken if not specified.
 
 
+  | **required**: False
+  | **type**: str
 
 
-
-Notes
------
-
-.. note::
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+     
+status
+  The expect status list. The module will wait for the job to be turned into one of the expected status specified. If one of the expect status specified matches the status of submitted job, it will return. If *NONE is specified, the module will not wait for anything and return right after the job is submitted. The valid options are "*NONE", "*ACTIVE", "*COMPLETE", "*JOBQ", "*OUTQ".
 
 
-See Also
---------
+  | **required**: false
+  | **type**: list
+  | **elements**: str
+  | **default**: [u'*NONE']
 
-.. seealso::
 
-   :ref:`ibmi_job_module`
-      The official documentation on the **ibmi_job** module.
+     
+time_out
+  The max time that the module waits for the submitted job is turned into expected status. It returns if the status of the submitted job is not turned into the expected status within the time_out time. This option will be ignored if *NONE is specified for option status.
+
+
+  | **required**: False
+  | **type**: str
+  | **default**: 1m
+
 
 
 Examples
@@ -72,74 +81,139 @@ Examples
 
 .. code-block:: yaml+jinja
 
-    
-    - name: Submit a batch job and run CALL QGPL/PGM1
-      ibmi_submit_job:
-        cmd: 'CALL QGPL/PGM1'
-        parameters: 'JOB(TEST)'
-        check_interval: '30s'
-        time_out: '80s'
-        status: ['*OUTQ', '*COMPLETE']
+   
+   - name: Submit a batch job and run CALL QGPL/PGM1
+     ibmi_submit_job:
+       cmd: 'CALL QGPL/PGM1'
+       parameters: 'JOB(TEST)'
+       check_interval: '30s'
+       time_out: '80s'
+       status: ['*OUTQ', '*COMPLETE']
 
+
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`ibmi_job_module`
 
 
 Return Values
 -------------
 
-  stderr_lines (When rc as non-zero(failure), list, ['CPF2111:Library TESTLIB already exists.'])
-    The task standard error split in lines
 
+   
+                              
+       stderr_lines
+        | The task standard error split in lines
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
-  end (When job has been submitted and task has waited for the job status for some time, str, 2019-12-02 11:07:54.064969)
-    The task execution end time
+              .. code-block::
 
+                       ["CPF2111:Library TESTLIB already exists."]
+            
+      
+      
+                              
+       end
+        | The task execution end time
+      
+        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
 
-  stdout (When rc as non-zero(failure), str, CPC2102: Library TESTLIB created)
-    The task standard output
+            
+      
+      
+                              
+       stdout
+        | The task standard output
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: str
+        | **sample**: CPC2102: Library TESTLIB created
 
+            
+      
+      
+                              
+       delta
+        | The task execution delta time
+      
+        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **type**: str
+        | **sample**: 0:00:00.307534
 
-  delta (When job has been submitted and task has waited for the job status for some time, str, 0:00:00.307534)
-    The task execution delta time
+            
+      
+      
+                              
+       start
+        | The task execution start time
+      
+        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
+            
+      
+      
+                              
+       stderr
+        | The task standard error
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: str
+        | **sample**: CPF2111:Library TESTLIB already exists
 
-  start (When job has been submitted and task has waited for the job status for some time, str, 2019-12-02 11:07:53.757435)
-    The task execution start time
+            
+      
+      
+                              
+       rc
+        | The task return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
+            
+      
+      
+                              
+       stdout_lines
+        | The task standard output split in lines
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
-  stderr (When rc as non-zero(failure), str, CPF2111:Library TESTLIB already exists)
-    The task standard error
+              .. code-block::
 
+                       ["CPC2102: Library TESTLIB created."]
+            
+      
+      
+                              
+       sbmjob_cmd
+        | The SBMJOB CL command that has been used.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: SBMJOB CMD(CRTLIB LIB(TESTLIB))
 
-  rc (always, int, 255)
-    The task return code (0 means success, non-zero means failure)
-
-
-  stdout_lines (When rc as non-zero(failure), list, ['CPC2102: Library TESTLIB created.'])
-    The task standard output split in lines
-
-
-  sbmjob_cmd (always, str, SBMJOB CMD(CRTLIB LIB(TESTLIB)))
-    The SBMJOB CL command that has been used.
-
-
-
-
-
-Status
-------
-
-
-
-
-- This module is not guaranteed to have a backwards compatible interface. *[preview]*
-
-
-- This module is maintained by community.
-
-
-
-Authors
-~~~~~~~
-
-- Wang Yun (@airwangyun)
-
+            
+      
+        

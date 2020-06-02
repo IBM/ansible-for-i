@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B. &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -123,10 +123,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B.</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from ibm i node A to another ibm i node B.</a></li>
@@ -152,7 +151,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_sync.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_sync.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,63 +209,67 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-sync-synchronize-a-save-file-from-current-ibm-i-node-a-to-another-ibm-i-node-b">
-<h1>ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B.<a class="headerlink" href="#ibmi-sync-synchronize-a-save-file-from-current-ibm-i-node-a-to-another-ibm-i-node-b" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-sync-module"></span><h1>ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B.<a class="headerlink" href="#ibmi-sync-synchronize-a-save-file-from-current-ibm-i-node-a-to-another-ibm-i-node-b" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id2">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id3">Notes</a></li>
-<li><a class="reference internal" href="#examples" id="id4">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id5">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id6">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id4">Notes</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id5">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The ibmi_sync module synchronize a save file from current ibm i node to another ibm i node.</p>
-<p>Only support to synchronize save file by now.</p>
-<p>For non-IBMi native targets, use the synchronize module instead.</p>
+<ul class="simple">
+<li><p>The ibmi_sync module synchronize a save file from current ibm i node to another ibm i node.</p></li>
+<li><p>Only support to synchronize save file by now.</p></li>
+<li><p>For non-IBMi native targets, use the synchronize module instead.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
 <h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>dest (optional, str, )</dt>
-<dd><p class="first">Path on the destination host that will be synchronized from the source.</p>
+<dl>
+<dt>dest</dt><dd><p>Path on the destination host that will be synchronized from the source.</p>
 <p>The path must be absolute, and dest must be a ibm i native library. For example, /qsys.lib/test.lib.</p>
-<p class="last">If not specify, dest will be equal to src.</p>
+<p>If not specify, dest will be equal to src.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
 </dd>
-<dt>src (True, str, None)</dt>
-<dd><p class="first">Save file path on the source host that will be synchronized to the destination.</p>
-<p class="last">The path must be absolute, and src must be a ibm i native library. For example, /qsys.lib/test.lib/c1.file.</p>
+<dt>private_key</dt><dd><p>Specifies SSH private key used to connect to remote ibm i host.</p>
+<p>The path can be absolute or relative.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: path</div>
+<div class="line"><strong>default</strong>: ~/.ssh/id_rsa</div>
+</div>
 </dd>
-<dt>private_key (optional, path, ~/.ssh/id_rsa)</dt>
-<dd><p class="first">Specifies SSH private key used to connect to remote ibm i host.</p>
-<p class="last">The path can be absolute or relative.</p>
+<dt>remote_host</dt><dd><p>The remote ibm i node address.</p>
+<p>Can be IP or host name.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
 </dd>
-<dt>remote_user (True, str, None)</dt>
-<dd>The user name to connect to the remote ibm i node.</dd>
-<dt>remote_host (True, str, None)</dt>
-<dd><p class="first">The remote ibm i node address.</p>
-<p class="last">Can be IP or host name.</p>
+<dt>remote_user</dt><dd><p>The user name to connect to the remote ibm i node.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>src</dt><dd><p>Save file path on the source host that will be synchronized to the destination.</p>
+<p>The path must be absolute, and src must be a ibm i native library. For example, /qsys.lib/test.lib/c1.file.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
 </dd>
 </dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id3">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3</li>
-<li>Make sure ssh passwordless login works from ibm i node A to ibm i node B</li>
-<li>private_key must be a rsa key in the legacy PEM private key format</li>
-<li>Doesn’t support IASP by now</li>
-</ul>
-</div>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id4">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Synchronize c1 save file to host.com</span>
   <span class="nt">ibmi_sync</span><span class="p">:</span>
     <span class="nt">src</span><span class="p">:</span> <span class="s">&#39;/qsys.lib/test.lib/c1.file&#39;</span>
@@ -276,37 +279,86 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3</p>
+<p>Make sure ssh passwordless login works from ibm i node A to ibm i node B</p>
+<p>private_key must be a rsa key in the legacy PEM private key format</p>
+<p>Doesn’t support IASP by now</p>
+</div>
+</div>
 <div class="section" id="return-values">
 <h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (always, list, [‘Failed to mv file to qsys. Make sure library exists.’])</dt>
-<dd>The standard error split in lines</dd>
-<dt>stderr (always, str, Failed to mv file to qsys. Make sure library exists.)</dt>
-<dd>The standard error</dd>
-<dt>stdout (always, str, Successfully synchronize file /QSYS.LIB/TEST.LIB/C1.FILE to remote host host.com)</dt>
-<dd>The standard output</dd>
-<dt>stdout_lines (always, list, [‘Successfully synchronize file /QSYS.LIB/TEST.LIB/C1.FILE to remote host host.com’])</dt>
-<dd>The standard output split in lines</dd>
-<dt>delta (always, str, 0:00:00.307534)</dt>
-<dd>The execution delta time.</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The action return code (0 means success, non-zero means failure)</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;Failed to mv file to qsys. Make sure library exists.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: Failed to mv file to qsys. Make sure library exists.</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: Successfully synchronize file /QSYS.LIB/TEST.LIB/C1.FILE to remote host host.com</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;Successfully synchronize file /QSYS.LIB/TEST.LIB/C1.FILE to remote host host.com&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The execution delta time.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The action return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id6">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Peng Zeng Yu (&#64;pengzengyufish)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -330,11 +382,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

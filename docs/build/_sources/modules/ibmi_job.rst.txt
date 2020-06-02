@@ -2,11 +2,13 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_job.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_job.py
 
+.. _ibmi_job_module:
 
 ibmi_job -- Returns job information according to inputs.
 ========================================================
+
 
 .. contents::
    :local:
@@ -15,62 +17,79 @@ ibmi_job -- Returns job information according to inputs.
 
 Synopsis
 --------
-
-The ``ibmi_job`` module returns information associated with one or more jobs.
-
-
-
+- The ``ibmi_job`` module returns information associated with one or more jobs.
 
 
 
 Parameters
 ----------
 
-  status (optional, str, *ALL)
-    The job status filter.
+
+     
+name
+  The qualified job name.
+
+  If this parameter is specified, the other parameters will be ignored.
 
 
-  subsystem (optional, str, *ALL)
-    The job subsystem filter. A valid subsystem name can be specified. Valid values are "*ALL" or subsystem name.
+  | **required**: False
+  | **type**: str
 
 
-  name (False, str, None)
-    The qualified job name.
-
-    If this parameter is specified, the other parameters will be ignored.
-
-
-  submitter (optional, str, *ALL)
-    The type of submitted jobs to return.
+     
+status
+  The job status filter.
 
 
-  type (optional, str, *ALL)
-    The job type filter.
+  | **required**: false
+  | **type**: str
+  | **default**: *ALL
+  | **choices**: *ALL, *ACTIVE, *JOBQ, *OUTQ
 
 
-  user (optional, str, *USER)
-    The user profile name to use as the job user filtering criteria.
-
-    Valid values are user profile name, "*USER" or "*ALL".
-
+     
+submitter
+  The type of submitted jobs to return.
 
 
+  | **required**: false
+  | **type**: str
+  | **default**: *ALL
+  | **choices**: *ALL, *JOB, *USER, *WRKSTN
 
 
-Notes
------
-
-.. note::
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+     
+subsystem
+  The job subsystem filter. A valid subsystem name can be specified. Valid values are "*ALL" or subsystem name.
 
 
-See Also
---------
+  | **required**: false
+  | **type**: str
+  | **default**: *ALL
 
-.. seealso::
 
-   :ref:`ibmi_submit_job_module`
-      The official documentation on the **ibmi_submit_job** module.
+     
+type
+  The job type filter.
+
+
+  | **required**: false
+  | **type**: str
+  | **default**: *ALL
+  | **choices**: *ALL, *BATCH, *INTERACT
+
+
+     
+user
+  The user profile name to use as the job user filtering criteria.
+
+  Valid values are user profile name, "*USER" or "*ALL".
+
+
+  | **required**: false
+  | **type**: str
+  | **default**: *USER
+
 
 
 Examples
@@ -78,75 +97,143 @@ Examples
 
 .. code-block:: yaml+jinja
 
-    
-    - name: Get status of a list of jobs
-      ibmi_job:
-        user: "WANGYUN"
-        type: "*BATCH"
+   
+   - name: Get status of a list of jobs
+     ibmi_job:
+       user: "WANGYUN"
+       type: "*BATCH"
 
-    - name: List job information
-      ibmi_job:
-        name: "556235/WANGYUN/TEST"
+   - name: List job information
+     ibmi_job:
+       name: "556235/WANGYUN/TEST"
 
+
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`ibmi_submit_job_module`
 
 
 Return Values
 -------------
 
-  stderr_lines (When rc as non-zero(failure), list, ['CPF2111:Library TESTLIB already exists.'])
-    The task standard error split in lines
 
+   
+                              
+       stderr_lines
+        | The task standard error split in lines
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
-  end (When job has been submitted and task has waited for the job status for some time, str, 2019-12-02 11:07:54.064969)
-    The task execution end time
+              .. code-block::
 
+                       ["CPF2111:Library TESTLIB already exists."]
+            
+      
+      
+                              
+       end
+        | The task execution end time
+      
+        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
 
-  stdout (When rc as non-zero(failure), str, CPC2102: Library TESTLIB created)
-    The task standard output
+            
+      
+      
+                              
+       stdout
+        | The task standard output
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: str
+        | **sample**: CPC2102: Library TESTLIB created
 
+            
+      
+      
+                              
+       rc
+        | The task return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
-  rc (always, int, 255)
-    The task return code (0 means success, non-zero means failure)
+            
+      
+      
+                              
+       job_info
+        | The information of the job(s)
+      
+        | **returned**: When rc is zero
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
 
-  job_info (When rc is zero, list, [{'JOB_STATUS': 'OUTQ', 'JOB_QUEUE_NAME': '', 'JOB_DESCRIPTION_LIBRARY': '', 'JOB_TYPE': 'BCH', 'JOB_ACCOUNTING_CODE': '*SYS', 'SUBMITTER_JOB_NAME': '', 'JOB_END_TIME': '2020-02-14-00.36.35', 'JOB_ENTERED_SYSTEM_TIME': '2020-02-14-00.36.35', 'JOB_DESCRIPTION': '', 'JOB_INFORMATION': 'YES', 'JOB_NAME': '514647/WANGYUN/QPRTJOB', 'JOB_TYPE_ENHANCED': 'ALTERNATE_SPOOL_USER', 'COMPLETION_STATUS': 'ABNORMAL', 'JOB_DATE': '', 'JOB_ACTIVE_TIME': '', 'JOB_QUEUE_LIBRARY': '', 'JOB_QUEUE_STATUS': '', 'SUBMITTER_MESSAGE_QUEUE': '', 'JOB_SUBSYSTEM': '', 'SUBMITTER_MESSAGE_QUEUE_LIBRARY': '', 'JOB_SCHEDULED_TIME': '', 'CCSID': '0', 'JOB_END_REASON': '', 'JOB_QUEUE_PRIORITY': '0', 'JOB_END_SEVERITY': '10'}, {'JOB_STATUS': 'OUTQ', 'JOB_QUEUE_NAME': '', 'JOB_DESCRIPTION_LIBRARY': 'QGPL', 'JOB_TYPE': 'INT', 'JOB_ACCOUNTING_CODE': '*SYS', 'SUBMITTER_JOB_NAME': '', 'JOB_END_TIME': '2020-03-24-11.06.44', 'JOB_ENTERED_SYSTEM_TIME': '2020-03-23-22.07.18', 'JOB_DESCRIPTION': 'QDFTJOBD', 'JOB_INFORMATION': 'YES', 'JOB_NAME': '547343/WANGYUN/QPADEV0001', 'JOB_TYPE_ENHANCED': 'INTERACTIVE_GROUP', 'COMPLETION_STATUS': 'ABNORMAL', 'JOB_DATE': '', 'JOB_ACTIVE_TIME': '2020-03-23-22.07.18', 'JOB_QUEUE_LIBRARY': '', 'JOB_QUEUE_STATUS': '', 'SUBMITTER_MESSAGE_QUEUE': '', 'JOB_SUBSYSTEM': '', 'SUBMITTER_MESSAGE_QUEUE_LIBRARY': '', 'JOB_SCHEDULED_TIME': '', 'CCSID': '65535', 'JOB_END_REASON': 'JOB ENDED DUE TO A DEVICE ERROR', 'JOB_QUEUE_PRIORITY': '0', 'JOB_END_SEVERITY': '30'}])
-    The information of the job(s)
+                       [{"CCSID": "0", "COMPLETION_STATUS": "ABNORMAL", "JOB_ACCOUNTING_CODE": "*SYS", "JOB_ACTIVE_TIME": "", "JOB_DATE": "", "JOB_DESCRIPTION": "", "JOB_DESCRIPTION_LIBRARY": "", "JOB_END_REASON": "", "JOB_END_SEVERITY": "10", "JOB_END_TIME": "2020-02-14-00.36.35", "JOB_ENTERED_SYSTEM_TIME": "2020-02-14-00.36.35", "JOB_INFORMATION": "YES", "JOB_NAME": "514647/WANGYUN/QPRTJOB", "JOB_QUEUE_LIBRARY": "", "JOB_QUEUE_NAME": "", "JOB_QUEUE_PRIORITY": "0", "JOB_QUEUE_STATUS": "", "JOB_SCHEDULED_TIME": "", "JOB_STATUS": "OUTQ", "JOB_SUBSYSTEM": "", "JOB_TYPE": "BCH", "JOB_TYPE_ENHANCED": "ALTERNATE_SPOOL_USER", "SUBMITTER_JOB_NAME": "", "SUBMITTER_MESSAGE_QUEUE": "", "SUBMITTER_MESSAGE_QUEUE_LIBRARY": ""}, {"CCSID": "65535", "COMPLETION_STATUS": "ABNORMAL", "JOB_ACCOUNTING_CODE": "*SYS", "JOB_ACTIVE_TIME": "2020-03-23-22.07.18", "JOB_DATE": "", "JOB_DESCRIPTION": "QDFTJOBD", "JOB_DESCRIPTION_LIBRARY": "QGPL", "JOB_END_REASON": "JOB ENDED DUE TO A DEVICE ERROR", "JOB_END_SEVERITY": "30", "JOB_END_TIME": "2020-03-24-11.06.44", "JOB_ENTERED_SYSTEM_TIME": "2020-03-23-22.07.18", "JOB_INFORMATION": "YES", "JOB_NAME": "547343/WANGYUN/QPADEV0001", "JOB_QUEUE_LIBRARY": "", "JOB_QUEUE_NAME": "", "JOB_QUEUE_PRIORITY": "0", "JOB_QUEUE_STATUS": "", "JOB_SCHEDULED_TIME": "", "JOB_STATUS": "OUTQ", "JOB_SUBSYSTEM": "", "JOB_TYPE": "INT", "JOB_TYPE_ENHANCED": "INTERACTIVE_GROUP", "SUBMITTER_JOB_NAME": "", "SUBMITTER_MESSAGE_QUEUE": "", "SUBMITTER_MESSAGE_QUEUE_LIBRARY": ""}]
+            
+      
+      
+                              
+       start
+        | The task execution start time
+      
+        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
+            
+      
+      
+                              
+       stderr
+        | The task standard error
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: str
+        | **sample**: CPF2111:Library TESTLIB already exists
 
-  start (When job has been submitted and task has waited for the job status for some time, str, 2019-12-02 11:07:53.757435)
-    The task execution start time
+            
+      
+      
+                              
+       delta
+        | The task execution delta time
+      
+        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **type**: str
+        | **sample**: 0:00:00.307534
 
+            
+      
+      
+                              
+       stdout_lines
+        | The task standard output split in lines
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
-  stderr (When rc as non-zero(failure), str, CPF2111:Library TESTLIB already exists)
-    The task standard error
+              .. code-block::
 
-
-  delta (When job has been submitted and task has waited for the job status for some time, str, 0:00:00.307534)
-    The task execution delta time
-
-
-  stdout_lines (When rc as non-zero(failure), list, ['CPC2102: Library TESTLIB created.'])
-    The task standard output split in lines
-
-
-
-
-
-Status
-------
-
-
-
-
-- This module is not guaranteed to have a backwards compatible interface. *[preview]*
-
-
-- This module is maintained by community.
-
-
-
-Authors
-~~~~~~~
-
-- Wang Yun (@airwangyun)
-
+                       ["CPC2102: Library TESTLIB created."]
+            
+      
+        

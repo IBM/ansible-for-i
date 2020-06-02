@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_copy – Copy a save file from local to a remote IBMi node &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_copy – Copy a save file from local to a remote IBMi node &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -95,11 +95,10 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_copy – Copy a save file from local to a remote IBMi node</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – vary on or off target device on a remote IBMi node</a></li>
@@ -153,7 +152,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -196,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_copy.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_copy.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -211,68 +210,61 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-copy-copy-a-save-file-from-local-to-a-remote-ibmi-node">
-<h1>ibmi_copy – Copy a save file from local to a remote IBMi node<a class="headerlink" href="#ibmi-copy-copy-a-save-file-from-local-to-a-remote-ibmi-node" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-copy-module"></span><h1>ibmi_copy – Copy a save file from local to a remote IBMi node<a class="headerlink" href="#ibmi-copy-copy-a-save-file-from-local-to-a-remote-ibmi-node" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id2">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id3">Notes</a></li>
-<li><a class="reference internal" href="#see-also" id="id4">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id5">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id6">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id7">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id4">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id5">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id6">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The ibmi_copy copies a save file from local to a remote IBMi node.</p>
-<p>ibmi_copy will not restore save file on IBMi node.</p>
-<p>For non-IBMi native targets, use the copy module instead.</p>
+<ul class="simple">
+<li><p>The ibmi_copy copies a save file from local to a remote IBMi node.</p></li>
+<li><p>ibmi_copy will not restore save file on IBMi node.</p></li>
+<li><p>For non-IBMi native targets, use the copy module instead.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
 <h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>src (True, str, None)</dt>
-<dd><p class="first">Local path to a save file to copy to the remote server.</p>
-<p class="last">This can be absolute or relative.</p>
-</dd>
-<dt>force (optional, bool, False)</dt>
-<dd><p class="first">Influence whether the remote save file must always be replaced.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">yes</span></code>, the remote save file will be replaced.</p>
-<p class="last">If <code class="docutils literal notranslate"><span class="pre">no</span></code>, the save file will only be transferred if the destination does not exist.</p>
-</dd>
-<dt>backup (optional, bool, False)</dt>
-<dd><p class="first">If set force true and save file already exists on remote, rename the exists remote save file so you can get the original file back.</p>
+<dl>
+<dt>backup</dt><dd><p>If set force true and save file already exists on remote, rename the exists remote save file so you can get the original file back.</p>
 <p>The backup save file name will be the original file name+number[1:9]. For example, the origial file name is obja, then rename the original file to obja1. If obja1 already exists, then rename the original file to obja2… util obja9, then report error.</p>
-<p class="last">Only works when force is True.</p>
+<p>Only works when force is True.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
 </dd>
-<dt>lib_name (True, str, None)</dt>
-<dd>Remote library where the save file should be copied to.</dd>
+<dt>force</dt><dd><p>Influence whether the remote save file must always be replaced.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">yes</span></code>, the remote save file will be replaced.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">no</span></code>, the save file will only be transferred if the destination does not exist.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>lib_name</dt><dd><p>Remote library where the save file should be copied to.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>src</dt><dd><p>Local path to a save file to copy to the remote server.</p>
+<p>This can be absolute or relative.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
 </dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id3">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under [defaults] section</li>
-</ul>
-</div>
-</div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id4">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">copy_module</span></dt>
-<dd>The official documentation on the <strong>copy</strong> module.</dd>
-</dl>
-</div>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id5">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Copy test.file on local to a remote IBMi.</span>
   <span class="nt">ibmi_copy</span><span class="p">:</span>
     <span class="nt">src</span><span class="p">:</span> <span class="s">&#39;/backup/test.file&#39;</span>
@@ -282,37 +274,92 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under [defaults] section</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id5">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">copy_module</span></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
 <h2><a class="toc-backref" href="#id6">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>src (always, str, /backup/test.file)</dt>
-<dd>Local absolute path to a save file to copy to the remote server.</dd>
-<dt>stderr (always, list, [‘CPF5813: File TEST in library TESTLIB already exists.’, ‘CPF7302: File TEST not created in library TESTLIB.’])</dt>
-<dd>The copy standard error</dd>
-<dt>stdout (always, list, File TEST in library TESTLIB already exists.)</dt>
-<dd>The copy standard output</dd>
-<dt>dest (always, str, /QSYS.LIB/TESTLIB.LIB/TEST.FILE)</dt>
-<dd>Remote absolute path where the file is copied to.</dd>
-<dt>delta (always, str, 0:00:00.307534)</dt>
-<dd>The copy execution delta time when file is renewed.</dd>
-<dt>msg (always, str, File is successfully copied.)</dt>
-<dd>The fetch execution message.</dd>
+<div><dl>
+<dt>src</dt><dd><div class="line-block">
+<div class="line">Local absolute path to a save file to copy to the remote server.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: /backup/test.file</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The copy standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF5813: File TEST in library TESTLIB already exists.&quot;</span><span class="p">,</span> <span class="s2">&quot;CPF7302: File TEST not created in library TESTLIB.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The copy standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;File TEST in library TESTLIB already exists.&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>dest</dt><dd><div class="line-block">
+<div class="line">Remote absolute path where the file is copied to.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: /QSYS.LIB/TESTLIB.LIB/TEST.FILE</div>
+</div>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The copy execution delta time when file is renewed.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>msg</dt><dd><div class="line-block">
+<div class="line">The fetch execution message.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: File is successfully copied.</div>
+</div>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id7">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Peng Zeng Yu (&#64;pengzengyufish)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -336,11 +383,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

@@ -2,11 +2,13 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_object_save.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_object_save.py
 
+.. _ibmi_object_save_module:
 
 ibmi_object_save -- Save one or more objects on a remote IBMi node
 ==================================================================
+
 
 .. contents::
    :local:
@@ -15,76 +17,122 @@ ibmi_object_save -- Save one or more objects on a remote IBMi node
 
 Synopsis
 --------
-
-The ibmi_object_save module create an save file on a remote IBMi nodes
-
-The saved objects and save file are on the remote host, and the save file *is not* copied to the local host.
-
-Only support *SAVF as the save file's format by now.
-
-
-
+- The ibmi_object_save module create an save file on a remote IBMi nodes
+- The saved objects and save file are on the remote host, and the save file *is not* copied to the local host.
+- Only support *SAVF as the save file's format by now.
 
 
 
 Parameters
 ----------
 
-  savefile_name (True, str, None)
-    The save file name.
+
+     
+asp_group
+  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
+
+  The ASP group name is the name of the primary ASP device within the ASP group.
 
 
-  parameters (optional, str,  )
-    The parameters that SAVOBJ command will take. Other than options above, all other parameters need to be specified here. The default values of parameters for SAVOBJ will be taken if not specified.
+  | **required**: false
+  | **type**: str
+  | **default**: *SYSBAS
 
 
-  format (optional, str, *SAVF)
-    The save file's format. Only support *SAVF by now.
+     
+force_save
+  If save file already exists or contains data, whether to clear data or not.
 
 
-  object_lib (True, str, None)
-    The library contains the objects.
+  | **required**: false
+  | **type**: bool
 
 
-  target_release (optional, str, *CURRENT)
-    The release of the operating system on which you intend to restore and use the object.
+     
+format
+  The save file's format. Only support *SAVF by now.
 
 
-  force_save (optional, bool, False)
-    If save file already exists or contains data, whether to clear data or not.
+  | **required**: false
+  | **type**: str
+  | **default**: *SAVF
+  | **choices**: *SAVF
 
 
-  object_names (optional, str, *ALL)
-    The objects need to be saved. One or more object names can be specified. Use space as separator.
+     
+joblog
+  If set to ``true``, append JOBLOG to stderr/stderr_lines.
 
 
-  savefile_lib (True, str, None)
-    The save file library.
+  | **required**: false
+  | **type**: bool
 
 
-  joblog (optional, bool, False)
-    If set to ``true``, append JOBLOG to stderr/stderr_lines.
+     
+object_lib
+  The library contains the objects.
 
 
-  object_types (optional, str, *ALL)
-    The object types. One or more object types can be specified. Use space as separator.
+  | **required**: True
+  | **type**: str
 
 
-  asp_group (optional, str, *SYSBAS)
-    Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
-
-    The ASP group name is the name of the primary ASP device within the ASP group.
-
+     
+object_names
+  The objects need to be saved. One or more object names can be specified. Use space as separator.
 
 
+  | **required**: false
+  | **type**: str
+  | **default**: *ALL
 
 
-Notes
------
+     
+object_types
+  The object types. One or more object types can be specified. Use space as separator.
 
-.. note::
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
+  | **required**: false
+  | **type**: str
+  | **default**: *ALL
+
+
+     
+parameters
+  The parameters that SAVOBJ command will take. Other than options above, all other parameters need to be specified here. The default values of parameters for SAVOBJ will be taken if not specified.
+
+
+  | **required**: false
+  | **type**: str
+  | **default**:  
+
+
+     
+savefile_lib
+  The save file library.
+
+
+  | **required**: True
+  | **type**: str
+
+
+     
+savefile_name
+  The save file name.
+
+
+  | **required**: True
+  | **type**: str
+
+
+     
+target_release
+  The release of the operating system on which you intend to restore and use the object.
+
+
+  | **required**: false
+  | **type**: str
+  | **default**: *CURRENT
 
 
 
@@ -93,116 +141,245 @@ Examples
 
 .. code-block:: yaml+jinja
 
-    
-    - name: Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary
-      ibmi_object_save:
-        object_names: 'test1 test2'
-        object_lib: 'objlib'
-        object_types: '*PGM *SRVPGM'
-        savefile_name: 'archive'
-        savefile_lib: 'archlib'
-        force_save: true
-        target_release: 'V7R2M0'
+   
+   - name: Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary
+     ibmi_object_save:
+       object_names: 'test1 test2'
+       object_lib: 'objlib'
+       object_types: '*PGM *SRVPGM'
+       savefile_name: 'archive'
+       savefile_lib: 'archlib'
+       force_save: true
+       target_release: 'V7R2M0'
+
+
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
 
 
 
 Return Values
 -------------
 
-  stderr_lines (always, list, ['CPF5813: File archive in library archlib already exists.', 'CPF7302: File archive not created in library archlib.'])
-    The save standard error split in lines
 
+   
+                              
+       stderr_lines
+        | The save standard error split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
 
-  stdout (always, str, CPC3722: 2 objects saved from library objlib.)
-    The save standard output
+              .. code-block::
 
+                       ["CPF5813: File archive in library archlib already exists.", "CPF7302: File archive not created in library archlib."]
+            
+      
+      
+                              
+       stdout
+        | The save standard output
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPC3722: 2 objects saved from library objlib.
 
-  rc (always, int, 255)
-    The save action return code (0 means success, non-zero means failure)
+            
+      
+      
+                              
+       rc
+        | The save action return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
+            
+      
+      
+                              
+       object_names
+        | The objects need to be saved.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: test1 test2
 
-  object_names (always, str, test1 test2)
-    The objects need to be saved.
+            
+      
+      
+                              
+       savefile_lib
+        | The save file library.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: c1lib
 
+            
+      
+      
+                              
+       delta
+        | The save execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
 
-  savefile_lib (always, str, c1lib)
-    The save file library.
+            
+      
+      
+                              
+       stdout_lines
+        | The save standard output split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
 
-  delta (always, str, 0:00:00.307534)
-    The save execution delta time
+                       ["CPC3722: 2 objects saved from library objlib."]
+            
+      
+      
+                              
+       savefile_name
+        | The save file name.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: c1
 
+            
+      
+      
+                              
+       end
+        | The save execution end time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
 
-  stdout_lines (always, list, ['CPC3722: 2 objects saved from library objlib.'])
-    The save standard output split in lines
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'PLUGILE', 'TO_PROGRAM': 'XMLSTOREDP', 'MESSAGE_TEXT': 'Command ended normally with exit status 0.', 'FROM_MODULE': 'QZSHRUNC', 'FROM_PROGRAM': 'QZSHRUNC', 'MESSAGE_TIMESTAMP': '2020-05-25-13.06.35.019371', 'FROM_USER': 'PENGZY', 'TO_INSTRUCTION': '5829', 'MESSAGE_SECOND_LEVEL_TEXT': '', 'MESSAGE_TYPE': 'COMPLETION', 'MESSAGE_ID': 'QSH0005', 'MESSAGE_LIBRARY': 'QSHELL', 'FROM_LIBRARY': 'QSHELL', 'SEVERITY': '0', 'FROM_PROCEDURE': 'main', 'TO_LIBRARY': 'QXMLSERV', 'FROM_INSTRUCTION': '149', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '12', 'MESSAGE_FILE': 'QZSHMSGF', 'TO_PROCEDURE': 'ILECMDEXC'}]
 
+            
+      
+      
+                              
+       start
+        | The save execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
-  savefile_name (always, str, c1)
-    The save file name.
+            
+      
+      
+                              
+       format
+        | The save file's format. Only support *SAVF by now.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: *SAVF
 
+            
+      
+      
+                              
+       target_release
+        | The release of the operating system on which you intend to restore and use the object.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: V7R1M0
 
-  end (always, str, 2019-12-02 11:07:54.064969)
-    The save execution end time
+            
+      
+      
+                              
+       force_save
+        | If save file already exists or contains data, whether to clear data or not.
+      
+        | **returned**: always
+        | **type**: bool      
+        | **sample**:
 
+              .. code-block::
 
-  job_log (always, str, [{'TO_MODULE': 'PLUGILE', 'TO_PROGRAM': 'XMLSTOREDP', 'MESSAGE_TEXT': 'Command ended normally with exit status 0.', 'FROM_MODULE': 'QZSHRUNC', 'FROM_PROGRAM': 'QZSHRUNC', 'MESSAGE_TIMESTAMP': '2020-05-25-13.06.35.019371', 'FROM_USER': 'PENGZY', 'TO_INSTRUCTION': '5829', 'MESSAGE_SECOND_LEVEL_TEXT': '', 'MESSAGE_TYPE': 'COMPLETION', 'MESSAGE_ID': 'QSH0005', 'MESSAGE_LIBRARY': 'QSHELL', 'FROM_LIBRARY': 'QSHELL', 'SEVERITY': '0', 'FROM_PROCEDURE': 'main', 'TO_LIBRARY': 'QXMLSERV', 'FROM_INSTRUCTION': '149', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '12', 'MESSAGE_FILE': 'QZSHMSGF', 'TO_PROCEDURE': 'ILECMDEXC'}])
-    the job_log
+                       true
+            
+      
+      
+                              
+       object_lib
+        | The library contains the object.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: objlib
 
+            
+      
+      
+                              
+       stderr
+        | The save standard error
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF5813: File archive in library archlib already exists.\nCPF7302: File archive not created in library archlib.\n
 
-  start (always, str, 2019-12-02 11:07:53.757435)
-    The save execution start time
+            
+      
+      
+                              
+       joblog
+        | Append JOBLOG to stderr/stderr_lines or not.
+      
+        | **returned**: always
+        | **type**: bool
+      
+      
+                              
+       command
+        | The last excuted command.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: SAVOBJ OBJ(*ALL) LIB(TESTLIB) DEV(*SAVF) OBJTYPE(*ALL) SAVF(TEST/ARCHLIB) TGTRLS(V7R1M0)
 
+            
+      
+      
+                              
+       object_types
+        | The object types.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: *PGM *SRVPGM
 
-  format (always, str, *SAVF)
-    The save file's format. Only support *SAVF by now.
-
-
-  target_release (always, str, V7R1M0)
-    The release of the operating system on which you intend to restore and use the object.
-
-
-  force_save (always, bool, True)
-    If save file already exists or contains data, whether to clear data or not.
-
-
-  object_lib (always, str, objlib)
-    The library contains the object.
-
-
-  stderr (always, str, CPF5813: File archive in library archlib already exists.\nCPF7302: File archive not created in library archlib.\n)
-    The save standard error
-
-
-  joblog (always, bool, False)
-    Append JOBLOG to stderr/stderr_lines or not.
-
-
-  command (always, str, SAVOBJ OBJ(*ALL) LIB(TESTLIB) DEV(*SAVF) OBJTYPE(*ALL) SAVF(TEST/ARCHLIB) TGTRLS(V7R1M0))
-    The last excuted command.
-
-
-  object_types (always, str, *PGM *SRVPGM)
-    The object types.
-
-
-
-
-
-Status
-------
-
-
-
-
-- This module is not guaranteed to have a backwards compatible interface. *[preview]*
-
-
-- This module is maintained by community.
-
-
-
-Authors
-~~~~~~~
-
-- Peng Zeng Yu (@pengzengyufish)
-
+            
+      
+        

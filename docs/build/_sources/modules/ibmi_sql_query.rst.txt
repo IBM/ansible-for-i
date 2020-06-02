@@ -2,11 +2,13 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_sql_query.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_sql_query.py
 
+.. _ibmi_sql_query_module:
 
 ibmi_sql_query -- Executes a SQL DQL(Data Query Language) statement on a remote IBMi node.
 ==========================================================================================
+
 
 .. contents::
    :local:
@@ -15,60 +17,59 @@ ibmi_sql_query -- Executes a SQL DQL(Data Query Language) statement on a remote 
 
 Synopsis
 --------
-
-The ``ibmi_sql_query`` module takes the SQL DQL(Data Query Language) statement as argument.
-
-The given SQL DQL(Data Query Language) statement will be executed on all selected nodes.
-
-Only run one statement at a time.
-
-
-
+- The ``ibmi_sql_query`` module takes the SQL DQL(Data Query Language) statement as argument.
+- The given SQL DQL(Data Query Language) statement will be executed on all selected nodes.
+- Only run one statement at a time.
 
 
 
 Parameters
 ----------
 
-  database (optional, str, *SYSBAS)
-    Specified database name, usually, its the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries
 
-    Default to use the '*LOCAL' entry
+     
+database
+  Specified database name, usually, its the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries
 
-
-  expected_row_count (optional, int, -1)
-    The expected row count
-
-    If it is equal or greater than 0, check if the actual row count returned from the query statement is matched with the expected row count
-
-    If it is less than 0, do not check if the actual row count returned from the query statement is matched with the expected row counit
+  Default to use the '*LOCAL' entry
 
 
-  sql (True, str, None)
-    The ``ibmi_sql_query`` module takes a IBM i SQL DQL(Data Query Language) statement to run.
+  | **required**: false
+  | **type**: str
+  | **default**: *SYSBAS
 
 
-  joblog (optional, bool, False)
-    If set to ``true``, output the JOBLOG even success.
+     
+expected_row_count
+  The expected row count
+
+  If it is equal or greater than 0, check if the actual row count returned from the query statement is matched with the expected row count
+
+  If it is less than 0, do not check if the actual row count returned from the query statement is matched with the expected row counit
 
 
+  | **required**: false
+  | **type**: int
+  | **default**: -1
 
 
-
-Notes
------
-
-.. note::
-   - Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+     
+joblog
+  If set to ``true``, output the JOBLOG even success.
 
 
-See Also
---------
+  | **required**: false
+  | **type**: bool
 
-.. seealso::
 
-   :ref:`ibmi_sql_execute_module`
-      The official documentation on the **ibmi_sql_execute** module.
+     
+sql
+  The ``ibmi_sql_query`` module takes a IBM i SQL DQL(Data Query Language) statement to run.
+
+
+  | **required**: True
+  | **type**: str
+
 
 
 Examples
@@ -76,78 +77,151 @@ Examples
 
 .. code-block:: yaml+jinja
 
-    
-    - name: Query the data of table Persons
-      ibmi_sql_query:
-        sql: 'select * from Persons'
+   
+   - name: Query the data of table Persons
+     ibmi_sql_query:
+       sql: 'select * from Persons'
 
+
+
+Notes
+-----
+
+.. note::
+   Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`ibmi_sql_execute_module`
 
 
 Return Values
 -------------
 
-  stderr_lines (When rc as non-zero(failure), list, [''])
-    The sql statement standard error split in lines
 
+   
+                              
+       stderr_lines
+        | The sql statement standard error split in lines
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
-  end (always, str, 2019-12-02 11:07:54.064969)
-    The sql statement execution end time
+              .. code-block::
 
+                       [""]
+            
+      
+      
+                              
+       end
+        | The sql statement execution end time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
 
-  job_log (when rc as non-zero(failure) or rc as success(0) but joblog set to true, str, [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}])
-    the job_log
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: when rc as non-zero(failure) or rc as success(0) but joblog set to true
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
 
+            
+      
+      
+                              
+       stdout
+        | The sql statement standard output
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: str
+      
+      
+                              
+       rc
+        | The sql statement return code (0 means success)
+      
+        | **returned**: always
+        | **type**: int
+      
+      
+                              
+       start
+        | The sql statement execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
-  stdout (When rc as non-zero(failure), str, )
-    The sql statement standard output
+            
+      
+      
+                              
+       delta
+        | The sql statement execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
 
+            
+      
+      
+                              
+       stderr
+        | The sql statement standard error
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: str
+      
+      
+                              
+       sql
+        | The sql statement executed by the task
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: select * from Persons
 
-  rc (always, int, 0)
-    The sql statement return code (0 means success)
+            
+      
+      
+                              
+       stdout_lines
+        | The sql statement standard output split in lines
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
 
-  start (always, str, 2019-12-02 11:07:53.757435)
-    The sql statement execution start time
+                       [""]
+            
+      
+      
+                              
+       row
+        | The sql query statement result
+      
+        | **returned**: when rc as 0(success)
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
 
-  delta (always, str, 0:00:00.307534)
-    The sql statement execution delta time
-
-
-  stderr (When rc as non-zero(failure), str, )
-    The sql statement standard error
-
-
-  sql (always, str, select * from Persons)
-    The sql statement executed by the task
-
-
-  stdout_lines (When rc as non-zero(failure), list, [''])
-    The sql statement standard output split in lines
-
-
-  row (when rc as 0(success), list, [{'LASTNAME': 'Le', 'ID_P': '919665', 'ADDRESS': 'Ring Building', 'FIRSTNAME': 'Chang', 'CITY': 'Beijing'}, {'LASTNAME': 'Li', 'ID_P': '919689', 'ADDRESS': 'Ring Building', 'FIRSTNAME': 'Zhang', 'CITY': 'Shanhai'}])
-    The sql query statement result
-
-
-
-
-
-Status
-------
-
-
-
-
-- This module is not guaranteed to have a backwards compatible interface. *[preview]*
-
-
-- This module is maintained by community.
-
-
-
-Authors
-~~~~~~~
-
-- Chang Le(@changlexc)
-
+                       [{"ADDRESS": "Ring Building", "CITY": "Beijing", "FIRSTNAME": "Chang", "ID_P": "919665", "LASTNAME": "Le"}, {"ADDRESS": "Ring Building", "CITY": "Shanhai", "FIRSTNAME": "Zhang", "ID_P": "919689", "LASTNAME": "Li"}]
+            
+      
+        

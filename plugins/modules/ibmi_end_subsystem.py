@@ -42,9 +42,10 @@ options:
   end_subsystem_option:
     description:
       - Specifies the options to take when ending the active subsystems
+    #type: str
     type: list
     elements: str
-    default: ['*DFT']
+    #default: ['*DFT']
     choices: ['*DFT', '*NOJOBLOG', '*CHGPTY', '*CHGTSL']
   parameters:
     description:

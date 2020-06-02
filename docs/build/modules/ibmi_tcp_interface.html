@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface. &mdash; Ansible Collection  documentation</title>
+  <title>ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Ansible Collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -125,10 +125,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server on a remote IBMi node</a></li>
@@ -152,7 +151,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Ansible Collection</a>
+          <a href="../index.html">IBM power_ibmi collection</a>
         
       </nav>
 
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_tcp_interface.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_tcp_interface.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,60 +209,97 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-tcp-interface-add-change-remove-or-query-a-tcp-ip-interface">
-<h1>ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.<a class="headerlink" href="#ibmi-tcp-interface-add-change-remove-or-query-a-tcp-ip-interface" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-tcp-interface-module"></span><h1>ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.<a class="headerlink" href="#ibmi-tcp-interface-add-change-remove-or-query-a-tcp-ip-interface" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id2">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id3">Notes</a></li>
-<li><a class="reference internal" href="#examples" id="id4">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id5">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id6">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id15">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id16">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id17">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id18">Notes</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id19">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">ibmi_tcp_interface</span></code> module add, change, remove, start, end or query a tcp/ip interface.</p>
-<p>This module provides the similar function of ADDTCPIFC, CHGTCPIFC, RMVTCPIFC, STRTCPIFC, ENDTCPIFC.</p>
-<p>In addition, the module provides query function for a specific internet address basing on internet address</p>
-<p>or alias_name.</p>
+<h2><a class="toc-backref" href="#id15">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_tcp_interface</span></code> module add, change, remove, start, end or query a tcp/ip interface.</p></li>
+<li><p>This module provides the similar function of ADDTCPIFC, CHGTCPIFC, RMVTCPIFC, STRTCPIFC, ENDTCPIFC.</p></li>
+<li><p>In addition, the module provides query function for a specific internet address basing on internet address</p></li>
+<li><p>or alias_name.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>line_description (False, str, None)</dt>
-<dd><p class="first">the name of the line description associated with the new interface.</p>
-<p class="last">The line description must exist before the TCP/IP interface can be added.</p>
+<h2><a class="toc-backref" href="#id16">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>alias_name</dt><dd><p>A name that can be used in place of the internet address.</p>
+<p>This alias_name can be used to change, remove, start, end and query a internet interface.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
 </dd>
-<dt>type_of_service (False, str, None)</dt>
-<dd><p class="first">The type of service specifies how the internet hosts and routers should make trade-offs</p>
-<p class="last">between throughput, delay, reliability, and cost.</p>
+<dt>associated_local_interface</dt><dd><p>Use this parameter to associate the IPv4 interface being added with an existing local IPv4 TCP/IP interface.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
 </dd>
-<dt>preferred_interface (False, list, None)</dt>
-<dd><p class="first">A list of preferred IPv4 interfaces that are to be used with the IPv4 interface being added for proxy</p>
-<p class="last">Address Resolution Protocol (ARP) agent selection.</p>
+<dt>auto_start</dt><dd><p>Specifies whether the interface is automatically started</p>
+<p>when the TCP/IP stack is activated by the Start TCP/IP (STRTCP) command.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>choices</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>YES, <a href="#id3"><span class="problematic" id="id4">*</span></a>NO</div>
+</div>
 </dd>
-<dt>text_description (False, str, None)</dt>
-<dd>Specifies text that briefly describes the interface.</dd>
-<dt>associated_local_interface (False, str, None)</dt>
-<dd>Use this parameter to associate the IPv4 interface being added with an existing local IPv4 TCP/IP interface.</dd>
-<dt>sec_to_wait (optional, int, 0)</dt>
-<dd><p class="first">The number of seconds that the module waits after executing the task</p>
+<dt>extra_params</dt><dd><p>The extra parameters that the user wants to pass into this module.</p>
+<p>These are the additional CL parameters that the user wants to pass to execute the CL commands.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>internet_address</dt><dd><p>The internet address that will be added, changed, removed or queried.</p>
+<p>The internet address may be an IPv4 or IPv6 address.</p>
+<p>An interface is associated with a line description.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>line_description</dt><dd><p>the name of the line description associated with the new interface.</p>
+<p>The line description must exist before the TCP/IP interface can be added.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>max_transmission_unit</dt><dd><p>Specifies the maximum size (in bytes) of IP datagrams that can be transmitted through this interface.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>preferred_interface</dt><dd><p>A list of preferred IPv4 interfaces that are to be used with the IPv4 interface being added for proxy</p>
+<p>Address Resolution Protocol (ARP) agent selection.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+</div>
+</dd>
+<dt>sec_to_wait</dt><dd><p>The number of seconds that the module waits after executing the task</p>
 <p>before returning the information of the internet address.</p>
 <p>Some tasks such as start and end the interface will need to wait some seconds</p>
 <p>before it can return the final status.</p>
 <p>If default zero is used, the returned information could be the intermediate status of</p>
-<p class="last">starting or ending the interface.</p>
+<p>starting or ending the interface.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: int</div>
+</div>
 </dd>
-<dt>max_transmission_unit (False, str, None)</dt>
-<dd>Specifies the maximum size (in bytes) of IP datagrams that can be transmitted through this interface.</dd>
-<dt>subnet_mask (False, str, None)</dt>
-<dd><p class="first">Defines the subnet mask</p>
-<p class="last">which is a bit mask that defines the part of the network where this IPv4 interface attaches.</p>
-</dd>
-<dt>state (optional, str, present)</dt>
-<dd><p class="first">The state of the interface.</p>
+<dt>state</dt><dd><p>The state of the interface.</p>
 <p>present means to add, change or query the internet interface.</p>
 <p>When the internet address does not exist on the IBM i system, present option will create the interface.</p>
 <p>When the internet address exists on the IBM i system, and only internet_address or alias_name is specified,</p>
@@ -275,45 +311,48 @@
 <p>active means to start the internet interface. Either internet_address or alias_name can be used.</p>
 <p>If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.</p>
 <p>inactive means to end the internet interface. Either internet_address or alias_name can be used.</p>
-<p class="last">If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.</p>
+<p>If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: present</div>
+<div class="line"><strong>choices</strong>: present, absent, inactive, active</div>
+</div>
 </dd>
-<dt>auto_start (False, str, None)</dt>
-<dd><p class="first">Specifies whether the interface is automatically started</p>
-<p class="last">when the TCP/IP stack is activated by the Start TCP/IP (STRTCP) command.</p>
+<dt>subnet_mask</dt><dd><p>Defines the subnet mask</p>
+<p>which is a bit mask that defines the part of the network where this IPv4 interface attaches.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
 </dd>
-<dt>extra_params (False, str, None)</dt>
-<dd><p class="first">The extra parameters that the user wants to pass into this module.</p>
-<p class="last">These are the additional CL parameters that the user wants to pass to execute the CL commands.</p>
+<dt>text_description</dt><dd><p>Specifies text that briefly describes the interface.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
 </dd>
-<dt>internet_address (False, str, None)</dt>
-<dd><p class="first">The internet address that will be added, changed, removed or queried.</p>
-<p>The internet address may be an IPv4 or IPv6 address.</p>
-<p class="last">An interface is associated with a line description.</p>
+<dt>type_of_service</dt><dd><p>The type of service specifies how the internet hosts and routers should make trade-offs</p>
+<p>between throughput, delay, reliability, and cost.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>choices</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>NORMAL, <a href="#id7"><span class="problematic" id="id8">*</span></a>MINDELAY, <a href="#id9"><span class="problematic" id="id10">*</span></a>MAXTHRPUT, <a href="#id11"><span class="problematic" id="id12">*</span></a>MAXRLB, <a href="#id13"><span class="problematic" id="id14">*</span></a>MINCOST</div>
+</div>
 </dd>
-<dt>alias_name (False, str, None)</dt>
-<dd><p class="first">A name that can be used in place of the internet address.</p>
-<p class="last">This alias_name can be used to change, remove, start, end and query a internet interface.</p>
-</dd>
-<dt>vlan_id (False, str, None)</dt>
-<dd><p class="first">The virtual LAN identifier of the associated line.</p>
+<dt>vlan_id</dt><dd><p>The virtual LAN identifier of the associated line.</p>
 <p>This identifies the virtual LAN to which this interface belongs according to IEEE standard 802.1Q.</p>
 <p>This parameter is only valid for interfaces defined for Ethernet adapters that support the 802.1Q standard.</p>
-<p class="last">This must be used together with line_description.</p>
+<p>This must be used together with line_description.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
 </dd>
 </dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id3">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
-</ul>
-</div>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id4">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id17">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 1</span>
   <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.11&#39;</span>
@@ -412,45 +451,124 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id18">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id19">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (When task has been executed., list, [‘CPF2111:Library TESTLIB already exists.’])</dt>
-<dd>The task standard error split in lines</dd>
-<dt>end (When task has been executed., str, 2019-12-02 11:07:54.064969)</dt>
-<dd>The task execution end time</dd>
-<dt>stderr (When rc as non-zero(failure), str, CPF2111:Library TESTLIB already exists)</dt>
-<dd>The task standard error</dd>
-<dt>stdout (When task has been executed., str, CPC2102: Library TESTLIB created)</dt>
-<dd>The task standard output</dd>
-<dt>cl_command (When task has been executed., str, CHGTCPIFC INTNETADR(‘9.5.168.12’) SUBNETMASK(‘255.255.0.0’) ALIASNAME(alias2))</dt>
-<dd>The CL command executed.</dd>
-<dt>rc (When task has been executed., int, 255)</dt>
-<dd>The task return code (0 means success, non-zero means failure)</dd>
-<dt>start (When task has been executed., str, 2019-12-02 11:07:53.757435)</dt>
-<dd>The task execution start time</dd>
-<dt>interface_info (When rc is zero., list, [{‘CONNECTION_TYPE’: ‘IPV4’, ‘LINE_DESCRIPTION’: ‘LINDES’, ‘MAXIMUM_TRANSMISSION_UNIT’: ‘LIND’, ‘VIRTUAL_LAN_ID’: ‘NONE’, ‘NETWORK_ADDRESS’: ‘9.5.0.0’, ‘SUBNET_MASK’: ‘255.255.0.0’, ‘INTERFACE_LINE_TYPE’: ‘VETH’, ‘AUTOSTART’: ‘YES’, ‘LAST_CHANGE_TIMESTAMP’: ‘2020-04-25T11:57:26’, ‘SERVICE_TYPE’: ‘NORMAL’, ‘INTERNET_ADDRESS’: ‘9.5.155.12’, ‘CONFIGURED_MAXIMUM_TRANSMISSION_UNIT’: ‘1024’, ‘ALIAS_NAME’: ‘ALIAS2’, ‘INTERFACE_STATUS’: ‘INACTIVE’}])</dt>
-<dd>The interface information. If state is absent, empty list is returned.</dd>
-<dt>delta (When task has been executed., str, 0:00:00.307534)</dt>
-<dd>The task execution delta time</dd>
-<dt>stdout_lines (When task has been executed., list, [‘CPC2102: Library TESTLIB created.’])</dt>
-<dd>The task standard output split in lines</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The task standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When task has been executed.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>end</dt><dd><div class="line-block">
+<div class="line">The task execution end time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When task has been executed.</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The task standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF2111:Library TESTLIB already exists</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The task standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When task has been executed.</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPC2102: Library TESTLIB created</div>
+</div>
+</dd>
+<dt>cl_command</dt><dd><div class="line-block">
+<div class="line">The CL command executed.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When task has been executed.</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CHGTCPIFC INTNETADR(‘9.5.168.12’) SUBNETMASK(‘255.255.0.0’) ALIASNAME(alias2)</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When task has been executed.</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>start</dt><dd><div class="line-block">
+<div class="line">The task execution start time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When task has been executed.</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
+</div>
+</dd>
+<dt>interface_info</dt><dd><div class="line-block">
+<div class="line">The interface information. If state is absent, empty list is returned.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;ALIAS_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;ALIAS2&quot;</span><span class="p">,</span> <span class="s2">&quot;AUTOSTART&quot;</span><span class="p">:</span> <span class="s2">&quot;YES&quot;</span><span class="p">,</span> <span class="s2">&quot;CONFIGURED_MAXIMUM_TRANSMISSION_UNIT&quot;</span><span class="p">:</span> <span class="s2">&quot;1024&quot;</span><span class="p">,</span> <span class="s2">&quot;CONNECTION_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;IPV4&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERFACE_LINE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;VETH&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERFACE_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;INACTIVE&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERNET_ADDRESS&quot;</span><span class="p">:</span> <span class="s2">&quot;9.5.155.12&quot;</span><span class="p">,</span> <span class="s2">&quot;LAST_CHANGE_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-04-25T11:57:26&quot;</span><span class="p">,</span> <span class="s2">&quot;LINE_DESCRIPTION&quot;</span><span class="p">:</span> <span class="s2">&quot;LINDES&quot;</span><span class="p">,</span> <span class="s2">&quot;MAXIMUM_TRANSMISSION_UNIT&quot;</span><span class="p">:</span> <span class="s2">&quot;LIND&quot;</span><span class="p">,</span> <span class="s2">&quot;NETWORK_ADDRESS&quot;</span><span class="p">:</span> <span class="s2">&quot;9.5.0.0&quot;</span><span class="p">,</span> <span class="s2">&quot;SERVICE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;NORMAL&quot;</span><span class="p">,</span> <span class="s2">&quot;SUBNET_MASK&quot;</span><span class="p">:</span> <span class="s2">&quot;255.255.0.0&quot;</span><span class="p">,</span> <span class="s2">&quot;VIRTUAL_LAN_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;NONE&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The task execution delta time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When task has been executed.</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The task standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When task has been executed.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPC2102: Library TESTLIB created.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id6">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Wang Yun (&#64;airwangyun)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -474,11 +592,10 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Simon Stone
+        &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

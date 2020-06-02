@@ -2,11 +2,13 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_cl_command.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_cl_command.py
 
+.. _ibmi_cl_command_module:
 
 ibmi_cl_command -- Executes a CL command on a remote IBMi node
 ==============================================================
+
 
 .. contents::
    :local:
@@ -15,60 +17,50 @@ ibmi_cl_command -- Executes a CL command on a remote IBMi node
 
 Synopsis
 --------
-
-The ``ibmi_cl_command`` module takes the CL command name followed by a list of space-delimited arguments.
-
-The given CL command will be executed on all selected nodes.
-
-For Pase or Qshell(Unix/Linux-liked) commands run on IBMi targets, like 'ls', 'chmod' etc, use the :ref:`command <command_module>` module instead.
-
-Only run one command at a time.
-
-
-
+- The ``ibmi_cl_command`` module takes the CL command name followed by a list of space-delimited arguments.
+- The given CL command will be executed on all selected nodes.
+- For Pase or Qshell(Unix/Linux-liked) commands run on IBMi targets, like 'ls', 'chmod' etc, use the :ref:`command <command_module>` module instead.
+- Only run one command at a time.
 
 
 
 Parameters
 ----------
 
-  cmd (True, str, None)
-    The IBM i CL command to run.
+
+     
+asp_group
+  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
+
+  The ASP group name is the name of the primary ASP device within the ASP group.
+
+  Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
 
 
-  asp_group (optional, str, *SYSBAS)
-    Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
-
-    The ASP group name is the name of the primary ASP device within the ASP group.
-
-    Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
+  | **required**: false
+  | **type**: str
+  | **default**: *SYSBAS
 
 
-  joblog (optional, bool, False)
-    If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
-
-    Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
-
+     
+cmd
+  The IBM i CL command to run.
 
 
+  | **required**: True
+  | **type**: str
 
 
-Notes
------
+     
+joblog
+  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
 
-.. note::
-   - IBM i CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*) don't have joblog returned.
-   - IBM i CL command can also be run by command module with quite simple result messages, add a prefix 'system' to the CL command.
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2).
+  Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
 
 
-See Also
---------
+  | **required**: false
+  | **type**: bool
 
-.. seealso::
-
-   :ref:`command_module`
-      The official documentation on the **command** module.
 
 
 Examples
@@ -76,79 +68,159 @@ Examples
 
 .. code-block:: yaml+jinja
 
-    
-    - name: Create a library by using CL command CRTLIB
-      ibmi_cl_command:
-        command: 'CRTLIB LIB(TESTLIB)'
-        asp_group: 'IASP1'
+   
+   - name: Create a library by using CL command CRTLIB
+     ibmi_cl_command:
+       command: 'CRTLIB LIB(TESTLIB)'
+       asp_group: 'IASP1'
 
+
+
+Notes
+-----
+
+.. note::
+   IBM i CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*) don't have joblog returned.
+
+   IBM i CL command can also be run by command module with quite simple result messages, add a prefix 'system' to the CL command.
+
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2).
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`command_module`
 
 
 Return Values
 -------------
 
-  stderr_lines (always, list, ['CPF2111:Library TESTLIB already exists.'])
-    The command standard error split in lines
 
+   
+                              
+       stderr_lines
+        | The command standard error split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
 
-  end (always, str, 2019-12-02 11:07:54.064969)
-    The command execution end time
+              .. code-block::
 
+                       ["CPF2111:Library TESTLIB already exists."]
+            
+      
+      
+                              
+       end
+        | The command execution end time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
 
-  job_log (always, str, [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}])
-    the job_log
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
 
+            
+      
+      
+                              
+       stdout
+        | The command standard output
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPC2102: Library TESTLIB created
 
-  stdout (always, str, CPC2102: Library TESTLIB created)
-    The command standard output
+            
+      
+      
+                              
+       cmd
+        | The command executed by the task
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CRTLIB LIB(TESTLIB)
 
+            
+      
+      
+                              
+       rc
+        | The command return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
-  cmd (always, str, CRTLIB LIB(TESTLIB))
-    The command executed by the task
+            
+      
+      
+                              
+       start
+        | The command execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
+            
+      
+      
+                              
+       delta
+        | The command execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
 
-  rc (always, int, 255)
-    The command return code (0 means success, non-zero means failure)
+            
+      
+      
+                              
+       stderr
+        | The command standard error
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF2111:Library TESTLIB already exists
 
+            
+      
+      
+                              
+       joblog
+        | Print JOBLOG or not when using itoolkit to run the CL command.
+      
+        | **returned**: always
+        | **type**: bool
+      
+      
+                              
+       stdout_lines
+        | The command standard output split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
 
-  start (always, str, 2019-12-02 11:07:53.757435)
-    The command execution start time
+              .. code-block::
 
-
-  delta (always, str, 0:00:00.307534)
-    The command execution delta time
-
-
-  stderr (always, str, CPF2111:Library TESTLIB already exists)
-    The command standard error
-
-
-  joblog (always, bool, False)
-    Print JOBLOG or not when using itoolkit to run the CL command.
-
-
-  stdout_lines (always, list, ['CPC2102: Library TESTLIB created.'])
-    The command standard output split in lines
-
-
-
-
-
-Status
-------
-
-
-
-
-- This module is not guaranteed to have a backwards compatible interface. *[preview]*
-
-
-- This module is maintained by community.
-
-
-
-Authors
-~~~~~~~
-
-- Chang Le(@changlexc)
-
+                       ["CPC2102: Library TESTLIB created."]
+            
+      
+        
