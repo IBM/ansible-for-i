@@ -42,10 +42,9 @@ options:
   end_subsystem_option:
     description:
       - Specifies the options to take when ending the active subsystems
-    #type: str
     type: list
     elements: str
-    #default: ['*DFT']
+    default: ['*DFT']
     choices: ['*DFT', '*NOJOBLOG', '*CHGPTY', '*CHGTSL']
   parameters:
     description:
@@ -140,7 +139,7 @@ job_log:
 
 import datetime
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible.module_utils.ibmi import ibmi_util
 
 
 def main():
