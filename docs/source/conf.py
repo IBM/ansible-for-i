@@ -21,10 +21,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Ansible Collection'
-copyright = '2020, Simon Stone'
-author = 'Simon Stone'
-
+project = 'IBM power_ibmi collection'
+copyright = '2020, IBM'
+author = 'IBM'
 
 # -- General configuration ---------------------------------------------------
 
@@ -50,8 +49,8 @@ html_theme = 'sphinx_rtd_theme'
 
 html_context = {
     "display_github": "True",
-    "github_user": "LiJunBJZhu",
-    "github_repo": "i_collection_core",
+    "github_user": "ansible-collections",
+    "github_repo": "ansible_for_i",
     "github_version": "master",
     "conf_py_path": "/docs/source/",
 }
