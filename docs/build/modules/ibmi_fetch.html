@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local &mdash; Ansible Collection  documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system." href="ibmi_fix.html" />
+    <link rel="prev" title="ibmi_end_subsystem – end a subsystem" href="ibmi_end_subsystem.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Ansible Collection
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../modules.html#module-reference">Module reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ibmi_at.html">ibmi_at – Schedule a batch job on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL command on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – vary on or off target device on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – end a subsystem</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks on target IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP on target IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_install_product_from_savf.html">ibmi_install_product_from_savf – Install the the licensed program(product) from a save file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_job.html">ibmi_job – Returns job information according to inputs.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search or reply message on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, Revoke or Display Object Authority</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot a machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_save_product_to_savf.html">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file on a remote ibm i node.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file on a remote ibm i node.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_execute.html">ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_query.html">ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement on a remote IBMi node.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – start a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from ibm i node A to another ibm i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_interface.html">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – delete the objects that make up the licensed program(product)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_user_and_group.html">ibmi_user_and_group – Create, Change or Display a user(or group) profile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible Collection</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../modules.html">Modules</a> &raquo;</li>
+        
+      <li>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_fetch.py" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ibmi-fetch-fetch-objects-or-a-library-from-a-remote-ibmi-node-and-store-on-local">
+<h1>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local<a class="headerlink" href="#ibmi-fetch-fetch-objects-or-a-library-from-a-remote-ibmi-node-and-store-on-local" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="id15">Synopsis</a></li>
+<li><a class="reference internal" href="#parameters" id="id16">Parameters</a></li>
+<li><a class="reference internal" href="#notes" id="id17">Notes</a></li>
+<li><a class="reference internal" href="#see-also" id="id18">See Also</a></li>
+<li><a class="reference internal" href="#examples" id="id19">Examples</a></li>
+<li><a class="reference internal" href="#return-values" id="id20">Return Values</a></li>
+<li><a class="reference internal" href="#status" id="id21">Status</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h2><a class="toc-backref" href="#id15">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>The ibmi_feth is used for fetching objects or a library as a SAVF from remote IBMi node and storing them locally in a file tree, organized by hostname.</p>
+<p>Save file that already exists at dest will be overwritten if it is different than the new one.</p>
+<p>For non-IBMi native targets, use the fetch module instead.</p>
+</div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id16">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="docutils">
+<dt>savefile_name (optional, str, )</dt>
+<dd><p class="first">The save file name can be specified.</p>
+<p class="last">If not specified savefile_name, the save file name will be the first object_name.file. If is_lib is True, the save file name will be lib_name.file. For example, if fetch obja.pgm and objb.srvpgm in objlib library, the save file name will be obja. If the obja already exists in objlib, then rename the save file name to (obja+number), number range from 1 to 9(obja1, obja2…obja9).</p>
+</dd>
+<dt>flat (optional, bool, False)</dt>
+<dd><p class="first">Allows you to override the default behavior of appending hostname/path/to/file to the destination.</p>
+<p>This can be useful if working with a single host, or if retrieving files that are uniquely named per host.</p>
+<p class="last">If using multiple hosts with the same filename, the file will be overwritten for each host.</p>
+</dd>
+<dt>is_lib (optional, bool, False)</dt>
+<dd>If it is a library needed to be fetched. If set True, the whole library will be fetched.</dd>
+<dt>format (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>SAVF)</dt>
+<dd>The save file’s format. Only support <a href="#id3"><span class="problematic" id="id4">*</span></a>SAVF by now.</dd>
+<dt>dest (True, str, None)</dt>
+<dd><p class="first">A local directory to save the file into.</p>
+<p class="last">For example, if the dest directory is /backup save file named /qsys.lib/objlib.lib/test1.file on host host.example.com, would be saved into /backup/host.example.com/qsys.lib/objlib.lib/test1.file. The host name is based on the inventory name. If dest=’’, dest will be current directory.</p>
+</dd>
+<dt>target_release (optional, str, <a href="#id5"><span class="problematic" id="id6">*</span></a>CURRENT)</dt>
+<dd>The release of the operating system on which you intend to restore and use the SAVF.</dd>
+<dt>force_save (optional, bool, False)</dt>
+<dd>If force to use savefile_name when savefile_name.file already exists on remote IBM i.</dd>
+<dt>validate_checksum (optional, bool, True)</dt>
+<dd>Verify that the source and destination checksums match after the files are fetched.</dd>
+<dt>object_names (optional, str, <a href="#id7"><span class="problematic" id="id8">*</span></a>ALL)</dt>
+<dd><p class="first">The objects need to be fetched. One or more object names can be specified. Use space as separator.</p>
+<p class="last">If object type is <a href="#id9"><span class="problematic" id="id10">*</span></a>FILE, then fetch it directly. Only one <a href="#id11"><span class="problematic" id="id12">*</span></a>FILE object will fetch directly at one time.</p>
+</dd>
+<dt>lib_name (True, str, None)</dt>
+<dd>The library contains the objects. If is_lib is Ture, lib_name means the library name.</dd>
+<dt>backup (optional, bool, False)</dt>
+<dd>If delete the save file on remote IBM i or not. If set True, the save file on remote IBM i will not be deleted.</dd>
+<dt>object_types (optional, str, <a href="#id13"><span class="problematic" id="id14">*</span></a>ALL)</dt>
+<dd>The object types. One or more object types can be specified. Use space as separator.</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id17">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under [defaults] section</li>
+<li>Need install 5770SS1 option 39 on remote IBM i for regex usage</li>
+</ul>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id18">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><span class="xref std std-ref">fetch_module</span></dt>
+<dd>The official documentation on the <strong>fetch</strong> module.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="examples">
+<h2><a class="toc-backref" href="#id19">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Fetch obja.pgm and objb.srvpgm in objlib libary as test1.savf(target release V7R2M0) on a remote IBMi to local. Store</span>
+        <span class="l l-Scalar l-Scalar-Plain">as /backup/host.example.com/qsys.lib/objlib.lib/test1.file and keep the save file on remote</span>
+  <span class="nt">ibmi_fetch</span><span class="p">:</span>
+    <span class="nt">object_names</span><span class="p">:</span> <span class="s">&#39;obj1</span><span class="nv"> </span><span class="s">obj2&#39;</span>
+    <span class="nt">lib_name</span><span class="p">:</span> <span class="s">&#39;objlib&#39;</span>
+    <span class="nt">object_types</span><span class="p">:</span> <span class="s">&#39;*PGM</span><span class="nv"> </span><span class="s">*SRVPGM&#39;</span>
+    <span class="nt">savefile_name</span><span class="p">:</span> <span class="s">&#39;test1&#39;</span>
+    <span class="nt">dest</span><span class="p">:</span> <span class="s">&#39;/backup&#39;</span>
+    <span class="nt">backup</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+    <span class="nt">target_release</span><span class="p">:</span> <span class="s">&#39;V7R2M0&#39;</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Fetch objlib libary on a remote IBMi to local, store as /backup/objlib.file.</span>
+  <span class="nt">ibmi_fetch</span><span class="p">:</span>
+    <span class="nt">lib_name</span><span class="p">:</span> <span class="s">&#39;objlib&#39;</span>
+    <span class="nt">dest</span><span class="p">:</span> <span class="s">&#39;/backup&#39;</span>
+    <span class="nt">flat</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="return-values">
+<h2><a class="toc-backref" href="#id20">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="docutils">
+<dt>file (always, str, /qsys.lib/test.lib/obja.file)</dt>
+<dd>The save file path on remote IBM i.</dd>
+<dt>remote_md5sum (always, str, ef67xhfs8638ac5d7e31fc56rfcv3760)</dt>
+<dd>The md5sum of the file on remote IBM i.</dd>
+<dt>stdout (always, list, File OBJA in library TESTLIB already exists. If still need save, please set force.)</dt>
+<dd>The fetch standard output</dd>
+<dt>dest (always, str, /users/tester/test/obja.file)</dt>
+<dd>The file path on local.</dd>
+<dt>checksum (always, str, 573f3e66ee97071134c9001732ed16f6bb7e8ab4)</dt>
+<dd>The checksum of the file on local.</dd>
+<dt>md5sum (always, str, ef67xhfs8638ac5d7e31fc56rfcv3760)</dt>
+<dd>The md5sum of the file on local.</dd>
+<dt>stderr (always, list, [‘CPF5813: File OBJA in library TESTLIB already exists.’, ‘CPF7302: File OBJA not created in library TESTLIB.’])</dt>
+<dd>The fetch standard error</dd>
+<dt>delta (always, str, 0:00:00.307534)</dt>
+<dd>The fetch execution delta time when file is renewed.</dd>
+<dt>msg (always, str, File is renewed on local.)</dt>
+<dd>The fetch execution message.</dd>
+<dt>remote_checksum (always, bool, 573f3e66ee97071134c9001732ed16f6bb7e8ab4)</dt>
+<dd>The checksum of the file on remote IBM i.</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="status">
+<h2><a class="toc-backref" href="#id21">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
+<li>This module is maintained by community.</li>
+</ul>
+<div class="section" id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Peng Zeng Yu (&#64;pengzengyufish)</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ibmi_fix.html" class="btn btn-neutral float-right" title="ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ibmi_end_subsystem.html" class="btn btn-neutral float-left" title="ibmi_end_subsystem – end a subsystem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Simon Stone
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
