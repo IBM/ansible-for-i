@@ -32,18 +32,18 @@ html_show_sphinx = False
 
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be extensions
-# coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = [
-    "sphinx_rtd_theme",
-]
-
-# # Add any Sphinx extension module names here, as strings. They can be
-# # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# # ones.
+# # Add any Sphinx extension module names here, as strings. They can be extensions
+# # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 # extensions = [
-#     'sphinx.ext.autosectionlabel'
+#     "sphinx_rtd_theme",
 # ]
+
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# ones.
+extensions = [
+    'sphinx.ext.autosectionlabel'
+]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -60,7 +60,7 @@ html_theme = 'sphinx_rtd_theme'
 
 html_context = {
     "display_github": "True",
-    "github_user": "ansible-collections",
+    "github_user": "IBM",
     "github_repo": "ansible_for_i",
     "github_version": "master",
     "conf_py_path": "/docs/source/",
