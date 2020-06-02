@@ -30,7 +30,7 @@ Requirements
 
 In order to use this Ansible collection, you must have the following pre-requisite software installed and available:
 
-**Python v3.7+**
+**Python**
 
     Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc).
     If you install Python from the package manager for your operating system, you must also install the development libraries (usually a package named ``python3-devel``), as these are required when installing modules through ``pip``.
@@ -53,7 +53,7 @@ You can use the ``ansible-galaxy`` command to install a collection from Ansible 
 
 ::
 
-    ansible-galaxy collection install iibm.power_ibmi
+    ansible-galaxy collection install ibm.power_ibmi
 
 Installing from source
 ----------------------
@@ -64,7 +64,7 @@ You can use the ``ansible-galaxy`` command to install a collection built from so
 
 ::
 
-    git clone https://github.com/LiJunBJZhu/i_collection_core.git
+    git clone https://github.com/IBM/ansible-for-i.git
 
 2. Build the collection artifact:
 

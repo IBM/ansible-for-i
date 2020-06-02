@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_user_and_group – Create, Change or Display a user(or group) profile &mdash; IBM power_ibmi collection  documentation</title>
+  <title>ibmi_user_and_group – Create, Change or Display a user(or group) profile &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -127,11 +127,10 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_user_and_group – Create, Change or Display a user(or group) profile</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 </ul>
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_user_and_group.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_user_and_group.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,38 +209,70 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-user-and-group-create-change-or-display-a-user-or-group-profile">
-<h1>ibmi_user_and_group – Create, Change or Display a user(or group) profile<a class="headerlink" href="#ibmi-user-and-group-create-change-or-display-a-user-or-group-profile" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-user-and-group-module"></span><h1>ibmi_user_and_group – Create, Change or Display a user(or group) profile<a class="headerlink" href="#ibmi-user-and-group-create-change-or-display-a-user-or-group-profile" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id39">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id40">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id41">Notes</a></li>
-<li><a class="reference internal" href="#see-also" id="id42">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id43">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id44">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id45">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id91">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id92">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id93">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id94">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id95">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id96">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id39">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">ibmi_user_and_group</span></code> module can do the user(or group) profile management(create, change, delete and display).</p>
-<p>A user profile contain a user’s passwords, the list of special authorities assigned to a user, and the objects the user owns.</p>
-<p>A group profile is a special type of user profile that provides the same authority to a group of users.</p>
-<p>You create group profiles in the same way that you create individual profiles.</p>
-<p>The system recognizes a group profile when you add the first member to it.</p>
-<p>At that point, the system sets information in the profile indicating that it is a group profile.</p>
+<h2><a class="toc-backref" href="#id91">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_user_and_group</span></code> module can do the user(or group) profile management(create, change, delete and display).</p></li>
+<li><p>A user profile contain a user’s passwords, the list of special authorities assigned to a user, and the objects the user owns.</p></li>
+<li><p>A group profile is a special type of user profile that provides the same authority to a group of users.</p></li>
+<li><p>You create group profiles in the same way that you create individual profiles.</p></li>
+<li><p>The system recognizes a group profile when you add the first member to it.</p></li>
+<li><p>At that point, the system sets information in the profile indicating that it is a group profile.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id40">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>status (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>SAME)</dt>
-<dd><p class="first">Specifies the status of the user profile.</p>
-<p>If not specify, ‘<a href="#id3"><span class="problematic" id="id4">*</span></a>ENABLED’ will be used for operation create, ‘<a href="#id5"><span class="problematic" id="id6">*</span></a>SAME’ will be used for operation change.</p>
-<p class="last">Valid only for operation create and change.</p>
+<h2><a class="toc-backref" href="#id92">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>expire</dt><dd><p>Specifies whether the password for this user is set to expired.</p>
+<p>If the password is set to expired, the user is required to change the password to sign on the system.</p>
+<p>If not specify, ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>NO’ will be used for operation create, ‘<a href="#id3"><span class="problematic" id="id4">*</span></a>SAME’ will be used for operation change.</p>
+<p>Valid only for operation create and change.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>SAME</div>
+<div class="line"><strong>choices</strong>: <a href="#id7"><span class="problematic" id="id8">*</span></a>NO, <a href="#id9"><span class="problematic" id="id10">*</span></a>YES, <a href="#id11"><span class="problematic" id="id12">*</span></a>SAME</div>
+</div>
 </dd>
-<dt>parameters (optional, str,  )</dt>
-<dd><p class="first">The parameters that CRTUSRPRF or CHGUSRPRF or DLTUSRPRF command will take.</p>
+<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>operation</dt><dd><p>The user or group profile operation.</p>
+<p>Operation create to create user(group) profile</p>
+<p>Operation change to change user(group) profile</p>
+<p>Operation display to display user(group) profile inforamtion</p>
+<p>Operation display_group_menbers to display the members of a group profile</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>choices</strong>: create, change, delete, display, display_group_members</div>
+</div>
+</dd>
+<dt>owner</dt><dd><p>Specifies the user that is to be the owner of objects created by this user.</p>
+<p>If not specify, ‘<a href="#id13"><span class="problematic" id="id14">*</span></a>USRPRF’ will be used for operation create, ‘<a href="#id15"><span class="problematic" id="id16">*</span></a>SAME’ will be used for operation change.</p>
+<p>Valid only for operation create and change.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id17"><span class="problematic" id="id18">*</span></a>SAME</div>
+<div class="line"><strong>choices</strong>: <a href="#id19"><span class="problematic" id="id20">*</span></a>USRPRF, <a href="#id21"><span class="problematic" id="id22">*</span></a>GRPPRF, <a href="#id23"><span class="problematic" id="id24">*</span></a>SAME</div>
+</div>
+</dd>
+<dt>parameters</dt><dd><p>The parameters that CRTUSRPRF or CHGUSRPRF or DLTUSRPRF command will take.</p>
 <p>Other than options above, all other parameters need to be specified here.</p>
 <p>The default values of parameters for CRTUSRPRF or CHGUSRPRF or DLTUSRPRF will be taken if not specified.</p>
 <p>Supported parameters contain</p>
@@ -250,83 +281,84 @@
 <p>LOCALE, USROPT, UID, GID, HOMEDIR, EIMASSOC, USREXPDATE, USREXPITV, AUT, JOBD when the operation is create or change</p>
 <p>Or OWNOBJOPT, PGPOPT, EIMASSOC when the operation is delete.</p>
 <p>refer to <a class="reference external" href="https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/crtusrprf.htm">https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/crtusrprf.htm</a>.</p>
-<p class="last">and <a class="reference external" href="https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm">https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm</a> for detail.</p>
+<p>and <a class="reference external" href="https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm">https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm</a> for detail.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>:</div>
+</div>
 </dd>
-<dt>text (optional, str, <a href="#id7"><span class="problematic" id="id8">*</span></a>SAME)</dt>
-<dd><p class="first">Specifies the text that briefly describes the user or group profile.</p>
-<p>If not specify, ‘Create by Ansible’ will be used for operation create, ‘<a href="#id9"><span class="problematic" id="id10">*</span></a>SAME’ will be used for operation change.</p>
-<p class="last">Valid only for operation create and change.</p>
+<dt>password</dt><dd><p>Specifies the password that allows the user to sign on the system.</p>
+<p>If not specify, operation create will use the user name as the password, operation change will not change the password.</p>
+<p>Valid only for operation create and change.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id25"><span class="problematic" id="id26">*</span></a>SAME</div>
+</div>
 </dd>
-<dt>user_group (optional, str, <a href="#id11"><span class="problematic" id="id12">*</span></a>SAME)</dt>
-<dd><p class="first">Specifies the user’s group profile name whose authority is used if no specific authority is given for the user.</p>
+<dt>special_authority</dt><dd><p>Specifies the special authorities given to a user.</p>
+<p>If not specify, ‘<a href="#id27"><span class="problematic" id="id28">*</span></a>USRCLS’ will be used for operation create, ‘<a href="#id29"><span class="problematic" id="id30">*</span></a>SAME’ will be used for operation change.</p>
+<p>Valid only for operation create and change.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+<div class="line"><strong>default</strong>: [u’<a href="#id31"><span class="problematic" id="id32">*</span></a>SAME’]</div>
+<div class="line"><strong>choices</strong>: <a href="#id33"><span class="problematic" id="id34">*</span></a>USRCLS, <a href="#id35"><span class="problematic" id="id36">*</span></a>NONE, <a href="#id37"><span class="problematic" id="id38">*</span></a>SAME, <a href="#id39"><span class="problematic" id="id40">*</span></a>ALLOBJ, <a href="#id41"><span class="problematic" id="id42">*</span></a>AUDIT, <a href="#id43"><span class="problematic" id="id44">*</span></a>JOBCTL, <a href="#id45"><span class="problematic" id="id46">*</span></a>SAVSYS, <a href="#id47"><span class="problematic" id="id48">*</span></a>IOSYSCFG, <a href="#id49"><span class="problematic" id="id50">*</span></a>SECADM, <a href="#id51"><span class="problematic" id="id52">*</span></a>SERVICE, <a href="#id53"><span class="problematic" id="id54">*</span></a>SPLCTL</div>
+</div>
+</dd>
+<dt>status</dt><dd><p>Specifies the status of the user profile.</p>
+<p>If not specify, ‘<a href="#id55"><span class="problematic" id="id56">*</span></a>ENABLED’ will be used for operation create, ‘<a href="#id57"><span class="problematic" id="id58">*</span></a>SAME’ will be used for operation change.</p>
+<p>Valid only for operation create and change.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id59"><span class="problematic" id="id60">*</span></a>SAME</div>
+<div class="line"><strong>choices</strong>: <a href="#id61"><span class="problematic" id="id62">*</span></a>ENABLED, <a href="#id63"><span class="problematic" id="id64">*</span></a>DISABLED, <a href="#id65"><span class="problematic" id="id66">*</span></a>SAME</div>
+</div>
+</dd>
+<dt>text</dt><dd><p>Specifies the text that briefly describes the user or group profile.</p>
+<p>If not specify, ‘Create by Ansible’ will be used for operation create, ‘<a href="#id67"><span class="problematic" id="id68">*</span></a>SAME’ will be used for operation change.</p>
+<p>Valid only for operation create and change.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id69"><span class="problematic" id="id70">*</span></a>SAME</div>
+</div>
+</dd>
+<dt>user</dt><dd><p>Specifies the user profile to be operated. A numeric user profile can be specified.</p>
+<p>If the user profile begins with a numeric, it must be prefixed with a Q.</p>
+<p>If you want to create, display, display group members of a group, this parameter is the group profile name.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>user_class</dt><dd><p>Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.</p>
+<p>If not specify, ‘<a href="#id71"><span class="problematic" id="id72">*</span></a>USER’ will be used for operation create, ‘<a href="#id73"><span class="problematic" id="id74">*</span></a>SAME’ will be used for operation change.</p>
+<p>Valid only for operation create and change.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id75"><span class="problematic" id="id76">*</span></a>SAME</div>
+<div class="line"><strong>choices</strong>: <a href="#id77"><span class="problematic" id="id78">*</span></a>USER, <a href="#id79"><span class="problematic" id="id80">*</span></a>SYSOPR, <a href="#id81"><span class="problematic" id="id82">*</span></a>PGMR, <a href="#id83"><span class="problematic" id="id84">*</span></a>SECADM, <a href="#id85"><span class="problematic" id="id86">*</span></a>SECOFR, <a href="#id87"><span class="problematic" id="id88">*</span></a>SAME</div>
+</div>
+</dd>
+<dt>user_group</dt><dd><p>Specifies the user’s group profile name whose authority is used if no specific authority is given for the user.</p>
 <p>If not specify, operation create is to create an individual user, or else, the new created user will be a member of the group.</p>
 <p>If not specify, operation change does nothing on the user, or else, the new changed user will be added as a member of the group.</p>
-<p class="last">Valid only for operation create and change.</p>
-</dd>
-<dt>special_authority (optional, list, [u’<a href="#id13"><span class="problematic" id="id14">*</span></a>SAME’])</dt>
-<dd><p class="first">Specifies the special authorities given to a user.</p>
-<p>If not specify, ‘<a href="#id15"><span class="problematic" id="id16">*</span></a>USRCLS’ will be used for operation create, ‘<a href="#id17"><span class="problematic" id="id18">*</span></a>SAME’ will be used for operation change.</p>
-<p class="last">Valid only for operation create and change.</p>
-</dd>
-<dt>expire (optional, str, <a href="#id19"><span class="problematic" id="id20">*</span></a>SAME)</dt>
-<dd><p class="first">Specifies whether the password for this user is set to expired.</p>
-<p>If the password is set to expired, the user is required to change the password to sign on the system.</p>
-<p>If not specify, ‘<a href="#id21"><span class="problematic" id="id22">*</span></a>NO’ will be used for operation create, ‘<a href="#id23"><span class="problematic" id="id24">*</span></a>SAME’ will be used for operation change.</p>
-<p class="last">Valid only for operation create and change.</p>
-</dd>
-<dt>user (True, str, None)</dt>
-<dd><p class="first">Specifies the user profile to be operated. A numeric user profile can be specified.</p>
-<p>If the user profile begins with a numeric, it must be prefixed with a Q.</p>
-<p class="last">If you want to create, display, display group members of a group, this parameter is the group profile name.</p>
-</dd>
-<dt>joblog (optional, bool, False)</dt>
-<dd>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</dd>
-<dt>owner (optional, str, <a href="#id25"><span class="problematic" id="id26">*</span></a>SAME)</dt>
-<dd><p class="first">Specifies the user that is to be the owner of objects created by this user.</p>
-<p>If not specify, ‘<a href="#id27"><span class="problematic" id="id28">*</span></a>USRPRF’ will be used for operation create, ‘<a href="#id29"><span class="problematic" id="id30">*</span></a>SAME’ will be used for operation change.</p>
-<p class="last">Valid only for operation create and change.</p>
-</dd>
-<dt>operation (True, str, None)</dt>
-<dd><p class="first">The user or group profile operation.</p>
-<p>Operation create to create user(group) profile</p>
-<p>Operation change to change user(group) profile</p>
-<p>Operation display to display user(group) profile inforamtion</p>
-<p class="last">Operation display_group_menbers to display the members of a group profile</p>
-</dd>
-<dt>password (optional, str, <a href="#id31"><span class="problematic" id="id32">*</span></a>SAME)</dt>
-<dd><p class="first">Specifies the password that allows the user to sign on the system.</p>
-<p>If not specify, operation create will use the user name as the password, operation change will not change the password.</p>
-<p class="last">Valid only for operation create and change.</p>
-</dd>
-<dt>user_class (optional, str, <a href="#id33"><span class="problematic" id="id34">*</span></a>SAME)</dt>
-<dd><p class="first">Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.</p>
-<p>If not specify, ‘<a href="#id35"><span class="problematic" id="id36">*</span></a>USER’ will be used for operation create, ‘<a href="#id37"><span class="problematic" id="id38">*</span></a>SAME’ will be used for operation change.</p>
-<p class="last">Valid only for operation create and change.</p>
+<p>Valid only for operation create and change.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id89"><span class="problematic" id="id90">*</span></a>SAME</div>
+</div>
 </dd>
 </dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id41">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
-</ul>
-</div>
-</div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id42">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">ibmi_cl_command_module</span></dt>
-<dd>The official documentation on the <strong>ibmi_cl_command</strong> module.</dd>
-</dl>
-</div>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id43">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id93">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create user profile</span>
   <span class="nt">ibmi_user_and_group</span><span class="p">:</span>
     <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;create&#39;</span>
@@ -344,39 +376,106 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id94">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id95">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="ibmi_cl_command.html#ibmi-cl-command-module"><span class="std std-ref">ibmi_cl_command – Executes a CL command on a remote IBMi node</span></a></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id44">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id96">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (when rc as no-zero(failure), list, [‘CPF2204: User profile CHANGL1 not found.’])</dt>
-<dd>The command standard error split in lines</dd>
-<dt>job_log (always, str, [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . <span class="classifier-delimiter">:</span> <span class="classifier">This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}])</span></dt>
-<dd>the job_log</dd>
-<dt>stderr (when rc as no-zero(failure), str, CPF22CF: User profile not allowed to be a group profile)</dt>
-<dd>The standard error</dd>
-<dt>stdout (when rc as 0(success) and the operation is not display or display_group_members, str, CPC2205: User profile CHANGLE changed.)</dt>
-<dd>The standard output</dd>
-<dt>stdout_lines (when rc as 0(success) and the operation is not display or display_group_members, list, [‘CPC2205: User profile CHANGLE changed.’])</dt>
-<dd>The command standard output split in lines</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The return code (0 means success, non-zero means failure)</dd>
-<dt>result_set (When rc as 0(success) and operation is display or display_group_members, list, [{‘USER_TEXT’: ‘’, ‘GROUP_PROFILE_NAME’: ‘GROUP1’, ‘USER_PROFILE_NAME’: ‘USERG1’}, {‘USER_TEXT’: ‘’, ‘GROUP_PROFILE_NAME’: ‘GROUP1’, ‘USER_PROFILE_NAME’: ‘USER2G1’}])</dt>
-<dd>The result set of user information or group members</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The command standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: when rc as no-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2204: User profile CHANGL1 not found.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">the job_log</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . :   This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}]</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: when rc as no-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF22CF: User profile not allowed to be a group profile</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: when rc as 0(success) and the operation is not display or display_group_members</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPC2205: User profile CHANGLE changed.</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The command standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: when rc as 0(success) and the operation is not display or display_group_members</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPC2205: User profile CHANGLE changed.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>result_set</dt><dd><div class="line-block">
+<div class="line">The result set of user information or group members</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as 0(success) and operation is display or display_group_members</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;GROUP_PROFILE_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;GROUP1&quot;</span><span class="p">,</span> <span class="s2">&quot;USER_PROFILE_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;USERG1&quot;</span><span class="p">,</span> <span class="s2">&quot;USER_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;GROUP_PROFILE_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;GROUP1&quot;</span><span class="p">,</span> <span class="s2">&quot;USER_PROFILE_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;USER2G1&quot;</span><span class="p">,</span> <span class="s2">&quot;USER_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id45">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Chang Le(&#64;changlexc)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -401,8 +500,7 @@
         &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_reboot – Reboot a machine &mdash; IBM power_ibmi collection  documentation</title>
+  <title>ibmi_reboot – Reboot a machine &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -115,11 +115,10 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_reboot – Reboot a machine</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_save_product_to_savf.html">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a></li>
@@ -196,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_reboot.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_reboot.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -211,94 +210,134 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-reboot-reboot-a-machine">
-<h1>ibmi_reboot – Reboot a machine<a class="headerlink" href="#ibmi-reboot-reboot-a-machine" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-reboot-module"></span><h1>ibmi_reboot – Reboot a machine<a class="headerlink" href="#ibmi-reboot-reboot-a-machine" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id15">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id16">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id17">Notes</a></li>
-<li><a class="reference internal" href="#see-also" id="id18">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id19">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id20">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id21">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id43">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id44">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id45">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id46">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id47">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id48">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id15">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>Reboot a IBMi machine, wait for it to go down, come back up, and respond to commands.</p>
-</div>
-<div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id16">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>pre_reboot_delay (optional, int, 60)</dt>
-<dd>Seconds to wait before issue the reboot command.</dd>
-<dt>how_to_end (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>IMMED)</dt>
-<dd><p class="first">Specifies whether the system allows the active subsystem to end processing of active jobs in a controlled manner.</p>
-<p class="last">or whether the system ends the jobs immediately. In either case, the system does perform certain job-cleanup functions.</p>
-</dd>
-<dt>end_subsystem_option (optional, str, <a href="#id3"><span class="problematic" id="id4">*</span></a>DFT)</dt>
-<dd>Specifies the options to take when ending the active.</dd>
-<dt>parameters (optional, str, )</dt>
-<dd><p class="first">The parameters that PWRDWNSYS command will take.</p>
-<p>Other than options above, all other parameters need to be specified here.</p>
-<p>The default values of parameters for PWRDWNSYS will be taken if not specified.</p>
-<p class="last">Only Install PTF device(INSPTFDEV) is supported now for IBMi 7.3 and above.</p>
-</dd>
-<dt>reboot_timeout (optional, int, 1800)</dt>
-<dd><p class="first">Maximum seconds to wait for machine to reboot and respond to a test command.</p>
-<p class="last">This timeout is evaluated separately for both reboot verification and test command success so the maximum execution time for the module is twice this amount.</p>
-</dd>
-<dt>timeout_option (optional, str, <a href="#id5"><span class="problematic" id="id6">*</span></a>CONTINUE)</dt>
-<dd><p class="first">Specifies the option to take when the system does not end within the time limit specified by the QPWRDWNLMT system value.</p>
-<p class="last">If this time limit is exceeded, the subsequent IPL will be abnormal regardless of the value specified for this parameter.</p>
-</dd>
-<dt>post_reboot_delay (optional, int, 60)</dt>
-<dd><p class="first">Seconds to wait after the reboot command was successful before attempting to validate the system rebooted successfully.</p>
-<p class="last">This is useful if you want wait for something to settle despite your connection already working.</p>
-</dd>
-<dt>reboot_type (optional, str, <a href="#id7"><span class="problematic" id="id8">*</span></a>IPLA)</dt>
-<dd>Specifies the point from which the initial program load (IPL) restarts.</dd>
-<dt>test_command (optional, str, uname)</dt>
-<dd>Command to run on the rebooted host and expect success from to determine the machine is ready for further tasks.</dd>
-<dt>msg (optional, str, Reboot initiated by Ansible)</dt>
-<dd>Message to display to users before reboot.</dd>
-<dt>controlled_end_delay_time (optional, int, 600)</dt>
-<dd><p class="first">Specifies the amount of time(1-99999), in seconds, that the system allows a controlled end to be performed by the active subsystems.</p>
-<p class="last">If the value is greater than 99999, ‘<a href="#id9"><span class="problematic" id="id10">*</span></a>NOLIMIT’ will be used in PWRDWNSYS commnad.</p>
-</dd>
-<dt>connect_timeout (optional, int, 300)</dt>
-<dd><p class="first">Maximum seconds to wait for a successful connection to the managed hosts before trying again.</p>
-<p class="last">If unspecified, the default setting for the underlying connection plugin is used.</p>
-</dd>
-<dt>ipl_source (optional, str, <a href="#id11"><span class="problematic" id="id12">*</span></a>PANEL)</dt>
-<dd>Specifies whether an initial-program-load (IPL) is started from the A-source, B-source or D-source of the system.</dd>
-</dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id17">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under[defaults] section.</li>
-<li>Be careful to use ‘<a href="#id13"><span class="problematic" id="id14">*</span></a>CNTRLD’ for option how_to_end,</li>
-<li>you need to specify the appropriate value for all the timout options according to the system performance.</li>
+<h2><a class="toc-backref" href="#id43">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Reboot a IBMi machine, wait for it to go down, come back up, and respond to commands.</p></li>
 </ul>
 </div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id44">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>connect_timeout</dt><dd><p>Maximum seconds to wait for a successful connection to the managed hosts before trying again.</p>
+<p>If unspecified, the default setting for the underlying connection plugin is used.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 300</div>
 </div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id18">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">reboot_module</span></dt>
-<dd>The official documentation on the <strong>reboot</strong> module.</dd>
+</dd>
+<dt>controlled_end_delay_time</dt><dd><p>Specifies the amount of time(1-99999), in seconds, that the system allows a controlled end to be performed by the active subsystems.</p>
+<p>If the value is greater than 99999, ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>NOLIMIT’ will be used in PWRDWNSYS commnad.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 600</div>
+</div>
+</dd>
+<dt>end_subsystem_option</dt><dd><p>Specifies the options to take when ending the active.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>DFT</div>
+<div class="line"><strong>choices</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>DFT, <a href="#id7"><span class="problematic" id="id8">*</span></a>NOJOBLOG, <a href="#id9"><span class="problematic" id="id10">*</span></a>CHGPTY, <a href="#id11"><span class="problematic" id="id12">*</span></a>CHGTSL</div>
+</div>
+</dd>
+<dt>how_to_end</dt><dd><p>Specifies whether the system allows the active subsystem to end processing of active jobs in a controlled manner.</p>
+<p>or whether the system ends the jobs immediately. In either case, the system does perform certain job-cleanup functions.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id13"><span class="problematic" id="id14">*</span></a>IMMED</div>
+<div class="line"><strong>choices</strong>: <a href="#id15"><span class="problematic" id="id16">*</span></a>IMMED, <a href="#id17"><span class="problematic" id="id18">*</span></a>CNTRLD</div>
+</div>
+</dd>
+<dt>ipl_source</dt><dd><p>Specifies whether an initial-program-load (IPL) is started from the A-source, B-source or D-source of the system.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id19"><span class="problematic" id="id20">*</span></a>PANEL</div>
+<div class="line"><strong>choices</strong>: <a href="#id21"><span class="problematic" id="id22">*</span></a>PANEL, A, B, D, <a href="#id23"><span class="problematic" id="id24">*</span></a>IMGCLG</div>
+</div>
+</dd>
+<dt>msg</dt><dd><p>Message to display to users before reboot.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: Reboot initiated by Ansible</div>
+</div>
+</dd>
+<dt>parameters</dt><dd><p>The parameters that PWRDWNSYS command will take.</p>
+<p>Other than options above, all other parameters need to be specified here.</p>
+<p>The default values of parameters for PWRDWNSYS will be taken if not specified.</p>
+<p>Only Install PTF device(INSPTFDEV) is supported now for IBMi 7.3 and above.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>post_reboot_delay</dt><dd><p>Seconds to wait after the reboot command was successful before attempting to validate the system rebooted successfully.</p>
+<p>This is useful if you want wait for something to settle despite your connection already working.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 60</div>
+</div>
+</dd>
+<dt>pre_reboot_delay</dt><dd><p>Seconds to wait before issue the reboot command.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 60</div>
+</div>
+</dd>
+<dt>reboot_timeout</dt><dd><p>Maximum seconds to wait for machine to reboot and respond to a test command.</p>
+<p>This timeout is evaluated separately for both reboot verification and test command success so the maximum execution time for the module is twice this amount.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 1800</div>
+</div>
+</dd>
+<dt>reboot_type</dt><dd><p>Specifies the point from which the initial program load (IPL) restarts.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id25"><span class="problematic" id="id26">*</span></a>IPLA</div>
+<div class="line"><strong>choices</strong>: <a href="#id27"><span class="problematic" id="id28">*</span></a>IPLA, <a href="#id29"><span class="problematic" id="id30">*</span></a>SYS, <a href="#id31"><span class="problematic" id="id32">*</span></a>FULL</div>
+</div>
+</dd>
+<dt>test_command</dt><dd><p>Command to run on the rebooted host and expect success from to determine the machine is ready for further tasks.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: uname</div>
+</div>
+</dd>
+<dt>timeout_option</dt><dd><p>Specifies the option to take when the system does not end within the time limit specified by the QPWRDWNLMT system value.</p>
+<p>If this time limit is exceeded, the subsequent IPL will be abnormal regardless of the value specified for this parameter.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id33"><span class="problematic" id="id34">*</span></a>CONTINUE</div>
+<div class="line"><strong>choices</strong>: <a href="#id35"><span class="problematic" id="id36">*</span></a>CONTINUE, <a href="#id37"><span class="problematic" id="id38">*</span></a>MSD, <a href="#id39"><span class="problematic" id="id40">*</span></a>SYSREFCDE</div>
+</div>
+</dd>
 </dl>
 </div>
-</div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id19">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id45">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Unconditionally reboot the machine with all defaults</span>
   <span class="nt">reboot</span><span class="p">:</span>
 
@@ -308,29 +347,53 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id46">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under[defaults] section.</p>
+<p>Be careful to use ‘<a href="#id41"><span class="problematic" id="id42">*</span></a>CNTRLD’ for option how_to_end,</p>
+<p>you need to specify the appropriate value for all the timout options according to the system performance.</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id47">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">reboot_module</span></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id20">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id48">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>rebooted (always, bool, True)</dt>
-<dd>true if the machine was rebooted</dd>
-<dt>elapsed (always, int, 553)</dt>
-<dd>The number of seconds that elapsed waiting for the system to be rebooted.</dd>
+<div><dl>
+<dt>rebooted</dt><dd><div class="line-block">
+<div class="line">true if the machine was rebooted</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">true</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>elapsed</dt><dd><div class="line-block">
+<div class="line">The number of seconds that elapsed waiting for the system to be rebooted.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 553</div>
+</div>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id21">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Chang Le (&#64;changlexc)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -357,8 +420,7 @@
         &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

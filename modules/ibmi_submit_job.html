@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB. &mdash; IBM power_ibmi collection  documentation</title>
+  <title>ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -122,11 +122,10 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B.</a></li>
@@ -196,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_submit_job.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_submit_job.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -211,61 +210,65 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-submit-job-submit-a-job-on-ibm-i-system-this-module-functions-like-sbmjob">
-<h1>ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.<a class="headerlink" href="#ibmi-submit-job-submit-a-job-on-ibm-i-system-this-module-functions-like-sbmjob" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-submit-job-module"></span><h1>ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.<a class="headerlink" href="#ibmi-submit-job-submit-a-job-on-ibm-i-system-this-module-functions-like-sbmjob" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id19">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id20">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id21">Notes</a></li>
-<li><a class="reference internal" href="#see-also" id="id22">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id23">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id24">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id25">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id19">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id20">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id21">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id22">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id23">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id24">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id19">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">ibmi_submit_job</span></code> module submits a job on IBM i system.</p>
-<p>It waits until the submitted job turns into expected status that is specified.</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_submit_job</span></code> module submits a job on IBM i system.</p></li>
+<li><p>It waits until the submitted job turns into expected status that is specified.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
 <h2><a class="toc-backref" href="#id20">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>status (optional, list, [u’<a href="#id1"><span class="problematic" id="id2">*</span></a>NONE’])</dt>
-<dd>The expect status list. The module will wait for the job to be turned into one of the expected status specified. If one of the expect status specified matches the status of submitted job, it will return. If <a href="#id3"><span class="problematic" id="id4">*</span></a>NONE is specified, the module will not wait for anything and return right after the job is submitted. The valid options are “<a href="#id5"><span class="problematic" id="id6">*</span></a>NONE”, “<a href="#id7"><span class="problematic" id="id8">*</span></a>ACTIVE”, “<a href="#id9"><span class="problematic" id="id10">*</span></a>COMPLETE”, “<a href="#id11"><span class="problematic" id="id12">*</span></a>JOBQ”, “<a href="#id13"><span class="problematic" id="id14">*</span></a>OUTQ”.</dd>
-<dt>time_out (False, str, 1m)</dt>
-<dd>The max time that the module waits for the submitted job is turned into expected status. It returns if the status of the submitted job is not turned into the expected status within the time_out time. This option will be ignored if <a href="#id15"><span class="problematic" id="id16">*</span></a>NONE is specified for option status.</dd>
-<dt>cmd (True, str, None)</dt>
-<dd>A command that runs in the batch job.</dd>
-<dt>check_interval (False, str, 1m)</dt>
-<dd>The time interval between current and next checks of the expected status of the submitted job. This option will be ignored if <a href="#id17"><span class="problematic" id="id18">*</span></a>NONE is specified for option status.</dd>
-<dt>parameters (False, str, )</dt>
-<dd>The parameters that SBMJOB will take. Other than CMD, all other parameters need to be specified here. The default values of parameters for SBMJOB will be taken if not specified.</dd>
+<dl>
+<dt>check_interval</dt><dd><p>The time interval between current and next checks of the expected status of the submitted job. This option will be ignored if <a href="#id1"><span class="problematic" id="id2">*</span></a>NONE is specified for option status.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: 1m</div>
+</div>
+</dd>
+<dt>cmd</dt><dd><p>A command that runs in the batch job.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>parameters</dt><dd><p>The parameters that SBMJOB will take. Other than CMD, all other parameters need to be specified here. The default values of parameters for SBMJOB will be taken if not specified.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>status</dt><dd><p>The expect status list. The module will wait for the job to be turned into one of the expected status specified. If one of the expect status specified matches the status of submitted job, it will return. If <a href="#id3"><span class="problematic" id="id4">*</span></a>NONE is specified, the module will not wait for anything and return right after the job is submitted. The valid options are “<a href="#id5"><span class="problematic" id="id6">*</span></a>NONE”, “<a href="#id7"><span class="problematic" id="id8">*</span></a>ACTIVE”, “<a href="#id9"><span class="problematic" id="id10">*</span></a>COMPLETE”, “<a href="#id11"><span class="problematic" id="id12">*</span></a>JOBQ”, “<a href="#id13"><span class="problematic" id="id14">*</span></a>OUTQ”.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+<div class="line"><strong>default</strong>: [u’<a href="#id15"><span class="problematic" id="id16">*</span></a>NONE’]</div>
+</div>
+</dd>
+<dt>time_out</dt><dd><p>The max time that the module waits for the submitted job is turned into expected status. It returns if the status of the submitted job is not turned into the expected status within the time_out time. This option will be ignored if <a href="#id17"><span class="problematic" id="id18">*</span></a>NONE is specified for option status.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: 1m</div>
+</div>
+</dd>
 </dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id21">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
-</ul>
-</div>
-</div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id22">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">ibmi_job_module</span></dt>
-<dd>The official documentation on the <strong>ibmi_job</strong> module.</dd>
-</dl>
-</div>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id23">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id21">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Submit a batch job and run CALL QGPL/PGM1</span>
   <span class="nt">ibmi_submit_job</span><span class="p">:</span>
     <span class="nt">cmd</span><span class="p">:</span> <span class="s">&#39;CALL</span><span class="nv"> </span><span class="s">QGPL/PGM1&#39;</span>
@@ -276,43 +279,119 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id22">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id23">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="ibmi_job.html#ibmi-job-module"><span class="std std-ref">ibmi_job – Returns job information according to inputs.</span></a></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
 <h2><a class="toc-backref" href="#id24">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (When rc as non-zero(failure), list, [‘CPF2111:Library TESTLIB already exists.’])</dt>
-<dd>The task standard error split in lines</dd>
-<dt>end (When job has been submitted and task has waited for the job status for some time, str, 2019-12-02 11:07:54.064969)</dt>
-<dd>The task execution end time</dd>
-<dt>stdout (When rc as non-zero(failure), str, CPC2102: Library TESTLIB created)</dt>
-<dd>The task standard output</dd>
-<dt>delta (When job has been submitted and task has waited for the job status for some time, str, 0:00:00.307534)</dt>
-<dd>The task execution delta time</dd>
-<dt>start (When job has been submitted and task has waited for the job status for some time, str, 2019-12-02 11:07:53.757435)</dt>
-<dd>The task execution start time</dd>
-<dt>stderr (When rc as non-zero(failure), str, CPF2111:Library TESTLIB already exists)</dt>
-<dd>The task standard error</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The task return code (0 means success, non-zero means failure)</dd>
-<dt>stdout_lines (When rc as non-zero(failure), list, [‘CPC2102: Library TESTLIB created.’])</dt>
-<dd>The task standard output split in lines</dd>
-<dt>sbmjob_cmd (always, str, SBMJOB CMD(CRTLIB LIB(TESTLIB)))</dt>
-<dd>The SBMJOB CL command that has been used.</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The task standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>end</dt><dd><div class="line-block">
+<div class="line">The task execution end time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When job has been submitted and task has waited for the job status for some time</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The task standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPC2102: Library TESTLIB created</div>
+</div>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The task execution delta time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When job has been submitted and task has waited for the job status for some time</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>start</dt><dd><div class="line-block">
+<div class="line">The task execution start time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When job has been submitted and task has waited for the job status for some time</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The task standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF2111:Library TESTLIB already exists</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The task standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPC2102: Library TESTLIB created.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>sbmjob_cmd</dt><dd><div class="line-block">
+<div class="line">The SBMJOB CL command that has been used.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: SBMJOB CMD(CRTLIB LIB(TESTLIB))</div>
+</div>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id25">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Wang Yun (&#64;airwangyun)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -339,8 +418,7 @@
         &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

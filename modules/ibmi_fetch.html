@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local &mdash; IBM power_ibmi collection  documentation</title>
+  <title>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -100,11 +100,10 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
@@ -196,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_fetch.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_fetch.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -211,83 +210,112 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-fetch-fetch-objects-or-a-library-from-a-remote-ibmi-node-and-store-on-local">
-<h1>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local<a class="headerlink" href="#ibmi-fetch-fetch-objects-or-a-library-from-a-remote-ibmi-node-and-store-on-local" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-fetch-module"></span><h1>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local<a class="headerlink" href="#ibmi-fetch-fetch-objects-or-a-library-from-a-remote-ibmi-node-and-store-on-local" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id15">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id16">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id17">Notes</a></li>
-<li><a class="reference internal" href="#see-also" id="id18">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id19">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id20">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id21">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id17">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id18">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id19">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id20">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id21">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id22">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id15">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The ibmi_feth is used for fetching objects or a library as a SAVF from remote IBMi node and storing them locally in a file tree, organized by hostname.</p>
-<p>Save file that already exists at dest will be overwritten if it is different than the new one.</p>
-<p>For non-IBMi native targets, use the fetch module instead.</p>
-</div>
-<div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id16">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>savefile_name (optional, str, )</dt>
-<dd><p class="first">The save file name can be specified.</p>
-<p class="last">If not specified savefile_name, the save file name will be the first object_name.file. If is_lib is True, the save file name will be lib_name.file. For example, if fetch obja.pgm and objb.srvpgm in objlib library, the save file name will be obja. If the obja already exists in objlib, then rename the save file name to (obja+number), number range from 1 to 9(obja1, obja2…obja9).</p>
-</dd>
-<dt>flat (optional, bool, False)</dt>
-<dd><p class="first">Allows you to override the default behavior of appending hostname/path/to/file to the destination.</p>
-<p>This can be useful if working with a single host, or if retrieving files that are uniquely named per host.</p>
-<p class="last">If using multiple hosts with the same filename, the file will be overwritten for each host.</p>
-</dd>
-<dt>is_lib (optional, bool, False)</dt>
-<dd>If it is a library needed to be fetched. If set True, the whole library will be fetched.</dd>
-<dt>format (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>SAVF)</dt>
-<dd>The save file’s format. Only support <a href="#id3"><span class="problematic" id="id4">*</span></a>SAVF by now.</dd>
-<dt>dest (True, str, None)</dt>
-<dd><p class="first">A local directory to save the file into.</p>
-<p class="last">For example, if the dest directory is /backup save file named /qsys.lib/objlib.lib/test1.file on host host.example.com, would be saved into /backup/host.example.com/qsys.lib/objlib.lib/test1.file. The host name is based on the inventory name. If dest=’’, dest will be current directory.</p>
-</dd>
-<dt>target_release (optional, str, <a href="#id5"><span class="problematic" id="id6">*</span></a>CURRENT)</dt>
-<dd>The release of the operating system on which you intend to restore and use the SAVF.</dd>
-<dt>force_save (optional, bool, False)</dt>
-<dd>If force to use savefile_name when savefile_name.file already exists on remote IBM i.</dd>
-<dt>validate_checksum (optional, bool, True)</dt>
-<dd>Verify that the source and destination checksums match after the files are fetched.</dd>
-<dt>object_names (optional, str, <a href="#id7"><span class="problematic" id="id8">*</span></a>ALL)</dt>
-<dd><p class="first">The objects need to be fetched. One or more object names can be specified. Use space as separator.</p>
-<p class="last">If object type is <a href="#id9"><span class="problematic" id="id10">*</span></a>FILE, then fetch it directly. Only one <a href="#id11"><span class="problematic" id="id12">*</span></a>FILE object will fetch directly at one time.</p>
-</dd>
-<dt>lib_name (True, str, None)</dt>
-<dd>The library contains the objects. If is_lib is Ture, lib_name means the library name.</dd>
-<dt>backup (optional, bool, False)</dt>
-<dd>If delete the save file on remote IBM i or not. If set True, the save file on remote IBM i will not be deleted.</dd>
-<dt>object_types (optional, str, <a href="#id13"><span class="problematic" id="id14">*</span></a>ALL)</dt>
-<dd>The object types. One or more object types can be specified. Use space as separator.</dd>
-</dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id17">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under [defaults] section</li>
-<li>Need install 5770SS1 option 39 on remote IBM i for regex usage</li>
+<h2><a class="toc-backref" href="#id17">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The ibmi_feth is used for fetching objects or a library as a SAVF from remote IBMi node and storing them locally in a file tree, organized by hostname.</p></li>
+<li><p>Save file that already exists at dest will be overwritten if it is different than the new one.</p></li>
+<li><p>For non-IBMi native targets, use the fetch module instead.</p></li>
 </ul>
 </div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id18">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>backup</dt><dd><p>If delete the save file on remote IBM i or not. If set True, the save file on remote IBM i will not be deleted.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
 </div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id18">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">fetch_module</span></dt>
-<dd>The official documentation on the <strong>fetch</strong> module.</dd>
+</dd>
+<dt>dest</dt><dd><p>A local directory to save the file into.</p>
+<p>For example, if the dest directory is /backup save file named /qsys.lib/objlib.lib/test1.file on host host.example.com, would be saved into /backup/host.example.com/qsys.lib/objlib.lib/test1.file. The host name is based on the inventory name. If dest=’’, dest will be current directory.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>flat</dt><dd><p>Allows you to override the default behavior of appending hostname/path/to/file to the destination.</p>
+<p>This can be useful if working with a single host, or if retrieving files that are uniquely named per host.</p>
+<p>If using multiple hosts with the same filename, the file will be overwritten for each host.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>force_save</dt><dd><p>If force to use savefile_name when savefile_name.file already exists on remote IBM i.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>format</dt><dd><p>The save file’s format. Only support <a href="#id1"><span class="problematic" id="id2">*</span></a>SAVF by now.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>SAVF</div>
+<div class="line"><strong>choices</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>SAVF</div>
+</div>
+</dd>
+<dt>is_lib</dt><dd><p>If it is a library needed to be fetched. If set True, the whole library will be fetched.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>lib_name</dt><dd><p>The library contains the objects. If is_lib is Ture, lib_name means the library name.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>object_names</dt><dd><p>The objects need to be fetched. One or more object names can be specified. Use space as separator.</p>
+<p>If object type is <a href="#id7"><span class="problematic" id="id8">*</span></a>FILE, then fetch it directly. Only one <a href="#id9"><span class="problematic" id="id10">*</span></a>FILE object will fetch directly at one time.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id11"><span class="problematic" id="id12">*</span></a>ALL</div>
+</div>
+</dd>
+<dt>object_types</dt><dd><p>The object types. One or more object types can be specified. Use space as separator.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id13"><span class="problematic" id="id14">*</span></a>ALL</div>
+</div>
+</dd>
+<dt>savefile_name</dt><dd><p>The save file name can be specified.</p>
+<p>If not specified savefile_name, the save file name will be the first object_name.file. If is_lib is True, the save file name will be lib_name.file. For example, if fetch obja.pgm and objb.srvpgm in objlib library, the save file name will be obja. If the obja already exists in objlib, then rename the save file name to (obja+number), number range from 1 to 9(obja1, obja2…obja9).</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>target_release</dt><dd><p>The release of the operating system on which you intend to restore and use the SAVF.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id15"><span class="problematic" id="id16">*</span></a>CURRENT</div>
+</div>
+</dd>
+<dt>validate_checksum</dt><dd><p>Verify that the source and destination checksums match after the files are fetched.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
+</div>
+</dd>
 </dl>
-</div>
 </div>
 <div class="section" id="examples">
 <h2><a class="toc-backref" href="#id19">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
@@ -309,45 +337,134 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id20">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under [defaults] section</p>
+<p>Need install 5770SS1 option 39 on remote IBM i for regex usage</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id21">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">fetch_module</span></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id20">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id22">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>file (always, str, /qsys.lib/test.lib/obja.file)</dt>
-<dd>The save file path on remote IBM i.</dd>
-<dt>remote_md5sum (always, str, ef67xhfs8638ac5d7e31fc56rfcv3760)</dt>
-<dd>The md5sum of the file on remote IBM i.</dd>
-<dt>stdout (always, list, File OBJA in library TESTLIB already exists. If still need save, please set force.)</dt>
-<dd>The fetch standard output</dd>
-<dt>dest (always, str, /users/tester/test/obja.file)</dt>
-<dd>The file path on local.</dd>
-<dt>checksum (always, str, 573f3e66ee97071134c9001732ed16f6bb7e8ab4)</dt>
-<dd>The checksum of the file on local.</dd>
-<dt>md5sum (always, str, ef67xhfs8638ac5d7e31fc56rfcv3760)</dt>
-<dd>The md5sum of the file on local.</dd>
-<dt>stderr (always, list, [‘CPF5813: File OBJA in library TESTLIB already exists.’, ‘CPF7302: File OBJA not created in library TESTLIB.’])</dt>
-<dd>The fetch standard error</dd>
-<dt>delta (always, str, 0:00:00.307534)</dt>
-<dd>The fetch execution delta time when file is renewed.</dd>
-<dt>msg (always, str, File is renewed on local.)</dt>
-<dd>The fetch execution message.</dd>
-<dt>remote_checksum (always, bool, 573f3e66ee97071134c9001732ed16f6bb7e8ab4)</dt>
-<dd>The checksum of the file on remote IBM i.</dd>
+<div><dl>
+<dt>file</dt><dd><div class="line-block">
+<div class="line">The save file path on remote IBM i.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: /qsys.lib/test.lib/obja.file</div>
+</div>
+</dd>
+<dt>remote_md5sum</dt><dd><div class="line-block">
+<div class="line">The md5sum of the file on remote IBM i.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: ef67xhfs8638ac5d7e31fc56rfcv3760</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The fetch standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;File OBJA in library TESTLIB already exists. If still need save, please set force.&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>dest</dt><dd><div class="line-block">
+<div class="line">The file path on local.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: /users/tester/test/obja.file</div>
+</div>
+</dd>
+<dt>checksum</dt><dd><div class="line-block">
+<div class="line">The checksum of the file on local.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 573f3e66ee97071134c9001732ed16f6bb7e8ab4</div>
+</div>
+</dd>
+<dt>md5sum</dt><dd><div class="line-block">
+<div class="line">The md5sum of the file on local.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: ef67xhfs8638ac5d7e31fc56rfcv3760</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The fetch standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF5813: File OBJA in library TESTLIB already exists.&quot;</span><span class="p">,</span> <span class="s2">&quot;CPF7302: File OBJA not created in library TESTLIB.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The fetch execution delta time when file is renewed.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>msg</dt><dd><div class="line-block">
+<div class="line">The fetch execution message.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: File is renewed on local.</div>
+</div>
+</dd>
+<dt>remote_checksum</dt><dd><div class="line-block">
+<div class="line">The checksum of the file on remote IBM i.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;573f3e66ee97071134c9001732ed16f6bb7e8ab4&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id21">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Peng Zeng Yu (&#64;pengzengyufish)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -374,8 +491,7 @@
         &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

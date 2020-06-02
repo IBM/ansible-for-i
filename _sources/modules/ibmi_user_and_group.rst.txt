@@ -2,11 +2,13 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_user_and_group.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_user_and_group.py
 
+.. _ibmi_user_and_group_module:
 
 ibmi_user_and_group -- Create, Change or Display a user(or group) profile
 =========================================================================
+
 
 .. contents::
    :local:
@@ -15,158 +17,208 @@ ibmi_user_and_group -- Create, Change or Display a user(or group) profile
 
 Synopsis
 --------
-
-The ``ibmi_user_and_group`` module can do the user(or group) profile management(create, change, delete and display).
-
-A user profile contain a user's passwords, the list of special authorities assigned to a user, and the objects the user owns.
-
-A group profile is a special type of user profile that provides the same authority to a group of users.
-
-You create group profiles in the same way that you create individual profiles.
-
-The system recognizes a group profile when you add the first member to it.
-
-At that point, the system sets information in the profile indicating that it is a group profile.
-
-
-
+- The ``ibmi_user_and_group`` module can do the user(or group) profile management(create, change, delete and display).
+- A user profile contain a user's passwords, the list of special authorities assigned to a user, and the objects the user owns.
+- A group profile is a special type of user profile that provides the same authority to a group of users.
+- You create group profiles in the same way that you create individual profiles.
+- The system recognizes a group profile when you add the first member to it.
+- At that point, the system sets information in the profile indicating that it is a group profile.
 
 
 
 Parameters
 ----------
 
-  status (optional, str, *SAME)
-    Specifies the status of the user profile.
 
-    If not specify, '*ENABLED' will be used for operation create, '*SAME' will be used for operation change.
+     
+expire
+  Specifies whether the password for this user is set to expired.
 
-    Valid only for operation create and change.
+  If the password is set to expired, the user is required to change the password to sign on the system.
 
+  If not specify, '*NO' will be used for operation create, '*SAME' will be used for operation change.
 
-  parameters (optional, str,  )
-    The parameters that CRTUSRPRF or CHGUSRPRF or DLTUSRPRF command will take.
+  Valid only for operation create and change.
 
-    Other than options above, all other parameters need to be specified here.
 
-    The default values of parameters for CRTUSRPRF or CHGUSRPRF or DLTUSRPRF will be taken if not specified.
+  | **required**: false
+  | **type**: str
+  | **default**: *SAME
+  | **choices**: *NO, *YES, *SAME
 
-    Supported parameters contain
 
-    ASTLVL, CURLIB, INLPGM, INLMNU, LMTCPB, TEXT, SPCENV, DSPSGNINF, PWDEXPITV, PWDCHGBLK, LCLPWDMGT, LMTDEVSSN, KBDBUF, MAXSTGLRG, MAXSTG, PTYLMT,
+     
+joblog
+  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
 
-    GRPAUT, GRPAUTTYP, SUPGRPPRF, ACGCDE, DOCPWD, MSGQ, DLVRY, SEV, PRTDEV, OUTQ, ATNPGM, SRTSEQ, LANGID, CNTRYID, CCSID, CHRIDCTL, SETJOBATR,
 
-    LOCALE, USROPT, UID, GID, HOMEDIR, EIMASSOC, USREXPDATE, USREXPITV, AUT, JOBD when the operation is create or change
+  | **required**: false
+  | **type**: bool
 
-    Or OWNOBJOPT, PGPOPT, EIMASSOC when the operation is delete.
 
-    refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/crtusrprf.htm.
+     
+operation
+  The user or group profile operation.
 
-    and https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm for detail.
+  Operation create to create user(group) profile
 
+  Operation change to change user(group) profile
 
-  text (optional, str, *SAME)
-    Specifies the text that briefly describes the user or group profile.
+  Operation display to display user(group) profile inforamtion
 
-    If not specify, 'Create by Ansible' will be used for operation create, '*SAME' will be used for operation change.
+  Operation display_group_menbers to display the members of a group profile
 
-    Valid only for operation create and change.
 
+  | **required**: True
+  | **type**: str
+  | **choices**: create, change, delete, display, display_group_members
 
-  user_group (optional, str, *SAME)
-    Specifies the user's group profile name whose authority is used if no specific authority is given for the user.
 
-    If not specify, operation create is to create an individual user, or else, the new created user will be a member of the group.
+     
+owner
+  Specifies the user that is to be the owner of objects created by this user.
 
-    If not specify, operation change does nothing on the user, or else, the new changed user will be added as a member of the group.
+  If not specify, '*USRPRF' will be used for operation create, '*SAME' will be used for operation change.
 
-    Valid only for operation create and change.
+  Valid only for operation create and change.
 
 
-  special_authority (optional, list, [u'*SAME'])
-    Specifies the special authorities given to a user.
+  | **required**: false
+  | **type**: str
+  | **default**: *SAME
+  | **choices**: *USRPRF, *GRPPRF, *SAME
 
-    If not specify, '*USRCLS' will be used for operation create, '*SAME' will be used for operation change.
 
-    Valid only for operation create and change.
+     
+parameters
+  The parameters that CRTUSRPRF or CHGUSRPRF or DLTUSRPRF command will take.
 
+  Other than options above, all other parameters need to be specified here.
 
-  expire (optional, str, *SAME)
-    Specifies whether the password for this user is set to expired.
+  The default values of parameters for CRTUSRPRF or CHGUSRPRF or DLTUSRPRF will be taken if not specified.
 
-    If the password is set to expired, the user is required to change the password to sign on the system.
+  Supported parameters contain
 
-    If not specify, '*NO' will be used for operation create, '*SAME' will be used for operation change.
+  ASTLVL, CURLIB, INLPGM, INLMNU, LMTCPB, TEXT, SPCENV, DSPSGNINF, PWDEXPITV, PWDCHGBLK, LCLPWDMGT, LMTDEVSSN, KBDBUF, MAXSTGLRG, MAXSTG, PTYLMT,
 
-    Valid only for operation create and change.
+  GRPAUT, GRPAUTTYP, SUPGRPPRF, ACGCDE, DOCPWD, MSGQ, DLVRY, SEV, PRTDEV, OUTQ, ATNPGM, SRTSEQ, LANGID, CNTRYID, CCSID, CHRIDCTL, SETJOBATR,
 
+  LOCALE, USROPT, UID, GID, HOMEDIR, EIMASSOC, USREXPDATE, USREXPITV, AUT, JOBD when the operation is create or change
 
-  user (True, str, None)
-    Specifies the user profile to be operated. A numeric user profile can be specified.
+  Or OWNOBJOPT, PGPOPT, EIMASSOC when the operation is delete.
 
-    If the user profile begins with a numeric, it must be prefixed with a Q.
+  refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/crtusrprf.htm.
 
-    If you want to create, display, display group members of a group, this parameter is the group profile name.
+  and https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm for detail.
 
 
-  joblog (optional, bool, False)
-    If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  | **required**: false
+  | **type**: str
+  | **default**:  
 
 
-  owner (optional, str, *SAME)
-    Specifies the user that is to be the owner of objects created by this user.
+     
+password
+  Specifies the password that allows the user to sign on the system.
 
-    If not specify, '*USRPRF' will be used for operation create, '*SAME' will be used for operation change.
+  If not specify, operation create will use the user name as the password, operation change will not change the password.
 
-    Valid only for operation create and change.
+  Valid only for operation create and change.
 
 
-  operation (True, str, None)
-    The user or group profile operation.
+  | **required**: false
+  | **type**: str
+  | **default**: *SAME
 
-    Operation create to create user(group) profile
 
-    Operation change to change user(group) profile
+     
+special_authority
+  Specifies the special authorities given to a user.
 
-    Operation display to display user(group) profile inforamtion
+  If not specify, '*USRCLS' will be used for operation create, '*SAME' will be used for operation change.
 
-    Operation display_group_menbers to display the members of a group profile
+  Valid only for operation create and change.
 
 
-  password (optional, str, *SAME)
-    Specifies the password that allows the user to sign on the system.
+  | **required**: false
+  | **type**: list
+  | **elements**: str
+  | **default**: [u'*SAME']
+  | **choices**: *USRCLS, *NONE, *SAME, *ALLOBJ, *AUDIT, *JOBCTL, *SAVSYS, *IOSYSCFG, *SECADM, *SERVICE, *SPLCTL
 
-    If not specify, operation create will use the user name as the password, operation change will not change the password.
 
-    Valid only for operation create and change.
+     
+status
+  Specifies the status of the user profile.
 
+  If not specify, '*ENABLED' will be used for operation create, '*SAME' will be used for operation change.
 
-  user_class (optional, str, *SAME)
-    Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.
+  Valid only for operation create and change.
 
-    If not specify, '*USER' will be used for operation create, '*SAME' will be used for operation change.
 
-    Valid only for operation create and change.
+  | **required**: false
+  | **type**: str
+  | **default**: *SAME
+  | **choices**: *ENABLED, *DISABLED, *SAME
 
 
+     
+text
+  Specifies the text that briefly describes the user or group profile.
 
+  If not specify, 'Create by Ansible' will be used for operation create, '*SAME' will be used for operation change.
 
+  Valid only for operation create and change.
 
-Notes
------
 
-.. note::
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+  | **required**: false
+  | **type**: str
+  | **default**: *SAME
 
 
-See Also
---------
+     
+user
+  Specifies the user profile to be operated. A numeric user profile can be specified.
 
-.. seealso::
+  If the user profile begins with a numeric, it must be prefixed with a Q.
 
-   :ref:`ibmi_cl_command_module`
-      The official documentation on the **ibmi_cl_command** module.
+  If you want to create, display, display group members of a group, this parameter is the group profile name.
+
+
+  | **required**: True
+  | **type**: str
+
+
+     
+user_class
+  Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.
+
+  If not specify, '*USER' will be used for operation create, '*SAME' will be used for operation change.
+
+  Valid only for operation create and change.
+
+
+  | **required**: false
+  | **type**: str
+  | **default**: *SAME
+  | **choices**: *USER, *SYSOPR, *PGMR, *SECADM, *SECOFR, *SAME
+
+
+     
+user_group
+  Specifies the user's group profile name whose authority is used if no specific authority is given for the user.
+
+  If not specify, operation create is to create an individual user, or else, the new created user will be a member of the group.
+
+  If not specify, operation change does nothing on the user, or else, the new changed user will be added as a member of the group.
+
+  Valid only for operation create and change.
+
+
+  | **required**: false
+  | **type**: str
+  | **default**: *SAME
+
 
 
 Examples
@@ -174,73 +226,127 @@ Examples
 
 .. code-block:: yaml+jinja
 
-    
-    - name: create user profile
-      ibmi_user_and_group:
-        operation: 'create'
-        user: 'changle'
+   
+   - name: create user profile
+     ibmi_user_and_group:
+       operation: 'create'
+       user: 'changle'
 
-    - name: display user profile
-      ibmi_user_and_group:
-        operation: 'display'
-        user: 'changle'
+   - name: display user profile
+     ibmi_user_and_group:
+       operation: 'display'
+       user: 'changle'
 
-    - name: display group members
-      ibmi_user_and_group:
-        operation: 'display_group_members'
-        user: 'group1'
+   - name: display group members
+     ibmi_user_and_group:
+       operation: 'display_group_members'
+       user: 'group1'
 
+
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`ibmi_cl_command_module`
 
 
 Return Values
 -------------
 
-  stderr_lines (when rc as no-zero(failure), list, ['CPF2204: User profile CHANGL1 not found.'])
-    The command standard error split in lines
 
+   
+                              
+       stderr_lines
+        | The command standard error split in lines
+      
+        | **returned**: when rc as no-zero(failure)
+        | **type**: list      
+        | **sample**:
 
-  job_log (always, str, [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}])
-    the job_log
+              .. code-block::
 
+                       ["CPF2204: User profile CHANGL1 not found."]
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
 
-  stderr (when rc as no-zero(failure), str, CPF22CF: User profile not allowed to be a group profile)
-    The standard error
+            
+      
+      
+                              
+       stderr
+        | The standard error
+      
+        | **returned**: when rc as no-zero(failure)
+        | **type**: str
+        | **sample**: CPF22CF: User profile not allowed to be a group profile
 
+            
+      
+      
+                              
+       stdout
+        | The standard output
+      
+        | **returned**: when rc as 0(success) and the operation is not display or display_group_members
+        | **type**: str
+        | **sample**: CPC2205: User profile CHANGLE changed.
 
-  stdout (when rc as 0(success) and the operation is not display or display_group_members, str, CPC2205: User profile CHANGLE changed.)
-    The standard output
+            
+      
+      
+                              
+       stdout_lines
+        | The command standard output split in lines
+      
+        | **returned**: when rc as 0(success) and the operation is not display or display_group_members
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
 
-  stdout_lines (when rc as 0(success) and the operation is not display or display_group_members, list, ['CPC2205: User profile CHANGLE changed.'])
-    The command standard output split in lines
+                       ["CPC2205: User profile CHANGLE changed."]
+            
+      
+      
+                              
+       rc
+        | The return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
+            
+      
+      
+                              
+       result_set
+        | The result set of user information or group members
+      
+        | **returned**: When rc as 0(success) and operation is display or display_group_members
+        | **type**: list      
+        | **sample**:
 
-  rc (always, int, 255)
-    The return code (0 means success, non-zero means failure)
+              .. code-block::
 
-
-  result_set (When rc as 0(success) and operation is display or display_group_members, list, [{'USER_TEXT': '', 'GROUP_PROFILE_NAME': 'GROUP1', 'USER_PROFILE_NAME': 'USERG1'}, {'USER_TEXT': '', 'GROUP_PROFILE_NAME': 'GROUP1', 'USER_PROFILE_NAME': 'USER2G1'}])
-    The result set of user information or group members
-
-
-
-
-
-Status
-------
-
-
-
-
-- This module is not guaranteed to have a backwards compatible interface. *[preview]*
-
-
-- This module is maintained by community.
-
-
-
-Authors
-~~~~~~~
-
-- Chang Le(@changlexc)
-
+                       [{"GROUP_PROFILE_NAME": "GROUP1", "USER_PROFILE_NAME": "USERG1", "USER_TEXT": ""}, {"GROUP_PROFILE_NAME": "GROUP1", "USER_PROFILE_NAME": "USER2G1", "USER_TEXT": ""}]
+            
+      
+        

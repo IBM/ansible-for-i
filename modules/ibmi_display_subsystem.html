@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem &mdash; IBM power_ibmi collection  documentation</title>
+  <title>ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -98,10 +98,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – end a subsystem</a></li>
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_display_subsystem.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_display_subsystem.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,47 +209,50 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-display-subsystem-display-all-currently-active-subsystems-or-currently-active-jobs-in-a-subsystem">
-<h1>ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem<a class="headerlink" href="#ibmi-display-subsystem-display-all-currently-active-subsystems-or-currently-active-jobs-in-a-subsystem" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-display-subsystem-module"></span><h1>ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem<a class="headerlink" href="#ibmi-display-subsystem-display-all-currently-active-subsystems-or-currently-active-jobs-in-a-subsystem" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id17">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id18">Parameters</a></li>
-<li><a class="reference internal" href="#see-also" id="id19">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id20">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id21">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id22">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id15">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id16">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id17">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id18">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id19">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id17">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>the <code class="docutils literal notranslate"><span class="pre">ibmi_display_subsystem</span></code> module all currently active subsystems or currently active jobs in a subsystem of the target ibmi node.</p>
-<p>In some ways it has equivalent results of WRKSBS if subsystem is ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>ALL’, otherwise, it has equivalent results of WRKSBSJOB</p>
+<h2><a class="toc-backref" href="#id15">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">ibmi_display_subsystem</span></code> module all currently active subsystems or currently active jobs in a subsystem of the target ibmi node.</p></li>
+<li><p>In some ways it has equivalent results of WRKSBS if subsystem is ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>ALL’, otherwise, it has equivalent results of WRKSBSJOB</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id18">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>subsystem (optional, str, <a href="#id3"><span class="problematic" id="id4">*</span></a>ALL)</dt>
-<dd>Specifies the name of the subsystem</dd>
-<dt>user (optional, str, <a href="#id5"><span class="problematic" id="id6">*</span></a>ALL)</dt>
-<dd>Specifies the name of the user whose jobs are displayed(‘<a href="#id7"><span class="problematic" id="id8">*</span></a>ALL’ for all user names). If subsystem is ‘<a href="#id9"><span class="problematic" id="id10">*</span></a>ALL’, this option is ignored</dd>
-<dt>joblog (optional, bool, False)</dt>
-<dd>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</dd>
-</dl>
-</div></blockquote>
+<h2><a class="toc-backref" href="#id16">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
 </div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id19">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">ibmi_end_subsystem, ibmi_start_subsystem_module</span></dt>
-<dd>The official documentation on the <strong>ibmi_end_subsystem, ibmi_start_subsystem</strong> module.</dd>
-</dl>
+</dd>
+<dt>subsystem</dt><dd><p>Specifies the name of the subsystem</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>ALL</div>
 </div>
+</dd>
+<dt>user</dt><dd><p>Specifies the name of the user whose jobs are displayed(‘<a href="#id5"><span class="problematic" id="id6">*</span></a>ALL’ for all user names). If subsystem is ‘<a href="#id7"><span class="problematic" id="id8">*</span></a>ALL’, this option is ignored</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id9"><span class="problematic" id="id10">*</span></a>ALL</div>
+</div>
+</dd>
+</dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id20">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id17">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Display all the active subsystems in this system</span>
   <span class="nt">ibmi_display_subsystem</span><span class="p">:</span>
 
@@ -265,41 +267,111 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id18">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">ibmi_end_subsystem, ibmi_start_subsystem_module</span></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id21">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id19">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (When rc as non-zero(failure), list, [‘’])</dt>
-<dd>The standard error split in lines</dd>
-<dt>subsystems (When rc as 0(success) and subsystem is ‘<a href="#id11"><span class="problematic" id="id12">*</span></a>ALL’, list, [‘                                      Work with Subsystems                                       5/25/20 19:55:04        Page 0001’, ‘                          Subsystem        Active                          Total         ———–Subsystem Pools—————–’, ‘      Subsystem             Number          Jobs        Status          Storage (M)       1   2   3   4   5   6   7   8   9  10’, ‘      QBATCH                018647              0       ACTIVE                     .00    2’, ‘      QCMN                  018651              7       ACTIVE                     .00    2’, ‘      QCTL                  018621              1       ACTIVE                     .00    2’, ‘      QHTTPSVR              018742              8       ACTIVE                     .00    2’, ‘      QINTER                018642              0       ACTIVE                     .00    2   3’, ‘      QSERVER               018631             16       ACTIVE                     .00    2’, ‘      QSPL                  018652              0       ACTIVE                     .00    2   4’, ‘      QSYSWRK               018622            111       ACTIVE                     .00    2’, ‘      QUSRWRK               018633             27       ACTIVE                     .00    2’, ‘                          * * * * *  E N D  O F  L I S T I N G  * * * * <a href="#id13"><span class="problematic" id="id14">*</span></a>’])</dt>
-<dd>The result set</dd>
-<dt>job_log (always, str, [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . <span class="classifier-delimiter">:</span> <span class="classifier">This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}])</span></dt>
-<dd>the job_log</dd>
-<dt>stdout (When rc as non-zero(failure), str, )</dt>
-<dd>The standard output of the display subsystem job results set</dd>
-<dt>stderr (When rc as non-zero(failure), str, )</dt>
-<dd>The standard error the the display subsystem job</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The task return code (0 means success, non-zero means failure)</dd>
-<dt>stdout_lines (When rc as non-zero(failure), list, [‘’])</dt>
-<dd>The standard output split in lines</dd>
-<dt>active_jobs (When rc as 0(success) and subsystem is not ‘<a href="#id15"><span class="problematic" id="id16">*</span></a>ALL’, list, [{‘JOB_STATUS’: ‘EVTW’, ‘FUNCTION’: ‘QEZSCNEP’, ‘CPU_TIME’: ‘17’, ‘ELAPSED_SYNC_DISK_IO_COUNT’: ‘0’, ‘ELAPSED_TOTAL_DISK_IO_COUNT’: ‘0’, ‘ELAPSED_INTERACTION_COUNT’: ‘0’, ‘ELAPSED_TIME’: ‘0.000’, ‘ELAPSED_CPU_TIME’: ‘0’, ‘FUNCTION_TYPE’: ‘PGM’, ‘ELAPSED_ASYNC_DISK_IO_COUNT’: ‘0’, ‘JOB_NAME’: ‘022042/QPGMR/QSYSSCD’, ‘SUBSYSTEM_LIBRARY_NAME’: ‘QSYS’, ‘SUBSYSTEM’: ‘QCTL’, ‘AUTHORIZATION_NAME’: ‘QPGMR’, ‘MEMORY_POOL’: ‘BASE’, ‘THREAD_COUNT’: ‘1’, ‘RUN_PRIORITY’: ‘10’, ‘SERVER_TYPE’: ‘’, ‘JOB_TYPE’: ‘BCH’, ‘ELAPSED_CPU_PERCENTAGE’: ‘0.0’, ‘TEMPORARY_STORAGE’: ‘6’, ‘ORDINAL_POSITION’: ‘2’, ‘INTERNAL_JOB_ID’: ‘002700010041F300A432B3A44FFD7001’, ‘ELAPSED_TOTAL_RESPONSE_TIME’: ‘0’, ‘TOTAL_DISK_IO_COUNT’: ‘587’, ‘ELAPSED_PAGE_FAULT_COUNT’: ‘0’, ‘JOB_END_REASON’: ‘’}])</dt>
-<dd>The result set</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>subsystems</dt><dd><div class="line-block">
+<div class="line">The result set</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as 0(success) and subsystem is ‘<a href="#id11"><span class="problematic" id="id12">*</span></a>ALL’</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;                                      Work with Subsystems                                       5/25/20 19:55:04        Page 0001&quot;</span><span class="p">,</span> <span class="s2">&quot;                          Subsystem        Active                          Total         -----------Subsystem Pools-----------------&quot;</span><span class="p">,</span> <span class="s2">&quot;      Subsystem             Number          Jobs        Status          Storage (M)       1   2   3   4   5   6   7   8   9  10&quot;</span><span class="p">,</span> <span class="s2">&quot;      QBATCH                018647              0       ACTIVE                     .00    2&quot;</span><span class="p">,</span> <span class="s2">&quot;      QCMN                  018651              7       ACTIVE                     .00    2&quot;</span><span class="p">,</span> <span class="s2">&quot;      QCTL                  018621              1       ACTIVE                     .00    2&quot;</span><span class="p">,</span> <span class="s2">&quot;      QHTTPSVR              018742              8       ACTIVE                     .00    2&quot;</span><span class="p">,</span> <span class="s2">&quot;      QINTER                018642              0       ACTIVE                     .00    2   3&quot;</span><span class="p">,</span> <span class="s2">&quot;      QSERVER               018631             16       ACTIVE                     .00    2&quot;</span><span class="p">,</span> <span class="s2">&quot;      QSPL                  018652              0       ACTIVE                     .00    2   4&quot;</span><span class="p">,</span> <span class="s2">&quot;      QSYSWRK               018622            111       ACTIVE                     .00    2&quot;</span><span class="p">,</span> <span class="s2">&quot;      QUSRWRK               018633             27       ACTIVE                     .00    2&quot;</span><span class="p">,</span> <span class="s2">&quot;                          * * * * *  E N D  O F  L I S T I N G  * * * * *&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">the job_log</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . :   This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}]</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The standard output of the display subsystem job results set</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The standard error the the display subsystem job</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>active_jobs</dt><dd><div class="line-block">
+<div class="line">The result set</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as 0(success) and subsystem is not ‘<a href="#id13"><span class="problematic" id="id14">*</span></a>ALL’</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;AUTHORIZATION_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;QPGMR&quot;</span><span class="p">,</span> <span class="s2">&quot;CPU_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;17&quot;</span><span class="p">,</span> <span class="s2">&quot;ELAPSED_ASYNC_DISK_IO_COUNT&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;ELAPSED_CPU_PERCENTAGE&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0&quot;</span><span class="p">,</span> <span class="s2">&quot;ELAPSED_CPU_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;ELAPSED_INTERACTION_COUNT&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;ELAPSED_PAGE_FAULT_COUNT&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;ELAPSED_SYNC_DISK_IO_COUNT&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;ELAPSED_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;0.000&quot;</span><span class="p">,</span> <span class="s2">&quot;ELAPSED_TOTAL_DISK_IO_COUNT&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;ELAPSED_TOTAL_RESPONSE_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;FUNCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;QEZSCNEP&quot;</span><span class="p">,</span> <span class="s2">&quot;FUNCTION_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;PGM&quot;</span><span class="p">,</span> <span class="s2">&quot;INTERNAL_JOB_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;002700010041F300A432B3A44FFD7001&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_END_REASON&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;022042/QPGMR/QSYSSCD&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;EVTW&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;BCH&quot;</span><span class="p">,</span> <span class="s2">&quot;MEMORY_POOL&quot;</span><span class="p">:</span> <span class="s2">&quot;BASE&quot;</span><span class="p">,</span> <span class="s2">&quot;ORDINAL_POSITION&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s2">&quot;RUN_PRIORITY&quot;</span><span class="p">:</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="s2">&quot;SERVER_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;SUBSYSTEM&quot;</span><span class="p">:</span> <span class="s2">&quot;QCTL&quot;</span><span class="p">,</span> <span class="s2">&quot;SUBSYSTEM_LIBRARY_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;TEMPORARY_STORAGE&quot;</span><span class="p">:</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="s2">&quot;THREAD_COUNT&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;TOTAL_DISK_IO_COUNT&quot;</span><span class="p">:</span> <span class="s2">&quot;587&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id22">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Chang Le (&#64;changlexc)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -326,8 +398,7 @@
         &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

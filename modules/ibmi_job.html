@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_job – Returns job information according to inputs. &mdash; IBM power_ibmi collection  documentation</title>
+  <title>ibmi_job – Returns job information according to inputs. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -107,11 +107,10 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_job – Returns job information according to inputs.</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library on a remote IBMi node</a></li>
@@ -196,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_job.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_job.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -211,66 +210,76 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-job-returns-job-information-according-to-inputs">
-<h1>ibmi_job – Returns job information according to inputs.<a class="headerlink" href="#ibmi-job-returns-job-information-according-to-inputs" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-job-module"></span><h1>ibmi_job – Returns job information according to inputs.<a class="headerlink" href="#ibmi-job-returns-job-information-according-to-inputs" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id21">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id22">Parameters</a></li>
-<li><a class="reference internal" href="#notes" id="id23">Notes</a></li>
-<li><a class="reference internal" href="#see-also" id="id24">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id25">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id26">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id27">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id39">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id40">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id41">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id42">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id43">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id44">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id21">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">ibmi_job</span></code> module returns information associated with one or more jobs.</p>
-</div>
-<div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id22">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>status (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>ALL)</dt>
-<dd>The job status filter.</dd>
-<dt>subsystem (optional, str, <a href="#id3"><span class="problematic" id="id4">*</span></a>ALL)</dt>
-<dd>The job subsystem filter. A valid subsystem name can be specified. Valid values are “<a href="#id5"><span class="problematic" id="id6">*</span></a>ALL” or subsystem name.</dd>
-<dt>name (False, str, None)</dt>
-<dd><p class="first">The qualified job name.</p>
-<p class="last">If this parameter is specified, the other parameters will be ignored.</p>
-</dd>
-<dt>submitter (optional, str, <a href="#id7"><span class="problematic" id="id8">*</span></a>ALL)</dt>
-<dd>The type of submitted jobs to return.</dd>
-<dt>type (optional, str, <a href="#id9"><span class="problematic" id="id10">*</span></a>ALL)</dt>
-<dd>The job type filter.</dd>
-<dt>user (optional, str, <a href="#id11"><span class="problematic" id="id12">*</span></a>USER)</dt>
-<dd><p class="first">The user profile name to use as the job user filtering criteria.</p>
-<p class="last">Valid values are user profile name, “<a href="#id13"><span class="problematic" id="id14">*</span></a>USER” or “<a href="#id15"><span class="problematic" id="id16">*</span></a>ALL”.</p>
-</dd>
-</dl>
-</div></blockquote>
-</div>
-<div class="section" id="notes">
-<h2><a class="toc-backref" href="#id23">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ul class="last simple">
-<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
+<h2><a class="toc-backref" href="#id39">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_job</span></code> module returns information associated with one or more jobs.</p></li>
 </ul>
 </div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id40">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>name</dt><dd><p>The qualified job name.</p>
+<p>If this parameter is specified, the other parameters will be ignored.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: str</div>
 </div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id24">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">ibmi_submit_job_module</span></dt>
-<dd>The official documentation on the <strong>ibmi_submit_job</strong> module.</dd>
+</dd>
+<dt>status</dt><dd><p>The job status filter.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>ALL</div>
+<div class="line"><strong>choices</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>ALL, <a href="#id5"><span class="problematic" id="id6">*</span></a>ACTIVE, <a href="#id7"><span class="problematic" id="id8">*</span></a>JOBQ, <a href="#id9"><span class="problematic" id="id10">*</span></a>OUTQ</div>
+</div>
+</dd>
+<dt>submitter</dt><dd><p>The type of submitted jobs to return.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id11"><span class="problematic" id="id12">*</span></a>ALL</div>
+<div class="line"><strong>choices</strong>: <a href="#id13"><span class="problematic" id="id14">*</span></a>ALL, <a href="#id15"><span class="problematic" id="id16">*</span></a>JOB, <a href="#id17"><span class="problematic" id="id18">*</span></a>USER, <a href="#id19"><span class="problematic" id="id20">*</span></a>WRKSTN</div>
+</div>
+</dd>
+<dt>subsystem</dt><dd><p>The job subsystem filter. A valid subsystem name can be specified. Valid values are “<a href="#id21"><span class="problematic" id="id22">*</span></a>ALL” or subsystem name.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id23"><span class="problematic" id="id24">*</span></a>ALL</div>
+</div>
+</dd>
+<dt>type</dt><dd><p>The job type filter.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id25"><span class="problematic" id="id26">*</span></a>ALL</div>
+<div class="line"><strong>choices</strong>: <a href="#id27"><span class="problematic" id="id28">*</span></a>ALL, <a href="#id29"><span class="problematic" id="id30">*</span></a>BATCH, <a href="#id31"><span class="problematic" id="id32">*</span></a>INTERACT</div>
+</div>
+</dd>
+<dt>user</dt><dd><p>The user profile name to use as the job user filtering criteria.</p>
+<p>Valid values are user profile name, “<a href="#id33"><span class="problematic" id="id34">*</span></a>USER” or “<a href="#id35"><span class="problematic" id="id36">*</span></a>ALL”.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id37"><span class="problematic" id="id38">*</span></a>USER</div>
+</div>
+</dd>
 </dl>
 </div>
-</div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id25">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id41">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Get status of a list of jobs</span>
   <span class="nt">ibmi_job</span><span class="p">:</span>
     <span class="nt">user</span><span class="p">:</span> <span class="s">&quot;WANGYUN&quot;</span>
@@ -282,43 +291,124 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id42">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id43">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="ibmi_submit_job.html#ibmi-submit-job-module"><span class="std std-ref">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</span></a></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id26">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id44">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (When rc as non-zero(failure), list, [‘CPF2111:Library TESTLIB already exists.’])</dt>
-<dd>The task standard error split in lines</dd>
-<dt>end (When job has been submitted and task has waited for the job status for some time, str, 2019-12-02 11:07:54.064969)</dt>
-<dd>The task execution end time</dd>
-<dt>stdout (When rc as non-zero(failure), str, CPC2102: Library TESTLIB created)</dt>
-<dd>The task standard output</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The task return code (0 means success, non-zero means failure)</dd>
-<dt>job_info (When rc is zero, list, [{‘JOB_STATUS’: ‘OUTQ’, ‘JOB_QUEUE_NAME’: ‘’, ‘JOB_DESCRIPTION_LIBRARY’: ‘’, ‘JOB_TYPE’: ‘BCH’, ‘JOB_ACCOUNTING_CODE’: ‘<a href="#id17"><span class="problematic" id="id18">*</span></a>SYS’, ‘SUBMITTER_JOB_NAME’: ‘’, ‘JOB_END_TIME’: ‘2020-02-14-00.36.35’, ‘JOB_ENTERED_SYSTEM_TIME’: ‘2020-02-14-00.36.35’, ‘JOB_DESCRIPTION’: ‘’, ‘JOB_INFORMATION’: ‘YES’, ‘JOB_NAME’: ‘514647/WANGYUN/QPRTJOB’, ‘JOB_TYPE_ENHANCED’: ‘ALTERNATE_SPOOL_USER’, ‘COMPLETION_STATUS’: ‘ABNORMAL’, ‘JOB_DATE’: ‘’, ‘JOB_ACTIVE_TIME’: ‘’, ‘JOB_QUEUE_LIBRARY’: ‘’, ‘JOB_QUEUE_STATUS’: ‘’, ‘SUBMITTER_MESSAGE_QUEUE’: ‘’, ‘JOB_SUBSYSTEM’: ‘’, ‘SUBMITTER_MESSAGE_QUEUE_LIBRARY’: ‘’, ‘JOB_SCHEDULED_TIME’: ‘’, ‘CCSID’: ‘0’, ‘JOB_END_REASON’: ‘’, ‘JOB_QUEUE_PRIORITY’: ‘0’, ‘JOB_END_SEVERITY’: ‘10’}, {‘JOB_STATUS’: ‘OUTQ’, ‘JOB_QUEUE_NAME’: ‘’, ‘JOB_DESCRIPTION_LIBRARY’: ‘QGPL’, ‘JOB_TYPE’: ‘INT’, ‘JOB_ACCOUNTING_CODE’: ‘<a href="#id19"><span class="problematic" id="id20">*</span></a>SYS’, ‘SUBMITTER_JOB_NAME’: ‘’, ‘JOB_END_TIME’: ‘2020-03-24-11.06.44’, ‘JOB_ENTERED_SYSTEM_TIME’: ‘2020-03-23-22.07.18’, ‘JOB_DESCRIPTION’: ‘QDFTJOBD’, ‘JOB_INFORMATION’: ‘YES’, ‘JOB_NAME’: ‘547343/WANGYUN/QPADEV0001’, ‘JOB_TYPE_ENHANCED’: ‘INTERACTIVE_GROUP’, ‘COMPLETION_STATUS’: ‘ABNORMAL’, ‘JOB_DATE’: ‘’, ‘JOB_ACTIVE_TIME’: ‘2020-03-23-22.07.18’, ‘JOB_QUEUE_LIBRARY’: ‘’, ‘JOB_QUEUE_STATUS’: ‘’, ‘SUBMITTER_MESSAGE_QUEUE’: ‘’, ‘JOB_SUBSYSTEM’: ‘’, ‘SUBMITTER_MESSAGE_QUEUE_LIBRARY’: ‘’, ‘JOB_SCHEDULED_TIME’: ‘’, ‘CCSID’: ‘65535’, ‘JOB_END_REASON’: ‘JOB ENDED DUE TO A DEVICE ERROR’, ‘JOB_QUEUE_PRIORITY’: ‘0’, ‘JOB_END_SEVERITY’: ‘30’}])</dt>
-<dd>The information of the job(s)</dd>
-<dt>start (When job has been submitted and task has waited for the job status for some time, str, 2019-12-02 11:07:53.757435)</dt>
-<dd>The task execution start time</dd>
-<dt>stderr (When rc as non-zero(failure), str, CPF2111:Library TESTLIB already exists)</dt>
-<dd>The task standard error</dd>
-<dt>delta (When job has been submitted and task has waited for the job status for some time, str, 0:00:00.307534)</dt>
-<dd>The task execution delta time</dd>
-<dt>stdout_lines (When rc as non-zero(failure), list, [‘CPC2102: Library TESTLIB created.’])</dt>
-<dd>The task standard output split in lines</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The task standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>end</dt><dd><div class="line-block">
+<div class="line">The task execution end time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When job has been submitted and task has waited for the job status for some time</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The task standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPC2102: Library TESTLIB created</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>job_info</dt><dd><div class="line-block">
+<div class="line">The information of the job(s)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;CCSID&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;COMPLETION_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;ABNORMAL&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_ACCOUNTING_CODE&quot;</span><span class="p">:</span> <span class="s2">&quot;*SYS&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_ACTIVE_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_DESCRIPTION&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_DESCRIPTION_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_END_REASON&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_END_SEVERITY&quot;</span><span class="p">:</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_END_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-02-14-00.36.35&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_ENTERED_SYSTEM_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-02-14-00.36.35&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_INFORMATION&quot;</span><span class="p">:</span> <span class="s2">&quot;YES&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;514647/WANGYUN/QPRTJOB&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_QUEUE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_QUEUE_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_QUEUE_PRIORITY&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_QUEUE_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_SCHEDULED_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;OUTQ&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_SUBSYSTEM&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;BCH&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_TYPE_ENHANCED&quot;</span><span class="p">:</span> <span class="s2">&quot;ALTERNATE_SPOOL_USER&quot;</span><span class="p">,</span> <span class="s2">&quot;SUBMITTER_JOB_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;SUBMITTER_MESSAGE_QUEUE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;SUBMITTER_MESSAGE_QUEUE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;CCSID&quot;</span><span class="p">:</span> <span class="s2">&quot;65535&quot;</span><span class="p">,</span> <span class="s2">&quot;COMPLETION_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;ABNORMAL&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_ACCOUNTING_CODE&quot;</span><span class="p">:</span> <span class="s2">&quot;*SYS&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_ACTIVE_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-03-23-22.07.18&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_DESCRIPTION&quot;</span><span class="p">:</span> <span class="s2">&quot;QDFTJOBD&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_DESCRIPTION_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QGPL&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_END_REASON&quot;</span><span class="p">:</span> <span class="s2">&quot;JOB ENDED DUE TO A DEVICE ERROR&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_END_SEVERITY&quot;</span><span class="p">:</span> <span class="s2">&quot;30&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_END_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-03-24-11.06.44&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_ENTERED_SYSTEM_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-03-23-22.07.18&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_INFORMATION&quot;</span><span class="p">:</span> <span class="s2">&quot;YES&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;547343/WANGYUN/QPADEV0001&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_QUEUE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_QUEUE_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_QUEUE_PRIORITY&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_QUEUE_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_SCHEDULED_TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;OUTQ&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_SUBSYSTEM&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;INT&quot;</span><span class="p">,</span> <span class="s2">&quot;JOB_TYPE_ENHANCED&quot;</span><span class="p">:</span> <span class="s2">&quot;INTERACTIVE_GROUP&quot;</span><span class="p">,</span> <span class="s2">&quot;SUBMITTER_JOB_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;SUBMITTER_MESSAGE_QUEUE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;SUBMITTER_MESSAGE_QUEUE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>start</dt><dd><div class="line-block">
+<div class="line">The task execution start time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When job has been submitted and task has waited for the job status for some time</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The task standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF2111:Library TESTLIB already exists</div>
+</div>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The task execution delta time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When job has been submitted and task has waited for the job status for some time</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The task standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPC2102: Library TESTLIB created.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id27">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Wang Yun (&#64;airwangyun)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -345,8 +435,7 @@
         &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

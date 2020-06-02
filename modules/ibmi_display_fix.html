@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_display_fix – display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF &mdash; IBM power_ibmi collection  documentation</title>
+  <title>ibmi_display_fix – display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -97,10 +97,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_display_fix – display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem</a></li>
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_display_fix.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_display_fix.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,52 +209,56 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-display-fix-display-the-ptf-program-temporary-fix-information-and-also-get-the-requisite-information-for-the-ptf">
-<h1>ibmi_display_fix – display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF<a class="headerlink" href="#ibmi-display-fix-display-the-ptf-program-temporary-fix-information-and-also-get-the-requisite-information-for-the-ptf" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-display-fix-module"></span><h1>ibmi_display_fix – display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF<a class="headerlink" href="#ibmi-display-fix-display-the-ptf-program-temporary-fix-information-and-also-get-the-requisite-information-for-the-ptf" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id15">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id16">Parameters</a></li>
-<li><a class="reference internal" href="#see-also" id="id17">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id18">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id19">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id20">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id3">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id4">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id5">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id6">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id7">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id15">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">ibmi_display_fix</span></code> module display the information of the PTF and also get the requisite PTF</p>
+<h2><a class="toc-backref" href="#id3">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_display_fix</span></code> module display the information of the PTF and also get the requisite PTF</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id16">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>release (True, str, None)</dt>
-<dd><p class="first">Specifies the release level of the PTF in one of the following formats.</p>
+<h2><a class="toc-backref" href="#id4">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>product</dt><dd><p>Specifies the product for the PTF</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>ptf</dt><dd><p>Specifies which PTF is shown for the specified product.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>release</dt><dd><p>Specifies the release level of the PTF in one of the following formats.</p>
 <p>VxRyMz, for example, V7R2M0 is version 7, release 2, modification 0</p>
 <p>vvrrmm, this format must be used if the version or release of the product is greater than 9.</p>
-<p class="last">For example, 110300 is version 11, release 3, modification 0.</p>
+<p>For example, 110300 is version 11, release 3, modification 0.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
 </dd>
-<dt>ptf (True, str, None)</dt>
-<dd>Specifies which PTF is shown for the specified product.</dd>
-<dt>product (True, str, None)</dt>
-<dd>Specifies the product for the PTF</dd>
-<dt>joblog (optional, bool, False)</dt>
-<dd>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</dd>
 </dl>
-</div></blockquote>
-</div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id17">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">ibmi_fix_module</span></dt>
-<dd>The official documentation on the <strong>ibmi_fix</strong> module.</dd>
-</dl>
-</div>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id18">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Get PTF information</span>
   <span class="nt">ibmi_display_fix</span><span class="p">:</span>
     <span class="nt">product</span><span class="p">:</span> <span class="s">&#39;5770SS1&#39;</span>
@@ -264,41 +267,108 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id6">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="ibmi_fix.html#ibmi-fix-module"><span class="std std-ref">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</span></a></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id19">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (always, list, [‘CPF2111:Library TESTLIB already exists.’])</dt>
-<dd>The command standard error split in lines</dd>
-<dt>job_log (always, str, [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . <span class="classifier-delimiter">:</span> <span class="classifier">This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}])</span></dt>
-<dd>the job_log</dd>
-<dt>stdout (always, str, CPC2102: Library TESTLIB created)</dt>
-<dd>The command standard output</dd>
-<dt>stderr (always, str, CPF2111:Library TESTLIB already exists)</dt>
-<dd>The command standard error</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The command return code (0 means success, non-zero means failure)</dd>
-<dt>stdout_lines (always, list, [‘CPC2102: Library TESTLIB created.’])</dt>
-<dd>The command standard output split in lines</dd>
-<dt>requisite_ptf (always, dict, {‘SI71139’: ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>PREREQ’, ‘SI71138’: ‘<a href="#id3"><span class="problematic" id="id4">*</span></a>PREREQ’, ‘SI71080’: ‘<a href="#id5"><span class="problematic" id="id6">*</span></a>COREQ’, ‘SI71137’: ‘<a href="#id7"><span class="problematic" id="id8">*</span></a>COREQ’, ‘SI70030’: ‘<a href="#id9"><span class="problematic" id="id10">*</span></a>PREREQ’, ‘SI71135’: ‘<a href="#id11"><span class="problematic" id="id12">*</span></a>COREQ’})</dt>
-<dd>The requisite PTFs and type</dd>
-<dt>ptf_info (always, str, [{‘PTF_ACTION_REQUIRED’: ‘NONE’, ‘PTF_PRODUCT_DESCRIPTION’: ‘IBM i’, ‘PTF_IS_RELEASED’: ‘NO’, ‘PTF_IPL_ACTION’: ‘NONE’, ‘PTF_MINIMUM_LEVEL’: ‘00’, ‘PTF_PRODUCT_RELEASE_LEVEL’: ‘V7R4M0’, ‘PTF_SUPERSEDED_BY_PTF’: ‘’, ‘PTF_TECHNOLOGY_REFRESH_PTF’: ‘NO’, ‘PTF_PRODUCT_LOAD’: ‘5050’, ‘PTF_ACTION_PENDING’: ‘NO’, ‘PTF_IDENTIFIER’: ‘SI73329’, ‘PTF_IPL_REQUIRED’: ‘IMMEDIATE’, ‘PTF_CREATION_TIMESTAMP’: ‘2020-05-14-22.08.22.000000’, ‘PTF_PRODUCT_ID’: ‘5770SS1’, ‘PTF_COVER_LETTER’: ‘YES’, ‘PTF_TEMPORARY_APPLY_TIMESTAMP’: ‘2020-05-14-22.39.06.000000’, ‘PTF_PRODUCT_OPTION’: ‘<a href="#id13"><span class="problematic" id="id14">*</span></a>BASE’, ‘PTF_MAXIMUM_LEVEL’: ‘00’, ‘PTF_SAVE_FILE’: ‘YES’, ‘PTF_RELEASE_LEVEL’: ‘V7R4M0’, ‘PTF_LOADED_STATUS’: ‘APPLIED’, ‘PTF_ON_ORDER’: ‘NO’, ‘PTF_STATUS_TIMESTAMP’: ‘2020-05-14-22.39.06.000000’}])</dt>
-<dd>the ptf information</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The command standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">the job_log</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . :   This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}]</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The command standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPC2102: Library TESTLIB created</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The command standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF2111:Library TESTLIB already exists</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The command return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The command standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPC2102: Library TESTLIB created.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>requisite_ptf</dt><dd><div class="line-block">
+<div class="line">The requisite PTFs and type</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: dict</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;SI70030&quot;</span><span class="p">:</span> <span class="s2">&quot;*PREREQ&quot;</span><span class="p">,</span> <span class="s2">&quot;SI71080&quot;</span><span class="p">:</span> <span class="s2">&quot;*COREQ&quot;</span><span class="p">,</span> <span class="s2">&quot;SI71135&quot;</span><span class="p">:</span> <span class="s2">&quot;*COREQ&quot;</span><span class="p">,</span> <span class="s2">&quot;SI71137&quot;</span><span class="p">:</span> <span class="s2">&quot;*COREQ&quot;</span><span class="p">,</span> <span class="s2">&quot;SI71138&quot;</span><span class="p">:</span> <span class="s2">&quot;*PREREQ&quot;</span><span class="p">,</span> <span class="s2">&quot;SI71139&quot;</span><span class="p">:</span> <span class="s2">&quot;*PREREQ&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>ptf_info</dt><dd><div class="line-block">
+<div class="line">the ptf information</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘PTF_ACTION_REQUIRED’: ‘NONE’, ‘PTF_PRODUCT_DESCRIPTION’: ‘IBM i’, ‘PTF_IS_RELEASED’: ‘NO’, ‘PTF_IPL_ACTION’: ‘NONE’, ‘PTF_MINIMUM_LEVEL’: ‘00’, ‘PTF_PRODUCT_RELEASE_LEVEL’: ‘V7R4M0’, ‘PTF_SUPERSEDED_BY_PTF’: ‘’, ‘PTF_TECHNOLOGY_REFRESH_PTF’: ‘NO’, ‘PTF_PRODUCT_LOAD’: ‘5050’, ‘PTF_ACTION_PENDING’: ‘NO’, ‘PTF_IDENTIFIER’: ‘SI73329’, ‘PTF_IPL_REQUIRED’: ‘IMMEDIATE’, ‘PTF_CREATION_TIMESTAMP’: ‘2020-05-14-22.08.22.000000’, ‘PTF_PRODUCT_ID’: ‘5770SS1’, ‘PTF_COVER_LETTER’: ‘YES’, ‘PTF_TEMPORARY_APPLY_TIMESTAMP’: ‘2020-05-14-22.39.06.000000’, ‘PTF_PRODUCT_OPTION’: ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>BASE’, ‘PTF_MAXIMUM_LEVEL’: ‘00’, ‘PTF_SAVE_FILE’: ‘YES’, ‘PTF_RELEASE_LEVEL’: ‘V7R4M0’, ‘PTF_LOADED_STATUS’: ‘APPLIED’, ‘PTF_ON_ORDER’: ‘NO’, ‘PTF_STATUS_TIMESTAMP’: ‘2020-05-14-22.39.06.000000’}]</div>
+</div>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id20">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Chang Le(&#64;changlexc)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -325,8 +395,7 @@
         &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_uninstall_product – delete the objects that make up the licensed program(product) &mdash; IBM power_ibmi collection  documentation</title>
+  <title>ibmi_uninstall_product – delete the objects that make up the licensed program(product) &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -127,10 +127,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_uninstall_product – delete the objects that make up the licensed program(product)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_user_and_group.html">ibmi_user_and_group – Create, Change or Display a user(or group) profile</a></li>
@@ -195,7 +194,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_uninstall_product.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_uninstall_product.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -210,52 +209,63 @@
            <div itemprop="articleBody">
             
   <div class="section" id="ibmi-uninstall-product-delete-the-objects-that-make-up-the-licensed-program-product">
-<h1>ibmi_uninstall_product – delete the objects that make up the licensed program(product)<a class="headerlink" href="#ibmi-uninstall-product-delete-the-objects-that-make-up-the-licensed-program-product" title="Permalink to this headline">¶</a></h1>
+<span id="ibmi-uninstall-product-module"></span><h1>ibmi_uninstall_product – delete the objects that make up the licensed program(product)<a class="headerlink" href="#ibmi-uninstall-product-delete-the-objects-that-make-up-the-licensed-program-product" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#synopsis" id="id27">Synopsis</a></li>
-<li><a class="reference internal" href="#parameters" id="id28">Parameters</a></li>
-<li><a class="reference internal" href="#see-also" id="id29">See Also</a></li>
-<li><a class="reference internal" href="#examples" id="id30">Examples</a></li>
-<li><a class="reference internal" href="#return-values" id="id31">Return Values</a></li>
-<li><a class="reference internal" href="#status" id="id32">Status</a></li>
+<li><p><a class="reference internal" href="#synopsis" id="id17">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id18">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id19">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id20">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id21">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id27">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
-<p>the <code class="docutils literal notranslate"><span class="pre">ibmi_uninstall_product</span></code> module delete the objects that make up the product on the target ibmi node.</p>
+<h2><a class="toc-backref" href="#id17">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">ibmi_uninstall_product</span></code> module delete the objects that make up the product on the target ibmi node.</p></li>
+</ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id28">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<blockquote>
-<div><dl class="docutils">
-<dt>release (optional, str, <a href="#id1"><span class="problematic" id="id2">*</span></a>ONLY)</dt>
-<dd>Specifies which version, release, and modification level of the licensed program is deleted</dd>
-<dt>product (True, str, None)</dt>
-<dd>Specifies the seven-character identifier of the licensed program that is deleted</dd>
-<dt>option (optional, str, <a href="#id3"><span class="problematic" id="id4">*</span></a>ALL)</dt>
-<dd>Specifies which of the parts of the licensed program specified on the Product prompt (LICPGM parameter) are deleted</dd>
-<dt>language (optional, str, <a href="#id5"><span class="problematic" id="id6">*</span></a>ALL)</dt>
-<dd><p class="first">Specifies which national language version (NLV) objects are deleted for the licensed program specified on the LICPGM parameter</p>
-<p class="last">It’s the IBM-supplied language feature codes, like German is 2924, English is 2924</p>
+<h2><a class="toc-backref" href="#id18">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
 </dd>
-<dt>joblog (optional, bool, False)</dt>
-<dd>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</dd>
-</dl>
-</div></blockquote>
+<dt>language</dt><dd><p>Specifies which national language version (NLV) objects are deleted for the licensed program specified on the LICPGM parameter</p>
+<p>It’s the IBM-supplied language feature codes, like German is 2924, English is 2924</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>ALL</div>
 </div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id29">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><span class="xref std std-ref">ibmi_install_product_from_savf, ibmi_save_product_to_savf_module</span></dt>
-<dd>The official documentation on the <strong>ibmi_install_product_from_savf, ibmi_save_product_to_savf</strong> module.</dd>
-</dl>
+</dd>
+<dt>option</dt><dd><p>Specifies which of the parts of the licensed program specified on the Product prompt (LICPGM parameter) are deleted</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>ALL</div>
 </div>
+</dd>
+<dt>product</dt><dd><p>Specifies the seven-character identifier of the licensed program that is deleted</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>release</dt><dd><p>Specifies which version, release, and modification level of the licensed program is deleted</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>ONLY</div>
+</div>
+</dd>
+</dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id30">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id19">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Deleting all Licensed Program Objects</span>
   <span class="nt">ibmi_uninstall_product</span><span class="p">:</span>
     <span class="nt">product</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5770QU1</span>
@@ -267,37 +277,85 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id20">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">ibmi_install_product_from_savf, ibmi_save_product_to_savf_module</span></p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id31">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id21">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><dl class="docutils">
-<dt>stderr_lines (always, list, [‘Product 5733D10 option <a href="#id7"><span class="problematic" id="id8">*</span></a>ALL release <a href="#id9"><span class="problematic" id="id10">*</span></a>ONLY language <a href="#id11"><span class="problematic" id="id12">*</span></a>ALL not installed’])</dt>
-<dd>The standard error split in lines</dd>
-<dt>job_log (always, str, [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . <span class="classifier-delimiter">:</span> <span class="classifier">This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}])</span></dt>
-<dd>the job_log</dd>
-<dt>stderr (When rc as non-zero(failure), str, Product 5733D10 option <a href="#id13"><span class="problematic" id="id14">*</span></a>ALL release <a href="#id15"><span class="problematic" id="id16">*</span></a>ONLY language <a href="#id17"><span class="problematic" id="id18">*</span></a>ALL not installed)</dt>
-<dd>The standard error</dd>
-<dt>stdout (always, str, Product 5733D10 option 11 release <a href="#id19"><span class="problematic" id="id20">*</span></a>ONLY language <a href="#id21"><span class="problematic" id="id22">*</span></a>ALL deleted.)</dt>
-<dd>The standard output</dd>
-<dt>stdout_lines (always, list, [‘Product 5733D10 option 11 release <a href="#id23"><span class="problematic" id="id24">*</span></a>ONLY language <a href="#id25"><span class="problematic" id="id26">*</span></a>ALL deleted.’])</dt>
-<dd>The standard output split in lines</dd>
-<dt>rc (always, int, 255)</dt>
-<dd>The task return code (0 means success, non-zero means failure)</dd>
+<div><dl>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;Product 5733D10 option *ALL release *ONLY language *ALL not installed&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">the job_log</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: [{‘TO_MODULE’: ‘QSQSRVR’, ‘TO_PROGRAM’: ‘QSQSRVR’, ‘MESSAGE_TEXT’: ‘Printer device PRT01 not found.’, ‘FROM_MODULE’: ‘’, ‘FROM_PROGRAM’: ‘QWTCHGJB’, ‘MESSAGE_TIMESTAMP’: ‘2020-05-20-21.41.40.845897’, ‘FROM_USER’: ‘CHANGLE’, ‘TO_INSTRUCTION’: ‘9369’, ‘MESSAGE_SECOND_LEVEL_TEXT’: ‘Cause … . . :   This message is used by application programs as a general escape message.’, ‘MESSAGE_TYPE’: ‘DIAGNOSTIC’, ‘MESSAGE_ID’: ‘CPD0912’, ‘MESSAGE_LIBRARY’: ‘QSYS’, ‘FROM_LIBRARY’: ‘QSYS’, ‘SEVERITY’: ‘20’, ‘FROM_PROCEDURE’: ‘’, ‘TO_LIBRARY’: ‘QSYS’, ‘FROM_INSTRUCTION’: ‘318F’, ‘MESSAGE_SUBTYPE’: ‘’, ‘ORDINAL_POSITION’: ‘5’, ‘MESSAGE_FILE’: ‘QCPFMSG’, ‘TO_PROCEDURE’: ‘QSQSRVR’}]</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: Product 5733D10 option <a href="#id7"><span class="problematic" id="id8">*</span></a>ALL release <a href="#id9"><span class="problematic" id="id10">*</span></a>ONLY language <a href="#id11"><span class="problematic" id="id12">*</span></a>ALL not installed</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: Product 5733D10 option 11 release <a href="#id13"><span class="problematic" id="id14">*</span></a>ONLY language <a href="#id15"><span class="problematic" id="id16">*</span></a>ALL deleted.</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;Product 5733D10 option 11 release *ONLY language *ALL deleted.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="status">
-<h2><a class="toc-backref" href="#id32">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
-<li>This module is maintained by community.</li>
-</ul>
-<div class="section" id="authors">
-<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Chang Le (&#64;changlexc)</li>
-</ul>
-</div>
 </div>
 </div>
 
@@ -324,8 +382,7 @@
         &copy; Copyright 2020, IBM
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 
