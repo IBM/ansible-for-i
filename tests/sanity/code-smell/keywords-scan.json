@@ -1,0 +1,12 @@
+{
+    "prefixes": [
+        "lib/ansible/",
+        "test/integration/",
+        "examples/"
+    ],
+    "extensions": [
+        ".py",
+        ".yml"
+    ],
+    "output": "path-message"
+}

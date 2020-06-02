@@ -1,0 +1,76 @@
+# Test when all dependent packages are in place  
+- name: Query the iASP existing
+  ibmi_sql_query:
+    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+  register: iasp_list
+
+- block:
+  - name: IASP - run CL command module with asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB(TRYIASP1) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      #joblog: true
+
+  - ibmi_cl_command:
+      cmd: CRTDTAARA DTAARA(TRYIASP1/{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}) TYPE(*DEC)
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+      #joblog: false
+
+  - name: IASP TC01 - check obj with asp_group
+    ibmi_cl_command:
+      cmd: CHKOBJ OBJ(TRYIASP1/{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}) OBJTYPE(*DTAARA)
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: true
+
+  - name: IASP TC02 - check obj without asp_group
+    ibmi_cl_command:
+      cmd: CHKOBJ OBJ(TRYIASP1/{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}) OBJTYPE(*DTAARA) 
+      joblog: false
+    register: cl_result
+    failed_when: cl_result.rc == 0
+
+  - name: IASP TC03 - run CL command module without asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB(TRYIASP2) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+
+  - name: IASP TC04 - create dataarea with asp_group
+    ibmi_cl_command:
+      cmd: CRTDTAARA DTAARA(TRYIASP2/data2) TYPE(*DEC)
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+      joblog: false
+
+  - name: IASP TC05 - check obj
+    ibmi_cl_command:
+      cmd: CHKOBJ OBJ(TRYIASP2/data2) OBJTYPE(*DTAARA)
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: true
+
+  - name: IASP TC06 - check obj without asp_group
+    ibmi_cl_command:
+      cmd: CHKOBJ OBJ(TRYIASP2/data2) OBJTYPE(*DTAARA) 
+      joblog: false
+    register: cl_result
+    failed_when: cl_result.rc == 0
+
+  - name: IASP TC07 - run CL command module with an invalid asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB(TRYIASP3) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+      asp_group: "abc"
+    register: cl_result
+    failed_when: "'Exception when connecting to IBM i Db2' not in cl_result.stderr"
+  when: iasp_list.row_count != 0
+
+  always:
+    - name: rmvlib
+      ibmi_cl_command:
+        cmd: dltlib lib(TRYIASP1)
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        joblog: true
+      ignore_errors: true
+    
+    - name: rmvlib
+      ibmi_cl_command:
+        cmd: dltlib lib(TRYIASP2)
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        joblog: true
+      ignore_errors: true

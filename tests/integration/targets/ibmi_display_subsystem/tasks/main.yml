@@ -1,0 +1,181 @@
+# test code for the ibmi_display_subsystem module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block:
+    - name: TC01 display subsystem 
+      ibmi_display_subsystem:
+        subsystem: '*ALL'
+        user: '*all'
+      register: dspsbs_result
+   
+    - name: TC01 assert the returned parameters
+      assert:
+        that: 
+          - dspsbs_result.stderr is not defined
+          - dspsbs_result.stderr_lines is not defined 
+          - dspsbs_result.stdout_lines is not defined
+          - dspsbs_result.active_jobs is not defined
+          - dspsbs_result.subsystems | length >= 2 
+
+    - name: TC02 display with default values
+      ibmi_display_subsystem:
+      register: dspsbs_result
+
+    - name: TC01 assert the returned parameters
+      assert:
+        that: 
+          - dspsbs_result.stderr is not defined
+          - dspsbs_result.stderr_lines is not defined 
+          - dspsbs_result.stdout_lines is not defined
+          - dspsbs_result.active_jobs is not defined
+          - dspsbs_result.subsystems | length >= 2
+          - dspsbs_result.subsystems[0] != '+++ success QSYS/WRKSBS'
+          - dspsbs_result.active_jobs is not defined 
+
+    - name: TC03 display with an user
+      ibmi_display_subsystem:
+        user: '{{ ansible_ssh_user }}'
+      register: dspsbs_result_2
+
+    - name: TC04 check whether QBATCH is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result_orig
+
+    - name: TC04 end the host server if it is running
+      ibmi_end_subsystem:
+        subsystem: QBATCH
+        how_to_end: '*IMMED'
+      when: "sql_result_orig.row | length == 1"
+
+    - name: TC04 pause 30 seconds to wait for subsystem ending
+      pause:
+        seconds: 30
+
+    - name: TC04 check whether QBATCH is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result_orig
+      until: sql_result_orig.row | length == 0
+      retries: 5
+      delay: 60    
+
+    - name: TC05 start subsystem if it is not running
+      ibmi_start_subsystem:
+        subsystem: QBATCH
+        library: QSYS
+      when: sql_result_orig.row | length == 0
+
+    - name: TC05 check whether QBATCH is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result_orig
+      until: sql_result_orig.row | length == 1
+      retries: 5
+      delay: 60  
+
+    - name: TC06 display info of a designated sbs
+      ibmi_display_subsystem:
+        subsystem: 'QBATCH'
+        user: '*all'
+      register: dspsbs_single_result
+
+    - name: TC06 assert the returned parameters
+      assert:
+        that: 
+          - dspsbs_single_result.stderr is not defined
+          - dspsbs_single_result.stderr_lines is not defined 
+          - dspsbs_single_result.stdout_lines is not defined
+          - dspsbs_single_result.subsystems is not defined
+          - dspsbs_single_result.rc == 0      
+          - dspsbs_single_result.active_jobs is defined
+  
+    - name: TC07 submit a job to QBATCH
+      ibmi_submit_job: 
+        cmd: "QSH CMD('sleep 120s')"
+        status: ['*NONE']
+        parameters: "JOBQ(QGPL/QBATCH)"
+
+    - name: TC07 display info of a designated sbs
+      ibmi_display_subsystem:
+        subsystem: 'QBATCH'
+      register: dspsbs_single_result
+
+    - name: TC07 assert the returned parameters
+      assert:
+        that: 
+          - dspsbs_single_result.active_jobs | length > 0
+          - dspsbs_single_result.active_jobs[0].AUTHORIZATION_NAME is defined
+          - dspsbs_single_result.active_jobs[0].CPU_TIME is defined
+          - dspsbs_single_result.active_jobs[0].ELAPSED_ASYNC_DISK_IO_COUNT is defined
+          - dspsbs_single_result.active_jobs[0].ELAPSED_CPU_PERCENTAGE is defined 
+          - dspsbs_single_result.active_jobs[0].ELAPSED_CPU_TIME is defined
+          - dspsbs_single_result.active_jobs[0].ELAPSED_INTERACTION_COUNT is defined 
+          - dspsbs_single_result.active_jobs[0].ELAPSED_PAGE_FAULT_COUNT is defined
+          - dspsbs_single_result.active_jobs[0].ELAPSED_SYNC_DISK_IO_COUNT is defined
+          - dspsbs_single_result.active_jobs[0].ELAPSED_TIME is defined
+          - dspsbs_single_result.active_jobs[0].ELAPSED_TOTAL_DISK_IO_COUNT is defined
+          - dspsbs_single_result.active_jobs[0].ELAPSED_TOTAL_RESPONSE_TIME is defined
+          - dspsbs_single_result.active_jobs[0].FUNCTION is defined 
+          - dspsbs_single_result.active_jobs[0].FUNCTION_TYPE is defined
+          - dspsbs_single_result.active_jobs[0].INTERNAL_JOB_ID is defined 
+          - dspsbs_single_result.active_jobs[0].JOB_END_REASON is defined
+          - dspsbs_single_result.active_jobs[0].JOB_NAME is defined
+          - dspsbs_single_result.active_jobs[0].JOB_STATUS is defined
+          - dspsbs_single_result.active_jobs[0].JOB_TYPE is defined
+          - dspsbs_single_result.active_jobs[0].MEMORY_POOL is defined
+          - dspsbs_single_result.active_jobs[0].ORDINAL_POSITION is defined 
+          - dspsbs_single_result.active_jobs[0].RUN_PRIORITY is defined
+          - dspsbs_single_result.active_jobs[0].SERVER_TYPE is defined 
+          - dspsbs_single_result.active_jobs[0].SUBSYSTEM == 'QBATCH'
+          - dspsbs_single_result.active_jobs[0].SUBSYSTEM_LIBRARY_NAME is defined
+          - dspsbs_single_result.active_jobs[0].TEMPORARY_STORAGE is defined
+          - dspsbs_single_result.active_jobs[0].THREAD_COUNT is defined 
+          - dspsbs_single_result.active_jobs[0].TOTAL_DISK_IO_COUNT is defined
+
+    - name: TC08 display with an user
+      ibmi_display_subsystem:
+        subsystem: 'QBATCH'
+        user: '{{ ansible_ssh_user }}'
+      register: dspsbs_single_result
+      failed_when: 'dspsbs_single_result.active_jobs | length == 0'
+
+    - name: TC09 display with an not existing user
+      ibmi_display_subsystem:
+        subsystem: 'QBATCH'
+        user: 'abc'
+      register: dspsbs_single_result
+      failed_when: 'dspsbs_single_result.active_jobs | length != 0'
+
+    - name: TC10 display an not existing subsystem
+      ibmi_display_subsystem:
+        subsystem: 'abcdefghigklmn'   
+      register: neg_result
+      failed_when: "'subsystem exceeds 10 characters' not in neg_result.msg" 
+
+    - name: TC11 display an not existing subsystem
+      ibmi_display_subsystem:
+        user: 'abcdefghigklmn'   
+      register: neg_result
+      failed_when: "'user exceeds 10 characters' not in neg_result.msg" 
+
+    - name: TC12 display an not existing subsystem
+      ibmi_display_subsystem:
+        subsystem: 'abcdef'   
+      register: neg_result 
+      failed_when: "'is not active' not in neg_result.msg"
+      
+    - name: TC13 Provide invalid option
+      ibmi_display_subsystem: 
+        abc: True
+      register: neg_result
+      failed_when: "'Unsupported parameters' not in neg_result.msg" 
+

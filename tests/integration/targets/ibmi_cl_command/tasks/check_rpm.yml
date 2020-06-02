@@ -1,0 +1,55 @@
+- name: Verify {{item}} installed
+  raw: /QOpensys/pkgs/bin/rpm -qa {{python}}-{{item}}
+  register: rpm_query_result
+
+- name: Remove {{item}} if it is installed
+  command: /QOpensys/pkgs/bin/yum remove {{python}}-{{item}} -y
+  when: rpm_query_result.stdout != ""
+
+- name: Remove the directory of {{item}} if it is removed
+  shell:
+    cmd: "rm -rf /QOpensys/pkgs/lib/{{python}}*/site-packages/{{item}}" 
+  args:  
+    executable: /usr/bin/qsh
+
+- name: run CL command module with joblog = True
+  ibmi_cl_command:
+    cmd: dltlib ansible1 
+    joblog: True
+  register: dltlib_result
+  ignore_errors: True
+
+- name: assert the previous task failed because the target ibm i lacks of {{item}}
+  assert:
+    that:  
+      - "'{{item}} package is required' in dltlib_result.stderr"
+
+- name: run CL command module with joblog = False
+  ibmi_cl_command:
+    cmd: DSPLIBL
+    joblog: false
+  register: crtlib_result
+
+- name: assert the returned parameters with joblog = False
+  assert:
+    that: 
+      - "'CPF2110' not in crtlib_result"
+      - crtlib_result.job_log == []
+      - crtlib_result.cmd != ""
+      - crtlib_result.stderr == ""
+      - crtlib_result.stderr_lines == []
+      - crtlib_result.rc == 0 
+
+- name: run CL command module without joblog
+  ibmi_cl_command:
+    cmd: dltlib lib(ansible1)
+  register: dltlib_result_1
+  ignore_errors: True
+
+- name: assert the previous task failed because the target ibm i lacks of {{item}}
+  assert:
+    that:  
+      - "'{{item}} package is required' in dltlib_result.stderr"
+
+- name: Install {{item}}
+  command: /QOpensys/pkgs/bin/yum install {{python}}-{{item}} -y

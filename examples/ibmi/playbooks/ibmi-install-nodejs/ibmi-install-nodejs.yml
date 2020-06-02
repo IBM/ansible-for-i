@@ -3,6 +3,9 @@
 ---
 - hosts: ibmi 
   gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
   vars: 
     checkout_dir: 'tmp_nodejs'
 

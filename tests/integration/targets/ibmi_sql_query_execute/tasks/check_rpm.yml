@@ -1,0 +1,38 @@
+- name: Verify {{item}} installed
+  raw: /QOpensys/pkgs/bin/rpm -qa {{python}}-{{item}}
+  register: rpm_query_result
+
+- name: Remove {{item}} if it is installed
+  command: /QOpensys/pkgs/bin/yum remove {{python}}-{{item}} -y
+  when: rpm_query_result.stdout != ""
+
+- name: Remove the directory of {{item}} if it is removed
+  shell:
+    cmd: "rm -rf /QOpensys/pkgs/lib/{{python}}*/site-packages/{{item}}" 
+  args:  
+    executable: /usr/bin/qsh
+
+- name: run sql query module
+  ibmi_sql_query:
+    sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
+  register: sql_query_result_1
+  ignore_errors: True
+
+- name: assert the previous task failed because the target ibm i lacks of {{item}}
+  assert:
+    that:  
+      - "'{{item}} package is required' in sql_query_result_1.stderr"
+
+- name: run sql execute module
+  ibmi_sql_execute:
+    sql: "create table ansible(id INT not null, name varchar(8), gender varchar(8))" 
+  register: sql_execute_result_1
+  ignore_errors: True
+
+- name: assert the previous task failed because the target ibm i lacks of {{item}}
+  assert:
+    that:  
+      - "'{{item}} package is required' in sql_execute_result_1.stderr"
+
+- name: Install {{item}}
+  command: /QOpensys/pkgs/bin/yum install {{python}}-{{item}} -y

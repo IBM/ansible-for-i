@@ -1,0 +1,462 @@
+- name: Verify 5770SS1 Option 39
+  command: system "DSPSFWRSC"
+  register: installed_native_products
+
+- set_fact:
+    Option39_installed: false
+
+- name: Promote message if 5770SS1 Option 39 is not installed
+  set_fact:
+    Option39_installed: true
+  when: '"5770SS1     39         5050" in installed_native_products.stdout'
+
+- include: setup_lib.yml
+
+- name: TC01 fetch with only required options
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+
+- name: TC01 assert the returned options
+  assert: 
+    that: 
+      - fetch_result.delta is defined
+      - fetch_result.stdout is defined
+      - fetch_result.stderr is defined
+      - fetch_result.file is defined 
+      - fetch_result.msg is defined
+      - fetch_result.md5sum is defined
+      - fetch_result.dest is defined
+      - fetch_result.remote_md5sum is defined
+      - fetch_result.remote_checksum is defined
+      - fetch_result.checksum is defined
+
+- include: validate_on_i.yml
+  vars: 
+    object_name: "*ALL"
+    object_type: "*ALL"
+    savefile_name: "SAVRST.FILE"
+
+- name: TC01 number of objects
+  assert: 
+    that:
+      - restored_result.object_list | length == 8
+
+- include: setup_lib.yml
+
+# Test positive cases of object_names
+- name: TC02 Fetch objects with all supported options
+  ibmi_fetch:
+    object_names: 'PGM1'
+    lib_name: 'SAVRST'
+    object_types: '*DTAARA'
+    savefile_name: 'ifetch1'
+    is_lib: false
+    dest: '{{ output_dir }}/fetched'
+    force_save: false
+    backup: false
+    format: '*SAVF'
+    target_release: '*CURRENT'
+    validate_checksum: true
+    flat: false
+  register: fetch_result
+
+- include: validate_on_i.yml
+  vars: 
+    object_name: "PGM1"
+    object_type: "*DTAARA"
+    savefile_name: "IFETCH1.FILE"
+
+- name: TC02 number of objects
+  assert: 
+    that:
+      - restored_result.object_list | length ==  1
+
+- include: setup_lib.yml
+
+- name: TC03 Fetch objects with more than one objects
+  ibmi_fetch:
+    object_names: 'PGM* ANSIJSNRC1'
+    lib_name: 'SAVRST'
+    savefile_name: 'ifetch1'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+
+- include: validate_on_i.yml
+  vars: 
+    object_name: "ANSIJSNRC1"
+    object_type: "*JRNRCV"
+    savefile_name: "IFETCH1.FILE"
+
+- name: TC03 number of objects
+  assert: 
+    that:
+      - restored_result.object_list | length == 1 
+
+- include: setup_lib.yml
+  
+- name: TC04 Fetch only one SAVF object the savefile_name should be ignored
+  ibmi_fetch:
+    object_names: 'SAVF1'
+    lib_name: 'SAVRST'
+    savefile_name: 'ifetch1'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+
+- include: copy_object.yml
+  vars:
+    savefile_name: "SAVF1.FILE"  
+
+- name: TC04 get the restored object info
+  ibmi_object_find:
+    object_name: "SAVF1"
+    object_type_list: "*FILE"
+    lib_name: "SAVRST"
+  register: restored_result
+
+- name: TC05 get the restored object info
+  ibmi_object_find:
+    object_name: "SAVF1"
+    object_type_list: "*FILE"
+    lib_name: "SAVRST"
+  register: original_result
+
+- name: TC05 assert the size of the object is name as the original
+  assert:
+    that:
+      - restored_result.object_list[0]['OBJSIZE'] == original_result.object_list[0]['OBJSIZE']
+
+- include: setup_lib.yml
+
+- name: TC06 fetch multiple objects including a SAVF
+  ibmi_fetch:
+    object_names: 'SAVF1 PGM2'
+    lib_name: 'SAVRST'
+    savefile_name: 'ifetch1'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+
+- include: copy_object.yml
+  vars:
+    savefile_name: "IFETCH1.FILE" 
+
+- include: cleanup_lib.yml
+  vars:
+    savefile_name: "IFETCH1.FILE" 
+
+- name: TC06 assert 2 objects restored to the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    expected_row_count: 2
+
+- include: setup_lib.yml
+
+# Test positive case of object_type
+- name: TC07 Fetch objects with object_type
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    object_types: '*FILE'
+    savefile_name: 'ifetch1'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+
+- include: copy_object.yml
+  vars:
+    savefile_name: "IFETCH1.FILE" 
+
+- include: cleanup_lib.yml
+  vars:
+    savefile_name: "IFETCH1.FILE" 
+
+- name: TC07 assert 2 objects restored to the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    expected_row_count: 4
+
+- include: setup_lib.yml
+
+- name: TC08 Fetch objects with all supported options
+  ibmi_fetch:
+    object_names: 'P* ANSIJSNRC1'
+    lib_name: 'SAVRST'
+    object_types: '*FILE *JRNRCV *DTAARA'
+    savefile_name: 'ifetch1'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+
+- include: copy_object.yml
+  vars:
+    savefile_name: "IFETCH1.FILE" 
+
+- include: cleanup_lib.yml
+  vars:
+    savefile_name: "IFETCH1.FILE" 
+
+- name: TC08 assert 2 objects restored to the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    expected_row_count: 6 
+
+- block:
+  - include: setup_lib.yml
+
+  # Test positive cases of savefile_name
+  - name: TC09 Fetch objects with all supported options
+    ibmi_fetch:
+      object_names: 'SAV*'
+      lib_name: 'SAVRST'
+      dest: '{{ output_dir }}/fetched'
+    register: fetch_result
+
+  - include: copy_object.yml
+    vars:
+      savefile_name: "SAVF1.FILE"  
+
+  - name: TC10 Fetch with savefile_name conflicts with an exsting object
+    ibmi_fetch:
+      object_names: 'PF1 SAVF1'
+      lib_name: 'SAVRST'
+      dest: '{{ output_dir }}/fetched'
+    register: fetch_result
+
+  - include: copy_object.yml
+    vars:
+      savefile_name: "PF11.FILE" 
+
+  - include: cleanup_lib.yml
+    vars:
+      savefile_name: "PF11.FILE" 
+
+  - name: TC10 assert 2 objects restored to the library
+    ibmi_sql_query:
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+      expected_row_count: 2
+
+  - include: setup_lib.yml
+
+  - name: TC11 Fetch with savefile_name conflicts with an exsting object
+    ibmi_fetch:
+      object_names: 'PF2* PGM*'
+      lib_name: 'SAVRST'
+      dest: '{{ output_dir }}/fetched'
+    register: fetch_result
+
+  - include: copy_object.yml
+    vars:
+      savefile_name: "PF21.FILE" 
+
+  - include: cleanup_lib.yml
+    vars:
+      savefile_name: "PF21.FILE"
+
+  - name: TC11 assert 2 objects restored to the library
+    ibmi_sql_query:
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+      expected_row_count: 4
+
+  - include: setup_lib.yml
+
+  - name: TC12 Fetch with savefile_name conflicts with an exsting object
+    ibmi_fetch:
+      object_names: 'PF* PGM*'
+      lib_name: 'SAVRST'
+      dest: '{{ output_dir }}/fetched'
+    register: fetch_result
+
+  - include: copy_object.yml
+    vars:
+      savefile_name: "PF.FILE" 
+
+  - include: cleanup_lib.yml
+    vars:
+      savefile_name: "PF.FILE"
+
+  - name: TC12 assert 2 objects restored to the library
+    ibmi_sql_query:
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+      expected_row_count: 5
+  when: "Option39_installed == true "
+
+- include: setup_lib.yml
+
+# Test positive cases of is_lib
+- name: TC13 Fetch a library
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    is_lib: true
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+
+- include: copy_object.yml
+  vars:
+    savefile_name: "SAVRST.FILE" 
+
+- name: TC13 restore the lib
+  ibmi_lib_restore:
+    saved_lib: 'SAVRST'
+    savefile_name: 'SAVRST'
+    savefile_lib: 'ARCHLIB'
+
+- name: TC13 assert 2 objects restored to the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    expected_row_count: 8
+- include: setup_lib.yml
+
+# Test positive cases of dest
+- name: TC14 Fetch objects with dest is ''
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: ''
+  register: fetch_result
+
+- name: TC15 Fetch objects with dest is 'test'
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: 'test'
+  register: fetch_result
+
+- name: TC16 Fetch objects with dest is '~/test'
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: '~/test'
+
+- name: TC17 Fetch objects with dest is 'test'
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: 'test'
+    flat: true
+  register: fetch_result
+
+- name: TC18 Fetch objects with dest is '~/test'
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: '~/test'
+    flat: true
+
+# Test positive cases of force_save
+- name: TC19 Fetch objects with all supported options
+  ibmi_fetch:
+    object_names: 'PF1 SAVF1'
+    lib_name: 'SAVRST'
+    dest: '{{ output_dir }}/fetched'
+    force_save: true 
+  register: fetch_result
+
+- include: copy_object.yml
+  vars:
+    savefile_name: "PF11.FILE" 
+
+- include: cleanup_lib.yml
+  vars:
+    savefile_name: "PF11.FILE" 
+
+- name: TC19 assert 2 objects restored to the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    expected_row_count: 2
+
+- include: setup_lib.yml
+
+- name: TC20 Fetch objects with force_save
+  ibmi_fetch:
+    object_names: 'PGM1 SAVF1'
+    lib_name: 'SAVRST'
+    dest: '{{ output_dir }}/fetched'
+    savefile_name: SAVF1
+    force_save: true 
+  register: fetch_result
+
+- include: copy_object.yml
+  vars:
+    savefile_name: "SAVF1.FILE" 
+
+- include: cleanup_lib.yml
+  vars:
+    savefile_name: "SAVF1.FILE" 
+
+- name: TC20 assert 2 objects restored to the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    expected_row_count: 2
+
+- include: setup_lib.yml
+
+# Test positive case of backup 
+- name: TC21 Fetch objects with backup=true
+  ibmi_fetch:
+    object_names: 'PGM1'
+    lib_name: 'SAVRST'
+    object_types: '*DTAARA'
+    savefile_name: 'ifetch1'
+    dest: '{{ output_dir }}/fetched'
+    backup: true
+  register: fetch_result
+
+- name: TC21 list all objects
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+
+- name: TC21 list all objects
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*FILE', 'IFETCH1') ) AS X;"
+    expected_row_count: 1 
+
+- include: setup_lib.yml
+
+# Test positive case of target_release 
+- name: TC22 Fetch objects with target_release 
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    object_types: '*FILE'
+    savefile_name: 'ifetch1'
+    dest: '{{ output_dir }}/fetched'
+    target_release: 'V7R2M0'
+  register: fetch_result
+
+- include: validate_on_i.yml
+  vars: 
+    object_name: "*ALL"
+    object_type: "*FILE"
+    savefile_name: "IFETCH1.FILE"
+
+- name: TC22 assert 2 objects restored to the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    expected_row_count: 4
+
+- include: setup_lib.yml
+
+# Test positive cases of validate_checksum
+- name: TC23 Fetch objects with validate_checksum
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    savefile_name: 'ifetch2'
+    dest: '{{ output_dir }}/fetched'
+    validate_checksum: false
+  register: fetch_result
+
+  # Test positive cases of flat
+- name: TC23 Fetch objects with flat
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    savefile_name: 'ifetch3'
+    dest: '{{ output_dir }}/fetched/123'
+    flat: yes
+  register: fetch_result
+
+- name: TC23 copy the file to ibmi
+  copy: src="{{ output_dir }}/fetched/123/IFETCH3.FILE" dest={{ remote_tmp_dir }}
+
+- name: TC23 move the file to library
+  command: 'mv {{ remote_tmp_dir }}/IFETCH3.FILE /QSYS.LIB/ARCHLIB.LIB/'
+
+- include: cleanup_lib.yml
+  vars:
+    savefile_name: "IFETCH3.FILE" 
+
+- name: TC23 assert 8 objects restored to the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    expected_row_count: 8 

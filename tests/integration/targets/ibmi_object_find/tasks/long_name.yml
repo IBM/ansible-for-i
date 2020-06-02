@@ -1,0 +1,99 @@
+- block: 
+    ## Setup - Create libraries and objects on test systems
+    - set_fact:
+        schema_long_name: schemanameabcdefghijklmnopqrstuvwxyz
+        table_long_name: tablenameabcdefghijklmnopqrstuvwxyz
+        new_object_name: TESTOBJ
+
+    ### When the schema name is longer then 10 characters the corresponding library name should be the 
+    ### 'first 5 characters + 00001'
+    - set_fact:
+        library_name: '{{schema_long_name[:5].upper()}}00001'
+        table_file_name: '{{table_long_name[:5].upper()}}00001'
+
+    - name: find the library
+      ibmi_object_find:
+        object_name: '{{library_name}}'
+        lib_name: 'QSYS'
+      register: long_name_result
+
+    - name: assert 0 object can be found
+      assert:
+        that:
+          - long_name_result.object_list | length == 0
+
+    - name: create schema 
+      ibmi_sql_execute: 
+        sql: 'create schema {{schema_long_name}}'
+
+    - name: find the library
+      ibmi_object_find:
+        object_name: '{{library_name}}'
+        lib_name: 'QSYS'
+      register: long_name_result
+
+    - name: assert 1 object can be found
+      assert:
+        that:
+          - long_name_result.object_list | length == 1
+
+    - name: create a dataarea in the new library
+      ibmi_cl_command:
+        cmd: CRTDTAARA DTAARA({{library_name}}/{{new_object_name}}) TYPE(*DEC)
+
+    - name: find the created object in the library
+      ibmi_object_find:
+        object_name: '{{new_object_name}}'
+        lib_name: '{{library_name}}'
+      register: long_name_result
+
+    - name: assert 1 object can be found
+      assert:
+        that:
+          - long_name_result.object_list | length == 1
+
+    - name: create journal receiver
+      ibmi_cl_command: 
+        cmd: QSYS/CRTJRNRCV JRNRCV({{library_name}}/ANSIJSNRCV) TEXT('JOURNAL RECEIVER FOR ANSIBLE')
+
+    - name: create journal
+      ibmi_cl_command: 
+        cmd: QSYS/CRTJRN JRN({{library_name}}/ANSIJSNJRN) JRNRCV({{library_name}}/ANSIJSNRCV) TEXT('JOURNAL FOR ANSIBLE') 
+
+    - name: run sql execute module
+      ibmi_sql_execute:
+        sql: "create table {{schema_long_name}}.{{table_long_name}}(id INT not null, name varchar(8), gender varchar(8))" 
+      ignore_errors: True
+
+    - name: find the created object in the library
+      ibmi_object_find:
+        object_name: '{{table_file_name}}'
+        lib_name: '{{library_name}}'
+      register: long_name_result
+
+    - name: assert 1 object should be found
+      assert:
+        that:
+          - long_name_result.object_list | length == 1
+
+  always:
+ 
+    - name: drop the table
+      ibmi_sql_execute:
+        sql: "drop table {{schema_long_name}}.{{table_long_name}}"
+      ignore_errors: True
+
+    - name: delete journal
+      ibmi_cl_command: 
+        cmd: QSYS/DLTJRN JRN({{library_name}}/ANSIJSNJRN) 
+      ignore_errors: True
+
+    - name: delete journal receiver
+      ibmi_cl_command: 
+        cmd: QSYS/DLTOBJ OBJ({{library_name}}/ANSIJSNRCV) OBJTYPE(*JRNRCV)
+      ignore_errors: True
+    
+    - name: rmvlib
+      ibmi_cl_command:
+        cmd: dltlib lib({{library_name}})
+      ignore_errors: true

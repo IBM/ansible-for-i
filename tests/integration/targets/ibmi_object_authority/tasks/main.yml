@@ -1,0 +1,58 @@
+# test code for the ibmi_object_authority module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#)
+
+- block:
+    - set_fact:
+        new_user: [ANSIUSER1, ANSIUSER2]
+        au_list: [au_list1, au_list2]
+        os_version: "{{ansible_distribution_version}}{{ansible_distribution_release}}"
+
+    - name: create two user profiles
+      ibmi_cl_command:
+        cmd: "crtusrprf usrprf({{item}}) password(passw0rd) status(*enabled) usrcls(*secofr) spcaut(*allobj *iosyscfg *jobctl *secadm *audit *service *splctl *savsys)"
+      loop: "{{new_user}}"
+      notify: remove user profiles
+      
+    - name: create authority list
+      ibmi_cl_command:
+        cmd: QSYS/CRTAUTL AUTL({{item}})
+      loop: "{{au_list}}"
+      notify: remove AUL
+
+    - name: add the new user profiles into AUL
+      ibmi_cl_command: 
+        cmd: ADDAUTLE AUTL({{au_list[0]}}) USER({{new_user[0]}}) AUT(*AUTLMGT *USE) 
+
+    - name: add the new user profiles into AUL
+      ibmi_cl_command: 
+        cmd: ADDAUTLE AUTL({{au_list[0]}}) USER({{new_user[1]}}) AUT(*OBJREF) 
+
+    - name: add the new user profiles into AUL
+      ibmi_cl_command: 
+        cmd: ADDAUTLE AUTL({{au_list[1]}}) USER({{new_user[0]}})
+
+    - name: add the new user profiles into AUL
+      ibmi_cl_command: 
+        cmd: ADDAUTLE AUTL({{au_list[1]}}) USER({{new_user[1]}}) AUT(*EXCLUDE)
+
+    - include: display_object_authority.yml
+    - include: grant_object_authority.yml
+    - include: grant_aul_list.yml
+    - include: grant_ref.yml
+    - include: iasp.yml
+
+  always:
+    - name: remove AUL
+      ibmi_cl_command:
+        cmd: QSYS/DLTAUTL AUTL({{item}})
+      loop: "{{au_list}}"
+      ignore_errors: true
+
+    - name: remove user profiles
+      ibmi_cl_command:
+        cmd: "QSYS/dltusrprf usrprf({{item}})"
+      loop: "{{new_user}}"
+      ignore_errors: true

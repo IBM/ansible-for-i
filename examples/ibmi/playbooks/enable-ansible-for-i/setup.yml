@@ -1,2 +1,1 @@
-- import_playbook: enable-ansible-server.yml
 - import_playbook: enable-ibmi.yml

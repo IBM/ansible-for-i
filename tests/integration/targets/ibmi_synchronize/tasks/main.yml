@@ -1,0 +1,121 @@
+# test code for the ibmi_synchronize module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# To run the playbook, use ansible-playbook -i your_inventory main.yml -e "delegate_host=your_ip delegate_host_user=your_user delegate_host_pass=your_password"
+- hosts: testhost
+  gather_facts: true 
+  
+  vars: 
+    delegate_host: ''
+    delegate_host_user: ''
+    delegate_host_pass: ''    
+
+  tasks:
+  - name: Add VM to Ansible in-memory inventory
+    add_host:
+      name: "{{delegate_host}}"
+      groups: remote_ibmi
+      ansible_user: "{{delegate_host_user}}" 
+      ansible_ssh_pass: "{{delegate_host_pass}}" 
+      ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+  - block:
+      - set_fact:
+          remote_temp_lib: 'ARCHLIB'
+          remote_restored_lib: 'SAVRST'
+          savf_name: 'SAVRST.FILE'
+          txt_name: 'foo.txt'
+          key_name: 'ansible_id_rsa'
+
+      - name: generate key pairs
+        command: "ssh-keygen -t rsa -m PEM -C 'Ansible key' -f '../files/{{key_name}}' -N ''"
+        delegate_to: localhost
+        ignore_errors: true
+
+      - name: add public key
+        authorized_key: user="{{ansible_ssh_user}}" key="{{ lookup('file', '../files/{{key_name}}.pub') }}"
+
+      - name: create libraries 
+        ibmi_cl_command: 
+          cmd: "crtlib lib({{item}})"
+        with_items: 
+          - '{{ remote_temp_lib }}'
+          - '{{ remote_restored_lib }}'
+
+      - name: copy key pairs to remote IBM i 
+        copy:
+          src: ../files/{{key_name}}
+          dest: '/tmp/'
+          mode: '0600'
+        delegate_to: '{{delegate_host}}'
+
+      - name: copy key pairs to remote IBM i 
+        copy:
+          src: ../files/{{key_name}}.pub
+          dest: '/tmp/'
+          mode: '0644'
+        delegate_to: '{{delegate_host}}'
+
+      - name: backup id_rsa key to default directory
+        command: mv ~/.ssh/id_rsa ~/.ssh/id_rsa_org
+        delegate_to: '{{delegate_host}}'
+        register: backup_key_result
+        ignore_errors: true
+
+      - name: copy key to default directory
+        command: cp /tmp/{{key_name}} ~/.ssh/id_rsa
+        delegate_to: '{{delegate_host}}'
+
+      - name: create library
+        ibmi_cl_command:
+          cmd: 'crtlib {{remote_temp_lib}}'
+        delegate_to: '{{delegate_host}}'
+
+      - name: copy a SAVF with force=true when the object does exist
+        ibmi_copy: 
+          src: '../files/{{ savf_name  }}'
+          lib_name: 'ARCHLIB'
+        delegate_to: '{{delegate_host}}'
+
+      - include: ibmi_synchronize.yml
+
+    always:
+
+      - name: remove public key
+        authorized_key: 
+          user: "{{ansible_ssh_user}}" 
+          key: "{{ lookup('file', '../files/{{key_name}}.pub') }}"
+          state: absent
+
+      - name: remove key files
+        command: rm -rf ../files/{{key_name}}
+        delegate_to: localhost
+      - name: remove key files
+        command: rm -rf ../files/{{key_name}}.pub
+        delegate_to: localhost
+
+      - name: delete libraries 
+        ibmi_cl_command: 
+          cmd: "dltlib lib({{remote_temp_lib}})"
+        delegate_to: '{{delegate_host}}' 
+        ignore_errors: true
+
+      - name: delete libraries 
+        ibmi_cl_command: 
+          cmd: "dltlib lib({{item}})"
+        with_items: 
+          - '{{ remote_temp_lib }}'
+          - '{{ remote_restored_lib }}'
+        ignore_errors: true
+
+      - name: backup id_rsa key to default directory
+        command: mv ~/.ssh/id_rsa_org ~/.ssh/id_rsa
+        delegate_to: '{{delegate_host}}'
+        ignore_errors: true
+
+      - name: backup id_rsa key to default directory
+        command: rm -rf ~/.ssh/id_rsa_org
+        delegate_to: '{{delegate_host}}'
+        ignore_errors: true

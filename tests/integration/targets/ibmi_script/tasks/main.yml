@@ -1,0 +1,16 @@
+# test code for the ibmi_script module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- name: Create a local temporary directory
+  shell: pwd
+  register: tempfile_result
+  delegate_to: localhost
+
+- set_fact:
+    file_path: '{{ tempfile_result.stdout }}/targets/ibmi_script/files'
+
+- include: cl.yml
+- include: sql.yml
+- include: iasp.yml

@@ -1,0 +1,5 @@
+lib/ansible/modules/ibmi/ibmi_powervc_os_server_capture.py validate-modules!skip
+lib/ansible/modules/ibmi/ibmi_powervc_os_server_capture.py import-3.6!skip
+lib/ansible/plugins/action/normal.py action-plugin-docs
+lib/ansible/modules/ibmi/ibmi_powervc_add_license_key.py validate-modules!skip
+lib/ansible/modules/ibmi/ibmi_powervc_add_license_key.py import-3.6!skip
