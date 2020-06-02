@@ -49,6 +49,7 @@ end_subsystem_option
   | **required**: false
   | **type**: list
   | **elements**: str
+  | **default**: [u'*DFT']
   | **choices**: *DFT, *NOJOBLOG, *CHGPTY, *CHGTSL
 
 
