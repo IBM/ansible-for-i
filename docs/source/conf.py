@@ -1,38 +1,49 @@
-#
-# SPDX-License-Identifier: Apache-2.0
-#
+##############################################################################
+# © Copyright IBM Corporation 2020                                           #
+##############################################################################
 
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
+##############################################################################
+#                 Sphinx documentation Configuration                         #
+##############################################################################
+# Configuration file for the Sphinx documentation builder, for more follow link:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
+# ``sphinx-build``` options follow link:
+# https://www.sphinx-doc.org/en/latest/man/sphinx-build.html
+##############################################################################
 
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-
-
-# -- Project information -----------------------------------------------------
+##############################################################################
+# Project information
+##############################################################################
 
 project = 'IBM power_ibmi collection'
 copyright = '2020, IBM'
 author = 'IBM'
 
+# The full version, including alpha/beta/rc tags
+release = '1.0.0'
+
+# Disable the Copyright footer for Read the docs at the bottom of the page
+# by setting property html_show_copyright = False
+html_show_copyright = True
+
+# Disable showing Sphinx footer message:
+# "Built with Sphinx using a theme provided by Read the Docs. "
+html_show_sphinx = False
+
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
+# Add any Sphinx extension module names here, as strings. They can be extensions
+# coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
-    'sphinx.ext.autosectionlabel'
+    "sphinx_rtd_theme",
 ]
+
+# # Add any Sphinx extension module names here, as strings. They can be
+# # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# # ones.
+# extensions = [
+#     'sphinx.ext.autosectionlabel'
+# ]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
