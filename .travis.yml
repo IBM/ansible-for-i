@@ -24,7 +24,7 @@ install:
 script:
   - pushd ~/.ansible/collections/ansible_collections/ibm/power_ibmi
   - ansible-test sanity --python 3.6 plugins/*/*.py
-  - ansible-test sanity --python 3.6 plugins/*/*/*.py
+  #- ansible-test sanity --python 3.6 plugins/*/*/*.py
   #- ansible-test integration --python 3.6 -v --allow-unsupported --continue-on-error $(find tests/integration/targets -name "ibmi*" -type d -printf "%P ")
   #- ansible-test integration --python 3.6 -v --start-at ibmi_lib_restore $(find tests/integration/targets -name "ibmi*" -type d -printf "%P ")
   #- ansible-test integration --python 3.6 ibmi_at
