@@ -1,0 +1,506 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface. &mdash; Ansible Collection  documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ibmi_tcp_server_service – Manage tcp server on a remote IBMi node" href="ibmi_tcp_server_service.html" />
+    <link rel="prev" title="ibmi_synchronize – Synchronize a save file from ibm i node A to another ibm i node B." href="ibmi_synchronize.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Ansible Collection
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../modules.html#module-reference">Module reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ibmi_at.html">ibmi_at – Schedule a batch job on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL command on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – vary on or off target device on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – end a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks on target IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP on target IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_install_product_from_savf.html">ibmi_install_product_from_savf – Install the the licensed program(product) from a save file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_job.html">ibmi_job – Returns job information according to inputs.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search or reply message on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, Revoke or Display Object Authority</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot a machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_save_product_to_savf.html">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file on a remote ibm i node.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file on a remote ibm i node.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_execute.html">ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_query.html">ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement on a remote IBMi node.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – start a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from ibm i node A to another ibm i node B.</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – delete the objects that make up the licensed program(product)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_user_and_group.html">ibmi_user_and_group – Create, Change or Display a user(or group) profile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible Collection</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../modules.html">Modules</a> &raquo;</li>
+        
+      <li>ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_tcp_interface.py" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ibmi-tcp-interface-add-change-remove-or-query-a-tcp-ip-interface">
+<h1>ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.<a class="headerlink" href="#ibmi-tcp-interface-add-change-remove-or-query-a-tcp-ip-interface" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></li>
+<li><a class="reference internal" href="#parameters" id="id2">Parameters</a></li>
+<li><a class="reference internal" href="#notes" id="id3">Notes</a></li>
+<li><a class="reference internal" href="#examples" id="id4">Examples</a></li>
+<li><a class="reference internal" href="#return-values" id="id5">Return Values</a></li>
+<li><a class="reference internal" href="#status" id="id6">Status</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ibmi_tcp_interface</span></code> module add, change, remove, start, end or query a tcp/ip interface.</p>
+<p>This module provides the similar function of ADDTCPIFC, CHGTCPIFC, RMVTCPIFC, STRTCPIFC, ENDTCPIFC.</p>
+<p>In addition, the module provides query function for a specific internet address basing on internet address</p>
+<p>or alias_name.</p>
+</div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="docutils">
+<dt>line_description (False, str, None)</dt>
+<dd><p class="first">the name of the line description associated with the new interface.</p>
+<p class="last">The line description must exist before the TCP/IP interface can be added.</p>
+</dd>
+<dt>type_of_service (False, str, None)</dt>
+<dd><p class="first">The type of service specifies how the internet hosts and routers should make trade-offs</p>
+<p class="last">between throughput, delay, reliability, and cost.</p>
+</dd>
+<dt>preferred_interface (False, list, None)</dt>
+<dd><p class="first">A list of preferred IPv4 interfaces that are to be used with the IPv4 interface being added for proxy</p>
+<p class="last">Address Resolution Protocol (ARP) agent selection.</p>
+</dd>
+<dt>text_description (False, str, None)</dt>
+<dd>Specifies text that briefly describes the interface.</dd>
+<dt>associated_local_interface (False, str, None)</dt>
+<dd>Use this parameter to associate the IPv4 interface being added with an existing local IPv4 TCP/IP interface.</dd>
+<dt>sec_to_wait (optional, int, 0)</dt>
+<dd><p class="first">The number of seconds that the module waits after executing the task</p>
+<p>before returning the information of the internet address.</p>
+<p>Some tasks such as start and end the interface will need to wait some seconds</p>
+<p>before it can return the final status.</p>
+<p>If default zero is used, the returned information could be the intermediate status of</p>
+<p class="last">starting or ending the interface.</p>
+</dd>
+<dt>max_transmission_unit (False, str, None)</dt>
+<dd>Specifies the maximum size (in bytes) of IP datagrams that can be transmitted through this interface.</dd>
+<dt>subnet_mask (False, str, None)</dt>
+<dd><p class="first">Defines the subnet mask</p>
+<p class="last">which is a bit mask that defines the part of the network where this IPv4 interface attaches.</p>
+</dd>
+<dt>state (optional, str, present)</dt>
+<dd><p class="first">The state of the interface.</p>
+<p>present means to add, change or query the internet interface.</p>
+<p>When the internet address does not exist on the IBM i system, present option will create the interface.</p>
+<p>When the internet address exists on the IBM i system, and only internet_address or alias_name is specified,</p>
+<p>present option will query the specific interface.</p>
+<p>When the internet address exists on the IBM i system, and internet_address option is used together</p>
+<p>with other options, present option will change the specific interface.</p>
+<p>absent mean to remove the internet interface. Either internet_address or alias_name can be used.</p>
+<p>If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.</p>
+<p>active means to start the internet interface. Either internet_address or alias_name can be used.</p>
+<p>If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.</p>
+<p>inactive means to end the internet interface. Either internet_address or alias_name can be used.</p>
+<p class="last">If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.</p>
+</dd>
+<dt>auto_start (False, str, None)</dt>
+<dd><p class="first">Specifies whether the interface is automatically started</p>
+<p class="last">when the TCP/IP stack is activated by the Start TCP/IP (STRTCP) command.</p>
+</dd>
+<dt>extra_params (False, str, None)</dt>
+<dd><p class="first">The extra parameters that the user wants to pass into this module.</p>
+<p class="last">These are the additional CL parameters that the user wants to pass to execute the CL commands.</p>
+</dd>
+<dt>internet_address (False, str, None)</dt>
+<dd><p class="first">The internet address that will be added, changed, removed or queried.</p>
+<p>The internet address may be an IPv4 or IPv6 address.</p>
+<p class="last">An interface is associated with a line description.</p>
+</dd>
+<dt>alias_name (False, str, None)</dt>
+<dd><p class="first">A name that can be used in place of the internet address.</p>
+<p class="last">This alias_name can be used to change, remove, start, end and query a internet interface.</p>
+</dd>
+<dt>vlan_id (False, str, None)</dt>
+<dd><p class="first">The virtual LAN identifier of the associated line.</p>
+<p>This identifies the virtual LAN to which this interface belongs according to IEEE standard 802.1Q.</p>
+<p>This parameter is only valid for interfaces defined for Ethernet adapters that support the 802.1Q standard.</p>
+<p class="last">This must be used together with line_description.</p>
+</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id3">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="examples">
+<h2><a class="toc-backref" href="#id4">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 1</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.11&#39;</span>
+    <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.255.0&#39;</span>
+    <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
+    <span class="nt">sec_to_wait</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 2</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.12&#39;</span>
+    <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
+    <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.255.0&#39;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+    <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 3</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.13&#39;</span>
+    <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
+    <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.255.0&#39;</span>
+    <span class="nt">preferred_interface</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;9.5.155.12&quot;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+    <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias13&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 4</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.14&#39;</span>
+    <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
+    <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.255.0&#39;</span>
+    <span class="nt">preferred_interface</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;9.5.155.12&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;9.5.155.13&quot;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+    <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias14&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 5</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.15&#39;</span>
+    <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
+    <span class="nt">vlan_id</span><span class="p">:</span> <span class="s">&#39;2&#39;</span>
+    <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.255.0&#39;</span>
+    <span class="nt">preferred_interface</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;9.5.155.12&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;9.5.155.13&quot;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+    <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias15&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">change an interface 1</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.11&#39;</span>
+    <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.0.0&#39;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">change an interface 2</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.12&#39;</span>
+    <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.0.0&#39;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+    <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias2&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">change an interface 3</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.11&#39;</span>
+    <span class="nt">preferred_interface</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;9.5.155.12&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;9.5.155.13&quot;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">change an interface 4</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.12&#39;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+    <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias2&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">query an interface by ip</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.12&#39;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">query an interface by alias name</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias14&#39;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">remove an interface by ip</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.11&#39;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;absent&#39;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">remove an interface by alias name</span>
+  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+    <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias2&#39;</span>
+    <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;absent&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="return-values">
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="docutils">
+<dt>stderr_lines (When task has been executed., list, [‘CPF2111:Library TESTLIB already exists.’])</dt>
+<dd>The task standard error split in lines</dd>
+<dt>end (When task has been executed., str, 2019-12-02 11:07:54.064969)</dt>
+<dd>The task execution end time</dd>
+<dt>stderr (When rc as non-zero(failure), str, CPF2111:Library TESTLIB already exists)</dt>
+<dd>The task standard error</dd>
+<dt>stdout (When task has been executed., str, CPC2102: Library TESTLIB created)</dt>
+<dd>The task standard output</dd>
+<dt>cl_command (When task has been executed., str, CHGTCPIFC INTNETADR(‘9.5.168.12’) SUBNETMASK(‘255.255.0.0’) ALIASNAME(alias2))</dt>
+<dd>The CL command executed.</dd>
+<dt>rc (When task has been executed., int, 255)</dt>
+<dd>The task return code (0 means success, non-zero means failure)</dd>
+<dt>start (When task has been executed., str, 2019-12-02 11:07:53.757435)</dt>
+<dd>The task execution start time</dd>
+<dt>interface_info (When rc is zero., list, [{‘CONNECTION_TYPE’: ‘IPV4’, ‘LINE_DESCRIPTION’: ‘LINDES’, ‘MAXIMUM_TRANSMISSION_UNIT’: ‘LIND’, ‘VIRTUAL_LAN_ID’: ‘NONE’, ‘NETWORK_ADDRESS’: ‘9.5.0.0’, ‘SUBNET_MASK’: ‘255.255.0.0’, ‘INTERFACE_LINE_TYPE’: ‘VETH’, ‘AUTOSTART’: ‘YES’, ‘LAST_CHANGE_TIMESTAMP’: ‘2020-04-25T11:57:26’, ‘SERVICE_TYPE’: ‘NORMAL’, ‘INTERNET_ADDRESS’: ‘9.5.155.12’, ‘CONFIGURED_MAXIMUM_TRANSMISSION_UNIT’: ‘1024’, ‘ALIAS_NAME’: ‘ALIAS2’, ‘INTERFACE_STATUS’: ‘INACTIVE’}])</dt>
+<dd>The interface information. If state is absent, empty list is returned.</dd>
+<dt>delta (When task has been executed., str, 0:00:00.307534)</dt>
+<dd>The task execution delta time</dd>
+<dt>stdout_lines (When task has been executed., list, [‘CPC2102: Library TESTLIB created.’])</dt>
+<dd>The task standard output split in lines</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="status">
+<h2><a class="toc-backref" href="#id6">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
+<li>This module is maintained by community.</li>
+</ul>
+<div class="section" id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Wang Yun (&#64;airwangyun)</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ibmi_tcp_server_service.html" class="btn btn-neutral float-right" title="ibmi_tcp_server_service – Manage tcp server on a remote IBMi node" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ibmi_synchronize.html" class="btn btn-neutral float-left" title="ibmi_synchronize – Synchronize a save file from ibm i node A to another ibm i node B." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Simon Stone
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
