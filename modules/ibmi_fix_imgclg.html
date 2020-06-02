@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog. &mdash; Ansible Collection  documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ibmi_get_nonconfigure_disks – Get all nonconfigure disks on target IBMi node" href="ibmi_get_nonconfigure_disks.html" />
+    <link rel="prev" title="ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system." href="ibmi_fix.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Ansible Collection
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../modules.html#module-reference">Module reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ibmi_at.html">ibmi_at – Schedule a batch job on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL command on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – vary on or off target device on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – end a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#status">Status</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks on target IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP on target IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_install_product_from_savf.html">ibmi_install_product_from_savf – Install the the licensed program(product) from a save file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_job.html">ibmi_job – Returns job information according to inputs.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search or reply message on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, Revoke or Display Object Authority</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot a machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_save_product_to_savf.html">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file on a remote ibm i node.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file on a remote ibm i node.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_execute.html">ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_query.html">ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement on a remote IBMi node.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – start a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from ibm i node A to another ibm i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_interface.html">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server on a remote IBMi node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – delete the objects that make up the licensed program(product)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_user_and_group.html">ibmi_user_and_group – Create, Change or Display a user(or group) profile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ansible Collection</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../modules.html">Modules</a> &raquo;</li>
+        
+      <li>ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/LiJunBJZhu/i_collection_core/tree/master/plugins/modules/ibmi_fix_imgclg.py" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ibmi-fix-imgclg-install-fixes-such-as-ptf-ptf-group-technology-refresh-to-the-target-ibm-i-system-by-image-catalog">
+<h1>ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.<a class="headerlink" href="#ibmi-fix-imgclg-install-fixes-such-as-ptf-ptf-group-technology-refresh-to-the-target-ibm-i-system-by-image-catalog" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="id17">Synopsis</a></li>
+<li><a class="reference internal" href="#parameters" id="id18">Parameters</a></li>
+<li><a class="reference internal" href="#notes" id="id19">Notes</a></li>
+<li><a class="reference internal" href="#see-also" id="id20">See Also</a></li>
+<li><a class="reference internal" href="#examples" id="id21">Examples</a></li>
+<li><a class="reference internal" href="#return-values" id="id22">Return Values</a></li>
+<li><a class="reference internal" href="#status" id="id23">Status</a></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h2><a class="toc-backref" href="#id17">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ibmi_fix</span></code> module install fixes to target IBM i system by image catalog.</p>
+<p>Single PTF, PTF group and TR PTF are supported.</p>
+</div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id18">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="docutils">
+<dt>src (True, str, None)</dt>
+<dd><p class="first">The path on the target IBM i system where the fix installation file is located.</p>
+<p class="last">The path is an IFS directory format.</p>
+</dd>
+<dt>rollback (optional, bool, True)</dt>
+<dd>Whether or not rollback if there’s failure during the installation of the fixes</dd>
+<dt>product_id (optional, list, [u’<a href="#id1"><span class="problematic" id="id2">*</span></a>ALL’])</dt>
+<dd>The product ID of the fixes to be installed.</dd>
+<dt>apply_type (optional, str, <a href="#id3"><span class="problematic" id="id4">*</span></a>DLYALL)</dt>
+<dd>The fix apply type of the install to perform.</dd>
+<dt>virtual_image_name_list (False, list, [u’<a href="#id5"><span class="problematic" id="id6">*</span></a>ALL’])</dt>
+<dd>The name list of the installation file.</dd>
+<dt>hiper_only (optional, bool, False)</dt>
+<dd><p class="first">Whether or not only install the hiper fixes.</p>
+<p class="last">Specify true if only need to install hiper fixes.</p>
+</dd>
+<dt>use_temp_path (optional, bool, True)</dt>
+<dd><p class="first">Whether or not to copy the installation file to a temp path.</p>
+<p>If true is chosen, it will copy the installation file to a temp path.</p>
+<p>The temp directory and the installation file copied to the temp directory will be both deleted after the task.</p>
+<p>It is recommended to use temp path to avoid conflicts.</p>
+<p>If false is chosen, the install will directly use the file specified in src option.</p>
+<p class="last">The installation file will not be deleted after install if false is chosen.</p>
+</dd>
+<dt>fix_omit_list (False, list, None)</dt>
+<dd><p class="first">The list of PTFs that will be omitted.</p>
+<p class="last">The key of the dict should be the product ID of the fix that is omitted.</p>
+</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id19">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</li>
+</ul>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id20">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><span class="xref std std-ref">ibmi_fix, ibmi_fix_savf_module</span></dt>
+<dd>The official documentation on the <strong>ibmi_fix, ibmi_fix_savf</strong> module.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="examples">
+<h2><a class="toc-backref" href="#id21">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Install a list of PTFs of LPP 5733SC1 from image catalog</span>
+  <span class="nt">ibmi_fix_imgclg</span><span class="p">:</span>
+    <span class="nt">product_id</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&#39;5733SC1&#39;</span>
+    <span class="nt">src</span><span class="p">:</span> <span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">fix_install_path</span> <span class="cp">}}</span><span class="s">&#39;</span>
+    <span class="nt">apply_type</span><span class="p">:</span> <span class="s">&#39;*DLYALL&#39;</span>
+    <span class="nt">hiper_only</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+    <span class="nt">use_temp_path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+    <span class="nt">rollback</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+    <span class="nt">virtual_image_name_list</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&#39;S2018V01.BIN&#39;</span>
+    <span class="nt">fix_omit_list</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">5733SC1</span><span class="p">:</span> <span class="s">&quot;SI70819&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="return-values">
+<h2><a class="toc-backref" href="#id22">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="docutils">
+<dt>stderr_lines (When error occurs., list, [‘CPF2111:Library TESTLIB already exists.’])</dt>
+<dd>The task standard error split in lines</dd>
+<dt>end (When rc is zero, str, 2019-12-02 11:07:54.064969)</dt>
+<dd>The task execution end time</dd>
+<dt>stdout_lines (When error occurs., list, [“CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(<a href="#id7"><span class="problematic" id="id8">*</span></a>VRT) ONLINE(<a href="#id9"><span class="problematic" id="id10">*</span></a>YES) TEXT(‘Created by Ansible for IBM i’)”, “+++ success CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(<a href="#id11"><span class="problematic" id="id12">*</span></a>VRT) ONLINE(<a href="#id13"><span class="problematic" id="id14">*</span></a>YES) TEXT(‘Created by Ansible for IBM i’)”, “CRTIMGCLG IMGCLG(ANSIBCLG1) DIR(‘/home/ansiblePTFInstallTemp/’) CRTDIR(<a href="#id15"><span class="problematic" id="id16">*</span></a>YES)”])</dt>
+<dd>The task standard output split in lines</dd>
+<dt>stdout (When error occurs., str, CPC2102: Library TESTLIB created)</dt>
+<dd>The task standard output</dd>
+<dt>rc (always, int, 255)</dt>
+<dd>The task return code (0 means success, non-zero means failure)</dd>
+<dt>start (When rc is zero, str, 2019-12-02 11:07:53.757435)</dt>
+<dd>The task execution start time</dd>
+<dt>stderr (When error occurs., str, CPF2111:Library TESTLIB already exists)</dt>
+<dd>The task standard error</dd>
+<dt>delta (When rc is zero, str, 0:00:00.307534)</dt>
+<dd>The task execution delta time</dd>
+<dt>need_action_ptf_list (When rc is zero., list, [{‘PTF_ACTION_REQUIRED’: ‘NONE’, ‘PTF_IPL_REQUIRED’: ‘IMMEDIATE’, ‘PTF_IDENTIFIER’: ‘SI71746’, ‘PTF_CREATION_TIMESTAMP’: ‘2019-12-06T01:00:43’, ‘PTF_PRODUCT_ID’: ‘5733SC1’, ‘PTF_TEMPORARY_APPLY_TIMESTAMP’: None, ‘PTF_IPL_ACTION’: ‘TEMPORARILY APPLIED’, ‘PTF_SAVE_FILE’: ‘NO’, ‘PTF_STATUS_TIMESTAMP’: ‘2020-03-24T09:03:55’, ‘PTF_LOADED_STATUS’: ‘LOADED’, ‘PTF_ACTION_PENDING’: ‘NO’}])</dt>
+<dd>The list contains the information of the just installed PTFs that need further IPL actions.</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="status">
+<h2><a class="toc-backref" href="#id23">Status</a><a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This module is not guaranteed to have a backwards compatible interface. <em>[preview]</em></li>
+<li>This module is maintained by community.</li>
+</ul>
+<div class="section" id="authors">
+<h3>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Wang Yun (&#64;airwangyun)</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ibmi_get_nonconfigure_disks.html" class="btn btn-neutral float-right" title="ibmi_get_nonconfigure_disks – Get all nonconfigure disks on target IBMi node" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ibmi_fix.html" class="btn btn-neutral float-left" title="ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Simon Stone
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
