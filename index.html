@@ -158,32 +158,39 @@
   <div class="section" id="power-ibm-i-collection-for-ansible">
 <h1>Power IBM i collection for Ansible<a class="headerlink" href="#power-ibm-i-collection-for-ansible" title="Permalink to this headline">¶</a></h1>
 <p>The IBM i collection includes modules. action plugins, sample playbooks to automate tasks on IBM i.</p>
-<p>Ansible is a radically simple IT automation system. It handles configuration management, application deployment, cloud provisioning, ad-hoc task execution, network automation, and multi-node orchestration. Ansible makes complex changes like zero-downtime rolling updates with load balancers easy.</p>
-<p>IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i support on Ansible, like providing more IBM i modules and examples to manage IBM i nodes.</p>
+<p>Ansible is a radically simple IT automation system. It handles configuration management, application
+deployment, cloud provisioning, ad-hoc task execution, network automation, and multi-node orchestration.
+Ansible makes complex changes like zero-downtime rolling updates with load balancers easy.</p>
+<p>IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i support on Ansible, like
+providing more IBM i modules and examples to manage IBM i nodes.</p>
 </div>
 <div class="section" id="getting-started-articles">
 <h1>Getting Started Articles<a class="headerlink" href="#getting-started-articles" title="Permalink to this headline">¶</a></h1>
-<p>You may want to check out below articles first if you are new to Ansible for IBM i support.
-<a class="reference external" href="https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/">https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/</a>
-<a class="reference external" href="https://ibm.github.io/cloud-i-blog/">https://ibm.github.io/cloud-i-blog/</a></p>
-<p>Dependencies on IBM i node:</p>
-<blockquote>
-<div><p>5733SC1 Base and Option 1
-5770DG1
-Python
-python itoolkit
-python ibm_db</p>
-</div></blockquote>
-<p>Note: 1) Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to
-examples/ibmi/playbooks/ibmi-install-yum.yml. 2) Both python 2 and python 3 are supported.
-The python which is used by Ansible depends on value of ansible_python_interpreter in the inventory file.
-For example, ansible_python_interpreter = “/QOpensys/pkgs/bin/python2” or
-ansible_python_interpreter = “/QOpensys/pkgs/bin/python3”</p>
+<p>You may want to check out below articles first if you are new to Ansible for IBM i support.</p>
+<p><a class="reference external" href="https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/">https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/</a></p>
+<p><a class="reference external" href="https://ibm.github.io/cloud-i-blog/">https://ibm.github.io/cloud-i-blog/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Dependencies on IBM i node</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>5733SC1 Base and Option 1</p></li>
+<li><p>5770DG1</p></li>
+<li><p>python3</p></li>
+<li><p>python3-itoolkit</p></li>
+<li><p>python3-ibm_db</p></li>
+</ul>
+</dd>
+<dt class="field-even">Note</dt>
+<dd class="field-even"><ul class="simple">
+<li><p>Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to</p></li>
+</ul>
+</dd>
+</dl>
+<p>examples/ibmi/playbooks/ibmi-install-yum.yml.</p>
 </div>
 <div class="section" id="features">
 <h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
 <p>The IBM i collection includes <a class="reference external" href="https://github.com/IBM/ansible-for-i/tree/master/plugins/action/">action plugins</a>, <a class="reference external" href="https://github.com/IBM/ansible-for-i/tree/master/plugins/modules/">modules</a>, <a class="reference external" href="https://github.com/IBM/ansible-for-i/tree/master/examples/playbooks/">sample playbooks</a>, and
-ansible-doc to automate tasks on IBM i.</p>
+<a class="reference external" href="https://github.com/IBM/ansible-for-i/tree/master/docs/">ansible-doc</a> to automate tasks on IBM i.</p>
 </div>
 <div class="section" id="copyright">
 <h1>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h1>

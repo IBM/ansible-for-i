@@ -12,25 +12,12 @@ and expandable feature set.
 Action
 ------
 
-* ``ibmi_copy``: A fork of Ansible `copy.py`_ action plugin that is modified to allow copy a SAVF file to remote IBM i nodes.
+* ``ibmi_copy``: An action plugin that is to allow copy a SAVF file to remote IBM i node.
 
-* ``ibmi_fetch``: A fork of Ansible `fetch.py`_ action plugin that is modified to allow fetch objects from IBM i nodes .
+* ``ibmi_fetch``: An action plugin that is to allow fetch objects from IBM i node .
 
-* ``ibmi_reboot``: A fork of Ansible `reboot.py`_ action plugin that is modified to reboot IBM i nodes.
+* ``ibmi_reboot``: An action plugin that is to reboot IBM i node.
 
-* ``ibmi_script``: A fork of Ansible `script.py`_ action plugin that is modified to allow run CL scripts and SQL scripts on IBM i nodes .
+* ``ibmi_script``: An action plugin that is to allow run CL scripts and SQL scripts on IBM i nodes .
 
-* ``ibmi_synchronize``: A fork of Ansible `synchronize.py`_ action plugin that is modified to allow synchronize SAVF objects.
-
-.. _copy.py:
-   https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/action/copy.py
-.. _fetch:
-   https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/action/fetch.py
-.. _reboot.py:
-   https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/action/reboot.py
-.. _script:
-   https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/action/script.py
-.. _synchronize.py:
-   https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/action/synchronize.py
-
-
+* ``ibmi_synchronize``: An action plugin that is to allow synchronize SAVF objects.
