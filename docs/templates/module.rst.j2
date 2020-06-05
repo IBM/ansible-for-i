@@ -42,7 +42,7 @@ Synopsis
 {% elif spec.type == 'int' %}
      {% set default_str = (spec.default | string ) %}
 {% elif spec.type == 'list' %}
-     {% set default_str = ("".join(spec.default) ) %}
+     {% set default_str = (spec.default | string ) %}
 {% else %}
      {% set default = ", default: " + spec.default if spec.default else "" %}
 {% endif %}
