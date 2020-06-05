@@ -3,35 +3,37 @@ Power IBM i collection for Ansible
 
 The IBM i collection includes modules. action plugins, sample playbooks to automate tasks on IBM i.
 
-Ansible is a radically simple IT automation system. It handles configuration management, application deployment, cloud provisioning, ad-hoc task execution, network automation, and multi-node orchestration. Ansible makes complex changes like zero-downtime rolling updates with load balancers easy.
+Ansible is a radically simple IT automation system. It handles configuration management, application 
+deployment, cloud provisioning, ad-hoc task execution, network automation, and multi-node orchestration. 
+Ansible makes complex changes like zero-downtime rolling updates with load balancers easy.
 
-IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i support on Ansible, like providing more IBM i modules and examples to manage IBM i nodes.
+IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i support on Ansible, like 
+providing more IBM i modules and examples to manage IBM i nodes.
 
 Getting Started Articles
 ========================
 You may want to check out below articles first if you are new to Ansible for IBM i support.
+
 https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/
+
 https://ibm.github.io/cloud-i-blog/
 
-Dependencies on IBM i node:
+:Dependencies on IBM i node:
+ - 5733SC1 Base and Option 1
+ - 5770DG1
+ - python3
+ - python3-itoolkit
+ - python3-ibm_db
 
-    5733SC1 Base and Option 1
-    5770DG1
-    Python
-    python itoolkit
-    python ibm_db
-
-Note: 1) Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to 
-examples/ibmi/playbooks/ibmi-install-yum.yml. 2) Both python 2 and python 3 are supported. 
-The python which is used by Ansible depends on value of ansible_python_interpreter in the inventory file. 
-For example, ansible_python_interpreter = "/QOpensys/pkgs/bin/python2" or 
-ansible_python_interpreter = "/QOpensys/pkgs/bin/python3"
+:Note: 
+ - Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to 
+examples/ibmi/playbooks/ibmi-install-yum.yml. 
 
 Features
 ========
 
 The IBM i collection includes `action plugins`_, `modules`_, `sample playbooks`_, and
-ansible-doc to automate tasks on IBM i.
+`ansible-doc`_ to automate tasks on IBM i.
 
 .. _action plugins:
    https://github.com/IBM/ansible-for-i/tree/master/plugins/action/
@@ -39,6 +41,8 @@ ansible-doc to automate tasks on IBM i.
     https://github.com/IBM/ansible-for-i/tree/master/plugins/modules/
 .. _sample playbooks:
     https://github.com/IBM/ansible-for-i/tree/master/examples/playbooks/
+.. _ansible-doc:
+    https://github.com/IBM/ansible-for-i/tree/master/docs/
 
 
 Copyright

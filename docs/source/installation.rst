@@ -30,7 +30,7 @@ Requirements
 
 In order to use this Ansible collection, you must have the following pre-requisite software installed and available:
 
-**Python**
+**Python v3.6+**
 
     Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc).
     If you install Python from the package manager for your operating system, you must also install the development libraries (usually a package named ``python3-devel``), as these are required when installing modules through ``pip``.
@@ -70,7 +70,7 @@ You can use the ``ansible-galaxy`` command to install a collection built from so
 
 ::
 
-    cd ansible-collection
+    cd ansible-for-i
     ansible-galaxy collection build
 
 3. Install the collection, replacing ``x.y.z`` with the current version:
