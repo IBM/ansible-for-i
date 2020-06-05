@@ -15,12 +15,12 @@ https://ibm.github.io/cloud-i-blog/
 <b>Dependencies on IBM i node: </b>
 1. 5733SC1 Base and Option 1
 2. 5770DG1
-3. Python
-4. python itoolkit
-5. python ibm_db
+3. Python3
+4. python3-itoolkit
+5. python3-ibm_db
 
-Note: 1) Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to examples/ibmi/playbooks/ibmi-install-yum.yml.
-2) Both python 2 and python 3 are supported. The python which is used by Ansible depends on value of  ansible_python_interpreter in the inventory file. For example, ansible_python_interpreter = "/QOpensys/pkgs/bin/python2" or ansible_python_interpreter = "/QOpensys/pkgs/bin/python3"
+Note: 
+1) Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to examples/ibmi/playbooks/ibmi-install-yum.yml.
 
 <b>How to enable IBM i nodes? </b> <br>
 1. Install ansible server. For example, run "pip install ansible" on a supported platform.
@@ -31,8 +31,10 @@ Note: 1) Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to
 <b>How to install the collection before it gets to be published to galaxy webesite </b> <br>
 1. Git clone the repostiory to local
 2. Run "ansible-galaxy collection build ."
-3. Run "ansible-galaxy collection install *.gz"
+3. Run "ansible-galaxy collection install ibm-power_ibmi-x.y.z.tar.gz"
 </br>
+
+Note: replacing x.y.z with the current version
 
 <b>How to install the collection after it gets to be published to galaxy website </b> <br>
 1. Run "ansible-galaxy collection install ibm.power_ibmi"
