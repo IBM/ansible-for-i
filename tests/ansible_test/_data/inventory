@@ -1,2 +1,0 @@
-[testhost]
-ibmi ansible_ssh_host=ansible ansible_ssh_user=${USERNAME} ansible_ssh_pass=${passowrd} ansible_python_interpreter="/QOpensys/pkgs/bin/python3"
