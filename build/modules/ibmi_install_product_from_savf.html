@@ -1,0 +1,461 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ibmi_install_product_from_savf – Install the licensed program(product) from a save file. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ibmi_job – Returns job information according to inputs." href="ibmi_job.html" />
+    <link rel="prev" title="ibmi_iasp – Control IASP" href="ibmi_iasp.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">Plugins</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../modules.html#module-reference">Module reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ibmi_at.html">ibmi_at – Schedule a batch job</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL(Control language) command</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBM i node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – Vary on or off target device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – Displays the PTF(Program Temporary Fix) information and also get the requisite information for the PTF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – Displays all currently active subsystems or currently active jobs in a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – End an active subsystem.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_install_product_from_savf – Install the licensed program(product) from a save file.</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_job.html">ibmi_job – Returns job information according to inputs.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, revoke or display object authority</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_query_job_log.html">ibmi_query_job_log – Query the specfic job log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot an IBM i machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reply_message.html">ibmi_reply_message – Send a reply message to the sender of an inquiry message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_save_product_to_savf.html">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_execute.html">ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_query.html">ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – Start an inactive subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_interface.html">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – Delete the objects that make up the licensed program(product)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_user_and_group.html">ibmi_user_and_group – Create, change or display a user(or group) profile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">IBM power_ibmi collection</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../modules.html">Modules</a> &raquo;</li>
+        
+      <li>ibmi_install_product_from_savf – Install the licensed program(product) from a save file.</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_install_product_from_savf.py" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ibmi-install-product-from-savf-install-the-licensed-program-product-from-a-save-file">
+<span id="ibmi-install-product-from-savf-module"></span><h1>ibmi_install_product_from_savf – Install the licensed program(product) from a save file.<a class="headerlink" href="#ibmi-install-product-from-savf-install-the-licensed-program-product-from-a-save-file" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#synopsis" id="id25">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id26">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id27">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id28">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id29">Return Values</a></p></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h2><a class="toc-backref" href="#id25">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_install_product_from_savf</span></code> module installs the product from a save file.</p></li>
+</ul>
+</div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id26">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>acceptance_cmd</dt><dd><p>The Accept Software Agreement command records the acceptance of the software agreement for a product. It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement. This command cannot be used to accept the Licensed Internal Code or the IBM i <a href="#id1"><span class="problematic" id="id2">*</span></a>Base software agreements. If invalid command specificed, message CPDB6D5 with following reason will be received, ‘Product cannot be installed in a batch request because the software agreement has not been previously accepted’. In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don’t know the command.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>:</div>
+</div>
+</dd>
+<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable job log even the rc is 0(success).</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>language</dt><dd><p>Specifies which national language version (NLV) objects to be used for restoring the licensed program. It’s the IBM-supplied language feature codes, like German is 2924, English is 2924.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>PRIMARY</div>
+</div>
+</dd>
+<dt>object_type</dt><dd><p>Specifies the type of licensed program objects to be restored.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>ALL</div>
+<div class="line"><strong>choices</strong>: <a href="#id7"><span class="problematic" id="id8">*</span></a>ALL, <a href="#id9"><span class="problematic" id="id10">*</span></a>PGM, <a href="#id11"><span class="problematic" id="id12">*</span></a>LNG</div>
+</div>
+</dd>
+<dt>option</dt><dd><p>Specifies which one of the optional parts of the licensed program given in the Product prompt (LICPGM parameter) is to be restored.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id13"><span class="problematic" id="id14">*</span></a>BASE</div>
+</div>
+</dd>
+<dt>parameters</dt><dd><p>The parameters that RSTLICPGM command will take. Other than options above, all other parameters need to be specified here. The default values of parameters for RSTLICPGM will be taken if not specified.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>:</div>
+</div>
+</dd>
+<dt>product</dt><dd><p>Specifies the seven-character identifier of the licensed program that is restored.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>release</dt><dd><p>Specifies the version, release, and modification level of the licensed program being restored.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id15"><span class="problematic" id="id16">*</span></a>FIRST</div>
+</div>
+</dd>
+<dt>replace_release</dt><dd><p>Specifies the version, release, and modification level of the licensed program being replaced.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: <a href="#id17"><span class="problematic" id="id18">*</span></a>ONLY</div>
+</div>
+</dd>
+<dt>savf_library</dt><dd><p>Specify the name of the library where the save file is located.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>savf_name</dt><dd><p>Specify the name of the save file.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h2><a class="toc-backref" href="#id27">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Restoring Program Using Defaults.</span>
+  <span class="nt">ibmi_install_product_from_savf</span><span class="p">:</span>
+    <span class="nt">product</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5770WDS</span>
+    <span class="nt">savf_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MYFILE</span>
+    <span class="nt">savf_library</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MYLIB</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Restoring Program with acceptance command.</span>
+  <span class="nt">ibmi_install_product_from_savf</span><span class="p">:</span>
+    <span class="nt">product</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5733D10</span>
+    <span class="nt">option</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">11</span>
+    <span class="nt">savf_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MYFILE</span>
+    <span class="nt">savf_library</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MYLIB</span>
+    <span class="nt">acceptance_cmd</span><span class="p">:</span> <span class="s">&quot;CALL</span><span class="nv"> </span><span class="s">PGM(QSYS/QLPACAGR)</span><span class="nv"> </span><span class="s">PARM(&#39;5733D10&#39;</span><span class="nv"> </span><span class="s">&#39;100001&#39;</span><span class="nv"> </span><span class="s">&#39;0011&#39;</span><span class="nv"> </span><span class="s">X&#39;00000010000000000000000000000000&#39;)&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="see-also">
+<h2><a class="toc-backref" href="#id28">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">ibmi_uninstall_product, ibmi_save_product_to_savf_module</span></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="return-values">
+<h2><a class="toc-backref" href="#id29">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The standard output.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as 0(success)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: +++ success RSTLICPGM LICPGM(5733D10) DEV(<a href="#id19"><span class="problematic" id="id20">*</span></a>SAVF) OPTION(<a href="#id21"><span class="problematic" id="id22">*</span></a>BASE) RSTOBJ(<a href="#id23"><span class="problematic" id="id24">*</span></a>ALL)</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The standard error.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF9801: Object QNOTE in library L10010125P not found</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure).</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The standard output split in lines.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as 0(success)</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;+++ success RSTLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The standard error split in lines.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc as non-zero(failure).</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF9801: Object QNOTE in library L10010125P not found&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">The IBM i job log of the task executed.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;FROM_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;318F&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QWTCHGJB&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_USER&quot;</span><span class="p">:</span> <span class="s2">&quot;CHANGLE&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;QCPFMSG&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;CPD0912&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SECOND_LEVEL_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Cause . . . . . :   This message is used by application programs as a general escape message.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SUBTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Printer device PRT01 not found.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-05-20-21.41.40.845897&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;DIAGNOSTIC&quot;</span><span class="p">,</span> <span class="s2">&quot;ORDINAL_POSITION&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;SEVERITY&quot;</span><span class="p">:</span> <span class="s2">&quot;20&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;9369&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+</dl>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ibmi_job.html" class="btn btn-neutral float-right" title="ibmi_job – Returns job information according to inputs." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ibmi_iasp.html" class="btn btn-neutral float-left" title="ibmi_iasp – Control IASP" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, IBM
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
