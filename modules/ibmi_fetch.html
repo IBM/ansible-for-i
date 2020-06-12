@@ -8,12 +8,10 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
+  <title>ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
-  
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
   
   
   
@@ -38,7 +36,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system." href="ibmi_fix.html" />
-    <link rel="prev" title="ibmi_end_subsystem – end a subsystem" href="ibmi_end_subsystem.html" /> 
+    <link rel="prev" title="ibmi_end_subsystem – End an active subsystem." href="ibmi_end_subsystem.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -91,14 +89,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../plugins.html">Plugins</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../modules.html">Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../modules.html#module-reference">Module reference</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="ibmi_at.html">ibmi_at – Schedule a batch job on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL command on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – vary on or off target device on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – display all currently active subsystems or currently active jobs in a subsystem</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – end a subsystem</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_at.html">ibmi_at – Schedule a batch job</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL(Control language) command</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBM i node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – Vary on or off target device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – Displays the PTF(Program Temporary Fix) information and also get the requisite information for the PTF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – Displays all currently active subsystems or currently active jobs in a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – End an active subsystem.</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
@@ -109,32 +107,34 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks on target IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP on target IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_install_product_from_savf.html">ibmi_install_product_from_savf – Install the the licensed program(product) from a save file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_install_product_from_savf.html">ibmi_install_product_from_savf – Install the licensed program(product) from a save file.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_job.html">ibmi_job – Returns job information according to inputs.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search or reply message on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, Revoke or Display Object Authority</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, revoke or display object authority</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot a machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_query_job_log.html">ibmi_query_job_log – Query the specfic job log</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot an IBM i machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reply_message.html">ibmi_reply_message – Send a reply message to the sender of an inquiry message</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_save_product_to_savf.html">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file on a remote ibm i node.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file on a remote ibm i node.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_execute.html">ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_query.html">ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement on a remote IBMi node.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – start a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_execute.html">ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_query.html">ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – Start an inactive subsystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current ibm i node A to another ibm i node B.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from ibm i node A to another ibm i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_interface.html">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server on a remote IBMi node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – delete the objects that make up the licensed program(product)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_user_and_group.html">ibmi_user_and_group – Create, Change or Display a user(or group) profile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – Delete the objects that make up the licensed program(product)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_user_and_group.html">ibmi_user_and_group – Create, change or display a user(or group) profile</a></li>
 </ul>
 </li>
 </ul>
@@ -188,7 +188,7 @@
         
           <li><a href="../modules.html">Modules</a> &raquo;</li>
         
-      <li>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local</li>
+      <li>ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -210,28 +210,28 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ibmi-fetch-fetch-objects-or-a-library-from-a-remote-ibmi-node-and-store-on-local">
-<span id="ibmi-fetch-module"></span><h1>ibmi_fetch – Fetch objects or a library from a remote IBMi node and store on local<a class="headerlink" href="#ibmi-fetch-fetch-objects-or-a-library-from-a-remote-ibmi-node-and-store-on-local" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="ibmi-fetch-fetch-objects-or-a-library-from-a-remote-ibm-i-node-and-store-on-local">
+<span id="ibmi-fetch-module"></span><h1>ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local<a class="headerlink" href="#ibmi-fetch-fetch-objects-or-a-library-from-a-remote-ibm-i-node-and-store-on-local" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#synopsis" id="id17">Synopsis</a></p></li>
-<li><p><a class="reference internal" href="#parameters" id="id18">Parameters</a></p></li>
-<li><p><a class="reference internal" href="#examples" id="id19">Examples</a></p></li>
-<li><p><a class="reference internal" href="#notes" id="id20">Notes</a></p></li>
-<li><p><a class="reference internal" href="#see-also" id="id21">See Also</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id22">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#synopsis" id="id11">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id12">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id13">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id14">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id15">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id16">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id17">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id11">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>The ibmi_feth is used for fetching objects or a library as a SAVF from remote IBMi node and storing them locally in a file tree, organized by hostname.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_feth</span></code> is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in a file tree, organized by hostname.</p></li>
 <li><p>Save file that already exists at dest will be overwritten if it is different than the new one.</p></li>
 <li><p>For non-IBMi native targets, use the fetch module instead.</p></li>
 </ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id18">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id12">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
 <dt>backup</dt><dd><p>If delete the save file on remote IBM i or not. If set True, the save file on remote IBM i will not be deleted.</p>
 <div class="line-block">
@@ -260,12 +260,12 @@
 <div class="line"><strong>type</strong>: bool</div>
 </div>
 </dd>
-<dt>format</dt><dd><p>The save file’s format. Only support <a href="#id1"><span class="problematic" id="id2">*</span></a>SAVF by now.</p>
+<dt>format</dt><dd><p>The save file’s format. Only support <code class="docutils literal notranslate"><span class="pre">*SAVF</span></code> by now.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>SAVF</div>
-<div class="line"><strong>choices</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>SAVF</div>
+<div class="line"><strong>default</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>SAVF</div>
+<div class="line"><strong>choices</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>SAVF</div>
 </div>
 </dd>
 <dt>is_lib</dt><dd><p>If it is a library needed to be fetched. If set True, the whole library will be fetched.</p>
@@ -274,25 +274,27 @@
 <div class="line"><strong>type</strong>: bool</div>
 </div>
 </dd>
-<dt>lib_name</dt><dd><p>The library contains the objects. If is_lib is Ture, lib_name means the library name.</p>
+<dt>lib_name</dt><dd><p>The library contains the objects. If is_lib is <code class="docutils literal notranslate"><span class="pre">Ture</span></code>, lib_name means the library name.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: True</div>
 <div class="line"><strong>type</strong>: str</div>
 </div>
 </dd>
-<dt>object_names</dt><dd><p>The objects need to be fetched. One or more object names can be specified. Use space as separator.</p>
-<p>If object type is <a href="#id7"><span class="problematic" id="id8">*</span></a>FILE, then fetch it directly. Only one <a href="#id9"><span class="problematic" id="id10">*</span></a>FILE object will fetch directly at one time.</p>
+<dt>object_names</dt><dd><p>The objects need to be fetched.</p>
+<p>One or more object names can be specified. Use space as separator.</p>
+<p>If object type is <code class="docutils literal notranslate"><span class="pre">*FILE</span></code>, then fetch it directly. Only one <code class="docutils literal notranslate"><span class="pre">*FILE</span></code> object will fetch directly at one time.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id11"><span class="problematic" id="id12">*</span></a>ALL</div>
+<div class="line"><strong>default</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>ALL</div>
 </div>
 </dd>
-<dt>object_types</dt><dd><p>The object types. One or more object types can be specified. Use space as separator.</p>
+<dt>object_types</dt><dd><p>The object types.</p>
+<p>One or more object types can be specified. Use space as separator.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id13"><span class="problematic" id="id14">*</span></a>ALL</div>
+<div class="line"><strong>default</strong>: <a href="#id7"><span class="problematic" id="id8">*</span></a>ALL</div>
 </div>
 </dd>
 <dt>savefile_name</dt><dd><p>The save file name can be specified.</p>
@@ -306,7 +308,7 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id15"><span class="problematic" id="id16">*</span></a>CURRENT</div>
+<div class="line"><strong>default</strong>: <a href="#id9"><span class="problematic" id="id10">*</span></a>CURRENT</div>
 </div>
 </dd>
 <dt>validate_checksum</dt><dd><p>Verify that the source and destination checksums match after the files are fetched.</p>
@@ -319,35 +321,35 @@
 </dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id19">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Fetch obja.pgm and objb.srvpgm in objlib libary as test1.savf(target release V7R2M0) on a remote IBMi to local. Store</span>
-        <span class="l l-Scalar l-Scalar-Plain">as /backup/host.example.com/qsys.lib/objlib.lib/test1.file and keep the save file on remote</span>
+<h2><a class="toc-backref" href="#id13">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Fetch obja.pgm and objb.srvpgm in objlib libary as test1.savf(target release V7R2M0) on a remote IBM i to local. Store</span>
+        <span class="l l-Scalar l-Scalar-Plain">as /backup/host.example.com/qsys.lib/objlib.lib/test1.file and keep the save file on remote.</span>
   <span class="nt">ibmi_fetch</span><span class="p">:</span>
     <span class="nt">object_names</span><span class="p">:</span> <span class="s">&#39;obj1</span><span class="nv"> </span><span class="s">obj2&#39;</span>
     <span class="nt">lib_name</span><span class="p">:</span> <span class="s">&#39;objlib&#39;</span>
     <span class="nt">object_types</span><span class="p">:</span> <span class="s">&#39;*PGM</span><span class="nv"> </span><span class="s">*SRVPGM&#39;</span>
     <span class="nt">savefile_name</span><span class="p">:</span> <span class="s">&#39;test1&#39;</span>
     <span class="nt">dest</span><span class="p">:</span> <span class="s">&#39;/backup&#39;</span>
-    <span class="nt">backup</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+    <span class="nt">backup</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
     <span class="nt">target_release</span><span class="p">:</span> <span class="s">&#39;V7R2M0&#39;</span>
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Fetch objlib libary on a remote IBMi to local, store as /backup/objlib.file.</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.</span>
   <span class="nt">ibmi_fetch</span><span class="p">:</span>
     <span class="nt">lib_name</span><span class="p">:</span> <span class="s">&#39;objlib&#39;</span>
     <span class="nt">dest</span><span class="p">:</span> <span class="s">&#39;/backup&#39;</span>
-    <span class="nt">flat</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+    <span class="nt">flat</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="notes">
-<h2><a class="toc-backref" href="#id20">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id14">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under [defaults] section</p>
+<p>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section</p>
 <p>Need install 5770SS1 option 39 on remote IBM i for regex usage</p>
 </div>
 </div>
 <div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id21">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id15">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -356,29 +358,20 @@
 </div>
 </div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id22">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id16">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl>
-<dt>file</dt><dd><div class="line-block">
-<div class="line">The save file path on remote IBM i.</div>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The fetch execution delta time when file is renewed.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: /qsys.lib/test.lib/obja.file</div>
-</div>
-</dd>
-<dt>remote_md5sum</dt><dd><div class="line-block">
-<div class="line">The md5sum of the file on remote IBM i.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: ef67xhfs8638ac5d7e31fc56rfcv3760</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
 </div>
 </dd>
 <dt>stdout</dt><dd><div class="line-block">
-<div class="line">The fetch standard output</div>
+<div class="line">The fetch standard output.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
@@ -391,35 +384,8 @@
 </div>
 </div></blockquote>
 </dd>
-<dt>dest</dt><dd><div class="line-block">
-<div class="line">The file path on local.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: /users/tester/test/obja.file</div>
-</div>
-</dd>
-<dt>checksum</dt><dd><div class="line-block">
-<div class="line">The checksum of the file on local.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: 573f3e66ee97071134c9001732ed16f6bb7e8ab4</div>
-</div>
-</dd>
-<dt>md5sum</dt><dd><div class="line-block">
-<div class="line">The md5sum of the file on local.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: ef67xhfs8638ac5d7e31fc56rfcv3760</div>
-</div>
-</dd>
 <dt>stderr</dt><dd><div class="line-block">
-<div class="line">The fetch standard error</div>
+<div class="line">The fetch standard error.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
@@ -432,13 +398,13 @@
 </div>
 </div></blockquote>
 </dd>
-<dt>delta</dt><dd><div class="line-block">
-<div class="line">The fetch execution delta time when file is renewed.</div>
+<dt>file</dt><dd><div class="line-block">
+<div class="line">The save file path on remote IBM i.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+<div class="line"><strong>sample</strong>: /qsys.lib/test.lib/obja.file</div>
 </div>
 </dd>
 <dt>msg</dt><dd><div class="line-block">
@@ -450,16 +416,61 @@
 <div class="line"><strong>sample</strong>: File is renewed on local.</div>
 </div>
 </dd>
+<dt>md5sum</dt><dd><div class="line-block">
+<div class="line">The md5sum of the file on local.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: ef67xhfs8638ac5d7e31fc56rfcv3760</div>
+</div>
+</dd>
+<dt>dest</dt><dd><div class="line-block">
+<div class="line">The file path on local.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: /users/tester/test/obja.file</div>
+</div>
+</dd>
+<dt>remote_md5sum</dt><dd><div class="line-block">
+<div class="line">The md5sum of the file on remote IBM i.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: ef67xhfs8638ac5d7e31fc56rfcv3760</div>
+</div>
+</dd>
 <dt>remote_checksum</dt><dd><div class="line-block">
 <div class="line">The checksum of the file on remote IBM i.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 573f3e66ee97071134c9001732ed16f6bb7e8ab4</div>
+</div>
+</dd>
+<dt>checksum</dt><dd><div class="line-block">
+<div class="line">The checksum of the file on local.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 573f3e66ee97071134c9001732ed16f6bb7e8ab4</div>
+</div>
+</dd>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">The IBM i job log of the task executed.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;573f3e66ee97071134c9001732ed16f6bb7e8ab4&quot;</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;FROM_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;025D&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QDDCDF&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_USER&quot;</span><span class="p">:</span> <span class="s2">&quot;TESTER&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;QCPFMSG&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;CPC7301&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SECOND_LEVEL_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SUBTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;File QUMEC created in library TEST.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-06-02-14.29.52.770625&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;COMPLETION&quot;</span><span class="p">,</span> <span class="s2">&quot;ORDINAL_POSITION&quot;</span><span class="p">:</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="s2">&quot;SEVERITY&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;5829&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QXMLSERV&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;PLUGILE&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;ILECMDEXC&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;XMLSTOREDP&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -480,7 +491,7 @@
         <a href="ibmi_fix.html" class="btn btn-neutral float-right" title="ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="ibmi_end_subsystem.html" class="btn btn-neutral float-left" title="ibmi_end_subsystem – end a subsystem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ibmi_end_subsystem.html" class="btn btn-neutral float-left" title="ibmi_end_subsystem – End an active subsystem." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
