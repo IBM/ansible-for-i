@@ -20,6 +20,8 @@ short_description: Control IASP
 version_added: 2.8
 description:
   - Control IASP.
+  - For IBM i V7R2, PTF SI72162 is required.
+  - For IBM i V7R3, PTF SI72161 is required.
   - For non-IBM i targets, no need.
 options:
   name:

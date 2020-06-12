@@ -16,7 +16,7 @@
       - disk_result.start is defined
       - disk_result.end is defined
       - disk_result.delta is defined
-      - disk_result.rc_msg is defined
+      - disk_result.job_log is defined
 
 - set_fact: 
     new_iasp: ['ANSIIASP1', 'ANSIIASP2']
@@ -26,7 +26,7 @@
     - name: assert the returned parameters
       assert:
         that: 
-          - "{{disk_result['disks'].split(' ') | length }} >= 5" 
+          - "{{disk_result['disks'].split(' ') | length }} >= 4" 
         fail_msg: "The IBM i doesn't have enough non-configured disks. It doesn't qualify for the testing."
 
     - include: primary.yml
