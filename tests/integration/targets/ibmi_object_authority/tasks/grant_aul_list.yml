@@ -112,10 +112,15 @@
         object_type: '*FILE'
       register: authority_result
 
+    # - debug: msg= {{authority_result['object_authority_list'][0]['AUTHORIZATION_LIST']}}
+    # - set_fact:
+    #     aul_list: "{{authority_result['object_authority_list'][0]['AUTHORIZATION_LIST']}}"
+
     - name: assert the returned object is correct
       assert:
         that:
-          - item['AUTHORIZATION_LIST'] == ''
+          #- item['AUTHORIZATION_LIST'] == "" or aul_list == "" 
+          - item['AUTHORIZATION_LIST'] == '' 
       loop: "{{authority_result.object_authority_list }}"
       when : os_version | int >= 74
 
@@ -158,7 +163,8 @@
         object_type: '*FILE'
         authorization_list: "{{au_list[0]}}"
       register: neg_result
-      failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      #failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: grant_autl with an not existing lib
       ibmi_object_authority:
@@ -168,7 +174,8 @@
         object_type: '*FILE'
         authorization_list: "{{au_list[0]}}"
       register: neg_result
-      failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: grant_autl with an not existing auth_list
       ibmi_object_authority:
@@ -178,7 +185,8 @@
         object_type: '*FILE'
         authorization_list: "ABC"
       register: neg_result
-      failed_when: "'Authorization list ABC does not exist' not in neg_result.stderr" 
+      #failed_when: "'Authorization list ABC does not exist' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2283') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: grant_autl without required options
       ibmi_object_authority:
@@ -225,7 +233,8 @@
         object_type: '*FILE'
         authorization_list: "{{au_list[0]}}"
       register: neg_result
-      failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      #failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: revoke_autl with an not existing lib
       ibmi_object_authority:
@@ -235,7 +244,8 @@
         object_type: '*FILE'
         authorization_list: "{{au_list[0]}}"
       register: neg_result
-      failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: grant_autl with an not existing auth_list
       ibmi_object_authority:
@@ -245,7 +255,8 @@
         object_type: '*FILE'
         authorization_list: "ABC"
       register: neg_result
-      failed_when: "'Authorization list ABC does not exist' not in neg_result.stderr" 
+      #failed_when: "'Authorization list ABC does not exist' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2283') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: revoke_autl without required options
       ibmi_object_authority:

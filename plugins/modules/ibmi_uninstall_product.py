@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -15,37 +15,37 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 module: ibmi_uninstall_product
-short_description: delete the objects that make up the licensed program(product)
+short_description: Delete the objects that make up the licensed program(product)
+version_added: "2.8"
 description:
-    - the C(ibmi_uninstall_product) module delete the objects that make up the product on the target ibmi node.
-version_added: "1.1"
+    - the C(ibmi_uninstall_product) module deletes the objects that make up the product.
 options:
   product:
     description:
-      - Specifies the seven-character identifier of the licensed program that is deleted
+      - Specifies the seven-character identifier of the licensed program that is deleted.
     type: str
     required: yes
   option:
     description:
-      - Specifies which of the parts of the licensed program specified on the Product prompt (LICPGM parameter) are deleted
+      - Specifies which of the parts of the licensed program specified on the Product prompt (LICPGM parameter) are deleted.
     type: str
     default: '*ALL'
   release:
     description:
-      - Specifies which version, release, and modification level of the licensed program is deleted
+      - Specifies which version, release, and modification level of the licensed program is deleted.
     type: str
     default: '*ONLY'
   language:
     description:
-      - Specifies which national language version (NLV) objects are deleted for the licensed program specified on the LICPGM parameter
-      - It's the IBM-supplied language feature codes, like German is 2924, English is 2924
+      - Specifies which national language version (NLV) objects are deleted for the licensed program specified on the LICPGM parameter.
+      - It's the IBM-supplied language feature codes, like German is 2924, English is 2924.
     type: str
     default: '*ALL'
   joblog:
     description:
       - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
     type: bool
-    default: false
+    default: False
 seealso:
 - module: ibmi_install_product_from_savf, ibmi_save_product_to_savf
 author:
@@ -53,11 +53,11 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: Deleting all Licensed Program Objects
+- name: Deleting all Licensed Program Objects.
   ibmi_uninstall_product:
     product: 5770QU1
 
-- name: Deleting only the German (NLV 2929) objects for all options of the licensed program 5770QU1
+- name: Deleting only the German (NLV 2929) objects for all options of the licensed program 5770QU1.
   ibmi_uninstall_product:
     product: 5770QU1
     language: 2929
@@ -65,7 +65,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 stdout:
-    description: The standard output
+    description: The standard output.
     type: str
     sample: 'Product 5733D10 option 11 release *ONLY language *ALL deleted.'
     returned: always
@@ -75,27 +75,27 @@ stderr:
     sample: 'Product 5733D10 option *ALL release *ONLY language *ALL not installed'
     returned: When rc as non-zero(failure)
 rc:
-    description: The task return code (0 means success, non-zero means failure)
+    description: The task return code (0 means success, non-zero means failure).
     type: int
     sample: 255
     returned: always
 stdout_lines:
-    description: The standard output split in lines
+    description: The standard output split in lines.
     type: list
     sample: [
         "Product 5733D10 option 11 release *ONLY language *ALL deleted."
     ]
     returned: always
 stderr_lines:
-    description: The standard error split in lines
+    description: The standard error split in lines.
     type: list
     sample: [
         "Product 5733D10 option *ALL release *ONLY language *ALL not installed"
     ]
     returned: always
 job_log:
-    description: the job_log
-    type: str
+    description: The IBM i job log of the task executed.
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -126,6 +126,8 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 
 def main():
     module = AnsibleModule(
@@ -138,6 +140,8 @@ def main():
         ),
         supports_check_mode=True,
     )
+
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
 
     product = module.params['product'].upper()
     option = module.params['option'].upper()

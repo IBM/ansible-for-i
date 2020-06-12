@@ -78,6 +78,11 @@ options:
         It takes time to return result if this option is turned on.
     default: false
     type: bool
+  joblog:
+    description:
+      - The job log of the job executing the task will be returned even rc is zero if it is set to true.
+    type: bool
+    default: false
 notes:
     - Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 seealso:
@@ -192,6 +197,35 @@ stderr_lines:
     returned: When rc as non-zero(failure)
     type: list
     sample: ['']
+job_log:
+    description: The job log of the job executes the task.
+    returned: always
+    type: list
+    sample: [
+        {
+            "FROM_INSTRUCTION": "318F",
+            "FROM_LIBRARY": "QSYS",
+            "FROM_MODULE": "",
+            "FROM_PROCEDURE": "",
+            "FROM_PROGRAM": "QWTCHGJB",
+            "FROM_USER": "CHANGLE",
+            "MESSAGE_FILE": "QCPFMSG",
+            "MESSAGE_ID": "CPD0912",
+            "MESSAGE_LIBRARY": "QSYS",
+            "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.",
+            "MESSAGE_SUBTYPE": "",
+            "MESSAGE_TEXT": "Printer device PRT01 not found.",
+            "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897",
+            "MESSAGE_TYPE": "DIAGNOSTIC",
+            "ORDINAL_POSITION": "5",
+            "SEVERITY": "20",
+            "TO_INSTRUCTION": "9369",
+            "TO_LIBRARY": "QSYS",
+            "TO_MODULE": "QSQSRVR",
+            "TO_PROCEDURE": "QSQSRVR",
+            "TO_PROGRAM": "QSQSRVR"
+        }
+    ]
 '''
 
 HAS_ITOOLKIT = True
@@ -202,6 +236,7 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
 try:
     from itoolkit import iToolKit
@@ -217,6 +252,8 @@ try:
 except ImportError:
     HAS_IBM_DB = False
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -224,58 +261,6 @@ IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG = 256
 IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR = 257
 IBMi_COMMAND_RC_UNEXPECTED_ROW_COUNT = 258
 IBMi_COMMAND_RC_INVALID_EXPECTED_ROW_COUNT = 259
-
-
-def interpret_return_code(rc):
-    if rc == IBMi_COMMAND_RC_SUCCESS:
-        return 'Success'
-    elif rc == IBMi_COMMAND_RC_ERROR:
-        return 'Generic failure'
-    elif rc == IBMi_COMMAND_RC_UNEXPECTED:
-        return 'Unexpected error'
-    elif rc == IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG:
-        return "iToolKit result dict does not have key 'joblog'"
-    elif rc == IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR:
-        return "iToolKit result dict does not have key 'error'"
-    else:
-        return "Unknown error"
-
-
-def itoolkit_run_sql(sql, asp):
-    conn = dbi.connect()
-    db_itransport = DatabaseTransport(conn)
-    itool = iToolKit()
-
-    # if asp is not None:
-    #    xml_itransport = XmlServiceTransport()
-    #    sql_setaspgrp = "SETASPGRP " + asp
-    #    itool.add(iCmd('setaspgrp', sql_setaspgrp))
-
-    itool.add(iSqlQuery('query', sql, {'error': 'on'}))
-    itool.add(iSqlFetch('fetch'))
-    itool.add(iSqlFree('free'))
-
-    itool.call(db_itransport)
-
-    command_output = itool.dict_out('fetch')
-
-    rc = IBMi_COMMAND_RC_UNEXPECTED
-    out = ''
-    err = ''
-    if 'error' in command_output:
-        command_error = command_output['error']
-        if 'joblog' in command_error:
-            rc = IBMi_COMMAND_RC_ERROR
-            err = command_error['joblog']
-        else:
-            # should not be here, must xmlservice has internal error
-            rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
-            err = "iToolKit result dict does not have key 'joblog', the output is %s" % command_output
-    else:
-        rc = IBMi_COMMAND_RC_SUCCESS
-        out = command_output['row']
-
-    return rc, out, err
 
 
 def age_where_stmt(input_age, input_age_stamp):
@@ -346,6 +331,7 @@ def main():
             size=dict(default=None, type='str'),
             iasp_name=dict(type='str', default='*SYSBAS'),
             use_regex=dict(default=False, type='bool'),
+            joblog=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -364,6 +350,7 @@ def main():
     input_lib = module.params['lib_name']
     input_obj_name = module.params['object_name']
     input_use_regex = module.params['use_regex']
+    joblog = module.params['joblog']
 
     startd = datetime.datetime.now()
 
@@ -427,11 +414,12 @@ def main():
           sql_where_stmt_size + \
           sql_where_stmt_regex
 
-    # rc, out, err = itoolkit_run_sql(sql, input_iasp_name)
-    out_result_set, err = db2i_tools.ibm_dbi_sql_query(connection_id, sql)
+    rc, out_result_set, err = ibmi_util.itoolkit_run_sql(connection_id, sql)
 
-    if err is not None:
-        err = handle_db_exception(err)
+    if joblog or (rc != IBMi_COMMAND_RC_SUCCESS):
+        job_log = ibmi_util.itoolkit_get_job_log(connection_id, startd)
+    else:
+        job_log = []
 
     if connection_id is not None:
         try:
@@ -442,14 +430,12 @@ def main():
     endd = datetime.datetime.now()
     delta = endd - startd
 
-    if err is not None:
-        rc = IBMi_COMMAND_RC_ERROR
-        rc_msg = interpret_return_code(rc)
+    if rc != IBMi_COMMAND_RC_SUCCESS:
         result_failed = dict(
             sql=sql,
             # size=input_size,
             # age=input_age,
-            # age_stamp=input_age_stamp,
+            job_log=job_log,
             stderr=err,
             rc=rc,
             start=str(startd),
@@ -457,28 +443,27 @@ def main():
             delta=str(delta),
             # changed=True,
         )
-        module.fail_json(msg='non-zero return code: ' + rc_msg, **result_failed)
+        module.fail_json(msg='Non-zero return code. ', **result_failed)
     else:
-        out = []
-        for result in out_result_set:
-            result_map = {"OBJNAME": result[0], "OBJTYPE": result[1],
-                          "OBJOWNER": result[2], "OBJDEFINER": result[3],
-                          "OBJCREATED": result[4], "TEXT": result[5],
-                          "OBJLIB": result[6], "IASP_NUMBER": result[7],
-                          "LAST_USED_TIMESTAMP": result[8], "LAST_RESET_TIMESTAMP": result[9],
-                          "OBJSIZE": result[10], "OBJATTRIBUTE": result[11], "OBJLONGSCHEMA": result[12]
-                          }
-            out.append(result_map)
+        # out = []
+        # for result in out_result_set:
+        #     result_map = {"OBJNAME": result[0], "OBJTYPE": result[1],
+        #                   "OBJOWNER": result[2], "OBJDEFINER": result[3],
+        #                   "OBJCREATED": result[4], "TEXT": result[5],
+        #                   "OBJLIB": result[6], "IASP_NUMBER": result[7],
+        #                   "LAST_USED_TIMESTAMP": result[8], "LAST_RESET_TIMESTAMP": result[9],
+        #                   "OBJSIZE": result[10], "OBJATTRIBUTE": result[11], "OBJLONGSCHEMA": result[12]
+        #                   }
+        #     out.append(result_map)
 
-        rc = IBMi_COMMAND_RC_SUCCESS
         result_success = dict(
             sql=sql,
-            object_list=out,
+            object_list=out_result_set,
             rc=rc,
             start=str(startd),
             end=str(endd),
             delta=str(delta),
-            # changed=True,
+            job_log=job_log,
         )
         module.exit_json(**result_success)
 

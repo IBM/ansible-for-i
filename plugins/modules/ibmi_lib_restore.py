@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
+# Author, Peng Zengyu <pzypeng@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -16,12 +16,12 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_lib_restore
-short_description: Restore one library on a remote IBMi node
-version_added: 1.0
+short_description: Restore one library
+version_added: 2.8
 description:
-     - The ibmi_lib_restore module restore an save file on a remote IBMi nodes
+     - The C(ibmi_lib_restore) module restore a save file.
      - The restored library and save file are on the remote host.
-     - Only support *SAVF as the save file's format by now.
+     - Only support C(*SAVF) as the save file's format by now.
 options:
   saved_lib:
     description:
@@ -40,7 +40,7 @@ options:
     required: yes
   format:
     description:
-      - The save file's format. Only support *SAVF by now.
+      - The save file's format. Only support C(*SAVF) by now.
     type: str
     default: '*SAVF'
     choices: ["*SAVF"]
@@ -52,7 +52,7 @@ options:
      default: '*SYSBAS'
   joblog:
     description:
-      - If set to C(true), append JOBLOG to stderr/stderr_lines.
+      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
     type: bool
     default: False
   parameters:
@@ -62,15 +62,12 @@ options:
     type: str
     default: ' '
 
-notes:
-    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-
 author:
-    - Peng Zeng Yu (@pengzengyufish)
+    - Peng Zengyu (@pengzengyufish)
 '''
 
 EXAMPLES = r'''
-- name: Restore savedlib libary from archive.savf in archlib libary
+- name: Restore savedlib libary from archive.savf in archlib libary.
   ibmi_lib_restore:
     saved_lib: 'savedlib'
     savefile_name: 'archive'
@@ -79,27 +76,27 @@ EXAMPLES = r'''
 
 RETURN = r'''
 start:
-    description: The restore execution start time
+    description: The restore execution start time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:53.757435'
 end:
-    description: The restore execution end time
+    description: The restore execution end time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:54.064969'
 delta:
-    description: The restore execution delta time
+    description: The restore execution delta time.
     returned: always
     type: str
     sample: '0:00:00.307534'
 stdout:
-    description: The restore standard output
+    description: The restore standard output.
     returned: always
     type: str
     sample: 'CPC3703: 2 objects restored from test to test.'
 stderr:
-    description: The restore standard error
+    description: The restore standard error.
     returned: always
     type: str
     sample: 'CPF3806: Objects from save file archive in archlib not restored.\n'
@@ -119,7 +116,7 @@ savefile_lib:
     type: str
     sample: c1lib
 format:
-    description: The save file's format. Only support *SAVF by now.
+    description: The save file's format. Only support C(*SAVF) by now.
     returned: always
     type: str
     sample: '*SAVF'
@@ -129,19 +126,19 @@ command:
     type: str
     sample: 'RSTLIB SAVLIB(TESTLIB) DEV(*SAVF) SAVF(TEST/ARCHLIB) '
 rc:
-    description: The restore action return code (0 means success, non-zero means failure)
+    description: The restore action return code. 0 means success.
     returned: always
     type: int
     sample: 255
 stdout_lines:
-    description: The restore standard output split in lines
+    description: The restore standard output split in lines.
     returned: always
     type: list
     sample: [
         "CPC3703: 2 objects restored from test to test."
     ]
 stderr_lines:
-    description: The restore standard error split in lines
+    description: The restore standard error split in lines.
     returned: always
     type: list
     sample: [
@@ -149,9 +146,9 @@ stderr_lines:
         "CPF3780: Specified file for library test not found."
     ]
 job_log:
-    description: the job_log
+    description: The IBM i job log of the task executed.
     returned: always
-    type: str
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "8873",
             "FROM_LIBRARY": "QSYS",
@@ -180,6 +177,7 @@ job_log:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():
@@ -196,12 +194,14 @@ def main():
         supports_check_mode=True,
     )
 
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
+
     saved_lib = module.params['saved_lib']
     savefile_name = module.params['savefile_name']
     savefile_lib = module.params['savefile_lib']
     format = module.params['format']
     joblog = module.params['joblog']
-    asp_group = module.params['asp_group']
+    asp_group = module.params['asp_group'].strip().upper()
     parameters = module.params['parameters']
 
     startd = datetime.datetime.now()

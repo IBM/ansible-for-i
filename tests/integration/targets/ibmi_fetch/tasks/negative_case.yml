@@ -32,9 +32,9 @@
     lib_name: 'SAVRST'
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
-  failed_when: "'Create SAVF failed. See stderr or stdout for more information' not in fetch_result.msg"
+  failed_when: "'Create SAVF failed' not in fetch_result.msg"
 
-- name: TC28 Fetch objects 
+- name: TC28 Fetch objects with invalid object_names 
   ibmi_fetch:
     object_names: 'ABC'
     lib_name: 'SAVRST'
@@ -49,7 +49,7 @@
     validate_checksum: true
     flat: false
   register: fetch_result
-  failed_when: "'Create SAVF failed. See stderr or stdout for more information' not in fetch_result.msg"
+  failed_when: "'Create SAVF failed' not in fetch_result.msg"
 
 - name: TC29 Fetch objects with duplicated object names
   ibmi_fetch:
@@ -70,15 +70,18 @@
     object_types: '*JRNRCV'
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
-  failed_when: "'No objects saved or restored for library SAVRST' not in ''.join(fetch_result.stderr)"
+  #failed_when: "'No objects saved or restored for library SAVRST' not in ''.join(fetch_result.stderr)"
+  # JRNRCV PGM1 in SAVRST not found
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3764') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 # Test with not existing lib_name
-- name: TC31 Fetch objects with not existing lib_nam
+- name: TC31 Fetch objects with not existing lib_name
   ibmi_fetch:
     lib_name: 'ABC'
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
-  failed_when: "'ABC not found' not in ''.join(fetch_result.stderr)"
+  #failed_when: "'ABC not found' not in ''.join(fetch_result.stderr)"
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF7302') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 # Test with invalid object_types
 - name: TC32 Fetch objects with invalid object_types
@@ -87,7 +90,9 @@
     object_types: 'ABC'
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
-  failed_when: "'CPD0084' not in ''.join(fetch_result.stderr)"
+  #failed_when: "'CPD0084' not in ''.join(fetch_result.stderr)"
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length == 0"
+
 
 # Test with invalid savefile_name
 - name: TC33 Fetch objects with invalid savefile_name
@@ -96,7 +101,8 @@
     savefile_name: 'abc*123'
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
-  failed_when: "'CPD0012' not in ''.join(fetch_result.stderr)"
+  #failed_when: "'CPD0012' not in ''.join(fetch_result.stderr)"
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0012') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 # Test with savefile_name more than 10 characters
 - name: TC34 Fetch objects with savefile_name more than 10 characters
@@ -105,7 +111,8 @@
     savefile_name: 'abc123456789'
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
-  failed_when: "'CPD0074' not in ''.join(fetch_result.stderr)"
+  #failed_when: "'CPD0074' not in ''.join(fetch_result.stderr)"
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0074') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 # Test with invalid is_lib
 - name: TC35 Fetch objects with invalid is_lib 

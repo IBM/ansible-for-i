@@ -7,14 +7,31 @@
 
 - name: query ip interface from remote system
   ibmi_sql_query:
-    sql: "SELECT INTERNET_ADDRESS,CONNECTION_TYPE,SUBNET_MASK,LINE_DESCRIPTION from QSYS2.NETSTAT_INTERFACE_INFO WHERE LINE_DESCRIPTION != '*LOOPBACK' and INTERNET_ADDRESS  not in ('*IP6SAC', '*IP4DHCP')"
+    sql: "SELECT INTERNET_ADDRESS,CONNECTION_TYPE,SUBNET_MASK,LINE_DESCRIPTION from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS  not in ('*IP6SAC', '*IP4DHCP') and LINE_DESCRIPTION not in ('*LOOPBACK')"
   register: ip_interface_info
 
 - set_fact:
     lind_name: "{{ip_interface_info.row[0]['LINE_DESCRIPTION']}}"
     subnet: "{{ip_interface_info.row[0]['SUBNET_MASK']}}"
-    ifc_name: "ANSI_IFC"
-    ifc_ip: "11.11.11.11"
+    ifc_name: "ANSI_IFC1"
+    ifc_ip_prefix: "192.168.0."
+    ip_postfix_list: [10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+
+- name: Random generate an IP
+  set_fact:
+    ifc_ip_postfix: "{{ ip_postfix_list | random }}"
+
+- set_fact:
+    ifc_ip: "{{ifc_ip_prefix}}{{ifc_ip_postfix}}"
+
+- name: query ip interface from remote system
+  ibmi_sql_query:
+    sql: "SELECT INTERNET_ADDRESS,INTERFACE_STATUS,ALIAS_NAME from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS='{{ifc_ip}}' or ALIAS_NAME='{{ifc_name}}'"
+  register: ifc_info
+
+- include: cleanup.yml
+  loop: '{{ifc_info.row}}'
+  when: ifc_info.row | length > 0 
 
 - block:
     - name: TC01 query an interface with internet_address
@@ -25,15 +42,45 @@
     - name: TC01 assert the returned options
       assert:
         that: 
-          #- tcp_result.stderr is defined
-          #- tcp_result.stderr_lines is defined
+          - tcp_result.cl_command == "" 
           - tcp_result.rc is defined
           - tcp_result.start is defined
           - tcp_result.end is defined
           - tcp_result.delta is defined
           - tcp_result.stdout is defined
           - tcp_result.stdout_lines is defined
-          #- tcp_result.cl_command is not defined 
+          - tcp_result.job_log == []
+          - tcp_result.interface_info is defined 
+          - tcp_result.interface_info[0]['LINE_DESCRIPTION'] == ip_interface_info.row[0]['LINE_DESCRIPTION']
+          - tcp_result.interface_info[0]['INTERNET_ADDRESS'] == ip_interface_info.row[0]['INTERNET_ADDRESS']
+          - tcp_result.interface_info[0]['SUBNET_MASK'] == ip_interface_info.row[0]['SUBNET_MASK']
+          - tcp_result.interface_info[0]['ALIAS_NAME'] is defined
+          - tcp_result.interface_info[0]['AUTOSTART'] is defined
+          - tcp_result.interface_info[0]['CONNECTION_TYPE'] is defined
+          - tcp_result.interface_info[0]['INTERFACE_LINE_TYPE'] is defined
+          - tcp_result.interface_info[0]['INTERFACE_STATUS'] is defined
+          - tcp_result.interface_info[0]['LAST_CHANGE_TIMESTAMP'] is defined
+          - tcp_result.interface_info[0]['MAXIMUM_TRANSMISSION_UNIT'] is defined
+          - tcp_result.interface_info[0]['NETWORK_ADDRESS'] is defined
+          - tcp_result.interface_info[0]['SERVICE_TYPE'] is defined
+          - tcp_result.interface_info[0]['VIRTUAL_LAN_ID'] is defined
+
+    - name: TC01 query an interface with internet_address
+      ibmi_tcp_interface:
+        internet_address: "{{ip_interface_info.row[0]['INTERNET_ADDRESS']}}"
+      register: tcp_result
+
+    - name: TC01 assert the returned options
+      assert:
+        that: 
+          - tcp_result.cl_command == "" 
+          - tcp_result.rc is defined
+          - tcp_result.start is defined
+          - tcp_result.end is defined
+          - tcp_result.delta is defined
+          - tcp_result.stdout is defined
+          - tcp_result.stdout_lines is defined
+          - tcp_result.job_log == []
           - tcp_result.interface_info is defined 
           - tcp_result.interface_info[0]['LINE_DESCRIPTION'] == ip_interface_info.row[0]['LINE_DESCRIPTION']
           - tcp_result.interface_info[0]['INTERNET_ADDRESS'] == ip_interface_info.row[0]['INTERNET_ADDRESS']
@@ -65,20 +112,41 @@
         text_description: 'CREATED BY ANSIBLE'
         sec_to_wait: 120
         extra_params: 'DHCPDYNDNS(*NO)'
+        joblog: true
+      register: tcp_result
 
     - name: TC02 assert the returned options
       assert:
         that: 
-          #- tcp_result.stderr is defined
-          #- tcp_result.stderr_lines is defined
           - tcp_result.rc is defined
           - tcp_result.start is defined
           - tcp_result.end is defined
           - tcp_result.delta is defined
           - tcp_result.stdout is defined
           - tcp_result.stdout_lines is defined
-          #- tcp_result.interface_info is not defined 
-          - tcp_result.cl_command is defined 
+          - '"QSYS/ADDTCPIFC" in tcp_result.cl_command'
+          - tcp_result.job_log | length > 0
+          - tcp_result.job_log[0]['FROM_INSTRUCTION'] is defined
+          - tcp_result.job_log[0]['FROM_LIBRARY'] is defined
+          - tcp_result.job_log[0]['FROM_MODULE'] is defined
+          - tcp_result.job_log[0]['FROM_PROCEDURE'] is defined
+          - tcp_result.job_log[0]['FROM_PROGRAM'] is defined
+          - tcp_result.job_log[0]['FROM_USER'] is defined
+          - tcp_result.job_log[0]['MESSAGE_FILE'] is defined
+          - tcp_result.job_log[0]['MESSAGE_ID'] is defined
+          - tcp_result.job_log[0]['MESSAGE_LIBRARY'] is defined
+          - tcp_result.job_log[0]['MESSAGE_SECOND_LEVEL_TEXT'] is defined
+          - tcp_result.job_log[0]['MESSAGE_SUBTYPE'] is defined
+          - tcp_result.job_log[0]['MESSAGE_TEXT'] is defined
+          - tcp_result.job_log[0]['MESSAGE_TIMESTAMP'] is defined
+          - tcp_result.job_log[0]['MESSAGE_TYPE'] is defined
+          - tcp_result.job_log[0]['ORDINAL_POSITION'] is defined
+          - tcp_result.job_log[0]['SEVERITY'] is defined
+          - tcp_result.job_log[0]['TO_INSTRUCTION'] is defined
+          - tcp_result.job_log[0]['TO_LIBRARY'] is defined
+          - tcp_result.job_log[0]['TO_MODULE'] is defined
+          - tcp_result.job_log[0]['TO_PROCEDURE'] is defined
+          - tcp_result.job_log[0]['TO_PROGRAM'] is defined
 
     - name: TC03 query an interface with alias_name
       ibmi_tcp_interface:
@@ -87,7 +155,8 @@
 
     - name: TC03 assert the returned options
       assert:
-        that: 
+        that:
+          - 'tcp_result.cl_command == ""'  
           - tcp_result.interface_info[0]['LINE_DESCRIPTION'] == "{{lind_name}}"
           - tcp_result.interface_info[0]['INTERNET_ADDRESS'] == "{{ifc_ip}}"
           - tcp_result.interface_info[0]['SUBNET_MASK'] == ip_interface_info.row[0]['SUBNET_MASK']
@@ -123,8 +192,6 @@
     - name: TC04 assert the returned options
       assert:
         that: 
-          #- tcp_result.stderr is defined
-          #- tcp_result.stderr_lines is defined
           - tcp_result.rc is defined
           - tcp_result.start is defined
           - tcp_result.end is defined
@@ -132,7 +199,7 @@
           - tcp_result.stdout is defined
           - tcp_result.stdout_lines is defined
           #- tcp_result.interface_info is not defined 
-          - tcp_result.cl_command is defined 
+          - '"QSYS/CHGTCPIFC" in tcp_result.cl_command' 
 
     - name: TC05 query an interface with alias_name
       ibmi_tcp_interface:
@@ -141,7 +208,8 @@
 
     - name: TC05 assert the returned options
       assert:
-        that: 
+        that:
+          - 'tcp_result.cl_command == ""'
           - tcp_result.interface_info[0]['LINE_DESCRIPTION'] == "{{lind_name}}"
           - tcp_result.interface_info[0]['INTERNET_ADDRESS'] == "{{ifc_ip}}"
           - tcp_result.interface_info[0]['SUBNET_MASK'] == ip_interface_info.row[0]['SUBNET_MASK']
@@ -165,16 +233,24 @@
     - name: TC06 assert the returned options
       assert:
         that: 
-          #- tcp_result.stderr is defined
-          #- tcp_result.stderr_lines is defined
           - tcp_result.rc is defined
           - tcp_result.start is defined
           - tcp_result.end is defined
           - tcp_result.delta is defined
           - tcp_result.stdout is defined
           - tcp_result.stdout_lines is defined
-          #- tcp_result.interface_info is not defined 
-          - tcp_result.cl_command is defined
+          - '"QSYS/RMVTCPIFC" in tcp_result.cl_command'
+
+    - name: TC06 query the deleted interface
+      ibmi_tcp_interface:
+        internet_address: '{{ifc_ip}}'
+      register: tcp_result
+
+    - name: TC06 assert the returned options
+      assert:
+        that: 
+          - tcp_result.interface_info | length == 0
+          - 'tcp_result.cl_command == ""'
 
     - name: TC07 query an interface with alias_name
       ibmi_tcp_interface:
@@ -192,6 +268,12 @@
         subnet_mask: '{{subnet}}'
         alias_name: '{{ifc_name}}'
         internet_address: '{{ifc_ip}}'
+      register: tcp_result
+
+    - name: TC08 assert the parameters
+      assert:
+        that:
+          - '"QSYS/ADDTCPIFC" in tcp_result.cl_command'
 
     - name: TC09 start the ifc with alias_name
       ibmi_tcp_interface: 
@@ -200,22 +282,31 @@
         sec_to_wait: 240
       register: tcp_result  
 
+    - name: TC09 assert the parameters
+      assert:
+        that:
+          - '"QSYS/STRTCPIFC" in tcp_result.cl_command'
+
     - name: TC10 query an interface with alias_name
       ibmi_tcp_interface:
         internet_address: '{{ifc_ip}}'
+        sec_to_wait: 120
       register: tcp_result
+      until: tcp_result.interface_info[0]['INTERFACE_STATUS'] == 'ACTIVE' or tcp_result.interface_info[0]['INTERFACE_STATUS'] == 'FAILED' 
+      retries: 5
+      delay: 60  
 
-    - name: TC10 assert the returned options
+    - name: TC08 assert the parameters
       assert:
-        that: 
-          - tcp_result.interface_info[0]['INTERFACE_STATUS'] == 'ACTIVE'
+        that:
+          - 'tcp_result.cl_command == ""'
+          -  tcp_result.interface_info[0]['INTERFACE_STATUS'] == 'ACTIVE' 
 
     - name: TC11 start the ifc again
       ibmi_tcp_interface: 
         internet_address: '{{ifc_ip}}'
         state: 'active'
         sec_to_wait: 120
-      register: tcp_result  
 
     - name: TC12 end the ifc 
       ibmi_tcp_interface: 
@@ -227,16 +318,13 @@
     - name: TC13 assert the returned options
       assert:
         that: 
-          #- tcp_result.stderr is defined
-          #- tcp_result.stderr_lines is defined
           - tcp_result.rc is defined
           - tcp_result.start is defined
           - tcp_result.end is defined
           - tcp_result.delta is defined
           - tcp_result.stdout is defined
           - tcp_result.stdout_lines is defined
-          #- tcp_result.interface_info is not defined 
-          - tcp_result.cl_command is defined
+          - '"QSYS/ENDTCPIFC" in tcp_result.cl_command'
 
     - name: TC14 query an interface with alias_name
       ibmi_tcp_interface:
@@ -247,31 +335,35 @@
       assert:
         that: 
           - tcp_result.interface_info[0]['INTERFACE_STATUS'] == 'INACTIVE'
+          - 'tcp_result.cl_command == ""'
 
     - name: TC15 end the ifc with alias_name again
       ibmi_tcp_interface: 
         alias_name: '{{ifc_name}}'
         state: 'inactive'
       register: tcp_result 
-      ignore_errors: true 
 
     - name: TC16 remove the ifc with alias_name
       ibmi_tcp_interface: 
         alias_name: '{{ifc_name}}'
         state: 'absent'
       register: tcp_result  
-    
+
+    - name: TC16 assert the returned options
+      assert:
+        that: 
+          - '"QSYS/RMVTCPIFC" in tcp_result.cl_command'
+
     - include: negative_case.yml
 
   always:
-    - name: remove ifc
-      ibmi_cl_command:
-        cmd: RMVTCPIFC INTNETADR('{{ifc_ip}}')
-      ignore_errors: true
+    - name: query ip interface from remote system
+      ibmi_sql_query:
+        sql: "SELECT INTERNET_ADDRESS,INTERFACE_STATUS,ALIAS_NAME from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS='{{ifc_ip}}' or ALIAS_NAME='{{ifc_name}}'"
+      register: ifc_info
 
-    - name: remove ifc
-      ibmi_cl_command:
-        cmd: RMVTCPIFC  ALIASNAME({{ifc_name}})
-      ignore_errors: true
+    - include: cleanup.yml
+      loop: '{{ifc_info.row}}'
+      when: ifc_info.row | length > 0 
 
 

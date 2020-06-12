@@ -122,7 +122,8 @@
   ibmi_uninstall_product:
     product: '5770ABC'
   register: neg_result
-  failed_when: "'CPD3D91' not in neg_result.stderr"
+  #failed_when: "'CPD3D91' not in neg_result.stderr"
+  failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3D91') | map(attribute='MESSAGE_ID') | list | length ==0"
 
 - name: assert the returned parameters
   assert:
@@ -139,7 +140,8 @@
     release: '*ONLY'
     language: '*ALL'
   register: neg_result
-  failed_when: "'CPD3D91' not in neg_result.stderr"
+  #failed_when: "'CPD3D91' not in neg_result.stderr"
+  failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3D91') | map(attribute='MESSAGE_ID') | list | length ==0"
 
 - name: uninstall the product with an invalid option
   ibmi_uninstall_product:
@@ -157,7 +159,8 @@
     release: 'ABC'
     language: '*ALL'
   register: neg_result
-  failed_when: "'CPD3DF5' not in neg_result.stderr"
+  #failed_when: "'CPD3DF5' not in neg_result.stderr"
+  failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DF5') | map(attribute='MESSAGE_ID') | list | length ==0"
 
 - name: uninstall the product with an invalid language
   ibmi_uninstall_product:
@@ -166,10 +169,12 @@
     release: '*ONLY'
     language: '1111'
   register: neg_result
-  failed_when: "'CPD3DF6' not in neg_result.stderr" 
+  #failed_when: "'CPD3DF6' not in neg_result.stderr" 
+  failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DF6') | map(attribute='MESSAGE_ID') | list | length ==0"
 
 - name: uninstall a running product
   ibmi_uninstall_product:
     product: '5770TC1'
   register: neg_result
-  failed_when: "'CPF3D97' not in neg_result.stderr"
+  #failed_when: "'CPF3D97' not in neg_result.stderr"
+  failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3D97') | map(attribute='MESSAGE_ID') | list | length ==0"

@@ -105,7 +105,8 @@
       ibmi_end_subsystem:
         subsystem: QBATCH          
       register: endsbs_result
-      failed_when: "'CPF1054' not in endsbs_result.stderr"
+      #failed_when: "'CPF1054' not in endsbs_result.stderr"
+      failed_when: "endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1054') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC05 assert the returned parameters
       assert:
@@ -129,7 +130,8 @@
         subsystem: abc 
         joblog: true   
       register: endsbs_result 
-      failed_when: "'CPF1054' not in endsbs_result.stderr"
+      #failed_when: "'CPF1054' not in endsbs_result.stderr"
+      failed_when: "endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1054') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC08 assert the returned parameters
       assert:

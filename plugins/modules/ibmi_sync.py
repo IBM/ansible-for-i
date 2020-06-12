@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
+# Author, Peng Zengyu <pzypeng@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -16,56 +16,56 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_sync
-short_description: Synchronize a save file from current ibm i node A to another ibm i node B.
-version_added: 1.0
+short_description: Synchronize a save file from current IBM i node A to another IBM i node B.
+version_added: 2.8
 description:
-     - The ibmi_sync module synchronize a save file from current ibm i node to another ibm i node.
+     - The C(ibmi_sync) module synchronize a save file from current IBM i node to another IBM i node.
      - Only support to synchronize save file by now.
      - For non-IBMi native targets, use the synchronize module instead.
 options:
   src:
     description:
       - Save file path on the source host that will be synchronized to the destination.
-      - The path must be absolute, and src must be a ibm i native library. For example, /qsys.lib/test.lib/c1.file.
+      - The path must be absolute, and src must be a IBM i native library. For example, /qsys.lib/test.lib/c1.file.
     type: str
     required: yes
   dest:
     description:
       - Path on the destination host that will be synchronized from the source.
-      - The path must be absolute, and dest must be a ibm i native library. For example, /qsys.lib/test.lib.
+      - The path must be absolute, and dest must be a IBM i native library. For example, /qsys.lib/test.lib.
       - If not specify, dest will be equal to src.
     type: str
     default: ''
   remote_user:
     description:
-      - The user name to connect to the remote ibm i node.
+      - The user name to connect to the remote IBM i node.
     type: str
     required: yes
   remote_host:
     description:
-      - The remote ibm i node address.
+      - The remote IBM i node address.
       - Can be IP or host name.
     type: str
     required: yes
   private_key:
     description:
-      - Specifies SSH private key used to connect to remote ibm i host.
+      - Specifies SSH private key used to connect to remote IBM i host.
       - The path can be absolute or relative.
     type: path
     default: '~/.ssh/id_rsa'
 
 notes:
-    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3
-    - Make sure ssh passwordless login works from ibm i node A to ibm i node B
-    - private_key must be a rsa key in the legacy PEM private key format
-    - Doesn't support IASP by now
+    - Need install paramiko package on target IBM i.
+    - Make sure ssh passwordless login works from IBM i node A to IBM i node B.
+    - private_key must be a rsa key in the legacy PEM private key format.
+    - Doesn't support IASP by now.
 
 author:
-    - Peng Zeng Yu (@pengzengyufish)
+    - Peng Zengyu (@pengzengyufish)
 '''
 
 EXAMPLES = r'''
-- name: Synchronize c1 save file to host.com
+- name: Synchronize c1 save file to host.com.
   ibmi_sync:
     src: '/qsys.lib/test.lib/c1.file'
     remote_host: 'host.com'
@@ -80,27 +80,27 @@ delta:
     type: str
     sample: '0:00:00.307534'
 stdout:
-    description: The standard output
+    description: The standard output.
     returned: always
     type: str
     sample: 'Successfully synchronize file /QSYS.LIB/TEST.LIB/C1.FILE to remote host host.com'
 stderr:
-    description: The standard error
+    description: The standard error.
     returned: always
     type: str
     sample: 'Failed to mv file to qsys. Make sure library exists.'
 rc:
-    description: The action return code (0 means success, non-zero means failure)
+    description: The action return code. 0 means success.
     returned: always
     type: int
     sample: 255
 stdout_lines:
-    description: The standard output split in lines
+    description: The standard output split in lines.
     returned: always
     type: list
     sample: ['Successfully synchronize file /QSYS.LIB/TEST.LIB/C1.FILE to remote host host.com']
 stderr_lines:
-    description: The standard error split in lines
+    description: The standard error split in lines.
     returned: always
     type: list
     sample: ['Failed to mv file to qsys. Make sure library exists.']
@@ -111,7 +111,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_native, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-
+__ibmi_module_version__ = "1.0.0-beta1"
 HAS_PARAMIKO = True
 
 try:
@@ -139,6 +139,7 @@ def main():
         ),
         supports_check_mode=True,
     )
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
     result = dict(
         stdout='',
         stderr='',

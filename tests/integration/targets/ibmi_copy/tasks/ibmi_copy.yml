@@ -26,7 +26,8 @@
     savefile_name: "{{ savf_name.split('.')[0] }}"
     savefile_lib: '{{remote_temp_lib}}'
   register: rstobj_result
-  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"  
+  #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0" 
+  failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 - name: TC01 confirm the object does exist on the remote lib
   ibmi_sql_query:
@@ -186,7 +187,9 @@
   assert:
     that:
       # The restore may reported user change error CPF3848 and some objects in the SAVF may not be restored CPF3773
-      - "'CPF3848' in rstobj_result.stderr or 'CPF3773' in rstobj_result.stderr"
+      #- "'CPF3848' in rstobj_result.stderr or 'CPF3773' in rstobj_result.stderr"
+      - "rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0 or
+      rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3773') | map(attribute='MESSAGE_ID') | list | length == 0"
   when: "rstobj_result.rc != 0"
 
 - name: TC09 copy a SAVF
@@ -207,7 +210,7 @@
     force: true 
     backup: true
   register: copy_result  
-  failed_when: "'Rename failure. SAVF names (/QSYS.LIB/ARCHLIB.LIB/PF9.FILE range(1,10)) are already exist on IBMi. Failed' not in copy_result.msg"
+  failed_when: "'Rename failure. SAVF names (/QSYS.LIB/ARCHLIB.LIB/PF9.FILE range(1,10)) are already exist on IBMi.' not in copy_result.msg"
 
 - name: TC10 confirm the two objects with same name in the library
   ibmi_sql_query:
@@ -274,4 +277,4 @@
     src: '{{ savf_name }}'
     lib_name: 'ABC'
   register: neg_result
-  failed_when: "'Library ABC not found' not in ''.join(neg_result.stderr)"
+  failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF7302') | map(attribute='MESSAGE_ID') | list | length == 0"

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
+# Author, Peng Zengyu <pzypeng@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -16,12 +16,12 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_object_save
-short_description: Save one or more objects on a remote IBMi node
-version_added: 1.0
+short_description: Save one or more objects
+version_added: 2.8
 description:
-     - The ibmi_object_save module create an save file on a remote IBMi nodes
-     - The saved objects and save file are on the remote host, and the save file I(is not) copied to the local host.
-     - Only support *SAVF as the save file's format by now.
+     - The C(ibmi_object_save) module create an save file on a remote IBM i nodes.
+     - The saved objects and save file are on the remote host, and the save file is not copied to the local host.
+     - Only support C(*SAVF) as the save file's format by now.
 options:
   object_names:
     description:
@@ -52,7 +52,7 @@ options:
     required: yes
   format:
     description:
-      - The save file's format. Only support *SAVF by now.
+      - The save file's format. Only support C(*SAVF) by now.
     type: str
     default: '*SAVF'
     choices: ["*SAVF"]
@@ -68,7 +68,7 @@ options:
     default: '*CURRENT'
   joblog:
     description:
-      - If set to C(true), append JOBLOG to stderr/stderr_lines.
+      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
     type: bool
     default: False
   asp_group:
@@ -84,48 +84,45 @@ options:
     type: str
     default: ' '
 
-notes:
-    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-
 author:
-    - Peng Zeng Yu (@pengzengyufish)
+    - Peng Zengyu (@pengzengyufish)
 '''
 
 EXAMPLES = r'''
-- name: Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary
+- name: Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary.
   ibmi_object_save:
     object_names: 'test1 test2'
     object_lib: 'objlib'
     object_types: '*PGM *SRVPGM'
     savefile_name: 'archive'
     savefile_lib: 'archlib'
-    force_save: true
+    force_save: True
     target_release: 'V7R2M0'
 '''
 
 RETURN = r'''
 start:
-    description: The save execution start time
+    description: The save execution start time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:53.757435'
 end:
-    description: The save execution end time
+    description: The save execution end time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:54.064969'
 delta:
-    description: The save execution delta time
+    description: The save execution delta time.
     returned: always
     type: str
     sample: '0:00:00.307534'
 stdout:
-    description: The save standard output
+    description: The save standard output.
     returned: always
     type: str
     sample: 'CPC3722: 2 objects saved from library objlib.'
 stderr:
-    description: The save standard error
+    description: The save standard error.
     returned: always
     type: str
     sample: 'CPF5813: File archive in library archlib already exists.\nCPF7302: File archive not created in library archlib.\n'
@@ -155,7 +152,7 @@ savefile_lib:
     type: str
     sample: 'c1lib'
 format:
-    description: The save file's format. Only support *SAVF by now.
+    description: The save file's format. Only support C(*SAVF) by now.
     returned: always
     type: str
     sample: '*SAVF'
@@ -163,7 +160,7 @@ force_save:
     description: If save file already exists or contains data, whether to clear data or not.
     returned: always
     type: bool
-    sample: true
+    sample: True
 target_release:
     description: The release of the operating system on which you intend to restore and use the object.
     returned: always
@@ -180,19 +177,19 @@ joblog:
     type: bool
     sample: False
 rc:
-    description: The save action return code (0 means success, non-zero means failure)
+    description: The save action return code. 0 means success.
     returned: always
     type: int
     sample: 255
 stdout_lines:
-    description: The save standard output split in lines
+    description: The save standard output split in lines.
     returned: always
     type: list
     sample: [
         "CPC3722: 2 objects saved from library objlib."
     ]
 stderr_lines:
-    description: The save standard error split in lines
+    description: The save standard error split in lines.
     returned: always
     type: list
     sample: [
@@ -200,16 +197,16 @@ stderr_lines:
         "CPF7302: File archive not created in library archlib."
     ]
 job_log:
-    description: the job_log
+    description: The IBM i job log of the task executed.
     returned: always
-    type: str
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "149",
             "FROM_LIBRARY": "QSHELL",
             "FROM_MODULE": "QZSHRUNC",
             "FROM_PROCEDURE": "main",
             "FROM_PROGRAM": "QZSHRUNC",
-            "FROM_USER": "PENGZY",
+            "FROM_USER": "TESTER",
             "MESSAGE_FILE": "QZSHMSGF",
             "MESSAGE_ID": "QSH0005",
             "MESSAGE_LIBRARY": "QSHELL",
@@ -231,6 +228,7 @@ job_log:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():
@@ -250,92 +248,98 @@ def main():
         ),
         supports_check_mode=True,
     )
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
+    conn = None
+    try:
+        object_names = module.params['object_names']
+        object_lib = module.params['object_lib']
+        object_types = module.params['object_types']
+        savefile_name = module.params['savefile_name']
+        savefile_lib = module.params['savefile_lib']
+        format = module.params['format']
+        force_save = module.params['force_save']
+        target_release = module.params['target_release']
+        joblog = module.params['joblog']
+        asp_group = module.params['asp_group'].strip().upper()
+        parameters = module.params['parameters']
 
-    object_names = module.params['object_names']
-    object_lib = module.params['object_lib']
-    object_types = module.params['object_types']
-    savefile_name = module.params['savefile_name']
-    savefile_lib = module.params['savefile_lib']
-    format = module.params['format']
-    force_save = module.params['force_save']
-    target_release = module.params['target_release']
-    joblog = module.params['joblog']
-    asp_group = module.params['asp_group']
-    parameters = module.params['parameters']
-
-    startd = datetime.datetime.now()
-    conn = ibmi_util.itoolkit_init()
-    # crtsavf
-    command = 'QSYS/CRTSAVF FILE({p_savefile_lib}/{p_savefile_name})'.format(
-        p_savefile_lib=savefile_lib,
-        p_savefile_name=savefile_name)
-    rc, out, error = ibmi_util.itoolkit_run_command(conn, command, asp_group)
-    if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-        # SAVOBJ
-        command = 'QSYS/SAVOBJ OBJ({p_object_names}) LIB({p_object_lib}) DEV({p_format}) OBJTYPE({p_object_types}) \
-            SAVF({p_savefile_lib}/{p_savefile_name}) TGTRLS({p_target_release}) {p_parameters}'.format(
-            p_object_names=object_names,
-            p_object_lib=object_lib,
-            p_format=format,
-            p_object_types=object_types,
+        startd = datetime.datetime.now()
+        conn = ibmi_util.itoolkit_init(asp_group)
+        # crtsavf
+        command = 'QSYS/CRTSAVF FILE({p_savefile_lib}/{p_savefile_name})'.format(
             p_savefile_lib=savefile_lib,
-            p_savefile_name=savefile_name,
-            p_target_release=target_release,
-            p_parameters=parameters)
-        rc, out, error = ibmi_util.itoolkit_run_command(conn, ' '.join(command.split()), asp_group)
-    else:
-        if 'CPF5813' in error:
-            if force_save is True:
-                # CLRSAVF
-                command = 'QSYS/CLRSAVF FILE({p_savefile_lib}/{p_savefile_name})'.format(
-                    p_savefile_lib=savefile_lib,
-                    p_savefile_name=savefile_name)
-                rc, out, error = ibmi_util.itoolkit_run_command(conn, command, asp_group)
-                if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-                    command = 'QSYS/SAVOBJ OBJ({p_object_names}) LIB({p_object_lib}) DEV({p_format}) OBJTYPE({p_object_types}) \
-                        SAVF({p_savefile_lib}/{p_savefile_name}) TGTRLS({p_target_release}) {p_parameters}'.format(
-                        p_object_names=object_names,
-                        p_object_lib=object_lib,
-                        p_format=format,
-                        p_object_types=object_types,
+            p_savefile_name=savefile_name)
+        rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
+        job_log = ibmi_util.itoolkit_get_job_log(conn, startd)
+        if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
+            # SAVOBJ
+            command = 'QSYS/SAVOBJ OBJ({p_object_names}) LIB({p_object_lib}) DEV({p_format}) OBJTYPE({p_object_types}) \
+                SAVF({p_savefile_lib}/{p_savefile_name}) TGTRLS({p_target_release}) {p_parameters}'.format(
+                p_object_names=object_names,
+                p_object_lib=object_lib,
+                p_format=format,
+                p_object_types=object_types,
+                p_savefile_lib=savefile_lib,
+                p_savefile_name=savefile_name,
+                p_target_release=target_release,
+                p_parameters=parameters)
+            rc, out, error = ibmi_util.itoolkit_run_command(conn, ' '.join(command.split()))
+        else:
+            if 'CPF5813' in str(job_log):
+                if force_save is True:
+                    # CLRSAVF
+                    command = 'QSYS/CLRSAVF FILE({p_savefile_lib}/{p_savefile_name})'.format(
                         p_savefile_lib=savefile_lib,
+                        p_savefile_name=savefile_name)
+                    rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
+                    if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
+                        command = 'QSYS/SAVOBJ OBJ({p_object_names}) LIB({p_object_lib}) DEV({p_format}) OBJTYPE({p_object_types}) \
+                            SAVF({p_savefile_lib}/{p_savefile_name}) TGTRLS({p_target_release}) {p_parameters}'.format(
+                            p_object_names=object_names,
+                            p_object_lib=object_lib,
+                            p_format=format,
+                            p_object_types=object_types,
+                            p_savefile_lib=savefile_lib,
+                            p_savefile_name=savefile_name,
+                            p_target_release=target_release,
+                            p_parameters=parameters)
+                        rc, out, error = ibmi_util.itoolkit_run_command(conn, ' '.join(command.split()))
+                else:
+                    out = 'File {p_savefile_name} in library {p_savefile_lib} already exists. Set force_save to force save.'.format(
                         p_savefile_name=savefile_name,
-                        p_target_release=target_release,
-                        p_parameters=parameters)
-                    rc, out, error = ibmi_util.itoolkit_run_command(conn, ' '.join(command.split()), asp_group)
-            else:
-                out = 'File {p_savefile_name} in library {p_savefile_lib} already exists. If still need save, please set force_save.'.format(
-                    p_savefile_name=savefile_name,
-                    p_savefile_lib=savefile_lib)
+                        p_savefile_lib=savefile_lib)
 
-    endd = datetime.datetime.now()
-    delta = endd - startd
-    job_log = ibmi_util.itoolkit_get_job_log(conn, startd)
-    result = dict(
-        object_names=object_names,
-        object_lib=object_lib,
-        object_types=object_types,
-        savefile_name=savefile_name,
-        savefile_lib=savefile_lib,
-        joblog=joblog,
-        format=format,
-        force_save=force_save,
-        target_release=target_release,
-        command=' '.join(command.split()),
-        job_log=job_log if joblog or rc else [],
-        stdout=out,
-        stderr=error,
-        rc=rc,
-        start=str(startd),
-        end=str(endd),
-        delta=str(delta),
-    )
+        endd = datetime.datetime.now()
+        delta = endd - startd
+        job_log = ibmi_util.itoolkit_get_job_log(conn, startd)
+        result = dict(
+            object_names=object_names,
+            object_lib=object_lib,
+            object_types=object_types,
+            savefile_name=savefile_name,
+            savefile_lib=savefile_lib,
+            joblog=joblog,
+            format=format,
+            force_save=force_save,
+            target_release=target_release,
+            command=' '.join(command.split()),
+            job_log=job_log if joblog or rc else [],
+            stdout=out,
+            stderr=error,
+            rc=rc,
+            start=str(startd),
+            end=str(endd),
+            delta=str(delta),
+        )
 
-    ibmi_util.itoolkti_close_connection(conn)
-    if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-        module.fail_json(msg='non-zero return code', **result)
+        if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
+            module.fail_json(msg='non-zero return code', **result)
 
-    module.exit_json(**result)
+        module.exit_json(**result)
+    except Exception as e:
+        module.fail_json(rc=ibmi_util.IBMi_COMMAND_RC_UNEXPECTED, msg=str(e))
+    finally:
+        ibmi_util.itoolkti_close_connection(conn)
 
 
 if __name__ == '__main__':

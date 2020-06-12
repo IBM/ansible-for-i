@@ -10,6 +10,8 @@
 #       OPTBASE     *FILE     JV1         SAVF           
 #       OPT16       *FILE     JV1         SAVF           
 #       OPT17       *FILE     JV1         SAVF   
+- include: simple_save_install_uninstall.yml
+  when: "ansible_distribution_version != '7' or ansible_distribution_release != '4'"
 
 - block:
     
@@ -37,7 +39,7 @@
     - name: uninstall the product with default values
       ibmi_uninstall_product:
         product: '5770JV1'
-      when: "'5770JV1   ' in installed_native_products.stdout"
+      when: "'5770JV1' in installed_native_products.stdout"
 
     - name: accept license
       ibmi_cl_command:

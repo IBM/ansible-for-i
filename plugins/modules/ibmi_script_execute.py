@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
+# Author, Peng Zengyu <pzypeng@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -16,12 +16,12 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_script_execute
-short_description: Execute a cl/sql script file on a remote ibm i node.
-version_added: 1.0
+short_description: Execute a cl/sql script file
+version_added: 2.8
 description:
-     - The ibmi_script_execute module execute a cl/sql script file on a remote ibm i node.
+     - The C(ibmi_script_execute) module execute a cl/sql script file on a remote ibm i node.
      - Only support cl/sql script file by now.
-     - For sql script, use RUNSQLSTM to process
+     - For sql script, use RUNSQLSTM to process.
      - For non-cl/sql script, use the script plugin instead.
 options:
   src:
@@ -33,7 +33,7 @@ options:
   type:
     description:
       - Specify the script file type.
-      - Only support CL or SQL script by now.
+      - Only support C(CL) or C(SQL) script by now.
     type: str
     required: yes
     choices: ["CL", "SQL"]
@@ -49,34 +49,33 @@ options:
          by the processing of the SQL statements.
        - If errors that are greater than the value specified for this parameter occur during processing, no more statements are
          run and the statements are rolled back if they are running under commitmentcontrol.
-       - Only works for sql script
+       - Only works for sql script.
      type: int
      default: 10
   parameters:
     description:
       - The parameters that RUNSQLSTM command will take. All other parameters need to be specified here.
       - The default values of parameters for RUNSQLSTM will be taken if not specified.
-      - Only works for sql script
+      - Only works for sql script.
     type: str
     default: ' '
 
 notes:
-    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
     - For cl script, the command supports line breaks.
-      When a command ends, add ':' at the end of each command or empty the next line.
-      Otherwise program will not consider it is the end of a command.
+    - When a command ends, add ':' at the end of each command or empty the next line.
+    - Otherwise program will not consider it is the end of a command.
 
 author:
-    - Peng Zeng Yu (@pengzengyufish)
+    - Peng Zengyu (@pengzengyufish)
 '''
 
 EXAMPLES = r'''
-- name: Execute test.cl on a remote ibm i node
+- name: Execute test.cl on a remote IBM i node.
   ibmi_script_execute:
     src: '/home/test.cl'
     type: 'CL'
 
-- name: Execute testsql.sql on a remote ibm i node
+- name: Execute testsql.sql on a remote IBM i node.
   ibmi_script_execute:
     src: '/home/testsql.sql'
     type: 'SQL'
@@ -91,34 +90,34 @@ delta:
     type: str
     sample: '0:00:00.307534'
 stdout:
-    description: The standard output
+    description: The standard output.
     returned: always
     type: str
     sample: 'Successfully execute script file /home/test.cl'
 stderr:
-    description: The standard error
+    description: The standard error.
     returned: always
     type: str
     sample: 'Execute command %s failed.'
 rc:
-    description: The action return code (0 means success, non-zero means failure)
+    description: The action return code. 0 means success.
     returned: always
     type: int
     sample: 255
 stdout_lines:
-    description: The standard output split in lines
+    description: The standard output split in lines.
     returned: always
     type: list
     sample: ['Successfully execute script file /home/test.cl']
 stderr_lines:
-    description: The standard error split in lines
+    description: The standard error split in lines.
     returned: always
     type: list
     sample: ['Execute command %s failed.']
 job_log:
-    description: the job_log
+    description: The IBM i job log of the task executed.
     returned: always
-    type: str
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "149",
             "FROM_LIBRARY": "QSHELL",
@@ -149,6 +148,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_native, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+__ibmi_module_version__ = "1.0.0-beta1"
 
 try:
     from shlex import quote
@@ -158,7 +158,6 @@ except ImportError:
 
 def return_error(module, error, out, conn, startd, result):
     job_log = ibmi_util.itoolkit_get_job_log(conn, startd)
-    ibmi_util.itoolkti_close_connection(conn)
     result.update({'rc': ibmi_util.IBMi_COMMAND_RC_ERROR, 'stderr': error, 'stdout': out, 'job_log': job_log})
     module.exit_json(**result)
 
@@ -174,6 +173,7 @@ def main():
         ),
         supports_check_mode=True,
     )
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
     result = dict(
         stdout='',
         stderr='',
@@ -181,16 +181,16 @@ def main():
         delta='',
         job_log=[]
     )
-
+    conn = None
     try:
         src = module.params['src']
-        asp_group = module.params['asp_group']
         type = module.params['type']
         severity_level = module.params['severity_level']
+        asp_group = module.params['asp_group'].strip().upper()
         parameters = module.params['parameters']
 
         startd = datetime.datetime.now()
-        conn = ibmi_util.itoolkit_init()
+        conn = ibmi_util.itoolkit_init(asp_group)
         src = os.path.realpath(src)
         if not os.path.isfile(src):
             return_error(module, "src {p_src} doesn't exist.".format(p_src=src), '', conn, startd, result)
@@ -211,23 +211,23 @@ def main():
                             command = command + line_command[:-1]
                         else:
                             command = command + line_command
-                        rc, out, error = ibmi_util.itoolkit_run_command(conn, command, asp_group)
+                        rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
                         if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
                             break
                         command = ''
                 elif command != '':
-                    rc, out, error = ibmi_util.itoolkit_run_command(conn, command, asp_group)
+                    rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
                     if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
                         break
                     command = ''
             if command != '':
-                rc, out, error = ibmi_util.itoolkit_run_command(conn, command, asp_group)
+                rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
         else:
             command = "QSYS/RUNSQLSTM SRCSTMF('{p_src}') ERRLVL({p_severity_level}) {p_parameters}".format(
                 p_src=src,
                 p_severity_level=severity_level,
                 p_parameters=parameters)
-            rc, out, error = ibmi_util.itoolkit_run_command(conn, command, asp_group)
+            rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
             if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
                 return_error(module, "Execute sql statement file {p_command} failed. err: \n {p_err}".format(
                     p_command=command,
@@ -247,7 +247,6 @@ def main():
                 conn,
                 startd,
                 result)
-        ibmi_util.itoolkti_close_connection(conn)
         result['stdout'] = "Successfully execute script file."
         result.update({'rc': rc, 'delta': str(delta)})
         module.exit_json(**result)
@@ -257,6 +256,8 @@ def main():
                       'stderr': "Unexpected exception happens. error: {p_to_text}. Use -vvv for more information.".format(
                           p_to_text=to_text(e))})
         module.fail_json(**result)
+    finally:
+        ibmi_util.itoolkti_close_connection(conn)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
+# Author, Peng Zengyu <pzypeng@cn.ibm.com>
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -17,7 +17,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.executor.powershell import module_manifest as ps_manifest
-
+__ibmi_module_version__ = "BUILDDATE_REPLACE"
 display = Display()
 
 
@@ -34,6 +34,8 @@ class ActionModule(ActionBase):
     ))
 
     def run(self, tmp=None, task_vars=None):
+
+        display.debug("version: " + __ibmi_module_version__)
 
         if task_vars is None:
             task_vars = dict()
@@ -78,12 +80,10 @@ class ActionModule(ActionBase):
             if result.get('stderr'):
                 result['failed'] = True
                 return result
-
             try:
                 src = self._loader.get_real_file(self._find_needle('files', src))
             except AnsibleError as e:
                 raise AnsibleActionFail(to_native(e))
-
             tmp_src = self._connection._shell.join_path(self._connection._shell.tmpdir, os.path.basename(src))
             self._transfer_file(src, tmp_src)
 
@@ -107,10 +107,10 @@ class ActionModule(ActionBase):
 
             if result['rc']:
                 result['failed'] = True
-                result.update(dict(stderr=("Failed to execute script file {p_src}.".format(p_src=src)) + result['stderr'],
+                result.update(dict(stderr=(u"Failed to execute script file {p_src}.".format(p_src=src)) + result['stderr'],
                                    delta=str(delta)))
             else:
-                result.update(dict(stdout="Successfully execute script file {p_src}.".format(p_src=src), delta=str(delta)))
+                result.update(dict(stdout=u"Successfully execute script file {p_src}.".format(p_src=src), delta=str(delta)))
 
         except Exception as e:
             result['stderr'] += "{p_to_text}".format(p_to_text=to_text(e))

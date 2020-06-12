@@ -18,6 +18,8 @@ from ansible.utils.display import Display
 
 display = Display()
 
+__ibmi_module_version__ = "BUILDDATE_REPLACE"
+
 
 class TimedOutException(Exception):
     pass
@@ -99,6 +101,7 @@ class ActionModule(RebootActionModule, ActionBase):
         return self.DEFAULT_SHUTDOWN_COMMAND
 
     def get_system_boot_time(self, distribution):
+        display.vvv('ibmi_reboot: version: ' + __ibmi_module_version__)
         module_output = self._execute_module(
             module_name='ibmi_sql_query',
             module_args={

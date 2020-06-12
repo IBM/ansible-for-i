@@ -16,21 +16,21 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_message
-short_description: Search or reply message on a remote IBMi node
-version_added: 2.10
+short_description: Search message
+version_added: 2.8
 description:
-  - Search or reply message on a remote IBMi node
-  - For non-IBMi targets, no need
+  - Search message.
+  - For non-IBM i targets, no need.
 options:
   operation:
     description:
-      - the operation of the messgae
+      - The operation of the messgae.
     type: str
     required: yes
-    choices: [ "find" ]
+    choices: ["find"]
   message_type:
     description:
-      - the type of the message
+      - The type of the message.
       - INFORMATIONAL, A message that conveys information about the condition of a function.
       - COMPLETION, A message that conveys completion status of work.
       - DIAGNOSTIC, A message about errors in the processing of a system function, in an application program, or in input data.
@@ -45,27 +45,27 @@ options:
       - SENDER, an inquiry or notify message that is kept by the sender.
       - NO_REPLY, a message that type is "INQUIRY" and has not been replied.
     type: str
-    choices: [ "INFORMATIONAL", "COMPLETION", "DIAGNOSTIC", "ESCAPE",
+    choices: ["INFORMATIONAL", "COMPLETION", "DIAGNOSTIC", "ESCAPE",
                "INQUIRY", "REPLY", "NOTIFY", "REQUEST", "SENDER", "NO_REPLY"]
     required: yes
   message_queue:
     description:
-      - the queue of the message
+      - The queue of the message.
     type: list
     elements: str
   message_lib:
     description:
-      - the library name which contains message queue
+      - The library name which contains message queue.
     type: str
     required: yes
   message_id:
     description:
-      - the id of the message
+      - The id of the message.
     type: list
     elements: str
   message_text:
     description:
-      - the message text of the message
+      - The message text of the message.
     type: str
   joblog:
     description:
@@ -77,7 +77,7 @@ seealso:
 - module: service
 
 author:
-- Jin Yi Fan(@jinyifan)
+- Jin Yifan(@jinyifan)
 '''
 
 EXAMPLES = r'''
@@ -99,27 +99,27 @@ EXAMPLES = r'''
 
 RETURN = r'''
 start:
-    description: The command execution start time
+    description: The command execution start time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:53.757435'
 end:
-    description: The command execution end time
+    description: The command execution end time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:54.064969'
 delta:
-    description: The command execution delta time
+    description: The command execution delta time.
     returned: always
     type: str
     sample: '0:00:00.307534'
 stderr:
-    description: The command standard error
+    description: The command standard error.
     returned: always
     type: str
     sample: 'Generic failure'
 sql:
-    description: The sql executed by the task
+    description: The sql executed by the task.
     returned: always
     type: str
     sample: "SELECT MESSAGE_QUEUE_LIBRARY, MESSAGE_QUEUE_NAME, MESSAGE_ID, MESSAGE_TYPE,
@@ -131,14 +131,14 @@ sql:
              AND MESSAGE_QUEUE_NAME = 'CHANGLE' OR MESSAGE_QUEUE_NAME = 'QHQB'
              AND MESSAGE_ID = 'CPF1241' OR MESSAGE_ID = 'CPF1240' AND MESSAGE_TYPE = 'INFORMATIONAL'"
 rc:
-    description: The command return code (0 means success, non-zero means failure)
+    description: The command return code (0 means success, non-zero means failure).
     returned: always
     type: int
     sample: 255
 message_info:
-    description: the message_info
+    description: The message_info.
     returned: always
-    type: str
+    type: list
     sample: [{
             "ASSOCIATED_MESSAGE_KEY": "",
             "FROM_JOB": "013447/QSYS/QINTER",
@@ -158,9 +158,9 @@ message_info:
             "SEVERITY": "0"
         }]
 job_log:
-    description: the job_log
+    description: The IBM i job log of the task executed.
     returned: always
-    type: str
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -170,7 +170,6 @@ job_log:
             "FROM_USER": "CHANGLE",
             "MESSAGE_FILE": "QCPFMSG",
             "MESSAGE_ID": "CPD0912",
-            "MESSAGE_KEY": "00000379",
             "MESSAGE_LIBRARY": "QSYS",
             "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.",
             "MESSAGE_SUBTYPE": "",
@@ -186,7 +185,7 @@ job_log:
             "TO_PROGRAM": "QSQSRVR"
         }]
 stderr_lines:
-    description: The command standard error split in lines
+    description: The command standard error split in lines.
     returned: always
     type: list
     sample: [
@@ -197,6 +196,8 @@ stderr_lines:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def handle_list_to_sql(sql, item_list, param_name):
@@ -239,6 +240,7 @@ def main():
         supports_check_mode=True,
     )
 
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
     operation = module.params['operation']
     message_type = module.params['message_type']
     message_queue = module.params['message_queue']

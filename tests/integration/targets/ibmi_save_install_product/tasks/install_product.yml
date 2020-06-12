@@ -4,6 +4,7 @@
     product: 5770JV1
     savf_name: 'OPTBASE'
     savf_library: 'JV1'
+    language: '2924'
     acceptance_cmd: "CALL PGM(QLPACAGR) PARM('5770JV1' 'V7r4m0' '0000' '*')"
   register: install_result 
 

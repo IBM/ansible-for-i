@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -16,14 +16,14 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_display_fix
-short_description: display the PTF(Program Temporary Fix)information and also get the requisite information for the PTF
-version_added: 2.10
+short_description: Displays the PTF(Program Temporary Fix) information and also get the requisite information for the PTF
+version_added: 2.8
 description:
-  - The C(ibmi_display_fix) module display the information of the PTF and also get the requisite PTF
+  - The C(ibmi_display_fix) module displays the information of the PTF and also get the requisite PTFs and their type.
 options:
   product:
     description:
-      - Specifies the product for the PTF
+      - Specifies the product ID for the PTF.
     type: str
     required: yes
   ptf:
@@ -33,17 +33,17 @@ options:
     required: yes
   release:
     description:
-      - Specifies the release level of the PTF in one of the following formats.
-      - VxRyMz, for example, V7R2M0 is version 7, release 2, modification 0
-      - vvrrmm, this format must be used if the version or release of the product is greater than 9.
-      - For example, 110300 is version 11, release 3, modification 0.
+      - Specifies the release level of the PTF in one of the following formats,
+        VxRyMz, for example, V7R2M0 is version 7, release 2, modification 0,
+        vvrrmm, this format must be used if the version or release of the product is greater than 9.
+        For example, 110300 is version 11, release 3, modification 0.
     type: str
     required: yes
   joblog:
     description:
-      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
+      - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
-    default: false
+    default: False
 seealso:
 - module: ibmi_fix
 
@@ -61,7 +61,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 requisite_ptf:
-    description: The requisite PTFs and type
+    description: The requisite PTFs and their type.
     returned: always
     type: dict
     sample: {
@@ -73,17 +73,17 @@ requisite_ptf:
         "SI71139": "*PREREQ"
     }
 stdout:
-    description: The command standard output
+    description: The command standard output.
     returned: always
     type: str
     sample: 'CPC2102: Library TESTLIB created'
 stderr:
-    description: The command standard error
+    description: The command standard error.
     returned: always
     type: str
     sample: 'CPF2111:Library TESTLIB already exists'
 rc:
-    description: The command return code (0 means success, non-zero means failure)
+    description: The command return code (0 means success, non-zero means failure).
     returned: always
     type: int
     sample: 255
@@ -95,16 +95,16 @@ stdout_lines:
         "CPC2102: Library TESTLIB created."
     ]
 stderr_lines:
-    description: The command standard error split in lines
+    description: The command standard error split in lines.
     returned: always
     type: list
     sample: [
         "CPF2111:Library TESTLIB already exists."
     ]
 job_log:
-    description: the job_log
+    description: The IBM i job log of the task executed.
     returned: always
-    type: str
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -131,7 +131,7 @@ job_log:
 ptf_info:
     description: the ptf information
     returned: always
-    type: str
+    type: list
     sample: [
         {
             "PTF_ACTION_PENDING": "NO",
@@ -165,6 +165,8 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 
 def main():
     module = AnsibleModule(
@@ -176,6 +178,8 @@ def main():
         ),
         supports_check_mode=True,
     )
+
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
 
     product = module.params['product'].strip().upper()
     ptf = module.params['ptf'].strip().upper()
@@ -250,6 +254,11 @@ def main():
         module.fail_json(msg=message, **result)
 
     result.update({'ptf_info': out})
+
+    if not joblog:
+        empty_list = []
+        result.update({'job_log': empty_list})
+
     module.exit_json(**result)
 
 

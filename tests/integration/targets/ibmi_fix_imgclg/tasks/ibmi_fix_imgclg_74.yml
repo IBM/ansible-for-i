@@ -61,7 +61,7 @@
   ibmi_fix_imgclg:
     src: '{{ remote_dir }}' 
     virtual_image_name_list: '{{ base_image_list}}'
-    product_id: '{{base_ptf_info.keys()}}'
+    product_id: '{{base_ptf_info.keys() | list}}'
     fix_omit_list: '{{omit_list}}'
     use_temp_path: true
     #use_temp_path: false
@@ -101,7 +101,7 @@
   ibmi_fix_imgclg:
     src: '{{ remote_dir }}' 
     virtual_image_name_list: '{{ base_image_list}}'
-    product_id: '{{base_ptf_info.keys()}}'
+    product_id: '{{base_ptf_info.keys() | list}}'
     use_temp_path: true
     apply_type: "*IMMONLY"
     hiper_only: false
@@ -152,7 +152,7 @@
   ibmi_fix_imgclg:
     src: '{{ remote_dir }}' 
     virtual_image_name_list: '{{ base_image_list}}'
-    product_id: '{{base_ptf_info.keys()}}'
+    product_id: '{{base_ptf_info.keys() | list}}'
     apply_type: "*IMMDLY"
     use_temp_path: false
     hiper_only: true

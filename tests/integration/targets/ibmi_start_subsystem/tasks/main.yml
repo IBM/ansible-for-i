@@ -87,7 +87,8 @@
       ibmi_start_subsystem:
         subsystem: abc    
       register: strsbs_result 
-      failed_when: "'CPF1013' not in strsbs_result.stderr"
+      #failed_when: "'CPF1013' not in strsbs_result.stderr"
+      failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1013') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: TC04 assert the returned parameters when joblog
       assert:
@@ -100,7 +101,8 @@
         library: abc
         joblog: true
       register: strsbs_result 
-      failed_when: "'CPF1080' not in strsbs_result.stderr"
+      #failed_when: "'CPF1080' not in strsbs_result.stderr"
+      failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1080') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: TC04 assert the returned parameters when joblog
       assert:

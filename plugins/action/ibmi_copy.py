@@ -1,5 +1,5 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
+# Author, Peng Zengyu <pzypeng@cn.ibm.com>
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -16,6 +16,7 @@ from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+__ibmi_module_version__ = "BUILDDATE_REPLACE"
 
 display = Display()
 
@@ -80,6 +81,8 @@ class ActionModule(ActionBase):
         return savf_name, savf_path, msg
 
     def run(self, tmp=None, task_vars=None):
+
+        display.debug("version: " + __ibmi_module_version__)
         ''' handler for fetch operations '''
         if task_vars is None:
             task_vars = dict()
@@ -99,6 +102,7 @@ class ActionModule(ActionBase):
                 remote_checksum="",
                 checksum="",
                 delta="",
+                job_log=[],
                 failed=False
             )
             savf_name = ''
@@ -137,9 +141,6 @@ class ActionModule(ActionBase):
             # Get the file name without extention
             savefile_name = os.path.splitext(os.path.basename(src))[0]
             savefile_path = self._calculate_savf_path(savefile_name, lib_name)
-            display.debug("savefile_name = {p_savefile_name}, savf_path = {p_savefile_path}".format(
-                p_savefile_name=savefile_name,
-                p_savefile_path=savefile_path))
 
             if self._execute_remote_stat(savefile_path, all_vars=task_vars, follow=False)['exists']:
                 if force is True:
@@ -161,10 +162,11 @@ class ActionModule(ActionBase):
                                 result['msg'] += "Failed to rename original SAVF on remote. "
                                 result['stderr'] = save_result['stderr_lines']
                                 result['stdout'] = save_result['stdout_lines']
+                                result['job_log'] = save_result['job_log']
                                 result['failed'] = True
                                 return result
-                        display.debug("The original save file is successfully renamed to {p_savefile_path}".format(
-                            p_savefile_path=savefile_path))
+                        display.debug("The original save file is successfully renamed to {p_rename_savf_name}".format(
+                            p_rename_savf_name=rename_savf_name))
                     else:
                         cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savefile_name}) OBJTYPE(*FILE)'.format(
                             p_lib_name=lib_name,
@@ -176,6 +178,7 @@ class ActionModule(ActionBase):
                             result['msg'] += "Failed to delete original SAVF on remote. "
                             result['stderr'] = save_result['stderr_lines']
                             result['stdout'] = save_result['stdout_lines']
+                            result['job_log'] = save_result['job_log']
                             result['failed'] = True
                             return result
                         display.debug("The original save file is deleted.")
@@ -195,13 +198,10 @@ class ActionModule(ActionBase):
                 result['msg'] += "Failed to create SAVF: {p_savefile_path} on remote.".format(p_savefile_path=savefile_path)
                 result['stderr'] = save_result['stderr_lines']
                 result['stdout'] = save_result['stdout_lines']
+                result['job_log'] = save_result['job_log']
                 result['failed'] = True
                 return result
             dir = os.path.dirname(savefile_path)
-
-            display.debug("Start to copy file. src = {p_src}, savefile_path= {p_savefile_path} ".format(
-                p_src=src,
-                p_savefile_path=savefile_path,))
             self._transfer_file(src, savefile_path)
 
             local_checksum = checksum(src)
@@ -236,5 +236,6 @@ class ActionModule(ActionBase):
                 if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS and ('CPF2105' not in save_result['stderr']):
                     result['msg'] += "Failed to delete the new created save file {p_savefile_path} on remote. ".format(
                         p_savefile_path=savefile_path)
+                    result['job_log'] = save_result['job_log']
 
         return result

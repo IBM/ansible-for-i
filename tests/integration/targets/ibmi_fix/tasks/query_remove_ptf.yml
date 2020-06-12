@@ -12,9 +12,9 @@
   ignore_errors: true
 
 - ibmi_cl_command:
-    cmd: "RMVPTF LICPGM({{item.value}}) SELECT({{item.key}}) RMV(*PERM)  DELAYED(*YES)"
+    cmd: "RMVPTF LICPGM({{item.value}}) SELECT({{item.key}}) RMV(*TEMP)  DELAYED(*YES)"
     joblog: true      
-  when: "'CPF3634' in remove_result.stderr"
+  when: "remove_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3634') | map(attribute='MESSAGE_ID') | list | length >=1"
   ignore_errors: true
 
 - name: verify the ptf has been installed

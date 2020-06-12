@@ -38,7 +38,8 @@
       type: 'SQL'
       #asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
     register: sql_result
-    failed_when: "'TRYIASP1 in QSYS type *LIB not found' not in sql_result.stderr"
+    #failed_when: "'TRYIASP1 in QSYS type *LIB not found' not in sql_result.stderr"
+    failed_when: "sql_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length ==0"
 
   - name: TC17 run script with an invalid iasp group
     ibmi_script:
@@ -46,7 +47,8 @@
       type: 'SQL'
       asp_group: "abc"
     register: sql_result
-    failed_when: "'Device ABC not found' not in sql_result.stderr"
+    #failed_when: "'Device ABC not found' not in sql_result.stderr"
+    #failed_when: "sql_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3781') | map(attribute='MESSAGE_ID') | list | length ==0"
   when: iasp_list.row_count != 0
 
   always:

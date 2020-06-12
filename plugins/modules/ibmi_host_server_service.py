@@ -16,11 +16,11 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_host_server_service
-short_description: Manage host server on a remote IBMi node
-version_added: 2.10
+short_description: Manage host server
+version_added: 2.8
 description:
-  - Manage and query IBMi host server service.
-  - For non-IBMi targets, use the M(service) module instead.
+  - Manage and query IBM i host server service.
+  - For non-IBM i targets, use the M(service) module instead.
 options:
   name_list:
     description:
@@ -36,11 +36,11 @@ options:
       - C(restarted) will always bounce the service.
       - B(At least one of state and enabled are required.)
     type: str
-    choices: [ "started", "stopped"]
+    choices: ["started", "stopped"]
     required: yes
   extra_parameters:
     description:
-      - extra parameter is appended at the end of host server service command
+      - Extra parameter is appended at the end of host server service command
     type: str
     default: ' '
   joblog:
@@ -53,7 +53,7 @@ seealso:
 - module: service
 
 author:
-- Jin Yi Fan(@jinyifan)
+- Jin Yifan(@jinyifan)
 '''
 
 EXAMPLES = r'''
@@ -66,9 +66,9 @@ EXAMPLES = r'''
 
 RETURN = r'''
 job_log:
-    description: the job_log
+    description: The IBM i job log of the task executed.
     returned: always
-    type: str
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -78,7 +78,6 @@ job_log:
             "FROM_USER": "CHANGLE",
             "MESSAGE_FILE": "QCPFMSG",
             "MESSAGE_ID": "CPD0912",
-            "MESSAGE_KEY": "00000379",
             "MESSAGE_LIBRARY": "QSYS",
             "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.",
             "MESSAGE_SUBTYPE": "",
@@ -94,49 +93,49 @@ job_log:
             "TO_PROGRAM": "QSQSRVR"
         }]
 start:
-    description: The command execution start time
+    description: The command execution start time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:53.757435'
 end:
-    description: The command execution end time
+    description: The command execution end time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:54.064969'
 delta:
-    description: The command execution delta time
+    description: The command execution delta time.
     returned: always
     type: str
     sample: '0:00:00.307534'
 stdout:
-    description: The command standard output
+    description: The command standard output.
     returned: always
     type: str
     sample: '+++ success STRHOSTSVR SERVER(*ALL)'
 stderr:
-    description: The command standard error
+    description: The command standard error.
     returned: always
     type: str
     sample: 'CPF2111:Library TESTLIB already exists'
 cmd:
-    description: The command executed by the task
+    description: The command executed by the task.
     returned: always
     type: str
     sample: 'STRHOSTSVR SERVER(*ALL)'
 rc:
-    description: The command return code (0 means success, non-zero means failure)
+    description: The command return code (0 means success, non-zero means failure).
     returned: always
     type: int
     sample: 255
 stdout_lines:
-    description: The command standard output split in lines
+    description: The command standard output split in lines.
     returned: always
     type: list
     sample: [
         "+++ success STRHOSTSVR SERVER(*ALL)"
     ]
 stderr_lines:
-    description: The command standard error split in lines
+    description: The command standard error split in lines.
     returned: always
     type: list
     sample: [
@@ -148,6 +147,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
 IBMi_STRSVR = "QSYS/STRHOSTSVR"
 IBMi_ENDSVR = "QSYS/ENDHOSTSVR"
 IBMi_HOST_SERVER_LIST = ["*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP"]
@@ -164,6 +164,7 @@ def main():
         supports_check_mode=True,
     )
 
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
     name_list = module.params['name_list']
     state = module.params['state']
     extra_parameters = module.params['extra_parameters']

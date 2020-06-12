@@ -15,7 +15,8 @@
     savf_library: 'JV1'
   register: install_result
   #Can't be installed because license agreement isn't accepted
-  failed_when: "'CPDB6D5' not in install_result.stderr"
+  #failed_when: "'CPDB6D5' not in install_result.stderr"
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPDB6D5') | map(attribute='MESSAGE_ID') | list | length ==0"
 
 - name: Install base with only required options
   ibmi_install_product_from_savf:

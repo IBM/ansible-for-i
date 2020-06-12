@@ -1,5 +1,5 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
+# Author, Peng Zengyu <pzypeng@cn.ibm.com>
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -17,6 +17,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
+__ibmi_module_version__ = "BUILDDATE_REPLACE"
 
 ifs_dir = '/tmp/.ansible'
 display = Display()
@@ -103,6 +104,8 @@ class ActionModule(ActionBase):
         return savf_name, savf_path
 
     def run(self, tmp=None, task_vars=None):
+
+        display.debug("version: " + __ibmi_module_version__)
         ''' handler for fetch operations '''
         if task_vars is None:
             task_vars = dict()
@@ -122,6 +125,7 @@ class ActionModule(ActionBase):
                 remote_checksum="",
                 checksum="",
                 delta="",
+                job_log=[],
                 failed=False
             )
             savf_name = ''
@@ -222,16 +226,17 @@ class ActionModule(ActionBase):
                     omitfile = 'OMITOBJ(({p_lib_name}/{p_savf_name} *FILE))'.format(p_lib_name=lib_name, p_savf_name=savf_name)
                     module_args = {'object_names': object_names, 'object_lib': lib_name, 'object_types': object_types,
                                    'savefile_name': savf_name, 'savefile_lib': lib_name, 'target_release': target_release,
-                                   'force_save': force_save, 'joblog': False, 'parameters': omitfile}
+                                   'force_save': force_save, 'joblog': True, 'parameters': omitfile}
                     module_output = self._execute_module(module_name='ibmi_object_save', module_args=module_args)
 
                 save_result = module_output
                 rc = save_result['rc']
-                if rc != 0 or ('CPC3708' in save_result['stdout']):
-                    result['msg'] = 'Create SAVF failed. See stderr or stdout for more information.'
+                if rc != 0 or ('CPC3708' in str(save_result['job_log'])):
+                    result['msg'] = 'Create SAVF failed. See job_log.'
                     result['failed'] = True
                     result['stderr'] = save_result['stderr_lines']
                     result['stdout'] = save_result['stdout_lines']
+                    result['job_log'] = save_result['job_log']
                     return result
                 created = True
 
@@ -259,7 +264,6 @@ class ActionModule(ActionBase):
             ifs_created = True
 
             source = '{p_ifs_dir}/{p_os}'.format(p_ifs_dir=ifs_dir, p_os=os.path.basename(savf_path))
-
             if not isinstance(source, string_types):
                 result['msg'] = "Invalid type supplied for source option, it must be a string"
                 result['failed'] = True
@@ -316,13 +320,12 @@ class ActionModule(ActionBase):
                     target_name = task_vars['inventory_hostname']
                 else:
                     target_name = self._play_context.remote_addr
-                dest = "{p_self}/{p_target_name}/{p_source_local}".format(
+                dest = u"{p_self}/{p_target_name}/{p_source_local}".format(
                     p_self=self._loader.path_dwim(dest),
                     p_target_name=target_name,
                     p_source_local=source_local)
 
             dest = dest.replace("//", "/")
-
             if remote_checksum in ('0', '1', '2', '3', '4', '5'):
                 result['changed'] = False
                 result['file'] = source

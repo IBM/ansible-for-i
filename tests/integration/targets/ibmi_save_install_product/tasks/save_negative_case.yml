@@ -45,7 +45,8 @@
         savf_library: 'SAVJV1'
         parameters: 'abc(abc)'
       register: save_result
-      failed_when: "'Keyword ABC not valid for this command' not in save_result.stderr" 
+      #failed_when: "'Keyword ABC not valid for this command' not in save_result.stderr" 
+      failed_when: "save_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0043') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: Save a product with invalid library
       ibmi_save_product_to_savf:
@@ -71,7 +72,8 @@
         savf_library: 'SAVJV1'
       register: save_result
       ##'ABC       ' not valid for parameter TGTRLS.
-      failed_when: "'CPD0084' not in save_result.stderr" 
+      #failed_when: "'CPD0084' not in save_result.stderr" 
+      failed_when: "save_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: Save a product with invalid release
       ibmi_save_product_to_savf:
@@ -81,7 +83,8 @@
         savf_library: 'SAVJV1'
       register: save_result
       ##Release ABC not valid for parameter RLS.
-      failed_when: "'CPD3DF5' not in save_result.stderr" 
+      #failed_when: "'CPD3DF5' not in save_result.stderr" 
+      failed_when: "save_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DF5') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: Save a product with invalid target_release
       ibmi_save_product_to_savf:
@@ -91,7 +94,8 @@
         savf_library: 'SAVJV1'
       register: save_result
       ##TGTRLS(V7R3M0) not valid for product 5770JV1                                                
-      failed_when: "'CPD3DA6' not in save_result.stderr"  
+      #failed_when: "'CPD3DA6' not in save_result.stderr"  
+      failed_when: "save_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DA6') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: Save a product with invalid release
       ibmi_save_product_to_savf:
@@ -101,7 +105,8 @@
         savf_library: 'SAVJV1'
       register: save_result
       ##Product 5770JV1 option *BASE release V7R3M0 not Saveed.                                                                                           
-      failed_when: "'CPD3D91' not in save_result.stderr" 
+      #failed_when: "'CPD3D91' not in save_result.stderr" 
+      failed_when: "save_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3D91') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: Save a product with invalid language
       ibmi_save_product_to_savf:
@@ -111,7 +116,8 @@
         savf_library: 'SAVJV1'
       register: save_result
       ##NLV ABCD not valid for LNG parameter.                                                  
-      failed_when: "'CPD3DF6' not in save_result.stderr"
+      #failed_when: "'CPD3DF6' not in save_result.stderr"
+      failed_when: "save_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DF6') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: Save a product with invalid language
       ibmi_save_product_to_savf:
@@ -122,7 +128,8 @@
       register: save_result
       ## Message . . . . :   *LNG objects for NLV 2989 for product 5770JV1 option *BASE
       ## release V7R4M0 not installed.                                                                                                                                     
-      failed_when: "'CPD3D90' not in save_result.stderr"
+      #failed_when: "'CPD3D90' not in save_result.stderr"
+      failed_when: "save_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3D90') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: Save a product with invalid object_type
       ibmi_save_product_to_savf:
@@ -142,7 +149,8 @@
         savf_library: 'SAVJV1'
       register: save_result
       ## Product 5770JV1 option 99 release *ONLY not installed.                                                                                         
-      failed_when: "'CPD3D91' not in save_result.stderr"
+      #failed_when: "'CPD3D91' not in save_result.stderr"
+      failed_when: "save_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3D91') | map(attribute='MESSAGE_ID') | list | length ==0"
       
     - name: Save a product with invalid product
       ibmi_save_product_to_savf:
@@ -150,7 +158,8 @@
         savf_name: 'OPTBASE'
         savf_library: 'SAVJV1'
       register: save_result
-      failed_when: "'CPD3D91' not in save_result.stderr"
+      #failed_when: "'CPD3D91' not in save_result.stderr"
+      failed_when: "save_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3D91') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: assert returned parameters
       assert:
