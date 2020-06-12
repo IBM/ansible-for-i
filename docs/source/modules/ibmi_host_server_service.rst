@@ -1,0 +1,216 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
+
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_host_server_service.py
+
+.. _ibmi_host_server_service_module:
+
+ibmi_host_server_service -- Manage host server on a remote IBMi node
+====================================================================
+
+
+.. contents::
+   :local:
+   :depth: 1
+
+
+Synopsis
+--------
+- Manage and query IBMi host server service.
+- For non-IBMi targets, use the :ref:`service <service_module>` module instead.
+
+
+
+Parameters
+----------
+
+
+     
+extra_parameters
+  extra parameter is appended at the end of host server service command
+
+
+  | **required**: false
+  | **type**: str
+  | **default**:  
+
+
+     
+joblog
+  If set to ``true``, append JOBLOG to stderr/stderr_lines.
+
+
+  | **required**: false
+  | **type**: bool
+
+
+     
+name_list
+  The name of the host server service. The valid value are "*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP".
+
+
+  | **required**: True
+  | **type**: list
+  | **elements**: str
+
+
+     
+state
+  ``started``/``stopped`` are idempotent actions that will not run commands unless necessary.
+
+  ``restarted`` will always bounce the service.
+
+  **At least one of state and enabled are required.**
+
+
+  | **required**: True
+  | **type**: str
+  | **choices**: started, stopped
+
+
+
+Examples
+--------
+
+.. code-block:: yaml+jinja
+
+   
+   - name: start host server service
+     ibmi_host_server_service:
+       name_list: ['*CENTRAL', '*DATABASE']
+       state: 'started'
+       joblog: True
+
+
+
+
+See Also
+--------
+
+.. seealso::
+
+   - :ref:`service_module`
+
+
+Return Values
+-------------
+
+
+   
+                              
+       stderr_lines
+        | The command standard error split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF2111:Library TESTLIB already exists."]
+            
+      
+      
+                              
+       end
+        | The command execution end time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
+
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_KEY': '00000379', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'TO_INSTRUCTION': '9369', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'FROM_USER': 'CHANGLE', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'FROM_PROCEDURE': '', 'FROM_INSTRUCTION': '318F', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'TO_LIBRARY': 'QSYS', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
+
+            
+      
+      
+                              
+       stdout
+        | The command standard output
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: +++ success STRHOSTSVR SERVER(*ALL)
+
+            
+      
+      
+                              
+       cmd
+        | The command executed by the task
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: STRHOSTSVR SERVER(*ALL)
+
+            
+      
+      
+                              
+       start
+        | The command execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
+
+            
+      
+      
+                              
+       delta
+        | The command execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
+            
+      
+      
+                              
+       stderr
+        | The command standard error
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF2111:Library TESTLIB already exists
+
+            
+      
+      
+                              
+       rc
+        | The command return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
+            
+      
+      
+                              
+       stdout_lines
+        | The command standard output split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["+++ success STRHOSTSVR SERVER(*ALL)"]
+            
+      
+        
