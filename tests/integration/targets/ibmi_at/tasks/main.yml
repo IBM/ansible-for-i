@@ -8,6 +8,14 @@
 
     - command: 'touch /tmp/at.txt'
 
+    # - name: List current QSQSVR job
+    #   ibmi_job:
+    #     name: "QSQSRVR"
+    #     #status: '*ACTIVE'
+    #     status: '*ALL'
+    #     user: '*ALL'
+    #   register: job_info_orig
+
     - name: TC01 schedule job with only required options
       ibmi_at: 
         job_name: 'test_at'
@@ -36,25 +44,30 @@
         cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
         frequency: "*ONCE"
         scddate: '04/01/2071'
+       #scddate: '2071/04/01' 
         scdday: "*NONE"
         schtime: "11:00:00"
         text: "Try ansible ibmi_at"
         parameters: ""
         joblog: true
       register: at_result
+      when: "ansible_OS400_SYSTEM_VALUES['QLANGID'] == 'ENU'"
 
     - name: TC02 assert the returned parameters
       assert:
         that:
           - at_result.job_log != [] 
           - at_result.command == "QSYS/ADDJOBSCDE JOB(testall) CMD(QSH CMD('/tmp/at.sh /tmp/at.txt')) FRQ(*ONCE) SCDDATE('04/01/2071') SCDDAY(*NONE) SCDTIME('11:00:00') TEXT('Try ansible ibmi_at')" 
+      when: "ansible_OS400_SYSTEM_VALUES['QLANGID'] == 'ENU'"
+
     - name: rmvjobsche
       ibmi_cl_command:
         cmd: 'RMVJOBSCDE JOB(TESTALL)'
+      when: "ansible_OS400_SYSTEM_VALUES['QLANGID'] == 'ENU'"
 
     - name: TC03 schedule job with addtional parameters options
       ibmi_at: 
-        job_name: 'testall'
+        job_name: 'TESTALL'
         cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
         frequency: "*MONTHLY"
         scddate: '*NONE'
@@ -68,8 +81,8 @@
     - name: TC03 assert the returned parameters
       assert:
         that:
-          - at_result.command == "QSYS/ADDJOBSCDE JOB(testall) CMD(QSH CMD('/tmp/at.sh /tmp/at.txt')) FRQ(*MONTHLY) SCDDATE(*NONE) SCDDAY(*MON) SCDTIME('11:00:00') TEXT('Try ansible ibmi_at') RELDAYMON(1)"
-                                  
+          - at_result.command == "QSYS/ADDJOBSCDE JOB(TESTALL) CMD(QSH CMD('/tmp/at.sh /tmp/at.txt')) FRQ(*MONTHLY) SCDDATE(*NONE) SCDDAY(*MON) SCDTIME('11:00:00') TEXT('Try ansible ibmi_at') RELDAYMON(1)"
+
     - name: TC03 rmvjobsche
       ibmi_cl_command:
         cmd: 'RMVJOBSCDE JOB(TESTALL)'
@@ -83,8 +96,9 @@
         scdday: "*NONE"
         joblog: true
       register: neg_result
-      failed_when: "'CPD0078' not in neg_result.stderr"
-
+      #failed_when: "'CPD0078' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0078') | map(attribute='MESSAGE_ID') | list | length == 0"
+      
     - name: TC04 assert result
       assert: 
         that: 
@@ -98,7 +112,8 @@
         scdday: "*NONE"
         joblog: false
       register: neg_result
-      failed_when: "'CPD0074' not in neg_result.stderr"
+      #failed_when: "'CPD0074' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0074') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC04 assert result
       assert: 
@@ -112,7 +127,9 @@
         frequency: "*ONCE"
         scdday: "*NONE"
       register: neg_result
-      failed_when: "'CPD0033' not in neg_result.stderr"
+      #failed_when: "'CPD0033' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0033') | map(attribute='MESSAGE_ID') | list | length == 0"
+ 
 
     - name: TC07 schedule job with invalid frequence
       ibmi_at: 
@@ -163,7 +180,8 @@
         scdday: "*NONE"
         parameters: "abc" 
       register: neg_result
-      failed_when: "'CPD0044' not in neg_result.stderr"
+      #failed_when: "'CPD0044' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC11 schedule job with unsupported option 
       ibmi_at: 
@@ -198,6 +216,18 @@
         frequency: "*WEEKLY"        
       register: neg_result
       failed_when: "'missing required arguments: job_name' not in neg_result.msg"
+
+    # - name: List current QSQSRVR job
+    #   ibmi_job:
+    #     name: "QSQSRVR"
+    #     status: '*ACTIVE'
+    #     user: 'QUSER'
+    #   register: job_info_final
+
+    # - name: assert the final number of QSQSRVR job is not increased too much
+    #   assert:
+    #     that:
+    #       - job_info_final.job_info | length == job_info_orig.job_info | length
 
   always:
     - name: delete script file

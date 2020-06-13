@@ -4,7 +4,7 @@
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
 
-- name: TC01 sync a SAVF to remote i with all options
+- name: sync a SAVF to remote i with all options
   ibmi_synchronize:
     src: '/qsys.lib/{{remote_temp_lib}}.lib/{{ savf_name}}'
     remote_user: "{{ansible_ssh_user}}"
@@ -13,7 +13,7 @@
   delegate_to: '{{delegate_host}}'
   register: sync_result
 
-- name: TC01 assert the returned parameters
+- name: assert the returned parameters
   assert:
     that:
       - sync_result.stdout_lines is defined
@@ -22,7 +22,7 @@
       - sync_result.stdout is defined
       - sync_result.delta is defined
 
-- name: TC01 confirm the object can be used
+- name: confirm the object can be used
   ibmi_object_restore:
     object_lib: '{{ remote_restored_lib }}'
     savefile_name: "{{ savf_name.split('.')[0] }}"
@@ -30,35 +30,35 @@
   register: restore_result
   ignore_errors: true 
 
-- name: TC01 confirm the object does exist on the remote lib
+- name: confirm the object does exist on the remote lib
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_restored_lib }}', '*ALL' ) );"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_restored_lib }}', '*ALL' ))  AS X;"
   register: sql_result
   failed_when: sql_result.row | length == 0
 
-- name: TC02 sync a SAVF without private_key
+- name: sync a SAVF without private_key
   ibmi_synchronize:
     src: '/qsys.lib/{{remote_temp_lib}}.lib/{{ savf_name}}'
     dest: '/qsys.lib/{{remote_temp_lib}}.lib/' 
   delegate_to: '{{delegate_host}}'
   register: sync_result
 
-- name: TC02 dltsavf
+- name: dltsavf
   ibmi_cl_command:
     cmd: DLTOBJ OBJ({{remote_temp_lib}}/{{ savf_name.split('.')[0]}}) OBJTYPE(*FILE)
 
-- name: TC02 create savf
+- name: create savf
   ibmi_cl_command:
     cmd: CRTSAVF {{remote_temp_lib}}/{{ savf_name.split('.')[0]}}
     
-- name: TC02 find objects with age=1s size=1k
+- name: find objects with age=1s size=1k
   ibmi_object_find: 
     object_type_list: "*FILE"
     lib_name: "{{remote_temp_lib}}"
     object_name: "{{ savf_name.split('.')[0]}}"
   register: find_result_org
 
-- name: TC03 sync a SAVF to remote i with all options
+- name: sync a SAVF to remote i with all options
   ibmi_synchronize:
     src: '/qsys.lib/{{remote_temp_lib}}.lib/{{ savf_name}}'
     remote_user: "{{ansible_ssh_user}}"
@@ -66,20 +66,20 @@
     private_key: '/tmp/{{key_name}}'
   delegate_to: '{{delegate_host}}'
 
-- name: TC03 find objects with age=1s size=1k
+- name: find objects with age=1s size=1k
   ibmi_object_find: 
     object_type_list: "*FILE"
     lib_name: "{{remote_temp_lib}}"
     object_name: "{{ savf_name.split('.')[0]}}"
   register: find_result_changed
 
-- name: TC03 assert the object has been overridden
+- name: assert the object has been overridden
   assert:
     that:
       - find_result_changed.object_list[0].LAST_USED_TIMESTAMP != find_result_org.object_list[0].LAST_USED_TIMESTAMP 
       - find_result_changed.object_list[0].OBJSIZE != find_result_org.object_list[0].OBJSIZE 
 
-- name: TC04 sync a SAVF with an invalid src
+- name: sync a SAVF with an invalid src
   ibmi_synchronize:
     src: 'ABC'
     dest: '/qsys.lib/{{remote_temp_lib}}.lib/' 
@@ -88,7 +88,7 @@
   register: sync_result
   ignore_errors: true
 
-- name: TC04 assert the returned parameters
+- name: assert the returned parameters
   assert:
     that:
       - sync_result.stdout_lines is defined
@@ -98,25 +98,25 @@
       - sync_result.delta is defined
       - "'src ABC is not a save file' in sync_result.stderr"
 
-- name: TC05 sync a SAVF with an invalid src
+- name: sync a SAVF with an invalid src
   ibmi_synchronize:
     src: 'ABC.file'
     dest: '/qsys.lib/{{remote_temp_lib}}.lib/' 
     private_key: '/tmp/{{key_name}}'
   delegate_to: '{{delegate_host}}'
   register: sync_result
-  failed_when: "'src ABC.file must be a ibm i native save file, the path should be absolute, start with /QSYS.LIB' not in sync_result.stderr"
+  failed_when: "'path should be absolute, start with /QSYS.LIB' not in sync_result.stderr"
 
-- name: TC06 sync a SAVF with an not existing src
+- name: sync a SAVF with an not existing src
   ibmi_synchronize:
     src: 'ABC.FILE'
     dest: '/qsys.lib/{{remote_temp_lib}}.lib/' 
     private_key: '/tmp/{{key_name}}'
   delegate_to: '{{delegate_host}}'
   register: sync_result
-  failed_when: "'src ABC.FILE must be a ibm i native save file, the path should be absolute, start with /QSYS.LIB' not in sync_result.stderr"
+  failed_when: "'path should be absolute, start with /QSYS.LIB' not in sync_result.stderr"
 
-- name: TC07 sync a SAVF with an invalid dest
+- name: sync a SAVF with an invalid dest
   ibmi_synchronize:
     src: '/qsys.lib/{{remote_temp_lib}}.lib/{{ savf_name}}'
     dest: 'ABC' 
@@ -126,14 +126,14 @@
   ignore_errors: true
   failed_when: "'dest ABC path should be absolute, start with /QSYS.LIB' not in sync_result.stderr"
 
-- name: TC08 sync a SAVF without dest
+- name: sync a SAVF without dest
   ibmi_synchronize:
     src: '/qsys.lib/{{remote_temp_lib}}.lib/{{ savf_name}}'
     private_key: '/tmp/{{key_name}}'
   delegate_to: '{{delegate_host}}'
   register: sync_result
 
-- name: TC09 sync with missing required options
+- name: sync with missing required options
   ibmi_synchronize:
     dest: '/qsys.lib/{{remote_temp_lib}}.lib/' 
     private_key: '/tmp/{{key_name}}'
@@ -151,12 +151,12 @@
   register: neg_result
   ignore_errors: true
 
-- name: TC09 assert unsupported parameter
+- name: assert unsupported parameter
   assert:
     that:
       - "'Invalid options for ibmi_synchronize: abc' in neg_result.msg"
 
-- name: TC10 sync a txt
+- name: sync a txt
   ibmi_synchronize:
     src: '/qsys.lib/{{remote_temp_lib}}.lib/{{ txt_name}}'
     dest: '/qsys.lib/{{remote_temp_lib}}.lib/' 
@@ -165,7 +165,7 @@
   register: sync_result
   failed_when: "'src /qsys.lib/ARCHLIB.lib/foo.txt is not a save file' not in sync_result.stderr" 
 
-- name: TC11 sync a SAVF to remote i with invalid key
+- name: sync a SAVF to remote i with invalid key
   ibmi_synchronize:
     src: '/qsys.lib/{{remote_temp_lib}}.lib/{{ savf_name}}'
     dest: '/qsys.lib/{{remote_temp_lib}}.lib/' 
@@ -174,7 +174,7 @@
   register: sync_result
   failed_when: "'Unexpected exception happens. error: [Errno 2] No such file or directory: b\\'ABC\\'. Use -vvv for more information.' not in sync_result.stderr"   
 
-- name: TC12 sync a SAVF to remote i with invalid user
+- name: sync a SAVF to remote i with invalid user
   ibmi_synchronize:
     src: '/qsys.lib/{{remote_temp_lib}}.lib/{{ savf_name}}'
     remote_user: "ABC"

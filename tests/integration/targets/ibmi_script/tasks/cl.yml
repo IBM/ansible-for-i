@@ -60,7 +60,8 @@
         that:
           - cl_result.delta is defined
           - cl_result.stdout is defined
-          - "'Library TESTSCRIPT already exists' in cl_result.stderr"
+          #- "'Library TESTSCRIPT already exists' in cl_result.stderr"
+          - cl_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2111') | map(attribute='MESSAGE_ID') | list | length >=1
           - cl_result.stdout_lines is defined 
           - cl_result.stderr_lines is defined
           - cl_result.rc is defined  
@@ -82,7 +83,8 @@
         src: 'cl4.text'
         type: 'CL'
       register: cl_result
-      failed_when: "'Errors occurred in command' not in cl_result.stderr"
+      #failed_when: "'Errors occurred in command' not in cl_result.stderr"
+      failed_when: "cl_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0018') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: TC04 query the data area
       ibmi_object_find:
@@ -103,6 +105,7 @@
       register: cl_result
       #ignore_errors: true
       failed_when: "'Could not find or access \\'abc.text\\'' not in cl_result.stderr"
+      #failed_when: "cl_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3781') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: TC06 run script without required options
       ibmi_script:

@@ -12,7 +12,7 @@
 
 - name: query immed ptf with only requried options
   ibmi_fix: 
-    fix_list: '{{ immed_ptf.keys() }}'
+    fix_list: '{{ immed_ptf.keys() |list}}'
     operation: 'query'
   register: fix_result
 
@@ -68,14 +68,6 @@
     fix_list: "{{ single_immed_ptf_number }}"
     operation: 'apply_only'
   register: fix_result 
-# - name: allow apply
-#   ibmi_fix:
-#     product_id: "{{ single_immed_ptf_product }}"
-#     save_file_object: '{{ single_immed_ptf_number }}' 
-#     save_file_lib: '{{remote_lib}}'
-#     fix_list: "{{ single_immed_ptf_number }}"
-#     operation: 'apply_only'
-#   register: fix_result 
 
 - assert:
     that:

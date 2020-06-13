@@ -103,6 +103,11 @@ options:
       - starting or ending the interface.
     type: int
     default: 0
+  joblog:
+    description:
+      - The job log of the job executing the task will be returned even rc is zero if it is set to True.
+    type: bool
+    default: false
   extra_params:
     description:
       - The extra parameters that the user wants to pass into this module.
@@ -115,10 +120,10 @@ options:
       - present means to add, change or query the internet interface.
       - When the internet address does not exist on the IBM i system, present option will create the interface.
       - When the internet address exists on the IBM i system, and only internet_address or alias_name is specified,
-      - present option will query the specific interface.
+        present option will query the specific interface.
       - When the internet address exists on the IBM i system, and internet_address option is used together
-      - with other options, present option will change the specific interface.
-      - absent mean to remove the internet interface. Either internet_address or alias_name can be used.
+        with other options, present option will change the specific interface.
+      - absent means to remove the internet interface. Either internet_address or alias_name can be used.
       - If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.
       - active means to start the internet interface. Either internet_address or alias_name can be used.
       - If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.
@@ -277,6 +282,35 @@ stderr_lines:
         "CPF2111:Library TESTLIB already exists."
     ]
     returned: When task has been executed.
+job_log:
+    description: The job log of the job executes the task.
+    returned: always
+    type: list
+    sample: [
+        {
+            "FROM_INSTRUCTION": "318F",
+            "FROM_LIBRARY": "QSYS",
+            "FROM_MODULE": "",
+            "FROM_PROCEDURE": "",
+            "FROM_PROGRAM": "QWTCHGJB",
+            "FROM_USER": "CHANGLE",
+            "MESSAGE_FILE": "QCPFMSG",
+            "MESSAGE_ID": "CPD0912",
+            "MESSAGE_LIBRARY": "QSYS",
+            "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.",
+            "MESSAGE_SUBTYPE": "",
+            "MESSAGE_TEXT": "Printer device PRT01 not found.",
+            "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897",
+            "MESSAGE_TYPE": "DIAGNOSTIC",
+            "ORDINAL_POSITION": "5",
+            "SEVERITY": "20",
+            "TO_INSTRUCTION": "9369",
+            "TO_LIBRARY": "QSYS",
+            "TO_MODULE": "QSQSRVR",
+            "TO_PROCEDURE": "QSQSRVR",
+            "TO_PROGRAM": "QSQSRVR"
+        }
+    ]
 cl_command:
     description: The CL command executed.
     type: str
@@ -329,7 +363,7 @@ try:
     import ibm_db_dbi as dbi
 except ImportError:
     HAS_IBM_DB = False
-
+__ibmi_module_version__ = "1.0.0-beta1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -339,23 +373,6 @@ IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR = 257
 IBMi_JOB_STATUS_NOT_EXPECTED = 258
 IBMi_PARAM_NOT_VALID = 259
 IBMi_JOB_STATUS_LIST = ["*NONE", "*ACTIVE", "*COMPLETE", "*JOBQ", "*OUTQ"]
-
-
-def interpret_return_code(rc):
-    if rc == IBMi_COMMAND_RC_SUCCESS:
-        return 'Success'
-    elif rc == IBMi_COMMAND_RC_ERROR:
-        return 'Generic failure'
-    elif rc == IBMi_COMMAND_RC_UNEXPECTED:
-        return 'Unexpected error'
-    elif rc == IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG:
-        return "iToolKit result dict does not have key 'joblog'"
-    elif rc == IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR:
-        return "iToolKit result dict does not have key 'error'"
-    elif rc == IBMi_JOB_STATUS_NOT_EXPECTED:
-        return "The returned status of the submitted job is not expected. "
-    else:
-        return "Unknown error"
 
 
 def return_interface_information(db_connection, internet_address, alias_name):
@@ -404,6 +421,7 @@ def main():
             text_description=dict(type='str', required=False),
             sec_to_wait=dict(type='int', default=0),
             extra_params=dict(type='str', required=False),
+            joblog=dict(type='bool', default=False),
             state=dict(type='str', default='present', choices=["present", "absent", "inactive", "active"])
         ),
         required_one_of=[["internet_address", "alias_name"]],
@@ -430,6 +448,7 @@ def main():
     state = module.params['state']
     extra_params = module.params['extra_params']
     sec_to_wait = module.params['sec_to_wait']
+    joblog = module.params['joblog']
 
     startd = datetime.datetime.now()
 
@@ -517,23 +536,23 @@ def main():
         time.sleep(sec_to_wait)
 
     rs, query_err = return_interface_information(connection_id, internet_address, alias_name)
-    job_log = ibmi_util.itoolkit_get_job_log(connection_id, startd)
 
     if query_err is not None:
         rc = IBMi_COMMAND_RC_ERROR
         err = query_err
+
+    if joblog or (rc != IBMi_COMMAND_RC_SUCCESS):
+        job_log = ibmi_util.itoolkit_get_job_log(connection_id, startd)
+    else:
+        job_log = []
 
     ibmi_util.itoolkti_close_connection(connection_id)
 
     endd = datetime.datetime.now()
     delta = endd - startd
 
-    rc_msg = interpret_return_code(rc)
-
     if rc != IBMi_COMMAND_RC_SUCCESS:
         result_failed = dict(
-            # size=input_size,
-            # age=input_age,
             job_log=job_log,
             changed=is_changed,
             stderr=err,
@@ -544,7 +563,7 @@ def main():
             stdout=out,
             cl_command=cl_command,
         )
-        module.fail_json(msg='non-zero return code: ' + rc_msg, **result_failed)
+        module.fail_json(msg='Non zero return code.', **result_failed)
     else:
         result_success = dict(
             changed=is_changed,

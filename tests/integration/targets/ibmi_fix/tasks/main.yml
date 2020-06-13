@@ -14,7 +14,7 @@
     - set_fact:
         remote_dir: '{{ remote_tmp_dir }}'
         immed_ptf: {'SI71746':'5733SC1'}
-        remote_lib: 'ARCHLIB'
+        remote_lib: 'FIXLIB'
 
     - ibmi_cl_command:
         cmd: 'CRTLIB LIB({{remote_lib}})'
@@ -31,20 +31,21 @@
             src: 'Q{{item}}.FILE'
             lib_name: '{{remote_lib}}'
           with_items: 
-            - '{{immed_ptf_with_requisite.keys()}}'
-            - '{{requisite_ptf.keys()}}'
-            - '{{ptf_for_product_not_installed.keys()}}'
-            - '{{delay_ptf.keys()}}'  
+            - '{{immed_ptf_with_requisite.keys() | list}}'
+            - '{{requisite_ptf.keys() | list}}'
+            - '{{ptf_for_product_not_installed.keys() | list}}'
+            - '{{delay_ptf.keys() | list}}'  
 
         - include: ibmi_fix_delayed.yml
         - include: ibmi_fix has_requisites.yml
       when: "ansible_distribution_version == '7' and ansible_distribution_release == '4'"
+    
 
     - name: copy save file to remote node
       ibmi_copy:
         src: '{{item}}.savf' 
         lib_name: '{{remote_lib}}'
-      loop: '{{immed_ptf.keys()}}'
+      loop: '{{immed_ptf.keys() | list}}'
 
     - include: ibmi_fix.yml
     - include: negative_case.yml

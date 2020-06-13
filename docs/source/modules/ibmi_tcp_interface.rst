@@ -85,6 +85,15 @@ internet_address
 
 
      
+joblog
+  The job log of the job executing the task will be returned even rc is zero if it is set to True.
+
+
+  | **required**: false
+  | **type**: bool
+
+
+     
 line_description
   the name of the line description associated with the new interface.
 
@@ -143,15 +152,11 @@ state
 
   When the internet address does not exist on the IBM i system, present option will create the interface.
 
-  When the internet address exists on the IBM i system, and only internet_address or alias_name is specified,
+  When the internet address exists on the IBM i system, and only internet_address or alias_name is specified, present option will query the specific interface.
 
-  present option will query the specific interface.
+  When the internet address exists on the IBM i system, and internet_address option is used together with other options, present option will change the specific interface.
 
-  When the internet address exists on the IBM i system, and internet_address option is used together
-
-  with other options, present option will change the specific interface.
-
-  absent mean to remove the internet interface. Either internet_address or alias_name can be used.
+  absent means to remove the internet interface. Either internet_address or alias_name can be used.
 
   If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.
 
@@ -337,16 +342,13 @@ Return Values
 
    
                               
-       stderr_lines
-        | The task standard error split in lines
+       start
+        | The task execution start time
       
         | **returned**: When task has been executed.
-        | **type**: list      
-        | **sample**:
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
-              .. code-block::
-
-                       ["CPF2111:Library TESTLIB already exists."]
             
       
       
@@ -362,12 +364,12 @@ Return Values
       
       
                               
-       stderr
-        | The task standard error
+       delta
+        | The task execution delta time
       
-        | **returned**: When rc as non-zero(failure)
+        | **returned**: When task has been executed.
         | **type**: str
-        | **sample**: CPF2111:Library TESTLIB already exists
+        | **sample**: 0:00:00.307534
 
             
       
@@ -384,12 +386,12 @@ Return Values
       
       
                               
-       cl_command
-        | The CL command executed.
+       stderr
+        | The task standard error
       
-        | **returned**: When task has been executed.
+        | **returned**: When rc as non-zero(failure)
         | **type**: str
-        | **sample**: CHGTCPIFC INTNETADR('9.5.168.12') SUBNETMASK('255.255.0.0') ALIASNAME(alias2)
+        | **sample**: CPF2111:Library TESTLIB already exists
 
             
       
@@ -406,12 +408,54 @@ Return Values
       
       
                               
-       start
-        | The task execution start time
+       stdout_lines
+        | The task standard output split in lines
+      
+        | **returned**: When task has been executed.
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPC2102: Library TESTLIB created."]
+            
+      
+      
+                              
+       stderr_lines
+        | The task standard error split in lines
+      
+        | **returned**: When task has been executed.
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF2111:Library TESTLIB already exists."]
+            
+      
+      
+                              
+       job_log
+        | The job log of the job executes the task.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
+            
+      
+      
+                              
+       cl_command
+        | The CL command executed.
       
         | **returned**: When task has been executed.
         | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
+        | **sample**: CHGTCPIFC INTNETADR('9.5.168.12') SUBNETMASK('255.255.0.0') ALIASNAME(alias2)
 
             
       
@@ -427,31 +471,6 @@ Return Values
               .. code-block::
 
                        [{"ALIAS_NAME": "ALIAS2", "AUTOSTART": "YES", "CONFIGURED_MAXIMUM_TRANSMISSION_UNIT": "1024", "CONNECTION_TYPE": "IPV4", "INTERFACE_LINE_TYPE": "VETH", "INTERFACE_STATUS": "INACTIVE", "INTERNET_ADDRESS": "9.5.155.12", "LAST_CHANGE_TIMESTAMP": "2020-04-25T11:57:26", "LINE_DESCRIPTION": "LINDES", "MAXIMUM_TRANSMISSION_UNIT": "LIND", "NETWORK_ADDRESS": "9.5.0.0", "SERVICE_TYPE": "NORMAL", "SUBNET_MASK": "255.255.0.0", "VIRTUAL_LAN_ID": "NONE"}]
-            
-      
-      
-                              
-       delta
-        | The task execution delta time
-      
-        | **returned**: When task has been executed.
-        | **type**: str
-        | **sample**: 0:00:00.307534
-
-            
-      
-      
-                              
-       stdout_lines
-        | The task standard output split in lines
-      
-        | **returned**: When task has been executed.
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPC2102: Library TESTLIB created."]
             
       
         

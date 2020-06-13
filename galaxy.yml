@@ -64,4 +64,7 @@ documentation: https://ibm.github.io/ansible-for-i/index.html
 # artifact. A pattern is matched from the relative path of the file or directory of the collection directory. This
 # uses 'fnmatch' to match the files or directories. Some directories and files like 'galaxy.yml', '*.pyc', '*.retry',
 # and '.git' are always filtered
-#build_ignore: ['*.git', 'tests', 'examples']
+build_ignore:
+  - ansible.cfg
+  - .gitignore
+  - .travis.yml

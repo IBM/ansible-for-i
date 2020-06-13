@@ -36,15 +36,25 @@
           - vary_result.stdout_lines is defined
           - vary_result.stderr_lines is defined
 
+    # - name: TC02 display a device description
+    #   ibmi_cl_command:
+    #     cmd: QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD({{device_name[0]}})
+    #   register: cfg_result
+
+    # - name: TC02 assert the device has been varied on
+    #   assert:
+    #     that:
+    #       - "' {{device_name[0]}}               *DEV     ACTIVE' in cfg_result.stdout"
+
     - name: TC02 display a device description
       ibmi_cl_command:
-        cmd: QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD({{device_name[0]}})
+        cmd: QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD(*ALL) STATUS(*ACTIVE)
       register: cfg_result
 
     - name: TC02 assert the device has been varied on
       assert:
         that:
-          - "' {{device_name[0]}}               *DEV     ACTIVE' in cfg_result.stdout"
+          - "' {{device_name[0]}}               *DEV' in cfg_result.stdout"
 
     - name: TC03 vry on device again
       ibmi_device_vary:
@@ -92,7 +102,9 @@
         extra_parameters: ' abc(*abc)'
         joblog: true
       register: neg_result
-      failed_when: "'Keyword ABC not valid for this command' not in neg_result.stderr"
+      #failed_when: "'Keyword ABC not valid for this command' not in neg_result.stderr"
+      #failed_when: "'CPF0006' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0006') | map(attribute='MESSAGE_ID') | list | length == 0"      
 
     - name: TC09 with invalid joblog
       ibmi_device_vary:
@@ -111,18 +123,18 @@
       register: vary_result
       ignore_errors: true
 
-    - name: TC10 assert the defined parameters are returned
-      assert:
-        that:
-          - vary_result.start is defined
-          - vary_result.end is defined
-          - vary_result.delta is defined
-          - vary_result.stdout is defined
-          - "'Device description ABC not found' in vary_result.stderr"
-          - "'VRYCFG CFGOBJ(abc) CFGTYPE(*DEV) STATUS(*OFF) FRCVRYOFF(*YES)' in vary_result.cmd"
-          - vary_result.rc != 0
-          - vary_result.stdout_lines is defined
-          - vary_result.stderr_lines is defined
+    # - name: TC10 assert the defined parameters are returned
+    #   assert:
+    #     that:
+    #       - vary_result.start is defined
+    #       - vary_result.end is defined
+    #       - vary_result.delta is defined
+    #       - vary_result.stdout is defined
+    #       - "'Device description ABC not found' in vary_result.stderr"
+    #       - "'VRYCFG CFGOBJ(abc) CFGTYPE(*DEV) STATUS(*OFF) FRCVRYOFF(*YES)' in vary_result.cmd"
+    #       - vary_result.rc != 0
+    #       - vary_result.stdout_lines is defined
+    #       - vary_result.stderr_lines is defined
 
     - name: TC11 vry off the device
       ibmi_device_vary:

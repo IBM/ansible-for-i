@@ -55,15 +55,6 @@
       - fix_result.stderr_lines is not defined
       - fix_result.ptf_list | length == 1
 
-# github issue is reported
-# - name: allow apply without identifying fix
-#   ibmi_fix:
-#     product_id: "{{ single_delay_ptf_product }}"
-#     #save_file_object: 'Q{{ item.key }}' 
-#     #save_file_lib: '{{remote_lib}}'
-#     operation: 'apply_only'
-#   #with_dict: '{{ delay_ptf }}'
-
 - name: immed apply a delayed ptf
   ibmi_fix:
     product_id: "{{ single_delay_ptf_product }}"
@@ -72,7 +63,8 @@
     fix_list: "{{ single_delay_ptf_number }}"
     operation: 'apply_only'
   register: fix_result
-  failed_when: "'cannot be applied or removed' not in fix_result.stderr"
+  #failed_when: "'cannot be applied or removed' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3634') | map(attribute='MESSAGE_ID') | list | length ==0"
 
 - assert:
     that:

@@ -3,7 +3,7 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-- name: TC01 Test with negative values for time setting
+- name: Test with negative values for time setting
   ibmi_reboot: 
     pre_reboot_delay: -1 
   register: reboot_result
@@ -13,7 +13,7 @@
     that:
       - "'The value of pre_reboot_delay must not be less than 0' in reboot_result.msg" 
 
-- name: TC02 Test with str values for time setting
+- name: Test with str values for time setting
   ibmi_reboot: 
     post_reboot_delay: abc
   register: reboot_result
@@ -23,7 +23,7 @@
     that:
       - "'be converted to int' in reboot_result.msg"
 
-- name: TC03 Test with negative values for time setting
+- name: Test with negative values for time setting
   ibmi_reboot: 
     reboot_timeout: -1 
     how_to_end: '*IMMED'
@@ -34,7 +34,7 @@
     that:
       - "'The value of reboot_timeout must not be less than 0' in reboot_result.msg" 
 
-- name: TC04 Test with str values for time setting
+- name: Test with str values for time setting
   ibmi_reboot: 
     connect_timeout: 'abc'
     how_to_end: '*IMMED'
@@ -45,26 +45,26 @@
     that:
       - "'be converted to int' in reboot_result.msg"
 
-- name: TC05 Test with negative values for time setting
+- name: Test with negative values for time setting
   ibmi_reboot: 
     controlled_end_delay_time: -1 
   register: reboot_result
   failed_when: "'Invalid value for controlled_end_delay_time option, it must be greater than 0' not in reboot_result.msg"
 
-- name: TC06 Test with invalid how_to_end
+- name: Test with invalid how_to_end
   ibmi_reboot:
     how_to_end: 'abc'
   register: reboot_result
   failed_when: "'Invalid value for how_to_end option' not in reboot_result.msg"
 
-- name: TC07 Test with invalid reboot_type
+- name: Test with invalid reboot_type
   ibmi_reboot:
     reboot_type: 'abc'
     how_to_end: '*IMMED'
   register: reboot_result
   failed_when: "'Invalid value for reboot_type option' not in reboot_result.msg"
 
-- name: TC08 Test with invalid ipl_source
+- name: Test with invalid ipl_source
   ibmi_reboot:
     ipl_source: 'abc'
     how_to_end: '*IMMED'
@@ -78,7 +78,7 @@
   register: reboot_result
   failed_when: "'Invalid value for end_subsystem_option option' not in reboot_result.msg"
 
-- name: TC09 Test with invalid timeout_option
+- name: Test with invalid timeout_option
   ibmi_reboot:
     timeout_option: 'abc'
     how_to_end: '*IMMED'
@@ -92,7 +92,7 @@
 #     how_to_end: '*IMMED'
 #   register: reboot_result
 
-- name: TC10 Use invalid parameter
+- name: Use invalid parameter
   ibmi_reboot:
     foo: bar
   register: reboot_result
@@ -104,7 +104,7 @@
 
 - import_tasks: get_boot_time.yml
 
-- name: TC11 Immediate reboot
+- name: Immediate reboot
   ibmi_reboot:
     pre_reboot_delay: 10
     post_reboot_delay: 60
@@ -122,19 +122,25 @@
 
 - import_tasks: get_reboot_inputs.yml
 
-- name: TC11 assert the reboot options match the module inputs
+- name: assert the reboot options match the module inputs
   assert: 
     that:
-      - "'How to end           *IMMED' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'Delay time           100' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'IPL source           A' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'End subsystem option *CHGPTY' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'Timeout option       *CONTINUE' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'Confirm              *NO' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      # - "'How to end           *IMMED' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      # - "'Delay time           100' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      # - "'IPL source           A' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      # - "'End subsystem option *CHGPTY' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      # - "'Timeout option       *CONTINUE' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      # - "'Confirm              *NO' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*IMMED' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'100' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'A' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*CHGPTY' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*CONTINUE' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*NO' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
 
 - import_tasks: get_boot_time.yml
 
-- name: TC12 Controlled reboot with two values of end_subsystem_option
+- name: Controlled reboot with two values of end_subsystem_option
   ibmi_reboot:
     pre_reboot_delay: 40
     post_reboot_delay: 60
@@ -152,31 +158,31 @@
 
 - import_tasks: get_reboot_inputs.yml
 
-- name: TC12 assert the reboot options match the module inputs
+- name: assert the reboot options match the module inputs
   assert: 
     that:
-      - "'How to end           *CNTRLD' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'Delay time           60' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'IPL source           B' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'End subsystem option *NOJOBLOG' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'Timeout option       *SYSREFCDE' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'Confirm              *NO' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*CNTRLD' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'60' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'B' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*NOJOBLOG' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*SYSREFCDE' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*NO' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
 
 - import_tasks: get_boot_time.yml
 
-- name: TC13 Reboot with default settings
+- name: Reboot with default settings
   ibmi_reboot:
   register: reboot_result
 
 - import_tasks: get_reboot_inputs.yml
 
-- name: TC13 assert the reboot options match the module inputs
+- name: assert the reboot options match the module inputs
   assert: 
     that:
-      - "'How to end           *IMMED' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'Delay time           600' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'IPL source           *PANEL' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'End subsystem option *DFT' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'Timeout option       *CONTINUE' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
-      - "'Confirm              *NO' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*IMMED' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'600' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*PANEL' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*DFT' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*CONTINUE' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+      - "'*NO' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
 

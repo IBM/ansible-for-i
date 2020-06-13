@@ -76,7 +76,7 @@
           - user_result.result_set[0]['SET_PASSWORD_TO_EXPIRE'] == 'YES'
           - user_result.result_set[0]['STATUS'] == '*DISABLED'
           - user_result.result_set[0]['USER_CLASS_NAME'] == '*SYSOPR'
-          - user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT'
+          - user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT' or user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT     '
           - user_result.result_set[0]['GROUP_PROFILE_NAME'] == '{{new_group[0].upper()}}'
           - user_result.result_set[0]['OWNER'] == '*GRPPRF'
           - user_result.result_set[0]['TEXT_DESCRIPTION'] == 'ANSIBLE TESTING'
@@ -130,7 +130,7 @@
           - user_result.result_set[0]['SET_PASSWORD_TO_EXPIRE'] == 'YES'
           - user_result.result_set[0]['STATUS'] == '*DISABLED'
           - user_result.result_set[0]['USER_CLASS_NAME'] == '*SYSOPR'
-          - user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT'
+          - user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT' or user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT     '
           - user_result.result_set[0]['GROUP_PROFILE_NAME'] == '{{new_group[0].upper()}}'
           - user_result.result_set[0]['OWNER'] == '*GRPPRF'
           - user_result.result_set[0]['TEXT_DESCRIPTION'] == 'CHANGED BY ANSIBLE'
@@ -162,7 +162,7 @@
           - user_result.result_set | length == 1
           - user_result.result_set[0]['SET_PASSWORD_TO_EXPIRE'] == 'NO'
           - user_result.result_set[0]['STATUS'] == '*ENABLED'
-          - user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *SECADM    *SPLCTL    *SERVICE   *IOSYSCFG'
+          - user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *SECADM    *SPLCTL    *SERVICE   *IOSYSCFG' or user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *SECADM    *SPLCTL    *SERVICE   *IOSYSCFG  ' 
           - user_result.result_set[0]['GROUP_PROFILE_NAME'] == '{{new_group[1].upper()}}'
           - user_result.result_set[0]['OWNER'] == '*USRPRF'
           - user_result.result_set[0]['TEXT_DESCRIPTION'] == 'ANSIBLE TESTING'
@@ -237,7 +237,8 @@
           - user_result.stdout_lines is not defined
           - user_result.stderr_lines is defined 
           - user_result.result_set is not defined
-          - "'CPF2258' in user_result.stderr"
+         #- "'CPF2258' in user_result.stderr"
+          - user_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2258') | map(attribute='MESSAGE_ID') | list | length >=1
 
     - name: TC19 delete a group which has a user member
       ibmi_user_and_group:
@@ -258,8 +259,9 @@
     - name: delete user profile
       ibmi_cl_command: 
         cmd: dltusrprf USRPRF({{item}}) OWNOBJOPT(*DLT)
+      ignore_errors: true
       with_items:
         - "{{new_user}}"
         - "{{new_group}}"
-      ignore_errors: true
+      
       

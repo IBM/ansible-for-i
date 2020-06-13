@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -16,8 +16,8 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_user_and_group
-short_description: Create, Change or Display a user(or group) profile
-version_added: 2.10
+short_description: Create, change or display a user(or group) profile
+version_added: 2.8
 description:
   - The C(ibmi_user_and_group) module can do the user(or group) profile management(create, change, delete and display).
   - A user profile contain a user's passwords, the list of special authorities assigned to a user, and the objects the user owns.
@@ -29,10 +29,10 @@ options:
   operation:
     description:
       - The user or group profile operation.
-      - Operation create to create user(group) profile
-      - Operation change to change user(group) profile
-      - Operation display to display user(group) profile inforamtion
-      - Operation display_group_menbers to display the members of a group profile
+      - Operation create to create user(group) profile.
+      - Operation change to change user(group) profile.
+      - Operation display to display user(group) profile inforamtion.
+      - Operation display_group_menbers to display the members of a group profile.
     choices: ['create', 'change', 'delete', 'display', 'display_group_members']
     type: str
     required: yes
@@ -54,7 +54,7 @@ options:
     description:
       - Specifies whether the password for this user is set to expired.
       - If the password is set to expired, the user is required to change the password to sign on the system.
-      - If not specify, '*NO' will be used for operation create, '*SAME' will be used for operation change.
+      - If not specify, C('*NO') will be used for operation create, C('*SAME') will be used for operation change.
       - Valid only for operation create and change.
     type: str
     choices: ['*NO', '*YES', '*SAME']
@@ -62,7 +62,7 @@ options:
   status:
     description:
       - Specifies the status of the user profile.
-      - If not specify, '*ENABLED' will be used for operation create, '*SAME' will be used for operation change.
+      - If not specify, '*ENABLED' will be used for operation create, C('*SAME') will be used for operation change.
       - Valid only for operation create and change.
     type: str
     choices: ['*ENABLED', '*DISABLED', '*SAME']
@@ -70,7 +70,7 @@ options:
   user_class:
     description:
       - Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.
-      - If not specify, '*USER' will be used for operation create, '*SAME' will be used for operation change.
+      - If not specify, '*USER' will be used for operation create, C('*SAME') will be used for operation change.
       - Valid only for operation create and change.
     type: str
     choices: ['*USER', '*SYSOPR', '*PGMR','*SECADM', '*SECOFR', '*SAME']
@@ -78,7 +78,7 @@ options:
   special_authority:
     description:
       - Specifies the special authorities given to a user.
-      - If not specify, '*USRCLS' will be used for operation create, '*SAME' will be used for operation change.
+      - If not specify, C('*USRCLS') will be used for operation create, C('*SAME') will be used for operation change.
       - Valid only for operation create and change.
     type: list
     elements: str
@@ -96,7 +96,7 @@ options:
   owner:
     description:
       - Specifies the user that is to be the owner of objects created by this user.
-      - If not specify, '*USRPRF' will be used for operation create, '*SAME' will be used for operation change.
+      - If not specify, C('*USRPRF') will be used for operation create, C('*SAME') will be used for operation change.
       - Valid only for operation create and change.
     type: str
     choices: ['*USRPRF', '*GRPPRF', '*SAME']
@@ -104,7 +104,7 @@ options:
   text:
     description:
       - Specifies the text that briefly describes the user or group profile.
-      - If not specify, 'Create by Ansible' will be used for operation create, '*SAME' will be used for operation change.
+      - If not specify, 'Create by Ansible' will be used for operation create, C('*SAME') will be used for operation change.
       - Valid only for operation create and change.
     type: str
     default: '*SAME'
@@ -114,21 +114,19 @@ options:
       - Other than options above, all other parameters need to be specified here.
       - The default values of parameters for CRTUSRPRF or CHGUSRPRF or DLTUSRPRF will be taken if not specified.
       - Supported parameters contain
-      - ASTLVL, CURLIB, INLPGM, INLMNU, LMTCPB, TEXT, SPCENV, DSPSGNINF, PWDEXPITV, PWDCHGBLK, LCLPWDMGT, LMTDEVSSN, KBDBUF, MAXSTGLRG, MAXSTG, PTYLMT,
-      - GRPAUT, GRPAUTTYP, SUPGRPPRF, ACGCDE, DOCPWD, MSGQ, DLVRY, SEV, PRTDEV, OUTQ, ATNPGM, SRTSEQ, LANGID, CNTRYID, CCSID, CHRIDCTL, SETJOBATR,
-      - LOCALE, USROPT, UID, GID, HOMEDIR, EIMASSOC, USREXPDATE, USREXPITV, AUT, JOBD when the operation is create or change
-      - Or OWNOBJOPT, PGPOPT, EIMASSOC when the operation is delete.
-      - refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/crtusrprf.htm.
-      - and https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm for detail.
+        ASTLVL, CURLIB, INLPGM, INLMNU, LMTCPB, TEXT, SPCENV, DSPSGNINF, PWDEXPITV, PWDCHGBLK, LCLPWDMGT, LMTDEVSSN, KBDBUF, MAXSTGLRG, MAXSTG, PTYLMT,
+        GRPAUT, GRPAUTTYP, SUPGRPPRF, ACGCDE, DOCPWD, MSGQ, DLVRY, SEV, PRTDEV, OUTQ, ATNPGM, SRTSEQ, LANGID, CNTRYID, CCSID, CHRIDCTL, SETJOBATR,
+        LOCALE, USROPT, UID, GID, HOMEDIR, EIMASSOC, USREXPDATE, USREXPITV, AUT, JOBD when the operation is create or change
+        Or OWNOBJOPT, PGPOPT, EIMASSOC when the operation is delete.
+      - Refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/crtusrprf.htm.
+        and https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm for detail.
     type: str
     default: ' '
   joblog:
     description:
-      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
+      - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: false
-notes:
-    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 seealso:
 - module: ibmi_cl_command
@@ -156,7 +154,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 stdout:
-    description: The standard output
+    description: The standard output.
     returned: when rc as 0(success) and the operation is not display or display_group_members
     type: str
     sample: "CPC2205: User profile CHANGLE changed."
@@ -171,21 +169,21 @@ rc:
     type: int
     sample: 255
 stdout_lines:
-    description: The command standard output split in lines
+    description: The command standard output split in lines.
     returned: when rc as 0(success) and the operation is not display or display_group_members
     type: list
     sample: [
         "CPC2205: User profile CHANGLE changed."
     ]
 stderr_lines:
-    description: The command standard error split in lines
+    description: The command standard error split in lines.
     returned: when rc as no-zero(failure)
     type: list
     sample: [
         "CPF2204: User profile CHANGL1 not found."
     ]
 result_set:
-    description: The result set of user information or group members
+    description: The result set of user information or group members.
     returned: When rc as 0(success) and operation is display or display_group_members
     type: list
     sample: [
@@ -201,8 +199,8 @@ result_set:
         }
     ]
 job_log:
-    description: the job_log
-    type: str
+    description: The IBM i job log of the task executed.
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -234,6 +232,8 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common import validation
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 
 def main():
     module = AnsibleModule(
@@ -259,6 +259,8 @@ def main():
         ),
         supports_check_mode=True,
     )
+
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
 
     operation = module.params['operation'].strip()
     user = module.params['user'].strip().upper()

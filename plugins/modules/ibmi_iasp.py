@@ -16,15 +16,17 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_iasp
-short_description: Control IASP on target IBMi node
-version_added: 2.10
+short_description: Control IASP
+version_added: 2.8
 description:
-  - Control IASP on target IBMi node
-  - For non-IBMi targets, no need
+  - Control IASP.
+  - For IBM i V7R2, PTF SI72162 is required.
+  - For IBM i V7R3, PTF SI72161 is required.
+  - For non-IBM i targets, no need.
 options:
   name:
     description:
-      - The name of the iasp
+      - The name of the iasp.
     type: str
     required: yes
   operation:
@@ -38,27 +40,27 @@ options:
     required: yes
   disks:
     description:
-      - The list of the unconfigure disks
+      - The list of the unconfigure disks.
     type: list
     elements: str
   asp_type:
     description:
-      - The asp_type of new create iasp
+      - The asp_type of new create iasp.
     type: str
     default: '*PRIMARY'
     choices: ['*PRIMARY', '*SECONDARY', '*UDFS']
   primary_asp:
     description:
-      - The primary_asp of new create iasp
+      - The primary_asp of new create iasp.
     type: str
   extra_parameters:
     description:
-      - extra parameter is appended at the end of create operation
+      - Extra parameter is appended at the end of create operation.
     type: str
     default: ' '
   synchronous:
     description:
-      - synchronous execute the iasp command
+      - Synchronous execute the iasp command.
     type: bool
     default: true
   joblog:
@@ -68,7 +70,7 @@ options:
     default: False
 
 author:
-- Jin Yi Fan(@jinyifan)
+- Jin Yifan(@jinyifan)
 '''
 
 EXAMPLES = r'''
@@ -80,50 +82,72 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
+job_log:
+    description: The IBM i job log of the task executed.
+    returned: always
+    type: list
+    sample: [{
+            "FROM_INSTRUCTION": "318F",
+            "FROM_LIBRARY": "QSYS",
+            "FROM_MODULE": "",
+            "FROM_PROCEDURE": "",
+            "FROM_PROGRAM": "QWTCHGJB",
+            "FROM_USER": "CHANGLE",
+            "MESSAGE_FILE": "QCPFMSG",
+            "MESSAGE_ID": "CPD0912",
+            "MESSAGE_LIBRARY": "QSYS",
+            "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.",
+            "MESSAGE_SUBTYPE": "",
+            "MESSAGE_TEXT": "Printer device PRT01 not found.",
+            "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897",
+            "MESSAGE_TYPE": "DIAGNOSTIC",
+            "ORDINAL_POSITION": "5",
+            "SEVERITY": "20",
+            "TO_INSTRUCTION": "9369",
+            "TO_LIBRARY": "QSYS",
+            "TO_MODULE": "QSQSRVR",
+            "TO_PROCEDURE": "QSQSRVR",
+            "TO_PROGRAM": "QSQSRVR"
+        }]
 start:
-    description: The command execution start time
+    description: The command execution start time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:53.757435'
 end:
-    description: The command execution end time
+    description: The command execution end time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:54.064969'
 delta:
-    description: The command execution delta time
+    description: The command execution delta time.
     returned: always
     type: str
     sample: '0:00:00.307534'
 stdout:
-    description: The command standard output
+    description: The command standard output.
     returned: always
     type: str
     sample: 'CPCB719: Configure Device ASP *DELETE request completed.'
 stderr:
-    description: The command standard error
+    description: The command standard error.
     returned: always
     type: str
     sample: 'Generic failure'
 cmd:
-    description: The command executed by the task
+    description: The command executed by the task.
     returned: always
     type: str
     sample: 'CFGDEVASP ASPDEV(YFTEST) ACTION(*DELETE) CONFIRM(*NO)'
 rc:
-    description: The command return code (0 means success, non-zero means failure)
+    description: The command return code (0 means success, non-zero means failure).
     returned: always
     type: int
     sample: 255
-rc_msg:
-    description: Meaning of the return code
-    returned: always
-    type: str
-    sample: 'Generic failure'
 asp_info:
-    description: the asp_info of the identify iasp
+    description: The asp_info of the identify iasp.
     returned: always
-    type: str
+    type: list
     sample: [{
             "ASP_NUMBER": "144",
             "ASP_STATE": "VARIED OFF",
@@ -164,14 +188,14 @@ asp_info:
             "UNPROTECTED_CAPACITY_AVAILABLE": "0"
         }]
 stdout_lines:
-    description: The command standard output split in lines
+    description: The command standard output split in lines.
     returned: always
     type: list
     sample: [
         "CPCB719: Configure Device ASP *DELETE request completed."
     ]
 stderr_lines:
-    description: The command standard error split in lines
+    description: The command standard error split in lines.
     returned: always
     type: list
     sample: [
@@ -182,6 +206,8 @@ stderr_lines:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():
@@ -204,6 +230,7 @@ def main():
         supports_check_mode=True,
     )
 
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
     name = module.params['name']
     operation = module.params['operation']
     disks = module.params['disks']
@@ -244,9 +271,9 @@ def main():
             out = "ASP " + name + " does not exsit"
             error = out
         else:
-            command = "CALL PGM(QSYS/QAENGADDDU) PARM('"
-            command = command + ibmi_util.fmtTo10(name) + "' '" + asp_number + "' "
-            command = command + "'0' "
+            command = "CALL PGM(QSYS/QAENGADDDU) PARM('{p_name}' '{p_asp_number}' '0' ".format(
+                p_name=ibmi_util.fmtTo10(name),
+                p_asp_number=asp_number)
             for disk in disks:
                 command = command + "'" + ibmi_util.fmtTo10(disk) + "' "
             command = command + ")"

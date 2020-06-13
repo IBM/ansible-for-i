@@ -75,6 +75,11 @@ options:
       - Whether or not rollback if there's failure during the installation of the fixes
     default: true
     type: bool
+  joblog:
+    description:
+      - The job log of the job executing the task will be returned even rc is zero if it is set to True.
+    type: bool
+    default: false
 
 notes:
    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
@@ -148,6 +153,35 @@ stderr_lines:
     sample: [
         "CPF2111:Library TESTLIB already exists."
     ]
+job_log:
+    description: The job log of the job executes the task.
+    returned: always
+    type: list
+    sample: [
+        {
+            "FROM_INSTRUCTION": "318F",
+            "FROM_LIBRARY": "QSYS",
+            "FROM_MODULE": "",
+            "FROM_PROCEDURE": "",
+            "FROM_PROGRAM": "QWTCHGJB",
+            "FROM_USER": "CHANGLE",
+            "MESSAGE_FILE": "QCPFMSG",
+            "MESSAGE_ID": "CPD0912",
+            "MESSAGE_LIBRARY": "QSYS",
+            "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.",
+            "MESSAGE_SUBTYPE": "",
+            "MESSAGE_TEXT": "Printer device PRT01 not found.",
+            "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897",
+            "MESSAGE_TYPE": "DIAGNOSTIC",
+            "ORDINAL_POSITION": "5",
+            "SEVERITY": "20",
+            "TO_INSTRUCTION": "9369",
+            "TO_LIBRARY": "QSYS",
+            "TO_MODULE": "QSQSRVR",
+            "TO_PROCEDURE": "QSQSRVR",
+            "TO_PROGRAM": "QSQSRVR"
+        }
+    ]
 need_action_ptf_list:
     description: The list contains the information of the just installed PTFs that need further IPL actions.
     type: list
@@ -180,6 +214,7 @@ import shutil
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi.temp_directory import TemporaryDirectory
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
 try:
     from itoolkit import iToolKit
@@ -196,7 +231,7 @@ try:
 except ImportError:
     HAS_IBM_DB = False
 
-
+__ibmi_module_version__ = "1.0.0-beta1"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -204,84 +239,8 @@ IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG = 256
 IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR = 257
 
 
-def interpret_return_code(rc):
-    if rc == IBMi_COMMAND_RC_SUCCESS:
-        return 'Success'
-    elif rc == IBMi_COMMAND_RC_ERROR:
-        return 'Generic failure'
-    elif rc == IBMi_COMMAND_RC_UNEXPECTED:
-        return 'Unexpected error'
-    elif rc == IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG:
-        return "iToolKit result dict does not have key 'joblog'"
-    elif rc == IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR:
-        return "iToolKit result dict does not have key 'error'"
-    else:
-        return "Unknown error"
-
-
-def itoolkit_run_sql(sql):
-    conn = dbi.connect()
-    db_itransport = DatabaseTransport(conn)
-    itool = iToolKit()
-
-    itool.add(iSqlQuery('query', sql, {'error': 'on'}))
-    itool.add(iSqlFetch('fetch'))
-    itool.add(iSqlFree('free'))
-
-    itool.call(db_itransport)
-
-    command_output = itool.dict_out('fetch')
-
-    rc = IBMi_COMMAND_RC_UNEXPECTED
-    out = ''
-    err = ''
-    if 'error' in command_output:
-        command_error = command_output['error']
-        if 'joblog' in command_error:
-            rc = IBMi_COMMAND_RC_ERROR
-            err = command_error['joblog']
-        else:
-            # should not be here, must xmlservice has internal error
-            rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
-            err = "iToolKit result dict does not have key 'joblog', the output is %s" % command_output
-    else:
-        rc = IBMi_COMMAND_RC_SUCCESS
-        out = command_output['row']
-
-    return rc, out, err
-
-
-def itoolkit_run_command(command):
-    conn = dbi.connect()
-    # itransport = iDB2Call(conn)
-    itransport = DatabaseTransport(conn)
-    itool = iToolKit()
-    itool.add(iCmd('command', command, {'error': 'on'}))
-    itool.call(itransport)
-
-    rc = IBMi_COMMAND_RC_UNEXPECTED
-    out = ''
-    err = ''
-
-    command_output = itool.dict_out('command')
-
-    if 'success' in command_output:
-        rc = IBMi_COMMAND_RC_SUCCESS
-        out = command_output['success']
-    elif 'error' in command_output:
-        command_error = command_output['error']
-        if 'joblog' in command_error:
-            rc = IBMi_COMMAND_RC_ERROR
-            err = command_error['joblog']
-        else:
-            # should not be here, must xmlservice has internal error
-            rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
-            err = "iToolKit result dict does not have key 'joblog', the output is %s" % command_output
-    else:
-        # should not be here, must xmlservice has internal error
-        rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR
-        err = "iToolKit result dict does not have key 'error', the output is %s" % command_output
-
+def itoolkit_run_command(connection_id, command):
+    rc, out, err = ibmi_util.itoolkit_run_command(connection_id, command)
     return rc, out, err
 
 
@@ -300,89 +259,14 @@ def wait_for_certain_time(input_wait_time):
     time.sleep(wait_time)
 
 
-def remove_ptf(module, product_id, ptf_selected_list, ptf_omit_list, temp_or_perm="*TEMP", delayed_option="*NO"):
-    cl_rmv_ptf_map = {"LICPGM": product_id,
-                      "RMV": temp_or_perm,
-                      "SELECT": "", "OMIT": "",
-                      "DELAYED": delayed_option}
-
-    if len(ptf_selected_list) > 0:
-        ptf_str_to_select = ' '.join(ptf_selected_list)
-        cl_rmv_ptf_map["SELECT"] = ptf_str_to_select
-
-    if len(ptf_omit_list) > 0:
-        ptf_str_to_omit = ' '.join(ptf_omit_list)
-        cl_rmv_ptf_map["OMIT"] = ptf_str_to_omit
-
-    cl_rmv_ptf = "RMVPTF"
-    for key, value in cl_rmv_ptf_map.items():
-        cl_rmv_ptf = cl_rmv_ptf + " " + key + "(" + value + ") "
-
-    args = ['system', cl_rmv_ptf]
-    rc, out, err = module.run_command(args, use_unsafe_shell=False)
-
-    return rc, out, err
-
-
-def install_ptf(module, product_id, ptf_list_to_select, ptf_list_to_omit,
-                device, save_file, delayed_option="*NO", temp_or_perm="*TEMP"):
-
-    cl_load_ptf_map = {"LICPGM": product_id,
-                       "DEV": "*SAVF",
-                       "SELECT": "", "OMIT": "",
-                       "SAVF": ""}
-
-    cl_apply_ptf_map = {"LICPGM": product_id, "SELECT": "", "OMIT": "",
-                        "APY": temp_or_perm, "DELAYED": delayed_option}
-
-    if len(ptf_list_to_select) > 0:
-        ptf_str_to_select = ' '.join(ptf_list_to_select)
-        cl_load_ptf_map["SELECT"] = ptf_str_to_select
-        cl_apply_ptf_map["SELECT"] = ptf_str_to_select
-
-    if len(ptf_list_to_omit) > 0:
-        ptf_str_to_omit = ' '.join(ptf_list_to_omit)
-        cl_load_ptf_map["OMIT"] = ptf_str_to_omit
-        cl_apply_ptf_map["OMIT"] = ptf_str_to_omit
-
-    if device == "*SAVF":
-        cl_load_ptf_map["SAVF"] = save_file
-
-    cl_load_ptf = "LODPTF"
-    for key, value in cl_load_ptf_map.items():
-        cl_load_ptf = cl_load_ptf + " " + key + "(" + value + ") "
-
-    cl_apply_ptf = "APYPTF"
-    for key, value in cl_apply_ptf_map.items():
-        cl_apply_ptf = cl_apply_ptf + " " + key + "(" + value + ") "
-
-    load_ptf_args = ['system', cl_load_ptf]
-    rc_load_ptf, out_load_ptf, err_load_ptf = module.run_command(load_ptf_args, use_unsafe_shell=False)
-
-    apy_ptf_args = ['system', cl_apply_ptf]
-    rc_apy_ptf, out_apy_ptf, err_apy_ptf = module.run_command(apy_ptf_args, use_unsafe_shell=False)
-
-    rc = rc_apy_ptf
-    out = None
-    err = None
-    if out_apy_ptf is not None:
-        out = out_load_ptf + "\n" + out_apy_ptf
-
-    if err_apy_ptf is not None:
-        err = err_load_ptf + "\n" + err_apy_ptf
-
-    return rc, out, err
-
-
-def run_a_list_of_commands(module, cmd_key_list, cmd_map):
+def run_a_list_of_commands(connection_id, cmd_key_list, cmd_map):
 
     for item in cmd_key_list:
         cur_cmd = cmd_map[item]
-        args = ['system', cur_cmd]
-        module.run_command(args, use_unsafe_shell=False)
+        itoolkit_run_command(connection_id, cur_cmd)
 
 
-def install_by_image_catalog(module, product_id_list, virtual_image_list, dir_target,
+def install_by_image_catalog(connection_id, module, product_id_list, virtual_image_list, dir_target,
                              opt_device, catalog_name, fix_omit_list, is_rollback=False, delayed_option="*DLYALL",
                              hiper_only=False):
 
@@ -439,37 +323,37 @@ def install_by_image_catalog(module, product_id_list, virtual_image_list, dir_ta
 
     module.log("Run CL Command: " + command_map["cl_crt_device"])
     # need to check the existense of the created opt device
-    rc, out, err = itoolkit_run_command(command_map["cl_crt_device"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["cl_crt_device"])
     # command_log.append(command_map["cl_crt_device"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["cl_crt_device"]
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(module, ["cl_dlt_device"], command_map)
+            run_a_list_of_commands(connection_id, ["cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
     module.log("Run CL Command: " + command_map["cl_crt_catalog"])
-    rc, out, err = itoolkit_run_command(command_map["cl_crt_catalog"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["cl_crt_catalog"])
     # command_log.append(command_map["cl_crt_catalog"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["cl_crt_catalog"]
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(module, ["cl_delete_image_catalog", "cl_dlt_device"], command_map)
+            run_a_list_of_commands(connection_id, ["cl_delete_image_catalog", "cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
     module.log("Run CL Command: " + command_map["cl_vary_on_device"])
-    rc, out, err = itoolkit_run_command(command_map["cl_vary_on_device"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["cl_vary_on_device"])
     # command_log.append(command_map["cl_vary_on_device"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["cl_vary_on_device"]
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(module, ["cl_vary_off_device",
-                                            "cl_delete_image_catalog", "cl_dlt_device"], command_map)
+            run_a_list_of_commands(connection_id, ["cl_vary_off_device",
+                                                   "cl_delete_image_catalog", "cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
     if (virtual_image_list is not None) and (virtual_image_list != ["*ALL"]):
@@ -478,89 +362,89 @@ def install_by_image_catalog(module, product_id_list, virtual_image_list, dir_ta
                                       + image_name + ") TOFILE(*fromfile) TEXT('Added by Ansible')"
             module.log("Run CL Command: " + cl_catalog_entry_adding)
 
-            rc, out, err = itoolkit_run_command(cl_catalog_entry_adding)
+            rc, out, err = itoolkit_run_command(connection_id, cl_catalog_entry_adding)
             # command_log.append(cl_catalog_entry_adding)
             # command_log.append(out)
             command_log = command_log + "\n" + cl_catalog_entry_adding
             command_log = command_log + "\n" + out
             if rc > 0:
                 if is_rollback:
-                    run_a_list_of_commands(module, ["cl_vary_off_device",
-                                                    "cl_delete_image_catalog", "cl_dlt_device"], command_map)
+                    run_a_list_of_commands(connection_id, ["cl_vary_off_device",
+                                                           "cl_delete_image_catalog", "cl_dlt_device"], command_map)
                 return rc, out, err, command_log
 
     module.log("Run CL Command: " + command_map["lod_image_catalog"])
-    rc, out, err = itoolkit_run_command(command_map["lod_image_catalog"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["lod_image_catalog"])
     # command_log.append(command_map["lod_image_catalog"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["lod_image_catalog"]
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(module, ["unload_image_catalog", "cl_vary_off_device",
-                                            "cl_delete_image_catalog", "cl_dlt_device"], command_map)
+            run_a_list_of_commands(connection_id, ["unload_image_catalog", "cl_vary_off_device",
+                                                   "cl_delete_image_catalog", "cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
     module.log("Run CL Command: " + command_map["cl_catalog_in_order"])
-    rc, out, err = itoolkit_run_command(command_map["cl_catalog_in_order"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["cl_catalog_in_order"])
     # command_log.append(command_map["cl_catalog_in_order"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["cl_catalog_in_order"]
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(module, ["unload_image_catalog", "cl_vary_off_device",
-                                            "cl_delete_image_catalog", "cl_dlt_device"], command_map)
+            run_a_list_of_commands(connection_id, ["unload_image_catalog", "cl_vary_off_device",
+                                                   "cl_delete_image_catalog", "cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
     module.log("Run CL Command: " + command_map["cl_inst_ptf"])
-    rc, out, err = itoolkit_run_command(command_map["cl_inst_ptf"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["cl_inst_ptf"])
     # command_log.append(command_map["cl_inst_ptf"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["cl_inst_ptf"]
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(module, ["unload_image_catalog", "cl_vary_off_device",
-                                            "cl_delete_image_catalog", "cl_dlt_device"], command_map)
+            run_a_list_of_commands(connection_id, ["unload_image_catalog", "cl_vary_off_device",
+                                                   "cl_delete_image_catalog", "cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
     module.log("Run CL Command: " + command_map["unload_image_catalog"])
-    rc, out, err = itoolkit_run_command(command_map["unload_image_catalog"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["unload_image_catalog"])
     # command_log.append(command_map["unload_image_catalog"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["unload_image_catalog"]
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(module, ["cl_vary_off_device",
-                                            "cl_delete_image_catalog", "cl_dlt_device"], command_map)
+            run_a_list_of_commands(connection_id, ["cl_vary_off_device",
+                                                   "cl_delete_image_catalog", "cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
     module.log("Run CL Command: " + command_map["cl_vary_off_device"])
-    rc, out, err = itoolkit_run_command(command_map["cl_vary_off_device"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["cl_vary_off_device"])
     # command_log.append(command_map["cl_vary_off_device"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["cl_vary_off_device"]
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(module, ["cl_delete_image_catalog", "cl_dlt_device"], command_map)
+            run_a_list_of_commands(connection_id, ["cl_delete_image_catalog", "cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
     module.log("Run CL Command: " + command_map["cl_delete_image_catalog"])
-    rc, out, err = itoolkit_run_command(command_map["cl_delete_image_catalog"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["cl_delete_image_catalog"])
     # command_log.append(command_map["cl_delete_image_catalog"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["cl_delete_image_catalog"]
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(module, ["cl_dlt_device"], command_map)
+            run_a_list_of_commands(connection_id, ["cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
     module.log("Run CL Command: " + command_map["cl_dlt_device"])
-    rc, out, err = itoolkit_run_command(command_map["cl_dlt_device"])
+    rc, out, err = itoolkit_run_command(connection_id, command_map["cl_dlt_device"])
     # command_log.append(command_map["cl_dlt_device"])
     # command_log.append(out)
     command_log = command_log + "\n" + command_map["cl_dlt_device"]
@@ -600,15 +484,16 @@ def return_fix_information(db_connection, product_id, start_timestamp, end_times
     out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
 
     out = []
-    for result in out_result_set:
-        result_map = {"PTF_PRODUCT_ID": result[0], "PTF_IDENTIFIER": result[1],
-                      "PTF_LOADED_STATUS": result[2], "PTF_SAVE_FILE": result[3],
-                      "PTF_IPL_ACTION": result[4], "PTF_ACTION_PENDING": result[5],
-                      "PTF_ACTION_REQUIRED": result[6], "PTF_IPL_REQUIRED": result[7],
-                      "PTF_STATUS_TIMESTAMP": result[8],
-                      "PTF_CREATION_TIMESTAMP": result[9], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[10]
-                      }
-        out.append(result_map)
+    if (out_result_set is not None):
+        for result in out_result_set:
+            result_map = {"PTF_PRODUCT_ID": result[0], "PTF_IDENTIFIER": result[1],
+                          "PTF_LOADED_STATUS": result[2], "PTF_SAVE_FILE": result[3],
+                          "PTF_IPL_ACTION": result[4], "PTF_ACTION_PENDING": result[5],
+                          "PTF_ACTION_REQUIRED": result[6], "PTF_IPL_REQUIRED": result[7],
+                          "PTF_STATUS_TIMESTAMP": result[8],
+                          "PTF_CREATION_TIMESTAMP": result[9], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[10]
+                          }
+            out.append(result_map)
     return out, err
 
 
@@ -641,6 +526,7 @@ def main():
             apply_type=dict(type='str', default='*DLYALL', choices=['*DLYALL', '*IMMDLY', '*IMMONLY']),
             hiper_only=dict(type='bool', default=False),
             rollback=dict(type='bool', default=True),
+            joblog=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -659,6 +545,7 @@ def main():
     use_temp_path = module.params['use_temp_path']
     hiper_only = module.params['hiper_only']
     rollback = module.params['rollback']
+    joblog = module.params['joblog']
 
     if not os.path.exists(path):
         return module.fail_json(msg="The path specified in src does not exist. The value is: " + path)
@@ -701,7 +588,7 @@ def main():
                         else:
                             return module.fail_json(msg="Image file " + source_file + " does not exist.")
 
-                rc, out, err, command_log = install_by_image_catalog(module, product_id, None, tmp_dir,
+                rc, out, err, command_log = install_by_image_catalog(connection_id, module, product_id, None, tmp_dir,
                                                                      str(dev_name), str(catalog_name),
                                                                      fix_omit_list, is_rollback=rollback,
                                                                      delayed_option=delayed_option,
@@ -709,7 +596,7 @@ def main():
             else:
                 module.fail_json(msg="Failed creating temp dir.")
     else:
-        rc, out, err, command_log = install_by_image_catalog(module, product_id, fix_file_name_list, path,
+        rc, out, err, command_log = install_by_image_catalog(connection_id, module, product_id, fix_file_name_list, path,
                                                              dev_name, catalog_name, fix_omit_list,
                                                              is_rollback=rollback,
                                                              delayed_option=delayed_option,
@@ -718,6 +605,10 @@ def main():
     endd = datetime.datetime.now()
     delta = endd - startd
     out_ptf_list, query_err = return_fix_information(connection_id, product_id, str(startd), str(endd))
+    if joblog or (rc != IBMi_COMMAND_RC_SUCCESS):
+        job_log = ibmi_util.itoolkit_get_job_log(connection_id, startd)
+    else:
+        job_log = []
 
     if connection_id is not None:
         try:
@@ -730,6 +621,7 @@ def main():
             stderr=err,
             stdout=command_log,
             rc=rc,
+            job_log=job_log,
             # changed=True,
         )
         module.fail_json(msg='Install from image catalog failed.', **result_failed)
@@ -741,6 +633,7 @@ def main():
             rc=rc,
             changed=True,
             need_action_ptf_list=out_ptf_list,
+            job_log=job_log,
         )
         module.exit_json(**result_success)
 

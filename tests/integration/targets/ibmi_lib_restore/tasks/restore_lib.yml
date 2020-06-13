@@ -4,7 +4,8 @@
     savefile_name: 'IBMISAVF'
     savefile_lib: 'ARCHLIB'
   register: rstobj_result
-  failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+  #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+  failed_when: "rstobj_result.rc != 0 and (rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length) == 0"
 
 - ibmi_lib_save:
     lib_name: 'SAVRST'
@@ -70,7 +71,8 @@
     savefile_name: 'SAVTEST'
     savefile_lib: 'ARCHLIB'
   register: rstlib_result
-  failed_when: "'ABC not found' not in rstlib_result.stderr"
+  #failed_when: "'ABC not found' not in rstlib_result.stderr"
+  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 - name: TC06 restore lib with wrong library name
   ibmi_lib_restore:
@@ -78,7 +80,8 @@
     savefile_name: 'SAVTEST'
     savefile_lib: 'ARCHLIB'
   register: rstlib_result
-  failed_when: "'CPF3780' not in rstlib_result.stderr"
+  #failed_when: "'CPF3780' not in rstlib_result.stderr"
+  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 - name: TC07 restore lib with duplicated saved_lib 
   ibmi_lib_restore:
@@ -88,7 +91,8 @@
     savefile_lib: 'ARCHLIB'
     joblog: 'true'
   register: rstlib_result
-  failed_when: "'ABC not found' not in rstlib_result.stderr" 
+  #failed_when: "'ABC not found' not in rstlib_result.stderr"
+  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 - name: TC08 restore lib from wrong format
   ibmi_lib_restore:
@@ -117,7 +121,9 @@
     parameters: 'abc'
     joblog: 'true'
   register: rstlib_result
-  failed_when: "'CPF0001' not in rstlib_result.stderr"
+  #failed_when: "'CPF0001' not in rstlib_result.stderr"
+  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0006') | map(attribute='MESSAGE_ID') | list | length == 0"
+
 
 - name: TC11 restore lib with an invalid option
   ibmi_lib_restore:

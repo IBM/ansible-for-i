@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 from __future__ import absolute_import, division, print_function
 
@@ -15,12 +15,10 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_sql_query
-short_description: Executes a SQL DQL(Data Query Language) statement on a remote IBMi node.
-version_added: 1.0
+short_description: Executes a SQL DQL(Data Query Language) statement.
+version_added: 2.8
 description:
      - The C(ibmi_sql_query) module takes the SQL DQL(Data Query Language) statement as argument.
-     - The given SQL DQL(Data Query Language) statement will be executed on all selected nodes.
-     - Only run one statement at a time.
 options:
   sql:
     description:
@@ -29,24 +27,24 @@ options:
     required: yes
   database:
     description:
-      - Specified database name, usually, its the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries
-      - Default to use the '*LOCAL' entry
+      - Specified database name, usually, it is the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries.
+      - Default to use the '*LOCAL' entry.
     type: str
     default: '*SYSBAS'
   expected_row_count:
     description:
-      - The expected row count
-      - If it is equal or greater than 0, check if the actual row count returned from the query statement is matched with the expected row count
-      - If it is less than 0, do not check if the actual row count returned from the query statement is matched with the expected row counit
+      - The expected row count.
+      - If it is equal or greater than 0, check if the actual row count returned from the query statement is matched with the expected row count.
+      - If it is less than 0, do not check if the actual row count returned from the query statement is matched with the expected row count.
     type: int
     default: -1
   joblog:
     description:
-      - If set to C(true), output the JOBLOG even success.
+      - If set to C(true), output the job log even success.
     type: bool
-    default: false
+    default: False
 notes:
-    - Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+    - This module can only run one statement at a time.
 seealso:
 - module: ibmi_sql_execute
 author:
@@ -54,29 +52,29 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: Query the data of table Persons
+- name: Query the data of table Persons.
   ibmi_sql_query:
     sql: 'select * from Persons'
 '''
 
 RETURN = r'''
 start:
-    description: The sql statement execution start time
+    description: The sql statement execution start time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:53.757435'
 end:
-    description: The sql statement execution end time
+    description: The sql statement execution end time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:54.064969'
 delta:
-    description: The sql statement execution delta time
+    description: The sql statement execution delta time.
     returned: always
     type: str
     sample: '0:00:00.307534'
 row:
-    description: The sql query statement result
+    description: The sql query statement result.
     returned: when rc as 0(success)
     type: list
     sample: [
@@ -96,39 +94,39 @@ row:
         }
     ]
 stdout:
-    description: The sql statement standard output
+    description: The sql statement standard output.
     returned: When rc as non-zero(failure)
     type: str
     sample: ''
 stderr:
-    description: The sql statement standard error
+    description: The sql statement standard error.
     returned: When rc as non-zero(failure)
     type: str
     sample: ''
 sql:
-    description: The sql statement executed by the task
+    description: The sql statement executed by the task.
     returned: always
     type: str
     sample: 'select * from Persons'
 rc:
-    description: The sql statement return code (0 means success)
+    description: The sql statement return code (0 means success).
     returned: always
     type: int
     sample: 0
 stdout_lines:
-    description: The sql statement standard output split in lines
+    description: The sql statement standard output split in lines.
     returned: When rc as non-zero(failure)
     type: list
     sample: ['']
 stderr_lines:
-    description: The sql statement standard error split in lines
+    description: The sql statement standard error split in lines.
     returned: When rc as non-zero(failure)
     type: list
     sample: ['']
 job_log:
-    description: the job_log
-    returned: when rc as non-zero(failure) or rc as success(0) but joblog set to true
-    type: str
+    description: The IBM i job log of the task executed.
+    returned: when rc as non-zero(failure) or rc as success(0) but joblog set to true.
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -159,6 +157,8 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 
 def main():
     module = AnsibleModule(
@@ -171,8 +171,10 @@ def main():
         supports_check_mode=True,
     )
 
-    sql = module.params['sql']
-    database = module.params['database'].upper()
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
+
+    sql = module.params['sql'].strip().upper()
+    database = module.params['database'].strip().upper()
     check_row_count = False
     expected_row_count = module.params['expected_row_count']
     if expected_row_count >= 0:

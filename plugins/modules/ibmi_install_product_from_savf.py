@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -15,51 +15,51 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 module: ibmi_install_product_from_savf
-short_description: Install the the licensed program(product) from a save file
+short_description: Install the licensed program(product) from a save file.
+version_added: "2.8"
 description:
-    - the C(ibmi_install_product_from_savf) module install the product from a save file on the target ibmi node.
-version_added: "1.1"
+    - The C(ibmi_install_product_from_savf) module installs the product from a save file.
 options:
   product:
     description:
-      - Specifies the seven-character identifier of the licensed program that is restored
+      - Specifies the seven-character identifier of the licensed program that is restored.
     type: str
     required: yes
   option:
     description:
-      - Specifies which one of the optional parts of the licensed program given in the Product prompt (LICPGM parameter) is to be restored
+      - Specifies which one of the optional parts of the licensed program given in the Product prompt (LICPGM parameter) is to be restored.
     type: str
     default: '*BASE'
   object_type:
     description:
-      - Specifies the type of licensed program objects to be restored
+      - Specifies the type of licensed program objects to be restored.
     type: str
     default: '*ALL'
     choices: ['*ALL', '*PGM', '*LNG']
   language:
     description:
-      - Specifies which national language version (NLV) objects to be used for restoring the licensed program
-      - It's the IBM-supplied language feature codes, like German is 2924, English is 2924
+      - Specifies which national language version (NLV) objects to be used for restoring the licensed program.
+        It's the IBM-supplied language feature codes, like German is 2924, English is 2924.
     type: str
     default: '*PRIMARY'
   release:
     description:
-      - Specifies the version, release, and modification level of the licensed program being restored
+      - Specifies the version, release, and modification level of the licensed program being restored.
     type: str
     default: '*FIRST'
   replace_release:
     description:
-      - Specifies the version, release, and modification level of the licensed program being replaced
+      - Specifies the version, release, and modification level of the licensed program being replaced.
     type: str
     default: '*ONLY'
   savf_name:
     description:
-      - Specify the name of the save file
+      - Specify the name of the save file.
     type: str
     required: yes
   savf_library:
     description:
-      - Specify the name of the library where the save file is located
+      - Specify the name of the library where the save file is located.
     type: str
     required: yes
   parameters:
@@ -70,19 +70,19 @@ options:
     default: ' '
   acceptance_cmd:
     description:
-      - The Accept Software Agreement command records the acceptance of the software agreement for a product
-      - It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement
-      - This command cannot be used to accept the Licensed Internal Code or the IBM i *Base software agreements
-      - If invalid command specificed, message CPDB6D5 with following reason will be received,
-      - 'Product cannot be installed in a batch request because the software agreement has not been previously accepted'
-      - In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don't know the command
+      - The Accept Software Agreement command records the acceptance of the software agreement for a product.
+        It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement.
+        This command cannot be used to accept the Licensed Internal Code or the IBM i *Base software agreements.
+        If invalid command specificed, message CPDB6D5 with following reason will be received,
+        'Product cannot be installed in a batch request because the software agreement has not been previously accepted'.
+        In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don't know the command.
     type: str
     default: ' '
   joblog:
     description:
-      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
+      - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
-    default: false
+    default: False
 seealso:
 - module: ibmi_uninstall_product, ibmi_save_product_to_savf
 author:
@@ -90,13 +90,13 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: Restoring Program Using Defaults
+- name: Restoring Program Using Defaults.
   ibmi_install_product_from_savf:
     product: 5770WDS
     savf_name: MYFILE
     savf_library: MYLIB
 
-- name: Restoring Program with acceptance command
+- name: Restoring Program with acceptance command.
   ibmi_install_product_from_savf:
     product: 5733D10
     option: 11
@@ -107,37 +107,37 @@ EXAMPLES = r'''
 
 RETURN = r'''
 stdout:
-    description: The standard output
+    description: The standard output.
     type: str
     sample: "+++ success RSTLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)"
     returned: When rc as 0(success)
 stderr:
-    description: The standard error
+    description: The standard error.
     type: str
     sample: 'CPF9801: Object QNOTE in library L10010125P not found'
     returned: When rc as non-zero(failure)
 rc:
-    description: The task return code (0 means success, non-zero means failure)
+    description: The task return code (0 means success, non-zero means failure).
     type: int
     sample: 255
     returned: always
 stdout_lines:
-    description: The standard output split in lines
+    description: The standard output split in lines.
     type: list
     sample: [
         "+++ success RSTLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)"
     ]
     returned: When rc as 0(success)
 stderr_lines:
-    description: The standard error split in lines
+    description: The standard error split in lines.
     type: list
     sample: [
         "CPF9801: Object QNOTE in library L10010125P not found"
     ]
-    returned: When rc as non-zero(failure)
+    returned: When rc as non-zero(failure).
 job_log:
-    description: the job_log
-    type: str
+    description: The IBM i job log of the task executed.
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -168,6 +168,8 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 
 def main():
     module = AnsibleModule(
@@ -186,6 +188,8 @@ def main():
         ),
         supports_check_mode=True,
     )
+
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
 
     product = module.params['product'].upper()
     option = module.params['option'].upper()

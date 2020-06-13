@@ -3,13 +3,8 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-#Test dependent packages 
+# Test dependent packages 
 - block: 
-    - name: run the CL command to delete the library
-      command: system dltlib ansible1
-      register: dltlib_result
-      failed_when: "dltlib_result.stderr != '' and 'CPF2110' not in dltlib_result.stderr"
-    
     - include: install_rpm.yml 
       vars: 
         python: "{{python_version}}"
@@ -23,6 +18,12 @@
   vars:
     required_rpms: [itoolkit, ibm_db]
     python_version: "{{ansible_python_interpreter.split('/')[-1]}}"   
+
+- name: cleanup environment
+  ibmi_cl_command:
+    cmd: dltlib lib(ansible1)
+    joblog: true
+  ignore_errors: true
 
 # Test when all dependent packages are in place  
 - name: TC01 run CL command module with joblog = False
@@ -55,7 +56,7 @@
       - dsplib_result_1.stderr == ""
       - dsplib_result_1.stderr_lines == []
       - dsplib_result_1.rc == 0
-      - dltlib_result_1.job_log == [] 
+      - dsplib_result_1.job_log == [] 
 
 - name: TC03 run CL command module with joblog = true
   ibmi_cl_command:
@@ -74,7 +75,7 @@
       - dltlib_result_1.rc == 0
       - dltlib_result_1.job_log != [] 
 
-- name: TC04 run CL command module with joblog = True
+- name: TC04 run CL command module to delete an not existing module
   ibmi_cl_command:
     cmd: dltlib lib(ansible1)
     joblog: True
@@ -85,9 +86,8 @@
   assert:
     that:
       - dltlib_result_2.job_log != []
-      - "'CPF2110' in dltlib_result_2.stderr"
-      - "'Recovery' in dltlib_result_2.stderr"
-      - "'Cause' in dltlib_result_2.stderr"
+      - dltlib_result_2.stderr != ""
+      - (dltlib_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length) >= 1
       - dltlib_result_2.rc != 0
 
 - name: TC05 run CL command module without any options
@@ -121,7 +121,8 @@
 - name: TC07 assert the previous task failed because lacks of required parameter cmd
   assert:
     that:
-      - "'CPD0030' in crtlib_result_4.stderr"
+      - crtlib_result_4.stderr != ""
+      - (crtlib_result_4.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0030') | map(attribute='MESSAGE_ID') | list | length) >= 1
 
 - name: TC08 run CL command module with an invalid command and joblog = True
   ibmi_cl_command:
@@ -133,7 +134,8 @@
 - name: TC08 assert the previous task failed because lacks of required parameter cmd
   assert:
     that:
-      - "'CPD0030' in crtlib_result_4.stderr"
+      - crtlib_result_5.stderr != ""
+      - (crtlib_result_5.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0030') | map(attribute='MESSAGE_ID') | list | length) >= 1
 
 - name: TC09 run CL command module with a valid command and an invalid joblog value
   ibmi_cl_command:
@@ -176,6 +178,6 @@
   ibmi_cl_command:
     cmd: dltlib ansible1
   register: dltlib_result_2
-  failed_when: "dltlib_result_2.stderr != '' and 'CPF2110' not in dltlib_result_2.stderr"
+  failed_when: "dltlib_result_2.rc != 0 and (dltlib_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length) == 0"
 
 - include: iasp.yml

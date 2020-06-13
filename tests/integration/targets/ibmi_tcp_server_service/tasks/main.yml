@@ -50,7 +50,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
       register: sql_result  
       until: sql_result.row | length == 1
       retries: 5
-      delay: 180    
+      delay: 300    
 
     - name: TC02 start host server when the host server is running
       ibmi_tcp_server_service:
@@ -217,7 +217,8 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
         extra_parameters: 'abc abc'
         joblog: true
       register: neg_result
-      failed_when: "'CPD0044' not in neg_result.stderr"
+      #failed_when: "'CPD0044' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: TC16 with invalid joblog
       ibmi_tcp_server_service:
@@ -233,4 +234,5 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
         state: 'started'
         joblog: true
       register: neg_result
-      failed_when: "'CPD0094' not in neg_result.stderr"
+      #failed_when: "'CPD0094' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0094') | map(attribute='MESSAGE_ID') | list | length ==0"

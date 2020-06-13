@@ -6,8 +6,8 @@
 
 .. _ibmi_end_subsystem_module:
 
-ibmi_end_subsystem -- end a subsystem
-=====================================
+ibmi_end_subsystem -- End an active subsystem.
+==============================================
 
 
 .. contents::
@@ -17,7 +17,7 @@ ibmi_end_subsystem -- end a subsystem
 
 Synopsis
 --------
-- the ``ibmi_end_subsystem`` module end a subsystem of the target ibmi node.
+- The ``ibmi_end_subsystem`` module ends an active subsystem.
 
 
 
@@ -27,13 +27,7 @@ Parameters
 
      
 controlled_end_delay_time
-  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation
-
-  If this amount of time is exceeded and the end operation is not complete,
-
-  any jobs still being processed in the subsystem are ended immediately
-
-  If the value is greater than 99999, '*NOLIMIT' will be used in ENDSBS commnad
+  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, ``'*NOLIMIT'`` will be used in ENDSBS command DELAY parameter.
 
 
   | **required**: false
@@ -43,19 +37,19 @@ controlled_end_delay_time
 
      
 end_subsystem_option
-  Specifies the options to take when ending the active subsystems
+  Specifies the options to take when ending the active subsystems.
 
 
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: [u'*DFT']
+  | **default**: ['*DFT']
   | **choices**: *DFT, *NOJOBLOG, *CHGPTY, *CHGTSL
 
 
      
 how_to_end
-  Specifies whether jobs in the subsystem are ended in a controlled manner or immediately
+  Specifies whether jobs in the subsystem are ended in a controlled manner or immediately.
 
 
   | **required**: false
@@ -66,7 +60,7 @@ how_to_end
 
      
 joblog
-  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  If set to ``true``, output the avaiable job log even the rc is 0(success).
 
 
   | **required**: false
@@ -75,11 +69,7 @@ joblog
 
      
 parameters
-  The parameters that ENDSBS command will take
-
-  Other than options above, all other parameters need to be specified here
-
-  The default values of parameters for ENDSBS will be taken if not specified
+  The parameters that ENDSBS command will take. Other than the options above, all other parameters need to be specified here. The default values of parameters for ENDSBS will be taken if not specified.
 
 
   | **required**: false
@@ -88,7 +78,7 @@ parameters
 
      
 subsystem
-  The name of the subsystem description
+  The name of the subsystem description.
 
 
   | **required**: True
@@ -102,11 +92,11 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: End the subsystem QBATCH
+   - name: End the subsystem QBATCH.
      ibmi_end_subsystem:
        subsystem: QBATCH
 
-   - name: End a subsystem with options
+   - name: End a subsystem with options.
      ibmi_end_subsystem:
        subsystem: QBATCH
        how_to_end: '*IMMED'
@@ -117,9 +107,9 @@ Notes
 -----
 
 .. note::
-   This module is NOT ALLOWED to end ALL subsystems, use the ``ibmi_cl_command`` module instead
+   This module is NOT ALLOWED to end ALL subsystems, use the ``ibmi_cl_command`` module instead.
 
-   This module is non-blocking, the end subsystem may still be in progress, use ``ibmi_display_subsystem_job`` module to check the status
+   This module is non-blocking, the ending subsystem may still be in progress, use ``ibmi_display_subsystem`` module to check the status.
 
 
 See Also
@@ -127,7 +117,7 @@ See Also
 
 .. seealso::
 
-   - :ref:`ibmi_end_subsystem_module`
+   - :ref:`ibmi_display_subsystem, ibmi_start_subsystem_module`
 
 
 Return Values
@@ -136,8 +126,55 @@ Return Values
 
    
                               
+       stdout
+        | The standard output of the end subsystem command.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF0943: Ending of subsystem QBATCH in progress.
+
+            
+      
+      
+                              
+       stderr
+        | The standard error the end subsystem command.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF1054: No subsystem MYJOB active.
+
+            
+      
+      
+                              
+       rc
+        | The task return code (0 means success, non-zero means failure).
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
+            
+      
+      
+                              
+       stdout_lines
+        | The standard output split in lines.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF0943: Ending of subsystem QBATCH in progress."]
+            
+      
+      
+                              
        stderr_lines
-        | The standard error split in lines
+        | The standard error split in lines.
       
         | **returned**: always
         | **type**: list      
@@ -151,40 +188,7 @@ Return Values
       
                               
        job_log
-        | the job_log
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
-
-            
-      
-      
-                              
-       stderr
-        | The standard error the end subsystem command
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPF1054: No subsystem MYJOB active.
-
-            
-      
-      
-                              
-       stdout
-        | The standard output of the end subsystem command
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPF0943: Ending of subsystem QBATCH in progress.
-
-            
-      
-      
-                              
-       stdout_lines
-        | The standard output split in lines
+        | The IBM i job log of the task executed.
       
         | **returned**: always
         | **type**: list      
@@ -192,18 +196,7 @@ Return Values
 
               .. code-block::
 
-                       ["CPF0943: Ending of subsystem QBATCH in progress."]
-            
-      
-      
-                              
-       rc
-        | The task return code (0 means success, non-zero means failure)
-      
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
-
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         

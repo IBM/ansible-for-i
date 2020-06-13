@@ -26,7 +26,7 @@
 
     - name: delete libraries 
       ibmi_cl_command: 
-        cmd: "dltlib lib({{item}})"
+        cmd: "QSYS/DLTLIB LIB({{item}})"
         joblog: 'true'
       with_items: 
         - SAVRST

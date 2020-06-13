@@ -14,7 +14,7 @@
     ibmi_fix_imgclg:
       src: '{{ remote_dir }}' 
       virtual_image_name_list: '{{ base_image_list[0]}}'
-      product_id: '{{base_ptf_info.keys()}}'
+      product_id: '{{base_ptf_info.keys() | list }}'
       fix_omit_list: [{}]
       use_temp_path: false
       apply_type: "*IMMDLY"
@@ -49,7 +49,7 @@
     ibmi_fix_imgclg:
       src: '{{ remote_dir }}' 
       virtual_image_name_list: '{{ base_image_list[0]}}'
-      product_id: '{{base_ptf_info.keys()}}'
+      product_id: '{{base_ptf_info.keys() | list}}'
       fix_omit_list: [{}]
       use_temp_path: true
       apply_type: "*IMMONLY"

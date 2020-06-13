@@ -36,11 +36,12 @@
       asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
       #joblog: true
     register: rstobj_result
-    failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+    #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+    failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length ==0"
 
   - name: TC22 verify all objects have been restored
     ibmi_sql_query:
-      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') );"
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
       database: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
     register: sql_query_result
 
@@ -112,7 +113,7 @@
 
   - name: TC27 verify all objects have been restored
     ibmi_sql_query:
-      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') );"
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
       database: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
       expected_row_count: 6
     register: sql_query_result

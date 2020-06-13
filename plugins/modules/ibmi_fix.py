@@ -73,6 +73,11 @@ options:
     choices: ['*TEMP', '*PERM']
     type: 'str'
     default: '*TEMP'
+  joblog:
+    description:
+      - The job log of the job executing the task will be returned even rc is zero if it is set to true.
+    type: bool
+    default: false
 notes:
    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 seealso:
@@ -140,6 +145,35 @@ rc:
     type: int
     sample: 255
     returned: always
+job_log:
+    description: The job log of the job executes the task.
+    returned: always
+    type: list
+    sample: [
+        {
+            "FROM_INSTRUCTION": "318F",
+            "FROM_LIBRARY": "QSYS",
+            "FROM_MODULE": "",
+            "FROM_PROCEDURE": "",
+            "FROM_PROGRAM": "QWTCHGJB",
+            "FROM_USER": "CHANGLE",
+            "MESSAGE_FILE": "QCPFMSG",
+            "MESSAGE_ID": "CPD0912",
+            "MESSAGE_LIBRARY": "QSYS",
+            "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.",
+            "MESSAGE_SUBTYPE": "",
+            "MESSAGE_TEXT": "Printer device PRT01 not found.",
+            "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897",
+            "MESSAGE_TYPE": "DIAGNOSTIC",
+            "ORDINAL_POSITION": "5",
+            "SEVERITY": "20",
+            "TO_INSTRUCTION": "9369",
+            "TO_LIBRARY": "QSYS",
+            "TO_MODULE": "QSQSRVR",
+            "TO_PROCEDURE": "QSQSRVR",
+            "TO_PROGRAM": "QSQSRVR"
+        }
+    ]
 stdout_lines:
     description: The task standard output split in lines
     type: list
@@ -162,6 +196,7 @@ HAS_IBM_DB = True
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
 try:
     from itoolkit import iToolKit
@@ -177,7 +212,7 @@ try:
     import ibm_db_dbi as dbi
 except ImportError:
     HAS_IBM_DB = False
-
+__ibmi_module_version__ = "1.0.0-beta1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -187,85 +222,8 @@ IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR = 257
 IBMi_JOB_STATUS_NOT_EXPECTED = 258
 
 
-def interpret_return_code(rc):
-    if rc == IBMi_COMMAND_RC_SUCCESS:
-        return 'Success'
-    elif rc == IBMi_COMMAND_RC_ERROR:
-        return 'Generic failure'
-    elif rc == IBMi_COMMAND_RC_UNEXPECTED:
-        return 'Unexpected error'
-    elif rc == IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG:
-        return "iToolKit result dict does not have key 'joblog'"
-    elif rc == IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR:
-        return "iToolKit result dict does not have key 'error'"
-    else:
-        return "Unknown error"
-
-
-def itoolkit_run_sql(sql):
-    conn = dbi.connect()
-    db_itransport = DatabaseTransport(conn)
-    itool = iToolKit()
-
-    itool.add(iSqlQuery('query', sql, {'error': 'on'}))
-    itool.add(iSqlFetch('fetch'))
-    itool.add(iSqlFree('free'))
-
-    itool.call(db_itransport)
-
-    command_output = itool.dict_out('fetch')
-
-    rc = IBMi_COMMAND_RC_UNEXPECTED
-    out = ''
-    err = ''
-    if 'error' in command_output:
-        command_error = command_output['error']
-        if 'joblog' in command_error:
-            rc = IBMi_COMMAND_RC_ERROR
-            err = command_error['joblog']
-        else:
-            # should not be here, must xmlservice has internal error
-            rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
-            err = "iToolKit result dict does not have key 'joblog', the output is %s" % command_output
-    else:
-        rc = IBMi_COMMAND_RC_SUCCESS
-        out = command_output['row']
-
-    return rc, out, err
-
-
 def itoolkit_run_command(connection_id, command):
-    # conn = dbi.connect()
-    conn = connection_id
-    # itransport = iDB2Call(conn)
-    itransport = DatabaseTransport(conn)
-    itool = iToolKit()
-    itool.add(iCmd('command', command, {'error': 'on'}))
-    itool.call(itransport)
-
-    rc = IBMi_COMMAND_RC_UNEXPECTED
-    out = ''
-    err = ''
-
-    command_output = itool.dict_out('command')
-
-    if 'success' in command_output:
-        rc = IBMi_COMMAND_RC_SUCCESS
-        out = command_output['success']
-    elif 'error' in command_output:
-        command_error = command_output['error']
-        if 'joblog' in command_error:
-            rc = IBMi_COMMAND_RC_ERROR
-            err = command_error['joblog']
-        else:
-            # should not be here, must xmlservice has internal error
-            rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
-            err = "iToolKit result dict does not have key 'joblog', the output is %s" % command_output
-    else:
-        # should not be here, must xmlservice has internal error
-        rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR
-        err = "iToolKit result dict does not have key 'error', the output is %s" % command_output
-
+    rc, out, err = ibmi_util.itoolkit_run_command(connection_id, command)
     return rc, out, err
 
 
@@ -375,24 +333,17 @@ def return_fix_information(db_connection, product_id, ptf_list):
     out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
 
     out = []
-    for result in out_result_set:
-        result_map = {"PTF_PRODUCT_ID": result[0], "PTF_IDENTIFIER": result[1],
-                      "PTF_LOADED_STATUS": result[2], "PTF_SAVE_FILE": result[3],
-                      "PTF_IPL_ACTION": result[4], "PTF_ACTION_PENDING": result[5],
-                      "PTF_ACTION_REQUIRED": result[6], "PTF_IPL_REQUIRED": result[7],
-                      "PTF_STATUS_TIMESTAMP": result[8],
-                      "PTF_CREATION_TIMESTAMP": result[9], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[10]
-                      }
-        out.append(result_map)
+    if (out_result_set is not None):
+        for result in out_result_set:
+            result_map = {"PTF_PRODUCT_ID": result[0], "PTF_IDENTIFIER": result[1],
+                          "PTF_LOADED_STATUS": result[2], "PTF_SAVE_FILE": result[3],
+                          "PTF_IPL_ACTION": result[4], "PTF_ACTION_PENDING": result[5],
+                          "PTF_ACTION_REQUIRED": result[6], "PTF_IPL_REQUIRED": result[7],
+                          "PTF_STATUS_TIMESTAMP": result[8],
+                          "PTF_CREATION_TIMESTAMP": result[9], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[10]
+                          }
+            out.append(result_map)
     return out, err
-
-
-def run_a_list_of_commands(module, cmd_key_list, cmd_map):
-
-    for item in cmd_key_list:
-        cur_cmd = cmd_map[item]
-        args = ['system', cur_cmd]
-        module.run_command(args, use_unsafe_shell=False)
 
 
 def main():
@@ -405,6 +356,7 @@ def main():
             save_file_lib=dict(type='str', default='QGPL'),
             delayed_option=dict(type='str', default='*NO', choices=['*YES', '*NO']),
             temp_or_perm=dict(type='str', default='*TEMP', choices=['*TEMP', '*PERM']),
+            joblog=dict(type='bool', default=False),
             operation=dict(type='str', default='load_and_apply', choices=['load_and_apply',
                                                                           'load_only', 'apply_only',
                                                                           'remove',
@@ -433,13 +385,14 @@ def main():
     delayed_option = module.params['delayed_option']
     temp_or_perm = module.params['temp_or_perm']
     operation = module.params['operation']
+    joblog = module.params['joblog']
 
     if operation in ['load_and_apply', 'load_only', 'remove']:
         if product_id == '*ALL':
             module.fail_json(msg="product_id cannot be *ALL when operation is remove, load_and_apply and load_only.")
 
     startd = datetime.datetime.now()
-
+    out = ''
     connection_id = None
     try:
         connection_id = dbi.connect()
@@ -456,12 +409,9 @@ def main():
                                    ptf_list_to_omit, "*SAVF", savf_obj, delayed_option, temp_or_perm,
                                    operation_bool_map[operation][0], operation_bool_map[operation][1])
 
-        # Need to query the status of the PTF
-
     elif operation in ['remove']:
         rc, out, err = remove_ptf(connection_id, module, product_id, ptf_list_to_select, ptf_list_to_omit,
                                   temp_or_perm=temp_or_perm, delayed_option=delayed_option)
-        # Need to query the status of the PTF
 
     # return the status of the ptf
     if ptf_list_to_select is not None:
@@ -476,7 +426,10 @@ def main():
         else:
             rc = IBMi_COMMAND_RC_SUCCESS
 
-    # job_log, get_joblog_err = db2i_tools.get_job_log(connection_id, "*")
+    if joblog or (rc != IBMi_COMMAND_RC_SUCCESS):
+        job_log = ibmi_util.itoolkit_get_job_log(connection_id, startd)
+    else:
+        job_log = []
 
     if connection_id is not None:
         try:
@@ -495,6 +448,7 @@ def main():
             stdout=out,
             stderr=err,
             rc=rc,
+            job_log=job_log,
             # changed=True,
         )
         module.fail_json(msg='non-zero return code', **result_failed)
@@ -505,7 +459,7 @@ def main():
             delta=str(delta),
             ptf_list=ptf_list,
             rc=rc,
-            # job_log=job_log,
+            job_log=job_log,
             # changed=True,
         )
         module.exit_json(**result_success)

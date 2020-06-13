@@ -137,6 +137,7 @@ import datetime
 import re
 import time
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
 try:
     from itoolkit import iToolKit
@@ -152,6 +153,7 @@ try:
 except ImportError:
     HAS_IBM_DB = False
 
+__ibmi_module_version__ = "1.0.0-beta1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -178,41 +180,6 @@ def interpret_return_code(rc):
         return "The returned status of the submitted job is not expected. "
     else:
         return "Unknown error"
-
-
-# def retrieve_job_attribute(job_number, job_user, job_name):
-#     conn = dbi.connect()
-#     itool = iToolKit()
-#     itool.add(iCmd('rtvjoba', 'RTVJOBA JOB(' + job_name + ') USER(' + job_user + ') NBR(' + job_number + ') '
-#                    'USRLIBL(?) SYSLIBL(?) CCSID(?N) OUTQ(?)'))
-#     # itransport = DatabaseTransport(conn)
-#     itransport = DirectTransport()
-#     itool.call(itransport)
-#
-#     # output
-#     rtvjoba = itool.dict_out('rtvjoba')
-#     print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-#     print(rtvjoba)
-#     if 'error' in rtvjoba:
-#         print(rtvjoba['error'])
-#         exit()
-#     elif 'row' in rtvjoba:
-#         rtvjoba_vals = rtvjoba['row']
-#
-#         for item_dict in rtvjoba_vals:
-#             for key in item_dict:
-#                 print(item_dict[key])
-#
-#         print('hahahahahahhahahahahhaah')
-#
-#         # print('value:' + rtvjoba)
-#         # print('USRLIBL = ' + rtvjoba_vals['USRLIBL'])
-#         # print('SYSLIBL = ' + rtvjoba_vals['SYSLIBL'])
-#         # print('CCSID   = ' + rtvjoba_vals['CCSID'])
-#         # print('OUTQ    = ' + rtvjoba_vals['OUTQ'])
-#     else:
-#         print('ERRORRRRRRRRRRRRRRRRRRR')
-#     print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 
 def itoolkit_run_sql(sql):
@@ -273,6 +240,8 @@ def main():
         ),
         supports_check_mode=True,
     )
+
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
 
     if HAS_ITOOLKIT is False:
         module.fail_json(msg="itoolkit package is required")
@@ -335,26 +304,35 @@ def main():
 
     submitted_job = re.search(r'\d{6}/[A-Za-z0-9#_]{1,10}/[A-Za-z0-9#_]{1,10}', out)
     job_submitted = submitted_job.group()
-
+    ibmi_util.log_debug("job_submitted: " + job_submitted, module._name)
     sql_get_job_info = "SELECT V_JOB_STATUS as \"job_status\", " \
                        "V_ACTIVE_JOB_STATUS as \"active_job_status\", " \
                        "V_RUN_PRIORITY as \"run_priority\", " \
                        "V_SBS_NAME as \"sbs_name\", " \
                        "V_CLIENT_IP_ADDRESS as \"ip_address\"" \
                        " FROM TABLE(QSYS2.GET_JOB_INFO('" + job_submitted + "')) A"
-    rc, out, err_msg = itoolkit_run_sql(sql_get_job_info)
+    rc, out, err_msg, query_job_log = ibmi_util.itoolkit_run_sql_once(sql_get_job_info)
 
     time_out_in_seconds = convert_wait_time_to_seconds(time_out)
+    returned_job_status = ''
+    if isinstance(out, list) and len(out) == 1:
+        returned_job_status = out[0]['job_status'].strip()
+    ibmi_util.log_debug("job_status: " + returned_job_status, module._name)
 
-    while out['job_status'] not in wait_for_job_status:
-        rc, out, err_msg = itoolkit_run_sql(sql_get_job_info)
+    while returned_job_status not in wait_for_job_status:
+        rc, out, err_msg, query_job_log = ibmi_util.itoolkit_run_sql_once(sql_get_job_info)
+        returned_job_status = ''
+        if isinstance(out, list) and len(out) == 1:
+            returned_job_status = out[0]['job_status'].strip()
+        ibmi_util.log_debug("job_status: " + returned_job_status, module._name)
         wait_for_certain_time(check_interval)
         current_time = datetime.datetime.now()
         running_time = (current_time - startd).seconds
         if running_time > time_out_in_seconds:
             break
 
-    if out['job_status'] not in wait_for_job_status:
+    ibmi_util.log_debug("job_status: " + returned_job_status, module._name)
+    if returned_job_status not in wait_for_job_status:
         rc = IBMi_JOB_STATUS_NOT_EXPECTED
 
     endd = datetime.datetime.now()

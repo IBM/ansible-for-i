@@ -205,7 +205,9 @@
         extra_parameters: 'abc abc'
         joblog: true
       register: neg_result
-      failed_when: "'CPD0044' not in neg_result.stderr"
+      #failed_when: "'CPD0044' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length == 0"
+
 
     - name: TC16 with invalid joblog
       ibmi_host_server_service:

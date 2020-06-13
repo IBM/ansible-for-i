@@ -4,7 +4,6 @@
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
 
-- include: iasp.yml
 - block: 
       
     - include: install_rpm.yml 
@@ -20,33 +19,42 @@
       ibmi_cl_command: 
         cmd: QSYS/CRTJRN JRN(QGPL/ANSIJSNJRN) JRNRCV(QGPL/ANSIJSNRCV) TEXT('JOURNAL FOR ANSIBLE')   
 
+    - name: TC00 check gathers query
+      ibmi_sql_query:
+        sql: "SELECT * FROM QSYS2.SYSCATALOGS"
+      register: sql_query_result_8
+
+    - name: create journal
+      debug: 
+        msg: "{{sql_query_result_8.row}}"  
+
     - name: TC01 run sql execute module
       ibmi_sql_execute:
-        sql: "create table ansible(id INT not null, name varchar(8), gender varchar(8))" 
+        sql: "create table qgpl.ansible(id INT not null, name varchar(8), gender varchar(8))" 
       register: sql_execute_result_2
-      ignore_errors: True
-   
+      failed_when: "sql_execute_result_2.rc !=0 and sql_execute_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL7905') | map(attribute='MESSAGE_ID') | list | length ==0"
+
     - name: TC01 start journal
       ibmi_cl_command: 
         cmd: QSYS/STRJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN)  
 
     - name: TC02 run the SQL command to insert a row
       ibmi_sql_execute:
-        sql: "INSERT INTO ansible VALUES('1', 'User1', 'Female')"
+        sql: "INSERT INTO qgpl.ansible VALUES('1', 'User1', 'Female')"
 
     - name: TC03 run the SQL command to query a table
       ibmi_sql_query:
-        sql: "select * from ansible"
+        sql: "select * from qgpl.ansible"
         expected_row_count: 1
       register: sql_query_result
 
     - name: TC04 run the SQL command to insert the row again
       ibmi_sql_execute:
-        sql: "INSERT INTO ansible VALUES('2', 'User2', 'Male')"
+        sql: "INSERT INTO qgpl.ansible VALUES('2', 'User2', 'Male')"
 
     - name: TC05 run the SQL command to query the table and check row count
       ibmi_sql_query:
-        sql: "select * from ansible"
+        sql: "select * from qgpl.ansible"
         expected_row_count: 2
 
     - include: check_rpm.yml
@@ -84,7 +92,8 @@
         sql: "SELECT * FROM QSYS2.ABC" 
         joblog: true
       register: sql_execute_result_9
-      failed_when: "'SQL0204' not in sql_execute_result_9.stderr"    
+      #failed_when: "'SQL0204' not in sql_execute_result_9.stderr"    
+      failed_when: "sql_execute_result_9.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: TC09 run a complex SQL command to query IPL
       ibmi_sql_query:
@@ -125,7 +134,8 @@ AS next_ipl_indicator FROM abnormal;"
       ibmi_sql_query:
         sql: "SELECT * FROM QSYS2.ABC" 
       register: sql_query_error_result_2
-      failed_when: "'SQL0204' not in sql_query_error_result_2.stderr"
+      #failed_when: "'SQL0204' not in sql_query_error_result_2.stderr"
+      failed_when: "sql_query_error_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length ==0"
 
     - name: TC11 run sql query module without sql option
       ibmi_sql_query:
@@ -146,7 +156,7 @@ AS next_ipl_indicator FROM abnormal;"
     - name: TC12 assert the previous task failed because lacks of required parameter sql
       assert:
         that:
-          - sql_query_result_6.rc == 255
+          - sql_query_result_6.rc != 0
     
     - name: TC13 run sql query with a valid sql and an invalid expected_row_count
       ibmi_sql_query:
@@ -204,7 +214,7 @@ AS next_ipl_indicator FROM abnormal;"
     - name: TC17 assert the previous task failed because lacks of required parameter sql
       assert:
         that:
-          - ibmi_sql_execute_4.rc == 255 
+          - ibmi_sql_execute_4.rc != 0 
     
     - name: TC18 run sql execute module with valid sql, expected_row_count and an invalid option abc
       ibmi_sql_execute:
@@ -218,6 +228,7 @@ AS next_ipl_indicator FROM abnormal;"
         that:
           - "'Unsupported parameters' in ibmi_sql_execute_5.msg"
 
+    - include: iasp.yml
   vars:
     required_rpms: [itoolkit, ibm_db]
     python_version: "{{ansible_python_interpreter.split('/')[-1]}}"   
@@ -235,7 +246,7 @@ AS next_ipl_indicator FROM abnormal;"
  
     - name: drop the table
       ibmi_sql_execute:
-        sql: "drop table ansible"
+        sql: "drop table qgpl.ansible"
       ignore_errors: True
 
     - name: delete journal

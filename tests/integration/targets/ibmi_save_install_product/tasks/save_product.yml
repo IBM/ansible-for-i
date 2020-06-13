@@ -63,24 +63,28 @@
     product: '5770JV1'
     savf_name: 'OPTBASE'
     savf_library: 'SAVJV11'
+    language: '2924'
 
 - name: restore lpp using the saved savf
   ibmi_install_product_from_savf:
     product: 5770JV1
     savf_name: 'OPTBASE'
     savf_library: 'SAVJV11'
+    language: '2924'
 
 - name: save lpp to an existing savf with data
   ibmi_save_product_to_savf:
     product: '5770JV1'
     savf_name: 'OPTBASE'
     savf_library: 'SAVJV11'
+    language: '2924'
 
 - name: restore lpp using the saved savf
   ibmi_install_product_from_savf:
     product: 5770JV1
     savf_name: 'OPTBASE'
     savf_library: 'SAVJV11'
+    language: '2924'
 
 - name: uninstall the product with default values
   ibmi_uninstall_product:
