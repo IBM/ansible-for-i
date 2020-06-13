@@ -239,7 +239,7 @@ try:
 except ImportError:
     HAS_IBM_DB = False
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.0.0-beta1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

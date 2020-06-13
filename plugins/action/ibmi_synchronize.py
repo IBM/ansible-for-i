@@ -15,7 +15,7 @@ from ansible.plugins.action import ActionBase
 from ansible.plugins.loader import connection_loader
 from ansible.utils.display import Display
 from ansible.inventory.host import Host
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.0.0-beta1"
 display = Display()
 
 

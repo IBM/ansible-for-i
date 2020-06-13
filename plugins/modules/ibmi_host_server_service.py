@@ -147,7 +147,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.0.0-beta1"
 IBMi_STRSVR = "QSYS/STRHOSTSVR"
 IBMi_ENDSVR = "QSYS/ENDHOSTSVR"
 IBMi_HOST_SERVER_LIST = ["*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP"]
