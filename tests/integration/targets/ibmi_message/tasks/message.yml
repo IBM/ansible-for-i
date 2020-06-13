@@ -132,7 +132,6 @@
       - neg_result.delta is defined
       - neg_result.stderr is defined
       - neg_result.message_info | length == 0 
-      - "'Row not found' in neg_result.stderr"
 
 - name: TC24 find msg job with not existing library
   ibmi_message:
@@ -146,7 +145,8 @@
 - name: TC24 assert returned option
   assert:
     that:
-      - "'Row not found' in neg_result.stderr"
+      #- "'Row not found' in neg_result.stderr"
+      - neg_result.message_info | length == 0
 
 - name: TC25 find msg job with not existing message text
   ibmi_message:
@@ -163,7 +163,7 @@
   assert:
     that:
       - neg_result.message_info | length == 0
-      - "'Row not found' in neg_result.stderr" 
+      #- "'Row not found' in neg_result.stderr"
 
 - name: TC26 find msg job with not-existing parameters
   ibmi_message:

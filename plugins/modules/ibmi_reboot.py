@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -15,10 +15,10 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 module: ibmi_reboot
-short_description: Reboot a machine
+short_description: Reboot an IBM i machine
+version_added: "2.8"
 description:
-    - Reboot a IBMi machine, wait for it to go down, come back up, and respond to commands.
-version_added: "1.1"
+    - Reboot a IBM i machine, wait for it to go down, come back up, and respond to commands.
 options:
   pre_reboot_delay:
     description:
@@ -53,11 +53,11 @@ options:
     description:
       - Message to display to users before reboot.
     type: str
-    default: Reboot initiated by Ansible
+    default: 'Reboot initiated by Ansible'
   how_to_end:
     description:
       - Specifies whether the system allows the active subsystem to end processing of active jobs in a controlled manner.
-      - or whether the system ends the jobs immediately. In either case, the system does perform certain job-cleanup functions.
+        or whether the system ends the jobs immediately. In either case, the system does perform certain job-cleanup functions.
     type: str
     default: '*IMMED'
     choices: ['*IMMED', '*CNTRLD']
@@ -101,9 +101,9 @@ options:
     type: str
     default: ''
 notes:
-- ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under[defaults] section.
-- Be careful to use '*CNTRLD' for option how_to_end,
-- you need to specify the appropriate value for all the timout options according to the system performance.
+    - ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section.
+    - Be careful to use '*CNTRLD' for option how_to_end,
+      you need to specify the appropriate value for all the timout options according to the system performance.
 seealso:
 - module: reboot
 author:

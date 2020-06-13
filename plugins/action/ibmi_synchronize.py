@@ -1,5 +1,5 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
+# Author, Peng Zengyu <pzypeng@cn.ibm.com>
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -15,7 +15,7 @@ from ansible.plugins.action import ActionBase
 from ansible.plugins.loader import connection_loader
 from ansible.utils.display import Display
 from ansible.inventory.host import Host
-
+__ibmi_module_version__ = "1.0.0-beta1"
 display = Display()
 
 
@@ -29,6 +29,8 @@ class ActionModule(ActionBase):
     ))
 
     def run(self, tmp=None, task_vars=None):
+
+        display.debug("version: " + __ibmi_module_version__)
 
         if task_vars is None:
             task_vars = dict()

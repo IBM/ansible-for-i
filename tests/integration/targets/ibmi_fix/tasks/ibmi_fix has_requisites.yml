@@ -53,7 +53,7 @@
 - name: allow apply without multiple fix in the list
   ibmi_fix:
     product_id: "*ALL"
-    fix_list: ['{{ immed_ptf_with_requisite_number }}', '{{requiste_ptf_number}}']
+    #fix_list: ['{{ immed_ptf_with_requisite_number }}', '{{requiste_ptf_number}}']
     operation: 'apply_only'
   register: fix_result 
 
@@ -112,7 +112,8 @@
     #operation: 'load_and_apply'
   register: fix_result 
   # PTF 5770SS1-SI70931 *ONLY not found on specified device
-  failed_when: "'CPF3921' not in fix_result.stderr"
+  #failed_when: "'CPF3921' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3921') | map(attribute='MESSAGE_ID') | list | length == 0"  
 
 - name: install fix with all options
   ibmi_fix:
@@ -125,7 +126,8 @@
     operation: 'load_only'
     temp_or_perm: '*TEMP'
   register: fix_result
-  failed_when: "'OMIT and SELECT parameters cannot be used together' not in fix_result.stderr"
+  #failed_when: "'OMIT and SELECT parameters cannot be used together' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3529') | map(attribute='MESSAGE_ID') | list | length == 0"  
 
 - name: query immed ptf with only requried options
   ibmi_fix: 

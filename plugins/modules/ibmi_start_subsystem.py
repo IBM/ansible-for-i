@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -15,26 +15,26 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 module: ibmi_start_subsystem
-short_description: start a subsystem
+short_description: Start an inactive subsystem
+version_added: "2.8"
 description:
-    - the C(ibmi_start_subsystem) module start a subsystem of the target ibmi node.
-version_added: "1.1"
+    - the C(ibmi_start_subsystem) module start an inactive subsystem.
 options:
   subsystem:
     description:
-      - The name of the subsystem description
+      - The name of the subsystem description.
     type: str
     required: yes
   library:
     description:
-      - Specify the library where the subsystem description is located
+      - Specify the library where the subsystem description is located.
     type: str
     default: '*LIBL'
   joblog:
     description:
-      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
+      - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
-    default: false
+    default: False
 seealso:
 - module: ibmi_end_subsystem
 author:
@@ -42,11 +42,11 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: Start the subsystem QBATCH
+- name: Start the subsystem QBATCH.
   ibmi_start_subsystem:
     subsystem: QBATCH
 
-- name: Start a user defined subsystem, which the subsystem description is MYSBS, located at library MYLIB
+- name: Start a user defined subsystem, which the subsystem description is MYSBS, located at library MYLIB.
   ibmi_start_subsystem:
     subsystem: MYSBS
     library: MYLIB
@@ -54,37 +54,37 @@ EXAMPLES = r'''
 
 RETURN = r'''
 stdout:
-    description: The standard output of the start subsystem command
+    description: The standard output of the start subsystem command.
     type: str
     sample: 'CPF0902: Subsystem QBATCH in library QSYS being started.'
     returned: always
 stderr:
-    description: The standard error the start subsystem command
+    description: The standard error the start subsystem command.
     type: str
     sample: 'CPF1010: Subsystem name QBATCH active.'
     returned: always
 rc:
-    description: The task return code (0 means success, non-zero means failure)
+    description: The task return code (0 means success, non-zero means failure).
     type: int
     sample: 255
     returned: always
 stdout_lines:
-    description: The standard output split in lines
+    description: The standard output split in lines.
     type: list
     sample: [
         "CPF0902: Subsystem QINTER in library QSYS being started."
     ]
     returned: always
 stderr_lines:
-    description: The standard error split in lines
+    description: The standard error split in lines.
     type: list
     sample: [
         "CPF1080: Library MYLIB not found."
     ]
     returned: always
 job_log:
-    description: the job_log
-    type: str
+    description: The IBM i job log of the task executed.
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -115,6 +115,8 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 
 def main():
     module = AnsibleModule(
@@ -126,8 +128,10 @@ def main():
         supports_check_mode=True,
     )
 
-    subsystem = module.params['subsystem']
-    library = module.params['library']
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
+
+    subsystem = module.params['subsystem'].strip().upper()
+    library = module.params['library'].strip().upper()
     joblog = module.params['joblog']
     if len(subsystem) > 10:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of subsystem exceeds 10 characters")

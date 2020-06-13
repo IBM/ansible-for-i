@@ -16,15 +16,15 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_device_vary
-short_description: vary on or off target device on a remote IBMi node
-version_added: 2.10
+short_description: Vary on or off target device
+version_added: 2.8
 description:
-  - vary on or off target device on a remote IBMi node.
-  - For non-IBMi targets, no need
+  - Vary on or off target device.
+  - For non-IBM i targets, no need.
 options:
   device_list:
     description:
-      - The name of the device
+      - The name of the device.
     type: list
     elements: str
     required: yes
@@ -39,7 +39,7 @@ options:
     required: yes
   extra_parameters:
     description:
-      - extra parameter is appended at the end of VARYCFG command
+      - Extra parameter is appended at the end of VARYCFG command.
     type: str
     default: ' '
   joblog:
@@ -52,7 +52,7 @@ seealso:
 - module: service
 
 author:
-- Jin Yi Fan(@jinyifan)
+- Jin Yifan(@jinyifan)
 '''
 
 EXAMPLES = r'''
@@ -65,9 +65,9 @@ EXAMPLES = r'''
 
 RETURN = r'''
 job_log:
-    description: the job_log
+    description: The IBM i job log of the task executed.
     returned: always
-    type: str
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -77,7 +77,6 @@ job_log:
             "FROM_USER": "CHANGLE",
             "MESSAGE_FILE": "QCPFMSG",
             "MESSAGE_ID": "CPD0912",
-            "MESSAGE_KEY": "00000379",
             "MESSAGE_LIBRARY": "QSYS",
             "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.",
             "MESSAGE_SUBTYPE": "",
@@ -93,49 +92,49 @@ job_log:
             "TO_PROGRAM": "QSQSRVR"
         }]
 start:
-    description: The command execution start time
+    description: The command execution start time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:53.757435'
 end:
-    description: The command execution end time
+    description: The command execution end time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:54.064969'
 delta:
-    description: The command execution delta time
+    description: The command execution delta time.
     returned: always
     type: str
     sample: '0:00:00.307534'
 stdout:
-    description: The command standard output
+    description: The command standard output.
     returned: always
     type: str
     sample: '+++ success VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON)'
 stderr:
-    description: The command standard error
+    description: The command standard error.
     returned: always
     type: str
     sample: 'CPF2111:Library TESTLIB already exists'
 cmd:
-    description: The command executed by the task
+    description: The command executed by the task.
     returned: always
     type: str
     sample: 'VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON) '
 rc:
-    description: The command return code (0 means success, non-zero means failure)
+    description: The command return code (0 means success, non-zero means failure).
     returned: always
     type: int
     sample: 255
 stdout_lines:
-    description: The command standard output split in lines
+    description: The command standard output split in lines.
     returned: always
     type: list
     sample: [
         "+++ success VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON)"
     ]
 stderr_lines:
-    description: The command standard error split in lines
+    description: The command standard error split in lines.
     returned: always
     type: list
     sample: [
@@ -146,6 +145,8 @@ stderr_lines:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():
@@ -162,6 +163,7 @@ def main():
         supports_check_mode=True,
     )
 
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
     device_list = module.params['device_list']
     status = module.params['status']
     extra_parameters = module.params['extra_parameters']

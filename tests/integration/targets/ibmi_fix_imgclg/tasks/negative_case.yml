@@ -53,7 +53,8 @@
     src: '{{ remote_dir }}' 
     virtual_image_name_list: 'S0240.TXT'
   register: fix_result
-  failed_when: "'No image files added to image catalog ANSIBCLG1' not in fix_result.stderr"
+  #failed_when: "'No image files added to image catalog ANSIBCLG1' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD4F4F') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 - name: install fix with a not existing src folder
   ibmi_fix_imgclg:
@@ -68,7 +69,8 @@
   ibmi_fix_imgclg:
     src: '/tmp/abcdesfg' 
   register: fix_result
-  failed_when: "'No image files added to image catalog ANSIBCLG1' not in fix_result.stderr"
+  #failed_when: "'No image files added to image catalog ANSIBCLG1' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD4F4F') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 - command: rm -rf /tmp/abcdesfg 
 
@@ -90,7 +92,8 @@
     product_id: '5770ABC'
     apply_type: "*IMMDLY"
   register: fix_result
-  failed_when: "'Product 5770ABC *ONLY not installed' not in fix_result.stderr"
+  #failed_when: "'Product 5770ABC *ONLY not installed' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3606') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 - name: install fix with an valid product id but not PTFs in the image match belong to it
   ibmi_fix_imgclg:
@@ -98,7 +101,8 @@
     product_id: '5770TC1'
     apply_type: "*IMMDLY"
   register: fix_result
-  failed_when: "'No PTFs installed.' not in fix_result.stderr"
+  #failed_when: "'No PTFs installed.' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3660') | map(attribute='MESSAGE_ID') | list | length == 0"
 
 - block:
   - name: install fix with a dependent delayed ptf in the image
@@ -111,7 +115,8 @@
       hiper_only: false
       rollback: true
     register: fix_result
-    failed_when: "'CPF3632' not in fix_result.stderr"
+    #failed_when: "'CPF3632' not in fix_result.stderr"
+    failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3632') | map(attribute='MESSAGE_ID') | list | length == 0"
 
   - ibmi_cl_command:
       cmd: "RMVPTF LICPGM(5770999) SELECT({{ptf_number}}) RMV(*PERM)"
@@ -125,9 +130,11 @@
     register: fix_result
     ignore_errors: true
 
-  - assert:
-      that:
-        - "'No PTFs installed.' in fix_result.stderr"
+  # - assert:
+  #     that:
+  #       #- "'No PTFs installed.' in fix_result.stderr"
+  #       - "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3660') | map(attribute='MESSAGE_ID') | list | length >= 1"
+  #   failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length == 0"
 
   - name: install fix with an image without hiper ptf but hiper_only=true
     ibmi_fix_imgclg:
@@ -167,5 +174,6 @@
       virtual_image_name_list: '{{ base_image_list[1]}}' 
       fix_omit_list: [{'5770999': 'MF66740'}]
     register: fix_result
-    failed_when: "'CPF3632' not in fix_result.stderr"
+    #failed_when: "'CPF3632' not in fix_result.stderr"
+    failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3632') | map(attribute='MESSAGE_ID') | list | length == 0"
   when: "ansible_distribution_version == '7' and ansible_distribution_release == '4'"

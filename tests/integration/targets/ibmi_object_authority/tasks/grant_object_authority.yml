@@ -367,7 +367,8 @@
           - "*READ"
           - "*DLT"
       register: neg_result
-      failed_when: "'Value \\'*ALL      \\' for parameter USER not a valid name' not in neg_result.stderr" 
+      #failed_when: "'Value \\'*ALL      \\' for parameter USER not a valid name' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0078') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC25 grant single value with an not existing object
       ibmi_object_authority:
@@ -381,7 +382,8 @@
           - "*READ"
           - "*DLT"
       register: neg_result
-      failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      #failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC26 grant single value with an not existing lib
       ibmi_object_authority:
@@ -395,7 +397,8 @@
           - "*READ"
           - "*DLT"
       register: neg_result
-      failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC27 grant single value with an not existing user
       ibmi_object_authority:
@@ -409,7 +412,8 @@
           - "*READ"
           - "*DLT"
       register: neg_result
-      failed_when: "'User profile ABC not found' not in neg_result.stderr" 
+      #failed_when: "'User profile ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2204') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC27 grant single value with an invalid authority
       ibmi_object_authority:
@@ -504,7 +508,8 @@
           - "*READ"
           - "*DLT"
       register: neg_result
-      failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      #failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC34 revoke single value with an not existing lib
       ibmi_object_authority:
@@ -518,7 +523,8 @@
           - "*READ"
           - "*DLT"
       register: neg_result
-      failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC35 revoke single value with an not existing user
       ibmi_object_authority:
@@ -532,7 +538,8 @@
           - "*READ"
           - "*DLT"
       register: neg_result
-      failed_when: "'User profile ABC not found' not in neg_result.stderr" 
+      #failed_when: "'User profile ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2204') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: TC36 revoke single value with an invalid authority
       ibmi_object_authority:

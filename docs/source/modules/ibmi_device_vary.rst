@@ -6,8 +6,8 @@
 
 .. _ibmi_device_vary_module:
 
-ibmi_device_vary -- vary on or off target device on a remote IBMi node
-======================================================================
+ibmi_device_vary -- Vary on or off target device
+================================================
 
 
 .. contents::
@@ -17,8 +17,8 @@ ibmi_device_vary -- vary on or off target device on a remote IBMi node
 
 Synopsis
 --------
-- vary on or off target device on a remote IBMi node.
-- For non-IBMi targets, no need
+- Vary on or off target device.
+- For non-IBM i targets, no need.
 
 
 
@@ -28,7 +28,7 @@ Parameters
 
      
 device_list
-  The name of the device
+  The name of the device.
 
 
   | **required**: True
@@ -38,7 +38,7 @@ device_list
 
      
 extra_parameters
-  extra parameter is appended at the end of VARYCFG command
+  Extra parameter is appended at the end of VARYCFG command.
 
 
   | **required**: false
@@ -99,8 +99,8 @@ Return Values
 
    
                               
-       stderr_lines
-        | The command standard error split in lines
+       job_log
+        | The IBM i job log of the task executed.
       
         | **returned**: always
         | **type**: list      
@@ -108,57 +108,13 @@ Return Values
 
               .. code-block::
 
-                       ["CPF2111:Library TESTLIB already exists."]
-            
-      
-      
-                              
-       end
-        | The command execution end time
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       job_log
-        | the job_log
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_KEY': '00000379', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'TO_INSTRUCTION': '9369', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'FROM_USER': 'CHANGLE', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'FROM_PROCEDURE': '', 'FROM_INSTRUCTION': '318F', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'TO_LIBRARY': 'QSYS', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
-
-            
-      
-      
-                              
-       stdout
-        | The command standard output
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: +++ success VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON)
-
-            
-      
-      
-                              
-       cmd
-        | The command executed by the task
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON) 
-
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
       
                               
        start
-        | The command execution start time
+        | The command execution start time.
       
         | **returned**: always
         | **type**: str
@@ -168,8 +124,19 @@ Return Values
       
       
                               
+       end
+        | The command execution end time.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
+
+            
+      
+      
+                              
        delta
-        | The command execution delta time
+        | The command execution delta time.
       
         | **returned**: always
         | **type**: str
@@ -179,8 +146,19 @@ Return Values
       
       
                               
+       stdout
+        | The command standard output.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: +++ success VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON)
+
+            
+      
+      
+                              
        stderr
-        | The command standard error
+        | The command standard error.
       
         | **returned**: always
         | **type**: str
@@ -190,8 +168,19 @@ Return Values
       
       
                               
+       cmd
+        | The command executed by the task.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON) 
+
+            
+      
+      
+                              
        rc
-        | The command return code (0 means success, non-zero means failure)
+        | The command return code (0 means success, non-zero means failure).
       
         | **returned**: always
         | **type**: int
@@ -202,7 +191,7 @@ Return Values
       
                               
        stdout_lines
-        | The command standard output split in lines
+        | The command standard output split in lines.
       
         | **returned**: always
         | **type**: list      
@@ -211,6 +200,20 @@ Return Values
               .. code-block::
 
                        ["+++ success VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON)"]
+            
+      
+      
+                              
+       stderr_lines
+        | The command standard error split in lines.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF2111:Library TESTLIB already exists."]
             
       
         

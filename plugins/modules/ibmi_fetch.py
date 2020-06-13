@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Peng Zeng Yu <pzypeng@cn.ibm.com>
+# Author, Peng Zengyu <pzypeng@cn.ibm.com>
 
 from __future__ import absolute_import, division, print_function
 
@@ -15,31 +15,31 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_fetch
-short_description: Fetch objects or a library from a remote IBMi node and store on local
-version_added: 1.0
+short_description: Fetch objects or a library from a remote IBM i node and store on local
+version_added: 2.8
 description:
-     - The ibmi_feth is used for fetching objects or a library as a SAVF from remote IBMi node
-       and storing them locally in a file tree, organized by hostname.
+     - The C(ibmi_feth) is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in
+       a file tree, organized by hostname.
      - Save file that already exists at dest will be overwritten if it is different than the new one.
      - For non-IBMi native targets, use the fetch module instead.
 options:
   object_names:
     description:
       - The objects need to be fetched.
-        One or more object names can be specified. Use space as separator.
-      - If object type is *FILE, then fetch it directly. Only one *FILE object will fetch directly at one time.
+      - One or more object names can be specified. Use space as separator.
+      - If object type is C(*FILE), then fetch it directly. Only one C(*FILE) object will fetch directly at one time.
     type: str
     default: '*ALL'
   lib_name:
     description:
       - The library contains the objects.
-        If is_lib is Ture, lib_name means the library name.
+        If is_lib is C(Ture), lib_name means the library name.
     type: str
     required: yes
   object_types:
     description:
       - The object types.
-        One or more object types can be specified. Use space as separator.
+      - One or more object types can be specified. Use space as separator.
     type: str
     default: '*ALL'
   savefile_name:
@@ -60,11 +60,11 @@ options:
     default: False
   dest:
     description:
-    - A local directory to save the file into.
-    - For example, if the dest directory is /backup save file named /qsys.lib/objlib.lib/test1.file on host host.example.com,
-      would be saved into /backup/host.example.com/qsys.lib/objlib.lib/test1.file.
-      The host name is based on the inventory name.
-      If dest='', dest will be current directory.
+      - A local directory to save the file into.
+      - For example, if the dest directory is /backup save file named /qsys.lib/objlib.lib/test1.file on host host.example.com,
+        would be saved into /backup/host.example.com/qsys.lib/objlib.lib/test1.file.
+        The host name is based on the inventory name.
+        If dest='', dest will be current directory.
     type: str
     required: yes
   force_save:
@@ -79,7 +79,7 @@ options:
     default: False
   format:
     description:
-      - The save file's format. Only support *SAVF by now.
+      - The save file's format. Only support C(*SAVF) by now.
     type: str
     default: '*SAVF'
     choices: ["*SAVF"]
@@ -102,30 +102,30 @@ options:
     default: False
 
 notes:
-    - ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under [defaults] section
+    - ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
     - Need install 5770SS1 option 39 on remote IBM i for regex usage
 seealso:
     - module: fetch
 author:
-    - Peng Zeng Yu (@pengzengyufish)
+    - Peng Zengyu (@pengzengyufish)
 '''
 
 EXAMPLES = r'''
-- name: Fetch obja.pgm and objb.srvpgm in objlib libary as test1.savf(target release V7R2M0) on a remote IBMi to local. Store
-        as /backup/host.example.com/qsys.lib/objlib.lib/test1.file and keep the save file on remote
+- name: Fetch obja.pgm and objb.srvpgm in objlib libary as test1.savf(target release V7R2M0) on a remote IBM i to local. Store
+        as /backup/host.example.com/qsys.lib/objlib.lib/test1.file and keep the save file on remote.
   ibmi_fetch:
     object_names: 'obj1 obj2'
     lib_name: 'objlib'
     object_types: '*PGM *SRVPGM'
     savefile_name: 'test1'
     dest: '/backup'
-    backup: true
+    backup: True
     target_release: 'V7R2M0'
-- name: Fetch objlib libary on a remote IBMi to local, store as /backup/objlib.file.
+- name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.
   ibmi_fetch:
     lib_name: 'objlib'
     dest: '/backup'
-    flat: true
+    flat: True
 '''
 
 RETURN = r'''
@@ -135,12 +135,12 @@ delta:
     type: str
     sample: '0:00:00.307534'
 stdout:
-    description: The fetch standard output
+    description: The fetch standard output.
     returned: always
     type: list
     sample: 'File OBJA in library TESTLIB already exists. If still need save, please set force.'
 stderr:
-    description: The fetch standard error
+    description: The fetch standard error.
     returned: always
     type: list
     sample: [
@@ -175,11 +175,38 @@ remote_md5sum:
 remote_checksum:
     description: The checksum of the file on remote IBM i.
     returned: always
-    type: bool
+    type: str
     sample: '573f3e66ee97071134c9001732ed16f6bb7e8ab4'
 checksum:
     description: The checksum of the file on local.
     returned: always
     type: str
     sample: '573f3e66ee97071134c9001732ed16f6bb7e8ab4'
+job_log:
+    description: The IBM i job log of the task executed.
+    returned: always
+    type: list
+    sample: [{
+            "FROM_INSTRUCTION": "025D",
+            "FROM_LIBRARY": "QSYS",
+            "FROM_MODULE": "",
+            "FROM_PROCEDURE": "",
+            "FROM_PROGRAM": "QDDCDF",
+            "FROM_USER": "TESTER",
+            "MESSAGE_FILE": "QCPFMSG",
+            "MESSAGE_ID": "CPC7301",
+            "MESSAGE_LIBRARY": "QSYS",
+            "MESSAGE_SECOND_LEVEL_TEXT": "",
+            "MESSAGE_SUBTYPE": "",
+            "MESSAGE_TEXT": "File QUMEC created in library TEST.",
+            "MESSAGE_TIMESTAMP": "2020-06-02-14.29.52.770625",
+            "MESSAGE_TYPE": "COMPLETION",
+            "ORDINAL_POSITION": "10",
+            "SEVERITY": "0",
+            "TO_INSTRUCTION": "5829",
+            "TO_LIBRARY": "QXMLSERV",
+            "TO_MODULE": "PLUGILE",
+            "TO_PROCEDURE": "ILECMDEXC",
+            "TO_PROGRAM": "XMLSTOREDP"
+        }]
 '''

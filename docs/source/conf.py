@@ -62,11 +62,9 @@ html_context = {
     "display_github": "True",
     "github_user": "IBM",
     "github_repo": "ansible_for_i",
-    "github_version": "master",
+    "github_version": "devel",
     "conf_py_path": "/docs/source/",
 }
 
 # The master toctree document.
 master_doc = 'index'
-
-html_favicon = 'favicon.ico'

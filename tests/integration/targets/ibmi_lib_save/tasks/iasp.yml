@@ -36,7 +36,8 @@
       asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
       #joblog: true
     register: rstobj_result
-    failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+    #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+    failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
 
   - name: TC19 save library with all supported options from iasp to sys
     ibmi_lib_save:

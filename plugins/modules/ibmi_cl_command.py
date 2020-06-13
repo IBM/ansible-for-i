@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -16,37 +16,36 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_cl_command
-short_description: Executes a CL command on a remote IBMi node
-version_added: 2.10
+short_description: Executes a CL(Control language) command
+version_added: 2.8
 description:
-  - The C(ibmi_cl_command) module takes the CL command name followed by a list of space-delimited arguments.
-  - The given CL command will be executed on all selected nodes.
-  - For Pase or Qshell(Unix/Linux-liked) commands run on IBMi targets, like 'ls', 'chmod' etc, use the M(command) module instead.
-  - Only run one command at a time.
+  - The C(ibmi_cl_command) module takes the CL command followed by a list of space-delimited arguments.
+  - For PASE(Portable Application Solutions Environment for i) or QSHELL(Unix/Linux-liked) commands,
+    like 'ls', 'chmod', use the C(command) module instead.
 options:
   cmd:
     description:
-      - The IBM i CL command to run.
+      - The CL command to run.
     type: str
     required: yes
   asp_group:
     description:
-      - Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
+      - Specifies the name of the ASP(Auxiliary Storage Pool) group to set for the current thread.
       - The ASP group name is the name of the primary ASP device within the ASP group.
       - Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
     type: str
     default: '*SYSBAS'
   joblog:
     description:
-      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
+      - If set to C(true), output the avaiable job log even the rc is 0(success).
       - Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
     type: bool
-    default: false
+    default: False
 
 notes:
-    - IBM i CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*) don't have joblog returned.
-    - IBM i CL command can also be run by command module with quite simple result messages, add a prefix 'system' to the CL command.
-    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2).
+    - CL command with OUTPUT parameter like 'DSPLIBL OUTPUT(*)', 'DSPHDWRSC TYPE(*AHW) OUTPUT(*)' does not have job log.
+    - CL command can also be run by C(command) module with simple stdout/stderr, put 'system' as the as first args in C(command) module.
+    - The C(ibmi_cl_command) module can only run one CL command at a time.
 
 seealso:
 - module: command
@@ -59,68 +58,67 @@ EXAMPLES = r'''
 - name: Create a library by using CL command CRTLIB
   ibmi_cl_command:
     command: 'CRTLIB LIB(TESTLIB)'
-    asp_group: 'IASP1'
 '''
 
 RETURN = r'''
 joblog:
-    description: Print JOBLOG or not when using itoolkit to run the CL command.
+    description: Print job log or not when using itoolkit to run the CL command.
     returned: always
     type: bool
-    sample: false
+    sample: False
 start:
-    description: The command execution start time
+    description: The command execution start time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:53.757435'
 end:
-    description: The command execution end time
+    description: The command execution end time.
     returned: always
     type: str
     sample: '2019-12-02 11:07:54.064969'
 delta:
-    description: The command execution delta time
+    description: The command execution delta time.
     returned: always
     type: str
     sample: '0:00:00.307534'
 stdout:
-    description: The command standard output
+    description: The command standard output.
     returned: always
     type: str
     sample: 'CPC2102: Library TESTLIB created'
 stderr:
-    description: The command standard error
+    description: The command standard error.
     returned: always
     type: str
     sample: 'CPF2111:Library TESTLIB already exists'
 cmd:
-    description: The command executed by the task
+    description: The CL command executed.
     returned: always
     type: str
     sample: 'CRTLIB LIB(TESTLIB)'
 rc:
-    description: The command return code (0 means success, non-zero means failure)
+    description: The command return code (0 means success, non-zero means failure).
     returned: always
     type: int
     sample: 255
 stdout_lines:
-    description: The command standard output split in lines
+    description: The command standard output split in lines.
     returned: always
     type: list
     sample: [
         "CPC2102: Library TESTLIB created."
     ]
 stderr_lines:
-    description: The command standard error split in lines
+    description: The command standard error split in lines.
     returned: always
     type: list
     sample: [
         "CPF2111:Library TESTLIB already exists."
     ]
 job_log:
-    description: the job_log
+    description: The IBM i job log of the task executed.
     returned: always
-    type: str
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -150,6 +148,8 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 
 def main():
     module = AnsibleModule(
@@ -161,12 +161,13 @@ def main():
         supports_check_mode=True,
     )
 
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
+
     command = module.params['cmd'].strip().upper()
     asp_group = module.params['asp_group'].strip().upper()
     joblog = module.params['joblog']
 
     startd = datetime.datetime.now()
-    job_log = []
 
     is_cmd5250 = False
     if command.startswith('DSP'):
@@ -183,6 +184,7 @@ def main():
     if is_cmd5250:
         args = ['system', command]
         rc, out, err = module.run_command(args, use_unsafe_shell=False)
+        job_log = []
     else:
         rc, out, err, job_log = ibmi_util.itoolkit_run_command_once(command, asp_group)
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -16,44 +16,43 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_object_authority
-short_description: Grant, Revoke or Display Object Authority
-version_added: 2.10
+short_description: Grant, revoke or display object authority
+version_added: 2.8
 description:
   - The C(ibmi_object_authority) module can do the named object(s) authority management(grant, revoke and display).
 options:
   operation:
     description:
       - The authority operation.
-      - Valid for all the operations
-      - Operation grant is to grant user(s) authority(s) to object(s)
-      - Operation revoke is to revoke user(s) authority(s) from object(s)
-      - Operation display is to display object(s)'s authority information
-      - Operation grant_autl is to grant a authorization list(the authorization list object contains the list of authority) to object(s)
-      - Operation revoke_autl is to revoke authorization list from object(s)
-      - Operation grant_ref is to grant the reference object to be queried to obtain authorization information
-      - for more information about reference object, refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
+      - Valid for all the operations.
+      - Operation grant is to grant user(s) authority(s) to object(s).
+      - Operation revoke is to revoke user(s) authority(s) from object(s).
+      - Operation display is to display object(s)'s authority information.
+      - Operation grant_autl is to grant a authorization list(the authorization list object contains the list of authority) to object(s).
+      - Operation revoke_autl is to revoke authorization list from object(s).
+      - Operation grant_ref is to grant the reference object to be queried to obtain authorization information.
+      - For more information about reference object, refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
     choices: ['grant', 'revoke', 'display', 'grant_autl', 'revoke_autl', 'grant_ref']
     type: str
     required: yes
   object_name:
     description:
       - Specify the name of the object for which specific authority is to be granted, revoked or displayed to one or more users.
-      - Valid for all the operations
+      - Valid for all the operations.
     type: str
     required: yes
   object_library:
     description:
       - Specify the name of the library to be searched.
-      - Valid for all the operations
+      - Valid for all the operations.
       - When operation is display, special value as '*LIBL', '*CURLIB', '*ALL', '*ALLUSR', '*USRLIBL', '*ALLAVL', '*ALLUSRAVL' are not supported.
-      - The special values and value '' will be treate as search all the ASP scope under the current thread.
     type: str
     default: '*LIBL'
   object_type:
     description:
       - Specify the object type of the object for which specific authorities are to be granted, revoked or displayed to the specified users.
       - Supported object type refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
-      - Valid for all the operations
+      - Valid for all the operations.
     type: str
     required: yes
     choices: ['*ALL', '*ALRTBL', '*BNDDIR', '*CFGL', '*CHTFMT', '*CLD', '*CLS',
@@ -80,14 +79,14 @@ options:
   user:
     description:
       - Specifies one or more users to whom authority for the named object is to be granted or revoked.
-      - Valid only for operations grant and revoke
+      - Valid only for operations grant and revoke.
     type: list
     elements: str
     default: ['']
   authority:
     description:
       - Specifies the authority to be granted or revoked to the users specified for the Users (USER) parameter.
-      - Valid only for operations grant and revoke
+      - Valid only for operations grant and revoke.
     type: list
     elements: str
     default: ['*CHANGE']
@@ -96,32 +95,32 @@ options:
   replace_authority:
     description:
       - Specifies whether the authorities replace the user's current authorities.
-      - Valid only for operations grant
+      - Valid only for operations grant.
     type: bool
     default: false
   authorization_list:
     description:
-      - Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl
-      - Valid only for operations grant_autl and revoke_autl, you must specify a value other than ''
+      - Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl.
+      - Valid only for operations grant_autl and revoke_autl, you must specify a value other than ''.
     type: str
     default: ''
   ref_object_name:
     description:
       - Specify the name of the reference object for which specific authority is to be granted, revoked or displayed to one or more users.
-      - Valid only for operation grant_ref, you must specify a value other than ''
+      - Valid only for operation grant_ref, you must specify a value other than ''.
     type: str
     default: ''
   ref_object_library:
     description:
       - Specify the name of the library to be searched.
-      - Valid only for operation grant_ref
+      - Valid only for operation grant_ref.
     type: str
     default: '*LIBL'
   ref_object_type:
     description:
       - Specify the reference object type of the object for which specific authorities are to be granted, revoked or displayed to the specified users.
       - Supported reference object type refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
-      - Valid only for operation grant_ref
+      - Valid only for operation grant_ref.
     type: str
     default: '*OBJTYPE'
     choices: ['*OBJTYPE', '*ALRTBL', '*AUTL', '*BNDDIR', '*CFGL', '*CHTFMT', '*CLD', '*CLS',
@@ -148,22 +147,20 @@ options:
   asp_group:
     description:
       - Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
-      - The ASP group name is the name of the primary ASP device within the ASP group.
-      - The different for asp_group and (ref_)asp_device are,
-      - the asp_group make the current ansible thread run under the asp_group.
-      - the (ref_)asp_device is the search scope for the object.
-      - If you want to searh the (ref_)object in an ASP, the asp_group must be set and varied on,
-      - (ref)asp_device can be set as '*' for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
+        The ASP group name is the name of the primary ASP device within the ASP group.
+        The different for asp_group and (ref_)asp_device are,
+        the asp_group make the current ansible thread run under the asp_group.
+        the (ref_)asp_device is the search scope for the object.
+        If you want to searh the (ref_)object in an ASP, the asp_group must be set and varied on,
+        (ref)asp_device can be set as '*' for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
       - Valid for all the operations
     type: str
     default: '*SYSBAS'
   joblog:
     description:
-      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
+      - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
-    default: false
-notes:
-    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+    default: False
 
 seealso:
 - module: ibmi_object_find
@@ -293,8 +290,8 @@ object_authority_list:
         }
     ]
 job_log:
-    description: the job_log
-    type: str
+    description: The IBM i job log of the task executed.
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -325,6 +322,8 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common import validation
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():
@@ -394,6 +393,8 @@ def main():
         ],
         supports_check_mode=True,
     )
+
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
 
     operation = module.params['operation'].strip().upper()
     object_name = module.params['object_name'].strip().upper()

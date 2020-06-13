@@ -6,8 +6,8 @@
 
 .. _ibmi_reboot_module:
 
-ibmi_reboot -- Reboot a machine
-===============================
+ibmi_reboot -- Reboot an IBM i machine
+======================================
 
 
 .. contents::
@@ -17,7 +17,7 @@ ibmi_reboot -- Reboot a machine
 
 Synopsis
 --------
-- Reboot a IBMi machine, wait for it to go down, come back up, and respond to commands.
+- Reboot a IBM i machine, wait for it to go down, come back up, and respond to commands.
 
 
 
@@ -62,9 +62,7 @@ end_subsystem_option
 
      
 how_to_end
-  Specifies whether the system allows the active subsystem to end processing of active jobs in a controlled manner.
-
-  or whether the system ends the jobs immediately. In either case, the system does perform certain job-cleanup functions.
+  Specifies whether the system allows the active subsystem to end processing of active jobs in a controlled manner. or whether the system ends the jobs immediately. In either case, the system does perform certain job-cleanup functions.
 
 
   | **required**: false
@@ -197,11 +195,9 @@ Notes
 -----
 
 .. note::
-   ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under[defaults] section.
+   ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section.
 
-   Be careful to use '*CNTRLD' for option how_to_end,
-
-   you need to specify the appropriate value for all the timout options according to the system performance.
+   Be careful to use '*CNTRLD' for option how_to_end, you need to specify the appropriate value for all the timout options according to the system performance.
 
 
 See Also

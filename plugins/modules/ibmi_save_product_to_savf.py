@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -16,56 +16,56 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_save_product_to_savf
 short_description: Save the the licensed program(product) to a save file
+version_added: "2.8"
 description:
-    - the C(ibmi_save_product_to_savf) module save the product to a save file on the target ibmi node.
-version_added: "1.1"
+    - the C(ibmi_save_product_to_savf) module saves the product to a save file.
 options:
   product:
     description:
-      - Specifies the seven-character identifier of the licensed program that is saved
+      - Specifies the seven-character identifier of the licensed program that is saved.
     type: str
     required: yes
   option:
     description:
-      - Specifies the optional parts of the licensed program given in the Product prompt (LICPGM parameter) that are saved
+      - Specifies the optional parts of the licensed program given in the Product prompt (LICPGM parameter) that are saved.
     type: str
     default: '*BASE'
   object_type:
     description:
-      - Specifies the type of licensed program objects being saved
+      - Specifies the type of licensed program objects being saved.
     type: str
     default: '*ALL'
     choices: ['*ALL', '*PGM', '*LNG']
   language:
     description:
-      - Specifies which national language version (NLV) is used for the save operation
-      - It's the IBM-supplied language feature codes, like German is 2924, English is 2924
-      - This parameter is ignored when object_type(*PGM) is specified
+      - Specifies which national language version (NLV) is used for the save operation.
+      - It's the IBM-supplied language feature codes, like German is 2924, English is 2924.
+      - This parameter is ignored when object_type(*PGM) is specified.
     type: str
     default: '*PRIMARY'
   release:
     description:
-      - Specifies which version, release, and modification level of the licensed program is saved
+      - Specifies which version, release, and modification level of the licensed program is saved.
     type: str
     default: '*ONLY'
   target_release:
     description:
-      - Specifies the release level of the operating system on which you intend to restore and use the product
+      - Specifies the release level of the operating system on which you intend to restore and use the product.
     type: str
     default: '*CURRENT'
   savf_name:
     description:
-      - Specify the name of the save file, if it is not existed, will create it
+      - Specify the name of the save file, if it is not existed, will create it.
     type: str
     required: yes
   savf_library:
     description:
-      - Specify the name of the library where the save file is located, if it is not existed, will create it
+      - Specify the name of the library where the save file is located, if it is not existed, will create it.
     type: str
     required: yes
   check_signature:
     description:
-      - Specifies if the digital signatures of objects being saved with the licensed program are to be checked
+      - Specifies if the digital signatures of objects being saved with the licensed program are to be checked.
     type: str
     default: '*SIGNED'
     choices: ['*SIGNED', '*ALL', '*NONE']
@@ -78,9 +78,9 @@ options:
     default: ' '
   joblog:
     description:
-      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
+      - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
-    default: false
+    default: False
 seealso:
 - module: ibmi_uninstall_product, ibmi_install_product_from_savf
 author:
@@ -88,13 +88,13 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: Saving Program using Defaults
+- name: Saving Program using Defaults.
   ibmi_save_product_to_savf:
     product: 5770WDS
     savf_name: MYFILE
     savf_library: MYLIB
 
-- name: Saving Program 5733D10 option 11
+- name: Saving Program 5733D10 option 11.
   ibmi_save_product_to_savf:
     product: 5733D10
     option: 11
@@ -104,37 +104,37 @@ EXAMPLES = r'''
 
 RETURN = r'''
 stdout:
-    description: The standard output
+    description: The standard output.
     type: str
     sample: "+++ success SAVLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)"
     returned: When rc as 0(success)
 stderr:
-    description: The standard error
+    description: The standard error.
     type: str
     sample: 'CPF9801: Object QNOTE in library L10010125P not found'
     returned: When rc as non-zero(failure)
 rc:
-    description: The task return code (0 means success, non-zero means failure)
+    description: The task return code (0 means success, non-zero means failure).
     type: int
     sample: 255
     returned: always
 stdout_lines:
-    description: The standard output split in lines
+    description: The standard output split in lines.
     type: list
     sample: [
         "+++ success SAVLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)"
     ]
     returned: When rc as 0(success)
 stderr_lines:
-    description: The standard error split in lines
+    description: The standard error split in lines.
     type: list
     sample: [
         "CPF9801: Object QNOTE in library L10010125P not found"
     ]
     returned: When rc as non-zero(failure)
 job_log:
-    description: the job_log
-    type: str
+    description: The IBM i job log of the task executed.
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -165,6 +165,8 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 
 def main():
     module = AnsibleModule(
@@ -183,6 +185,8 @@ def main():
         ),
         supports_check_mode=True,
     )
+
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
 
     product = module.params['product'].upper()
     option = module.params['option'].upper()

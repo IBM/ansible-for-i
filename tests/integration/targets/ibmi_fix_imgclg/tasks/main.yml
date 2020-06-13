@@ -29,7 +29,7 @@
   when: os_version == '74'
 
 - set_fact:
-    product_id_list: "{{base_ptf_info.keys()}}"
+    product_id_list: "{{base_ptf_info.keys() | list}}"
     has_5770SS1_ptf: false
     has_5770999_ptf: false
     require_IPL: false 
@@ -37,12 +37,12 @@
 - set_fact:
     has_5770SS1_ptf: true
     dict_5770SS1: {'5770SS1': "{{base_ptf_info['5770SS1']}}"}
-  when: "'5770SS1' in base_ptf_info.keys() | join(' ')"
+  when: "'5770SS1' in base_ptf_info.keys() | list | join(' ')"
 
 - set_fact:
     has_5770999_ptf: true
     dict_5770999: {'5770999': "{{base_ptf_info['5770999']}}"}
-  when: "'5770999' in base_ptf_info.keys() | join(' ')"
+  when: "'5770999' in base_ptf_info.keys() | list | join(' ')"
 
 - name: fail the testing if PTFs in base_ptf_info have been superseded or permanent applied. 
   ibmi_sql_query:
@@ -63,6 +63,6 @@
   when: "os_version != '74'"
 
 - include: ibmi_fix_imgclg_74.yml 
-  when: "os_vesion == '74'"
+  when: "os_version == '74'"
   
 - include: negative_case.yml

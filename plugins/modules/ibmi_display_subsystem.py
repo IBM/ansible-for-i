@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Le Chang <changle@cn.ibm.com>
+# Author, Chang Le <changle@cn.ibm.com>
 
 
 from __future__ import absolute_import, division, print_function
@@ -15,27 +15,28 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = r'''
 module: ibmi_display_subsystem
-short_description: display all currently active subsystems or currently active jobs in a subsystem
+short_description: Displays all currently active subsystems or currently active jobs in a subsystem
+version_added: 2.8
 description:
-    - the C(ibmi_display_subsystem) module all currently active subsystems or currently active jobs in a subsystem of the target ibmi node.
-    - In some ways it has equivalent results of WRKSBS if subsystem is '*ALL', otherwise, it has equivalent results of WRKSBSJOB
-version_added: "1.1"
+    - The C(ibmi_display_subsystem) module displays all currently active subsystems or currently active jobs in a subsystem.
+    - In some ways it has equivalent results of WRKSBS if subsystem is C('*ALL'), otherwise, it has equivalent results of WRKSBSJOB.
 options:
   subsystem:
     description:
-      - Specifies the name of the subsystem
+      - Specifies the name of the subsystem.
     type: str
     default: '*ALL'
   user:
     description:
-      - Specifies the name of the user whose jobs are displayed('*ALL' for all user names). If subsystem is '*ALL', this option is ignored
+      - Specifies the name of the user whose jobs are displayed, C('*ALL') for all users.
+        If subsystem is C('*ALL'), this option is ignored.
     type: str
     default: '*ALL'
   joblog:
     description:
-      - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
+      - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
-    default: false
+    default: False
 seealso:
 - module: ibmi_end_subsystem, ibmi_start_subsystem
 author:
@@ -43,14 +44,14 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: Display all the active subsystems in this system
+- name: Display all the active subsystems in this system.
   ibmi_display_subsystem:
 
-- name: Display all the active jobs of subsystem QINTER
+- name: Display all the active jobs of subsystem QINTER.
   ibmi_display_subsystem:
     subsystem: QINTER
 
-- name: Display With One User's Job of subsystem QBATCH
+- name: Display With One User's Job of subsystem QBATCH.
   ibmi_display_subsystem:
     subsystem: QBATCH
     user: 'JONES'
@@ -58,33 +59,33 @@ EXAMPLES = r'''
 
 RETURN = r'''
 stdout:
-    description: The standard output of the display subsystem job results set
+    description: The standard output of the display subsystem job results set.
     type: str
     sample: ''
-    returned: When rc as non-zero(failure)
+    returned: When rc as non-zero(failure).
 stderr:
-    description: The standard error the the display subsystem job
+    description: The standard error the the display subsystem job.
     type: str
     sample: ''
-    returned: When rc as non-zero(failure)
+    returned: When rc as non-zero(failure).
 rc:
-    description: The task return code (0 means success, non-zero means failure)
+    description: The task return code (0 means success, non-zero means failure).
     type: int
     sample: 255
     returned: always
 stdout_lines:
-    description: The standard output split in lines
+    description: The standard output split in lines.
     type: list
     sample: ['']
     returned: When rc as non-zero(failure)
 stderr_lines:
-    description: The standard error split in lines
+    description: The standard error split in lines.
     type: list
     sample: ['']
     returned: When rc as non-zero(failure)
 job_log:
-    description: the job_log
-    type: str
+    description: The IBM i job log of the task executed.
+    type: list
     sample: [{
             "FROM_INSTRUCTION": "318F",
             "FROM_LIBRARY": "QSYS",
@@ -110,8 +111,8 @@ job_log:
         }]
     returned: always
 subsystems:
-    description: The result set
-    returned: When rc as 0(success) and subsystem is '*ALL'
+    description: The list of the currently active subsystems.
+    returned: When rc as 0(success) and subsystem is C('*ALL').
     type: list
     sample: [
         "                                      Work with Subsystems                                       5/25/20 19:55:04        Page 0001",
@@ -130,7 +131,7 @@ subsystems:
     ]
 active_jobs:
     description: The result set
-    returned: When rc as 0(success) and subsystem is not '*ALL'
+    returned: When rc as 0(success) and subsystem is not C('*ALL').
     type: list
     sample: [
         {
@@ -170,6 +171,8 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
+__ibmi_module_version__ = "1.0.0-beta1"
+
 
 def main():
     module = AnsibleModule(
@@ -181,8 +184,10 @@ def main():
         supports_check_mode=True,
     )
 
-    subsystem = module.params['subsystem'].upper()
-    user = module.params['user'].upper()
+    ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
+
+    subsystem = module.params['subsystem'].strip().upper()
+    user = module.params['user'].strip().upper()
     joblog = module.params['joblog']
     if len(subsystem) > 10:
         module.fail_json(rc=256, msg="Value of subsystem exceeds 10 characters")

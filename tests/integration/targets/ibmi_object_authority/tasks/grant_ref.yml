@@ -81,14 +81,14 @@
         object_type: '*FILE'
       register: authority_result
 
-    - name: TC47 assert the returned object is correct
+    - name: assert the returned object is correct
       assert:
         that:
           - item['AUTHORIZATION_LIST'] == '{{au_list[1].upper()}}'
       loop: "{{authority_result.object_authority_list }}"
       when : os_version | int >= 74
 
-    - name: TC48 grant grant refaut to 2 objects
+    - name: grant grant refaut to 2 objects
       ibmi_object_authority:
         operation: 'grant_ref'
         object_name: 'ANSIOBJ1'
@@ -98,7 +98,7 @@
         ref_object_library: REFLIB
         ref_object_type: '*FILE'
 
-    - name: TC49 display AUL 2 objects
+    - name: display AUL 2 objects
       ibmi_object_authority:
         operation: 'display'
         object_name: 'ANSIOBJ1'
@@ -106,14 +106,14 @@
         object_type: '*ALL'
       register: authority_result
 
-    - name: TC49 assert the returned object is correct
+    - name: assert the returned object is correct
       assert:
         that:
           - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
       loop: "{{authority_result.object_authority_list }}"
       when : os_version | int >= 74
 
-    - name: TC50 grant_ref with an not existing object
+    - name: grant_ref with an not existing object
       ibmi_object_authority:
         operation: 'grant_ref'
         object_name: 'ANSIOBJ1'
@@ -123,9 +123,10 @@
         ref_object_library: REFLIB
         ref_object_type: '*FILE'
       register: neg_result
-      failed_when: "'Object ABC in library REFLIB type *FILE not found' not in neg_result.stderr" 
+      #failed_when: "'Object ABC in library REFLIB type *FILE not found' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC51 grant_ref with an not existing lib
+    - name: grant_ref with an not existing lib
       ibmi_object_authority:
         operation: 'grant_ref'
         object_name: 'ANSIOBJ1'
@@ -135,9 +136,11 @@
         ref_object_library: ABC
         ref_object_type: '*FILE'
       register: neg_result
-      failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC52 grant_autl without required options
+
+    - name: grant_autl without required options
       ibmi_object_authority:
         operation: 'grant_ref'
         object_name: 'ANSIOBJ1'
@@ -149,7 +152,7 @@
       register: neg_result
       failed_when: "'missing required arguments: object_type' not in neg_result.msg"
 
-    - name: TC53 grant_autl without required options
+    - name: grant_autl without required options
       ibmi_object_authority:
         operation: 'grant_ref'
         #object_name: 'ANSIOBJ1'
@@ -161,7 +164,7 @@
       register: neg_result
       failed_when: "'missing required arguments: object_name' not in neg_result.msg"
 
-    - name: TC54 grant_autl without required options
+    - name: grant_autl without required options
       ibmi_object_authority:
         operation: 'grant_ref'
         object_name: 'ANSIOBJ1'
