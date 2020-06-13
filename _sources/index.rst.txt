@@ -36,13 +36,13 @@ The IBM i collection includes `action plugins`_, `modules`_, `sample playbooks`_
 `ansible-doc`_ to automate tasks on IBM i.
 
 .. _action plugins:
-   https://github.com/IBM/ansible-for-i/tree/master/plugins/action/
+   https://github.com/IBM/ansible-for-i/tree/devel/plugins/action/
 .. _modules:
-    https://github.com/IBM/ansible-for-i/tree/master/plugins/modules/
+    https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/
 .. _sample playbooks:
-    https://github.com/IBM/ansible-for-i/tree/master/examples/playbooks/
+    https://github.com/IBM/ansible-for-i/tree/devel/examples/playbooks/
 .. _ansible-doc:
-    https://github.com/IBM/ansible-for-i/tree/master/docs/
+    https://github.com/IBM/ansible-for-i/tree/devel/docs/
 
 
 Copyright
