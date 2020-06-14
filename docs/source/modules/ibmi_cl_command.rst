@@ -6,8 +6,8 @@
 
 .. _ibmi_cl_command_module:
 
-ibmi_cl_command -- Executes a CL(Control language) command
-==========================================================
+ibmi_cl_command -- Executes a CL command on a remote IBMi node
+==============================================================
 
 
 .. contents::
@@ -17,8 +17,10 @@ ibmi_cl_command -- Executes a CL(Control language) command
 
 Synopsis
 --------
-- The ``ibmi_cl_command`` module takes the CL command followed by a list of space-delimited arguments.
-- For PASE(Portable Application Solutions Environment for i) or QSHELL(Unix/Linux-liked) commands, like 'ls', 'chmod', use the ``command`` module instead.
+- The ``ibmi_cl_command`` module takes the CL command name followed by a list of space-delimited arguments.
+- The given CL command will be executed on all selected nodes.
+- For Pase or Qshell(Unix/Linux-liked) commands run on IBMi targets, like 'ls', 'chmod' etc, use the :ref:`command <command_module>` module instead.
+- Only run one command at a time.
 
 
 
@@ -28,7 +30,7 @@ Parameters
 
      
 asp_group
-  Specifies the name of the ASP(Auxiliary Storage Pool) group to set for the current thread.
+  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
 
   The ASP group name is the name of the primary ASP device within the ASP group.
 
@@ -42,7 +44,7 @@ asp_group
 
      
 cmd
-  The CL command to run.
+  The IBM i CL command to run.
 
 
   | **required**: True
@@ -51,7 +53,7 @@ cmd
 
      
 joblog
-  If set to ``true``, output the avaiable job log even the rc is 0(success).
+  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
 
   Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
 
@@ -70,6 +72,7 @@ Examples
    - name: Create a library by using CL command CRTLIB
      ibmi_cl_command:
        command: 'CRTLIB LIB(TESTLIB)'
+       asp_group: 'IASP1'
 
 
 
@@ -77,11 +80,11 @@ Notes
 -----
 
 .. note::
-   CL command with OUTPUT parameter like 'DSPLIBL OUTPUT(*)', 'DSPHDWRSC TYPE(*AHW) OUTPUT(*)' does not have job log.
+   IBM i CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*) don't have joblog returned.
 
-   CL command can also be run by ``command`` module with simple stdout/stderr, put 'system' as the as first args in ``command`` module.
+   IBM i CL command can also be run by command module with quite simple result messages, add a prefix 'system' to the CL command.
 
-   The ``ibmi_cl_command`` module can only run one CL command at a time.
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2).
 
 
 See Also
@@ -98,107 +101,8 @@ Return Values
 
    
                               
-       joblog
-        | Print job log or not when using itoolkit to run the CL command.
-      
-        | **returned**: always
-        | **type**: bool
-      
-      
-                              
-       start
-        | The command execution start time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
-
-            
-      
-      
-                              
-       end
-        | The command execution end time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       delta
-        | The command execution delta time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 0:00:00.307534
-
-            
-      
-      
-                              
-       stdout
-        | The command standard output.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPC2102: Library TESTLIB created
-
-            
-      
-      
-                              
-       stderr
-        | The command standard error.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPF2111:Library TESTLIB already exists
-
-            
-      
-      
-                              
-       cmd
-        | The CL command executed.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CRTLIB LIB(TESTLIB)
-
-            
-      
-      
-                              
-       rc
-        | The command return code (0 means success, non-zero means failure).
-      
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
-
-            
-      
-      
-                              
-       stdout_lines
-        | The command standard output split in lines.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPC2102: Library TESTLIB created."]
-            
-      
-      
-                              
        stderr_lines
-        | The command standard error split in lines.
+        | The command standard error split in lines
       
         | **returned**: always
         | **type**: list      
@@ -211,8 +115,104 @@ Return Values
       
       
                               
+       end
+        | The command execution end time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
+
+            
+      
+      
+                              
        job_log
-        | The IBM i job log of the task executed.
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
+
+            
+      
+      
+                              
+       stdout
+        | The command standard output
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPC2102: Library TESTLIB created
+
+            
+      
+      
+                              
+       cmd
+        | The command executed by the task
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CRTLIB LIB(TESTLIB)
+
+            
+      
+      
+                              
+       rc
+        | The command return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
+            
+      
+      
+                              
+       start
+        | The command execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
+
+            
+      
+      
+                              
+       delta
+        | The command execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
+            
+      
+      
+                              
+       stderr
+        | The command standard error
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF2111:Library TESTLIB already exists
+
+            
+      
+      
+                              
+       joblog
+        | Print JOBLOG or not when using itoolkit to run the CL command.
+      
+        | **returned**: always
+        | **type**: bool
+      
+      
+                              
+       stdout_lines
+        | The command standard output split in lines
       
         | **returned**: always
         | **type**: list      
@@ -220,7 +220,7 @@ Return Values
 
               .. code-block::
 
-                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
+                       ["CPC2102: Library TESTLIB created."]
             
       
         

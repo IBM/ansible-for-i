@@ -6,8 +6,8 @@
 
 .. _ibmi_lib_save_module:
 
-ibmi_lib_save -- Save one libary
-================================
+ibmi_lib_save -- Save one libary on a remote IBMi node
+======================================================
 
 
 .. contents::
@@ -17,9 +17,9 @@ ibmi_lib_save -- Save one libary
 
 Synopsis
 --------
-- The ``ibmi_lib_save`` module create an save file on a remote IBM i nodes.
-- The save file is not copied to the local host.
-- Only support ``*SAVF`` as the save file's format by now.
+- The ibmi_lib_save module create an save file on a remote IBMi nodes
+- The save file *is not* copied to the local host.
+- Only support *SAVF as the save file's format by now.
 
 
 
@@ -50,7 +50,7 @@ force_save
 
      
 format
-  The save file's format. Only support ``*SAVF`` by now.
+  The save file's format. Only support *SAVF by now.
 
 
   | **required**: false
@@ -61,7 +61,7 @@ format
 
      
 joblog
-  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  If set to ``true``, append JOBLOG to stderr/stderr_lines.
 
 
   | **required**: false
@@ -107,7 +107,7 @@ savefile_name
 
      
 target_release
-  The release of the operating system on which you intend to restore and use the save file.
+  The release of the operating system on which you intend to restore and use the SAVF.
 
 
   | **required**: false
@@ -122,15 +122,21 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Force to save test libary to archive.savf in archlib libary.
+   - name: Force to save test libary to archive.savf in archlib libary
      ibmi_lib_save:
        lib_name: 'test'
        savefile_name: 'archive'
        savefile_lib: 'archlib'
-       force_save: True
+       force_save: true
        target_release: 'V7R2M0'
 
 
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 
@@ -141,78 +147,26 @@ Return Values
 
    
                               
-       start
-        | The save execution start time.
+       stderr_lines
+        | The save standard error split in lines
       
         | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
+        | **type**: list      
+        | **sample**:
 
-            
-      
-      
-                              
-       end
-        | The save execution end time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
+              .. code-block::
 
-            
-      
-      
-                              
-       delta
-        | The save execution delta time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 0:00:00.307534
-
+                       ["CPF5813: File archive in library archlib already exists.", "CPF7302: File archive not created in library archlib."]
             
       
       
                               
        stdout
-        | The save standard output.
+        | The save standard output
       
         | **returned**: always
         | **type**: str
         | **sample**: CPC3722: 2 objects saved from library test.
-
-            
-      
-      
-                              
-       stderr
-        | The save standard error.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPF5813: File archive in library archlib already exists.\nCPF7302: File archive not created in library archlib.\n
-
-            
-      
-      
-                              
-       lib_name
-        | The library need to be saved.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: test
-
-            
-      
-      
-                              
-       savefile_name
-        | The save file name.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: archive
 
             
       
@@ -229,12 +183,92 @@ Return Values
       
       
                               
+       delta
+        | The save execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
+            
+      
+      
+                              
+       stdout_lines
+        | The save standard output split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPC3722: 2 objects saved from library test."]
+            
+      
+      
+                              
+       savefile_name
+        | The save file name.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: archive
+
+            
+      
+      
+                              
+       end
+        | The save execution end time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
+
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'User Profile = TESTER', 'FROM_MODULE': 'QSQSRVR', 'FROM_PROGRAM': 'QSQSRVR', 'MESSAGE_TIMESTAMP': '2020-05-25-12.54.26.489891', 'FROM_USER': 'TESTER', 'TO_INSTRUCTION': '8873', 'MESSAGE_SECOND_LEVEL_TEXT': '', 'MESSAGE_TYPE': 'COMPLETION', 'MESSAGE_ID': '', 'MESSAGE_LIBRARY': '', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '0', 'FROM_PROCEDURE': 'QSQSRVR', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '8873', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '8', 'MESSAGE_FILE': '', 'TO_PROCEDURE': 'QSQSRVR'}]
+
+            
+      
+      
+                              
+       start
+        | The save execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
+
+            
+      
+      
+                              
        format
-        | The save file's format. Only support C(*SAVF) by now.
+        | The save file's format. Only support *SAVF by now.
       
         | **returned**: always
         | **type**: str
         | **sample**: *SAVF
+
+            
+      
+      
+                              
+       target_release
+        | The release of the operating system on which you intend to restore and use the library.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: V7R2M0
 
             
       
@@ -254,17 +288,6 @@ Return Values
       
       
                               
-       target_release
-        | The release of the operating system on which you intend to restore and use the library.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: V7R2M0
-
-            
-      
-      
-                              
        command
         | The last excuted command.
       
@@ -276,8 +299,19 @@ Return Values
       
       
                               
+       stderr
+        | The save standard error
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF5813: File archive in library archlib already exists.\nCPF7302: File archive not created in library archlib.\n
+
+            
+      
+      
+                              
        rc
-        | The save action return code. 0 means success.
+        | The save action return code (0 means success, non-zero means failure)
       
         | **returned**: always
         | **type**: int
@@ -287,44 +321,13 @@ Return Values
       
       
                               
-       stdout_lines
-        | The save standard output split in lines.
+       lib_name
+        | The library need to be saved.
       
         | **returned**: always
-        | **type**: list      
-        | **sample**:
+        | **type**: str
+        | **sample**: test
 
-              .. code-block::
-
-                       ["CPC3722: 2 objects saved from library test."]
-            
-      
-      
-                              
-       stderr_lines
-        | The save standard error split in lines.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPF5813: File archive in library archlib already exists.", "CPF7302: File archive not created in library archlib."]
-            
-      
-      
-                              
-       job_log
-        | The IBM i job log of the task executed.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       [{"FROM_INSTRUCTION": "8873", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "QSQSRVR", "FROM_PROCEDURE": "QSQSRVR", "FROM_PROGRAM": "QSQSRVR", "FROM_USER": "TESTER", "MESSAGE_FILE": "", "MESSAGE_ID": "", "MESSAGE_LIBRARY": "", "MESSAGE_SECOND_LEVEL_TEXT": "", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "User Profile = TESTER", "MESSAGE_TIMESTAMP": "2020-05-25-12.54.26.489891", "MESSAGE_TYPE": "COMPLETION", "ORDINAL_POSITION": "8", "SEVERITY": "0", "TO_INSTRUCTION": "8873", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         

@@ -6,8 +6,8 @@
 
 .. _ibmi_at_module:
 
-ibmi_at -- Schedule a batch job
-===============================
+ibmi_at -- Schedule a batch job on a remote IBMi node
+=====================================================
 
 
 .. contents::
@@ -17,7 +17,7 @@ ibmi_at -- Schedule a batch job
 
 Synopsis
 --------
-- The ``ibmi_at`` module schedule a batch job.
+- The ibmi_at module schedule a batch job on a remote IBMi node
 
 
 
@@ -55,7 +55,7 @@ job_name
 
      
 joblog
-  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  If set to ``true``, append JOBLOG to stderr/stderr_lines.
 
 
   | **required**: false
@@ -64,9 +64,7 @@ joblog
 
      
 parameters
-  The parameters that ADDJOBSCDE command will take. Other than options above, all other parameters need to be specified here.
-
-  The default values of parameters for ADDJOBSCDE will be taken if not specified.
+  The parameters that ADDJOBSCDE command will take. Other than options above, all other parameters need to be specified here. The default values of parameters for ADDJOBSCDE will be taken if not specified.
 
 
   | **required**: false
@@ -123,7 +121,7 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Add a job schedule entry test.
+   - name: Add a job schedule entry test
      ibmi_at:
        job_name: 'test'
        cmd: 'QSYS/WRKSRVAGT TYPE(*UAK)'
@@ -132,6 +130,12 @@ Examples
        text: 'Test job schedule'
 
 
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 
@@ -142,8 +146,55 @@ Return Values
 
    
                               
+       stderr_lines
+        | The standard error split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF5813: File archive in library archlib already exists.", "CPF7302: File archive not created in library archlib."]
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'User Profile = TESTER', 'FROM_MODULE': 'QSQSRVR', 'FROM_PROGRAM': 'QSQSRVR', 'MESSAGE_TIMESTAMP': '2020-05-25-12.40.00.690270', 'FROM_USER': 'TESTER', 'TO_INSTRUCTION': '8873', 'MESSAGE_SECOND_LEVEL_TEXT': '', 'MESSAGE_TYPE': 'COMPLETION', 'MESSAGE_ID': '', 'MESSAGE_LIBRARY': '', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '0', 'FROM_PROCEDURE': 'QSQSRVR', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '8873', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '8', 'MESSAGE_FILE': '', 'TO_PROCEDURE': 'QSQSRVR'}]
+
+            
+      
+      
+                              
+       stdout
+        | The standard output
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPC1238: Job schedule entry TEST number 000074 added.
+
+            
+      
+      
+                              
+       rc
+        | The action return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
+            
+      
+      
+                              
        command
-        | The execution command.
+        | The execution command
       
         | **returned**: always
         | **type**: str
@@ -153,12 +204,12 @@ Return Values
       
       
                               
-       msg
-        | The execution message.
+       stderr
+        | The standard error
       
         | **returned**: always
         | **type**: str
-        | **sample**: Either scddate or scdday need to be *NONE.
+        | **sample**: CPF5813: File archive in library archlib already exists.\nCPF7302: File archive not created in library archlib.\n
 
             
       
@@ -175,41 +226,19 @@ Return Values
       
       
                               
-       stdout
-        | The standard output.
+       msg
+        | The execution message.
       
         | **returned**: always
         | **type**: str
-        | **sample**: CPC1238: Job schedule entry TEST number 000074 added.
-
-            
-      
-      
-                              
-       stderr
-        | The standard error.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPF5813: File archive in library archlib already exists.\nCPF7302: File archive not created in library archlib.\n
-
-            
-      
-      
-                              
-       rc
-        | The action return code. 0 means success.
-      
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
+        | **sample**: Either scddate or scdday need to be *NONE.
 
             
       
       
                               
        stdout_lines
-        | The standard output split in lines.
+        | The standard output split in lines
       
         | **returned**: always
         | **type**: list      
@@ -218,34 +247,6 @@ Return Values
               .. code-block::
 
                        ["CPC1238: Job schedule entry TEST number 000074 added."]
-            
-      
-      
-                              
-       stderr_lines
-        | The standard error split in lines.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPF5813: File archive in library archlib already exists.", "CPF7302: File archive not created in library archlib."]
-            
-      
-      
-                              
-       job_log
-        | The IBM i job log of the task executed.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       [{"FROM_INSTRUCTION": "8873", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "QSQSRVR", "FROM_PROCEDURE": "QSQSRVR", "FROM_PROGRAM": "QSQSRVR", "FROM_USER": "TESTER", "MESSAGE_FILE": "", "MESSAGE_ID": "", "MESSAGE_LIBRARY": "", "MESSAGE_SECOND_LEVEL_TEXT": "", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "User Profile = TESTER", "MESSAGE_TIMESTAMP": "2020-05-25-12.40.00.690270", "MESSAGE_TYPE": "COMPLETION", "ORDINAL_POSITION": "8", "SEVERITY": "0", "TO_INSTRUCTION": "8873", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         
