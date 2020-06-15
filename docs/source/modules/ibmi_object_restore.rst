@@ -6,8 +6,8 @@
 
 .. _ibmi_object_restore_module:
 
-ibmi_object_restore -- Restore one or more objects on a remote IBMi node
-========================================================================
+ibmi_object_restore -- Restore one or more objects
+==================================================
 
 
 .. contents::
@@ -17,9 +17,9 @@ ibmi_object_restore -- Restore one or more objects on a remote IBMi node
 
 Synopsis
 --------
-- The ibmi_object_restore module restore an save file on a remote IBMi nodes
+- The ``ibmi_object_restore`` module restore an save file on a remote IBM i nodes
 - The restored objects and save file are on the remote host.
-- Only support *SAVF as the save file's format by now.
+- Only support ``*SAVF`` as the save file's format by now.
 
 
 
@@ -41,7 +41,7 @@ asp_group
 
      
 format
-  The save file's format. Only support *SAVF by now.
+  The save file's format. Only support ``*SAVF`` by now.
 
 
   | **required**: false
@@ -52,7 +52,7 @@ format
 
      
 joblog
-  If set to ``true``, append JOBLOG to stderr/stderr_lines.
+  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
 
 
   | **required**: false
@@ -70,7 +70,9 @@ object_lib
 
      
 object_names
-  The objects need to be restored. One or more object names can be specified. Use space as separator.
+  The objects need to be restored.
+
+  One or more object names can be specified. Use space as separator.
 
 
   | **required**: false
@@ -80,7 +82,9 @@ object_names
 
      
 object_types
-  The object types. One or more object types can be specified. Use space as separator.
+  The object types.
+
+  One or more object types can be specified. Use space as separator.
 
 
   | **required**: false
@@ -123,7 +127,7 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Restore test1.pgm test2.srvpgm in savedlib libary from archive.savf in archlib libary
+   - name: Restore test1.pgm test2.srvpgm in savedlib libary from archive.savf in archlib libary.
      ibmi_object_restore:
        object_names: 'test1 test2'
        object_lib: 'savedlib'
@@ -132,12 +136,6 @@ Examples
        savefile_lib: 'archlib'
 
 
-
-Notes
------
-
-.. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 
@@ -148,22 +146,41 @@ Return Values
 
    
                               
-       stderr_lines
-        | The restore standard error split in lines
+       start
+        | The restore execution start time.
       
         | **returned**: always
-        | **type**: list      
-        | **sample**:
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
-              .. code-block::
+            
+      
+      
+                              
+       end
+        | The restore execution end time.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
 
-                       ["CPF9812: File file1 in library C1 not found."]
+            
+      
+      
+                              
+       delta
+        | The restore execution delta time.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
             
       
       
                               
        stdout
-        | The restore standard output
+        | The restore standard output.
       
         | **returned**: always
         | **type**: str
@@ -173,12 +190,12 @@ Return Values
       
       
                               
-       rc
-        | The restore action return code (0 means success, non-zero means failure)
+       stderr
+        | The restore standard error.
       
         | **returned**: always
-        | **type**: int
-        | **sample**: 255
+        | **type**: str
+        | **sample**: CPF9812: File file1 in library C1 not found..\
 
             
       
@@ -195,38 +212,24 @@ Return Values
       
       
                               
-       savefile_lib
-        | The save file library.
+       object_lib
+        | The library that contains the saved objects.
       
         | **returned**: always
         | **type**: str
-        | **sample**: c1lib
+        | **sample**: objectlib
 
             
       
       
                               
-       delta
-        | The restore execution delta time
+       object_types
+        | The objects types.
       
         | **returned**: always
         | **type**: str
-        | **sample**: 0:00:00.307534
+        | **sample**: *PGM *SRVPGM
 
-            
-      
-      
-                              
-       stdout_lines
-        | The restore standard output split in lines
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPC3703: 2 objects restored from C1 to C1."]
             
       
       
@@ -242,77 +245,25 @@ Return Values
       
       
                               
-       end
-        | The restore execution end time
+       savefile_lib
+        | The save file library.
       
         | **returned**: always
         | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       job_log
-        | the job_log
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'User Profile = TESTER', 'FROM_MODULE': 'QSQSRVR', 'FROM_PROGRAM': 'QSQSRVR', 'MESSAGE_TIMESTAMP': '2020-05-25-13.09.36.988652', 'FROM_USER': 'TESTER', 'TO_INSTRUCTION': '8873', 'MESSAGE_SECOND_LEVEL_TEXT': '', 'MESSAGE_TYPE': 'COMPLETION', 'MESSAGE_ID': '', 'MESSAGE_LIBRARY': '', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '0', 'FROM_PROCEDURE': 'QSQSRVR', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '8873', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '8', 'MESSAGE_FILE': '', 'TO_PROCEDURE': 'QSQSRVR'}]
+        | **sample**: c1lib
 
             
       
       
                               
        format
-        | The save file's format. Only support *SAVF by now.
+        | The save file's format. Only support C(*SAVF) by now.
       
         | **returned**: always
         | **type**: str
         | **sample**: *SAVF
 
             
-      
-      
-                              
-       start
-        | The restore execution start time
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
-
-            
-      
-      
-                              
-       object_lib
-        | The library that contains the saved objects.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: objectlib
-
-            
-      
-      
-                              
-       stderr
-        | The restore standard error
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPF9812: File file1 in library C1 not found..\
-
-            
-      
-      
-                              
-       joblog
-        | Append JOBLOG to stderr/stderr_lines or not.
-      
-        | **returned**: always
-        | **type**: bool
       
       
                               
@@ -327,13 +278,63 @@ Return Values
       
       
                               
-       object_types
-        | The objects types.
+       joblog
+        | Append JOBLOG to stderr/stderr_lines or not.
       
         | **returned**: always
-        | **type**: str
-        | **sample**: *PGM *SRVPGM
+        | **type**: bool
+      
+      
+                              
+       rc
+        | The restore action return code. 0 means success.
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
+            
+      
+      
+                              
+       stdout_lines
+        | The restore standard output split in lines.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPC3703: 2 objects restored from C1 to C1."]
+            
+      
+      
+                              
+       stderr_lines
+        | The restore standard error split in lines.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF9812: File file1 in library C1 not found."]
+            
+      
+      
+                              
+       job_log
+        | The IBM i job log of the task executed.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"FROM_INSTRUCTION": "8873", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "QSQSRVR", "FROM_PROCEDURE": "QSQSRVR", "FROM_PROGRAM": "QSQSRVR", "FROM_USER": "TESTER", "MESSAGE_FILE": "", "MESSAGE_ID": "", "MESSAGE_LIBRARY": "", "MESSAGE_SECOND_LEVEL_TEXT": "", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "User Profile = TESTER", "MESSAGE_TIMESTAMP": "2020-05-25-13.09.36.988652", "MESSAGE_TYPE": "COMPLETION", "ORDINAL_POSITION": "8", "SEVERITY": "0", "TO_INSTRUCTION": "8873", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         

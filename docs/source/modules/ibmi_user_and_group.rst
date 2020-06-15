@@ -6,7 +6,7 @@
 
 .. _ibmi_user_and_group_module:
 
-ibmi_user_and_group -- Create, Change or Display a user(or group) profile
+ibmi_user_and_group -- Create, change or display a user(or group) profile
 =========================================================================
 
 
@@ -36,7 +36,7 @@ expire
 
   If the password is set to expired, the user is required to change the password to sign on the system.
 
-  If not specify, '*NO' will be used for operation create, '*SAME' will be used for operation change.
+  If not specify, ``'*NO'`` will be used for operation create, ``'*SAME'`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -49,7 +49,7 @@ expire
 
      
 joblog
-  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  If set to ``true``, output the avaiable job log even the rc is 0(success).
 
 
   | **required**: false
@@ -60,13 +60,13 @@ joblog
 operation
   The user or group profile operation.
 
-  Operation create to create user(group) profile
+  Operation create to create user(group) profile.
 
-  Operation change to change user(group) profile
+  Operation change to change user(group) profile.
 
-  Operation display to display user(group) profile inforamtion
+  Operation display to display user(group) profile inforamtion.
 
-  Operation display_group_menbers to display the members of a group profile
+  Operation display_group_menbers to display the members of a group profile.
 
 
   | **required**: True
@@ -78,7 +78,7 @@ operation
 owner
   Specifies the user that is to be the owner of objects created by this user.
 
-  If not specify, '*USRPRF' will be used for operation create, '*SAME' will be used for operation change.
+  If not specify, ``'*USRPRF'`` will be used for operation create, ``'*SAME'`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -97,19 +97,9 @@ parameters
 
   The default values of parameters for CRTUSRPRF or CHGUSRPRF or DLTUSRPRF will be taken if not specified.
 
-  Supported parameters contain
+  Supported parameters contain ASTLVL, CURLIB, INLPGM, INLMNU, LMTCPB, TEXT, SPCENV, DSPSGNINF, PWDEXPITV, PWDCHGBLK, LCLPWDMGT, LMTDEVSSN, KBDBUF, MAXSTGLRG, MAXSTG, PTYLMT, GRPAUT, GRPAUTTYP, SUPGRPPRF, ACGCDE, DOCPWD, MSGQ, DLVRY, SEV, PRTDEV, OUTQ, ATNPGM, SRTSEQ, LANGID, CNTRYID, CCSID, CHRIDCTL, SETJOBATR, LOCALE, USROPT, UID, GID, HOMEDIR, EIMASSOC, USREXPDATE, USREXPITV, AUT, JOBD when the operation is create or change Or OWNOBJOPT, PGPOPT, EIMASSOC when the operation is delete.
 
-  ASTLVL, CURLIB, INLPGM, INLMNU, LMTCPB, TEXT, SPCENV, DSPSGNINF, PWDEXPITV, PWDCHGBLK, LCLPWDMGT, LMTDEVSSN, KBDBUF, MAXSTGLRG, MAXSTG, PTYLMT,
-
-  GRPAUT, GRPAUTTYP, SUPGRPPRF, ACGCDE, DOCPWD, MSGQ, DLVRY, SEV, PRTDEV, OUTQ, ATNPGM, SRTSEQ, LANGID, CNTRYID, CCSID, CHRIDCTL, SETJOBATR,
-
-  LOCALE, USROPT, UID, GID, HOMEDIR, EIMASSOC, USREXPDATE, USREXPITV, AUT, JOBD when the operation is create or change
-
-  Or OWNOBJOPT, PGPOPT, EIMASSOC when the operation is delete.
-
-  refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/crtusrprf.htm.
-
-  and https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm for detail.
+  Refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/crtusrprf.htm. and https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm for detail.
 
 
   | **required**: false
@@ -135,7 +125,7 @@ password
 special_authority
   Specifies the special authorities given to a user.
 
-  If not specify, '*USRCLS' will be used for operation create, '*SAME' will be used for operation change.
+  If not specify, ``'*USRCLS'`` will be used for operation create, ``'*SAME'`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -143,7 +133,7 @@ special_authority
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: [u'*SAME']
+  | **default**: ['*SAME']
   | **choices**: *USRCLS, *NONE, *SAME, *ALLOBJ, *AUDIT, *JOBCTL, *SAVSYS, *IOSYSCFG, *SECADM, *SERVICE, *SPLCTL
 
 
@@ -151,7 +141,7 @@ special_authority
 status
   Specifies the status of the user profile.
 
-  If not specify, '*ENABLED' will be used for operation create, '*SAME' will be used for operation change.
+  If not specify, '*ENABLED' will be used for operation create, ``'*SAME'`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -166,7 +156,7 @@ status
 text
   Specifies the text that briefly describes the user or group profile.
 
-  If not specify, 'Create by Ansible' will be used for operation create, '*SAME' will be used for operation change.
+  If not specify, 'Create by Ansible' will be used for operation create, ``'*SAME'`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -193,7 +183,7 @@ user
 user_class
   Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.
 
-  If not specify, '*USER' will be used for operation create, '*SAME' will be used for operation change.
+  If not specify, '*USER' will be used for operation create, ``'*SAME'`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -244,12 +234,6 @@ Examples
 
 
 
-Notes
------
-
-.. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-
 
 See Also
 --------
@@ -265,26 +249,12 @@ Return Values
 
    
                               
-       stderr_lines
-        | The command standard error split in lines
+       stdout
+        | The standard output.
       
-        | **returned**: when rc as no-zero(failure)
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPF2204: User profile CHANGL1 not found."]
-            
-      
-      
-                              
-       job_log
-        | the job_log
-      
-        | **returned**: always
+        | **returned**: when rc as 0(success) and the operation is not display or display_group_members
         | **type**: str
-        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
+        | **sample**: CPC2205: User profile CHANGLE changed.
 
             
       
@@ -301,19 +271,19 @@ Return Values
       
       
                               
-       stdout
-        | The standard output
+       rc
+        | The return code (0 means success, non-zero means failure)
       
-        | **returned**: when rc as 0(success) and the operation is not display or display_group_members
-        | **type**: str
-        | **sample**: CPC2205: User profile CHANGLE changed.
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
             
       
       
                               
        stdout_lines
-        | The command standard output split in lines
+        | The command standard output split in lines.
       
         | **returned**: when rc as 0(success) and the operation is not display or display_group_members
         | **type**: list      
@@ -326,19 +296,22 @@ Return Values
       
       
                               
-       rc
-        | The return code (0 means success, non-zero means failure)
+       stderr_lines
+        | The command standard error split in lines.
       
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
+        | **returned**: when rc as no-zero(failure)
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
+
+                       ["CPF2204: User profile CHANGL1 not found."]
             
       
       
                               
        result_set
-        | The result set of user information or group members
+        | The result set of user information or group members.
       
         | **returned**: When rc as 0(success) and operation is display or display_group_members
         | **type**: list      
@@ -347,6 +320,20 @@ Return Values
               .. code-block::
 
                        [{"GROUP_PROFILE_NAME": "GROUP1", "USER_PROFILE_NAME": "USERG1", "USER_TEXT": ""}, {"GROUP_PROFILE_NAME": "GROUP1", "USER_PROFILE_NAME": "USER2G1", "USER_TEXT": ""}]
+            
+      
+      
+                              
+       job_log
+        | The IBM i job log of the task executed.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         
