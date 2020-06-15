@@ -70,3 +70,4 @@ build_ignore:
   - .travis.yml
   - .script
   - .DS_Store
+  - .gitkeep
