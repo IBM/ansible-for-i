@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_cl_command
 short_description: Executes a CL(Control language) command
-version_added: 2.8
+version_added: '2.8'
 description:
   - The C(ibmi_cl_command) module takes the CL command followed by a list of space-delimited arguments.
   - For PASE(Portable Application Solutions Environment for i) or QSHELL(Unix/Linux-liked) commands,

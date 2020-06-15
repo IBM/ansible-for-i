@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_object_find
 short_description: Find specific IBM i object(s).
-version_added: 1.0
+version_added: '2.8'
 description:
      - Return a list of IBM i objects based on specific criteria. Multiple criteria are AND'd together.
 options:

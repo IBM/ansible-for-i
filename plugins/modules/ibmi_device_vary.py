@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_device_vary
 short_description: Vary on or off target device
-version_added: 2.8
+version_added: '2.8'
 description:
   - Vary on or off target device.
   - For non-IBM i targets, no need.

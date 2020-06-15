@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix
 short_description: Install, remove or query an individual fix or a set of fixes on to IBM i system.
-version_added: 1.0
+version_added: '2.8'
 description:
      - The C(ibmi_fix) module install fixes to target IBM i system.
      - The installation file of the fixes should be in the format of save file.

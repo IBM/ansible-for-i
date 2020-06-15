@@ -68,3 +68,5 @@ build_ignore:
   - ansible.cfg
   - .gitignore
   - .travis.yml
+  - .script
+  - .DS_Store

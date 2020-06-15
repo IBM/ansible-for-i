@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sync
 short_description: Synchronize a save file from current IBM i node A to another IBM i node B.
-version_added: 2.8
+version_added: '2.8'
 description:
      - The C(ibmi_sync) module synchronize a save file from current IBM i node to another IBM i node.
      - Only support to synchronize save file by now.

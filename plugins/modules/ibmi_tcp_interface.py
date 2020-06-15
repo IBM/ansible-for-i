@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_tcp_interface
 short_description: Add, change, remove or query a tcp/ip interface.
-version_added: 1.1
+version_added: '2.8'
 description:
      - The C(ibmi_tcp_interface) module add, change, remove, start, end or query a tcp/ip interface.
      - This module provides the similar function of ADDTCPIFC, CHGTCPIFC, RMVTCPIFC, STRTCPIFC, ENDTCPIFC.
