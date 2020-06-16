@@ -6,8 +6,8 @@
 
 .. _ibmi_sql_execute_module:
 
-ibmi_sql_execute -- Executes a SQL non-DQL(Data Query Language) statement
-=========================================================================
+ibmi_sql_execute -- Executes a SQL non-DQL(Data Query Language) statement on a remote IBMi node
+===============================================================================================
 
 
 .. contents::
@@ -18,6 +18,8 @@ ibmi_sql_execute -- Executes a SQL non-DQL(Data Query Language) statement
 Synopsis
 --------
 - The ``ibmi_sql_execute`` module takes the SQL non-DQL(Data Query Language) statement as argument.
+- The given SQL non-DQL(Data Query Language) statement will be executed on all selected nodes.
+- Only run one statement at a time.
 
 
 
@@ -72,7 +74,7 @@ Notes
 -----
 
 .. note::
-   This module can only run one SQL statement at a time.
+   Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 See Also
@@ -89,93 +91,8 @@ Return Values
 
    
                               
-       start
-        | The sql statement execution start time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
-
-            
-      
-      
-                              
-       end
-        | The sql statement execution end time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       delta
-        | The sql statement execution delta time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 0:00:00.307534
-
-            
-      
-      
-                              
-       stdout
-        | The sql statement standard output.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: +++ success INSERT INTO Persons VALUES('919665', 'Le', 'Chang', 'Ring Building', 'Beijing')
-
-            
-      
-      
-                              
-       stderr
-        | The sql statement standard error.
-      
-        | **returned**: always
-        | **type**: str
-      
-      
-                              
-       sql
-        | The sql statement executed by the task.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: INSERT INTO Persons VALUES('919665', 'Le', 'Chang', 'Ring Building', 'Beijing')
-
-            
-      
-      
-                              
-       rc
-        | The sql statement return code (0 means success, non-zero means failure).
-      
-        | **returned**: always
-        | **type**: int
-      
-      
-                              
-       stdout_lines
-        | The sql statement standard output split in lines.
-      
-        | **returned**: When rc as non-zero(failure)
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["+++ success INSERT INTO Persons VALUES(\u0027919665\u0027, \u0027Le\u0027, \u0027Chang\u0027, \u0027Ring Building\u0027, \u0027Beijing\u0027)"]
-            
-      
-      
-                              
        stderr_lines
-        | The sql statement standard error split in lines.
+        | The sql statement standard error split in lines
       
         | **returned**: When rc as non-zero(failure)
         | **type**: list      
@@ -188,16 +105,98 @@ Return Values
       
       
                               
-       job_log
-        | The IBM i job log of the task executed.
+       end
+        | The sql statement execution end time
       
-        | **returned**: when rc as non-zero(failure) or rc as success(0) but joblog set to true.
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
+
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: when rc as non-zero(failure) or rc as success(0) but joblog set to true
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
+
+            
+      
+      
+                              
+       stdout
+        | The sql statement standard output
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: +++ success INSERT INTO Persons VALUES('919665', 'Le', 'Chang', 'Ring Building', 'Beijing')
+
+            
+      
+      
+                              
+       sql
+        | The sql statement executed by the task
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: INSERT INTO Persons VALUES('919665', 'Le', 'Chang', 'Ring Building', 'Beijing')
+
+            
+      
+      
+                              
+       rc
+        | The sql statement return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+      
+      
+                              
+       start
+        | The sql statement execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
+
+            
+      
+      
+                              
+       stderr
+        | The sql statement standard error
+      
+        | **returned**: always
+        | **type**: str
+      
+      
+                              
+       delta
+        | The sql statement execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
+            
+      
+      
+                              
+       stdout_lines
+        | The sql statement standard output split in lines
+      
+        | **returned**: When rc as non-zero(failure)
         | **type**: list      
         | **sample**:
 
               .. code-block::
 
-                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
+                       ["+++ success INSERT INTO Persons VALUES(\u0027919665\u0027, \u0027Le\u0027, \u0027Chang\u0027, \u0027Ring Building\u0027, \u0027Beijing\u0027)"]
             
       
         

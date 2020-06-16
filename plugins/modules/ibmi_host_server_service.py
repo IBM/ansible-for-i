@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_host_server_service
 short_description: Manage host server
-version_added: '2.8'
+version_added: 2.8
 description:
   - Manage and query IBM i host server service.
   - For non-IBM i targets, use the M(service) module instead.

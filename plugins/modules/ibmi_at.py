@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_at
 short_description: Schedule a batch job
-version_added: '2.8'
+version_added: 2.8
 description:
      - The C(ibmi_at) module schedule a batch job.
 options:

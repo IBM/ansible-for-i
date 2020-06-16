@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_submit_job
 short_description: Submit a job on IBM i system. This module functions like SBMJOB.
-version_added: '2.8'
+version_added: 1.0
 description:
      - The C(ibmi_submit_job) module submits a job on IBM i system.
      - It waits until the submitted job turns into expected status that is specified.

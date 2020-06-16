@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sql_query
 short_description: Executes a SQL DQL(Data Query Language) statement.
-version_added: '2.8'
+version_added: 2.8
 description:
      - The C(ibmi_sql_query) module takes the SQL DQL(Data Query Language) statement as argument.
 options:

@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_copy
 short_description: Copy a save file from local to a remote IBM i node
-version_added: '2.8'
+version_added: 2.8
 description:
      - The C(ibmi_copy) copies a save file from local to a remote IBM i node.
      - C(ibmi_copy) will not restore save file on IBM i node.
