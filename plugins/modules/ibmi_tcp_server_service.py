@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_tcp_server_service
 short_description: Manage tcp server
-version_added: 2.8
+version_added: '2.8'
 description:
   - Manage and query IBMi tcp server service.
   - For non-IBMi targets, use the M(service) module instead.

@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_display_subsystem
 short_description: Displays all currently active subsystems or currently active jobs in a subsystem
-version_added: 2.8
+version_added: '2.8'
 description:
     - The C(ibmi_display_subsystem) module displays all currently active subsystems or currently active jobs in a subsystem.
     - In some ways it has equivalent results of WRKSBS if subsystem is C('*ALL'), otherwise, it has equivalent results of WRKSBSJOB.

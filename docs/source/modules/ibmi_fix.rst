@@ -46,7 +46,7 @@ fix_list
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: [u'*ALL']
+  | **default**: ['*ALL']
 
 
      
@@ -59,6 +59,15 @@ fix_omit_list
   | **required**: False
   | **type**: list
   | **elements**: str
+
+
+     
+joblog
+  The job log of the job executing the task will be returned even rc is zero if it is set to true.
+
+
+  | **required**: false
+  | **type**: bool
 
 
      
@@ -178,53 +187,6 @@ Return Values
 
    
                               
-       stderr_lines
-        | The task standard error split in lines
-      
-        | **returned**: When error occurs.
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPF2111:Library TESTLIB already exists."]
-            
-      
-      
-                              
-       end
-        | The task execution end time
-      
-        | **returned**: When rc is zero
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       stdout
-        | The task standard output
-      
-        | **returned**: When error occurs.
-        | **type**: str
-        | **sample**: CPC2102: Library TESTLIB created
-
-            
-      
-      
-                              
-       rc
-        | The task return code (0 means success, non-zero means failure)
-      
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
-
-            
-      
-      
-                              
        start
         | The task execution start time
       
@@ -236,12 +198,12 @@ Return Values
       
       
                               
-       stderr
-        | The task standard error
+       end
+        | The task execution end time
       
-        | **returned**: When error occurs.
+        | **returned**: When rc is zero
         | **type**: str
-        | **sample**: CPF2111:Library TESTLIB already exists
+        | **sample**: 2019-12-02 11:07:54.064969
 
             
       
@@ -258,6 +220,53 @@ Return Values
       
       
                               
+       stdout
+        | The task standard output
+      
+        | **returned**: When error occurs.
+        | **type**: str
+        | **sample**: CPC2102: Library TESTLIB created
+
+            
+      
+      
+                              
+       stderr
+        | The task standard error
+      
+        | **returned**: When error occurs.
+        | **type**: str
+        | **sample**: CPF2111:Library TESTLIB already exists
+
+            
+      
+      
+                              
+       rc
+        | The task return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
+            
+      
+      
+                              
+       job_log
+        | The job log of the job executes the task.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
+            
+      
+      
+                              
        stdout_lines
         | The task standard output split in lines
       
@@ -268,6 +277,20 @@ Return Values
               .. code-block::
 
                        ["CPC2102: Library TESTLIB created."]
+            
+      
+      
+                              
+       stderr_lines
+        | The task standard error split in lines
+      
+        | **returned**: When error occurs.
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF2111:Library TESTLIB already exists."]
             
       
         

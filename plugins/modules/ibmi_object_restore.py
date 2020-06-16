@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_object_restore
 short_description: Restore one or more objects
-version_added: 2.8
+version_added: '2.8'
 description:
      - The C(ibmi_object_restore) module restore an save file on a remote IBM i nodes
      - The restored objects and save file are on the remote host.
