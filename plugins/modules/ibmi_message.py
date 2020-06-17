@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_message
 short_description: Search message
-version_added: 2.8
+version_added: '2.8'
 description:
   - Search message.
   - For non-IBM i targets, no need.
@@ -197,7 +197,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0-beta1"
+__ibmi_module_version__ = "0.0.1"
 
 
 def handle_list_to_sql(sql, item_list, param_name):

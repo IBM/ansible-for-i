@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_job
 short_description: Returns job information according to inputs.
-version_added: 1.0
+version_added: '2.8'
 description:
      - The C(ibmi_job) module returns information associated with one or more jobs.
 options:
@@ -239,7 +239,7 @@ try:
 except ImportError:
     HAS_IBM_DB = False
 
-__ibmi_module_version__ = "1.0.0-beta1"
+__ibmi_module_version__ = "0.0.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

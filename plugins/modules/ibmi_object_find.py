@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_object_find
 short_description: Find specific IBM i object(s).
-version_added: 1.0
+version_added: '2.8'
 description:
      - Return a list of IBM i objects based on specific criteria. Multiple criteria are AND'd together.
 options:
@@ -252,7 +252,7 @@ try:
 except ImportError:
     HAS_IBM_DB = False
 
-__ibmi_module_version__ = "1.0.0-beta1"
+__ibmi_module_version__ = "0.0.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

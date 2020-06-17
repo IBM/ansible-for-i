@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_at
 short_description: Schedule a batch job
-version_added: 2.8
+version_added: '2.8'
 description:
      - The C(ibmi_at) module schedule a batch job.
 options:
@@ -165,7 +165,7 @@ job_log:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.0.0-beta1"
+__ibmi_module_version__ = "0.0.1"
 scdday_list = ['*NONE', '*ALL', '*MON', '*TUE', '*WED', '*THU', '*FRI', '*SAT', '*SUN']
 
 

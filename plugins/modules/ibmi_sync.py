@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sync
 short_description: Synchronize a save file from current IBM i node A to another IBM i node B.
-version_added: 2.8
+version_added: '2.8'
 description:
      - The C(ibmi_sync) module synchronize a save file from current IBM i node to another IBM i node.
      - Only support to synchronize save file by now.
@@ -111,7 +111,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_native, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.0.0-beta1"
+__ibmi_module_version__ = "0.0.1"
 HAS_PARAMIKO = True
 
 try:

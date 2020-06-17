@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix_imgclg
 short_description: Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.
-version_added: 1.0
+version_added: '2.8'
 description:
      - The C(ibmi_fix) module install fixes to target IBM i system by image catalog.
      - Single PTF, PTF group and TR PTF are supported.
@@ -231,7 +231,7 @@ try:
 except ImportError:
     HAS_IBM_DB = False
 
-__ibmi_module_version__ = "1.0.0-beta1"
+__ibmi_module_version__ = "0.0.1"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255

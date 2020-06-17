@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_tcp_interface
 short_description: Add, change, remove or query a tcp/ip interface.
-version_added: 1.1
+version_added: '2.8'
 description:
      - The C(ibmi_tcp_interface) module add, change, remove, start, end or query a tcp/ip interface.
      - This module provides the similar function of ADDTCPIFC, CHGTCPIFC, RMVTCPIFC, STRTCPIFC, ENDTCPIFC.
@@ -363,7 +363,7 @@ try:
     import ibm_db_dbi as dbi
 except ImportError:
     HAS_IBM_DB = False
-__ibmi_module_version__ = "1.0.0-beta1"
+__ibmi_module_version__ = "0.0.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
