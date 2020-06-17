@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_fix_imgclg.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/0.0.1/plugins/modules/ibmi_fix_imgclg.py
 
 .. _ibmi_fix_imgclg_module:
 
