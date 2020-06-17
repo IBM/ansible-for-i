@@ -33,7 +33,7 @@ options:
     description:
       - C(create)/C(delete)/C(add_disks) are idempotent actions that will not run
         commands unless necessary.
-      - C(view) will return the iasp state
+      - C(display) will return the iasp state
       - B(At least one of operation are required.)
     type: str
     choices: [ "create", "add_disks", "delete", "display" ]
