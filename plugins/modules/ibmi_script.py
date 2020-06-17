@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_script
 short_description: Execute a local cl/sql script file.
-version_added: '2.8'
+version_added: 2.8
 description:
      - The C(ibmi_script) plugin transfer a local cl/sql script file to a remote ibm i node and execute.
      - Only support cl/sql script file by now.

@@ -2,12 +2,12 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/0.0.1/plugins/modules/ibmi_script_execute.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_script_execute.py
 
 .. _ibmi_script_execute_module:
 
-ibmi_script_execute -- Execute a cl/sql script file
-===================================================
+ibmi_script_execute -- Execute a cl/sql script file on a remote ibm i node.
+===========================================================================
 
 
 .. contents::
@@ -17,9 +17,9 @@ ibmi_script_execute -- Execute a cl/sql script file
 
 Synopsis
 --------
-- The ``ibmi_script_execute`` module execute a cl/sql script file on a remote ibm i node.
+- The ibmi_script_execute module execute a cl/sql script file on a remote ibm i node.
 - Only support cl/sql script file by now.
-- For sql script, use RUNSQLSTM to process.
+- For sql script, use RUNSQLSTM to process
 - For non-cl/sql script, use the script plugin instead.
 
 
@@ -46,7 +46,7 @@ parameters
 
   The default values of parameters for RUNSQLSTM will be taken if not specified.
 
-  Only works for sql script.
+  Only works for sql script
 
 
   | **required**: false
@@ -60,7 +60,7 @@ severity_level
 
   If errors that are greater than the value specified for this parameter occur during processing, no more statements are run and the statements are rolled back if they are running under commitmentcontrol.
 
-  Only works for sql script.
+  Only works for sql script
 
 
   | **required**: false
@@ -83,7 +83,7 @@ src
 type
   Specify the script file type.
 
-  Only support ``CL`` or ``SQL`` script by now.
+  Only support CL or SQL script by now.
 
 
   | **required**: True
@@ -98,12 +98,12 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Execute test.cl on a remote IBM i node.
+   - name: Execute test.cl on a remote ibm i node
      ibmi_script_execute:
        src: '/home/test.cl'
        type: 'CL'
 
-   - name: Execute testsql.sql on a remote IBM i node.
+   - name: Execute testsql.sql on a remote ibm i node
      ibmi_script_execute:
        src: '/home/testsql.sql'
        type: 'SQL'
@@ -116,11 +116,9 @@ Notes
 -----
 
 .. note::
-   For cl script, the command supports line breaks.
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
-   When a command ends, add ':' at the end of each command or empty the next line.
-
-   Otherwise program will not consider it is the end of a command.
+   For cl script, the command supports line breaks. When a command ends, add ':' at the end of each command or empty the next line. Otherwise program will not consider it is the end of a command.
 
 
 
@@ -131,66 +129,8 @@ Return Values
 
    
                               
-       delta
-        | The execution delta time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 0:00:00.307534
-
-            
-      
-      
-                              
-       stdout
-        | The standard output.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: Successfully execute script file /home/test.cl
-
-            
-      
-      
-                              
-       stderr
-        | The standard error.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: Execute command %s failed.
-
-            
-      
-      
-                              
-       rc
-        | The action return code. 0 means success.
-      
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
-
-            
-      
-      
-                              
-       stdout_lines
-        | The standard output split in lines.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["Successfully execute script file /home/test.cl"]
-            
-      
-      
-                              
        stderr_lines
-        | The standard error split in lines.
+        | The standard error split in lines
       
         | **returned**: always
         | **type**: list      
@@ -204,7 +144,40 @@ Return Values
       
                               
        job_log
-        | The IBM i job log of the task executed.
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'PLUGILE', 'TO_PROGRAM': 'XMLSTOREDP', 'MESSAGE_TEXT': 'Command ended normally with exit status 0.', 'FROM_MODULE': 'QZSHRUNC', 'FROM_PROGRAM': 'QZSHRUNC', 'MESSAGE_TIMESTAMP': '2020-05-27-16.17.43.738571', 'FROM_USER': 'TESTER', 'TO_INSTRUCTION': '5829', 'MESSAGE_SECOND_LEVEL_TEXT': '', 'MESSAGE_TYPE': 'COMPLETION', 'MESSAGE_ID': 'QSH0005', 'MESSAGE_LIBRARY': 'QSHELL', 'FROM_LIBRARY': 'QSHELL', 'SEVERITY': '0', 'FROM_PROCEDURE': 'main', 'TO_LIBRARY': 'QXMLSERV', 'FROM_INSTRUCTION': '149', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '13', 'MESSAGE_FILE': 'QZSHMSGF', 'TO_PROCEDURE': 'ILECMDEXC'}]
+
+            
+      
+      
+                              
+       stderr
+        | The standard error
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: Execute command %s failed.
+
+            
+      
+      
+                              
+       stdout
+        | The standard output
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: Successfully execute script file /home/test.cl
+
+            
+      
+      
+                              
+       stdout_lines
+        | The standard output split in lines
       
         | **returned**: always
         | **type**: list      
@@ -212,7 +185,29 @@ Return Values
 
               .. code-block::
 
-                       [{"FROM_INSTRUCTION": "149", "FROM_LIBRARY": "QSHELL", "FROM_MODULE": "QZSHRUNC", "FROM_PROCEDURE": "main", "FROM_PROGRAM": "QZSHRUNC", "FROM_USER": "TESTER", "MESSAGE_FILE": "QZSHMSGF", "MESSAGE_ID": "QSH0005", "MESSAGE_LIBRARY": "QSHELL", "MESSAGE_SECOND_LEVEL_TEXT": "", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Command ended normally with exit status 0.", "MESSAGE_TIMESTAMP": "2020-05-27-16.17.43.738571", "MESSAGE_TYPE": "COMPLETION", "ORDINAL_POSITION": "13", "SEVERITY": "0", "TO_INSTRUCTION": "5829", "TO_LIBRARY": "QXMLSERV", "TO_MODULE": "PLUGILE", "TO_PROCEDURE": "ILECMDEXC", "TO_PROGRAM": "XMLSTOREDP"}]
+                       ["Successfully execute script file /home/test.cl"]
+            
+      
+      
+                              
+       delta
+        | The execution delta time.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
+            
+      
+      
+                              
+       rc
+        | The action return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
             
       
         

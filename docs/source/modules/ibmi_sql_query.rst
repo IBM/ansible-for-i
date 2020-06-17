@@ -2,12 +2,12 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/0.0.1/plugins/modules/ibmi_sql_query.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_sql_query.py
 
 .. _ibmi_sql_query_module:
 
-ibmi_sql_query -- Executes a SQL DQL(Data Query Language) statement.
-====================================================================
+ibmi_sql_query -- Executes a SQL DQL(Data Query Language) statement on a remote IBMi node.
+==========================================================================================
 
 
 .. contents::
@@ -18,6 +18,8 @@ ibmi_sql_query -- Executes a SQL DQL(Data Query Language) statement.
 Synopsis
 --------
 - The ``ibmi_sql_query`` module takes the SQL DQL(Data Query Language) statement as argument.
+- The given SQL DQL(Data Query Language) statement will be executed on all selected nodes.
+- Only run one statement at a time.
 
 
 
@@ -27,9 +29,9 @@ Parameters
 
      
 database
-  Specified database name, usually, it is the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries.
+  Specified database name, usually, its the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries
 
-  Default to use the '*LOCAL' entry.
+  Default to use the '*LOCAL' entry
 
 
   | **required**: false
@@ -39,11 +41,11 @@ database
 
      
 expected_row_count
-  The expected row count.
+  The expected row count
 
-  If it is equal or greater than 0, check if the actual row count returned from the query statement is matched with the expected row count.
+  If it is equal or greater than 0, check if the actual row count returned from the query statement is matched with the expected row count
 
-  If it is less than 0, do not check if the actual row count returned from the query statement is matched with the expected row count.
+  If it is less than 0, do not check if the actual row count returned from the query statement is matched with the expected row counit
 
 
   | **required**: false
@@ -53,7 +55,7 @@ expected_row_count
 
      
 joblog
-  If set to ``true``, output the job log even success.
+  If set to ``true``, output the JOBLOG even success.
 
 
   | **required**: false
@@ -76,7 +78,7 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Query the data of table Persons.
+   - name: Query the data of table Persons
      ibmi_sql_query:
        sql: 'select * from Persons'
 
@@ -86,7 +88,7 @@ Notes
 -----
 
 .. note::
-   This module can only run one statement at a time.
+   Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 See Also
@@ -103,19 +105,22 @@ Return Values
 
    
                               
-       start
-        | The sql statement execution start time.
+       stderr_lines
+        | The sql statement standard error split in lines
       
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
+
+                       [""]
             
       
       
                               
        end
-        | The sql statement execution end time.
+        | The sql statement execution end time
       
         | **returned**: always
         | **type**: str
@@ -125,8 +130,46 @@ Return Values
       
       
                               
+       job_log
+        | the job_log
+      
+        | **returned**: when rc as non-zero(failure) or rc as success(0) but joblog set to true
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
+
+            
+      
+      
+                              
+       stdout
+        | The sql statement standard output
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: str
+      
+      
+                              
+       rc
+        | The sql statement return code (0 means success)
+      
+        | **returned**: always
+        | **type**: int
+      
+      
+                              
+       start
+        | The sql statement execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
+
+            
+      
+      
+                              
        delta
-        | The sql statement execution delta time.
+        | The sql statement execution delta time
       
         | **returned**: always
         | **type**: str
@@ -136,30 +179,8 @@ Return Values
       
       
                               
-       row
-        | The sql query statement result.
-      
-        | **returned**: when rc as 0(success)
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       [{"ADDRESS": "Ring Building", "CITY": "Beijing", "FIRSTNAME": "Chang", "ID_P": "919665", "LASTNAME": "Le"}, {"ADDRESS": "Ring Building", "CITY": "Shanhai", "FIRSTNAME": "Zhang", "ID_P": "919689", "LASTNAME": "Li"}]
-            
-      
-      
-                              
-       stdout
-        | The sql statement standard output.
-      
-        | **returned**: When rc as non-zero(failure)
-        | **type**: str
-      
-      
-                              
        stderr
-        | The sql statement standard error.
+        | The sql statement standard error
       
         | **returned**: When rc as non-zero(failure)
         | **type**: str
@@ -167,7 +188,7 @@ Return Values
       
                               
        sql
-        | The sql statement executed by the task.
+        | The sql statement executed by the task
       
         | **returned**: always
         | **type**: str
@@ -177,16 +198,8 @@ Return Values
       
       
                               
-       rc
-        | The sql statement return code (0 means success).
-      
-        | **returned**: always
-        | **type**: int
-      
-      
-                              
        stdout_lines
-        | The sql statement standard output split in lines.
+        | The sql statement standard output split in lines
       
         | **returned**: When rc as non-zero(failure)
         | **type**: list      
@@ -199,30 +212,16 @@ Return Values
       
       
                               
-       stderr_lines
-        | The sql statement standard error split in lines.
+       row
+        | The sql query statement result
       
-        | **returned**: When rc as non-zero(failure)
+        | **returned**: when rc as 0(success)
         | **type**: list      
         | **sample**:
 
               .. code-block::
 
-                       [""]
-            
-      
-      
-                              
-       job_log
-        | The IBM i job log of the task executed.
-      
-        | **returned**: when rc as non-zero(failure) or rc as success(0) but joblog set to true.
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
+                       [{"ADDRESS": "Ring Building", "CITY": "Beijing", "FIRSTNAME": "Chang", "ID_P": "919665", "LASTNAME": "Le"}, {"ADDRESS": "Ring Building", "CITY": "Shanhai", "FIRSTNAME": "Zhang", "ID_P": "919689", "LASTNAME": "Li"}]
             
       
         

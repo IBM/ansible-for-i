@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_iasp
 short_description: Control IASP
-version_added: '2.8'
+version_added: 2.8
 description:
   - Control IASP.
   - For IBM i V7R2, PTF SI72162 is required.
@@ -33,7 +33,7 @@ options:
     description:
       - C(create)/C(delete)/C(add_disks) are idempotent actions that will not run
         commands unless necessary.
-      - C(display) will return the iasp state
+      - C(view) will return the iasp state
       - B(At least one of operation are required.)
     type: str
     choices: [ "create", "add_disks", "delete", "display" ]

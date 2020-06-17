@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_lib_save
 short_description: Save one libary
-version_added: '2.8'
+version_added: 2.8
 description:
      - The C(ibmi_lib_save) module create an save file on a remote IBM i nodes.
      - The save file is not copied to the local host.

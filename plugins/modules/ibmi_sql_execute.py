@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sql_execute
 short_description: Executes a SQL non-DQL(Data Query Language) statement
-version_added: '2.8'
+version_added: 2.8
 description:
      - The C(ibmi_sql_execute) module takes the SQL non-DQL(Data Query Language) statement as argument.
 options:

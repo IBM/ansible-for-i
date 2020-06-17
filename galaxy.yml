@@ -28,11 +28,15 @@ authors:
 # A short summary description of the collection
 description: The IBM i collection includes ansible action plugins, modules, sample playbooks to automate tasks on IBM i.
 
-# Portions of this collection are licensed under GNU General Public License Version 3.0
-# and portions of this collection are licensed under Apache License, Version 2.0
+# Either a single license or a list of licenses for content inside of a collection. Ansible Galaxy currently only
+# accepts L(SPDX,https://spdx.org/licenses/) licenses. This key is mutually exclusive with 'license_file'
 license:
-  - "GPL-3.0-only"
-  - "Apache-2.0"
+- GPLv3
+- Apache-2.0
+
+# # The path to the license file for the collection. This path is relative to the root of the collection. This key is
+# # mutually exclusive with 'license'
+# license_file: COPYING
 
 # A list of tags you want to associate with the collection for indexing/searching. A tag name has the same character
 # requirements as 'namespace' and 'name'
@@ -50,6 +54,12 @@ repository: https://github.com/IBM/ansible-for-i
 # The URL to any online docs
 documentation: https://ibm.github.io/ansible-for-i/index.html
 
+# The URL to the homepage of the collection/project
+#homepage: https://ibm.github.io/ansible-for-i/index.html
+
+# The URL to the collection issue tracker
+#issues: https://github.com/IBM/ansible-for-i/issues
+
 # A list of file glob-like patterns used to filter any files or directories that should not be included in the build
 # artifact. A pattern is matched from the relative path of the file or directory of the collection directory. This
 # uses 'fnmatch' to match the files or directories. Some directories and files like 'galaxy.yml', '*.pyc', '*.retry',
@@ -58,6 +68,3 @@ build_ignore:
   - ansible.cfg
   - .gitignore
   - .travis.yml
-  - .script
-  - .DS_Store
-  - .gitkeep

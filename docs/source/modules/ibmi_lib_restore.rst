@@ -2,12 +2,12 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/0.0.1/plugins/modules/ibmi_lib_restore.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_lib_restore.py
 
 .. _ibmi_lib_restore_module:
 
-ibmi_lib_restore -- Restore one library
-=======================================
+ibmi_lib_restore -- Restore one library on a remote IBMi node
+=============================================================
 
 
 .. contents::
@@ -17,9 +17,9 @@ ibmi_lib_restore -- Restore one library
 
 Synopsis
 --------
-- The ``ibmi_lib_restore`` module restore a save file.
+- The ibmi_lib_restore module restore an save file on a remote IBMi nodes
 - The restored library and save file are on the remote host.
-- Only support ``*SAVF`` as the save file's format by now.
+- Only support *SAVF as the save file's format by now.
 
 
 
@@ -41,7 +41,7 @@ asp_group
 
      
 format
-  The save file's format. Only support ``*SAVF`` by now.
+  The save file's format. Only support *SAVF by now.
 
 
   | **required**: false
@@ -52,7 +52,7 @@ format
 
      
 joblog
-  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  If set to ``true``, append JOBLOG to stderr/stderr_lines.
 
 
   | **required**: false
@@ -103,13 +103,19 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Restore savedlib libary from archive.savf in archlib libary.
+   - name: Restore savedlib libary from archive.savf in archlib libary
      ibmi_lib_restore:
        saved_lib: 'savedlib'
        savefile_name: 'archive'
        savefile_lib: 'archlib'
 
 
+
+Notes
+-----
+
+.. note::
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 
@@ -119,61 +125,6 @@ Return Values
 
 
    
-                              
-       start
-        | The restore execution start time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
-
-            
-      
-      
-                              
-       end
-        | The restore execution end time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       delta
-        | The restore execution delta time.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 0:00:00.307534
-
-            
-      
-      
-                              
-       stdout
-        | The restore standard output.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPC3703: 2 objects restored from test to test.
-
-            
-      
-      
-                              
-       stderr
-        | The restore standard error.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPF3806: Objects from save file archive in archlib not restored.\n
-
-            
-      
-      
                               
        saved_lib
         | The library need to be restored.
@@ -197,23 +148,81 @@ Return Values
       
       
                               
-       savefile_lib
-        | The save file library.
+       end
+        | The restore execution end time
       
         | **returned**: always
         | **type**: str
-        | **sample**: c1lib
+        | **sample**: 2019-12-02 11:07:54.064969
+
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'User Profile = TESTER', 'FROM_MODULE': 'QSQSRVR', 'FROM_PROGRAM': 'QSQSRVR', 'MESSAGE_TIMESTAMP': '2020-05-25-12.59.59.966873', 'FROM_USER': 'TESTER', 'TO_INSTRUCTION': '8873', 'MESSAGE_SECOND_LEVEL_TEXT': '', 'MESSAGE_TYPE': 'COMPLETION', 'MESSAGE_ID': '', 'MESSAGE_LIBRARY': '', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '0', 'FROM_PROCEDURE': 'QSQSRVR', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '8873', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '8', 'MESSAGE_FILE': '', 'TO_PROCEDURE': 'QSQSRVR'}]
+
+            
+      
+      
+                              
+       stdout
+        | The restore standard output
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPC3703: 2 objects restored from test to test.
 
             
       
       
                               
        format
-        | The save file's format. Only support C(*SAVF) by now.
+        | The save file's format. Only support *SAVF by now.
       
         | **returned**: always
         | **type**: str
         | **sample**: *SAVF
+
+            
+      
+      
+                              
+       stderr_lines
+        | The restore standard error split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF3806: Objects from save file archive in archlib not restored.", "CPF3780: Specified file for library test not found."]
+            
+      
+      
+                              
+       start
+        | The restore execution start time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
+
+            
+      
+      
+                              
+       delta
+        | The restore execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
 
             
       
@@ -230,8 +239,30 @@ Return Values
       
       
                               
+       savefile_lib
+        | The save file library.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: c1lib
+
+            
+      
+      
+                              
+       stderr
+        | The restore standard error
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF3806: Objects from save file archive in archlib not restored.\n
+
+            
+      
+      
+                              
        rc
-        | The restore action return code. 0 means success.
+        | The restore action return code (0 means success, non-zero means failure)
       
         | **returned**: always
         | **type**: int
@@ -242,7 +273,7 @@ Return Values
       
                               
        stdout_lines
-        | The restore standard output split in lines.
+        | The restore standard output split in lines
       
         | **returned**: always
         | **type**: list      
@@ -251,34 +282,6 @@ Return Values
               .. code-block::
 
                        ["CPC3703: 2 objects restored from test to test."]
-            
-      
-      
-                              
-       stderr_lines
-        | The restore standard error split in lines.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPF3806: Objects from save file archive in archlib not restored.", "CPF3780: Specified file for library test not found."]
-            
-      
-      
-                              
-       job_log
-        | The IBM i job log of the task executed.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       [{"FROM_INSTRUCTION": "8873", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "QSQSRVR", "FROM_PROCEDURE": "QSQSRVR", "FROM_PROGRAM": "QSQSRVR", "FROM_USER": "TESTER", "MESSAGE_FILE": "", "MESSAGE_ID": "", "MESSAGE_LIBRARY": "", "MESSAGE_SECOND_LEVEL_TEXT": "", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "User Profile = TESTER", "MESSAGE_TIMESTAMP": "2020-05-25-12.59.59.966873", "MESSAGE_TYPE": "COMPLETION", "ORDINAL_POSITION": "8", "SEVERITY": "0", "TO_INSTRUCTION": "8873", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         

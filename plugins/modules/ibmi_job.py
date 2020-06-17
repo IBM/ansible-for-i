@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_job
 short_description: Returns job information according to inputs.
-version_added: '2.8'
+version_added: 1.0
 description:
      - The C(ibmi_job) module returns information associated with one or more jobs.
 options:
