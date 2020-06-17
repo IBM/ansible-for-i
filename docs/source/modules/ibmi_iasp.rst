@@ -81,7 +81,7 @@ name
 operation
   ``create``/``delete``/``add_disks`` are idempotent actions that will not run commands unless necessary.
 
-  ``view`` will return the iasp state
+  ``display`` will return the iasp state
 
   **At least one of operation are required.**
 
