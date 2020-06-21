@@ -34,6 +34,8 @@
         ibmi_sql_query:
           sql: "select * from qgpl.ansible"
         register: sql_query_result
+      - debug:
+          var: sql_query_result
 
       - name: run the SQL command to insert the row again
         ibmi_sql_execute:
@@ -43,6 +45,9 @@
         ibmi_sql_query:
           sql: "select * from qgpl.ansible"
           expected_row_count: 2
+        register: sql_row_count
+      - debug:
+          var: sql_row_count
 
       always:
       - name: end journal
