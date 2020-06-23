@@ -12,7 +12,7 @@
 
       - name: Ocupacion de disco
         ibmi_sql_query:
-          sql: "select ASP_NUMBER, DEVD_NAME, DISK_UNITS, PRESENT,  TOTAL_CAPACITY_AVAILABLE, TOTAL_CAPACITY, DEC(DEC(TOTAL_CAPACITY_AVAILABLE, 19, 2) DEC(TOTAL_CAPACITY, 19, 2) * 100, 19, 2) AS AVAILABLE_SPACE from qsys2.asp_info ORDER BY 7 ASC"
+          sql: "select ASP_NUMBER, DEVD_NAME, DISK_UNITS, PRESENT,  TOTAL_CAPACITY_AVAILABLE, TOTAL_CAPACITY, DEC(DEC(TOTAL_CAPACITY_AVAILABLE, 19, 2)/ DEC(TOTAL_CAPACITY, 19, 2) * 100, 19, 2) AS AVAILABLE_SPACE from qsys2.asp_info ORDER BY 7 ASC"
         register: sql_query_result
       - debug:
           var: sql_query_result.row
