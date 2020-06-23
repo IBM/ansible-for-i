@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/0.0.1/plugins/modules/ibmi_iasp.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_iasp.py
 
 .. _ibmi_iasp_module:
 
@@ -81,7 +81,7 @@ name
 operation
   ``create``/``delete``/``add_disks`` are idempotent actions that will not run commands unless necessary.
 
-  ``display`` will return the iasp state
+  ``view`` will return the iasp state
 
   **At least one of operation are required.**
 
