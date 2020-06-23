@@ -23,13 +23,13 @@
 (
 select OS_VERSION, OS_RELEASE from sysibmadm.env_sys_info
 )
-SELECT VARCHAR(GRP_CRNCY,26) AS "GRPCUR",
-       GRP_ID,  VARCHAR(GRP_TITLE, 20) AS "NAME",
+SELECT VARCHAR(GRP_CRNCY,26) AS \"GRPCUR\",
+       GRP_ID,  VARCHAR(GRP_TITLE, 20) AS \"NAME\",
        GRP_LVL, GRP_IBMLVL, GRP_LSTUPD,
        GRP_RLS, GRP_SYSSTS
 FROM iLevel, systools.group_ptf_currency P
 WHERE ptf_group_release =
-'R' CONCAT iVersion CONCAT iRelease concat '0'
+''R'' CONCAT iVersion CONCAT iRelease concat ''0''
 ORDER BY ptf_group_level_available -
 ptf_group_level_installed DESC"
 
