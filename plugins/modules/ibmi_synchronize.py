@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_synchronize
 short_description: Synchronize a save file from IBM i node A to another IBM i node B
-version_added: 2.8
+version_added: '2.8'
 description:
      - The C(ibmi_synchronize) plugin synchronize a save file from IBM i node A to another IBM i node B.
      - C(ibmi_synchronize) plugin calls ibmi_sync module.

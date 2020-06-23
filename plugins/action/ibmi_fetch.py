@@ -17,7 +17,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 ifs_dir = '/tmp/.ansible'
 display = Display()
@@ -126,6 +126,7 @@ class ActionModule(ActionBase):
                 checksum="",
                 delta="",
                 job_log=[],
+                rc=255,
                 failed=False
             )
             savf_name = ''
@@ -237,6 +238,7 @@ class ActionModule(ActionBase):
                     result['stderr'] = save_result['stderr_lines']
                     result['stdout'] = save_result['stdout_lines']
                     result['job_log'] = save_result['job_log']
+                    result['rc'] = save_result['rc']
                     return result
                 created = True
 
@@ -249,8 +251,9 @@ class ActionModule(ActionBase):
             rc = save_result['rc']
             if rc != 0 and ('exists' not in save_result['stderr']):
                 result['msg'] = save_result['msg']
-                result['failed'] = True
                 result['stderr'] = save_result['stderr_lines']
+                result['rc'] = save_result['rc']
+                result['failed'] = True
                 return result
             module_output = self._execute_module(module_name='command', module_args={'_raw_params': command})
             save_result = module_output
@@ -260,6 +263,7 @@ class ActionModule(ActionBase):
                 result['failed'] = True
                 result['stderr'] = save_result['stderr_lines']
                 result['stdout'] = save_result['stdout_lines']
+                result['rc'] = save_result['rc']
                 return result
             ifs_created = True
 
@@ -380,7 +384,7 @@ class ActionModule(ActionBase):
                     result['msg'] += " File is renewed on local."
                     result.update({'changed': True, 'md5sum': new_md5, 'dest': dest,
                                    'remote_md5sum': None, 'checksum': new_checksum,
-                                   'remote_checksum': remote_checksum, 'delta': str(delta), 'file': savf})
+                                   'remote_checksum': remote_checksum, 'delta': str(delta), 'file': savf, 'rc': 0})
             else:
                 # For backwards compatibility. We'll return None on FIPS enabled systems
                 try:
@@ -392,7 +396,7 @@ class ActionModule(ActionBase):
                 if (created is True and backup is True) or is_savf is True:
                     savf = savf_path
                 result.update(dict(changed=False, md5sum=local_md5, file=savf, delta=str(delta), dest=dest,
-                                   checksum=local_checksum))
+                                   checksum=local_checksum, rc=0))
 
         except Exception as e:
             result['msg'] += "{p_to_text}".format(p_to_text=to_text(e))

@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix
 short_description: Install, remove or query an individual fix or a set of fixes on to IBM i system.
-version_added: 1.0
+version_added: '2.8'
 description:
      - The C(ibmi_fix) module install fixes to target IBM i system.
      - The installation file of the fixes should be in the format of save file.
@@ -198,21 +198,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-try:
-    from itoolkit import iToolKit
-    from itoolkit import iCmd
-    from itoolkit import iSqlFree
-    from itoolkit import iSqlFetch
-    from itoolkit import iSqlQuery
-    from itoolkit.transport import DatabaseTransport, DirectTransport
-except ImportError:
-    HAS_ITOOLKIT = False
-
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -371,12 +357,6 @@ def main():
         supports_check_mode=True,
     )
 
-    if HAS_ITOOLKIT is False:
-        module.fail_json(msg="itoolkit package is required")
-
-    if HAS_IBM_DB is False:
-        module.fail_json(msg="ibm_db package is required")
-
     product_id = module.params['product_id']
     ptf_list_to_select = module.params['fix_list']
     ptf_list_to_omit = module.params['fix_omit_list']
@@ -393,11 +373,7 @@ def main():
 
     startd = datetime.datetime.now()
     out = ''
-    connection_id = None
-    try:
-        connection_id = dbi.connect()
-    except Exception as e_db_connect:
-        module.fail_json(msg="Exception when connecting to IBM i Db2. " + str(e_db_connect))
+    connection_id = ibmi_util.itoolkit_init()
 
     if operation in ['load_and_apply', 'load_only', 'apply_only']:
         operation_bool_map = {'load_and_apply': [False, False], 'load_only': [True, False], 'apply_only': [False, True]}
@@ -432,10 +408,7 @@ def main():
         job_log = []
 
     if connection_id is not None:
-        try:
-            connection_id.close()
-        except Exception as e_disconnect:
-            module.log("ERROR: Unable to disconnect from the database. " + str(e_disconnect))
+        ibmi_util.itoolkti_close_connection(connection_id)
 
     endd = datetime.datetime.now()
     delta = endd - startd

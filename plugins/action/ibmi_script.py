@@ -17,7 +17,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.executor.powershell import module_manifest as ps_manifest
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 display = Display()
 
 

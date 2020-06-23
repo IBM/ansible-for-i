@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_submit_job
 short_description: Submit a job on IBM i system. This module functions like SBMJOB.
-version_added: 1.0
+version_added: '2.8'
 description:
      - The C(ibmi_submit_job) module submits a job on IBM i system.
      - It waits until the submitted job turns into expected status that is specified.
@@ -139,21 +139,7 @@ import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-try:
-    from itoolkit import iToolKit
-    from itoolkit import iSqlFree
-    from itoolkit import iSqlFetch
-    from itoolkit import iSqlQuery
-    from itoolkit.transport import DatabaseTransport, DirectTransport
-except ImportError:
-    HAS_ITOOLKIT = False
-
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
-
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -180,38 +166,6 @@ def interpret_return_code(rc):
         return "The returned status of the submitted job is not expected. "
     else:
         return "Unknown error"
-
-
-def itoolkit_run_sql(sql):
-    conn = dbi.connect()
-    db_itransport = DatabaseTransport(conn)
-    itool = iToolKit()
-
-    itool.add(iSqlQuery('query', sql, {'error': 'on'}))
-    itool.add(iSqlFetch('fetch'))
-    itool.add(iSqlFree('free'))
-
-    itool.call(db_itransport)
-
-    command_output = itool.dict_out('fetch')
-
-    rc = IBMi_COMMAND_RC_UNEXPECTED
-    out = ''
-    err = ''
-    if 'error' in command_output:
-        command_error = command_output['error']
-        if 'joblog' in command_error:
-            rc = IBMi_COMMAND_RC_ERROR
-            err = command_error['joblog']
-        else:
-            # should not be here, must xmlservice has internal error
-            rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
-            err = "iToolKit result dict does not have key 'joblog', the output is %s" % command_output
-    else:
-        rc = IBMi_COMMAND_RC_SUCCESS
-        out = command_output['row']
-
-    return rc, out, err
 
 
 def convert_wait_time_to_seconds(input_wait_time):
@@ -242,12 +196,6 @@ def main():
     )
 
     ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
-
-    if HAS_ITOOLKIT is False:
-        module.fail_json(msg="itoolkit package is required")
-
-    if HAS_IBM_DB is False:
-        module.fail_json(msg="ibm_db package is required")
 
     command = module.params['cmd']
     time_out = module.params['time_out']

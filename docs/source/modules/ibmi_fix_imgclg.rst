@@ -61,6 +61,15 @@ hiper_only
 
 
      
+joblog
+  The job log of the job executing the task will be returned even rc is zero if it is set to True.
+
+
+  | **required**: false
+  | **type**: bool
+
+
+     
 product_id
   The product ID of the fixes to be installed.
 
@@ -68,7 +77,7 @@ product_id
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: [u'*ALL']
+  | **default**: ['*ALL']
 
 
      
@@ -120,7 +129,7 @@ virtual_image_name_list
   | **required**: False
   | **type**: list
   | **elements**: str
-  | **default**: [u'*ALL']
+  | **default**: ['*ALL']
 
 
 
@@ -167,16 +176,13 @@ Return Values
 
    
                               
-       stderr_lines
-        | The task standard error split in lines
+       start
+        | The task execution start time
       
-        | **returned**: When error occurs.
-        | **type**: list      
-        | **sample**:
+        | **returned**: When rc is zero
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
-              .. code-block::
-
-                       ["CPF2111:Library TESTLIB already exists."]
             
       
       
@@ -187,6 +193,50 @@ Return Values
         | **returned**: When rc is zero
         | **type**: str
         | **sample**: 2019-12-02 11:07:54.064969
+
+            
+      
+      
+                              
+       delta
+        | The task execution delta time
+      
+        | **returned**: When rc is zero
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
+            
+      
+      
+                              
+       stdout
+        | The task standard output
+      
+        | **returned**: When error occurs.
+        | **type**: str
+        | **sample**: CPC2102: Library TESTLIB created
+
+            
+      
+      
+                              
+       stderr
+        | The task standard error
+      
+        | **returned**: When error occurs.
+        | **type**: str
+        | **sample**: CPF2111:Library TESTLIB already exists
+
+            
+      
+      
+                              
+       rc
+        | The task return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
             
       
@@ -206,57 +256,30 @@ Return Values
       
       
                               
-       stdout
-        | The task standard output
+       stderr_lines
+        | The task standard error split in lines
       
         | **returned**: When error occurs.
-        | **type**: str
-        | **sample**: CPC2102: Library TESTLIB created
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
+
+                       ["CPF2111:Library TESTLIB already exists."]
             
       
       
                               
-       rc
-        | The task return code (0 means success, non-zero means failure)
+       job_log
+        | The job log of the job executes the task.
       
         | **returned**: always
-        | **type**: int
-        | **sample**: 255
+        | **type**: list      
+        | **sample**:
 
-            
-      
-      
-                              
-       start
-        | The task execution start time
-      
-        | **returned**: When rc is zero
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
+              .. code-block::
 
-            
-      
-      
-                              
-       stderr
-        | The task standard error
-      
-        | **returned**: When error occurs.
-        | **type**: str
-        | **sample**: CPF2111:Library TESTLIB already exists
-
-            
-      
-      
-                              
-       delta
-        | The task execution delta time
-      
-        | **returned**: When rc is zero
-        | **type**: str
-        | **sample**: 0:00:00.307534
-
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
       

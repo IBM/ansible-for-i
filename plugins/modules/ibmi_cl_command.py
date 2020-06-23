@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_cl_command
 short_description: Executes a CL(Control language) command
-version_added: 2.8
+version_added: '2.8'
 description:
   - The C(ibmi_cl_command) module takes the CL command followed by a list of space-delimited arguments.
   - For PASE(Portable Application Solutions Environment for i) or QSHELL(Unix/Linux-liked) commands,
@@ -148,7 +148,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -183,6 +183,7 @@ def main():
 
     if is_cmd5250:
         args = ['system', command]
+        ibmi_util.log_info("Is 5250 command: " + command + ", use system utility to run", module._name)
         rc, out, err = module.run_command(args, use_unsafe_shell=False)
         job_log = []
     else:

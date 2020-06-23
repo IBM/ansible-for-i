@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_object_restore
 short_description: Restore one or more objects
-version_added: 2.8
+version_added: '2.8'
 description:
      - The C(ibmi_object_restore) module restore an save file on a remote IBM i nodes
      - The restored objects and save file are on the remote host.
@@ -205,7 +205,7 @@ job_log:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

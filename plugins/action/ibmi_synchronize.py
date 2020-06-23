@@ -15,7 +15,7 @@ from ansible.plugins.action import ActionBase
 from ansible.plugins.loader import connection_loader
 from ansible.utils.display import Display
 from ansible.inventory.host import Host
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 display = Display()
 
 

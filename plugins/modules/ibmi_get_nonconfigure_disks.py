@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_get_nonconfigure_disks
 short_description: Get all nonconfigure disks
-version_added: 2.8
+version_added: '2.8'
 description:
   - Get all nonconfigure disks.
   - For non-IBM i targets, no need.
@@ -110,7 +110,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def getNonconfigureDisk(time):

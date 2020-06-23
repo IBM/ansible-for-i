@@ -1,10 +1,5 @@
-# power_ibmi
-The IBM i collection includes modules. action plugins, sample playbooks to automate tasks on IBM i.
-
-
-Ansible is a radically simple IT automation system. It handles configuration management, application deployment, cloud provisioning, ad-hoc task execution, network automation, and multi-node orchestration. Ansible makes complex changes like zero-downtime rolling updates with load balancers easy. 
-
-IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i support on Ansible, like providing more IBM i modules and examples to manage IBM i nodes. 
+# IBM Power IBM i collection
+The IBM Power IBM i collection, also represented as power_ibmi in this document, includes modules, action plugins, sample playbooks to automate tasks on IBM i, such as executing CL commands, running SQL statements, submitting jobs, managing fixes, etc.
 
 <b>Getting Started Articles: </b> 
 
@@ -28,14 +23,20 @@ Note:
 3. Create your inventory file under examples/ibmi, an example can be found here "examples/ibmi/hosts_ibmi.ini"
 6. Run "ansible-playbook -i examples/ibmi/your_inventory_file examples/ibmi/playbooks/enable-ansible-for-i/enable-ibmi.yml"</br>
 
-<b>How to install the collection before it gets to be published to galaxy webesite </b> <br>
+<b>How to install the collection before it gets to be published to galaxy webesite?</b> <br>
 1. Git clone the repostiory to local
 2. Run "ansible-galaxy collection build ."
-3. Run "ansible-galaxy collection install ibm-power_ibmi-x.y.z.tar.gz"
-</br>
-
-Note: replacing x.y.z with the current version
+3. Run "ansible-galaxy collection install ibm-power_ibmi-x.y.z.tar.gz" (Note: replacing x.y.z with the current version)
 
 <b>How to install the collection after it gets to be published to galaxy website </b> <br>
-1. Run "ansible-galaxy collection install ibm.power_ibmi"
+Run "ansible-galaxy collection install ibm.power_ibmi"
 </br>
+</br>
+<b>Copyright</b>
+</br>
+© Copyright IBM Corporation 2020
+</br>
+
+<b>License</b>
+</br>
+This collection is licensed under GNU General Public License, Version 3.0.

@@ -16,7 +16,7 @@ from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 display = Display()
 
@@ -103,6 +103,7 @@ class ActionModule(ActionBase):
                 checksum="",
                 delta="",
                 job_log=[],
+                rc=255,
                 failed=False
             )
             savf_name = ''
@@ -163,6 +164,7 @@ class ActionModule(ActionBase):
                                 result['stderr'] = save_result['stderr_lines']
                                 result['stdout'] = save_result['stdout_lines']
                                 result['job_log'] = save_result['job_log']
+                                result['rc'] = save_result['rc']
                                 result['failed'] = True
                                 return result
                         display.debug("The original save file is successfully renamed to {p_rename_savf_name}".format(
@@ -179,6 +181,7 @@ class ActionModule(ActionBase):
                             result['stderr'] = save_result['stderr_lines']
                             result['stdout'] = save_result['stdout_lines']
                             result['job_log'] = save_result['job_log']
+                            result['rc'] = save_result['rc']
                             result['failed'] = True
                             return result
                         display.debug("The original save file is deleted.")
@@ -199,6 +202,7 @@ class ActionModule(ActionBase):
                 result['stderr'] = save_result['stderr_lines']
                 result['stdout'] = save_result['stdout_lines']
                 result['job_log'] = save_result['job_log']
+                result['rc'] = save_result['rc']
                 result['failed'] = True
                 return result
             dir = os.path.dirname(savefile_path)
@@ -219,7 +223,7 @@ class ActionModule(ActionBase):
             endd = datetime.datetime.now()
             delta = endd - startd
 
-            result.update(dict(msg="File is successfully copied.", src=src, delta=str(delta), dest=savefile_path))
+            result.update(dict(msg="File is successfully copied.", src=src, delta=str(delta), dest=savefile_path), rc=0)
 
         except Exception as e:
             result['msg'] += "{p_to_text}".format(p_to_text=to_text(e))
