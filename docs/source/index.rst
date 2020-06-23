@@ -27,7 +27,7 @@ https://ibm.github.io/cloud-i-blog/
 
 :Note: 
  - Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to 
-playbooks/enable-ansible-for-i/ibmi-install-yum.yml. 
+examples/ibmi/playbooks/ibmi-install-yum.yml. 
 
 Features
 ========
