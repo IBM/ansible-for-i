@@ -222,12 +222,14 @@ def main():
                     command = ''
             if command != '':
                 rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
+                ibmi_util.log_debug("run command: " + command, module._name)
         else:
             command = "QSYS/RUNSQLSTM SRCSTMF('{p_src}') ERRLVL({p_severity_level}) {p_parameters}".format(
                 p_src=src,
                 p_severity_level=severity_level,
                 p_parameters=parameters)
             rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
+            ibmi_util.log_debug("RUNSQLSTM: " + command, module._name)
             if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
                 return_error(module, "Execute sql statement file {p_command} failed. err: \n {p_err}".format(
                     p_command=command,

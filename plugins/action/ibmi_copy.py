@@ -167,7 +167,7 @@ class ActionModule(ActionBase):
                                 result['rc'] = save_result['rc']
                                 result['failed'] = True
                                 return result
-                        display.debug("The original save file is successfully renamed to {p_rename_savf_name}".format(
+                        display.debug("ibm i debug: The original save file is successfully renamed to {p_rename_savf_name}".format(
                             p_rename_savf_name=rename_savf_name))
                     else:
                         cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savefile_name}) OBJTYPE(*FILE)'.format(
@@ -184,7 +184,7 @@ class ActionModule(ActionBase):
                             result['rc'] = save_result['rc']
                             result['failed'] = True
                             return result
-                        display.debug("The original save file is deleted.")
+                        display.debug("ibm i debug: The original save file is deleted.")
                 else:
                     result['msg'] += "File with the Same name already exists on remote. If still want to copy, set force True. "
                     result['failed'] = True
@@ -206,6 +206,7 @@ class ActionModule(ActionBase):
                 result['failed'] = True
                 return result
             dir = os.path.dirname(savefile_path)
+            display.debug("ibm i debug: transfer {p_src} to {p_savefile_path}".format(p_src=src, p_savefile_path=savefile_path))
             self._transfer_file(src, savefile_path)
 
             local_checksum = checksum(src)

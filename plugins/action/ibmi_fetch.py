@@ -222,12 +222,14 @@ class ActionModule(ActionBase):
                     module_args = {'lib_name': lib_name, 'savefile_name': savf_name, 'savefile_lib': lib_name,
                                    'target_release': target_release, 'force_save': force_save, 'joblog': True,
                                    'parameters': omitfile}
+                    display.debug("ibm i debug: call ibmi_lib_save {p_module_args}".format(p_module_args=module_args))
                     module_output = self._execute_module(module_name='ibmi_lib_save', module_args=module_args)
                 else:
                     omitfile = 'OMITOBJ(({p_lib_name}/{p_savf_name} *FILE))'.format(p_lib_name=lib_name, p_savf_name=savf_name)
                     module_args = {'object_names': object_names, 'object_lib': lib_name, 'object_types': object_types,
                                    'savefile_name': savf_name, 'savefile_lib': lib_name, 'target_release': target_release,
                                    'force_save': force_save, 'joblog': True, 'parameters': omitfile}
+                    display.debug("ibm i debug: call ibmi_object_save {p_module_args}".format(p_module_args=module_args))
                     module_output = self._execute_module(module_name='ibmi_object_save', module_args=module_args)
 
                 save_result = module_output
@@ -356,6 +358,7 @@ class ActionModule(ActionBase):
                 makedirs_safe(os.path.dirname(dest))
 
                 # fetch the file and check for changes
+                display.debug("ibm i debug: fetch {p_source} {p_dest}".format(p_source=source, p_dest=dest))
                 if remote_data is None:
                     self._connection.fetch_file(source, dest)
                 else:
