@@ -35,7 +35,7 @@ delayed_option
   | **required**: false
   | **type**: str
   | **default**: *NO
-  | **choices**: *YES, *NO
+  | **choices**: *YES, *NO, *IMMDLY
 
 
      

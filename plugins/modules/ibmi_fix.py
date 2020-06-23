@@ -52,7 +52,7 @@ options:
   delayed_option:
     description:
       - Controls whether the PTF is delayed apply or not
-    choices: ['*YES', '*NO']
+    choices: ['*YES', '*NO', '*IMMDLY']
     type: str
     default: '*NO'
   operation:
@@ -340,7 +340,7 @@ def main():
             fix_omit_list=dict(type='list', elements='str'),
             save_file_object=dict(type='str'),
             save_file_lib=dict(type='str', default='QGPL'),
-            delayed_option=dict(type='str', default='*NO', choices=['*YES', '*NO']),
+            delayed_option=dict(type='str', default='*NO', choices=['*YES', '*NO', '*IMMDLY']),
             temp_or_perm=dict(type='str', default='*TEMP', choices=['*TEMP', '*PERM']),
             joblog=dict(type='bool', default=False),
             operation=dict(type='str', default='load_and_apply', choices=['load_and_apply',
