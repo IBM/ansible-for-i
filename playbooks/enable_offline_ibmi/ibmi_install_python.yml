@@ -41,10 +41,6 @@
   when: default_python_existance.rc != 0
 
 - block:
-    - fail: 
-        msg: "package_path is not provided, please provide the directory path where the installation packages locate at"
-      when: package_path == ""
-
     - set_fact:
         has_rpm_to_be_installed: false
 
