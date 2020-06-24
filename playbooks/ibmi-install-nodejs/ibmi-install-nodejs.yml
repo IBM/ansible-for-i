@@ -1,5 +1,5 @@
-#ibmi-install-nodejs.yml 
-#Refer to https://bitbucket.org/ibmi/opensource/src/master/docs/yum/ to get more details about IBM i opensource.  
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 - hosts: ibmi 
   gather_facts: no

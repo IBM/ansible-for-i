@@ -1,0 +1,30 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- name: Verify {{dependency}} installed
+  raw: /QOpensys/pkgs/bin/rpm -qa {{python}}-{{dependency}}
+  register: rpm_query_result
+
+- block: 
+    - name: find out the name of installation package of {{dependency}}
+      shell: ls {{package_path}}/{{python}}-{{dependency}}*.rpm 
+      delegate_to: localhost
+      register: python_file_list 
+
+    - set_fact: 
+        rpm_list: "{{ rpm_list|default([]) + [rpm_full_path.split('/')[-1]] }}"
+      loop: '{{python_file_list.stdout_lines}}'
+      loop_control:
+        loop_var: rpm_full_path
+
+    - include: transfer_files.yml
+      loop: '{{rpm_list}}'
+      loop_control:
+        loop_var: package
+      vars:
+        target_path: '{{remote_temp_dir}}'
+
+    - set_fact:
+        has_rpm_to_be_installed: true
+
+  when: rpm_query_result.stdout == ""

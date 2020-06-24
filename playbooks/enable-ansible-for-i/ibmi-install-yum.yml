@@ -1,5 +1,5 @@
-#ibmi-install-yum.yml 
-#Refer to https://bitbucket.org/ibmi/opensource/src/master/docs/yum/ to get more details about IBM i opensource.  
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 - name: Check whether yum has been installed. If not, install it in following tasks.
   raw: ls -l /QOpensys/pkgs/bin/yum

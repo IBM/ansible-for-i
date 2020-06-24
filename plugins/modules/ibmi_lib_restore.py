@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_lib_restore
 short_description: Restore one library
-version_added: 2.8
+version_added: '2.8'
 description:
      - The C(ibmi_lib_restore) module restore a save file.
      - The restored library and save file are on the remote host.

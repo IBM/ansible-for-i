@@ -2,8 +2,6 @@
 ---
 - hosts: ibmi 
   gather_facts: no 
-  collections:
-   - ibm.power_ibmi
   
   tasks:
 

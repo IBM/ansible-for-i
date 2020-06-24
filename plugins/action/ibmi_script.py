@@ -85,6 +85,7 @@ class ActionModule(ActionBase):
             except AnsibleError as e:
                 raise AnsibleActionFail(to_native(e))
             tmp_src = self._connection._shell.join_path(self._connection._shell.tmpdir, os.path.basename(src))
+            display.debug("ibm i debug: transfer script file {p_src} to {p_tmp_src}".format(p_src=src, p_tmp_src=tmp_src))
             self._transfer_file(src, tmp_src)
 
             local_checksum = checksum(src)

@@ -126,6 +126,7 @@ class ActionModule(ActionBase):
                 checksum="",
                 delta="",
                 job_log=[],
+                rc=255,
                 failed=False
             )
             savf_name = ''
@@ -221,12 +222,14 @@ class ActionModule(ActionBase):
                     module_args = {'lib_name': lib_name, 'savefile_name': savf_name, 'savefile_lib': lib_name,
                                    'target_release': target_release, 'force_save': force_save, 'joblog': True,
                                    'parameters': omitfile}
+                    display.debug("ibm i debug: call ibmi_lib_save {p_module_args}".format(p_module_args=module_args))
                     module_output = self._execute_module(module_name='ibmi_lib_save', module_args=module_args)
                 else:
                     omitfile = 'OMITOBJ(({p_lib_name}/{p_savf_name} *FILE))'.format(p_lib_name=lib_name, p_savf_name=savf_name)
                     module_args = {'object_names': object_names, 'object_lib': lib_name, 'object_types': object_types,
                                    'savefile_name': savf_name, 'savefile_lib': lib_name, 'target_release': target_release,
                                    'force_save': force_save, 'joblog': True, 'parameters': omitfile}
+                    display.debug("ibm i debug: call ibmi_object_save {p_module_args}".format(p_module_args=module_args))
                     module_output = self._execute_module(module_name='ibmi_object_save', module_args=module_args)
 
                 save_result = module_output
@@ -237,6 +240,7 @@ class ActionModule(ActionBase):
                     result['stderr'] = save_result['stderr_lines']
                     result['stdout'] = save_result['stdout_lines']
                     result['job_log'] = save_result['job_log']
+                    result['rc'] = save_result['rc']
                     return result
                 created = True
 
@@ -249,8 +253,9 @@ class ActionModule(ActionBase):
             rc = save_result['rc']
             if rc != 0 and ('exists' not in save_result['stderr']):
                 result['msg'] = save_result['msg']
-                result['failed'] = True
                 result['stderr'] = save_result['stderr_lines']
+                result['rc'] = save_result['rc']
+                result['failed'] = True
                 return result
             module_output = self._execute_module(module_name='command', module_args={'_raw_params': command})
             save_result = module_output
@@ -260,6 +265,7 @@ class ActionModule(ActionBase):
                 result['failed'] = True
                 result['stderr'] = save_result['stderr_lines']
                 result['stdout'] = save_result['stdout_lines']
+                result['rc'] = save_result['rc']
                 return result
             ifs_created = True
 
@@ -352,6 +358,7 @@ class ActionModule(ActionBase):
                 makedirs_safe(os.path.dirname(dest))
 
                 # fetch the file and check for changes
+                display.debug("ibm i debug: fetch {p_source} {p_dest}".format(p_source=source, p_dest=dest))
                 if remote_data is None:
                     self._connection.fetch_file(source, dest)
                 else:
@@ -380,7 +387,7 @@ class ActionModule(ActionBase):
                     result['msg'] += " File is renewed on local."
                     result.update({'changed': True, 'md5sum': new_md5, 'dest': dest,
                                    'remote_md5sum': None, 'checksum': new_checksum,
-                                   'remote_checksum': remote_checksum, 'delta': str(delta), 'file': savf})
+                                   'remote_checksum': remote_checksum, 'delta': str(delta), 'file': savf, 'rc': 0})
             else:
                 # For backwards compatibility. We'll return None on FIPS enabled systems
                 try:
@@ -392,7 +399,7 @@ class ActionModule(ActionBase):
                 if (created is True and backup is True) or is_savf is True:
                     savf = savf_path
                 result.update(dict(changed=False, md5sum=local_md5, file=savf, delta=str(delta), dest=dest,
-                                   checksum=local_checksum))
+                                   checksum=local_checksum, rc=0))
 
         except Exception as e:
             result['msg'] += "{p_to_text}".format(p_to_text=to_text(e))

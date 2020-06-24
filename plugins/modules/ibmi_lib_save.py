@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_lib_save
 short_description: Save one libary
-version_added: 2.8
+version_added: '2.8'
 description:
      - The C(ibmi_lib_save) module create an save file on a remote IBM i nodes.
      - The save file is not copied to the local host.
@@ -238,6 +238,7 @@ def main():
             p_savefile_name=savefile_name)
         rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
         job_log = ibmi_util.itoolkit_get_job_log(conn, startd)
+        ibmi_util.log_debug("CRTSAVF: " + command, module._name)
         if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
             # SAVLIB
             command = 'QSYS/SAVLIB LIB({p_lib_name}) DEV({p_format}) SAVF({p_savefile_lib}/{p_savefile_name}) \
@@ -251,12 +252,14 @@ def main():
             rc, out, error = ibmi_util.itoolkit_run_command(conn, ' '.join(command.split()))
         else:
             if 'CPF5813' in str(job_log):
+                ibmi_util.log_debug("SAVF " + savefile_name + " already exists", module._name)
                 if force_save is True:
                     # CLRSAVF
                     command = 'QSYS/CLRSAVF FILE({p_savefile_lib}/{p_savefile_name})'.format(
                         p_savefile_lib=savefile_lib,
                         p_savefile_name=savefile_name)
                     rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
+                    ibmi_util.log_debug("CLRSAVF: " + command, module._name)
                     if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
                         command = 'QSYS/SAVLIB LIB({p_lib_name}) DEV({p_format}) SAVF({p_savefile_lib}/{p_savefile_name}) \
                           TGTRLS({p_target_release}) {p_parameters}'.format(

@@ -97,6 +97,7 @@ class ActionModule(ActionBase):
                 remote_user = C.DEFAULT_REMOTE_USER
         _tmp_args['remote_user'] = remote_user
 
+        display.debug("ibm i debug: args for ibmi_sync {p_tmp_args}".format(p_tmp_args=_tmp_args))
         # run the module and store the result
         result.update(self._execute_module('ibmi_sync', module_args=_tmp_args))
         result['failed'] = result['rc']

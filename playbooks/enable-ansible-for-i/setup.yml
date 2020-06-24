@@ -1,5 +1,5 @@
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Author, Li Jun, Zhu <zhuljbj@126.com>
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 
 - hosts: ibmi 
@@ -25,9 +25,9 @@
   - name: Promote message if 5770DG1 is not installed
     fail:
       msg: 5770DG1 is not installed
-    when: '"5770DG1     *BASE      5050" not in installed_native_products.stdout'
+    when: '"5770DG1" not in installed_native_products.stdout'
 
   - name: IBM i is now available for being managed by Ansible
     debug:
       msg: "The IBM i node is ready for Ansible."
-    when: '"5770DG1     *BASE      5050" in installed_native_products.stdout'
+    when: '"5770DG1" in installed_native_products.stdout'

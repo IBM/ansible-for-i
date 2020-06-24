@@ -103,6 +103,7 @@ class ActionModule(ActionBase):
                 checksum="",
                 delta="",
                 job_log=[],
+                rc=255,
                 failed=False
             )
             savf_name = ''
@@ -163,9 +164,10 @@ class ActionModule(ActionBase):
                                 result['stderr'] = save_result['stderr_lines']
                                 result['stdout'] = save_result['stdout_lines']
                                 result['job_log'] = save_result['job_log']
+                                result['rc'] = save_result['rc']
                                 result['failed'] = True
                                 return result
-                        display.debug("The original save file is successfully renamed to {p_rename_savf_name}".format(
+                        display.debug("ibm i debug: The original save file is successfully renamed to {p_rename_savf_name}".format(
                             p_rename_savf_name=rename_savf_name))
                     else:
                         cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savefile_name}) OBJTYPE(*FILE)'.format(
@@ -179,9 +181,10 @@ class ActionModule(ActionBase):
                             result['stderr'] = save_result['stderr_lines']
                             result['stdout'] = save_result['stdout_lines']
                             result['job_log'] = save_result['job_log']
+                            result['rc'] = save_result['rc']
                             result['failed'] = True
                             return result
-                        display.debug("The original save file is deleted.")
+                        display.debug("ibm i debug: The original save file is deleted.")
                 else:
                     result['msg'] += "File with the Same name already exists on remote. If still want to copy, set force True. "
                     result['failed'] = True
@@ -199,9 +202,11 @@ class ActionModule(ActionBase):
                 result['stderr'] = save_result['stderr_lines']
                 result['stdout'] = save_result['stdout_lines']
                 result['job_log'] = save_result['job_log']
+                result['rc'] = save_result['rc']
                 result['failed'] = True
                 return result
             dir = os.path.dirname(savefile_path)
+            display.debug("ibm i debug: transfer {p_src} to {p_savefile_path}".format(p_src=src, p_savefile_path=savefile_path))
             self._transfer_file(src, savefile_path)
 
             local_checksum = checksum(src)
@@ -219,7 +224,7 @@ class ActionModule(ActionBase):
             endd = datetime.datetime.now()
             delta = endd - startd
 
-            result.update(dict(msg="File is successfully copied.", src=src, delta=str(delta), dest=savefile_path))
+            result.update(dict(msg="File is successfully copied.", src=src, delta=str(delta), dest=savefile_path), rc=0)
 
         except Exception as e:
             result['msg'] += "{p_to_text}".format(p_to_text=to_text(e))
