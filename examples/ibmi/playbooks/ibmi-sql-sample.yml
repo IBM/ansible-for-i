@@ -58,6 +58,10 @@
         ibmi_sql_execute:
           sql: "drop table qgpl.ansible"
 
+      - name: cambiar trabajo a lista de mensajes de sistema
+        ibmi_cl_command: 
+          cmd: CHGJOB INQMSGRPY(*SYSRPYL)  
+
       - name: delete journal
         ibmi_cl_command: 
           cmd: QSYS/DLTJRN JRN(QGPL/ANSIJSNJRN) 
