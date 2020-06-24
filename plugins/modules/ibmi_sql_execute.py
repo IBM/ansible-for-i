@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sql_execute
 short_description: Executes a SQL non-DQL(Data Query Language) statement
-version_added: 2.8
+version_added: '2.8'
 description:
      - The C(ibmi_sql_execute) module takes the SQL non-DQL(Data Query Language) statement as argument.
 options:
@@ -130,7 +130,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():

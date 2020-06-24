@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_job.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_job.py
 
 .. _ibmi_job_module:
 
@@ -23,6 +23,15 @@ Synopsis
 
 Parameters
 ----------
+
+
+     
+joblog
+  The job log of the job executing the task will be returned even rc is zero if it is set to true.
+
+
+  | **required**: false
+  | **type**: bool
 
 
      
@@ -88,7 +97,7 @@ user
 
   | **required**: false
   | **type**: str
-  | **default**: *USER
+  | **default**: *ALL
 
 
 
@@ -130,67 +139,6 @@ Return Values
 
    
                               
-       stderr_lines
-        | The task standard error split in lines
-      
-        | **returned**: When rc as non-zero(failure)
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPF2111:Library TESTLIB already exists."]
-            
-      
-      
-                              
-       end
-        | The task execution end time
-      
-        | **returned**: When job has been submitted and task has waited for the job status for some time
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       stdout
-        | The task standard output
-      
-        | **returned**: When rc as non-zero(failure)
-        | **type**: str
-        | **sample**: CPC2102: Library TESTLIB created
-
-            
-      
-      
-                              
-       rc
-        | The task return code (0 means success, non-zero means failure)
-      
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
-
-            
-      
-      
-                              
-       job_info
-        | The information of the job(s)
-      
-        | **returned**: When rc is zero
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       [{"CCSID": "0", "COMPLETION_STATUS": "ABNORMAL", "JOB_ACCOUNTING_CODE": "*SYS", "JOB_ACTIVE_TIME": "", "JOB_DATE": "", "JOB_DESCRIPTION": "", "JOB_DESCRIPTION_LIBRARY": "", "JOB_END_REASON": "", "JOB_END_SEVERITY": "10", "JOB_END_TIME": "2020-02-14-00.36.35", "JOB_ENTERED_SYSTEM_TIME": "2020-02-14-00.36.35", "JOB_INFORMATION": "YES", "JOB_NAME": "514647/WANGYUN/QPRTJOB", "JOB_QUEUE_LIBRARY": "", "JOB_QUEUE_NAME": "", "JOB_QUEUE_PRIORITY": "0", "JOB_QUEUE_STATUS": "", "JOB_SCHEDULED_TIME": "", "JOB_STATUS": "OUTQ", "JOB_SUBSYSTEM": "", "JOB_TYPE": "BCH", "JOB_TYPE_ENHANCED": "ALTERNATE_SPOOL_USER", "SUBMITTER_JOB_NAME": "", "SUBMITTER_MESSAGE_QUEUE": "", "SUBMITTER_MESSAGE_QUEUE_LIBRARY": ""}, {"CCSID": "65535", "COMPLETION_STATUS": "ABNORMAL", "JOB_ACCOUNTING_CODE": "*SYS", "JOB_ACTIVE_TIME": "2020-03-23-22.07.18", "JOB_DATE": "", "JOB_DESCRIPTION": "QDFTJOBD", "JOB_DESCRIPTION_LIBRARY": "QGPL", "JOB_END_REASON": "JOB ENDED DUE TO A DEVICE ERROR", "JOB_END_SEVERITY": "30", "JOB_END_TIME": "2020-03-24-11.06.44", "JOB_ENTERED_SYSTEM_TIME": "2020-03-23-22.07.18", "JOB_INFORMATION": "YES", "JOB_NAME": "547343/WANGYUN/QPADEV0001", "JOB_QUEUE_LIBRARY": "", "JOB_QUEUE_NAME": "", "JOB_QUEUE_PRIORITY": "0", "JOB_QUEUE_STATUS": "", "JOB_SCHEDULED_TIME": "", "JOB_STATUS": "OUTQ", "JOB_SUBSYSTEM": "", "JOB_TYPE": "INT", "JOB_TYPE_ENHANCED": "INTERACTIVE_GROUP", "SUBMITTER_JOB_NAME": "", "SUBMITTER_MESSAGE_QUEUE": "", "SUBMITTER_MESSAGE_QUEUE_LIBRARY": ""}]
-            
-      
-      
-                              
        start
         | The task execution start time
       
@@ -202,12 +150,12 @@ Return Values
       
       
                               
-       stderr
-        | The task standard error
+       end
+        | The task execution end time
       
-        | **returned**: When rc as non-zero(failure)
+        | **returned**: When job has been submitted and task has waited for the job status for some time
         | **type**: str
-        | **sample**: CPF2111:Library TESTLIB already exists
+        | **sample**: 2019-12-02 11:07:54.064969
 
             
       
@@ -224,6 +172,39 @@ Return Values
       
       
                               
+       stdout
+        | The task standard output
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: str
+        | **sample**: CPC2102: Library TESTLIB created
+
+            
+      
+      
+                              
+       stderr
+        | The task standard error
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: str
+        | **sample**: CPF2111:Library TESTLIB already exists
+
+            
+      
+      
+                              
+       rc
+        | The task return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
+            
+      
+      
+                              
        stdout_lines
         | The task standard output split in lines
       
@@ -234,6 +215,48 @@ Return Values
               .. code-block::
 
                        ["CPC2102: Library TESTLIB created."]
+            
+      
+      
+                              
+       stderr_lines
+        | The task standard error split in lines
+      
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF2111:Library TESTLIB already exists."]
+            
+      
+      
+                              
+       job_log
+        | The job log of the job executes the task.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
+            
+      
+      
+                              
+       job_info
+        | The information of the job(s)
+      
+        | **returned**: When rc is zero
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"CCSID": "0", "COMPLETION_STATUS": "ABNORMAL", "JOB_ACCOUNTING_CODE": "*SYS", "JOB_ACTIVE_TIME": "", "JOB_DATE": "", "JOB_DESCRIPTION": "", "JOB_DESCRIPTION_LIBRARY": "", "JOB_END_REASON": "", "JOB_END_SEVERITY": "10", "JOB_END_TIME": "2020-02-14-00.36.35", "JOB_ENTERED_SYSTEM_TIME": "2020-02-14-00.36.35", "JOB_INFORMATION": "YES", "JOB_NAME": "514647/WANGYUN/QPRTJOB", "JOB_QUEUE_LIBRARY": "", "JOB_QUEUE_NAME": "", "JOB_QUEUE_PRIORITY": "0", "JOB_QUEUE_STATUS": "", "JOB_SCHEDULED_TIME": "", "JOB_STATUS": "OUTQ", "JOB_SUBSYSTEM": "", "JOB_TYPE": "BCH", "JOB_TYPE_ENHANCED": "ALTERNATE_SPOOL_USER", "SUBMITTER_JOB_NAME": "", "SUBMITTER_MESSAGE_QUEUE": "", "SUBMITTER_MESSAGE_QUEUE_LIBRARY": ""}, {"CCSID": "65535", "COMPLETION_STATUS": "ABNORMAL", "JOB_ACCOUNTING_CODE": "*SYS", "JOB_ACTIVE_TIME": "2020-03-23-22.07.18", "JOB_DATE": "", "JOB_DESCRIPTION": "QDFTJOBD", "JOB_DESCRIPTION_LIBRARY": "QGPL", "JOB_END_REASON": "JOB ENDED DUE TO A DEVICE ERROR", "JOB_END_SEVERITY": "30", "JOB_END_TIME": "2020-03-24-11.06.44", "JOB_ENTERED_SYSTEM_TIME": "2020-03-23-22.07.18", "JOB_INFORMATION": "YES", "JOB_NAME": "547343/WANGYUN/QPADEV0001", "JOB_QUEUE_LIBRARY": "", "JOB_QUEUE_NAME": "", "JOB_QUEUE_PRIORITY": "0", "JOB_QUEUE_STATUS": "", "JOB_SCHEDULED_TIME": "", "JOB_STATUS": "OUTQ", "JOB_SUBSYSTEM": "", "JOB_TYPE": "INT", "JOB_TYPE_ENHANCED": "INTERACTIVE_GROUP", "SUBMITTER_JOB_NAME": "", "SUBMITTER_MESSAGE_QUEUE": "", "SUBMITTER_MESSAGE_QUEUE_LIBRARY": ""}]
             
       
         

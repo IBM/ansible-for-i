@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_submit_job.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_submit_job.py
 
 .. _ibmi_submit_job_module:
 
@@ -62,7 +62,7 @@ status
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: [u'*NONE']
+  | **default**: ['*NONE']
 
 
      
@@ -113,16 +113,13 @@ Return Values
 
    
                               
-       stderr_lines
-        | The task standard error split in lines
+       start
+        | The task execution start time
       
-        | **returned**: When rc as non-zero(failure)
-        | **type**: list      
-        | **sample**:
+        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
 
-              .. code-block::
-
-                       ["CPF2111:Library TESTLIB already exists."]
             
       
       
@@ -133,17 +130,6 @@ Return Values
         | **returned**: When job has been submitted and task has waited for the job status for some time
         | **type**: str
         | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       stdout
-        | The task standard output
-      
-        | **returned**: When rc as non-zero(failure)
-        | **type**: str
-        | **sample**: CPC2102: Library TESTLIB created
 
             
       
@@ -160,12 +146,12 @@ Return Values
       
       
                               
-       start
-        | The task execution start time
+       stdout
+        | The task standard output
       
-        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **returned**: When rc as non-zero(failure)
         | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
+        | **sample**: CPC2102: Library TESTLIB created
 
             
       
@@ -177,6 +163,17 @@ Return Values
         | **returned**: When rc as non-zero(failure)
         | **type**: str
         | **sample**: CPF2111:Library TESTLIB already exists
+
+            
+      
+      
+                              
+       sbmjob_cmd
+        | The SBMJOB CL command that has been used.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: SBMJOB CMD(CRTLIB LIB(TESTLIB))
 
             
       
@@ -207,13 +204,16 @@ Return Values
       
       
                               
-       sbmjob_cmd
-        | The SBMJOB CL command that has been used.
+       stderr_lines
+        | The task standard error split in lines
       
-        | **returned**: always
-        | **type**: str
-        | **sample**: SBMJOB CMD(CRTLIB LIB(TESTLIB))
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
+
+                       ["CPF2111:Library TESTLIB already exists."]
             
       
         

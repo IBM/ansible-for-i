@@ -17,7 +17,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.executor.powershell import module_manifest as ps_manifest
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 display = Display()
 
 
@@ -85,6 +85,7 @@ class ActionModule(ActionBase):
             except AnsibleError as e:
                 raise AnsibleActionFail(to_native(e))
             tmp_src = self._connection._shell.join_path(self._connection._shell.tmpdir, os.path.basename(src))
+            display.debug("ibm i debug: transfer script file {p_src} to {p_tmp_src}".format(p_src=src, p_tmp_src=tmp_src))
             self._transfer_file(src, tmp_src)
 
             local_checksum = checksum(src)

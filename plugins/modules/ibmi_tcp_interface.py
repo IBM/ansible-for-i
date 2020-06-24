@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_tcp_interface
 short_description: Add, change, remove or query a tcp/ip interface.
-version_added: 1.1
+version_added: '2.8'
 description:
      - The C(ibmi_tcp_interface) module add, change, remove, start, end or query a tcp/ip interface.
      - This module provides the similar function of ADDTCPIFC, CHGTCPIFC, RMVTCPIFC, STRTCPIFC, ENDTCPIFC.
@@ -349,21 +349,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-try:
-    from itoolkit import iToolKit
-    from itoolkit import iSqlFree
-    from itoolkit import iSqlFetch
-    from itoolkit import iSqlQuery
-    from itoolkit import iCmd
-    from itoolkit.transport import DatabaseTransport, DirectTransport
-except ImportError:
-    HAS_ITOOLKIT = False
-
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -427,12 +413,6 @@ def main():
         required_one_of=[["internet_address", "alias_name"]],
         supports_check_mode=True,
     )
-
-    if HAS_ITOOLKIT is False:
-        module.fail_json(msg="itoolkit package is required")
-
-    if HAS_IBM_DB is False:
-        module.fail_json(msg="ibm_db package is required")
 
     internet_address = module.params['internet_address']
     line_description = module.params['line_description']

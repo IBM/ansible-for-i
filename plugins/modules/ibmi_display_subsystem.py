@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_display_subsystem
 short_description: Displays all currently active subsystems or currently active jobs in a subsystem
-version_added: 2.8
+version_added: '2.8'
 description:
     - The C(ibmi_display_subsystem) module displays all currently active subsystems or currently active jobs in a subsystem.
     - In some ways it has equivalent results of WRKSBS if subsystem is C('*ALL'), otherwise, it has equivalent results of WRKSBSJOB.
@@ -171,7 +171,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():
@@ -222,6 +222,7 @@ def main():
             module.exit_json(**result_success)
     else:
         sql = "SELECT J.SUBSYSTEM FROM TABLE (QSYS2.ACTIVE_JOB_INFO()) J WHERE JOB_TYPE = 'SBS'"
+        ibmi_util.log_info("Command to run: " + sql, module._name)
         rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(sql)
 
         if rc:
@@ -250,6 +251,7 @@ def main():
                     SUBSYSTEM_LIST_FILTER => '{subsystem_pattern}', \
                     CURRENT_USER_LIST_FILTER => '{user_pattern}')) J WHERE JOB_TYPE NOT IN ('SBS', 'SYS')".format(
                     subsystem_pattern=subsystem, user_pattern=user)
+            ibmi_util.log_info("Command to run: " + sql, module._name)
             rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(sql)
             if rc:
                 result_failed = dict(

@@ -2,12 +2,12 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_tcp_server_service.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_tcp_server_service.py
 
 .. _ibmi_tcp_server_service_module:
 
-ibmi_tcp_server_service -- Manage tcp server on a remote IBMi node
-==================================================================
+ibmi_tcp_server_service -- Manage tcp server
+============================================
 
 
 .. contents::
@@ -28,7 +28,7 @@ Parameters
 
      
 extra_parameters
-  extra parameter is appended at the end of tcp server service command
+  Extra parameter is appended at the end of tcp server service command.
 
 
   | **required**: false
@@ -99,8 +99,8 @@ Return Values
 
    
                               
-       stderr_lines
-        | The command standard error split in lines
+       job_log
+        | The IBM i job log of the task executed.
       
         | **returned**: always
         | **type**: list      
@@ -108,57 +108,13 @@ Return Values
 
               .. code-block::
 
-                       ["CPF2111:Library TESTLIB already exists."]
-            
-      
-      
-                              
-       end
-        | The command execution end time
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       job_log
-        | the job_log
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_KEY': '00000379', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'TO_INSTRUCTION': '9369', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'FROM_USER': 'CHANGLE', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'FROM_PROCEDURE': '', 'FROM_INSTRUCTION': '318F', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'TO_LIBRARY': 'QSYS', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
-
-            
-      
-      
-                              
-       stdout
-        | The command standard output
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPC2102: Library TESTLIB created
-
-            
-      
-      
-                              
-       cmd
-        | The command executed by the task
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CRTLIB LIB(TESTLIB)
-
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
       
                               
        start
-        | The command execution start time
+        | The command execution start time.
       
         | **returned**: always
         | **type**: str
@@ -168,8 +124,19 @@ Return Values
       
       
                               
+       end
+        | The command execution end time.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
+
+            
+      
+      
+                              
        delta
-        | The command execution delta time
+        | The command execution delta time.
       
         | **returned**: always
         | **type**: str
@@ -179,8 +146,19 @@ Return Values
       
       
                               
+       stdout
+        | The command standard output.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPC2102: Library TESTLIB created
+
+            
+      
+      
+                              
        stderr
-        | The command standard error
+        | The command standard error.
       
         | **returned**: always
         | **type**: str
@@ -190,8 +168,19 @@ Return Values
       
       
                               
+       cmd
+        | The command executed by the task.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CRTLIB LIB(TESTLIB)
+
+            
+      
+      
+                              
        rc
-        | The command return code (0 means success, non-zero means failure)
+        | The command return code (0 means success, non-zero means failure).
       
         | **returned**: always
         | **type**: int
@@ -202,7 +191,7 @@ Return Values
       
                               
        stdout_lines
-        | The command standard output split in lines
+        | The command standard output split in lines.
       
         | **returned**: always
         | **type**: list      
@@ -211,6 +200,20 @@ Return Values
               .. code-block::
 
                        ["CPC2102: Library TESTLIB created."]
+            
+      
+      
+                              
+       stderr_lines
+        | The command standard error split in lines.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF2111:Library TESTLIB already exists."]
             
       
         

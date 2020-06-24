@@ -2,12 +2,12 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_fetch.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fetch.py
 
 .. _ibmi_fetch_module:
 
-ibmi_fetch -- Fetch objects or a library from a remote IBMi node and store on local
-===================================================================================
+ibmi_fetch -- Fetch objects or a library from a remote IBM i node and store on local
+====================================================================================
 
 
 .. contents::
@@ -17,7 +17,7 @@ ibmi_fetch -- Fetch objects or a library from a remote IBMi node and store on lo
 
 Synopsis
 --------
-- The ibmi_feth is used for fetching objects or a library as a SAVF from remote IBMi node and storing them locally in a file tree, organized by hostname.
+- The ``ibmi_feth`` is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in a file tree, organized by hostname.
 - Save file that already exists at dest will be overwritten if it is different than the new one.
 - For non-IBMi native targets, use the fetch module instead.
 
@@ -71,7 +71,7 @@ force_save
 
      
 format
-  The save file's format. Only support *SAVF by now.
+  The save file's format. Only support ``*SAVF`` by now.
 
 
   | **required**: false
@@ -91,7 +91,7 @@ is_lib
 
      
 lib_name
-  The library contains the objects. If is_lib is Ture, lib_name means the library name.
+  The library contains the objects. If is_lib is ``Ture``, lib_name means the library name.
 
 
   | **required**: True
@@ -100,9 +100,11 @@ lib_name
 
      
 object_names
-  The objects need to be fetched. One or more object names can be specified. Use space as separator.
+  The objects need to be fetched.
 
-  If object type is *FILE, then fetch it directly. Only one *FILE object will fetch directly at one time.
+  One or more object names can be specified. Use space as separator.
+
+  If object type is ``*FILE``, then fetch it directly. Only one ``*FILE`` object will fetch directly at one time.
 
 
   | **required**: false
@@ -112,7 +114,9 @@ object_names
 
      
 object_types
-  The object types. One or more object types can be specified. Use space as separator.
+  The object types.
+
+  One or more object types can be specified. Use space as separator.
 
 
   | **required**: false
@@ -158,21 +162,21 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Fetch obja.pgm and objb.srvpgm in objlib libary as test1.savf(target release V7R2M0) on a remote IBMi to local. Store
-           as /backup/host.example.com/qsys.lib/objlib.lib/test1.file and keep the save file on remote
+   - name: Fetch obja.pgm and objb.srvpgm in objlib libary as test1.savf(target release V7R2M0) on a remote IBM i to local. Store
+           as /backup/host.example.com/qsys.lib/objlib.lib/test1.file and keep the save file on remote.
      ibmi_fetch:
        object_names: 'obj1 obj2'
        lib_name: 'objlib'
        object_types: '*PGM *SRVPGM'
        savefile_name: 'test1'
        dest: '/backup'
-       backup: true
+       backup: True
        target_release: 'V7R2M0'
-   - name: Fetch objlib libary on a remote IBMi to local, store as /backup/objlib.file.
+   - name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.
      ibmi_fetch:
        lib_name: 'objlib'
        dest: '/backup'
-       flat: true
+       flat: True
 
 
 
@@ -180,7 +184,7 @@ Notes
 -----
 
 .. note::
-   ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3(or python2) under [defaults] section
+   ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
 
    Need install 5770SS1 option 39 on remote IBM i for regex usage
 
@@ -199,30 +203,19 @@ Return Values
 
    
                               
-       file
-        | The save file path on remote IBM i.
+       delta
+        | The fetch execution delta time when file is renewed.
       
         | **returned**: always
         | **type**: str
-        | **sample**: /qsys.lib/test.lib/obja.file
-
-            
-      
-      
-                              
-       remote_md5sum
-        | The md5sum of the file on remote IBM i.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: ef67xhfs8638ac5d7e31fc56rfcv3760
+        | **sample**: 0:00:00.307534
 
             
       
       
                               
        stdout
-        | The fetch standard output
+        | The fetch standard output.
       
         | **returned**: always
         | **type**: list      
@@ -235,41 +228,8 @@ Return Values
       
       
                               
-       dest
-        | The file path on local.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: /users/tester/test/obja.file
-
-            
-      
-      
-                              
-       checksum
-        | The checksum of the file on local.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 573f3e66ee97071134c9001732ed16f6bb7e8ab4
-
-            
-      
-      
-                              
-       md5sum
-        | The md5sum of the file on local.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: ef67xhfs8638ac5d7e31fc56rfcv3760
-
-            
-      
-      
-                              
        stderr
-        | The fetch standard error
+        | The fetch standard error.
       
         | **returned**: always
         | **type**: list      
@@ -282,12 +242,12 @@ Return Values
       
       
                               
-       delta
-        | The fetch execution delta time when file is renewed.
+       file
+        | The save file path on remote IBM i.
       
         | **returned**: always
         | **type**: str
-        | **sample**: 0:00:00.307534
+        | **sample**: /qsys.lib/test.lib/obja.file
 
             
       
@@ -304,16 +264,82 @@ Return Values
       
       
                               
+       md5sum
+        | The md5sum of the file on local.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: ef67xhfs8638ac5d7e31fc56rfcv3760
+
+            
+      
+      
+                              
+       dest
+        | The file path on local.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: /users/tester/test/obja.file
+
+            
+      
+      
+                              
+       remote_md5sum
+        | The md5sum of the file on remote IBM i.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: ef67xhfs8638ac5d7e31fc56rfcv3760
+
+            
+      
+      
+                              
        remote_checksum
         | The checksum of the file on remote IBM i.
       
         | **returned**: always
-        | **type**: bool      
+        | **type**: str
+        | **sample**: 573f3e66ee97071134c9001732ed16f6bb7e8ab4
+
+            
+      
+      
+                              
+       checksum
+        | The checksum of the file on local.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 573f3e66ee97071134c9001732ed16f6bb7e8ab4
+
+            
+      
+      
+                              
+       rc
+        | The action return code. 0 means success.
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
+            
+      
+      
+                              
+       job_log
+        | The IBM i job log of the task executed.
+      
+        | **returned**: always
+        | **type**: list      
         | **sample**:
 
               .. code-block::
 
-                       "573f3e66ee97071134c9001732ed16f6bb7e8ab4"
+                       [{"FROM_INSTRUCTION": "025D", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QDDCDF", "FROM_USER": "TESTER", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPC7301", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "File QUMEC created in library TEST.", "MESSAGE_TIMESTAMP": "2020-06-02-14.29.52.770625", "MESSAGE_TYPE": "COMPLETION", "ORDINAL_POSITION": "10", "SEVERITY": "0", "TO_INSTRUCTION": "5829", "TO_LIBRARY": "QXMLSERV", "TO_MODULE": "PLUGILE", "TO_PROCEDURE": "ILECMDEXC", "TO_PROGRAM": "XMLSTOREDP"}]
             
       
         

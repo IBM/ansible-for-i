@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix_imgclg
 short_description: Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.
-version_added: 1.0
+version_added: '2.8'
 description:
      - The C(ibmi_fix) module install fixes to target IBM i system by image catalog.
      - Single PTF, PTF group and TR PTF are supported.
@@ -216,22 +216,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-try:
-    from itoolkit import iToolKit
-    from itoolkit import iCmd
-    from itoolkit import iSqlFree
-    from itoolkit import iSqlFetch
-    from itoolkit import iSqlQuery
-    from itoolkit.transport import DatabaseTransport, DirectTransport
-except ImportError:
-    HAS_ITOOLKIT = False
-
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
-
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -531,12 +516,6 @@ def main():
         supports_check_mode=True,
     )
 
-    if HAS_ITOOLKIT is False:
-        module.fail_json(msg="itoolkit package is required")
-
-    if HAS_IBM_DB is False:
-        module.fail_json(msg="ibm_db package is required")
-
     product_id = module.params['product_id']
     fix_file_name_list = module.params['virtual_image_name_list']
     fix_omit_list = module.params['fix_omit_list']
@@ -555,11 +534,7 @@ def main():
 
     startd = datetime.datetime.now()
 
-    connection_id = None
-    try:
-        connection_id = dbi.connect()
-    except Exception as e_db_connect:
-        module.fail_json(msg="Exception when connecting to IBM i Db2. " + str(e_db_connect))
+    connection_id = ibmi_util.itoolkit_init()
 
     catalog_name = generate_object_name(connection_id, "QUSRSYS", "*IMGCLG", "ANSIBCLG")
     dev_name = generate_object_name(connection_id, "QSYS", "*DEVD", "ANSIBOPT")
@@ -611,10 +586,7 @@ def main():
         job_log = []
 
     if connection_id is not None:
-        try:
-            connection_id.close()
-        except Exception as e_disconnect:
-            err = "ERROR: Unable to disconnect from the database. " + str(e_disconnect)
+        ibmi_util.itoolkti_close_connection(connection_id)
 
     if rc > 0:
         result_failed = dict(

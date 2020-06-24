@@ -2,11 +2,11 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_object_authority.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_authority.py
 
 .. _ibmi_object_authority_module:
 
-ibmi_object_authority -- Grant, Revoke or Display Object Authority
+ibmi_object_authority -- Grant, revoke or display object authority
 ==================================================================
 
 
@@ -41,19 +41,7 @@ asp_device
 
      
 asp_group
-  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.
-
-  The ASP group name is the name of the primary ASP device within the ASP group.
-
-  The different for asp_group and (ref_)asp_device are,
-
-  the asp_group make the current ansible thread run under the asp_group.
-
-  the (ref_)asp_device is the search scope for the object.
-
-  If you want to searh the (ref_)object in an ASP, the asp_group must be set and varied on,
-
-  (ref)asp_device can be set as '*' for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
+  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread. The ASP group name is the name of the primary ASP device within the ASP group. The different for asp_group and (ref_)asp_device are, the asp_group make the current ansible thread run under the asp_group. the (ref_)asp_device is the search scope for the object. If you want to searh the (ref_)object in an ASP, the asp_group must be set and varied on, (ref)asp_device can be set as '*' for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
 
   Valid for all the operations
 
@@ -67,21 +55,21 @@ asp_group
 authority
   Specifies the authority to be granted or revoked to the users specified for the Users (USER) parameter.
 
-  Valid only for operations grant and revoke
+  Valid only for operations grant and revoke.
 
 
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: [u'*CHANGE']
+  | **default**: ['*CHANGE']
   | **choices**: *CHANGE, *ALL, *USE, *EXCLUDE, *AUTL, *OBJALTER, *OBJEXIST, *OBJMGT, *OBJOPR, *OBJREF, *ADD, *DLT, *READ, *UPD, *EXECUTE
 
 
      
 authorization_list
-  Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl
+  Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl.
 
-  Valid only for operations grant_autl and revoke_autl, you must specify a value other than ''
+  Valid only for operations grant_autl and revoke_autl, you must specify a value other than ''.
 
 
   | **required**: false
@@ -90,7 +78,7 @@ authorization_list
 
      
 joblog
-  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  If set to ``true``, output the avaiable job log even the rc is 0(success).
 
 
   | **required**: false
@@ -101,11 +89,9 @@ joblog
 object_library
   Specify the name of the library to be searched.
 
-  Valid for all the operations
+  Valid for all the operations.
 
   When operation is display, special value as '*LIBL', '*CURLIB', '*ALL', '*ALLUSR', '*USRLIBL', '*ALLAVL', '*ALLUSRAVL' are not supported.
-
-  The special values and value '' will be treate as search all the ASP scope under the current thread.
 
 
   | **required**: false
@@ -117,7 +103,7 @@ object_library
 object_name
   Specify the name of the object for which specific authority is to be granted, revoked or displayed to one or more users.
 
-  Valid for all the operations
+  Valid for all the operations.
 
 
   | **required**: True
@@ -130,7 +116,7 @@ object_type
 
   Supported object type refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
 
-  Valid for all the operations
+  Valid for all the operations.
 
 
   | **required**: True
@@ -142,21 +128,21 @@ object_type
 operation
   The authority operation.
 
-  Valid for all the operations
+  Valid for all the operations.
 
-  Operation grant is to grant user(s) authority(s) to object(s)
+  Operation grant is to grant user(s) authority(s) to object(s).
 
-  Operation revoke is to revoke user(s) authority(s) from object(s)
+  Operation revoke is to revoke user(s) authority(s) from object(s).
 
-  Operation display is to display object(s)'s authority information
+  Operation display is to display object(s)'s authority information.
 
-  Operation grant_autl is to grant a authorization list(the authorization list object contains the list of authority) to object(s)
+  Operation grant_autl is to grant a authorization list(the authorization list object contains the list of authority) to object(s).
 
-  Operation revoke_autl is to revoke authorization list from object(s)
+  Operation revoke_autl is to revoke authorization list from object(s).
 
-  Operation grant_ref is to grant the reference object to be queried to obtain authorization information
+  Operation grant_ref is to grant the reference object to be queried to obtain authorization information.
 
-  for more information about reference object, refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
+  For more information about reference object, refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
 
 
   | **required**: True
@@ -182,7 +168,7 @@ ref_asp_device
 ref_object_library
   Specify the name of the library to be searched.
 
-  Valid only for operation grant_ref
+  Valid only for operation grant_ref.
 
 
   | **required**: false
@@ -194,7 +180,7 @@ ref_object_library
 ref_object_name
   Specify the name of the reference object for which specific authority is to be granted, revoked or displayed to one or more users.
 
-  Valid only for operation grant_ref, you must specify a value other than ''
+  Valid only for operation grant_ref, you must specify a value other than ''.
 
 
   | **required**: false
@@ -207,7 +193,7 @@ ref_object_type
 
   Supported reference object type refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/grtobjaut.htm
 
-  Valid only for operation grant_ref
+  Valid only for operation grant_ref.
 
 
   | **required**: false
@@ -220,7 +206,7 @@ ref_object_type
 replace_authority
   Specifies whether the authorities replace the user's current authorities.
 
-  Valid only for operations grant
+  Valid only for operations grant.
 
 
   | **required**: false
@@ -231,13 +217,13 @@ replace_authority
 user
   Specifies one or more users to whom authority for the named object is to be granted or revoked.
 
-  Valid only for operations grant and revoke
+  Valid only for operations grant and revoke.
 
 
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: [u'']
+  | **default**: ['']
 
 
 
@@ -307,12 +293,6 @@ Examples
 
 
 
-Notes
------
-
-.. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-
 
 See Also
 --------
@@ -327,6 +307,53 @@ Return Values
 
 
    
+                              
+       stdout
+        | The standard output
+      
+        | **returned**: when rc as 0(success) and the operation is not display
+        | **type**: str
+        | **sample**: CPI2204: Authority given to 1 objects. Not given to 0 objects. Partially given to 0 objects.
+
+            
+      
+      
+                              
+       stderr
+        | The standard error
+      
+        | **returned**: when rc as no-zero(failure)
+        | **type**: str
+        | **sample**: CPF2209: Library CHANGL not found
+
+            
+      
+      
+                              
+       rc
+        | The return code (0 means success, non-zero means failure)
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
+            
+      
+      
+                              
+       stdout_lines
+        | The command standard output split in lines
+      
+        | **returned**: when rc as 0(success) and the operation is not display
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPI2204: Authority given to 1 objects. Not given to 0 objects. Partially given to 0 objects.", "CPC2201: Object authority granted."]
+            
+      
+      
                               
        stderr_lines
         | The command standard error split in lines
@@ -357,59 +384,15 @@ Return Values
       
                               
        job_log
-        | the job_log
+        | The IBM i job log of the task executed.
       
         | **returned**: always
-        | **type**: str
-        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
-
-            
-      
-      
-                              
-       stderr
-        | The standard error
-      
-        | **returned**: when rc as no-zero(failure)
-        | **type**: str
-        | **sample**: CPF2209: Library CHANGL not found
-
-            
-      
-      
-                              
-       stdout
-        | The standard output
-      
-        | **returned**: when rc as 0(success) and the operation is not display
-        | **type**: str
-        | **sample**: CPI2204: Authority given to 1 objects. Not given to 0 objects. Partially given to 0 objects.
-
-            
-      
-      
-                              
-       stdout_lines
-        | The command standard output split in lines
-      
-        | **returned**: when rc as 0(success) and the operation is not display
         | **type**: list      
         | **sample**:
 
               .. code-block::
 
-                       ["CPI2204: Authority given to 1 objects. Not given to 0 objects. Partially given to 0 objects.", "CPC2201: Object authority granted."]
-            
-      
-      
-                              
-       rc
-        | The return code (0 means success, non-zero means failure)
-      
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
-
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         

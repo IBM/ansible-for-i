@@ -2,12 +2,12 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_message.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_message.py
 
 .. _ibmi_message_module:
 
-ibmi_message -- Search or reply message on a remote IBMi node
-=============================================================
+ibmi_message -- Search message
+==============================
 
 
 .. contents::
@@ -17,8 +17,8 @@ ibmi_message -- Search or reply message on a remote IBMi node
 
 Synopsis
 --------
-- Search or reply message on a remote IBMi node
-- For non-IBMi targets, no need
+- Search message.
+- For non-IBM i targets, no need.
 
 
 
@@ -37,7 +37,7 @@ joblog
 
      
 message_id
-  the id of the message
+  The id of the message.
 
 
   | **required**: false
@@ -47,7 +47,7 @@ message_id
 
      
 message_lib
-  the library name which contains message queue
+  The library name which contains message queue.
 
 
   | **required**: True
@@ -56,7 +56,7 @@ message_lib
 
      
 message_queue
-  the queue of the message
+  The queue of the message.
 
 
   | **required**: false
@@ -66,7 +66,7 @@ message_queue
 
      
 message_text
-  the message text of the message
+  The message text of the message.
 
 
   | **required**: false
@@ -75,7 +75,7 @@ message_text
 
      
 message_type
-  the type of the message
+  The type of the message.
 
   INFORMATIONAL, A message that conveys information about the condition of a function.
 
@@ -105,7 +105,7 @@ message_type
 
      
 operation
-  the operation of the messgae
+  The operation of the messgae.
 
 
   | **required**: True
@@ -152,77 +152,8 @@ Return Values
 
    
                               
-       stderr_lines
-        | The command standard error split in lines
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["Generic failure."]
-            
-      
-      
-                              
-       end
-        | The command execution end time
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       job_log
-        | the job_log
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_KEY': '00000379', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'TO_INSTRUCTION': '9369', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'FROM_USER': 'CHANGLE', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'FROM_PROCEDURE': '', 'FROM_INSTRUCTION': '318F', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'TO_LIBRARY': 'QSYS', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
-
-            
-      
-      
-                              
-       sql
-        | The sql executed by the task
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: SELECT MESSAGE_QUEUE_LIBRARY, MESSAGE_QUEUE_NAME, MESSAGE_ID, MESSAGE_TYPE, MESSAGE_SUBTYPE, MESSAGE_TEXT, SEVERITY, MESSAGE_TIMESTAMP, MESSAGE_KEY, ASSOCIATED_MESSAGE_KEY, FROM_USER, FROM_JOB, FROM_PROGRAM, MESSAGE_FILE_LIBRARY, MESSAGE_FILE_NAME, MESSAGE_SECOND_LEVEL_TEXT FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_QUEUE_LIBRARY = 'QUSRSYS' AND MESSAGE_QUEUE_NAME = 'CHANGLE' OR MESSAGE_QUEUE_NAME = 'QHQB' AND MESSAGE_ID = 'CPF1241' OR MESSAGE_ID = 'CPF1240' AND MESSAGE_TYPE = 'INFORMATIONAL'
-
-            
-      
-      
-                              
-       delta
-        | The command execution delta time
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: 0:00:00.307534
-
-            
-      
-      
-                              
-       message_info
-        | the message_info
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: [{'MESSAGE_KEY': '00003B70', 'ASSOCIATED_MESSAGE_KEY': '', 'MESSAGE_TEXT': 'CPI1131 Job 013659/CHANGLE/QPADEV0002 disconnected by user QSYS.', 'MESSAGE_QUEUE_NAME': 'QSYSOPR', 'FROM_PROGRAM': 'QWTMMDSC', 'MESSAGE_QUEUE_LIBRARY': 'QSYS', 'FROM_USER': 'QSYS', 'MESSAGE_TIMESTAMP': '2020-04-24-09.44.35.568129', 'MESSAGE_SECOND_LEVEL_TEXT': '&N Cause . . . . . :   User QSYS performed the Disconnect Job (DSCJOB) command for the job.', 'MESSAGE_TYPE': 'INFORMATIONAL', 'MESSAGE_ID': 'CPI1131', 'SEVERITY': '0', 'MESSAGE_FILE_LIBRARY': 'QSYS', 'MESSAGE_SUBTYPE': '', 'FROM_JOB': '013447/QSYS/QINTER', 'MESSAGE_FILE_NAME': 'QCPFMSG'}]
-
-            
-      
-      
-                              
        start
-        | The command execution start time
+        | The command execution start time.
       
         | **returned**: always
         | **type**: str
@@ -232,8 +163,30 @@ Return Values
       
       
                               
+       end
+        | The command execution end time.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:54.064969
+
+            
+      
+      
+                              
+       delta
+        | The command execution delta time.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
+            
+      
+      
+                              
        stderr
-        | The command standard error
+        | The command standard error.
       
         | **returned**: always
         | **type**: str
@@ -243,13 +196,66 @@ Return Values
       
       
                               
+       sql
+        | The sql executed by the task.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: SELECT MESSAGE_QUEUE_LIBRARY, MESSAGE_QUEUE_NAME, MESSAGE_ID, MESSAGE_TYPE, MESSAGE_SUBTYPE, MESSAGE_TEXT, SEVERITY, MESSAGE_TIMESTAMP, MESSAGE_KEY, ASSOCIATED_MESSAGE_KEY, FROM_USER, FROM_JOB, FROM_PROGRAM, MESSAGE_FILE_LIBRARY, MESSAGE_FILE_NAME, MESSAGE_SECOND_LEVEL_TEXT FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_QUEUE_LIBRARY = 'QUSRSYS' AND MESSAGE_QUEUE_NAME = 'CHANGLE' OR MESSAGE_QUEUE_NAME = 'QHQB' AND MESSAGE_ID = 'CPF1241' OR MESSAGE_ID = 'CPF1240' AND MESSAGE_TYPE = 'INFORMATIONAL'
+
+            
+      
+      
+                              
        rc
-        | The command return code (0 means success, non-zero means failure)
+        | The command return code (0 means success, non-zero means failure).
       
         | **returned**: always
         | **type**: int
         | **sample**: 255
 
+            
+      
+      
+                              
+       message_info
+        | The message_info.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"ASSOCIATED_MESSAGE_KEY": "", "FROM_JOB": "013447/QSYS/QINTER", "FROM_PROGRAM": "QWTMMDSC", "FROM_USER": "QSYS", "MESSAGE_FILE_LIBRARY": "QSYS", "MESSAGE_FILE_NAME": "QCPFMSG", "MESSAGE_ID": "CPI1131", "MESSAGE_KEY": "00003B70", "MESSAGE_QUEUE_LIBRARY": "QSYS", "MESSAGE_QUEUE_NAME": "QSYSOPR", "MESSAGE_SECOND_LEVEL_TEXT": "\u0026N Cause . . . . . :   User QSYS performed the Disconnect Job (DSCJOB) command for the job.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "CPI1131 Job 013659/CHANGLE/QPADEV0002 disconnected by user QSYS.", "MESSAGE_TIMESTAMP": "2020-04-24-09.44.35.568129", "MESSAGE_TYPE": "INFORMATIONAL", "SEVERITY": "0"}]
+            
+      
+      
+                              
+       job_log
+        | The IBM i job log of the task executed.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
+            
+      
+      
+                              
+       stderr_lines
+        | The command standard error split in lines.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["Generic failure."]
             
       
         

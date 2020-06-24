@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_device_vary
 short_description: Vary on or off target device
-version_added: 2.8
+version_added: '2.8'
 description:
   - Vary on or off target device.
   - For non-IBM i targets, no need.
@@ -146,7 +146,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():

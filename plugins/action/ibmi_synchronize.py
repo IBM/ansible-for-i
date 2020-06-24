@@ -15,7 +15,7 @@ from ansible.plugins.action import ActionBase
 from ansible.plugins.loader import connection_loader
 from ansible.utils.display import Display
 from ansible.inventory.host import Host
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 display = Display()
 
 
@@ -97,6 +97,7 @@ class ActionModule(ActionBase):
                 remote_user = C.DEFAULT_REMOTE_USER
         _tmp_args['remote_user'] = remote_user
 
+        display.debug("ibm i debug: args for ibmi_sync {p_tmp_args}".format(p_tmp_args=_tmp_args))
         # run the module and store the result
         result.update(self._execute_module('ibmi_sync', module_args=_tmp_args))
         result['failed'] = result['rc']

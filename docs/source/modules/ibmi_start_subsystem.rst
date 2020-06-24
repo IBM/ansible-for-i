@@ -2,12 +2,12 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_start_subsystem.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_start_subsystem.py
 
 .. _ibmi_start_subsystem_module:
 
-ibmi_start_subsystem -- start a subsystem
-=========================================
+ibmi_start_subsystem -- Start an inactive subsystem
+===================================================
 
 
 .. contents::
@@ -17,7 +17,7 @@ ibmi_start_subsystem -- start a subsystem
 
 Synopsis
 --------
-- the ``ibmi_start_subsystem`` module start a subsystem of the target ibmi node.
+- the ``ibmi_start_subsystem`` module start an inactive subsystem.
 
 
 
@@ -27,7 +27,7 @@ Parameters
 
      
 joblog
-  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  If set to ``true``, output the avaiable job log even the rc is 0(success).
 
 
   | **required**: false
@@ -36,7 +36,7 @@ joblog
 
      
 library
-  Specify the library where the subsystem description is located
+  Specify the library where the subsystem description is located.
 
 
   | **required**: false
@@ -46,7 +46,7 @@ library
 
      
 subsystem
-  The name of the subsystem description
+  The name of the subsystem description.
 
 
   | **required**: True
@@ -60,11 +60,11 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Start the subsystem QBATCH
+   - name: Start the subsystem QBATCH.
      ibmi_start_subsystem:
        subsystem: QBATCH
 
-   - name: Start a user defined subsystem, which the subsystem description is MYSBS, located at library MYLIB
+   - name: Start a user defined subsystem, which the subsystem description is MYSBS, located at library MYLIB.
      ibmi_start_subsystem:
        subsystem: MYSBS
        library: MYLIB
@@ -86,8 +86,55 @@ Return Values
 
    
                               
+       stdout
+        | The standard output of the start subsystem command.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF0902: Subsystem QBATCH in library QSYS being started.
+
+            
+      
+      
+                              
+       stderr
+        | The standard error the start subsystem command.
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: CPF1010: Subsystem name QBATCH active.
+
+            
+      
+      
+                              
+       rc
+        | The task return code (0 means success, non-zero means failure).
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
+
+            
+      
+      
+                              
+       stdout_lines
+        | The standard output split in lines.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF0902: Subsystem QINTER in library QSYS being started."]
+            
+      
+      
+                              
        stderr_lines
-        | The standard error split in lines
+        | The standard error split in lines.
       
         | **returned**: always
         | **type**: list      
@@ -101,40 +148,7 @@ Return Values
       
                               
        job_log
-        | the job_log
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
-
-            
-      
-      
-                              
-       stderr
-        | The standard error the start subsystem command
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPF1010: Subsystem name QBATCH active.
-
-            
-      
-      
-                              
-       stdout
-        | The standard output of the start subsystem command
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: CPF0902: Subsystem QBATCH in library QSYS being started.
-
-            
-      
-      
-                              
-       stdout_lines
-        | The standard output split in lines
+        | The IBM i job log of the task executed.
       
         | **returned**: always
         | **type**: list      
@@ -142,18 +156,7 @@ Return Values
 
               .. code-block::
 
-                       ["CPF0902: Subsystem QINTER in library QSYS being started."]
-            
-      
-      
-                              
-       rc
-        | The task return code (0 means success, non-zero means failure)
-      
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
-
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         

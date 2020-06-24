@@ -2,12 +2,12 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_get_nonconfigure_disks.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_get_nonconfigure_disks.py
 
 .. _ibmi_get_nonconfigure_disks_module:
 
-ibmi_get_nonconfigure_disks -- Get all nonconfigure disks on target IBMi node
-=============================================================================
+ibmi_get_nonconfigure_disks -- Get all nonconfigure disks
+=========================================================
 
 
 .. contents::
@@ -17,8 +17,8 @@ ibmi_get_nonconfigure_disks -- Get all nonconfigure disks on target IBMi node
 
 Synopsis
 --------
-- Get all nonconfigure disks on target IBMi node
-- For non-IBMi targets, no need
+- Get all nonconfigure disks.
+- For non-IBM i targets, no need.
 
 
 
@@ -57,8 +57,22 @@ Return Values
 
    
                               
+       job_log
+        | The IBM i job log of the task executed.
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
+            
+      
+      
+                              
        start
-        | The command execution start time
+        | The command execution start time.
       
         | **returned**: always
         | **type**: str
@@ -69,7 +83,7 @@ Return Values
       
                               
        end
-        | The command execution end time
+        | The command execution end time.
       
         | **returned**: always
         | **type**: str
@@ -80,7 +94,7 @@ Return Values
       
                               
        delta
-        | The command execution delta time
+        | The command execution delta time.
       
         | **returned**: always
         | **type**: str
@@ -91,18 +105,18 @@ Return Values
       
                               
        disks
-        | all un-configure disks
+        | all un-configure disks.
       
         | **returned**: always
         | **type**: str
-        | **sample**: DMP002 DMP019 DMP005 DMP014 DMP031 DMP012 
+        | **sample**: DMP002 DMP019 DMP005 DMP014 DMP031 DMP012
 
             
       
       
                               
        rc
-        | The command return code (0 means success, non-zero means failure)
+        | The command return code (0 means success, non-zero means failure).
       
         | **returned**: always
         | **type**: int
@@ -110,7 +124,7 @@ Return Values
       
                               
        rc_msg
-        | Meaning of the return code
+        | Meaning of the return code.
       
         | **returned**: always
         | **type**: str
