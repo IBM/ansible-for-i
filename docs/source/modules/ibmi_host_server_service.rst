@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_host_server_service.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_host_server_service.py
 
 .. _ibmi_host_server_service_module:
 
