@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/0.0.1/plugins/modules/ibmi_fetch.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fetch.py
 
 .. _ibmi_fetch_module:
 
@@ -314,6 +314,17 @@ Return Values
         | **returned**: always
         | **type**: str
         | **sample**: 573f3e66ee97071134c9001732ed16f6bb7e8ab4
+
+            
+      
+      
+                              
+       rc
+        | The action return code. 0 means success.
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
             
       
