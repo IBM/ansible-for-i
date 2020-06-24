@@ -1,0 +1,23 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0
+
+# setup ibmi off line
+---
+- name: check whether the installation {{package}} package can be found on ansible server
+  stat:
+    path: '{{package_path}}/{{package}}'
+  delegate_to: localhost
+  register: installation_file_state    
+
+- set_fact: 
+    transfer_command: "scp {{package_path}}/{{package}} {{ibmi_user}}@{{ibmi_host}}:{{target_path}}/"
+
+- name: transfer installation package to remote IBM i and the target directory is {{target_path}}
+  shell: 'sshpass -p {{ibmi_pass}} {{transfer_command}}'
+  delegate_to: localhost 
+  when: ibmi_pass != "" 
+
+- name: transfer installation package to remote IBM i and the target directory is {{target_path}}
+  shell: '{{transfer_command}}'
+  delegate_to: localhost 
+  when: ibmi_pass == "" 

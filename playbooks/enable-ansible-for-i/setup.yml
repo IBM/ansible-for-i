@@ -1,0 +1,33 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+
+- hosts: ibmi 
+  gather_facts: no 
+
+  tasks:
+  - include: ibmi-install-yum.yml
+
+  - block:
+      - include: ibmi-install-rpm.yml 
+        vars: 
+          python: "{{python_version}}"
+        with_list: "{{required_rpms}}"     
+      
+    vars:
+      required_rpms: [itoolkit, ibm_db]
+      python_version: "{{ansible_python_interpreter.split('/')[-1]}}"
+
+  - name: Verify 5770DG1
+    command: system "DSPSFWRSC"
+    register: installed_native_products
+
+  - name: Promote message if 5770DG1 is not installed
+    fail:
+      msg: 5770DG1 is not installed
+    when: '"5770DG1" not in installed_native_products.stdout'
+
+  - name: IBM i is now available for being managed by Ansible
+    debug:
+      msg: "The IBM i node is ready for Ansible."
+    when: '"5770DG1" in installed_native_products.stdout'

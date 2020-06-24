@@ -1,0 +1,74 @@
+---
+# tasks file for check_ptf
+- name: clear vars for every run
+  set_fact:
+    ptfs: []
+    ptfs_status: {}
+
+- name: compose ptf list and ptfs status dict
+  set_fact:
+    ptfs: "{{ ptfs|default([]) + [item.ptf_number] }}"
+    ptfs_status: "{{ ptfs_status|default({}) | combine( {item.ptf_number: 'NON-EXISTENT'} ) }}"
+  loop: '{{ check_ptf_list }}'
+
+- name: print ptf number list to-be-checked
+  debug:
+    msg: 'ptf numbers to be checked: {{ ptfs }}'
+
+- name: query the status of the request ptf
+  ibm.power_ibmi.ibmi_fix:
+    fix_list: '{{ ptfs }}'
+    operation: 'query'
+  register: check
+
+- name: compose check result dict
+  set_fact:
+    ptfs_info: "{{ check.ptf_list }}"
+
+- name: compose ptfs status dict
+  set_fact:
+    checked_ptf: "{{ checked_ptf|default({}) | combine( {item.PTF_IDENTIFIER: item.PTF_LOADED_STATUS} ) }}"
+  loop: '{{ ptfs_info | list }}'
+
+- name: combine the query result and unknown ptf
+  set_fact:
+    ptfs_status: "{{ ptfs_status|default({}) | combine( checked_ptf ) }}"
+
+- name: compose to_be_load list
+  set_fact:
+    to_be_loadnumber: []
+    to_be_load: []
+
+- name: compose to-be-load ptf numbers
+  set_fact:
+    to_be_loadnumber: "{{ to_be_loadnumber|default([]) + [ptf_status.key] }}"
+  when: ptf_status.value == 'NON-EXISTENT' or ptf_status.value == 'PERMANENTLY REMOVED' or ptf_status.value == 'NOT LOADED'
+  with_dict: "{{ ptfs_status }}"
+  loop_control:
+    loop_var: ptf_status
+
+- name: compose to-be-load ptfs list
+  include_tasks: find_ptfinfo.yml
+  with_list: "{{ to_be_loadnumber }}"
+  loop_control:
+    loop_var: ptf_number
+
+- name: compose to-be-load ptf numbers
+  set_fact:
+    ptfs_info: "{{ ptfs_info|default([]) + [{'PTF_PRODUCT_ID': ptf_status.key, 'PTF_LOADED_STATUS': 'NON-EXISTENT'}] }}"
+  when: ptf_status.value == 'NON-EXISTENT'
+  with_dict: "{{ ptfs_status }}"
+  loop_control:
+    loop_var: ptf_status
+
+- name: print ptfs status
+  debug:
+    msg: 'ptfs status: {{ ptfs_status }}'
+
+- name: print ptfs status
+  debug:
+    msg: 'ptfs info: {{ ptfs_info }}'
+
+- name: print to be loaded ptf list
+  debug:
+    msg: "to be loaded ptf list: {{ to_be_load }}"

@@ -1,0 +1,55 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- hosts: ibmi 
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
+  vars: 
+    checkout_dir: 'tmp_nodejs'
+
+  tasks:
+  - name: Install Node js
+    command: /QOpensys/pkgs/bin/yum install nodejs10 -y
+    ignore_errors: True
+
+  - name: verify git has been installed
+    stat:
+      path: /QOpensys/pkgs/bin/git
+    register: git_stat
+
+  - name: Install git if it is not there
+    command: /QOpensys/pkgs/bin/yum install git -y
+    when: git_stat.stat.exists == false
+
+  - name: upgrade yum in case EC_POINT_copy error
+    command: /QOpensys/pkgs/bin/yum upgrade -y
+
+  - name: create symlink for git command to use git module
+    command: ln -fs /QOpensys/pkgs/bin/git /usr/bin/git
+    ignore_errors: true
+    
+  - name: set http.sslVerify for git
+    command: 'git config --global http.sslVerify false'
+    ignore_errors: true 
+
+  - name: clone repo
+    git:
+      repo: 'https://github.com/IBM/ibmi-oss-examples.git'
+      dest: '{{ checkout_dir }}'
+
+  - name: npm i
+    shell: "(/QOpensys/pkgs/lib/nodejs10/bin/npm  i  --scripts-prepend-node-path)"
+    args:
+      warn: False
+      chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
+      executable: /usr/bin/sh
+
+  - name: Start the demo application
+    shell: "(nohup /QOpensys/pkgs/lib/nodejs10/bin/node index.js >/dev/null 2>&1 &)"
+    args:
+      warn: False
+      chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
+      executable: /usr/bin/sh
+    async: 10

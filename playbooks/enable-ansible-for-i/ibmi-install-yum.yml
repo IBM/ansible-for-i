@@ -1,0 +1,58 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- name: Check whether yum has been installed. If not, install it in following tasks.
+  raw: ls -l /QOpensys/pkgs/bin/yum
+  args:
+    executable: /qopensys/usr/bin/qsh
+  register: default_yum_existance
+  ignore_errors: True
+
+- name: Create the installation script on IBM i
+  raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
+  args:
+    executable: /qopensys/usr/bin/qsh
+  when: "'No such path or directory' in default_yum_existance.stdout"
+
+- name: Write the content to the installation script on IBM i
+  raw: "echo \"
+create or replace table qtemp.ftpcmd(cmd char(240)) on replace delete rows;
+create or replace table qtemp.ftplog(line char(240)) on replace delete rows;
+
+insert into qtemp.ftpcmd(CMD) values 
+  ('anonymous anonymous@example.com')
+,('namefmt 1')
+,('lcd /tmp')
+,('cd /software/ibmi/products/pase/rpms')
+,('bin')
+,('get README.md (replace')
+,('get bootstrap.tar.Z (replace')
+,('get bootstrap.sh (replace')
+with nc
+;
+
+CL:OVRDBF FILE(INPUT) TOFILE(QTEMP/FTPCMD) MBR(*FIRST) OVRSCOPE(*JOB);
+CL:OVRDBF FILE(OUTPUT) TOFILE(QTEMP/FTPLOG) MBR(*FIRST) OVRSCOPE(*JOB);
+
+CL:FTP RMTSYS('public.dhe.ibm.com');
+
+CL:QSH CMD('touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstrap.sh > /tmp/bootstrap.log 2>&1');
+\" >> /tmp/bootstrap.sql"
+  args:
+    executable: /qopensys/usr/bin/qsh 
+  when: "'No such path or directory' in default_yum_existance.stdout"
+
+- name: Run the installation script to install yum
+  raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
+  args: 
+    executable: /qopensys/usr/bin/qsh
+  register: output_of_runsqlstm
+  when: "'No such path or directory' in default_yum_existance.stdout"
+  failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
+
+- name: Run /QOpensys/pkgs/bin/yum to confirm yum has been installed properly
+  raw: ls -l /QOpensys/pkgs/bin/yum
+  args:
+    executable: /qopensys/usr/bin/qsh
+  register: output_of_yum
+  failed_when: "'No such path or directory' in output_of_yum"

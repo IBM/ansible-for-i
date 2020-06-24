@@ -1,0 +1,137 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+- hosts: ibmi
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
+  tasks:
+
+  - name: Query the iASP existing
+    ibmi_sql_query:
+      sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+    register: iasp_list
+
+  - block:
+    - name: run CL command module with asp_group
+      ibmi_cl_command:
+        cmd: CRTLIB LIB(TRYIASP1) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        joblog: true
+
+    - name: create journal receiver
+      ibmi_cl_command: 
+        cmd: QSYS/CRTJRNRCV JRNRCV(TRYIASP1/ANSIJSNRCV) TEXT('JOURNAL RECEIVER FOR ANSIBLE')
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+
+    - name: create journal
+      ibmi_cl_command: 
+        cmd: QSYS/CRTJRN JRN(TRYIASP1/ANSIJSNJRN) JRNRCV(TRYIASP1/ANSIJSNRCV) TEXT('JOURNAL FOR ANSIBLE') 
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+
+    - name: run sql execute module
+      ibmi_sql_execute:
+        sql: "create table tryiasp1.ansible(id INT not null, name varchar(8), gender varchar(8))" 
+        database: "{{iasp_list.row[0]['RDB_NAME']}}" 
+      ignore_errors: True
+
+    - name: start journal
+      ibmi_cl_command: 
+        cmd: QSYS/STRJRNPF FILE(TRYIASP1/ANSIBLE) JRN(TRYIASP1/ANSIJSNJRN)  
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+
+    - name: run the SQL command to insert a row
+      ibmi_sql_execute:
+        sql: "INSERT INTO tryiasp1.ansible VALUES('1', 'User1', 'Female')"
+        database: "{{iasp_list.row[0]['RDB_NAME']}}" 
+
+    - name: run the SQL command to insert a row without defining database
+      ibmi_sql_execute:
+        sql: "INSERT INTO tryiasp1.ansible VALUES('1', 'User1', 'Female')"
+      register: sql_result
+      failed_when: "'SQL0204' not in sql_result.stderr"
+
+    - name: run the SQL command to insert a row with an invalid database 
+      ibmi_sql_execute:
+        sql: "INSERT INTO tryiasp1.ansible VALUES('1', 'User1', 'Female')"
+        database: "abc"
+      register: sql_result
+      failed_when: "'most likely the database does not exist on the system' not in sql_result.stderr"
+
+    - name: run the SQL command to query a table
+      ibmi_sql_query:
+        sql: "select * from tryiasp1.ansible"
+        expected_row_count: 1
+        database: "{{iasp_list.row[0]['RDB_NAME']}}" 
+      register: sql_query_result
+    
+    - name: run the SQL command to query a table
+      ibmi_sql_query:
+        sql: "select * from tryiasp1.ansible"
+        expected_row_count: 1
+      register: sql_query_result
+      failed_when: "'SQL0204' not in sql_query_result.stderr"
+
+    - name: run the SQL command to query a table
+      ibmi_sql_query:
+        sql: "select * from tryiasp1.ansible"
+        database: "abc" 
+      register: sql_query_result
+      failed_when: "'most likely the database does not exist on the system' not in sql_query_result.stderr"
+
+    - name: run the SQL command to insert the row again
+      ibmi_sql_execute:
+        sql: "INSERT INTO tryiasp1.ansible VALUES('2', 'User2', 'Male')"
+        database: "{{iasp_list.row[0]['RDB_NAME']}}" 
+
+    - name: run the SQL command to query the table and check row count
+      ibmi_sql_query:
+        sql: "select * from tryiasp1.ansible"
+        expected_row_count: 2
+        database: "{{iasp_list.row[0]['RDB_NAME']}}" 
+    when: iasp_list.row_count != 0
+
+    always:
+      - name: end journal
+        ibmi_cl_command: 
+          cmd: QSYS/ENDJRNPF FILE(TRYIASP1/ANSIBLE) JRN(TRYIASP1/ANSIJSNJRN)
+          asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        ignore_errors: True
+  
+      - name: drop the table
+        ibmi_sql_execute:
+          sql: "drop table tryiasp1.ansible"
+          database: "{{iasp_list.row[0]['RDB_NAME']}}" 
+        ignore_errors: True
+
+      - name: delete journal
+        ibmi_cl_command: 
+          cmd: QSYS/DLTJRN JRN(TRYIASP1/ANSIJSNJRN) 
+          asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        ignore_errors: True
+
+      - name: create default reply list entry for CPA7025
+        ibmi_cl_command: 
+          cmd: ADDRPYLE SEQNBR(9999) MSGID(CPA7025) RPY(I)
+          asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        ignore_errors: True
+
+      - name: delete journal receiver
+        ibmi_cl_command: 
+          cmd: QSYS/DLTOBJ OBJ(TRYIASP1/ANSIJSNRCV) OBJTYPE(*JRNRCV)
+          asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        ignore_errors: True
+
+      - name: remove reply list entry
+        ibmi_cl_command: 
+          cmd: QSYS/RMVRPYLE SEQNBR(9999)
+          asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        ignore_errors: True
+
+      - name: rmvlib
+        ibmi_cl_command:
+          cmd: dltlib lib(TRYIASP1)
+          asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+          joblog: true
+        ignore_errors: true

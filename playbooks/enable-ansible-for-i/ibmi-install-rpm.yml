@@ -1,0 +1,9 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- name: Verify {{item}} installed
+  raw: /QOpensys/pkgs/bin/rpm -qa {{python}}-{{item}}
+  register: rpm_query_result
+- name: Install {{item}} if it is not installed
+  raw: /QOpensys/pkgs/bin/yum install {{python}}-{{item}} -y
+  when: rpm_query_result.stdout == ""

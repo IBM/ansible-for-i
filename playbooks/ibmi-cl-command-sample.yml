@@ -1,0 +1,30 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- hosts: ibmi
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
+  tasks:
+  - name: run the CL command to create a library
+    ibmi_cl_command:
+      cmd: crtlib lib(ansiblei)
+    register: crt_lib_result
+
+  - name: run the CL command to create the library again
+    ibmi_cl_command:
+      cmd: crtlib lib(ansiblei)
+      joblog: true
+    register: crt_lib_repeated_result
+    ignore_errors: True
+
+  - name: assert the repeating creation of the library failed
+    assert:
+      that:
+      - (crt_lib_repeated_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2111') | map(attribute='MESSAGE_ID') | list | length) >= 1
+
+  - name: run the CL command to delete the library
+    ibmi_cl_command:
+      cmd: dltlib ansiblei
+      joblog: false

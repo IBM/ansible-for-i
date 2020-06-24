@@ -1,0 +1,20 @@
+---
+# tasks file for load_ptf
+- name: involve ibmi_fix
+  ibm.power_ibmi.ibmi_fix:
+    product_id: "{{ load_ptf.product_id }}"
+    save_file_object: "{{ load_ptf.savf_name }}"
+    save_file_lib: '{{ remote_lib }}'
+    operation: 'load_only'
+  ignore_errors: True
+  register: load_fix_result
+
+- name: log success in result
+  set_fact:
+    excution_status: "{{ excution_status|default({}) | combine( {load_ptf.ptf_number: 'success'} ) }}"
+  when: load_fix_result.failed == 0
+
+- name: log fail in result
+  set_fact:
+    excution_status: "{{ excution_status|default({}) | combine( {load_ptf.ptf_number: 'fail'} ) }}"
+  when: load_fix_result.failed != 0
