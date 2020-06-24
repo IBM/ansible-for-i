@@ -1,0 +1,7 @@
+---
+- name: Verify {{item}} installed
+  raw: /QOpensys/pkgs/bin/rpm -qa {{python}}-{{item}}
+  register: rpm_query_result
+- name: Install {{item}} if it is not installed
+  raw: /QOpensys/pkgs/bin/yum install {{python}}-{{item}} -y
+  when: rpm_query_result.stdout == ""
