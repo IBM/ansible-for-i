@@ -1,5 +1,5 @@
 # Ansible Content for IBM Power Systems - IBM i
-The <b>Ansible Content for IBM Power Systems - IBM i</b> provides modules, action plugins, sample playbooks to automate tasks on IBM i, such as command execution, system and application configuration, work management, fix management, application deployment, etc.
+The <b>Ansible Content for IBM Power Systems - IBM i</b> provides modules, action plugins, roles and sample playbooks to automate tasks on IBM i, such as command execution, system and application configuration, work management, fix management, application deployment, etc.
 
 # Ansible Content for IBM Power Systems
 IBM Power Systems is a family of enterprise servers that helps transform your organization by delivering industry leading resilience, scalability and accelerated performance for the most sensitive, mission critical workloads and next-generation AI and edge solutions. The Power platform also leverages open source technologies that enable you to run these workloads in a hybrid cloud environment with consistent tools, processes and skills.

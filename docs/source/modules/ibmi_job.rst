@@ -97,7 +97,7 @@ user
 
   | **required**: false
   | **type**: str
-  | **default**: *USER
+  | **default**: *ALL
 
 
 

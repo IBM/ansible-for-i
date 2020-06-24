@@ -49,7 +49,7 @@ options:
       - The user profile name to use as the job user filtering criteria.
       - Valid values are user profile name, "*USER" or "*ALL".
     type: str
-    default: "*USER"
+    default: "*ALL"
   submitter:
     description:
       - The type of submitted jobs to return.
@@ -244,7 +244,7 @@ def main():
             status=dict(type='str', default='*ALL', choices=["*ALL", "*ACTIVE", "*JOBQ", "*OUTQ"]),
             type=dict(type='str', default="*ALL", choices=["*ALL", "*BATCH", "*INTERACT"]),
             subsystem=dict(type='str', default='*ALL'),
-            user=dict(type='str', default='*USER'),
+            user=dict(type='str', default='*ALL'),
             submitter=dict(type='str', default='*ALL', choices=["*ALL", "*JOB", "*USER", "*WRKSTN"]),
             joblog=dict(type='bool', default=False),
         ),
