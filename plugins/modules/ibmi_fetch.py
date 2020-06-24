@@ -182,6 +182,11 @@ checksum:
     returned: always
     type: str
     sample: '573f3e66ee97071134c9001732ed16f6bb7e8ab4'
+rc:
+    description: The action return code. 0 means success.
+    returned: always
+    type: int
+    sample: 255
 job_log:
     description: The IBM i job log of the task executed.
     returned: always

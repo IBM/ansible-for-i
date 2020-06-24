@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/0.0.1/plugins/modules/ibmi_copy.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_copy.py
 
 .. _ibmi_copy_module:
 
@@ -177,6 +177,17 @@ Return Values
         | **returned**: always
         | **type**: str
         | **sample**: /QSYS.LIB/TESTLIB.LIB/TEST.FILE
+
+            
+      
+      
+                              
+       rc
+        | The action return code. 0 means success.
+      
+        | **returned**: always
+        | **type**: int
+        | **sample**: 255
 
             
       

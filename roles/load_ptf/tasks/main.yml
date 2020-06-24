@@ -1,0 +1,15 @@
+---
+# tasks file for load_ptf
+- name: compose result list
+  set_fact:
+    excution_status: {}
+
+- name: load ptfs from save file
+  include_tasks: load_individual_ptf.yml
+  loop: "{{ to_be_loaded_list }}"
+  loop_control:
+    loop_var: load_ptf
+
+- name: summarize the load ptfs excution status
+  debug:
+    msg: 'load ptfs excution status: {{ excution_status }}'

@@ -102,6 +102,11 @@ dest:
     returned: always
     type: str
     sample: '/QSYS.LIB/TESTLIB.LIB/TEST.FILE'
+rc:
+    description: The action return code. 0 means success.
+    returned: always
+    type: int
+    sample: 255
 job_log:
     description: The IBM i job log of the task executed.
     returned: always

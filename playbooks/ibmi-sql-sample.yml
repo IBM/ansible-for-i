@@ -1,3 +1,6 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
 #ibmi-sql-sample.yml 
 #The sample file is to provide an example about how to create a table, insert a row, query the table and drop the table
 ---

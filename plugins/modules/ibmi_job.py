@@ -49,7 +49,7 @@ options:
       - The user profile name to use as the job user filtering criteria.
       - Valid values are user profile name, "*USER" or "*ALL".
     type: str
-    default: "*USER"
+    default: "*ALL"
   submitter:
     description:
       - The type of submitted jobs to return.
@@ -225,21 +225,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-try:
-    from itoolkit import iToolKit
-    from itoolkit import iSqlFree
-    from itoolkit import iSqlFetch
-    from itoolkit import iSqlQuery
-    from itoolkit.transport import DatabaseTransport, DirectTransport
-except ImportError:
-    HAS_ITOOLKIT = False
-
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
-
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -258,18 +244,12 @@ def main():
             status=dict(type='str', default='*ALL', choices=["*ALL", "*ACTIVE", "*JOBQ", "*OUTQ"]),
             type=dict(type='str', default="*ALL", choices=["*ALL", "*BATCH", "*INTERACT"]),
             subsystem=dict(type='str', default='*ALL'),
-            user=dict(type='str', default='*USER'),
+            user=dict(type='str', default='*ALL'),
             submitter=dict(type='str', default='*ALL', choices=["*ALL", "*JOB", "*USER", "*WRKSTN"]),
             joblog=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
-
-    if HAS_ITOOLKIT is False:
-        module.fail_json(msg="itoolkit package is required")
-
-    if HAS_IBM_DB is False:
-        module.fail_json(msg="ibm_db package is required")
 
     job_name = module.params['name']
     job_status = module.params['status']

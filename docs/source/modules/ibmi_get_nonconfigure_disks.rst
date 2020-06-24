@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/0.0.1/plugins/modules/ibmi_get_nonconfigure_disks.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_get_nonconfigure_disks.py
 
 .. _ibmi_get_nonconfigure_disks_module:
 

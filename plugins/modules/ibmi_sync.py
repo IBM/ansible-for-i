@@ -111,7 +111,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_native, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 HAS_PARAMIKO = True
 
 try:
@@ -172,8 +172,10 @@ def main():
         if not os.path.isfile(src):
             return_error(module, "src doesn't exist. {p_src}".format(p_src=src), result)
 
+        ibmi_util.log_debug("mkdir " + ifs_dir, module._name)
         rc, out, err = module.run_command(['mkdir', ifs_dir], use_unsafe_shell=False)
         if rc is 0 or 'File exists' in err:
+            ibmi_util.log_debug("cp " + src + " " + ifs_dir, module._name)
             rc, out, err = module.run_command(['cp', src, ifs_dir], use_unsafe_shell=False)
             if rc is 0:
                 src_basename = os.path.basename(src)
@@ -194,11 +196,13 @@ def main():
                         p_ifs_dir=ifs_dir,
                         p_line=line), result)
                 try:
+                    ibmi_util.log_debug("sftp: put " + ifs_name + " " + ifs_name, module._name)
                     sftp.put(ifs_name, ifs_name)
                 except Exception as e:
                     return_error(module, "Put {p_to_text} to remote host exception. Use -vvv for more information.".format(
                         p_to_text=to_text(e)), result)
 
+                ibmi_util.log_debug("mv " + ifs_name + " " + dest, module._name)
                 stdin, stdout, stderr = ssh.exec_command('mv {p_ifs_name} {p_dest}'.format(p_ifs_name=ifs_name, p_dest=dest))
                 line = stderr.readlines()
                 if line != []:

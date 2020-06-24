@@ -1,0 +1,50 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0
+
+# setup offline ibmi
+---
+- hosts: ibmi
+  gather_facts: no 
+  vars:
+    package_path: ""
+    ibmi_host: "{{ansible_ssh_host}}"
+    ibmi_user: "{{ansible_ssh_user}}"
+    ibmi_pass: ""
+    required_rpms: [six, itoolkit, ibm_db]
+    python_version: "{{ansible_python_interpreter.split('/')[-1]}}"
+    yum_packages: ['bootstrap.sh', 'bootstrap.tar.Z']
+    remote_temp_dir: /tmp/ansible-rpm
+
+  tasks:
+  - block:
+      - name: Create a local temporary directory
+        raw: mkdir -p {{remote_temp_dir}} 
+        args:
+          executable: /qopensys/usr/bin/qsh
+        register: tempfile_result
+
+      - name: initialize ibmi_pass
+        set_fact: 
+          ibmi_pass: '{{ansible_ssh_pass}}'
+        when: ansible_ssh_pass is defined
+
+      - include: ibmi_install_yum.yml
+      - include: ibmi_install_python.yml
+
+      - name: Verify 5770DG1
+        command: system "DSPSFWRSC"
+        register: installed_native_products
+
+      - name: Promote message if 5770DG1 is not installed
+        fail:
+          msg: 5770DG1 is not installed
+        when: '"5770DG1" not in installed_native_products.stdout'
+
+      - name: IBM i is now available for being managed by Ansible
+        debug:
+          msg: "The IBM i node is ready for Ansible."
+        when: '"5770DG1" in installed_native_products.stdout'
+
+    always:
+      - name: remove temp dir
+        raw: rm -rf {{remote_temp_dir}} 

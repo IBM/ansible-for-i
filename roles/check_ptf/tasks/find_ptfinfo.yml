@@ -1,0 +1,9 @@
+---
+# tasks file for find_ptfinfo
+- name: compose to-be-load ptf numbers
+  set_fact:
+    to_be_load: "{{ to_be_load|default([]) + [ptf_info] }}"
+  when: ptf_info.ptf_number == ptf_number
+  with_list: "{{ check_ptf_list }}"
+  loop_control:
+    loop_var: ptf_info

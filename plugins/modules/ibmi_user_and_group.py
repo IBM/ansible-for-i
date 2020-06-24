@@ -232,7 +232,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common import validation
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():
@@ -316,6 +316,7 @@ def main():
     # Check to see if the group exists
     chkobj_cmd = 'QSYS/CHKOBJ OBJ(QSYS/{p_group}) OBJTYPE(*USRPRF)'.format(p_group=user_group)
     args = ['system', chkobj_cmd]
+    ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
     rc, out, err = module.run_command(args, use_unsafe_shell=False)
     if rc != 0:
         group_exist = False
@@ -325,6 +326,7 @@ def main():
     # Check to see if the user exists
     chkobj_cmd = 'QSYS/CHKOBJ OBJ(QSYS/{p_user}) OBJTYPE(*USRPRF)'.format(p_user=user)
     args = ['system', chkobj_cmd]
+    ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
     rc, out, err = module.run_command(args, use_unsafe_shell=False)
     if rc != 0:
         user_exist = False

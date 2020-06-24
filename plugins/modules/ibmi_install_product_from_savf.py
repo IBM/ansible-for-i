@@ -168,7 +168,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.0.0-beta1"
 
 
 def main():
@@ -223,6 +223,7 @@ def main():
         pattern_savf_library=savf_library.strip())
     # Check to see if the savf is existed
     args = ['system', chkobj_cmd]
+    ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
     rc, out, err = module.run_command(args, use_unsafe_shell=False)
     if rc != 0:
         result = dict(
@@ -235,6 +236,7 @@ def main():
 
     # Call the The Accept Software Agreement command
     args = ['system', acceptance_cmd]
+    ibmi_util.log_info("Acceptance command to run: " + acceptance_cmd, module._name)
     rc, out, err = module.run_command(args, use_unsafe_shell=False)
     if rc != 0:
         result = dict(
