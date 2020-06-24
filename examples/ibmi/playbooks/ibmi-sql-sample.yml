@@ -35,7 +35,7 @@
           sql: "select * from qgpl.ansible"
         register: sql_query_result
       - debug:
-          name: ver las filas que hay
+          msg: que filas que hay
           var: sql_query_result.row
 
       - name: run the SQL command to insert the row again
@@ -48,7 +48,7 @@
           expected_row_count: 2
         register: sql_row_count
       - debug:
-          name: cuantas filas hay
+          msg: cuantas filas hay
           var: sql_row_count.row_count
 
       always:
