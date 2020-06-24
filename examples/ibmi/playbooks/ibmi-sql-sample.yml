@@ -34,8 +34,8 @@
         ibmi_sql_query:
           sql: "select * from qgpl.ansible"
         register: sql_query_result
-      - debug:
-          msg: que filas que hay
+      - name:  que filas que hay 
+        debug: 
           var: sql_query_result.row
 
       - name: run the SQL command to insert the row again
@@ -47,8 +47,8 @@
           sql: "select * from qgpl.ansible"
           expected_row_count: 2
         register: sql_row_count
-      - debug:
-          msg: cuantas filas hay
+      - name: cuantas filas hay
+        debug:
           var: sql_row_count.row_count
 
       always:
