@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fetch
 short_description: Fetch objects or a library from a remote IBM i node and store on local
-version_added: '2.8'
+version_added: 2.8
 description:
      - The C(ibmi_feth) is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in
        a file tree, organized by hostname.
@@ -182,11 +182,6 @@ checksum:
     returned: always
     type: str
     sample: '573f3e66ee97071134c9001732ed16f6bb7e8ab4'
-rc:
-    description: The action return code. 0 means success.
-    returned: always
-    type: int
-    sample: 255
 job_log:
     description: The IBM i job log of the task executed.
     returned: always

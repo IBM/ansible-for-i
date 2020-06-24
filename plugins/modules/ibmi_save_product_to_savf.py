@@ -165,7 +165,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0-beta1"
+__ibmi_module_version__ = "0.0.1"
 
 
 def main():
@@ -219,13 +219,11 @@ def main():
     command = 'QSYS/CHKOBJ OBJ(QSYS/{pattern_savf_library}) OBJTYPE(*LIB)'.format(
         pattern_savf_library=savf_library.strip())
     args = ['system', command]
-    ibmi_util.log_info("Command to run: " + command, module._name)
     rc, out, err = module.run_command(args, use_unsafe_shell=False)
     if rc != 0:  # library not exist, create it
         command = "QSYS/CRTLIB LIB({pattern_savf_library}) TEXT('Create by Ansible')".format(
             pattern_savf_library=savf_library.strip())
         args = ['system', command]
-        ibmi_util.log_info("Command to run: " + command, module._name)
         rc, out, err = module.run_command(args, use_unsafe_shell=False)
         if rc != 0:  # fail to create library
             result = dict(
@@ -241,14 +239,12 @@ def main():
         pattern_savf_library=savf_library.strip())
     # Check if the savf is existed
     args = ['system', command]
-    ibmi_util.log_info("Command to run: " + command, module._name)
     rc, out, err = module.run_command(args, use_unsafe_shell=False)
     if rc != 0:  # savf not existed
         command = "QSYS/CRTSAVF FILE({pattern_savf_library}/{pattern_savf_name}) TEXT('Create by Ansible')".format(
             pattern_savf_name=savf_name.strip(),
             pattern_savf_library=savf_library.strip())
         args = ['system', command]
-        ibmi_util.log_info("Command to run: " + command, module._name)
         rc, out, err = module.run_command(args, use_unsafe_shell=False)
         if rc != 0:  # fail to create savf
             result = dict(

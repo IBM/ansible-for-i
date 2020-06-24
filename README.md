@@ -1,16 +1,41 @@
-# Ansible Content for IBM Power Systems - IBM i
-The <b>Ansible Content for IBM Power Systems - IBM i</b> provides modules, action plugins, roles and sample playbooks to automate tasks on IBM i, such as command execution, system and application configuration, work management, fix management, application deployment, etc.
+# power_ibmi
+The IBM i collection includes modules. action plugins, sample playbooks to automate tasks on IBM i.
 
-# Ansible Content for IBM Power Systems
-IBM Power Systems is a family of enterprise servers that helps transform your organization by delivering industry leading resilience, scalability and accelerated performance for the most sensitive, mission critical workloads and next-generation AI and edge solutions. The Power platform also leverages open source technologies that enable you to run these workloads in a hybrid cloud environment with consistent tools, processes and skills.
 
-Ansible Content for IBM Power Systems - IBM i, as part of the broader offering of <b>Ansible Content for IBM Power Systems</b>, is available from Ansible Galaxy and has community support.
+Ansible is a radically simple IT automation system. It handles configuration management, application deployment, cloud provisioning, ad-hoc task execution, network automation, and multi-node orchestration. Ansible makes complex changes like zero-downtime rolling updates with load balancers easy. 
 
-# Resources
-For detail guides and reference, please visit the <a href="https://ibm.github.io/ansible-for-i/index.html" target="_blank">Documentation</a> site.
+IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i support on Ansible, like providing more IBM i modules and examples to manage IBM i nodes. 
 
-# License
-This collection is licensed under GNU General Public License, Version 3.0.
+<b>Getting Started Articles: </b> 
 
-# Copyright
-© Copyright IBM Corporation 2020
+You may want to check out below articles first if you are new to Ansible for IBM i support. <br>
+https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/  <br>
+https://ibm.github.io/cloud-i-blog/
+
+<b>Dependencies on IBM i node: </b>
+1. 5733SC1 Base and Option 1
+2. 5770DG1
+3. Python3
+4. python3-itoolkit
+5. python3-ibm_db
+
+Note: 
+1) Use yum to install 3, 4, 5. About how to install yum on IBM i, refer to examples/ibmi/playbooks/ibmi-install-yum.yml.
+
+<b>How to enable IBM i nodes? </b> <br>
+1. Install ansible server. For example, run "pip install ansible" on a supported platform.
+2. Git clone the repostiory to local
+3. Create your inventory file under examples/ibmi, an example can be found here "examples/ibmi/hosts_ibmi.ini"
+6. Run "ansible-playbook -i examples/ibmi/your_inventory_file examples/ibmi/playbooks/enable-ansible-for-i/enable-ibmi.yml"</br>
+
+<b>How to install the collection before it gets to be published to galaxy webesite </b> <br>
+1. Git clone the repostiory to local
+2. Run "ansible-galaxy collection build ."
+3. Run "ansible-galaxy collection install ibm-power_ibmi-x.y.z.tar.gz"
+</br>
+
+Note: replacing x.y.z with the current version
+
+<b>How to install the collection after it gets to be published to galaxy website </b> <br>
+1. Run "ansible-galaxy collection install ibm.power_ibmi"
+</br>

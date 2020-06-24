@@ -2,11 +2,11 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_uninstall_product.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_uninstall_product.py
 
 .. _ibmi_uninstall_product_module:
 
-ibmi_uninstall_product -- Delete the objects that make up the licensed program(product)
+ibmi_uninstall_product -- delete the objects that make up the licensed program(product)
 =======================================================================================
 
 
@@ -17,7 +17,7 @@ ibmi_uninstall_product -- Delete the objects that make up the licensed program(p
 
 Synopsis
 --------
-- the ``ibmi_uninstall_product`` module deletes the objects that make up the product.
+- the ``ibmi_uninstall_product`` module delete the objects that make up the product on the target ibmi node.
 
 
 
@@ -36,9 +36,9 @@ joblog
 
      
 language
-  Specifies which national language version (NLV) objects are deleted for the licensed program specified on the LICPGM parameter.
+  Specifies which national language version (NLV) objects are deleted for the licensed program specified on the LICPGM parameter
 
-  It's the IBM-supplied language feature codes, like German is 2924, English is 2924.
+  It's the IBM-supplied language feature codes, like German is 2924, English is 2924
 
 
   | **required**: false
@@ -48,7 +48,7 @@ language
 
      
 option
-  Specifies which of the parts of the licensed program specified on the Product prompt (LICPGM parameter) are deleted.
+  Specifies which of the parts of the licensed program specified on the Product prompt (LICPGM parameter) are deleted
 
 
   | **required**: false
@@ -58,7 +58,7 @@ option
 
      
 product
-  Specifies the seven-character identifier of the licensed program that is deleted.
+  Specifies the seven-character identifier of the licensed program that is deleted
 
 
   | **required**: True
@@ -67,7 +67,7 @@ product
 
      
 release
-  Specifies which version, release, and modification level of the licensed program is deleted.
+  Specifies which version, release, and modification level of the licensed program is deleted
 
 
   | **required**: false
@@ -82,11 +82,11 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Deleting all Licensed Program Objects.
+   - name: Deleting all Licensed Program Objects
      ibmi_uninstall_product:
        product: 5770QU1
 
-   - name: Deleting only the German (NLV 2929) objects for all options of the licensed program 5770QU1.
+   - name: Deleting only the German (NLV 2929) objects for all options of the licensed program 5770QU1
      ibmi_uninstall_product:
        product: 5770QU1
        language: 2929
@@ -108,12 +108,26 @@ Return Values
 
    
                               
-       stdout
-        | The standard output.
+       stderr_lines
+        | The standard error split in lines
+      
+        | **returned**: always
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["Product 5733D10 option *ALL release *ONLY language *ALL not installed"]
+            
+      
+      
+                              
+       job_log
+        | the job_log
       
         | **returned**: always
         | **type**: str
-        | **sample**: Product 5733D10 option 11 release *ONLY language *ALL deleted.
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
 
             
       
@@ -130,19 +144,19 @@ Return Values
       
       
                               
-       rc
-        | The task return code (0 means success, non-zero means failure).
+       stdout
+        | The standard output
       
         | **returned**: always
-        | **type**: int
-        | **sample**: 255
+        | **type**: str
+        | **sample**: Product 5733D10 option 11 release *ONLY language *ALL deleted.
 
             
       
       
                               
        stdout_lines
-        | The standard output split in lines.
+        | The standard output split in lines
       
         | **returned**: always
         | **type**: list      
@@ -155,30 +169,13 @@ Return Values
       
       
                               
-       stderr_lines
-        | The standard error split in lines.
+       rc
+        | The task return code (0 means success, non-zero means failure)
       
         | **returned**: always
-        | **type**: list      
-        | **sample**:
+        | **type**: int
+        | **sample**: 255
 
-              .. code-block::
-
-                       ["Product 5733D10 option *ALL release *ONLY language *ALL not installed"]
-            
-      
-      
-                              
-       job_log
-        | The IBM i job log of the task executed.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         

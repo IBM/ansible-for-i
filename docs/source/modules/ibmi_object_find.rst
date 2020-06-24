@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_find.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_object_find.py
 
 .. _ibmi_object_find_module:
 
@@ -57,15 +57,6 @@ iasp_name
   | **required**: false
   | **type**: str
   | **default**: *SYSBAS
-
-
-     
-joblog
-  The job log of the job executing the task will be returned even rc is zero if it is set to true.
-
-
-  | **required**: false
-  | **type**: bool
 
 
      
@@ -175,13 +166,16 @@ Return Values
 
    
                               
-       start
-        | The task execution start time
+       stderr_lines
+        | The task execution standard error split in lines
       
-        | **returned**: always
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
+
+                       [""]
             
       
       
@@ -197,14 +191,11 @@ Return Values
       
       
                               
-       delta
-        | The task execution delta time
+       stdout
+        | The task execution standard output
       
-        | **returned**: always
+        | **returned**: When rc as non-zero(failure)
         | **type**: str
-        | **sample**: 0:00:00.307534
-
-            
       
       
                               
@@ -222,11 +213,25 @@ Return Values
       
       
                               
-       stdout
-        | The task execution standard output
+       start
+        | The task execution start time
       
-        | **returned**: When rc as non-zero(failure)
+        | **returned**: always
         | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
+
+            
+      
+      
+                              
+       delta
+        | The task execution delta time
+      
+        | **returned**: always
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
+            
       
       
                               
@@ -256,34 +261,6 @@ Return Values
               .. code-block::
 
                        [""]
-            
-      
-      
-                              
-       stderr_lines
-        | The task execution standard error split in lines
-      
-        | **returned**: When rc as non-zero(failure)
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       [""]
-            
-      
-      
-                              
-       job_log
-        | The job log of the job executes the task.
-      
-        | **returned**: always
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         

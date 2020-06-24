@@ -2,12 +2,12 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_install_product_from_savf.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_install_product_from_savf.py
 
 .. _ibmi_install_product_from_savf_module:
 
-ibmi_install_product_from_savf -- Install the licensed program(product) from a save file.
-=========================================================================================
+ibmi_install_product_from_savf -- Install the the licensed program(product) from a save file
+============================================================================================
 
 
 .. contents::
@@ -17,7 +17,7 @@ ibmi_install_product_from_savf -- Install the licensed program(product) from a s
 
 Synopsis
 --------
-- The ``ibmi_install_product_from_savf`` module installs the product from a save file.
+- the ``ibmi_install_product_from_savf`` module install the product from a save file on the target ibmi node.
 
 
 
@@ -27,7 +27,17 @@ Parameters
 
      
 acceptance_cmd
-  The Accept Software Agreement command records the acceptance of the software agreement for a product. It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement. This command cannot be used to accept the Licensed Internal Code or the IBM i *Base software agreements. If invalid command specificed, message CPDB6D5 with following reason will be received, 'Product cannot be installed in a batch request because the software agreement has not been previously accepted'. In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don't know the command.
+  The Accept Software Agreement command records the acceptance of the software agreement for a product
+
+  It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement
+
+  This command cannot be used to accept the Licensed Internal Code or the IBM i *Base software agreements
+
+  If invalid command specificed, message CPDB6D5 with following reason will be received,
+
+  Product cannot be installed in a batch request because the software agreement has not been previously accepted
+
+  In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don't know the command
 
 
   | **required**: false
@@ -37,7 +47,7 @@ acceptance_cmd
 
      
 joblog
-  If set to ``true``, output the avaiable job log even the rc is 0(success).
+  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
 
 
   | **required**: false
@@ -46,7 +56,9 @@ joblog
 
      
 language
-  Specifies which national language version (NLV) objects to be used for restoring the licensed program. It's the IBM-supplied language feature codes, like German is 2924, English is 2924.
+  Specifies which national language version (NLV) objects to be used for restoring the licensed program
+
+  It's the IBM-supplied language feature codes, like German is 2924, English is 2924
 
 
   | **required**: false
@@ -56,7 +68,7 @@ language
 
      
 object_type
-  Specifies the type of licensed program objects to be restored.
+  Specifies the type of licensed program objects to be restored
 
 
   | **required**: false
@@ -67,7 +79,7 @@ object_type
 
      
 option
-  Specifies which one of the optional parts of the licensed program given in the Product prompt (LICPGM parameter) is to be restored.
+  Specifies which one of the optional parts of the licensed program given in the Product prompt (LICPGM parameter) is to be restored
 
 
   | **required**: false
@@ -87,7 +99,7 @@ parameters
 
      
 product
-  Specifies the seven-character identifier of the licensed program that is restored.
+  Specifies the seven-character identifier of the licensed program that is restored
 
 
   | **required**: True
@@ -96,7 +108,7 @@ product
 
      
 release
-  Specifies the version, release, and modification level of the licensed program being restored.
+  Specifies the version, release, and modification level of the licensed program being restored
 
 
   | **required**: false
@@ -106,7 +118,7 @@ release
 
      
 replace_release
-  Specifies the version, release, and modification level of the licensed program being replaced.
+  Specifies the version, release, and modification level of the licensed program being replaced
 
 
   | **required**: false
@@ -116,7 +128,7 @@ replace_release
 
      
 savf_library
-  Specify the name of the library where the save file is located.
+  Specify the name of the library where the save file is located
 
 
   | **required**: True
@@ -125,7 +137,7 @@ savf_library
 
      
 savf_name
-  Specify the name of the save file.
+  Specify the name of the save file
 
 
   | **required**: True
@@ -139,13 +151,13 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Restoring Program Using Defaults.
+   - name: Restoring Program Using Defaults
      ibmi_install_product_from_savf:
        product: 5770WDS
        savf_name: MYFILE
        savf_library: MYLIB
 
-   - name: Restoring Program with acceptance command.
+   - name: Restoring Program with acceptance command
      ibmi_install_product_from_savf:
        product: 5733D10
        option: 11
@@ -170,19 +182,33 @@ Return Values
 
    
                               
-       stdout
-        | The standard output.
+       stderr_lines
+        | The standard error split in lines
       
-        | **returned**: When rc as 0(success)
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["CPF9801: Object QNOTE in library L10010125P not found"]
+            
+      
+      
+                              
+       job_log
+        | the job_log
+      
+        | **returned**: always
         | **type**: str
-        | **sample**: +++ success RSTLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)
+        | **sample**: [{'TO_MODULE': 'QSQSRVR', 'TO_PROGRAM': 'QSQSRVR', 'MESSAGE_TEXT': 'Printer device PRT01 not found.', 'FROM_MODULE': '', 'FROM_PROGRAM': 'QWTCHGJB', 'MESSAGE_TIMESTAMP': '2020-05-20-21.41.40.845897', 'FROM_USER': 'CHANGLE', 'TO_INSTRUCTION': '9369', 'MESSAGE_SECOND_LEVEL_TEXT': 'Cause . . . . . :   This message is used by application programs as a general escape message.', 'MESSAGE_TYPE': 'DIAGNOSTIC', 'MESSAGE_ID': 'CPD0912', 'MESSAGE_LIBRARY': 'QSYS', 'FROM_LIBRARY': 'QSYS', 'SEVERITY': '20', 'FROM_PROCEDURE': '', 'TO_LIBRARY': 'QSYS', 'FROM_INSTRUCTION': '318F', 'MESSAGE_SUBTYPE': '', 'ORDINAL_POSITION': '5', 'MESSAGE_FILE': 'QCPFMSG', 'TO_PROCEDURE': 'QSQSRVR'}]
 
             
       
       
                               
        stderr
-        | The standard error.
+        | The standard error
       
         | **returned**: When rc as non-zero(failure)
         | **type**: str
@@ -192,19 +218,19 @@ Return Values
       
       
                               
-       rc
-        | The task return code (0 means success, non-zero means failure).
+       stdout
+        | The standard output
       
-        | **returned**: always
-        | **type**: int
-        | **sample**: 255
+        | **returned**: When rc as 0(success)
+        | **type**: str
+        | **sample**: +++ success RSTLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)
 
             
       
       
                               
        stdout_lines
-        | The standard output split in lines.
+        | The standard output split in lines
       
         | **returned**: When rc as 0(success)
         | **type**: list      
@@ -217,30 +243,13 @@ Return Values
       
       
                               
-       stderr_lines
-        | The standard error split in lines.
-      
-        | **returned**: When rc as non-zero(failure).
-        | **type**: list      
-        | **sample**:
-
-              .. code-block::
-
-                       ["CPF9801: Object QNOTE in library L10010125P not found"]
-            
-      
-      
-                              
-       job_log
-        | The IBM i job log of the task executed.
+       rc
+        | The task return code (0 means success, non-zero means failure)
       
         | **returned**: always
-        | **type**: list      
-        | **sample**:
+        | **type**: int
+        | **sample**: 255
 
-              .. code-block::
-
-                       [{"FROM_INSTRUCTION": "318F", "FROM_LIBRARY": "QSYS", "FROM_MODULE": "", "FROM_PROCEDURE": "", "FROM_PROGRAM": "QWTCHGJB", "FROM_USER": "CHANGLE", "MESSAGE_FILE": "QCPFMSG", "MESSAGE_ID": "CPD0912", "MESSAGE_LIBRARY": "QSYS", "MESSAGE_SECOND_LEVEL_TEXT": "Cause . . . . . :   This message is used by application programs as a general escape message.", "MESSAGE_SUBTYPE": "", "MESSAGE_TEXT": "Printer device PRT01 not found.", "MESSAGE_TIMESTAMP": "2020-05-20-21.41.40.845897", "MESSAGE_TYPE": "DIAGNOSTIC", "ORDINAL_POSITION": "5", "SEVERITY": "20", "TO_INSTRUCTION": "9369", "TO_LIBRARY": "QSYS", "TO_MODULE": "QSQSRVR", "TO_PROCEDURE": "QSQSRVR", "TO_PROGRAM": "QSQSRVR"}]
             
       
         

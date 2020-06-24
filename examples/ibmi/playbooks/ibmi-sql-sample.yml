@@ -1,0 +1,69 @@
+#ibmi-sql-sample.yml 
+#The sample file is to provide an example about how to create a table, insert a row, query the table and drop the table
+---
+- hosts: ibmi
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
+  tasks:
+  - name: create journal receiver
+    ibmi_cl_command: 
+      cmd: QSYS/CRTJRNRCV JRNRCV(QGPL/ANSIJSNRCV) TEXT('JOURNAL RECEIVER FOR ANSIBLE')
+
+  - name: create journal
+    ibmi_cl_command: 
+      cmd: QSYS/CRTJRN JRN(QGPL/ANSIJSNJRN) JRNRCV(QGPL/ANSIJSNRCV) TEXT('JOURNAL FOR ANSIBLE') 
+
+  - name: run the SQL command to create a table
+    ibmi_sql_execute:
+      sql: "create table ansible(id INT not null, name varchar(8), gender varchar(8))" 
+    register: create_table_result
+    failed_when: "create_table_result.stderr != '' and ('CPF1301' not in create_table_result.stderr or 'SQL0601' in create_table_result.stderr)"
+
+  - name: start journal
+    ibmi_cl_command: 
+      cmd: QSYS/STRJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN)   
+
+  - name: run the SQL command to insert a row
+    ibmi_sql_execute:
+      sql: "INSERT INTO ansible VALUES('1', 'User1', 'Female')"
+
+  - name: run the SQL command to query a table
+    ibmi_sql_query:
+      sql: "select * from ansible"
+    register: sql_query_result
+
+  - name: run the SQL command to insert the row again
+    ibmi_sql_execute:
+      sql: "INSERT INTO ansible VALUES('2', 'User2', 'Male')"
+
+  - name: run the SQL command to query the table and check row count
+    ibmi_sql_query:
+      sql: "select * from ansible"
+      expected_row_count: 2
+
+  - name: end journal
+    ibmi_cl_command: 
+      cmd: QSYS/ENDJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN) 
+ 
+  - name: run sql to drop the table
+    ibmi_sql_execute:
+      sql: "drop table ansible"
+
+  - name: delete journal
+    ibmi_cl_command: 
+      cmd: QSYS/DLTJRN JRN(QGPL/ANSIJSNJRN) 
+
+  - name: create default reply list entry for CPA7025
+    ibmi_cl_command: 
+      cmd: ADDRPYLE SEQNBR(9999) MSGID(CPA7025) RPY(I)
+
+  - name: delete journal receiver
+    ibmi_cl_command: 
+      cmd: QSYS/DLTOBJ OBJ(QGPL/ANSIJSNRCV) OBJTYPE(*JRNRCV)
+
+  - name: remove reply list entry
+    ibmi_cl_command: 
+      cmd: QSYS/RMVRPYLE SEQNBR(9999)  
+  

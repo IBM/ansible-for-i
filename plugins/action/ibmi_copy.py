@@ -16,7 +16,7 @@ from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.0.0-beta1"
+__ibmi_module_version__ = "0.0.1"
 
 display = Display()
 
@@ -103,7 +103,6 @@ class ActionModule(ActionBase):
                 checksum="",
                 delta="",
                 job_log=[],
-                rc=255,
                 failed=False
             )
             savf_name = ''
@@ -164,10 +163,9 @@ class ActionModule(ActionBase):
                                 result['stderr'] = save_result['stderr_lines']
                                 result['stdout'] = save_result['stdout_lines']
                                 result['job_log'] = save_result['job_log']
-                                result['rc'] = save_result['rc']
                                 result['failed'] = True
                                 return result
-                        display.debug("ibm i debug: The original save file is successfully renamed to {p_rename_savf_name}".format(
+                        display.debug("The original save file is successfully renamed to {p_rename_savf_name}".format(
                             p_rename_savf_name=rename_savf_name))
                     else:
                         cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savefile_name}) OBJTYPE(*FILE)'.format(
@@ -181,10 +179,9 @@ class ActionModule(ActionBase):
                             result['stderr'] = save_result['stderr_lines']
                             result['stdout'] = save_result['stdout_lines']
                             result['job_log'] = save_result['job_log']
-                            result['rc'] = save_result['rc']
                             result['failed'] = True
                             return result
-                        display.debug("ibm i debug: The original save file is deleted.")
+                        display.debug("The original save file is deleted.")
                 else:
                     result['msg'] += "File with the Same name already exists on remote. If still want to copy, set force True. "
                     result['failed'] = True
@@ -202,11 +199,9 @@ class ActionModule(ActionBase):
                 result['stderr'] = save_result['stderr_lines']
                 result['stdout'] = save_result['stdout_lines']
                 result['job_log'] = save_result['job_log']
-                result['rc'] = save_result['rc']
                 result['failed'] = True
                 return result
             dir = os.path.dirname(savefile_path)
-            display.debug("ibm i debug: transfer {p_src} to {p_savefile_path}".format(p_src=src, p_savefile_path=savefile_path))
             self._transfer_file(src, savefile_path)
 
             local_checksum = checksum(src)
@@ -224,7 +219,7 @@ class ActionModule(ActionBase):
             endd = datetime.datetime.now()
             delta = endd - startd
 
-            result.update(dict(msg="File is successfully copied.", src=src, delta=str(delta), dest=savefile_path), rc=0)
+            result.update(dict(msg="File is successfully copied.", src=src, delta=str(delta), dest=savefile_path))
 
         except Exception as e:
             result['msg'] += "{p_to_text}".format(p_to_text=to_text(e))

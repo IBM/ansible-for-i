@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 ..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_submit_job.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/ansible_collection_beta/plugins/modules/ibmi_submit_job.py
 
 .. _ibmi_submit_job_module:
 
@@ -62,7 +62,7 @@ status
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: ['*NONE']
+  | **default**: [u'*NONE']
 
 
      
@@ -113,13 +113,16 @@ Return Values
 
    
                               
-       start
-        | The task execution start time
+       stderr_lines
+        | The task standard error split in lines
       
-        | **returned**: When job has been submitted and task has waited for the job status for some time
-        | **type**: str
-        | **sample**: 2019-12-02 11:07:53.757435
+        | **returned**: When rc as non-zero(failure)
+        | **type**: list      
+        | **sample**:
 
+              .. code-block::
+
+                       ["CPF2111:Library TESTLIB already exists."]
             
       
       
@@ -130,17 +133,6 @@ Return Values
         | **returned**: When job has been submitted and task has waited for the job status for some time
         | **type**: str
         | **sample**: 2019-12-02 11:07:54.064969
-
-            
-      
-      
-                              
-       delta
-        | The task execution delta time
-      
-        | **returned**: When job has been submitted and task has waited for the job status for some time
-        | **type**: str
-        | **sample**: 0:00:00.307534
 
             
       
@@ -157,23 +149,34 @@ Return Values
       
       
                               
+       delta
+        | The task execution delta time
+      
+        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **type**: str
+        | **sample**: 0:00:00.307534
+
+            
+      
+      
+                              
+       start
+        | The task execution start time
+      
+        | **returned**: When job has been submitted and task has waited for the job status for some time
+        | **type**: str
+        | **sample**: 2019-12-02 11:07:53.757435
+
+            
+      
+      
+                              
        stderr
         | The task standard error
       
         | **returned**: When rc as non-zero(failure)
         | **type**: str
         | **sample**: CPF2111:Library TESTLIB already exists
-
-            
-      
-      
-                              
-       sbmjob_cmd
-        | The SBMJOB CL command that has been used.
-      
-        | **returned**: always
-        | **type**: str
-        | **sample**: SBMJOB CMD(CRTLIB LIB(TESTLIB))
 
             
       
@@ -204,16 +207,13 @@ Return Values
       
       
                               
-       stderr_lines
-        | The task standard error split in lines
+       sbmjob_cmd
+        | The SBMJOB CL command that has been used.
       
-        | **returned**: When rc as non-zero(failure)
-        | **type**: list      
-        | **sample**:
+        | **returned**: always
+        | **type**: str
+        | **sample**: SBMJOB CMD(CRTLIB LIB(TESTLIB))
 
-              .. code-block::
-
-                       ["CPF2111:Library TESTLIB already exists."]
             
       
         

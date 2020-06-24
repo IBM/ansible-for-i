@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_object_find
 short_description: Find specific IBM i object(s).
-version_added: '2.8'
+version_added: 1.0
 description:
      - Return a list of IBM i objects based on specific criteria. Multiple criteria are AND'd together.
 options:
@@ -238,7 +238,21 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0-beta1"
+try:
+    from itoolkit import iToolKit
+    from itoolkit import iSqlFree
+    from itoolkit import iSqlFetch
+    from itoolkit import iSqlQuery
+    from itoolkit.transport import DatabaseTransport
+except ImportError:
+    HAS_ITOOLKIT = False
+
+try:
+    import ibm_db_dbi as dbi
+except ImportError:
+    HAS_IBM_DB = False
+
+__ibmi_module_version__ = "0.0.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -322,6 +336,12 @@ def main():
         supports_check_mode=True,
     )
 
+    if HAS_ITOOLKIT is False:
+        module.fail_json(msg="itoolkit package is required")
+
+    if HAS_IBM_DB is False:
+        module.fail_json(msg="ibm_db package is required")
+
     input_age = module.params['age']
     input_age_stamp = module.params['age_stamp']
     input_object_type = module.params['object_type_list']
@@ -337,9 +357,15 @@ def main():
     connection_id = None
 
     if input_iasp_name.strip() != '*SYSBAS':
-        connection_id = ibmi_util.itoolkit_init(db_name='{db_pattern}'.format(db_pattern=input_iasp_name))
+        try:
+            connection_id = dbi.connect(database='{db_pattern}'.format(db_pattern=input_iasp_name))
+        except Exception as e_db_connect:
+            module.fail_json(msg="Exception when trying to use IASP. " + str(e_db_connect))
     else:
-        connection_id = ibmi_util.itoolkit_init()
+        try:
+            connection_id = dbi.connect()
+        except Exception as e_db_connect:
+            module.fail_json(msg="Exception when connecting to IBM i Db2. " + str(e_db_connect))
 
     # generate age where stmt
     if input_age is None:
@@ -396,7 +422,10 @@ def main():
         job_log = []
 
     if connection_id is not None:
-        ibmi_util.itoolkti_close_connection(connection_id)
+        try:
+            connection_id.close()
+        except Exception as e_disconnect:
+            err = "ERROR: Unable to disconnect from the database. " + str(e_disconnect)
 
     endd = datetime.datetime.now()
     delta = endd - startd
