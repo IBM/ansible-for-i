@@ -13,16 +13,26 @@
         ibmi_sql_query:
           sql: "select ASP_NUMBER, TOTAL_CAPACITY_AVAILABLE, TOTAL_CAPACITY, DEC(DEC(TOTAL_CAPACITY_AVAILABLE, 19, 2)/ DEC(TOTAL_CAPACITY, 19, 2) * 100, 19, 2) AS AVAILABLE_SPACE from qsys2.asp_info"
         register: sql_query_result
-      - debug:
+      - name: La ocupacion de disco es  
+        debug:
           var: sql_query_result.row
 
       - name: PTF level
         ibmi_sql_query:
           sql: "select PTF_GROUP_NAME, PTF_GROUP_LEVEL, PTF_GROUP_STATUS from qsys2.GROUP_PTF_INFO"
-
         register: sql_query_result1
-      - debug:
+      - name: Los grupos de ptf son  
+        debug:
           var: sql_query_result1.row
 
-      
+ 
+      - name: History log - ultima hora
+        ibmi_sql_query:
+          sql: "SELECT X.MESSAGE_ID, X.MESSAGE_TIMESTAMP, X.FROM_USER, X.FROM_JOB,X.MESSAGE_ID, X.MESSAGE_TEXT FROM TABLE(QSYS2.HISTORY_LOG_INFO(CURRENT TIMESTAMP - 1 HOUR)) X WHERE X.SEVERITY > 10"
+        register: sql_query_result2
+      - name: History log ultima hora 
+        debug:
+          var: sql_query_result1.row
+
+       
       
