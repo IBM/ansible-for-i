@@ -174,10 +174,10 @@ def main():
 
         ibmi_util.log_debug("mkdir " + ifs_dir, module._name)
         rc, out, err = module.run_command(['mkdir', ifs_dir], use_unsafe_shell=False)
-        if rc is 0 or 'File exists' in err:
+        if rc == 0 or 'File exists' in err:
             ibmi_util.log_debug("cp " + src + " " + ifs_dir, module._name)
             rc, out, err = module.run_command(['cp', src, ifs_dir], use_unsafe_shell=False)
-            if rc is 0:
+            if rc == 0:
                 src_basename = os.path.basename(src)
                 ifs_name = ifs_dir + src_basename
                 private_key = to_bytes(private_key, errors='surrogate_or_strict')
