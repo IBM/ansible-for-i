@@ -32,7 +32,7 @@
         register: sql_query_result2
       - name: History log ultima hora 
         debug:
-          var: sql_query_result1.row
+          var: sql_query_result2.row
 
        
       
