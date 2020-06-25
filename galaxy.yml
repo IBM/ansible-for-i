@@ -9,7 +9,7 @@ namespace: ibm
 name: power_ibmi
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.0.0-beta1
+version: 1.0.0
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -17,11 +17,11 @@ readme: README.md
 # A list of the collection's content authors. Can be just the name or in the format 'Full Name <email> (url)
 # @nicks:irc/im.site#channel'
 authors:
-- Chang Le<changle@cn.ibm.com>
-- Zhu Lijun <zhuljbj@@cn.ibm.com>
-- Peng Zengyu <pzypeng@cn.ibm.com>
-- Wang Yun <cdlwangy@cn.ibm.com>
-- Jin Yifan <jinyifan@cn.ibm.com>
+  - Chang Le<changle@cn.ibm.com>
+  - Zhu Lijun <zhuljbj@@cn.ibm.com>
+  - Peng Zengyu <pzypeng@cn.ibm.com>
+  - Wang Yun <cdlwangy@cn.ibm.com>
+  - Jin Yifan <jinyifan@cn.ibm.com>
 
 ### OPTIONAL but strongly recommended
 
@@ -31,8 +31,8 @@ description: Ansible Content for IBM Power Systems - IBM i provides Ansible acti
 # Either a single license or a list of licenses for content inside of a collection. Ansible Galaxy currently only
 # accepts L(SPDX,https://spdx.org/licenses/) licenses. This key is mutually exclusive with 'license_file'
 license:
-- GPLv3
-- Apache-2.0
+  - "GPL-3.0-only"
+  - "Apache-2.0"
 
 # # The path to the license file for the collection. This path is relative to the root of the collection. This key is
 # # mutually exclusive with 'license'
