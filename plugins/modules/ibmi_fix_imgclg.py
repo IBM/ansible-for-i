@@ -548,7 +548,6 @@ def main():
                     # move all the objects to the target folder
                     for f in os.listdir(path):
                         source_file = os.path.join(path, f)
-                        target_file = os.path.join(tmp_dir, f)
                         if os.path.isfile(source_file):
                             shutil.copy(source_file, tmp_dir)
                 else:

@@ -84,7 +84,7 @@ operation
 
   ``view`` will return the iasp state
 
-  \*\*At least one of operation are required.\*\*
+  **At least one of operation are required.**
 
 
   | **required**: True

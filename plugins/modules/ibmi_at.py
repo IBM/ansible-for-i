@@ -45,7 +45,7 @@ options:
   scdday:
     description:
       - Specifies the day of the week on which the job is submitted.
-      - The valid value are '*NONE', '*ALL', '*MON', '*TUE', '*WED', '*THU', '*FRI', '*SAT', '*SUN'.
+      - The valid value are C(*NONE), C(*ALL), C(*MON), C(*TUE), C(*WED), C(*THU), C(*FRI), C(*SAT), C(*SUN).
     type: list
     elements: str
     default: "*NONE"

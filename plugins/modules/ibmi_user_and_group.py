@@ -54,7 +54,7 @@ options:
     description:
       - Specifies whether the password for this user is set to expired.
       - If the password is set to expired, the user is required to change the password to sign on the system.
-      - If not specify, C('*NO') will be used for operation create, C('*SAME') will be used for operation change.
+      - If not specify, C(*NO) will be used for operation create, C(*SAME) will be used for operation change.
       - Valid only for operation create and change.
     type: str
     choices: ['*NO', '*YES', '*SAME']
@@ -62,7 +62,7 @@ options:
   status:
     description:
       - Specifies the status of the user profile.
-      - If not specify, '*ENABLED' will be used for operation create, C('*SAME') will be used for operation change.
+      - If not specify, C(*ENABLED) will be used for operation create, C(*SAME) will be used for operation change.
       - Valid only for operation create and change.
     type: str
     choices: ['*ENABLED', '*DISABLED', '*SAME']
@@ -70,7 +70,7 @@ options:
   user_class:
     description:
       - Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.
-      - If not specify, '*USER' will be used for operation create, C('*SAME') will be used for operation change.
+      - If not specify, C(*USER) will be used for operation create, C(*SAME) will be used for operation change.
       - Valid only for operation create and change.
     type: str
     choices: ['*USER', '*SYSOPR', '*PGMR','*SECADM', '*SECOFR', '*SAME']
@@ -78,7 +78,7 @@ options:
   special_authority:
     description:
       - Specifies the special authorities given to a user.
-      - If not specify, C('*USRCLS') will be used for operation create, C('*SAME') will be used for operation change.
+      - If not specify, C(*USRCLS) will be used for operation create, C(*SAME) will be used for operation change.
       - Valid only for operation create and change.
     type: list
     elements: str
@@ -96,7 +96,7 @@ options:
   owner:
     description:
       - Specifies the user that is to be the owner of objects created by this user.
-      - If not specify, C('*USRPRF') will be used for operation create, C('*SAME') will be used for operation change.
+      - If not specify, C(*USRPRF) will be used for operation create, C(*SAME) will be used for operation change.
       - Valid only for operation create and change.
     type: str
     choices: ['*USRPRF', '*GRPPRF', '*SAME']
@@ -104,7 +104,7 @@ options:
   text:
     description:
       - Specifies the text that briefly describes the user or group profile.
-      - If not specify, 'Create by Ansible' will be used for operation create, C('*SAME') will be used for operation change.
+      - If not specify, 'Create by Ansible' will be used for operation create, C(*SAME) will be used for operation change.
       - Valid only for operation create and change.
     type: str
     default: '*SAME'
@@ -227,9 +227,7 @@ job_log:
     returned: always
 '''
 
-import datetime
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common import validation
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
 __ibmi_module_version__ = "1.0.0"

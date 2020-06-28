@@ -67,7 +67,7 @@ options:
   iasp_name:
     description:
       - The auxiliary storage pool (ASP) where storage is allocated for the object.
-      - The default value is "*SYSBAS".
+      - The default value is C(*SYSBAS).
       - If an IASP name is specified, objects in this ASP group will be returned, including both SYSBAS and IASP.
     default: "*SYSBAS"
     type: str

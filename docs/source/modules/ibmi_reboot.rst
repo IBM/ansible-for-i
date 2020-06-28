@@ -42,7 +42,7 @@ connect_timeout
 controlled_end_delay_time
   Specifies the amount of time(1-99999), in seconds, that the system allows a controlled end to be performed by the active subsystems.
 
-  If the value is greater than 99999, '\*NOLIMIT' will be used in PWRDWNSYS commnad.
+  If the value is greater than 99999, ``*NOLIMIT`` will be used in PWRDWNSYS commnad.
 
 
   | **required**: false
@@ -200,7 +200,7 @@ Notes
 .. note::
    ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section.
 
-   Be careful to use '\*CNTRLD' for option how_to_end, you need to specify the appropriate value for all the timout options according to the system performance.
+   Be careful to use ``*CNTRLD`` for option how_to_end, you need to specify the appropriate value for all the timout options according to the system performance.
 
 
 

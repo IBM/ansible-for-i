@@ -42,7 +42,7 @@ asp_device
 
      
 asp_group
-  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread. The ASP group name is the name of the primary ASP device within the ASP group. The different for asp_group and (ref_)asp_device are, the asp_group make the current ansible thread run under the asp_group. the (ref_)asp_device is the search scope for the object. If you want to searh the (ref_)object in an ASP, the asp_group must be set and varied on, (ref)asp_device can be set as '\*' for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
+  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread. The ASP group name is the name of the primary ASP device within the ASP group. The different for asp_group and asp_device or ref_asp_device are, the asp_group make the current ansible thread run under the asp_group. the asp_device or ref_asp_device is the search scope for the object. If you want to searh the object or ref_object in an ASP, the asp_group must be set and varied on, asp_device or ref_asp_device can be set as ``*`` for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
 
   Valid for all the operations
 
@@ -70,7 +70,7 @@ authority
 authorization_list
   Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl.
 
-  Valid only for operations grant_autl and revoke_autl, you must specify a value other than ''.
+  Valid only for operations grant_autl and revoke_autl, you must specify a value other than ``''``.
 
 
   | **required**: false
@@ -92,7 +92,7 @@ object_library
 
   Valid for all the operations.
 
-  When operation is display, special value as '\*LIBL', '\*CURLIB', '\*ALL', '\*ALLUSR', '\*USRLIBL', '\*ALLAVL', '\*ALLUSRAVL' are not supported.
+  When operation is display, special value as ``*LIBL``, ``*CURLIB``, ``*ALL``, ``*ALLUSR``, ``*USRLIBL``, ``*ALLAVL``, ``*ALLUSRAVL`` are not supported.
 
 
   | **required**: false
@@ -181,7 +181,7 @@ ref_object_library
 ref_object_name
   Specify the name of the reference object for which specific authority is to be granted, revoked or displayed to one or more users.
 
-  Valid only for operation grant_ref, you must specify a value other than ''.
+  Valid only for operation grant_ref, you must specify a value other than ``''``.
 
 
   | **required**: false

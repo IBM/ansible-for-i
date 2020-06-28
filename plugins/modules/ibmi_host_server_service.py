@@ -25,7 +25,7 @@ options:
   name_list:
     description:
       - The name of the host server service.
-        The valid value are "*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP".
+        The valid value are C(*ALL), C(*CENTRAL), C(*DATABASE), C(*DTAQ), C(*FILE), C(*NETPRT), C(*RMTCMD), C(*SIGNON), C(*SVRMAP).
     type: list
     elements: str
     required: yes

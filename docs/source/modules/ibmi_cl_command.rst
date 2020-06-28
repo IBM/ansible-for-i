@@ -33,7 +33,7 @@ asp_group
 
   The ASP group name is the name of the primary ASP device within the ASP group.
 
-  Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(\*), DSPHDWRSC TYPE(\*AHW) OUTPUT(\*).
+  Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL, DSPHDWRSC.
 
 
   | **required**: false
@@ -54,7 +54,7 @@ cmd
 joblog
   If set to ``true``, output the avaiable job log even the rc is 0(success).
 
-  Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(\*), DSPHDWRSC TYPE(\*AHW) OUTPUT(\*).
+  Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL, DSPHDWRSC.
 
 
   | **required**: false
@@ -80,7 +80,7 @@ Notes
 -----
 
 .. note::
-   CL command with OUTPUT parameter like 'DSPLIBL OUTPUT(\*)', 'DSPHDWRSC TYPE(\*AHW) OUTPUT(\*)' does not have job log.
+   CL command with OUTPUT parameter like DSPLIBL, DSPHDWRSC does not have job log.
 
    CL command can also be run by ``command`` module with simple stdout/stderr, put 'system' as the as first args in ``command`` module.
 

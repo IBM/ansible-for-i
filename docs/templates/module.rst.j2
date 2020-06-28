@@ -64,7 +64,7 @@ Synopsis
 
 {{ "  " * level }}{{ name }}
 {%     for para in spec.description %}
-  {{ "  " * level }}{{ para | rst_ify | replace('*', '\*') }}
+  {{ "  " * level }}{{ para | rst_ify }}
 
 {%     endfor %}
 
@@ -119,7 +119,7 @@ Notes
 
 .. note::
 {%   for note in notes %}
-   {{ note | rst_ify | replace('*','\*')}}
+   {{ note | rst_ify }}
 
 {%   endfor %}
 {% endif %}

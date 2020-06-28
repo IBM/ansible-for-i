@@ -4,19 +4,14 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import os
-import base64
 import datetime
-import re
-import shlex
 
 from ansible.errors import AnsibleError, AnsibleActionFail
-from ansible.module_utils._text import to_text, to_native, to_bytes
+from ansible.module_utils._text import to_text, to_native
 from ansible.module_utils.six import string_types
-from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
-from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
-from ansible.executor.powershell import module_manifest as ps_manifest
+from ansible.utils.hashing import checksum
 __ibmi_module_version__ = "1.0.0"
 display = Display()
 
@@ -89,7 +84,6 @@ class ActionModule(ActionBase):
             self._transfer_file(src, tmp_src)
 
             local_checksum = checksum(src)
-            remote_data = None
             if not self._connection.become:
                 remote_checksum = self._remote_checksum(tmp_src, all_vars=task_vars, follow=True)
 

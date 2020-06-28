@@ -25,10 +25,10 @@ options:
   name_list:
     description:
       - The name of the tcp server service.
-        The valid value are "*ALL", "*AUTOSTART", "*BOOTP", "*DBG", "*DDM", "*DHCP", "*DIRSRV", "*DLFM", "*DNS",
-        "*DOMINO", "*EDRSQL", "*FTP", "*HTTP", "*HOD", "*IAS", "*INETD", "*LPD", "*MGTC", "*NETSVR", "*NSLD", "*NTP",
-        "*ODPA", "*OMPROUTED", "*ONDMD", "*POP", "*QOS", "*REXEC", "*ROUTED", "*SLP", "*SMTP", "*SNMP", "*SRVSPTPRX",
-        "*SSHD", "*TCM", "*TELNET", "*TFTP", "*VPN", "*WEBFACING".
+        The valid value are C(*ALL), C(*AUTOSTART), C(*BOOTP), C(*DBG), C(*DDM), C(*DHCP), C(*DIRSRV), C(*DLFM), C(*DNS),
+        C(*DOMINO), C(*EDRSQL), C(*FTP), C(*HTTP), C(*HOD), C(*IAS), C(*INETD), C(*LPD), C(*MGTC), C(*NETSVR), C(*NSLD), C(*NTP),
+        C(*ODPA), C(*OMPROUTED), C(*ONDMD), C(*POP), C(*QOS), C(*REXEC), C(*ROUTED), C(*SLP), C(*SMTP), C(*SNMP), C(*SRVSPTPRX),
+        C(*SSHD), C(*TCM), C(*TELNET), C(*TFTP), C(*VPN), C(*WEBFACING).
     type: list
     elements: str
     required: yes

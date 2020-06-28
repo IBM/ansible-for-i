@@ -42,7 +42,7 @@ asp_group
 
      
 format
-  The save file's format. Only support ``\*SAVF`` by now.
+  The save file's format. Only support ``*SAVF`` by now.
 
 
   | **required**: false

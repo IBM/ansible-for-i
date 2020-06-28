@@ -41,13 +41,13 @@ options:
     choices: ["*ALL", "*BATCH", "*INTERACT"]
   subsystem:
     description:
-      - The job subsystem filter. A valid subsystem name can be specified. Valid values are "*ALL" or subsystem name.
+      - The job subsystem filter. A valid subsystem name can be specified. Valid values are C(*ALL) or subsystem name.
     type: str
     default: "*ALL"
   user:
     description:
       - The user profile name to use as the job user filtering criteria.
-      - Valid values are user profile name, "*USER" or "*ALL".
+      - Valid values are user profile name, C(*USER) or C(*ALL).
     type: str
     default: "*ALL"
   submitter:

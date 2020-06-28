@@ -72,7 +72,7 @@ force_save
 
      
 format
-  The save file's format. Only support ``\*SAVF`` by now.
+  The save file's format. Only support ``*SAVF`` by now.
 
 
   | **required**: false
@@ -105,7 +105,7 @@ object_names
 
   One or more object names can be specified. Use space as separator.
 
-  If object type is ``\*FILE``, then fetch it directly. Only one ``\*FILE`` object will fetch directly at one time.
+  If object type is ``*FILE``, then fetch it directly. Only one ``*FILE`` object will fetch directly at one time.
 
 
   | **required**: false

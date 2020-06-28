@@ -4,17 +4,15 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import os
-import base64
 import datetime
 
 from ansible.errors import AnsibleError, AnsibleActionFail
-from ansible.module_utils._text import to_text, to_native, to_bytes
+from ansible.module_utils._text import to_text, to_native
 from ansible.module_utils.six import string_types
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
-from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
-from ansible.utils.path import makedirs_safe
+from ansible.utils.hashing import checksum
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 __ibmi_module_version__ = "1.0.0"
 
@@ -106,9 +104,7 @@ class ActionModule(ActionBase):
                 rc=255,
                 failed=False
             )
-            savf_name = ''
             created = False
-            is_savf = False
             if self._play_context.check_mode:
                 result['skipped'] = True
                 result['msg'] = 'check mode not (yet) supported for this module'
@@ -205,12 +201,10 @@ class ActionModule(ActionBase):
                 result['rc'] = save_result['rc']
                 result['failed'] = True
                 return result
-            dir = os.path.dirname(savefile_path)
             display.debug("ibm i debug: transfer {p_src} to {p_savefile_path}".format(p_src=src, p_savefile_path=savefile_path))
             self._transfer_file(src, savefile_path)
 
             local_checksum = checksum(src)
-            remote_data = None
             if not self._connection.become:
                 remote_checksum = self._remote_checksum(savefile_path, all_vars=task_vars, follow=True)
 

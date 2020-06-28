@@ -17,7 +17,7 @@ ibmi_display_subsystem -- Displays all currently active subsystems or currently 
 Synopsis
 --------
 - The ``ibmi_display_subsystem`` module displays all currently active subsystems or currently active jobs in a subsystem.
-- In some ways it has equivalent results of WRKSBS if subsystem is ``'*ALL'``, otherwise, it has equivalent results of WRKSBSJOB.
+- In some ways it has equivalent results of WRKSBS if subsystem is ``*ALL``, otherwise, it has equivalent results of WRKSBSJOB.
 
 
 
@@ -48,7 +48,7 @@ subsystem
 
      
 user
-  Specifies the name of the user whose jobs are displayed, ``'\*ALL'`` for all users. If subsystem is ``'\*ALL'``, this option is ignored.
+  Specifies the name of the user whose jobs are displayed, ``*ALL`` for all users. If subsystem is ``*ALL``, this option is ignored.
 
 
   | **required**: false
@@ -168,7 +168,7 @@ Return Values
        subsystems
         | The list of the currently active subsystems.
       
-        | **returned**: When rc as 0(success) and subsystem is C('*ALL').
+        | **returned**: When rc as 0(success) and subsystem is C(*ALL).
         | **type**: list      
         | **sample**:
 
@@ -182,7 +182,7 @@ Return Values
        active_jobs
         | The result set
       
-        | **returned**: When rc as 0(success) and subsystem is not C('*ALL').
+        | **returned**: When rc as 0(success) and subsystem is not C(*ALL).
         | **type**: list      
         | **sample**:
 

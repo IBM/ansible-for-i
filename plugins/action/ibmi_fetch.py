@@ -8,7 +8,6 @@ import base64
 import datetime
 
 from ansible.errors import AnsibleError
-from ansible.errors import AnsibleConnectionFailure
 from ansible.module_utils._text import to_text
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils.six import string_types

@@ -28,7 +28,7 @@ Parameters
 
      
 controlled_end_delay_time
-  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, ``'\*NOLIMIT'`` will be used in ENDSBS command DELAY parameter.
+  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, ``*NOLIMIT`` will be used in ENDSBS command DELAY parameter.
 
 
   | **required**: false
