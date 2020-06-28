@@ -50,16 +50,25 @@
         type: '*BATCH'
         subsystem: "QSYSWRK"
         user: "QSYS"
-        #submitter: "*JOB"
+        submitter: "*JOB"
       register: job_result
 
     - name: list job with all options other than default values
       ibmi_job: 
         status: "*ACTIVE"
         type: '*BATCH'
-        #subsystem: "QSYSWRK"
-        #user: "QSYS"
-        submitter: "*JOB"
+        subsystem: "QSYSWRK"
+        user: "QSYS"
+        submitter: "*USER"
+      register: job_result
+
+    - name: list job with all options other than default values
+      ibmi_job: 
+        status: "*ACTIVE"
+        type: '*BATCH'
+        subsystem: "QSYSWRK"
+        user: "QSYS"
+        submitter: "*WRKSTN"
       register: job_result
 
     - name: list job with all options other than default values
@@ -72,6 +81,7 @@
         status: "*ACTIVE"
         type: '*BATCH'
         subsystem: "QSYSWRK"
+        user: "QSYS"
         submitter: "*ALL"
       register: job_result
 
@@ -92,7 +102,7 @@
     - name: Submit a job with only required options
       ibmi_submit_job: 
         cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
-        status: ['*COMPLETE', '*OUTQ', '*ACTIVE']
+        status: ['*COMPLETE', '*OUTQ']
       register: sbmjob_result
 
     - name: list job with check_interval
@@ -107,7 +117,7 @@
         subsystem: "*ALL"
         user: "ZHULJ"
       register: job_result
-      #failed_when: "job_result.job_info | length == 0"
+      failed_when: "job_result.job_info | length == 0"
 
     - name: list job with all options other than default values
       ibmi_job: 
@@ -164,6 +174,32 @@
       register: neg_result
       failed_when: "'value of submitter must be one of' not in neg_result.msg"
 
+    - name: list job info with not existing user
+      ibmi_job: 
+        status: "*OUTQ"
+        type: '*ALL'
+        subsystem: "QSYSWRK"
+        user: "ABC"
+      register: neg_result
+      #failed_when: "job_result.job_info | length == 0"
+
+    - name: list job info with not existing subsystem
+      ibmi_job: 
+        status: "*OUTQ"
+        type: '*ALL'
+        subsystem: "ABC"
+      register: neg_result
+      #failed_when: "job_result.job_info | length == 0"
+
+    - name: query job info with invalid name
+      ibmi_job: 
+        name: "111111/WANGYUN/TEST"
+        status: "*OUTQ"
+        type: '*ALL'
+        subsystem: "QSYSWRK"
+      #register: neg_result
+      #failed_when: "job_result.job_info | length == 0"
+    
   always:
     - name: delete script file
       command: "rm -rf /tmp/sbmjob_script.sh"

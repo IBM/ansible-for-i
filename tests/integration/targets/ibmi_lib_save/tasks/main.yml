@@ -12,5 +12,3 @@
     - name: remove copied file
       command: 'rm -rf /tmp/IBMISAVF.FILE'
       ignore_errors: true
-
-

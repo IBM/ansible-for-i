@@ -150,7 +150,7 @@
         that:
           - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
       loop: "{{authority_result.object_authority_list }}"
-      when : os_version | int >= 74
+      when: os_version | int >= 74
 
     - name: revoke 2 authorities to user
       ibmi_object_authority:
@@ -177,7 +177,7 @@
         that:
           - item['AUTHORIZATION_LIST'] == ''
       loop: "{{authority_result.object_authority_list }}"
-      when : os_version | int >= 74
+      when: os_version | int >= 74
 
     - name: grant 1 users 1 AUL to a single object
       ibmi_object_authority:
@@ -218,7 +218,7 @@
         that:
           - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
       loop: "{{authority_result.object_authority_list }}"
-      when : os_version | int >= 74
+      when: os_version | int >= 74
 
     - name: grant 1 users 1 authority to a single object
       ibmi_object_authority:

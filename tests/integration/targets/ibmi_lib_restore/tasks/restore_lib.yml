@@ -83,17 +83,6 @@
   #failed_when: "'CPF3780' not in rstlib_result.stderr"
   failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-- name: TC07 restore lib with duplicated saved_lib 
-  ibmi_lib_restore:
-    saved_lib: 'SAVRST'
-    saved_lib: 'ABC'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-    joblog: 'true'
-  register: rstlib_result
-  #failed_when: "'ABC not found' not in rstlib_result.stderr"
-  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
-
 - name: TC08 restore lib from wrong format
   ibmi_lib_restore:
     saved_lib: 'SAVRST'

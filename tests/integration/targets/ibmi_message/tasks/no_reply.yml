@@ -87,4 +87,3 @@
 - debug: 
     msg: "'Created the message queues and send the requird messages to the message queues before run the testing'"
   when: is_msgq_ready == false 
-
