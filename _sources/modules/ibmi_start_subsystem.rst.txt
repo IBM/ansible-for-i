@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_start_subsystem.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_start_subsystem.py
 
 .. _ibmi_start_subsystem_module:
 
-
 ibmi_start_subsystem -- Start an inactive subsystem
 ===================================================
-
 
 
 .. contents::
@@ -17,8 +18,6 @@ ibmi_start_subsystem -- Start an inactive subsystem
 Synopsis
 --------
 - the ``ibmi_start_subsystem`` module start an inactive subsystem.
-
-
 
 
 
@@ -42,7 +41,7 @@ library
 
   | **required**: false
   | **type**: str
-  | **default**: \*LIBL
+  | **default**: *LIBL
 
 
      
@@ -52,7 +51,6 @@ subsystem
 
   | **required**: True
   | **type**: str
-
 
 
 
@@ -74,15 +72,12 @@ Examples
 
 
 
-
-
 See Also
 --------
 
 .. seealso::
 
    - :ref:`ibmi_end_subsystem_module`
-
 
 
 Return Values

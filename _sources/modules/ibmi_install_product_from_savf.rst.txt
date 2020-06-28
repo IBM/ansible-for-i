@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_install_product_from_savf.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_install_product_from_savf.py
 
 .. _ibmi_install_product_from_savf_module:
 
-
 ibmi_install_product_from_savf -- Install the licensed program(product) from a save file.
 =========================================================================================
-
 
 
 .. contents::
@@ -20,15 +21,13 @@ Synopsis
 
 
 
-
-
 Parameters
 ----------
 
 
      
 acceptance_cmd
-  The Accept Software Agreement command records the acceptance of the software agreement for a product. It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement. This command cannot be used to accept the Licensed Internal Code or the IBM i \*Base software agreements. If invalid command specificed, message CPDB6D5 with following reason will be received, 'Product cannot be installed in a batch request because the software agreement has not been previously accepted'. In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don't know the command.
+  The Accept Software Agreement command records the acceptance of the software agreement for a product. It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement. This command cannot be used to accept the Licensed Internal Code or the IBM i ``*Base`` software agreements. If invalid command specificed, message CPDB6D5 with following reason will be received, 'Product cannot be installed in a batch request because the software agreement has not been previously accepted'. In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don't know the command.
 
 
   | **required**: false
@@ -52,7 +51,7 @@ language
 
   | **required**: false
   | **type**: str
-  | **default**: \*PRIMARY
+  | **default**: *PRIMARY
 
 
      
@@ -62,8 +61,8 @@ object_type
 
   | **required**: false
   | **type**: str
-  | **default**: \*ALL
-  | **choices**: \*ALL, \*PGM, \*LNG
+  | **default**: *ALL
+  | **choices**: *ALL, *PGM, *LNG
 
 
      
@@ -73,7 +72,7 @@ option
 
   | **required**: false
   | **type**: str
-  | **default**: \*BASE
+  | **default**: *BASE
 
 
      
@@ -102,7 +101,7 @@ release
 
   | **required**: false
   | **type**: str
-  | **default**: \*FIRST
+  | **default**: *FIRST
 
 
      
@@ -112,7 +111,7 @@ replace_release
 
   | **required**: false
   | **type**: str
-  | **default**: \*ONLY
+  | **default**: *ONLY
 
 
      
@@ -131,7 +130,6 @@ savf_name
 
   | **required**: True
   | **type**: str
-
 
 
 
@@ -158,15 +156,12 @@ Examples
 
 
 
-
-
 See Also
 --------
 
 .. seealso::
 
    - :ref:`ibmi_uninstall_product, ibmi_save_product_to_savf_module`
-
 
 
 Return Values
@@ -180,7 +175,7 @@ Return Values
       
         | **returned**: When rc as 0(success)
         | **type**: str
-        | **sample**: +++ success RSTLICPGM LICPGM(5733D10) DEV(\*SAVF) OPTION(\*BASE) RSTOBJ(\*ALL)
+        | **sample**: +++ success RSTLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)
 
             
       

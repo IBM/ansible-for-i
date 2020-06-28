@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_at.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_at.py
 
 .. _ibmi_at_module:
 
-
 ibmi_at -- Schedule a batch job
 ===============================
-
 
 
 .. contents::
@@ -17,8 +18,6 @@ ibmi_at -- Schedule a batch job
 Synopsis
 --------
 - The ``ibmi_at`` module schedule a batch job.
-
-
 
 
 
@@ -42,7 +41,7 @@ frequency
 
   | **required**: True
   | **type**: str
-  | **choices**: \*ONCE, \*WEEKLY, \*MONTHLY
+  | **choices**: *ONCE, *WEEKLY, *MONTHLY
 
 
      
@@ -81,20 +80,20 @@ scddate
 
   | **required**: false
   | **type**: str
-  | **default**: \*CURRENT
+  | **default**: *CURRENT
 
 
      
 scdday
   Specifies the day of the week on which the job is submitted.
 
-  The valid value are '\*NONE', '\*ALL', '\*MON', '\*TUE', '\*WED', '\*THU', '\*FRI', '\*SAT', '\*SUN'.
+  The valid value are '*NONE', '*ALL', '*MON', '*TUE', '*WED', '*THU', '*FRI', '*SAT', '*SUN'.
 
 
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: \*NONE
+  | **default**: *NONE
 
 
      
@@ -104,7 +103,7 @@ schtime
 
   | **required**: false
   | **type**: str
-  | **default**: \*CURRENT
+  | **default**: *CURRENT
 
 
      
@@ -114,8 +113,7 @@ text
 
   | **required**: false
   | **type**: str
-  | **default**: \*BLANK
-
+  | **default**: *BLANK
 
 
 
@@ -138,9 +136,6 @@ Examples
 
 
 
-
-
-
 Return Values
 -------------
 
@@ -152,7 +147,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: QSYS/ADDJOBSCDE JOB(RUNCOM) CMD(QBLDSYSR/CHGSYSSEC OPTION(\*CHGPW)) FRQ(\*WEEKLY) SCDDATE(\*CURRENT) SCDDAY(\*NONE) SCDTIME(\*CURRENT) TEXT(\*BLANK) 
+        | **sample**: QSYS/ADDJOBSCDE JOB(RUNCOM) CMD(QBLDSYSR/CHGSYSSEC OPTION(*CHGPW)) FRQ(*WEEKLY) SCDDATE(*CURRENT) SCDDAY(*NONE) SCDTIME(*CURRENT) TEXT(*BLANK) 
 
             
       
@@ -163,7 +158,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: Either scddate or scdday need to be \*NONE.
+        | **sample**: Either scddate or scdday need to be *NONE.
 
             
       

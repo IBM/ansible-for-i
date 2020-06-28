@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_lib_save.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_lib_save.py
 
 .. _ibmi_lib_save_module:
 
-
 ibmi_lib_save -- Save one libary
 ================================
-
 
 
 .. contents::
@@ -19,8 +20,6 @@ Synopsis
 - The ``ibmi_lib_save`` module create an save file on a remote IBM i nodes.
 - The save file is not copied to the local host.
 - Only support ``*SAVF`` as the save file's format by now.
-
-
 
 
 
@@ -37,7 +36,7 @@ asp_group
 
   | **required**: false
   | **type**: str
-  | **default**: \*SYSBAS
+  | **default**: *SYSBAS
 
 
      
@@ -51,13 +50,13 @@ force_save
 
      
 format
-  The save file's format. Only support ``\*SAVF`` by now.
+  The save file's format. Only support ``*SAVF`` by now.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAVF
-  | **choices**: \*SAVF
+  | **default**: *SAVF
+  | **choices**: *SAVF
 
 
      
@@ -113,8 +112,7 @@ target_release
 
   | **required**: false
   | **type**: str
-  | **default**: \*CURRENT
-
+  | **default**: *CURRENT
 
 
 
@@ -131,9 +129,6 @@ Examples
        savefile_lib: 'archlib'
        force_save: True
        target_release: 'V7R2M0'
-
-
-
 
 
 
@@ -235,11 +230,11 @@ Return Values
       
                               
        format
-        | The save file's format. Only support ``*SAVF`` by now.
+        | The save file's format. Only support C(*SAVF) by now.
       
         | **returned**: always
         | **type**: str
-        | **sample**: \*SAVF
+        | **sample**: *SAVF
 
             
       
@@ -275,7 +270,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: SAVLIB LIB(TEST) DEV(\*SAVF) SAVF(TEST/ARCHLIB) TGTRLS(V7R2M0)
+        | **sample**: SAVLIB LIB(TEST) DEV(*SAVF) SAVF(TEST/ARCHLIB) TGTRLS(V7R2M0)
 
             
       

@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_message.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_message.py
 
 .. _ibmi_message_module:
 
-
 ibmi_message -- Search message
 ==============================
-
 
 
 .. contents::
@@ -18,8 +19,6 @@ Synopsis
 --------
 - Search message.
 - For non-IBM i targets, no need.
-
-
 
 
 
@@ -115,7 +114,6 @@ operation
 
 
 
-
 Examples
 --------
 
@@ -140,15 +138,12 @@ Examples
 
 
 
-
-
 See Also
 --------
 
 .. seealso::
 
    - :ref:`service_module`
-
 
 
 Return Values

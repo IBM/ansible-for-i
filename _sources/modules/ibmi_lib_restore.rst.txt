@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_lib_restore.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_lib_restore.py
 
 .. _ibmi_lib_restore_module:
 
-
 ibmi_lib_restore -- Restore one library
 =======================================
-
 
 
 .. contents::
@@ -19,8 +20,6 @@ Synopsis
 - The ``ibmi_lib_restore`` module restore a save file.
 - The restored library and save file are on the remote host.
 - Only support ``*SAVF`` as the save file's format by now.
-
-
 
 
 
@@ -37,18 +36,18 @@ asp_group
 
   | **required**: false
   | **type**: str
-  | **default**: \*SYSBAS
+  | **default**: *SYSBAS
 
 
      
 format
-  The save file's format. Only support ``\*SAVF`` by now.
+  The save file's format. Only support ``*SAVF`` by now.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAVF
-  | **choices**: \*SAVF
+  | **default**: *SAVF
+  | **choices**: *SAVF
 
 
      
@@ -98,7 +97,6 @@ savefile_name
 
 
 
-
 Examples
 --------
 
@@ -110,9 +108,6 @@ Examples
        saved_lib: 'savedlib'
        savefile_name: 'archive'
        savefile_lib: 'archlib'
-
-
-
 
 
 
@@ -214,11 +209,11 @@ Return Values
       
                               
        format
-        | The save file's format. Only support ``*SAVF`` by now.
+        | The save file's format. Only support C(*SAVF) by now.
       
         | **returned**: always
         | **type**: str
-        | **sample**: \*SAVF
+        | **sample**: *SAVF
 
             
       
@@ -229,7 +224,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: RSTLIB SAVLIB(TESTLIB) DEV(\*SAVF) SAVF(TEST/ARCHLIB) 
+        | **sample**: RSTLIB SAVLIB(TESTLIB) DEV(*SAVF) SAVF(TEST/ARCHLIB) 
 
             
       

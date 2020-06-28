@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_imgclg.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_imgclg.py
 
 .. _ibmi_fix_imgclg_module:
 
-
 ibmi_fix_imgclg -- Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.
 ========================================================================================================================
-
 
 
 .. contents::
@@ -21,8 +22,6 @@ Synopsis
 
 
 
-
-
 Parameters
 ----------
 
@@ -34,8 +33,8 @@ apply_type
 
   | **required**: false
   | **type**: str
-  | **default**: \*DLYALL
-  | **choices**: \*DLYALL, \*IMMDLY, \*IMMONLY
+  | **default**: *DLYALL
+  | **choices**: *DLYALL, *IMMDLY, *IMMONLY
 
 
      
@@ -78,7 +77,7 @@ product_id
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: ['\*ALL']
+  | **default**: ['*ALL']
 
 
      
@@ -130,8 +129,7 @@ virtual_image_name_list
   | **required**: False
   | **type**: list
   | **elements**: str
-  | **default**: ['\*ALL']
-
+  | **default**: ['*ALL']
 
 
 
@@ -157,13 +155,11 @@ Examples
 
 
 
-
 Notes
 -----
 
 .. note::
    Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-
 
 
 See Also
@@ -172,7 +168,6 @@ See Also
 .. seealso::
 
    - :ref:`ibmi_fix, ibmi_fix_savf_module`
-
 
 
 Return Values
