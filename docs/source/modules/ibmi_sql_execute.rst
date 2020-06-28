@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_sql_execute.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_sql_execute.py
 
 .. _ibmi_sql_execute_module:
 
-
 ibmi_sql_execute -- Executes a SQL non-DQL(Data Query Language) statement
 =========================================================================
-
 
 
 .. contents::
@@ -20,8 +21,6 @@ Synopsis
 
 
 
-
-
 Parameters
 ----------
 
@@ -30,12 +29,12 @@ Parameters
 database
   Specified database name, usually, its the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries
 
-  Default to use the '\*LOCAL' entry
+  Default to use the ``*LOCAL`` entry
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SYSBAS
+  | **default**: *SYSBAS
 
 
      
@@ -57,7 +56,6 @@ sql
 
 
 
-
 Examples
 --------
 
@@ -70,13 +68,11 @@ Examples
 
 
 
-
 Notes
 -----
 
 .. note::
    This module can only run one SQL statement at a time.
-
 
 
 See Also
@@ -85,7 +81,6 @@ See Also
 .. seealso::
 
    - :ref:`IBMi_sql_query_module`
-
 
 
 Return Values

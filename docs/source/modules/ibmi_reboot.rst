@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_reboot.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_reboot.py
 
 .. _ibmi_reboot_module:
 
-
 ibmi_reboot -- Reboot an IBM i machine
 ======================================
-
 
 
 .. contents::
@@ -17,8 +18,6 @@ ibmi_reboot -- Reboot an IBM i machine
 Synopsis
 --------
 - Reboot a IBM i machine, wait for it to go down, come back up, and respond to commands.
-
-
 
 
 
@@ -42,7 +41,7 @@ connect_timeout
 controlled_end_delay_time
   Specifies the amount of time(1-99999), in seconds, that the system allows a controlled end to be performed by the active subsystems.
 
-  If the value is greater than 99999, '\*NOLIMIT' will be used in PWRDWNSYS commnad.
+  If the value is greater than 99999, ``*NOLIMIT`` will be used in PWRDWNSYS commnad.
 
 
   | **required**: false
@@ -57,8 +56,8 @@ end_subsystem_option
 
   | **required**: false
   | **type**: str
-  | **default**: \*DFT
-  | **choices**: \*DFT, \*NOJOBLOG, \*CHGPTY, \*CHGTSL
+  | **default**: *DFT
+  | **choices**: *DFT, *NOJOBLOG, *CHGPTY, *CHGTSL
 
 
      
@@ -68,8 +67,8 @@ how_to_end
 
   | **required**: false
   | **type**: str
-  | **default**: \*IMMED
-  | **choices**: \*IMMED, \*CNTRLD
+  | **default**: *IMMED
+  | **choices**: *IMMED, *CNTRLD
 
 
      
@@ -79,8 +78,8 @@ ipl_source
 
   | **required**: false
   | **type**: str
-  | **default**: \*PANEL
-  | **choices**: \*PANEL, A, B, D, \*IMGCLG
+  | **default**: *PANEL
+  | **choices**: *PANEL, A, B, D, *IMGCLG
 
 
      
@@ -149,8 +148,8 @@ reboot_type
 
   | **required**: false
   | **type**: str
-  | **default**: \*IPLA
-  | **choices**: \*IPLA, \*SYS, \*FULL
+  | **default**: *IPLA
+  | **choices**: *IPLA, *SYS, *FULL
 
 
      
@@ -172,9 +171,8 @@ timeout_option
 
   | **required**: false
   | **type**: str
-  | **default**: \*CONTINUE
-  | **choices**: \*CONTINUE, \*MSD, \*SYSREFCDE
-
+  | **default**: *CONTINUE
+  | **choices**: *CONTINUE, *MSD, *SYSREFCDE
 
 
 
@@ -193,15 +191,13 @@ Examples
 
 
 
-
 Notes
 -----
 
 .. note::
    ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section.
 
-   Be careful to use '\*CNTRLD' for option how_to_end, you need to specify the appropriate value for all the timout options according to the system performance.
-
+   Be careful to use ``*CNTRLD`` for option how_to_end, you need to specify the appropriate value for all the timout options according to the system performance.
 
 
 See Also
@@ -210,7 +206,6 @@ See Also
 .. seealso::
 
    - :ref:`reboot_module`
-
 
 
 Return Values

@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_find.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_find.py
 
 .. _ibmi_object_find_module:
 
-
 ibmi_object_find -- Find specific IBM i object(s).
 ==================================================
-
 
 
 .. contents::
@@ -17,8 +18,6 @@ ibmi_object_find -- Find specific IBM i object(s).
 Synopsis
 --------
 - Return a list of IBM i objects based on specific criteria. Multiple criteria are AND'd together.
-
-
 
 
 
@@ -50,14 +49,14 @@ age_stamp
 iasp_name
   The auxiliary storage pool (ASP) where storage is allocated for the object.
 
-  The default value is "\*SYSBAS".
+  The default value is "*SYSBAS".
 
   If an IASP name is specified, objects in this ASP group will be returned, including both SYSBAS and IASP.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SYSBAS
+  | **default**: *SYSBAS
 
 
      
@@ -76,7 +75,7 @@ lib_name
 
   | **required**: False
   | **type**: str
-  | **default**: \*ALLUSR
+  | **default**: *ALLUSR
 
 
      
@@ -86,7 +85,7 @@ object_name
 
   | **required**: false
   | **type**: str
-  | **default**: \*ALL
+  | **default**: *ALL
 
 
      
@@ -96,7 +95,7 @@ object_type_list
 
   | **required**: False
   | **type**: str
-  | **default**: \*ALL
+  | **default**: *ALL
 
 
      
@@ -115,7 +114,6 @@ use_regex
 
   | **required**: false
   | **type**: bool
-
 
 
 
@@ -156,13 +154,11 @@ Examples
 
 
 
-
 Notes
 -----
 
 .. note::
    Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-
 
 
 See Also
@@ -171,7 +167,6 @@ See Also
 .. seealso::
 
    - :ref:`find_module`
-
 
 
 Return Values

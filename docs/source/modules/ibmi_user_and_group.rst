@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_user_and_group.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_user_and_group.py
 
 .. _ibmi_user_and_group_module:
 
-
 ibmi_user_and_group -- Create, change or display a user(or group) profile
 =========================================================================
-
 
 
 .. contents::
@@ -25,8 +26,6 @@ Synopsis
 
 
 
-
-
 Parameters
 ----------
 
@@ -37,15 +36,15 @@ expire
 
   If the password is set to expired, the user is required to change the password to sign on the system.
 
-  If not specify, ``'\*NO'`` will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, ``*NO`` will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAME
-  | **choices**: \*NO, \*YES, \*SAME
+  | **default**: *SAME
+  | **choices**: *NO, *YES, *SAME
 
 
      
@@ -79,15 +78,15 @@ operation
 owner
   Specifies the user that is to be the owner of objects created by this user.
 
-  If not specify, ``'\*USRPRF'`` will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, ``*USRPRF`` will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAME
-  | **choices**: \*USRPRF, \*GRPPRF, \*SAME
+  | **default**: *SAME
+  | **choices**: *USRPRF, *GRPPRF, *SAME
 
 
      
@@ -119,14 +118,14 @@ password
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAME
+  | **default**: *SAME
 
 
      
 special_authority
   Specifies the special authorities given to a user.
 
-  If not specify, ``'\*USRCLS'`` will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, ``*USRCLS`` will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -134,37 +133,37 @@ special_authority
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: ['\*SAME']
-  | **choices**: \*USRCLS, \*NONE, \*SAME, \*ALLOBJ, \*AUDIT, \*JOBCTL, \*SAVSYS, \*IOSYSCFG, \*SECADM, \*SERVICE, \*SPLCTL
+  | **default**: ['*SAME']
+  | **choices**: *USRCLS, *NONE, *SAME, *ALLOBJ, *AUDIT, *JOBCTL, *SAVSYS, *IOSYSCFG, *SECADM, *SERVICE, *SPLCTL
 
 
      
 status
   Specifies the status of the user profile.
 
-  If not specify, '\*ENABLED' will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, '*ENABLED' will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAME
-  | **choices**: \*ENABLED, \*DISABLED, \*SAME
+  | **default**: *SAME
+  | **choices**: *ENABLED, *DISABLED, *SAME
 
 
      
 text
   Specifies the text that briefly describes the user or group profile.
 
-  If not specify, 'Create by Ansible' will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, 'Create by Ansible' will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAME
+  | **default**: *SAME
 
 
      
@@ -184,15 +183,15 @@ user
 user_class
   Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.
 
-  If not specify, '\*USER' will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, ``*USER`` will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAME
-  | **choices**: \*USER, \*SYSOPR, \*PGMR, \*SECADM, \*SECOFR, \*SAME
+  | **default**: *SAME
+  | **choices**: *USER, *SYSOPR, *PGMR, *SECADM, *SECOFR, *SAME
 
 
      
@@ -208,8 +207,7 @@ user_group
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAME
-
+  | **default**: *SAME
 
 
 
@@ -237,15 +235,12 @@ Examples
 
 
 
-
-
 See Also
 --------
 
 .. seealso::
 
    - :ref:`ibmi_cl_command_module`
-
 
 
 Return Values

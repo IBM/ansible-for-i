@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_save_product_to_savf.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_save_product_to_savf.py
 
 .. _ibmi_save_product_to_savf_module:
 
-
 ibmi_save_product_to_savf -- Save the the licensed program(product) to a save file
 ==================================================================================
-
 
 
 .. contents::
@@ -17,8 +18,6 @@ ibmi_save_product_to_savf -- Save the the licensed program(product) to a save fi
 Synopsis
 --------
 - the ``ibmi_save_product_to_savf`` module saves the product to a save file.
-
-
 
 
 
@@ -33,8 +32,8 @@ check_signature
 
   | **required**: false
   | **type**: str
-  | **default**: \*SIGNED
-  | **choices**: \*SIGNED, \*ALL, \*NONE
+  | **default**: *SIGNED
+  | **choices**: *SIGNED, *ALL, *NONE
 
 
      
@@ -52,12 +51,12 @@ language
 
   It's the IBM-supplied language feature codes, like German is 2924, English is 2924.
 
-  This parameter is ignored when object_type(\*PGM) is specified.
+  This parameter is ignored when object_type ``*PGM`` is specified.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*PRIMARY
+  | **default**: *PRIMARY
 
 
      
@@ -67,8 +66,8 @@ object_type
 
   | **required**: false
   | **type**: str
-  | **default**: \*ALL
-  | **choices**: \*ALL, \*PGM, \*LNG
+  | **default**: *ALL
+  | **choices**: *ALL, *PGM, *LNG
 
 
      
@@ -78,7 +77,7 @@ option
 
   | **required**: false
   | **type**: str
-  | **default**: \*BASE
+  | **default**: *BASE
 
 
      
@@ -87,7 +86,7 @@ parameters
 
   The default values of parameters for SAVLICPGM will be taken if not specified.
 
-  Parameter CLEAR in SAVLICPGM command should not be specified here, 'CLEAR(\*ALL)' already used.
+  Parameter CLEAR in SAVLICPGM command should not be specified here, ``CLEAR(*ALL``) already used.
 
 
   | **required**: false
@@ -111,7 +110,7 @@ release
 
   | **required**: false
   | **type**: str
-  | **default**: \*ONLY
+  | **default**: *ONLY
 
 
      
@@ -139,8 +138,7 @@ target_release
 
   | **required**: false
   | **type**: str
-  | **default**: \*CURRENT
-
+  | **default**: *CURRENT
 
 
 
@@ -166,15 +164,12 @@ Examples
 
 
 
-
-
 See Also
 --------
 
 .. seealso::
 
    - :ref:`ibmi_uninstall_product, ibmi_install_product_from_savf_module`
-
 
 
 Return Values
@@ -188,7 +183,7 @@ Return Values
       
         | **returned**: When rc as 0(success)
         | **type**: str
-        | **sample**: +++ success SAVLICPGM LICPGM(5733D10) DEV(\*SAVF) OPTION(\*BASE) RSTOBJ(\*ALL)
+        | **sample**: +++ success SAVLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)
 
             
       

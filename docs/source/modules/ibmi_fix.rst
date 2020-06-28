@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix.py
 
 .. _ibmi_fix_module:
 
-
 ibmi_fix -- Install, remove or query an individual fix or a set of fixes on to IBM i system.
 ============================================================================================
-
 
 
 .. contents::
@@ -22,8 +23,6 @@ Synopsis
 
 
 
-
-
 Parameters
 ----------
 
@@ -35,8 +34,8 @@ delayed_option
 
   | **required**: false
   | **type**: str
-  | **default**: \*NO
-  | **choices**: \*YES, \*NO, \*IMMDLY
+  | **default**: *NO
+  | **choices**: *YES, *NO, *IMMDLY
 
 
      
@@ -47,7 +46,7 @@ fix_list
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: ['\*ALL']
+  | **default**: ['*ALL']
 
 
      
@@ -129,9 +128,8 @@ temp_or_perm
 
   | **required**: false
   | **type**: str
-  | **default**: \*TEMP
-  | **choices**: \*TEMP, \*PERM
-
+  | **default**: *TEMP
+  | **choices**: *TEMP, *PERM
 
 
 
@@ -168,13 +166,11 @@ Examples
 
 
 
-
 Notes
 -----
 
 .. note::
    Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
-
 
 
 See Also
@@ -183,7 +179,6 @@ See Also
 .. seealso::
 
    - :ref:`ibmi_fix_imgclg_module`
-
 
 
 Return Values

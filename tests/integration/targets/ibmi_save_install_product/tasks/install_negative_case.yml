@@ -206,3 +206,5 @@
   # *FIRST not supported.                                                    
   #failed_when: "'CPD3DD6' not in install_result.stderr"
   failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DFE') | map(attribute='MESSAGE_ID') | list | length ==0"
+   
+

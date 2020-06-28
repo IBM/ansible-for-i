@@ -1,14 +1,10 @@
-{# ------------------------------------------------------------------------ #}
-{# © Copyright IBM Corporation 2020                                         #}
-{# ------------------------------------------------------------------------ #}
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/{{ module }}.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/{{ module }}.py
 
 .. _{{ module }}_module:
-
-{# ------------------------------------------------------------------------ #}
-{# Generate the title based on the module name and doc description          #}
-{# ------------------------------------------------------------------------ #}
 
 {% set title = module + ' -- ' + short_description | rst_ify %}
 {{ title }}
@@ -21,17 +17,10 @@
     {%   endfor %}
 #}
 
-{# ------------------------------------------------------------------------ #}
-{# Generate top level links                                                 #}
-{# ------------------------------------------------------------------------ #}
-
 .. contents::
    :local:
    :depth: 1
 
-{# ------------------------------------------------------------------------ #}
-{# Generate the synopsis based on the doc description                       #}
-{# ------------------------------------------------------------------------ #}
 
 Synopsis
 --------
@@ -42,10 +31,6 @@ Synopsis
 {%   endfor %}
 
 {% endif %}
-
-{# ------------------------------------------------------------------------ #}
-{# Parse options and format function                                        #}
-{# ------------------------------------------------------------------------ #}
 
 {% macro option_generation(opts, level) %}
 {%   for name, spec in opts | dictsort recursive %}
@@ -64,7 +49,7 @@ Synopsis
 
 {{ "  " * level }}{{ name }}
 {%     for para in spec.description %}
-  {{ "  " * level }}{{ para | rst_ify | replace('*', '\*') }}
+  {{ "  " * level }}{{ para | rst_ify }}
 
 {%     endfor %}
 
@@ -74,10 +59,10 @@ Synopsis
   {{ "  " * level }}| **elements**: {{ spec.elements }}
 {%     endif %}
 {%     if spec.default %}
-  {{ "  " * level }}| **default**: {{ spec.default | replace('*', '\*')}}
+  {{ "  " * level }}| **default**: {{ spec.default }}
 {%     endif %}
 {%     if spec.choices %}
-  {{ "  " * level }}| **choices**: {{ (", ".join(spec.choices)) | replace('*', '\*')}}
+  {{ "  " * level }}| **choices**: {{ ", ".join(spec.choices) }}
 {%     endif %}
 
 {%     if spec.suboptions %}
@@ -86,20 +71,12 @@ Synopsis
 {%   endfor %}
 {% endmacro %}
 
-{# ------------------------------------------------------------- #}
-{# Generate the options doc                                      #}
-{# ------------------------------------------------------------- #}
-
 {% if options -%}
 Parameters
 ----------
 
 {{ option_generation(options, 0) }}
 {% endif %}
-
-{# ------------------------------------------------------------- #}
-{# Generate the sample doc                                       #}
-{# ------------------------------------------------------------- #}
 
 Examples
 --------
@@ -109,24 +86,16 @@ Examples
 {{ examples | indent(3, True) }}
 
 
-{# ------------------------------------------------------------- #}
-{# Generate the notes doc                                        #}
-{# ------------------------------------------------------------- #}
-
 {% if notes -%}
 Notes
 -----
 
 .. note::
 {%   for note in notes %}
-   {{ note | rst_ify | replace('*','\*')}}
+   {{ note | rst_ify }}
 
 {%   endfor %}
 {% endif %}
-
-{# ------------------------------------------------------------- #}
-{# Generate the set also doc                                     #}
-{# ------------------------------------------------------------- #}
 
 {% if seealso -%}
 See Also
@@ -138,10 +107,6 @@ See Also
    - :ref:`{{ item.module }}_module`
 {% endfor %}
 {% endif %}
-
-{# ------------------------------------------------------------- #}
-{# Return doc macro                                              #}
-{# ------------------------------------------------------------- #}
 
 {% macro result_generation(results, level) %}
 
@@ -155,9 +120,9 @@ See Also
 
       {{ entry | indent(level, True) }}
       {% if _description is iterable and _description is not string %}
-{{ "  " * (level) }}| {{ _description[0] | rst_ify }}
+{{ "  " * (level) }}| {{ _description[0] }}
       {% else %}
-{{ "  " * (level) }}| {{ _description | rst_ify}}
+{{ "  " * (level) }}| {{ _description }}
       {% endif %}
 
       {% if _returned %}
@@ -175,7 +140,7 @@ See Also
                        {{ _sample | tojson }}
       {% else %}
 
-      {{ "  " * level }}| **sample**: {{ _sample | replace('*', '\*')}}
+      {{ "  " * level }}| **sample**: {{ _sample }}
 
       {% endif %}
       {% endif %}
@@ -186,9 +151,6 @@ See Also
 
       {% endfor  %}
   {% endmacro %}
-{# ------------------------------------------------------------- #}
-{# Generate the return values doc                                #}
-{# ------------------------------------------------------------- #}
 
 {% if returndocs -%}
 Return Values

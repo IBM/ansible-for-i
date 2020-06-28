@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_tcp_server_service.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_tcp_server_service.py
 
 .. _ibmi_tcp_server_service_module:
 
-
 ibmi_tcp_server_service -- Manage tcp server
 ============================================
-
 
 
 .. contents::
@@ -18,8 +19,6 @@ Synopsis
 --------
 - Manage and query IBMi tcp server service.
 - For non-IBMi targets, use the :ref:`service <service_module>` module instead.
-
-
 
 
 
@@ -48,7 +47,7 @@ joblog
 
      
 name_list
-  The name of the tcp server service. The valid value are "\*ALL", "\*AUTOSTART", "\*BOOTP", "\*DBG", "\*DDM", "\*DHCP", "\*DIRSRV", "\*DLFM", "\*DNS", "\*DOMINO", "\*EDRSQL", "\*FTP", "\*HTTP", "\*HOD", "\*IAS", "\*INETD", "\*LPD", "\*MGTC", "\*NETSVR", "\*NSLD", "\*NTP", "\*ODPA", "\*OMPROUTED", "\*ONDMD", "\*POP", "\*QOS", "\*REXEC", "\*ROUTED", "\*SLP", "\*SMTP", "\*SNMP", "\*SRVSPTPRX", "\*SSHD", "\*TCM", "\*TELNET", "\*TFTP", "\*VPN", "\*WEBFACING".
+  The name of the tcp server service. The valid value are "*ALL", "*AUTOSTART", "*BOOTP", "*DBG", "*DDM", "*DHCP", "*DIRSRV", "*DLFM", "*DNS", "*DOMINO", "*EDRSQL", "*FTP", "*HTTP", "*HOD", "*IAS", "*INETD", "*LPD", "*MGTC", "*NETSVR", "*NSLD", "*NTP", "*ODPA", "*OMPROUTED", "*ONDMD", "*POP", "*QOS", "*REXEC", "*ROUTED", "*SLP", "*SMTP", "*SNMP", "*SRVSPTPRX", "*SSHD", "*TCM", "*TELNET", "*TFTP", "*VPN", "*WEBFACING".
 
 
   | **required**: True
@@ -62,13 +61,12 @@ state
 
   ``restarted`` will always bounce the service.
 
-  \*\*At least one of state and enabled are required.\*\*
+  **At least one of state and enabled are required.**
 
 
   | **required**: True
   | **type**: str
   | **choices**: started, stopped
-
 
 
 
@@ -87,15 +85,12 @@ Examples
 
 
 
-
-
 See Also
 --------
 
 .. seealso::
 
    - :ref:`service_module`
-
 
 
 Return Values

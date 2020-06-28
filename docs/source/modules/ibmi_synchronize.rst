@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_synchronize.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_synchronize.py
 
 .. _ibmi_synchronize_module:
 
-
 ibmi_synchronize -- Synchronize a save file from IBM i node A to another IBM i node B
 =====================================================================================
-
 
 
 .. contents::
@@ -22,8 +23,6 @@ Synopsis
 - For non-IBMi native targets, use the synchronize module instead.
 - delegate_to must be set to IBM i node A, and set hosts to IBM i node B.
 - Be careful to set delegate_to or hosts to node groups. The synchronized data may be overridden.
-
-
 
 
 
@@ -79,7 +78,6 @@ src
 
 
 
-
 Examples
 --------
 
@@ -92,7 +90,6 @@ Examples
        remote_user: 'user'
        private_key: '/home/test/id_rsa'
      delegate_to: nodeA
-
 
 
 
@@ -109,8 +106,6 @@ Notes
    private_key must be a rsa key in the legacy PEM private key format.
 
    Doesn't support IASP by now.
-
-
 
 
 

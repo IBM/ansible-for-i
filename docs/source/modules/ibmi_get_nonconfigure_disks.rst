@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_get_nonconfigure_disks.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_get_nonconfigure_disks.py
 
 .. _ibmi_get_nonconfigure_disks_module:
 
-
 ibmi_get_nonconfigure_disks -- Get all nonconfigure disks
 =========================================================
-
 
 
 .. contents::
@@ -18,8 +19,6 @@ Synopsis
 --------
 - Get all nonconfigure disks.
 - For non-IBM i targets, no need.
-
-
 
 
 
@@ -37,7 +36,6 @@ joblog
 
 
 
-
 Examples
 --------
 
@@ -47,9 +45,6 @@ Examples
    - name: get all nonconfigure disks
      ibmi_get_nonconfigure_disks:
        joblog: True
-
-
-
 
 
 

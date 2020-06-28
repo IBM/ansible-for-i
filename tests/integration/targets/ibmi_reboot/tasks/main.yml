@@ -185,3 +185,4 @@
       - "'*DFT' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
       - "'*CONTINUE' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
       - "'*NO' in pwr_cmd_input.row[0]['MESSAGE_SECOND_LEVEL_TEXT']"
+

@@ -127,3 +127,4 @@
         cmd: 'STRSBS SBSD(QBATCH)'
       when: sql_result.row | length == 1
       ignore_errors: true
+

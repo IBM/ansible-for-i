@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_end_subsystem.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_end_subsystem.py
 
 .. _ibmi_end_subsystem_module:
 
-
 ibmi_end_subsystem -- End an active subsystem.
 ==============================================
-
 
 
 .. contents::
@@ -20,15 +21,13 @@ Synopsis
 
 
 
-
-
 Parameters
 ----------
 
 
      
 controlled_end_delay_time
-  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, ``'\*NOLIMIT'`` will be used in ENDSBS command DELAY parameter.
+  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, ``*NOLIMIT`` will be used in ENDSBS command DELAY parameter.
 
 
   | **required**: false
@@ -44,8 +43,8 @@ end_subsystem_option
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: ['\*DFT']
-  | **choices**: \*DFT, \*NOJOBLOG, \*CHGPTY, \*CHGTSL
+  | **default**: ['*DFT']
+  | **choices**: *DFT, *NOJOBLOG, *CHGPTY, *CHGTSL
 
 
      
@@ -55,8 +54,8 @@ how_to_end
 
   | **required**: false
   | **type**: str
-  | **default**: \*CNTRLD
-  | **choices**: \*IMMED, \*CNTRLD
+  | **default**: *CNTRLD
+  | **choices**: *IMMED, *CNTRLD
 
 
      
@@ -87,7 +86,6 @@ subsystem
 
 
 
-
 Examples
 --------
 
@@ -105,7 +103,6 @@ Examples
 
 
 
-
 Notes
 -----
 
@@ -115,14 +112,12 @@ Notes
    This module is non-blocking, the ending subsystem may still be in progress, use ``ibmi_display_subsystem`` module to check the status.
 
 
-
 See Also
 --------
 
 .. seealso::
 
    - :ref:`ibmi_display_subsystem, ibmi_start_subsystem_module`
-
 
 
 Return Values

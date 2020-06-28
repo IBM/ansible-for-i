@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_restore.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_restore.py
 
 .. _ibmi_object_restore_module:
 
-
 ibmi_object_restore -- Restore one or more objects
 ==================================================
-
 
 
 .. contents::
@@ -19,8 +20,6 @@ Synopsis
 - The ``ibmi_object_restore`` module restore an save file on a remote IBM i nodes
 - The restored objects and save file are on the remote host.
 - Only support ``*SAVF`` as the save file's format by now.
-
-
 
 
 
@@ -37,18 +36,18 @@ asp_group
 
   | **required**: false
   | **type**: str
-  | **default**: \*SYSBAS
+  | **default**: *SYSBAS
 
 
      
 format
-  The save file's format. Only support ``\*SAVF`` by now.
+  The save file's format. Only support ``*SAVF`` by now.
 
 
   | **required**: false
   | **type**: str
-  | **default**: \*SAVF
-  | **choices**: \*SAVF
+  | **default**: *SAVF
+  | **choices**: *SAVF
 
 
      
@@ -78,7 +77,7 @@ object_names
 
   | **required**: false
   | **type**: str
-  | **default**: \*ALL
+  | **default**: *ALL
 
 
      
@@ -90,7 +89,7 @@ object_types
 
   | **required**: false
   | **type**: str
-  | **default**: \*ALL
+  | **default**: *ALL
 
 
      
@@ -122,7 +121,6 @@ savefile_name
 
 
 
-
 Examples
 --------
 
@@ -136,9 +134,6 @@ Examples
        object_types: '*PGM *SRVPGM'
        savefile_name: 'archive'
        savefile_lib: 'archlib'
-
-
-
 
 
 
@@ -233,7 +228,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: \*PGM \*SRVPGM
+        | **sample**: *PGM *SRVPGM
 
             
       
@@ -262,11 +257,11 @@ Return Values
       
                               
        format
-        | The save file's format. Only support ``*SAVF`` by now.
+        | The save file's format. Only support C(*SAVF) by now.
       
         | **returned**: always
         | **type**: str
-        | **sample**: \*SAVF
+        | **sample**: *SAVF
 
             
       
@@ -277,7 +272,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: RSTOBJ OBJ(OBJA) SAVLIB(TESTLIB) DEV(\*SAVF) OBJTYPE(\*ALL) SAVF(TEST/ARCHLIB)
+        | **sample**: RSTOBJ OBJ(OBJA) SAVLIB(TESTLIB) DEV(*SAVF) OBJTYPE(*ALL) SAVF(TEST/ARCHLIB)
 
             
       

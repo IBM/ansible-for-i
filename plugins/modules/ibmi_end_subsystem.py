@@ -36,7 +36,7 @@ options:
       - Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation.
         If this amount of time is exceeded and the end operation is not complete,
         any jobs still being processed in the subsystem are ended immediately.
-        If the value is greater than 99999, C('*NOLIMIT') will be used in ENDSBS command DELAY parameter.
+        If the value is greater than 99999, C(*NOLIMIT) will be used in ENDSBS command DELAY parameter.
     type: int
     default: 100000
   end_subsystem_option:
@@ -137,7 +137,6 @@ job_log:
     returned: always
 '''
 
-import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 

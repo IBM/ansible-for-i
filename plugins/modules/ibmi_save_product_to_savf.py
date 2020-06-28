@@ -40,7 +40,7 @@ options:
     description:
       - Specifies which national language version (NLV) is used for the save operation.
       - It's the IBM-supplied language feature codes, like German is 2924, English is 2924.
-      - This parameter is ignored when object_type(*PGM) is specified.
+      - This parameter is ignored when object_type C(*PGM) is specified.
     type: str
     default: '*PRIMARY'
   release:
@@ -73,7 +73,7 @@ options:
     description:
       - The parameters that SAVLICPGM command will take. Other than options above, all other parameters need to be specified here.
       - The default values of parameters for SAVLICPGM will be taken if not specified.
-      - Parameter CLEAR in SAVLICPGM command should not be specified here, 'CLEAR(*ALL)' already used.
+      - Parameter CLEAR in SAVLICPGM command should not be specified here, C(CLEAR(*ALL)) already used.
     type: str
     default: ' '
   joblog:
@@ -161,7 +161,6 @@ job_log:
     returned: always
 '''
 
-import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 

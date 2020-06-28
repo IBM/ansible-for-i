@@ -1,12 +1,13 @@
+..
+.. SPDX-License-Identifier: Apache-2.0
+..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_script.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_script.py
 
 .. _ibmi_script_module:
 
-
 ibmi_script -- Execute a local cl/sql script file.
 ==================================================
-
 
 
 .. contents::
@@ -20,8 +21,6 @@ Synopsis
 - Only support cl/sql script file by now.
 - For sql script, use RUNSQLSTM to process.
 - For non-cl/sql script, use the script plugin instead.
-
-
 
 
 
@@ -92,7 +91,6 @@ type
 
 
 
-
 Examples
 --------
 
@@ -113,7 +111,6 @@ Examples
 
 
 
-
 Notes
 -----
 
@@ -125,8 +122,6 @@ Notes
    When a command ends, add ':' at the end of each command or empty the next line.
 
    Otherwise program will not consider it is the end of a command.
-
-
 
 
 
