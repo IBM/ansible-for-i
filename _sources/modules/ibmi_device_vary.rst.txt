@@ -62,7 +62,7 @@ status
 
   ``reset`` will always bounce the service.
 
-  \*\*At least one of status are required.\*\*
+  **At least one of status are required.**
 
 
   | **required**: True

@@ -70,7 +70,7 @@ submitter
 
      
 subsystem
-  The job subsystem filter. A valid subsystem name can be specified. Valid values are "\*ALL" or subsystem name.
+  The job subsystem filter. A valid subsystem name can be specified. Valid values are ``*ALL`` or subsystem name.
 
 
   | **required**: false
@@ -93,7 +93,7 @@ type
 user
   The user profile name to use as the job user filtering criteria.
 
-  Valid values are user profile name, "\*USER" or "\*ALL".
+  Valid values are user profile name, ``*USER`` or ``*ALL``.
 
 
   | **required**: false

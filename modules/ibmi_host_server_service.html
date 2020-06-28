@@ -243,7 +243,7 @@
 <div class="line"><strong>type</strong>: bool</div>
 </div>
 </dd>
-<dt>name_list</dt><dd><p>The name of the host server service. The valid value are “*ALL”, “*CENTRAL”, “*DATABASE”, “*DTAQ”, “*FILE”, “*NETPRT”, “*RMTCMD”, “*SIGNON”, “*SVRMAP”.</p>
+<dt>name_list</dt><dd><p>The name of the host server service. The valid value are <code class="docutils literal notranslate"><span class="pre">*ALL</span></code>, <code class="docutils literal notranslate"><span class="pre">*CENTRAL</span></code>, <code class="docutils literal notranslate"><span class="pre">*DATABASE</span></code>, <code class="docutils literal notranslate"><span class="pre">*DTAQ</span></code>, <code class="docutils literal notranslate"><span class="pre">*FILE</span></code>, <code class="docutils literal notranslate"><span class="pre">*NETPRT</span></code>, <code class="docutils literal notranslate"><span class="pre">*RMTCMD</span></code>, <code class="docutils literal notranslate"><span class="pre">*SIGNON</span></code>, <code class="docutils literal notranslate"><span class="pre">*SVRMAP</span></code>.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: True</div>
 <div class="line"><strong>type</strong>: list</div>
@@ -252,7 +252,7 @@
 </dd>
 <dt>state</dt><dd><p><code class="docutils literal notranslate"><span class="pre">started</span></code>/<code class="docutils literal notranslate"><span class="pre">stopped</span></code> are idempotent actions that will not run commands unless necessary.</p>
 <p><code class="docutils literal notranslate"><span class="pre">restarted</span></code> will always bounce the service.</p>
-<p>**At least one of state and enabled are required.**</p>
+<p><strong>At least one of state and enabled are required.</strong></p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: True</div>
 <div class="line"><strong>type</strong>: str</div>

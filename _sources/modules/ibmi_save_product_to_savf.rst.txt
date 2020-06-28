@@ -52,7 +52,7 @@ language
 
   It's the IBM-supplied language feature codes, like German is 2924, English is 2924.
 
-  This parameter is ignored when object_type(\*PGM) is specified.
+  This parameter is ignored when object_type ``*PGM`` is specified.
 
 
   | **required**: false
@@ -87,7 +87,7 @@ parameters
 
   The default values of parameters for SAVLICPGM will be taken if not specified.
 
-  Parameter CLEAR in SAVLICPGM command should not be specified here, 'CLEAR(\*ALL)' already used.
+  Parameter CLEAR in SAVLICPGM command should not be specified here, ``CLEAR(*ALL``) already used.
 
 
   | **required**: false

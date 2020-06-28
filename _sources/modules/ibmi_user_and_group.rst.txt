@@ -37,7 +37,7 @@ expire
 
   If the password is set to expired, the user is required to change the password to sign on the system.
 
-  If not specify, ``'\*NO'`` will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, ``*NO`` will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -79,7 +79,7 @@ operation
 owner
   Specifies the user that is to be the owner of objects created by this user.
 
-  If not specify, ``'\*USRPRF'`` will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, ``*USRPRF`` will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -126,7 +126,7 @@ password
 special_authority
   Specifies the special authorities given to a user.
 
-  If not specify, ``'\*USRCLS'`` will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, ``*USRCLS`` will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -142,7 +142,7 @@ special_authority
 status
   Specifies the status of the user profile.
 
-  If not specify, '\*ENABLED' will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, ``*ENABLED`` will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -157,7 +157,7 @@ status
 text
   Specifies the text that briefly describes the user or group profile.
 
-  If not specify, 'Create by Ansible' will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, 'Create by Ansible' will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -184,7 +184,7 @@ user
 user_class
   Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.
 
-  If not specify, '\*USER' will be used for operation create, ``'\*SAME'`` will be used for operation change.
+  If not specify, ``*USER`` will be used for operation create, ``*SAME`` will be used for operation change.
 
   Valid only for operation create and change.
 

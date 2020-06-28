@@ -88,7 +88,7 @@ scddate
 scdday
   Specifies the day of the week on which the job is submitted.
 
-  The valid value are '\*NONE', '\*ALL', '\*MON', '\*TUE', '\*WED', '\*THU', '\*FRI', '\*SAT', '\*SUN'.
+  The valid value are ``*NONE``, ``*ALL``, ``*MON``, ``*TUE``, ``*WED``, ``*THU``, ``*FRI``, ``*SAT``, ``*SUN``.
 
 
   | **required**: false

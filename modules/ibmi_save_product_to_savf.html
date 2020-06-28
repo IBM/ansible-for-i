@@ -245,7 +245,7 @@
 </dd>
 <dt>language</dt><dd><p>Specifies which national language version (NLV) is used for the save operation.</p>
 <p>It’s the IBM-supplied language feature codes, like German is 2924, English is 2924.</p>
-<p>This parameter is ignored when object_type(*PGM) is specified.</p>
+<p>This parameter is ignored when object_type <code class="docutils literal notranslate"><span class="pre">*PGM</span></code> is specified.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
@@ -269,7 +269,7 @@
 </dd>
 <dt>parameters</dt><dd><p>The parameters that SAVLICPGM command will take. Other than options above, all other parameters need to be specified here.</p>
 <p>The default values of parameters for SAVLICPGM will be taken if not specified.</p>
-<p>Parameter CLEAR in SAVLICPGM command should not be specified here, ‘CLEAR(*ALL)’ already used.</p>
+<p>Parameter CLEAR in SAVLICPGM command should not be specified here, <code class="docutils literal notranslate"><span class="pre">CLEAR(*ALL</span></code>) already used.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>

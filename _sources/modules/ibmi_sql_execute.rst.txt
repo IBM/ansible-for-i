@@ -30,7 +30,7 @@ Parameters
 database
   Specified database name, usually, its the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries
 
-  Default to use the '\*LOCAL' entry
+  Default to use the ``*LOCAL`` entry
 
 
   | **required**: false
