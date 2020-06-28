@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_device_vary.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_device_vary.pyy
 
 .. _ibmi_device_vary_module:
 
+
 ibmi_device_vary -- Vary on or off target device
 ================================================
+
 
 
 .. contents::
@@ -19,6 +18,8 @@ Synopsis
 --------
 - Vary on or off target device.
 - For non-IBM i targets, no need.
+
+
 
 
 
@@ -61,12 +62,13 @@ status
 
   ``reset`` will always bounce the service.
 
-  **At least one of status are required.**
+  \*\*At least one of status are required.\*\*
 
 
   | **required**: True
   | **type**: str
-  | **choices**: *ON, *OFF, *RESET, *ALLOCATE, UNPROTECTED, *DEALLOCATE
+  | **choices**: \*ON, \*OFF, \*RESET, \*ALLOCATE, UNPROTECTED, \*DEALLOCATE
+
 
 
 
@@ -85,12 +87,15 @@ Examples
 
 
 
+
+
 See Also
 --------
 
 .. seealso::
 
    - :ref:`service_module`
+
 
 
 Return Values
@@ -151,7 +156,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: +++ success VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON)
+        | **sample**: +++ success VRYCFG CFGOBJ(IASP1) CFGTYPE(\*DEV) STATUS(\*ON)
 
             
       
@@ -173,7 +178,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: VRYCFG CFGOBJ(IASP1) CFGTYPE(*DEV) STATUS(*ON) 
+        | **sample**: VRYCFG CFGOBJ(IASP1) CFGTYPE(\*DEV) STATUS(\*ON) 
 
             
       

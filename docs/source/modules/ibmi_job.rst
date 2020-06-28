@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_job.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_job.pyy
 
 .. _ibmi_job_module:
 
+
 ibmi_job -- Returns job information according to inputs.
 ========================================================
+
 
 
 .. contents::
@@ -18,6 +17,8 @@ ibmi_job -- Returns job information according to inputs.
 Synopsis
 --------
 - The ``ibmi_job`` module returns information associated with one or more jobs.
+
+
 
 
 
@@ -52,8 +53,8 @@ status
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
-  | **choices**: *ALL, *ACTIVE, *JOBQ, *OUTQ
+  | **default**: \*ALL
+  | **choices**: \*ALL, \*ACTIVE, \*JOBQ, \*OUTQ
 
 
      
@@ -63,18 +64,18 @@ submitter
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
-  | **choices**: *ALL, *JOB, *USER, *WRKSTN
+  | **default**: \*ALL
+  | **choices**: \*ALL, \*JOB, \*USER, \*WRKSTN
 
 
      
 subsystem
-  The job subsystem filter. A valid subsystem name can be specified. Valid values are "*ALL" or subsystem name.
+  The job subsystem filter. A valid subsystem name can be specified. Valid values are "\*ALL" or subsystem name.
 
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
+  | **default**: \*ALL
 
 
      
@@ -84,20 +85,21 @@ type
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
-  | **choices**: *ALL, *BATCH, *INTERACT
+  | **default**: \*ALL
+  | **choices**: \*ALL, \*BATCH, \*INTERACT
 
 
      
 user
   The user profile name to use as the job user filtering criteria.
 
-  Valid values are user profile name, "*USER" or "*ALL".
+  Valid values are user profile name, "\*USER" or "\*ALL".
 
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
+  | **default**: \*ALL
+
 
 
 
@@ -118,11 +120,13 @@ Examples
 
 
 
+
 Notes
 -----
 
 .. note::
    Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
 
 
 See Also
@@ -131,6 +135,7 @@ See Also
 .. seealso::
 
    - :ref:`ibmi_submit_job_module`
+
 
 
 Return Values

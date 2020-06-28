@@ -2,8 +2,11 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
+import glob
 import os
+import re
 import datetime
+import decimal
 import tempfile
 import logging
 import logging.config
@@ -17,7 +20,9 @@ try:
     from itoolkit import iSqlFetch
     from itoolkit import iSqlQuery
     from itoolkit import iCmd
+    from itoolkit import iCmd5250
     from itoolkit.transport import DatabaseTransport
+    from itoolkit.transport import DirectTransport
 except ImportError:
     HAS_ITOOLKIT = False
 
@@ -39,7 +44,6 @@ IBMi_PARAM_NOT_VALID = 260
 IBMi_NO_ROW_FOUND_ERROR = 261
 IBMi_SUBSYSTEM_NOT_ACTIVE = 262
 IBMi_END_ALL_SUBSYSTEM_NOT_ALLOWED = 263
-IBMi_PTF_NOT_FOUND = 264
 
 IBMi_SQL_RC_ERROR = 301
 

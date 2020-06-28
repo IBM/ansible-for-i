@@ -1,4 +1,3 @@
-
 - set_fact:
     ip_info: "{{item['INTERNET_ADDRESS']}}"
 

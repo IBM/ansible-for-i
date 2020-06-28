@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_tcp_interface.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_tcp_interface.pyy
 
 .. _ibmi_tcp_interface_module:
 
+
 ibmi_tcp_interface -- Add, change, remove or query a tcp/ip interface.
 ======================================================================
+
 
 
 .. contents::
@@ -21,6 +20,8 @@ Synopsis
 - This module provides the similar function of ADDTCPIFC, CHGTCPIFC, RMVTCPIFC, STRTCPIFC, ENDTCPIFC.
 - In addition, the module provides query function for a specific internet address basing on internet address
 - or alias_name.
+
+
 
 
 
@@ -57,7 +58,7 @@ auto_start
 
   | **required**: False
   | **type**: str
-  | **choices**: *YES, *NO
+  | **choices**: \*YES, \*NO
 
 
      
@@ -204,7 +205,7 @@ type_of_service
 
   | **required**: False
   | **type**: str
-  | **choices**: *NORMAL, *MINDELAY, *MAXTHRPUT, *MAXRLB, *MINCOST
+  | **choices**: \*NORMAL, \*MINDELAY, \*MAXTHRPUT, \*MAXRLB, \*MINCOST
 
 
      
@@ -220,6 +221,7 @@ vlan_id
 
   | **required**: False
   | **type**: str
+
 
 
 
@@ -327,11 +329,14 @@ Examples
 
 
 
+
 Notes
 -----
 
 .. note::
    Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+
+
 
 
 

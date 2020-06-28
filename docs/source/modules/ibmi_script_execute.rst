@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_script_execute.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_script_execute.pyy
 
 .. _ibmi_script_execute_module:
 
+
 ibmi_script_execute -- Execute a cl/sql script file
 ===================================================
+
 
 
 .. contents::
@@ -24,6 +23,8 @@ Synopsis
 
 
 
+
+
 Parameters
 ----------
 
@@ -37,7 +38,7 @@ asp_group
 
   | **required**: false
   | **type**: str
-  | **default**: *SYSBAS
+  | **default**: \*SYSBAS
 
 
      
@@ -92,6 +93,7 @@ type
 
 
 
+
 Examples
 --------
 
@@ -112,6 +114,7 @@ Examples
 
 
 
+
 Notes
 -----
 
@@ -121,6 +124,8 @@ Notes
    When a command ends, add ':' at the end of each command or empty the next line.
 
    Otherwise program will not consider it is the end of a command.
+
+
 
 
 

@@ -113,11 +113,11 @@
     that:
       - "'failed to process size' in neg_result.msg" 
 
-# - name: TC07 find objects with invalid iasp_name 
-#   ibmi_object_find: 
-#      iasp_name: "IASP1"
-#   register: neg_result
-#   failed_when: "'Exception when trying to use IASP.' not in neg_result.msg"
+- name: TC07 find objects with invalid iasp_name 
+  ibmi_object_find: 
+     iasp_name: "IASP1"
+  register: neg_result
+  failed_when: "'Exception when trying to use IASP.' not in neg_result.msg"
 
 - name: TC08 find objects with invalid use_regex 
   ibmi_object_find: 

@@ -125,4 +125,3 @@
     loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
   
   - include: remove_ptf.yml
-
