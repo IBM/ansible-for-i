@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_authority.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_authority.pyy
 
 .. _ibmi_object_authority_module:
 
+
 ibmi_object_authority -- Grant, revoke or display object authority
 ==================================================================
+
 
 
 .. contents::
@@ -18,6 +17,8 @@ ibmi_object_authority -- Grant, revoke or display object authority
 Synopsis
 --------
 - The ``ibmi_object_authority`` module can do the named object(s) authority management(grant, revoke and display).
+
+
 
 
 
@@ -36,19 +37,19 @@ asp_device
 
   | **required**: false
   | **type**: str
-  | **default**: *
+  | **default**: \*
 
 
      
 asp_group
-  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread. The ASP group name is the name of the primary ASP device within the ASP group. The different for asp_group and (ref_)asp_device are, the asp_group make the current ansible thread run under the asp_group. the (ref_)asp_device is the search scope for the object. If you want to searh the (ref_)object in an ASP, the asp_group must be set and varied on, (ref)asp_device can be set as '*' for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
+  Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread. The ASP group name is the name of the primary ASP device within the ASP group. The different for asp_group and (ref_)asp_device are, the asp_group make the current ansible thread run under the asp_group. the (ref_)asp_device is the search scope for the object. If you want to searh the (ref_)object in an ASP, the asp_group must be set and varied on, (ref)asp_device can be set as '\*' for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.
 
   Valid for all the operations
 
 
   | **required**: false
   | **type**: str
-  | **default**: *SYSBAS
+  | **default**: \*SYSBAS
 
 
      
@@ -61,8 +62,8 @@ authority
   | **required**: false
   | **type**: list
   | **elements**: str
-  | **default**: ['*CHANGE']
-  | **choices**: *CHANGE, *ALL, *USE, *EXCLUDE, *AUTL, *OBJALTER, *OBJEXIST, *OBJMGT, *OBJOPR, *OBJREF, *ADD, *DLT, *READ, *UPD, *EXECUTE
+  | **default**: ['\*CHANGE']
+  | **choices**: \*CHANGE, \*ALL, \*USE, \*EXCLUDE, \*AUTL, \*OBJALTER, \*OBJEXIST, \*OBJMGT, \*OBJOPR, \*OBJREF, \*ADD, \*DLT, \*READ, \*UPD, \*EXECUTE
 
 
      
@@ -91,12 +92,12 @@ object_library
 
   Valid for all the operations.
 
-  When operation is display, special value as '*LIBL', '*CURLIB', '*ALL', '*ALLUSR', '*USRLIBL', '*ALLAVL', '*ALLUSRAVL' are not supported.
+  When operation is display, special value as '\*LIBL', '\*CURLIB', '\*ALL', '\*ALLUSR', '\*USRLIBL', '\*ALLAVL', '\*ALLUSRAVL' are not supported.
 
 
   | **required**: false
   | **type**: str
-  | **default**: *LIBL
+  | **default**: \*LIBL
 
 
      
@@ -121,7 +122,7 @@ object_type
 
   | **required**: True
   | **type**: str
-  | **choices**: *ALL, *ALRTBL, *BNDDIR, *CFGL, *CHTFMT, *CLD, *CLS, *CMD, *CNNL, *COSD, *CRG, *CRQD, *CSI, *CSPMAP, *CSPTBL, *CTLD, *DEVD, *DTAARA, *DTADCT, *DTAQ, *EDTD, *FCT, *FILE, *FNTRSC, *FNTTBL, *FORMDF, *FTR, *GSS, *IGCDCT, *IGCSRT, *IGCTBL, *IMGCLG, *IPXD, *JOBD, *JOBQ, *JOBSCD, *JRN, *JRNRCV, *LIB, *LIND, *LOCALE, *M36, *M36CFG, *MEDDFN, *MENU, *MGTCOL, *MODD, *MODULE, *MSGF, *MSGQ, *NODGRP, *NODL, *NTBD, *NWID, *NWSCFG, *NWSD, *OUTQ, *OVL, *PAGDFN, *PAGSEG, *PDFMAP, *PDG, *PGM, *PNLGRP, *PRDAVL, *PRDDFN, *PRDLOD, *PSFCFG, *QMFORM, *QMQRY, *QRYDFN, *RCT, *S36, *SBSD, *SCHIDX, *SPADCT, *SQLPKG, *SQLUDT, *SQLXSR, *SRVPGM, *SSND, *SVRSTG, *TBL, *TIMZON, *USRIDX, *USRPRF, *USRQ, *USRSPC, *VLDL, *WSCST
+  | **choices**: \*ALL, \*ALRTBL, \*BNDDIR, \*CFGL, \*CHTFMT, \*CLD, \*CLS, \*CMD, \*CNNL, \*COSD, \*CRG, \*CRQD, \*CSI, \*CSPMAP, \*CSPTBL, \*CTLD, \*DEVD, \*DTAARA, \*DTADCT, \*DTAQ, \*EDTD, \*FCT, \*FILE, \*FNTRSC, \*FNTTBL, \*FORMDF, \*FTR, \*GSS, \*IGCDCT, \*IGCSRT, \*IGCTBL, \*IMGCLG, \*IPXD, \*JOBD, \*JOBQ, \*JOBSCD, \*JRN, \*JRNRCV, \*LIB, \*LIND, \*LOCALE, \*M36, \*M36CFG, \*MEDDFN, \*MENU, \*MGTCOL, \*MODD, \*MODULE, \*MSGF, \*MSGQ, \*NODGRP, \*NODL, \*NTBD, \*NWID, \*NWSCFG, \*NWSD, \*OUTQ, \*OVL, \*PAGDFN, \*PAGSEG, \*PDFMAP, \*PDG, \*PGM, \*PNLGRP, \*PRDAVL, \*PRDDFN, \*PRDLOD, \*PSFCFG, \*QMFORM, \*QMQRY, \*QRYDFN, \*RCT, \*S36, \*SBSD, \*SCHIDX, \*SPADCT, \*SQLPKG, \*SQLUDT, \*SQLXSR, \*SRVPGM, \*SSND, \*SVRSTG, \*TBL, \*TIMZON, \*USRIDX, \*USRPRF, \*USRQ, \*USRSPC, \*VLDL, \*WSCST
 
 
      
@@ -161,7 +162,7 @@ ref_asp_device
 
   | **required**: false
   | **type**: str
-  | **default**: *
+  | **default**: \*
 
 
      
@@ -173,7 +174,7 @@ ref_object_library
 
   | **required**: false
   | **type**: str
-  | **default**: *LIBL
+  | **default**: \*LIBL
 
 
      
@@ -198,8 +199,8 @@ ref_object_type
 
   | **required**: false
   | **type**: str
-  | **default**: *OBJTYPE
-  | **choices**: *OBJTYPE, *ALRTBL, *AUTL, *BNDDIR, *CFGL, *CHTFMT, *CLD, *CLS, *CMD, *CNNL, *COSD, *CRG, *CRQD, *CSI, *CSPMAP, *CSPTBL, *CTLD, *DEVD, *DTAARA, *DTADCT, *DTAQ, *EDTD, *FCT, *FILE, *FNTRSC, *FNTTBL, *FORMDF, *FTR, *GSS, *IGCDCT, *IGCSRT, *IGCTBL, *IMGCLG, *IPXD, *JOBD, *JOBQ, *JOBSCD, *JRN, *JRNRCV, *LIB, *LIND, *LOCALE, *M36, *M36CFG, *MEDDFN, *MENU, *MGTCOL, *MODD, *MODULE, *MSGF, *MSGQ, *NODGRP, *NODL, *NTBD, *NWID, *NWSCFG, *NWSD, *OUTQ, *OVL, *PAGDFN, *PAGSEG, *PDFMAP, *PDG, *PGM, *PNLGRP, *PRDDFN, *PRDLOD, *PSFCFG, *QMFORM, *QMQRY, *QRYDFN, *RCT, *S36, *SBSD, *SCHIDX, *SPADCT, *SQLPKG, *SQLUDT, *SQLXSR, *SRVPGM, *SSND, *SVRSTG, *TBL, *TIMZON, *USRIDX, *USRPRF, *USRQ, *USRSPC, *VLDL, *WSCST
+  | **default**: \*OBJTYPE
+  | **choices**: \*OBJTYPE, \*ALRTBL, \*AUTL, \*BNDDIR, \*CFGL, \*CHTFMT, \*CLD, \*CLS, \*CMD, \*CNNL, \*COSD, \*CRG, \*CRQD, \*CSI, \*CSPMAP, \*CSPTBL, \*CTLD, \*DEVD, \*DTAARA, \*DTADCT, \*DTAQ, \*EDTD, \*FCT, \*FILE, \*FNTRSC, \*FNTTBL, \*FORMDF, \*FTR, \*GSS, \*IGCDCT, \*IGCSRT, \*IGCTBL, \*IMGCLG, \*IPXD, \*JOBD, \*JOBQ, \*JOBSCD, \*JRN, \*JRNRCV, \*LIB, \*LIND, \*LOCALE, \*M36, \*M36CFG, \*MEDDFN, \*MENU, \*MGTCOL, \*MODD, \*MODULE, \*MSGF, \*MSGQ, \*NODGRP, \*NODL, \*NTBD, \*NWID, \*NWSCFG, \*NWSD, \*OUTQ, \*OVL, \*PAGDFN, \*PAGSEG, \*PDFMAP, \*PDG, \*PGM, \*PNLGRP, \*PRDDFN, \*PRDLOD, \*PSFCFG, \*QMFORM, \*QMQRY, \*QRYDFN, \*RCT, \*S36, \*SBSD, \*SCHIDX, \*SPADCT, \*SQLPKG, \*SQLUDT, \*SQLXSR, \*SRVPGM, \*SSND, \*SVRSTG, \*TBL, \*TIMZON, \*USRIDX, \*USRPRF, \*USRQ, \*USRSPC, \*VLDL, \*WSCST
 
 
      
@@ -224,6 +225,7 @@ user
   | **type**: list
   | **elements**: str
   | **default**: ['']
+
 
 
 
@@ -294,12 +296,15 @@ Examples
 
 
 
+
+
 See Also
 --------
 
 .. seealso::
 
    - :ref:`ibmi_object_find_module`
+
 
 
 Return Values

@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_display_subsystem.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_display_subsystem.pyy
 
 .. _ibmi_display_subsystem_module:
 
+
 ibmi_display_subsystem -- Displays all currently active subsystems or currently active jobs in a subsystem
 ==========================================================================================================
+
 
 
 .. contents::
@@ -19,6 +18,8 @@ Synopsis
 --------
 - The ``ibmi_display_subsystem`` module displays all currently active subsystems or currently active jobs in a subsystem.
 - In some ways it has equivalent results of WRKSBS if subsystem is ``'*ALL'``, otherwise, it has equivalent results of WRKSBSJOB.
+
+
 
 
 
@@ -42,17 +43,18 @@ subsystem
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
+  | **default**: \*ALL
 
 
      
 user
-  Specifies the name of the user whose jobs are displayed, ``'*ALL'`` for all users. If subsystem is ``'*ALL'``, this option is ignored.
+  Specifies the name of the user whose jobs are displayed, ``'\*ALL'`` for all users. If subsystem is ``'\*ALL'``, this option is ignored.
 
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
+  | **default**: \*ALL
+
 
 
 
@@ -77,12 +79,15 @@ Examples
 
 
 
+
+
 See Also
 --------
 
 .. seealso::
 
    - :ref:`ibmi_end_subsystem, ibmi_start_subsystem_module`
+
 
 
 Return Values

@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_uninstall_product.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_uninstall_product.pyy
 
 .. _ibmi_uninstall_product_module:
 
+
 ibmi_uninstall_product -- Delete the objects that make up the licensed program(product)
 =======================================================================================
+
 
 
 .. contents::
@@ -18,6 +17,8 @@ ibmi_uninstall_product -- Delete the objects that make up the licensed program(p
 Synopsis
 --------
 - the ``ibmi_uninstall_product`` module deletes the objects that make up the product.
+
+
 
 
 
@@ -43,7 +44,7 @@ language
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
+  | **default**: \*ALL
 
 
      
@@ -53,7 +54,7 @@ option
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
+  | **default**: \*ALL
 
 
      
@@ -72,7 +73,8 @@ release
 
   | **required**: false
   | **type**: str
-  | **default**: *ONLY
+  | **default**: \*ONLY
+
 
 
 
@@ -94,12 +96,15 @@ Examples
 
 
 
+
+
 See Also
 --------
 
 .. seealso::
 
    - :ref:`ibmi_install_product_from_savf, ibmi_save_product_to_savf_module`
+
 
 
 Return Values
@@ -113,7 +118,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: Product 5733D10 option 11 release *ONLY language *ALL deleted.
+        | **sample**: Product 5733D10 option 11 release \*ONLY language \*ALL deleted.
 
             
       
@@ -124,7 +129,7 @@ Return Values
       
         | **returned**: When rc as non-zero(failure)
         | **type**: str
-        | **sample**: Product 5733D10 option *ALL release *ONLY language *ALL not installed
+        | **sample**: Product 5733D10 option \*ALL release \*ONLY language \*ALL not installed
 
             
       
