@@ -195,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_authority.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_authority.pyy" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -213,21 +213,21 @@
 <span id="ibmi-object-authority-module"></span><h1>ibmi_object_authority – Grant, revoke or display object authority<a class="headerlink" href="#ibmi-object-authority-grant-revoke-or-display-object-authority" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#synopsis" id="id401">Synopsis</a></p></li>
-<li><p><a class="reference internal" href="#parameters" id="id402">Parameters</a></p></li>
-<li><p><a class="reference internal" href="#examples" id="id403">Examples</a></p></li>
-<li><p><a class="reference internal" href="#see-also" id="id404">See Also</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id405">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id4">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id5">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id401">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_object_authority</span></code> module can do the named object(s) authority management(grant, revoke and display).</p></li>
 </ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id402">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
 <dt>asp_device</dt><dd><p>Specifies the auxiliary storage pool (ASP) device name where the library that contains the object (OBJ parameter) is located.</p>
 <p>The ASP group name is the name of the primary ASP device within the ASP group.</p>
@@ -238,12 +238,12 @@
 <div class="line"><strong>default</strong>: *</div>
 </div>
 </dd>
-<dt>asp_group</dt><dd><p>Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread. The ASP group name is the name of the primary ASP device within the ASP group. The different for asp_group and asp_device or ref_asp_device are, the asp_group make the current ansible thread run under the asp_group. the asp_device or ref_asp_device is the search scope for the object. If you want to searh the object or ref_object in an ASP, the asp_group must be set and varied on, asp_device or ref_asp_device can be set as <code class="docutils literal notranslate"><span class="pre">*</span></code> for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.</p>
+<dt>asp_group</dt><dd><p>Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread. The ASP group name is the name of the primary ASP device within the ASP group. The different for asp_group and (<a href="#id6"><span class="problematic" id="id7">ref_</span></a>)asp_device are, the asp_group make the current ansible thread run under the asp_group. the (<a href="#id8"><span class="problematic" id="id9">ref_</span></a>)asp_device is the search scope for the object. If you want to searh the (<a href="#id10"><span class="problematic" id="id11">ref_</span></a>)object in an ASP, the asp_group must be set and varied on, (ref)asp_device can be set as ‘*’ for searching in the ASP and also the system ASP or asp_group name to just search in this ASP.</p>
 <p>Valid for all the operations</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>SYSBAS</div>
+<div class="line"><strong>default</strong>: *SYSBAS</div>
 </div>
 </dd>
 <dt>authority</dt><dd><p>Specifies the authority to be granted or revoked to the users specified for the Users (USER) parameter.</p>
@@ -252,12 +252,12 @@
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>elements</strong>: str</div>
-<div class="line"><strong>default</strong>: [‘<a href="#id3"><span class="problematic" id="id4">*</span></a>CHANGE’]</div>
-<div class="line"><strong>choices</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>CHANGE, <a href="#id7"><span class="problematic" id="id8">*</span></a>ALL, <a href="#id9"><span class="problematic" id="id10">*</span></a>USE, <a href="#id11"><span class="problematic" id="id12">*</span></a>EXCLUDE, <a href="#id13"><span class="problematic" id="id14">*</span></a>AUTL, <a href="#id15"><span class="problematic" id="id16">*</span></a>OBJALTER, <a href="#id17"><span class="problematic" id="id18">*</span></a>OBJEXIST, <a href="#id19"><span class="problematic" id="id20">*</span></a>OBJMGT, <a href="#id21"><span class="problematic" id="id22">*</span></a>OBJOPR, <a href="#id23"><span class="problematic" id="id24">*</span></a>OBJREF, <a href="#id25"><span class="problematic" id="id26">*</span></a>ADD, <a href="#id27"><span class="problematic" id="id28">*</span></a>DLT, <a href="#id29"><span class="problematic" id="id30">*</span></a>READ, <a href="#id31"><span class="problematic" id="id32">*</span></a>UPD, <a href="#id33"><span class="problematic" id="id34">*</span></a>EXECUTE</div>
+<div class="line"><strong>default</strong>: [‘*CHANGE’]</div>
+<div class="line"><strong>choices</strong>: *CHANGE, *ALL, *USE, *EXCLUDE, *AUTL, *OBJALTER, *OBJEXIST, *OBJMGT, *OBJOPR, *OBJREF, *ADD, *DLT, *READ, *UPD, *EXECUTE</div>
 </div>
 </dd>
 <dt>authorization_list</dt><dd><p>Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl.</p>
-<p>Valid only for operations grant_autl and revoke_autl, you must specify a value other than <code class="docutils literal notranslate"><span class="pre">''</span></code>.</p>
+<p>Valid only for operations grant_autl and revoke_autl, you must specify a value other than ‘’.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
@@ -271,11 +271,11 @@
 </dd>
 <dt>object_library</dt><dd><p>Specify the name of the library to be searched.</p>
 <p>Valid for all the operations.</p>
-<p>When operation is display, special value as <code class="docutils literal notranslate"><span class="pre">*LIBL</span></code>, <code class="docutils literal notranslate"><span class="pre">*CURLIB</span></code>, <code class="docutils literal notranslate"><span class="pre">*ALL</span></code>, <code class="docutils literal notranslate"><span class="pre">*ALLUSR</span></code>, <code class="docutils literal notranslate"><span class="pre">*USRLIBL</span></code>, <code class="docutils literal notranslate"><span class="pre">*ALLAVL</span></code>, <code class="docutils literal notranslate"><span class="pre">*ALLUSRAVL</span></code> are not supported.</p>
+<p>When operation is display, special value as ‘*LIBL’, ‘*CURLIB’, ‘*ALL’, ‘*ALLUSR’, ‘*USRLIBL’, ‘*ALLAVL’, ‘*ALLUSRAVL’ are not supported.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id35"><span class="problematic" id="id36">*</span></a>LIBL</div>
+<div class="line"><strong>default</strong>: *LIBL</div>
 </div>
 </dd>
 <dt>object_name</dt><dd><p>Specify the name of the object for which specific authority is to be granted, revoked or displayed to one or more users.</p>
@@ -291,7 +291,7 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: True</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>choices</strong>: <a href="#id37"><span class="problematic" id="id38">*</span></a>ALL, <a href="#id39"><span class="problematic" id="id40">*</span></a>ALRTBL, <a href="#id41"><span class="problematic" id="id42">*</span></a>BNDDIR, <a href="#id43"><span class="problematic" id="id44">*</span></a>CFGL, <a href="#id45"><span class="problematic" id="id46">*</span></a>CHTFMT, <a href="#id47"><span class="problematic" id="id48">*</span></a>CLD, <a href="#id49"><span class="problematic" id="id50">*</span></a>CLS, <a href="#id51"><span class="problematic" id="id52">*</span></a>CMD, <a href="#id53"><span class="problematic" id="id54">*</span></a>CNNL, <a href="#id55"><span class="problematic" id="id56">*</span></a>COSD, <a href="#id57"><span class="problematic" id="id58">*</span></a>CRG, <a href="#id59"><span class="problematic" id="id60">*</span></a>CRQD, <a href="#id61"><span class="problematic" id="id62">*</span></a>CSI, <a href="#id63"><span class="problematic" id="id64">*</span></a>CSPMAP, <a href="#id65"><span class="problematic" id="id66">*</span></a>CSPTBL, <a href="#id67"><span class="problematic" id="id68">*</span></a>CTLD, <a href="#id69"><span class="problematic" id="id70">*</span></a>DEVD, <a href="#id71"><span class="problematic" id="id72">*</span></a>DTAARA, <a href="#id73"><span class="problematic" id="id74">*</span></a>DTADCT, <a href="#id75"><span class="problematic" id="id76">*</span></a>DTAQ, <a href="#id77"><span class="problematic" id="id78">*</span></a>EDTD, <a href="#id79"><span class="problematic" id="id80">*</span></a>FCT, <a href="#id81"><span class="problematic" id="id82">*</span></a>FILE, <a href="#id83"><span class="problematic" id="id84">*</span></a>FNTRSC, <a href="#id85"><span class="problematic" id="id86">*</span></a>FNTTBL, <a href="#id87"><span class="problematic" id="id88">*</span></a>FORMDF, <a href="#id89"><span class="problematic" id="id90">*</span></a>FTR, <a href="#id91"><span class="problematic" id="id92">*</span></a>GSS, <a href="#id93"><span class="problematic" id="id94">*</span></a>IGCDCT, <a href="#id95"><span class="problematic" id="id96">*</span></a>IGCSRT, <a href="#id97"><span class="problematic" id="id98">*</span></a>IGCTBL, <a href="#id99"><span class="problematic" id="id100">*</span></a>IMGCLG, <a href="#id101"><span class="problematic" id="id102">*</span></a>IPXD, <a href="#id103"><span class="problematic" id="id104">*</span></a>JOBD, <a href="#id105"><span class="problematic" id="id106">*</span></a>JOBQ, <a href="#id107"><span class="problematic" id="id108">*</span></a>JOBSCD, <a href="#id109"><span class="problematic" id="id110">*</span></a>JRN, <a href="#id111"><span class="problematic" id="id112">*</span></a>JRNRCV, <a href="#id113"><span class="problematic" id="id114">*</span></a>LIB, <a href="#id115"><span class="problematic" id="id116">*</span></a>LIND, <a href="#id117"><span class="problematic" id="id118">*</span></a>LOCALE, <a href="#id119"><span class="problematic" id="id120">*</span></a>M36, <a href="#id121"><span class="problematic" id="id122">*</span></a>M36CFG, <a href="#id123"><span class="problematic" id="id124">*</span></a>MEDDFN, <a href="#id125"><span class="problematic" id="id126">*</span></a>MENU, <a href="#id127"><span class="problematic" id="id128">*</span></a>MGTCOL, <a href="#id129"><span class="problematic" id="id130">*</span></a>MODD, <a href="#id131"><span class="problematic" id="id132">*</span></a>MODULE, <a href="#id133"><span class="problematic" id="id134">*</span></a>MSGF, <a href="#id135"><span class="problematic" id="id136">*</span></a>MSGQ, <a href="#id137"><span class="problematic" id="id138">*</span></a>NODGRP, <a href="#id139"><span class="problematic" id="id140">*</span></a>NODL, <a href="#id141"><span class="problematic" id="id142">*</span></a>NTBD, <a href="#id143"><span class="problematic" id="id144">*</span></a>NWID, <a href="#id145"><span class="problematic" id="id146">*</span></a>NWSCFG, <a href="#id147"><span class="problematic" id="id148">*</span></a>NWSD, <a href="#id149"><span class="problematic" id="id150">*</span></a>OUTQ, <a href="#id151"><span class="problematic" id="id152">*</span></a>OVL, <a href="#id153"><span class="problematic" id="id154">*</span></a>PAGDFN, <a href="#id155"><span class="problematic" id="id156">*</span></a>PAGSEG, <a href="#id157"><span class="problematic" id="id158">*</span></a>PDFMAP, <a href="#id159"><span class="problematic" id="id160">*</span></a>PDG, <a href="#id161"><span class="problematic" id="id162">*</span></a>PGM, <a href="#id163"><span class="problematic" id="id164">*</span></a>PNLGRP, <a href="#id165"><span class="problematic" id="id166">*</span></a>PRDAVL, <a href="#id167"><span class="problematic" id="id168">*</span></a>PRDDFN, <a href="#id169"><span class="problematic" id="id170">*</span></a>PRDLOD, <a href="#id171"><span class="problematic" id="id172">*</span></a>PSFCFG, <a href="#id173"><span class="problematic" id="id174">*</span></a>QMFORM, <a href="#id175"><span class="problematic" id="id176">*</span></a>QMQRY, <a href="#id177"><span class="problematic" id="id178">*</span></a>QRYDFN, <a href="#id179"><span class="problematic" id="id180">*</span></a>RCT, <a href="#id181"><span class="problematic" id="id182">*</span></a>S36, <a href="#id183"><span class="problematic" id="id184">*</span></a>SBSD, <a href="#id185"><span class="problematic" id="id186">*</span></a>SCHIDX, <a href="#id187"><span class="problematic" id="id188">*</span></a>SPADCT, <a href="#id189"><span class="problematic" id="id190">*</span></a>SQLPKG, <a href="#id191"><span class="problematic" id="id192">*</span></a>SQLUDT, <a href="#id193"><span class="problematic" id="id194">*</span></a>SQLXSR, <a href="#id195"><span class="problematic" id="id196">*</span></a>SRVPGM, <a href="#id197"><span class="problematic" id="id198">*</span></a>SSND, <a href="#id199"><span class="problematic" id="id200">*</span></a>SVRSTG, <a href="#id201"><span class="problematic" id="id202">*</span></a>TBL, <a href="#id203"><span class="problematic" id="id204">*</span></a>TIMZON, <a href="#id205"><span class="problematic" id="id206">*</span></a>USRIDX, <a href="#id207"><span class="problematic" id="id208">*</span></a>USRPRF, <a href="#id209"><span class="problematic" id="id210">*</span></a>USRQ, <a href="#id211"><span class="problematic" id="id212">*</span></a>USRSPC, <a href="#id213"><span class="problematic" id="id214">*</span></a>VLDL, <a href="#id215"><span class="problematic" id="id216">*</span></a>WSCST</div>
+<div class="line"><strong>choices</strong>: *ALL, *ALRTBL, *BNDDIR, *CFGL, *CHTFMT, *CLD, *CLS, *CMD, *CNNL, *COSD, *CRG, *CRQD, *CSI, *CSPMAP, *CSPTBL, *CTLD, *DEVD, *DTAARA, *DTADCT, *DTAQ, *EDTD, *FCT, *FILE, *FNTRSC, *FNTTBL, *FORMDF, *FTR, *GSS, *IGCDCT, *IGCSRT, *IGCTBL, *IMGCLG, *IPXD, *JOBD, *JOBQ, *JOBSCD, *JRN, *JRNRCV, *LIB, *LIND, *LOCALE, *M36, *M36CFG, *MEDDFN, *MENU, *MGTCOL, *MODD, *MODULE, *MSGF, *MSGQ, *NODGRP, *NODL, *NTBD, *NWID, *NWSCFG, *NWSD, *OUTQ, *OVL, *PAGDFN, *PAGSEG, *PDFMAP, *PDG, *PGM, *PNLGRP, *PRDAVL, *PRDDFN, *PRDLOD, *PSFCFG, *QMFORM, *QMQRY, *QRYDFN, *RCT, *S36, *SBSD, *SCHIDX, *SPADCT, *SQLPKG, *SQLUDT, *SQLXSR, *SRVPGM, *SSND, *SVRSTG, *TBL, *TIMZON, *USRIDX, *USRPRF, *USRQ, *USRSPC, *VLDL, *WSCST</div>
 </div>
 </dd>
 <dt>operation</dt><dd><p>The authority operation.</p>
@@ -323,11 +323,11 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id217"><span class="problematic" id="id218">*</span></a>LIBL</div>
+<div class="line"><strong>default</strong>: *LIBL</div>
 </div>
 </dd>
 <dt>ref_object_name</dt><dd><p>Specify the name of the reference object for which specific authority is to be granted, revoked or displayed to one or more users.</p>
-<p>Valid only for operation grant_ref, you must specify a value other than <code class="docutils literal notranslate"><span class="pre">''</span></code>.</p>
+<p>Valid only for operation grant_ref, you must specify a value other than ‘’.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
@@ -339,8 +339,8 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id219"><span class="problematic" id="id220">*</span></a>OBJTYPE</div>
-<div class="line"><strong>choices</strong>: <a href="#id221"><span class="problematic" id="id222">*</span></a>OBJTYPE, <a href="#id223"><span class="problematic" id="id224">*</span></a>ALRTBL, <a href="#id225"><span class="problematic" id="id226">*</span></a>AUTL, <a href="#id227"><span class="problematic" id="id228">*</span></a>BNDDIR, <a href="#id229"><span class="problematic" id="id230">*</span></a>CFGL, <a href="#id231"><span class="problematic" id="id232">*</span></a>CHTFMT, <a href="#id233"><span class="problematic" id="id234">*</span></a>CLD, <a href="#id235"><span class="problematic" id="id236">*</span></a>CLS, <a href="#id237"><span class="problematic" id="id238">*</span></a>CMD, <a href="#id239"><span class="problematic" id="id240">*</span></a>CNNL, <a href="#id241"><span class="problematic" id="id242">*</span></a>COSD, <a href="#id243"><span class="problematic" id="id244">*</span></a>CRG, <a href="#id245"><span class="problematic" id="id246">*</span></a>CRQD, <a href="#id247"><span class="problematic" id="id248">*</span></a>CSI, <a href="#id249"><span class="problematic" id="id250">*</span></a>CSPMAP, <a href="#id251"><span class="problematic" id="id252">*</span></a>CSPTBL, <a href="#id253"><span class="problematic" id="id254">*</span></a>CTLD, <a href="#id255"><span class="problematic" id="id256">*</span></a>DEVD, <a href="#id257"><span class="problematic" id="id258">*</span></a>DTAARA, <a href="#id259"><span class="problematic" id="id260">*</span></a>DTADCT, <a href="#id261"><span class="problematic" id="id262">*</span></a>DTAQ, <a href="#id263"><span class="problematic" id="id264">*</span></a>EDTD, <a href="#id265"><span class="problematic" id="id266">*</span></a>FCT, <a href="#id267"><span class="problematic" id="id268">*</span></a>FILE, <a href="#id269"><span class="problematic" id="id270">*</span></a>FNTRSC, <a href="#id271"><span class="problematic" id="id272">*</span></a>FNTTBL, <a href="#id273"><span class="problematic" id="id274">*</span></a>FORMDF, <a href="#id275"><span class="problematic" id="id276">*</span></a>FTR, <a href="#id277"><span class="problematic" id="id278">*</span></a>GSS, <a href="#id279"><span class="problematic" id="id280">*</span></a>IGCDCT, <a href="#id281"><span class="problematic" id="id282">*</span></a>IGCSRT, <a href="#id283"><span class="problematic" id="id284">*</span></a>IGCTBL, <a href="#id285"><span class="problematic" id="id286">*</span></a>IMGCLG, <a href="#id287"><span class="problematic" id="id288">*</span></a>IPXD, <a href="#id289"><span class="problematic" id="id290">*</span></a>JOBD, <a href="#id291"><span class="problematic" id="id292">*</span></a>JOBQ, <a href="#id293"><span class="problematic" id="id294">*</span></a>JOBSCD, <a href="#id295"><span class="problematic" id="id296">*</span></a>JRN, <a href="#id297"><span class="problematic" id="id298">*</span></a>JRNRCV, <a href="#id299"><span class="problematic" id="id300">*</span></a>LIB, <a href="#id301"><span class="problematic" id="id302">*</span></a>LIND, <a href="#id303"><span class="problematic" id="id304">*</span></a>LOCALE, <a href="#id305"><span class="problematic" id="id306">*</span></a>M36, <a href="#id307"><span class="problematic" id="id308">*</span></a>M36CFG, <a href="#id309"><span class="problematic" id="id310">*</span></a>MEDDFN, <a href="#id311"><span class="problematic" id="id312">*</span></a>MENU, <a href="#id313"><span class="problematic" id="id314">*</span></a>MGTCOL, <a href="#id315"><span class="problematic" id="id316">*</span></a>MODD, <a href="#id317"><span class="problematic" id="id318">*</span></a>MODULE, <a href="#id319"><span class="problematic" id="id320">*</span></a>MSGF, <a href="#id321"><span class="problematic" id="id322">*</span></a>MSGQ, <a href="#id323"><span class="problematic" id="id324">*</span></a>NODGRP, <a href="#id325"><span class="problematic" id="id326">*</span></a>NODL, <a href="#id327"><span class="problematic" id="id328">*</span></a>NTBD, <a href="#id329"><span class="problematic" id="id330">*</span></a>NWID, <a href="#id331"><span class="problematic" id="id332">*</span></a>NWSCFG, <a href="#id333"><span class="problematic" id="id334">*</span></a>NWSD, <a href="#id335"><span class="problematic" id="id336">*</span></a>OUTQ, <a href="#id337"><span class="problematic" id="id338">*</span></a>OVL, <a href="#id339"><span class="problematic" id="id340">*</span></a>PAGDFN, <a href="#id341"><span class="problematic" id="id342">*</span></a>PAGSEG, <a href="#id343"><span class="problematic" id="id344">*</span></a>PDFMAP, <a href="#id345"><span class="problematic" id="id346">*</span></a>PDG, <a href="#id347"><span class="problematic" id="id348">*</span></a>PGM, <a href="#id349"><span class="problematic" id="id350">*</span></a>PNLGRP, <a href="#id351"><span class="problematic" id="id352">*</span></a>PRDDFN, <a href="#id353"><span class="problematic" id="id354">*</span></a>PRDLOD, <a href="#id355"><span class="problematic" id="id356">*</span></a>PSFCFG, <a href="#id357"><span class="problematic" id="id358">*</span></a>QMFORM, <a href="#id359"><span class="problematic" id="id360">*</span></a>QMQRY, <a href="#id361"><span class="problematic" id="id362">*</span></a>QRYDFN, <a href="#id363"><span class="problematic" id="id364">*</span></a>RCT, <a href="#id365"><span class="problematic" id="id366">*</span></a>S36, <a href="#id367"><span class="problematic" id="id368">*</span></a>SBSD, <a href="#id369"><span class="problematic" id="id370">*</span></a>SCHIDX, <a href="#id371"><span class="problematic" id="id372">*</span></a>SPADCT, <a href="#id373"><span class="problematic" id="id374">*</span></a>SQLPKG, <a href="#id375"><span class="problematic" id="id376">*</span></a>SQLUDT, <a href="#id377"><span class="problematic" id="id378">*</span></a>SQLXSR, <a href="#id379"><span class="problematic" id="id380">*</span></a>SRVPGM, <a href="#id381"><span class="problematic" id="id382">*</span></a>SSND, <a href="#id383"><span class="problematic" id="id384">*</span></a>SVRSTG, <a href="#id385"><span class="problematic" id="id386">*</span></a>TBL, <a href="#id387"><span class="problematic" id="id388">*</span></a>TIMZON, <a href="#id389"><span class="problematic" id="id390">*</span></a>USRIDX, <a href="#id391"><span class="problematic" id="id392">*</span></a>USRPRF, <a href="#id393"><span class="problematic" id="id394">*</span></a>USRQ, <a href="#id395"><span class="problematic" id="id396">*</span></a>USRSPC, <a href="#id397"><span class="problematic" id="id398">*</span></a>VLDL, <a href="#id399"><span class="problematic" id="id400">*</span></a>WSCST</div>
+<div class="line"><strong>default</strong>: *OBJTYPE</div>
+<div class="line"><strong>choices</strong>: *OBJTYPE, *ALRTBL, *AUTL, *BNDDIR, *CFGL, *CHTFMT, *CLD, *CLS, *CMD, *CNNL, *COSD, *CRG, *CRQD, *CSI, *CSPMAP, *CSPTBL, *CTLD, *DEVD, *DTAARA, *DTADCT, *DTAQ, *EDTD, *FCT, *FILE, *FNTRSC, *FNTTBL, *FORMDF, *FTR, *GSS, *IGCDCT, *IGCSRT, *IGCTBL, *IMGCLG, *IPXD, *JOBD, *JOBQ, *JOBSCD, *JRN, *JRNRCV, *LIB, *LIND, *LOCALE, *M36, *M36CFG, *MEDDFN, *MENU, *MGTCOL, *MODD, *MODULE, *MSGF, *MSGQ, *NODGRP, *NODL, *NTBD, *NWID, *NWSCFG, *NWSD, *OUTQ, *OVL, *PAGDFN, *PAGSEG, *PDFMAP, *PDG, *PGM, *PNLGRP, *PRDDFN, *PRDLOD, *PSFCFG, *QMFORM, *QMQRY, *QRYDFN, *RCT, *S36, *SBSD, *SCHIDX, *SPADCT, *SQLPKG, *SQLUDT, *SQLXSR, *SRVPGM, *SSND, *SVRSTG, *TBL, *TIMZON, *USRIDX, *USRPRF, *USRQ, *USRSPC, *VLDL, *WSCST</div>
 </div>
 </dd>
 <dt>replace_authority</dt><dd><p>Specifies whether the authorities replace the user’s current authorities.</p>
@@ -362,7 +362,7 @@
 </dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id403">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Grant 1 user 1 authority on object</span>
   <span class="nt">ibmi_object_authority</span><span class="p">:</span>
     <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">grant</span>
@@ -424,7 +424,7 @@
 </div>
 </div>
 <div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id404">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -433,7 +433,7 @@
 </div>
 </div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id405">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl>
 <dt>stdout</dt><dd><div class="line-block">

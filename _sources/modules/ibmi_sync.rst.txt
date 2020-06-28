@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_sync.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_sync.pyy
 
 .. _ibmi_sync_module:
 
+
 ibmi_sync -- Synchronize a save file from current IBM i node A to another IBM i node B.
 =======================================================================================
+
 
 
 .. contents::
@@ -20,6 +19,8 @@ Synopsis
 - The ``ibmi_sync`` module synchronize a save file from current IBM i node to another IBM i node.
 - Only support to synchronize save file by now.
 - For non-IBMi native targets, use the synchronize module instead.
+
+
 
 
 
@@ -84,6 +85,7 @@ src
 
 
 
+
 Examples
 --------
 
@@ -99,6 +101,7 @@ Examples
 
 
 
+
 Notes
 -----
 
@@ -110,6 +113,8 @@ Notes
    private_key must be a rsa key in the legacy PEM private key format.
 
    Doesn't support IASP by now.
+
+
 
 
 

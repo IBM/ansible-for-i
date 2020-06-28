@@ -195,7 +195,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_uninstall_product.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_uninstall_product.pyy" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -213,21 +213,21 @@
 <span id="ibmi-uninstall-product-module"></span><h1>ibmi_uninstall_product – Delete the objects that make up the licensed program(product)<a class="headerlink" href="#ibmi-uninstall-product-delete-the-objects-that-make-up-the-licensed-program-product" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#synopsis" id="id17">Synopsis</a></p></li>
-<li><p><a class="reference internal" href="#parameters" id="id18">Parameters</a></p></li>
-<li><p><a class="reference internal" href="#examples" id="id19">Examples</a></p></li>
-<li><p><a class="reference internal" href="#see-also" id="id20">See Also</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id21">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id4">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id5">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id17">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>the <code class="docutils literal notranslate"><span class="pre">ibmi_uninstall_product</span></code> module deletes the objects that make up the product.</p></li>
 </ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id18">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
 <dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</p>
 <div class="line-block">
@@ -240,14 +240,14 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>ALL</div>
+<div class="line"><strong>default</strong>: *ALL</div>
 </div>
 </dd>
 <dt>option</dt><dd><p>Specifies which of the parts of the licensed program specified on the Product prompt (LICPGM parameter) are deleted.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>ALL</div>
+<div class="line"><strong>default</strong>: *ALL</div>
 </div>
 </dd>
 <dt>product</dt><dd><p>Specifies the seven-character identifier of the licensed program that is deleted.</p>
@@ -260,13 +260,13 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>ONLY</div>
+<div class="line"><strong>default</strong>: *ONLY</div>
 </div>
 </dd>
 </dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id19">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Deleting all Licensed Program Objects.</span>
   <span class="nt">ibmi_uninstall_product</span><span class="p">:</span>
     <span class="nt">product</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5770QU1</span>
@@ -279,7 +279,7 @@
 </div>
 </div>
 <div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id20">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -288,7 +288,7 @@
 </div>
 </div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id21">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl>
 <dt>stdout</dt><dd><div class="line-block">
@@ -297,7 +297,7 @@
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: Product 5733D10 option 11 release <a href="#id7"><span class="problematic" id="id8">*</span></a>ONLY language <a href="#id9"><span class="problematic" id="id10">*</span></a>ALL deleted.</div>
+<div class="line"><strong>sample</strong>: Product 5733D10 option 11 release *ONLY language *ALL deleted.</div>
 </div>
 </dd>
 <dt>stderr</dt><dd><div class="line-block">
@@ -306,7 +306,7 @@
 <div class="line-block">
 <div class="line"><strong>returned</strong>: When rc as non-zero(failure)</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: Product 5733D10 option <a href="#id11"><span class="problematic" id="id12">*</span></a>ALL release <a href="#id13"><span class="problematic" id="id14">*</span></a>ONLY language <a href="#id15"><span class="problematic" id="id16">*</span></a>ALL not installed</div>
+<div class="line"><strong>sample</strong>: Product 5733D10 option *ALL release *ONLY language *ALL not installed</div>
 </div>
 </dd>
 <dt>rc</dt><dd><div class="line-block">
