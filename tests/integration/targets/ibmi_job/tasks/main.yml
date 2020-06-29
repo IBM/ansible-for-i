@@ -44,21 +44,13 @@
           - job_result.stderr is not defined
           - job_result.stdout is not defined 
 
-    - name: list job with all options other than default values
-      ibmi_job: 
-        status: "*ACTIVE"
-        type: '*BATCH'
-        subsystem: "QSYSWRK"
-        user: "QSYS"
-        submitter: "*JOB"
-      register: job_result
 
     - name: list job with all options other than default values
       ibmi_job: 
         status: "*ACTIVE"
         type: '*BATCH'
-        subsystem: "QSYSWRK"
-        user: "QSYS"
+        #subsystem: "QSYSWRK"
+        #user: "QSYS"
         submitter: "*USER"
       register: job_result
 
@@ -68,7 +60,7 @@
         type: '*BATCH'
         subsystem: "QSYSWRK"
         user: "QSYS"
-        submitter: "*WRKSTN"
+        #submitter: "*WRKSTN"
       register: job_result
 
     - name: list job with all options other than default values
@@ -108,16 +100,6 @@
     - name: list job with check_interval
       ibmi_job: 
         name: "{{ sbmjob_result.job_submitted }}"
-
-
-    - name: list job with all options other than default values
-      ibmi_job: 
-        status: "*OUTQ"
-        type: '*ALL'
-        subsystem: "*ALL"
-        user: "ZHULJ"
-      register: job_result
-      failed_when: "job_result.job_info | length == 0"
 
     - name: list job with all options other than default values
       ibmi_job: 
@@ -189,7 +171,7 @@
         type: '*ALL'
         subsystem: "ABC"
       register: neg_result
-      #failed_when: "job_result.job_info | length == 0"
+      failed_when: "job_result.rc != 0"
 
     - name: query job info with invalid name
       ibmi_job: 
