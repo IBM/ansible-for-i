@@ -27,4 +27,4 @@
     - set_fact:
         has_rpm_to_be_installed: true
 
-  when: rpm_query_result.stdout == ""
+  when: dependency not in rpm_query_result.stdout

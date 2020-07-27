@@ -13,7 +13,8 @@
     transfer_command: "scp {{package_path}}/{{package}} {{ibmi_user}}@{{ibmi_host}}:{{target_path}}/"
 
 - name: transfer installation package to remote IBM i and the target directory is {{target_path}}
-  shell: 'sshpass -p {{ibmi_pass}} {{transfer_command}}'
+  no_log: true
+  shell: 'sshpass -p "{{ibmi_pass}}" {{transfer_command}}'
   delegate_to: localhost 
   when: ibmi_pass != "" 
 

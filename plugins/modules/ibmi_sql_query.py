@@ -43,6 +43,12 @@ options:
       - If set to C(true), output the job log even success.
     type: bool
     default: False
+  hex_columns:
+    description:
+      - Specifies the column names which actually a hex string.
+    type: list
+    elements: str
+    default: []
 notes:
     - This module can only run one statement at a time.
 seealso:
@@ -157,7 +163,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -167,6 +173,7 @@ def main():
             database=dict(type='str', default='*SYSBAS'),
             expected_row_count=dict(type='int', default=-1),
             joblog=dict(type='bool', default=False),
+            hex_columns=dict(type='list', default=[], elements='str'),
         ),
         supports_check_mode=True,
     )
@@ -180,11 +187,12 @@ def main():
     if expected_row_count >= 0:
         check_row_count = True
     joblog = module.params['joblog']
+    hex_columns = module.params['hex_columns']
 
     startd = datetime.datetime.now()
 
     job_log = []
-    rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(sql, database)
+    rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(sql, database, hex_columns)
 
     endd = datetime.datetime.now()
     delta = endd - startd

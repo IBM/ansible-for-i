@@ -1,0 +1,554 @@
+# test code for the ibmi_module_config module
+# (c) 2020, zhaoyao <zhaoyao@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+#
+# Test scope
+# 1. check if dump option dumps all information in the config file correctly
+# 2. check if log_config option set all parameters correctly /etc/ansible/ibmi_ansible.cfg
+# 3. run a module with log enabled, check if all logs go to the right place
+# 4. check if the authority of the config file is set correctly
+# 5. check if the default option is functioning if os400 is first configured with log enabled.
+# 6. neg_test: check when each opt is invalid - this often happens when a user profile is copied on os400
+# 7. verify max_log_size_mb tower_settings
+# 8. verify each log_level prints right level of logs
+# 9. use an *USER user to run some test, permission denied error expected.
+ 
+- block:
+  - set_fact:
+      superuser: "{{ansible_ssh_user}}"
+      linestoappend: '\ \ \ \ ibmi_util.log_error("version: " + __ibmi_module_version__, module._name)\n    ibmi_util.log_warning("version: " + __ibmi_module_version__, module._name)\n    ibmi_util.log_debug("version: " + __ibmi_module_version__, module._name)\n    ibmi_util.log_critical("version: " + __ibmi_module_version__, module._name)'
+  # when first run, the server has no cfg file, check if it's can be generated as expected.
+
+  - name: TC00 - set ibmi_pass for *USER to be created
+    no_log: true
+    set_fact:
+      ibmi_user: "ZHYAO"
+      ibmi_pass: '{{ansible_ssh_pass}}'
+      when: ansible_ssh_pass is defined
+      
+  - name: TC00 - create a *USER profile to do authority test
+    ibmi_user_and_group:
+      operation: 'create'
+      user: "{{ibmi_user}}"
+      special_authority: '*NONE'
+      password: "{{ibmi_pass}}"
+      user_class: '*USER'
+    register: crtusrprf
+    failed_when: crtusrprf.rc != 0  
+
+  - name: TC00 - switch to *USER created above(ibmi_user) for authority negative test
+    set_fact: 
+      ansible_ssh_user: "{{ibmi_user}}"
+
+  - name: TC00 - set config_dir to a dir that a *USER profile has no authority, should fail
+    ibmi_module_config:
+      section: log_config
+      config_dir: etc     # should fail since no authority
+      log_level: debug
+    register: set_result
+    ignore_errors: true
+    failed_when: set_result.rc == 0
+
+  - name: TC00 - assert expected results
+    assert:
+      that:
+        - set_result.rc == 255
+        - '"Current user write permission denied for IBMi Ansible configuration directory" in set_result.msg' 
+
+  - name: TC00 - write log to a dir with no authority to
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     
+      log_level: debug
+      log_dir: /var/ansible_log             #no authority
+      log_file: ibmi_ansible_modules_cuz.log
+    register: cuz_result
+    ignore_errors: true
+    failed_when: cuz_result.rc == 0    
+
+  - name: TC00 - assert expected results
+    assert:
+      that:
+        - cuz_result.rc == 255
+        - '"[Errno 13] Permission denied" in cuz_result.msg' 
+
+  - name: TC00 - write log to another user's home
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     
+      log_level: debug
+      log_dir: /home/{{superuser}}             #no authority
+      log_file: ibmi_ansible_modules_cuz.log
+    register: cuz_result
+    ignore_errors: true
+    failed_when: cuz_result.rc == 0   
+
+  - name: TC00 - assert expected results
+    assert:
+      that:
+        - cuz_result.rc == 255
+        - '"Current user write permission denied for IBMi Ansible log directory" in cuz_result.msg' 
+
+  - name: TC01 - switch to superuser as {{ansible_ssh_user}}
+    set_fact: 
+      ansible_ssh_user: "{{superuser}}"
+
+  - name: TC01 - set cfg file with default settings
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     # effective for current user only
+      log_level: debug
+    register: set_result
+    failed_when: set_result.rc != 0
+
+
+  - name: TC01 - verify if the config file is exist
+    stat:
+      path: /home/{{ansible_ssh_user}}/ibmi_ansible.cfg
+    register: p
+    
+  - name: TC01 - assert file attribution
+    assert:
+      that:
+        - p.stat.exists
+        - p.stat.isreg
+        - p.stat.pw_name == "{{ansible_ssh_user | lower}}"
+
+  - name: TC02 - Dump the cfg file generated in TC01 and check if the file content is correct.
+    ibmi_module_config:
+      section: dump
+    register: default_config_file_info
+    failed_when: ! default_config_file_info.msg.find('Success to dump IBMi Ansible module settings') == -1
+
+  - name: TC02 - file content check
+    shell: cat /home/{{ansible_ssh_user}}/ibmi_ansible.cfg
+    register: config_file_content
+   
+  - name: TC02 - check if json data as expected
+    assert:
+      that:
+        - (config_file_content.stdout | from_json).log_config.no_log == false
+        - (config_file_content.stdout | from_json).log_config.max_log_size_mb == 5
+        - (config_file_content.stdout | from_json).log_config.log_level == "DEBUG"
+        - (config_file_content.stdout | from_json).log_config.log_file == "ibmi_ansible_modules.log"
+        - (config_file_content.stdout | from_json).log_config.log_dir == "/var/log"
+
+  - name: TC02A - check if every log_level setting works fine
+  # change ibmi_ansible.cfg file, run a module, check the logentries
+    ibmi_module_config:
+      section: log_config
+      config_dir: "{{ item[0] }}"     
+      log_level: "{{ item[1] }}"
+    register: loop_default
+    with_nested:
+      - ['home', 'etc']
+      - ['debug', 'info', 'warning', 'error', 'critical']
+    failed_when: loop_default.rc != 0
+
+
+  - name: TC03 - set cfg file with default settings to etc folder
+    ibmi_module_config:
+      section: log_config
+      config_dir: etc     # effective for all users on the system
+      log_level: info
+    register: set_etc_default
+    failed_when: ! set_etc_default.msg.find('Success to configure IBMi Ansible module settings') == -1
+
+  - name: TC03 - verify the cfg exists as /etc/ansible/ibmi_ansible.cfg  
+    stat:
+      path: /etc/ansible/ibmi_ansible.cfg
+    register: p_etc
+    failed_when:  p_etc.stat.exists == false or p_etc.stat.isreg == false
+
+  - name: TC04 - dump the cfg file under /etc/
+    ibmi_module_config:
+      section: dump
+    register: default_config_file_info_etc
+    failed_when: ! default_config_file_info_etc.msg.find('Success to dump IBMi Ansible module settings') == -1
+  
+  - name: TC04 - file content check
+    shell: cat /etc/ansible/ibmi_ansible.cfg
+    register: config_file_content_etc
+   
+  - name: TC04 - check if json data as expected
+    assert:
+      that:
+        - (config_file_content_etc.stdout | from_json).log_config.no_log == false
+        - (config_file_content_etc.stdout | from_json).log_config.max_log_size_mb == 5
+        - (config_file_content_etc.stdout | from_json).log_config.log_level == "INFO"
+        - (config_file_content_etc.stdout | from_json).log_config.log_file == "ibmi_ansible_modules.log"
+        - (config_file_content_etc.stdout | from_json).log_config.log_dir == "/var/log"
+
+  - name: TC05A - neg test, check if error when invalid section option given
+    ibmi_module_config:
+      section: invalid # invalid option
+      config_dir: home     
+      log_level: error    
+    register: neg_result
+    failed_when: neg_result.failed == 0
+
+  - name: TC05B - neg test, check if error when invalid config_dir option given
+    ibmi_module_config:
+      section: log_config
+      config_dir: invalid    # invalid option
+      log_level: critical    
+    register: neg_result
+    failed_when: neg_result.failed == 0       
+
+  - name: TC05C - neg test, check if error when invalid log_level option given
+    ibmi_module_config:
+      section: dump
+      config_dir: home     
+      log_level: invalid    # invalid option
+    register: neg_result
+    failed_when: neg_result.failed == 0
+
+  - name: TC06 - check customized setting options, upload customized cfg file
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     # effective for current user only
+      log_level: debug
+      log_dir: /var/ansible_log
+      log_file: ibmi_ansible_modules_cuz.log
+    register: cuz_result
+    failed_when: cuz_result.rc != 0
+
+  - name: TC06 - verify if log generated successfully as settings, run a module and check the log
+    ibmi_cl_command:
+      cmd: 'CRTLIB LIB(TESTLIB)'
+      joblog: true
+
+  - name: TC06 - verify if file location and file name are correct
+    stat:
+      path: /var/ansible_log/ibmi_ansible_modules_cuz.log
+    register: c_config_home
+    failed_when: c_config_home.stat.exists == false or c_config_home.stat.isreg == false
+
+  - name: TC06 - Check whether file contains expected log, file location, file name are correct
+    shell: "grep -i 'ibmi_cl_command' /var/ansible_log/ibmi_ansible_modules_cuz.log"
+    register: grep_result
+    failed_when: '"- ibmi_cl_command: version:" not in grep_result.stdout'
+
+  - name: TC07 - change to no_log true
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     # effective for current user only
+      log_level: debug
+      no_log: true
+      max_log_size_mb: 1
+      log_dir: /var/ansible_log
+      log_file: ibmi_ansible_modules_cuz.log
+    register: settrue_result
+    failed_when: settrue_result.rc != 0
+  
+  - name: TC07 - Run a module, prepare to see if log is written
+    ibmi_job:
+      user: "{{ansible_ssh_user}}"
+      type: "*BATCH"
+    ignore_errors: true 
+
+  - name: TC07 - Check log file, make sure log is not written
+    lineinfile:
+      name: /var/ansible_log/ibmi_ansible_modules_cuz.log
+      line: "ibmi_job"
+      state: absent
+    check_mode: yes
+    register: conf_abs
+    failed_when: (conf_abs is changed) or (conf_abs is failed)
+
+  - name: TC08 - check if the behavior of max_log_size_mb is correct, the min value is 1
+    # replace a big large enough log file and replace the current one
+    copy:
+      src: large.log
+      dest: /var/ansible_log/ibmi_ansible_modules_cuz.log
+      owner: qsys
+      force: true
+
+  - name: TC08 - test each log_level to print corresponding logs - change module to print logs, prepare for TC09 as well
+    local_action: command sed -i '/\ \ \ \ ibmi_util.log_info/a {{linestoappend}}' ~/.ansible/collections/ansible_collections/ibm/power_ibmi/plugins/modules/ibmi_message.py
+    register: sedappend
+    failed_when: sedappend.rc != 0
+  #   # this must be done before the 1st run of ibmi_message, otherwise it'll not be effective.
+  #   failed_when: false
+
+  - name: TC08 - need write log, so change it back to no_log false
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     # effective for current user only
+      log_level: debug
+      no_log: false
+      max_log_size_mb: 1
+      log_dir: /var/ansible_log
+      log_file: ibmi_ansible_modules_cuz.log
+    register: setback_result
+    failed_when: setback_result.rc != 0  
+
+
+  - name: TC08 - run a module, to see if the current file is zipped and a new one is created automatically
+    ibmi_message:
+      operation: 'find'
+      message_type: 'NO_REPLY'
+      message_lib: 'QUSRSYS'
+      message_queue: ['QPGMR', 'QSECOFR']
+    ignore_errors: true  #Just need the log, ignore any error
+
+  - name: TC08 - find new .log file and archived .zip file to see if they're what we want
+    find:
+      paths: /var/ansible_log
+      file_type: file
+      patterns:
+        - 'ibmi_ansible_modules_cuz.log_*.zip'
+        - 'ibmi_ansible_modules_cuz.log'
+    register: find_result
+    failed_when: find_result.matched != 2 # a new and an archived
+
+  - name: TC08 - check if new log entry written to new log file  
+    shell: "grep -i 'ibmi_message' /var/ansible_log/ibmi_ansible_modules_cuz.log"
+    register: grep_newlog_result
+    failed_when: '"- ibmi_message: version:" not in grep_newlog_result.stdout'
+
+#日志级别：
+#critical > error > warning > info > debug,notset
+#级别越高打印的日志越少
+#debug    : 打印全部的日志(notset等同于debug)
+#info     : 打印info,warning,error,critical级别的日志
+#warning  : 打印warning,error,critical级别的日志
+#error    : 打印error,critical级别的日志
+#critical : 打印critical级别 这次新加的
+
+  - name: TC09A - set log_level to debug
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     # effective for current user only
+      log_level: debug
+      no_log: false
+      log_dir: /var/ansible_log
+      log_file: ibmi_ansible_modules_cuz.log
+    register: setinfo_result
+    failed_when: setinfo_result.rc != 0  
+
+  - name: TC09A - clear current log file 
+    shell: cat /dev/null > /var/ansible_log/ibmi_ansible_modules_cuz.log
+    register: clear_result
+    failed_when: clear_result.rc != 0
+
+  - name: TC09A - run the modifiled module to print corresponding logs
+    ibmi_message:
+      operation: 'find'
+      message_type: 'NO_REPLY'
+      message_lib: 'QUSRSYS'
+      message_queue: ['QPGMR', 'QSECOFR']
+    ignore_errors: true  #Just need the log, ignore any error
+  
+  - name: TC09A - check if all logs are print except debug
+    shell: "grep -i ' - ibmi_message' /var/ansible_log/ibmi_ansible_modules_cuz.log"
+    register: grep_result
+    failed_when: grep_result.rc != 0
+
+  - name: TC09A - assert result
+    assert:
+      that:
+        - '"DEBUG - ibmi_message:" in grep_result.stdout'
+        - '"INFO - ibmi_message:" in grep_result.stdout'
+        - '"WARNING - ibmi_message:" in grep_result.stdout'
+        - '"ERROR - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
+
+  - name: TC09B - set log_level to info
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     # effective for current user only
+      log_level: info
+      no_log: false
+      log_dir: /var/ansible_log
+      log_file: ibmi_ansible_modules_cuz.log
+    register: setinfo_result
+    failed_when: setinfo_result.rc != 0  
+
+  - name: TC09B - clear current log file 
+    shell: cat /dev/null > /var/ansible_log/ibmi_ansible_modules_cuz.log
+    register: clear_result
+    failed_when: clear_result.rc != 0
+
+  - name: TC09B - run the modifiled module to print corresponding logs
+    ibmi_message:
+      operation: 'find'
+      message_type: 'NO_REPLY'
+      message_lib: 'QUSRSYS'
+      message_queue: ['QPGMR', 'QSECOFR']
+    ignore_errors: true  #Just need the log, ignore any error
+  
+  - name: TC09B - check if all logs are print except debug
+    shell: "grep -i ' - ibmi_message' /var/ansible_log/ibmi_ansible_modules_cuz.log"
+    register: grep_result
+    failed_when: grep_result.rc != 0
+
+  - name: TC09B - assert result
+    assert:
+      that:
+        - '"DEBUG - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - ibmi_message:" in grep_result.stdout'
+        - '"WARNING - ibmi_message:" in grep_result.stdout'
+        - '"ERROR - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
+
+  - name: TC09C - set log_level to warning
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     # effective for current user only
+      log_level: warning
+      no_log: false
+      log_dir: /var/ansible_log
+      log_file: ibmi_ansible_modules_cuz.log
+    register: setinfo_result
+    failed_when: setinfo_result.rc != 0  
+
+  - name: TC09C - clear current log file 
+    shell: cat /dev/null > /var/ansible_log/ibmi_ansible_modules_cuz.log
+    register: clear_result
+    failed_when: clear_result.rc != 0
+
+  - name: TC09C - run the modifiled module to print corresponding logs
+    ibmi_message:
+      operation: 'find'
+      message_type: 'NO_REPLY'
+      message_lib: 'QUSRSYS'
+      message_queue: ['QPGMR', 'QSECOFR']
+    ignore_errors: true  #Just need the log, ignore any error
+
+  - name: TC09C - check if all logs are print except debug and info
+    shell: "grep -i ' - ibmi_message' /var/ansible_log/ibmi_ansible_modules_cuz.log"
+    register: grep_result
+    failed_when: grep_result.rc != 0
+
+  - name: TC09C - assert result
+    assert:
+      that:
+        - '"DEBUG - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - ibmi_message:" in grep_result.stdout'
+        - '"ERROR - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
+
+  - name: TC09D - set log_level to error
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     # effective for current user only
+      log_level: error
+      no_log: false
+      log_dir: /var/ansible_log
+      log_file: ibmi_ansible_modules_cuz.log
+    register: setinfo_result
+    failed_when: setinfo_result.rc != 0  
+
+  - name: TC09D - clear current log file 
+    shell: cat /dev/null > /var/ansible_log/ibmi_ansible_modules_cuz.log
+    register: clear_result
+    failed_when: clear_result.rc != 0
+
+  - name: TC09D - run the modifiled module to print corresponding logs
+    ibmi_message:
+      operation: 'find'
+      message_type: 'NO_REPLY'
+      message_lib: 'QUSRSYS'
+      message_queue: ['QPGMR', 'QSECOFR']
+    ignore_errors: true  #Just need the log, ignore any error
+
+  - name: TC09D - check if all logs are print except debug and info
+    shell: "grep -i ' - ibmi_message' /var/ansible_log/ibmi_ansible_modules_cuz.log"
+    register: grep_result
+    failed_when: grep_result.rc != 0
+
+  - name: TC09D - assert result
+    assert:
+      that:
+        - '"DEBUG - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - ibmi_message:" not in grep_result.stdout'
+        - '"ERROR - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
+
+  - name: TC09E - set log_level to critical
+    ibmi_module_config:
+      section: log_config
+      config_dir: home     # effective for current user only
+      log_level: critical
+      no_log: false
+      log_dir: /var/ansible_log
+      log_file: ibmi_ansible_modules_cuz.log
+    register: setinfo_result
+    failed_when: setinfo_result.rc != 0  
+
+  - name: TC09E - clear current log file 
+    shell: cat /dev/null > /var/ansible_log/ibmi_ansible_modules_cuz.log
+    register: clear_result
+    failed_when: clear_result.rc != 0
+
+  - name: TC09E - run the modifiled module to print corresponding logs
+    ibmi_message:
+      operation: 'find'
+      message_type: 'NO_REPLY'
+      message_lib: 'QUSRSYS'
+      message_queue: ['QPGMR', 'QSECOFR']
+    ignore_errors: true  #Just need the log, ignore any error
+  
+  - name: TC09E - check if all logs are print except debug and info
+    shell: "grep -i ' - ibmi_message' /var/ansible_log/ibmi_ansible_modules_cuz.log"
+    register: grep_result
+    failed_when: grep_result.rc != 0
+
+  - name: TC09E - assert result
+    assert:
+      that:
+        - '"DEBUG - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - ibmi_message:" not in grep_result.stdout'
+        - '"ERROR - ibmi_message:" not in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
+
+
+
+  always:
+
+    - name: switch to superuser
+      set_fact: 
+        ansible_ssh_user: "{{superuser}}"
+        
+    - name: delete any cfg file in user's home dir if exists
+      file:
+        path: /home/{{ansible_ssh_user}}/ibmi_ansible.cfg
+        state: absent
+   
+    - name: remove config file under /etc 
+      command: rm -f /etc/ansible/ibmi_ansible.cfg
+      register: rmvf_result
+      failed_when: rmvf_result.rc != 0
+
+    - name: remove testlib
+      ibmi_cl_command: 
+        cmd: 'DLTLIB TESTLIB'
+      register: dltlib_result
+      failed_when: (dltlib_result.rc != 0) and (dltlib_result.job_log[0].MESSAGE_ID != "CPF2110")
+
+    - name: remove customized log folder and log file 
+      command: rm -rf /var/ansible_log
+      register: rmvrf_result
+      failed_when: rmvrf_result.rc != 0
+
+    - name: remove default log file under etc 
+      command: rm -f /var/log/ibmi_ansible_modules.log
+      register: rmdftf_result
+      failed_when: rmdftf_result.rc != 0
+
+    - name: TC - remove the line just append
+      local_action: command sed -i '/\ \ \ \ ibmi_util.log_error/,+3 d' ~/.ansible/collections/ansible_collections/ibm/power_ibmi/plugins/modules/ibmi_message.py
+      register: sedremove
+      failed_when: sedremove.rc != 0
+    
+    - name: remove *USER profile created
+      ibmi_cl_command:
+        cmd:  'DLTUSRPRF USRPRF({{ibmi_user}}) OWNOBJOPT(*DLT)'
+      register: dltusrprf
+      failed_when: dltusrprf.rc != 0

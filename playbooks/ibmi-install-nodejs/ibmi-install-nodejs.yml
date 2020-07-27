@@ -1,10 +1,10 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-- hosts: ibmi 
+- hosts: all 
   gather_facts: no
   collections:
-   - ibm.power_ibmi
+    - ibm.power_ibmi
   
   vars: 
     checkout_dir: 'tmp_nodejs'

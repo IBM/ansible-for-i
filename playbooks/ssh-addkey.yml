@@ -1,6 +1,6 @@
 #ssh-addkey.yml 
 ---
-- hosts: ibmi 
+- hosts: all
   gather_facts: no 
   
   tasks:

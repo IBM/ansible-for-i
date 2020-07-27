@@ -3,7 +3,7 @@
 
 # setup offline ibmi
 ---
-- hosts: ibmi
+- hosts: all 
   gather_facts: no 
   vars:
     package_path: ""
@@ -24,12 +24,23 @@
         register: tempfile_result
 
       - name: initialize ibmi_pass
+        no_log: true
         set_fact: 
           ibmi_pass: '{{ansible_ssh_pass}}'
         when: ansible_ssh_pass is defined
 
+      - set_fact:
+          yum_installed: false
+
       - include: ibmi_install_yum.yml
       - include: ibmi_install_python.yml
+
+      - name: disable the ibm repository
+        lineinfile:
+          path: "/QOpenSys/etc/yum/repos.d/ibm.repo"
+          regexp: "enabled=1" 
+          line: "enabled=0"
+        when: yum_installed
 
       - name: Verify 5770DG1
         command: system "DSPSFWRSC"

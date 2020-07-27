@@ -1,0 +1,89 @@
+# test code for the ibmi_query_job_log module
+# (c) 2020, zhaoyao <zhaoyao@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+
+- name: Get status of a list of jobs
+  ibmi_job:
+    user: "{{ansible_ssh_user}}"
+    type: "*INTERACT"
+    status: "*ACTIVE"
+  register: job_list_info
+
+- set_fact:
+    returned_job_number: "{{job_list_info.job_info[0]['JOB_NAME'].split('/')}}"
+  when: job_list_info.job_info | length > 0 
+
+- name: TC01 Query the specfic job log
+  ibmi_query_job_log:
+    job_number: "{{returned_job_number[0]}}"
+    job_user: "{{returned_job_number[1]}}"
+    job_name: "{{returned_job_number[2]}}"
+  register: query_job_log_info 
+
+- name: TC01 assert returned parameters of ibmi_query_job_log
+  assert:
+    that:
+      - query_job_log_info.job_log | length >= 0
+      - query_job_log_info.job_log[0]['FROM_INSTRUCTION'] is defined
+      - query_job_log_info.sql is defined    
+
+
+# test negative test cases
+
+- name: TC02 Query the specific job log with a non-exist job number
+  ibmi_query_job_log:
+    job_number: "999999"
+    job_user: "{{returned_job_number[1]}}"
+    job_name: "{{returned_job_number[2]}}"
+  register: neg_result
+  failed_when:
+    - neg_result.rc == 0
+    - '"SQLSTATE=42704 SQLCODE=-443" not in neg_result.stderr'
+  #ignore_errors: True
+
+- name: TC02 assert returned parameters with joblog = True
+  assert:
+    that:
+      - neg_result.sql is defined   
+      - neg_result.job_log == []
+      - neg_result.rc == 301
+      - '"non-zero return code" in neg_result.msg'  
+    #failed_when: "'non-zero return code' not in query_job_log_info.msg"
+
+- name: TC03 Query the specific job log with a non-exist job user
+  ibmi_query_job_log:
+    job_number: "{{returned_job_number[0]}}"
+    job_user: "dummyuser"
+    job_name: "{{returned_job_number[2]}}"
+  register: neg_result
+  failed_when:
+    - neg_result.rc == 0
+    - '"SQLSTATE=42704 SQLCODE=-443" not in neg_result.stderr'
+
+- name: TC03 assert returned parameters with joblog = True
+  assert:
+    that:
+      - neg_result.sql is defined   
+      - neg_result.job_log == []
+      - neg_result.rc == 301
+      - '"non-zero return code" in neg_result.msg'  
+
+- name: TC04 Query the specific job log with a non-exist job name
+  ibmi_query_job_log:
+    job_number: "{{returned_job_number[0]}}i"
+    job_user: "{{returned_job_number[1]}}"
+    job_name: "dummyjob"
+  register: neg_result
+  failed_when:
+    - neg_result.rc == 0
+    - '"SQLSTATE=42704 SQLCODE=-443" not in neg_result.stderr'
+
+- name: TC04 assert returned parameters with joblog = True
+  assert:
+    that:
+      - neg_result.sql is defined   
+      - neg_result.job_log == []
+      - neg_result.rc == 301
+      - '"non-zero return code" in neg_result.msg'  

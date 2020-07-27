@@ -53,6 +53,16 @@ expected_row_count
 
 
      
+hex_columns
+  Specifies the column names which actually a hex string.
+
+
+  | **required**: false
+  | **type**: list
+  | **elements**: str
+
+
+     
 joblog
   If set to ``true``, output the job log even success.
 

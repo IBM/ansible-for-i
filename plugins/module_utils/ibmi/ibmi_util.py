@@ -3,10 +3,14 @@ __metaclass__ = type
 
 
 import os
+import re
+import json
 import datetime
 import tempfile
 import logging
 import logging.config
+import zipfile
+import binascii
 
 HAS_ITOOLKIT = True
 HAS_IBM_DB = True
@@ -49,6 +53,13 @@ IBMi_COMMAND_RC_UNEXPECTED = 999
 
 SYSBAS = '*SYSBAS'
 
+IBMi_DEFAULT_CONFIG_DIR = '/etc/ansible'
+IBMi_ANSIBLE_CONFIG_FILE = 'ibmi_ansible.cfg'
+IBMi_DEFAULT_LOG_DIR = '/var/log'
+IBMi_DEFAULT_LOG_FILE = 'ibmi_ansible_modules.log'
+IBMi_DEFAULT_LOG_LEVEL_STR = 'INFO'
+IBMi_DEFAULT_MAX_LOG_SIZE = 5 * 1024 * 1024
+
 
 def itoolkit_init(db_name=SYSBAS):
     conn = None
@@ -67,7 +78,7 @@ def itoolkit_init(db_name=SYSBAS):
     return conn
 
 
-def itoolkit_run_sql_once(sql, db_name=SYSBAS):
+def itoolkit_run_sql_once(sql, db_name=SYSBAS, hex_convert_columns=None):
     conn = None
     out_list = []
     job_log = []
@@ -76,7 +87,7 @@ def itoolkit_run_sql_once(sql, db_name=SYSBAS):
     try:
         startd = datetime.datetime.now()
         conn = itoolkit_init(db_name)
-        rc, out_list, error = itoolkit_run_sql(conn, sql)
+        rc, out_list, error = itoolkit_run_sql(conn, sql, hex_convert_columns)
         job_log = db2i_tools.get_job_log(conn, '*', startd)
         return rc, out_list, error, job_log
     except ImportError as e_import:
@@ -92,8 +103,8 @@ def itoolkit_get_job_log(conn, time):
     return out
 
 
-def itoolkit_run_sql(conn, sql):
-    return db_get_result_list(conn, sql)
+def itoolkit_run_sql(conn, sql, hex_convert_columns=None):
+    return db_get_result_list(conn, sql, hex_convert_columns)
 
 
 def itoolkit_run_sql_old(conn, sql):
@@ -245,8 +256,10 @@ def db_get_fields_from_cursor(cursor):
 
 
 # returns the result list containing maps with column name as key, column value as value
-def db_get_result_list(connection_id, sql):
+def db_get_result_list(connection_id, sql, hex_convert_columns):
     try:
+        if hex_convert_columns is None:
+            hex_convert_columns = []
         result_list = []
         cur = connection_id.cursor()
         cur.execute(sql)
@@ -262,7 +275,14 @@ def db_get_result_list(connection_id, sql):
                 if not row[col_num]:
                     row_map[str(k)] = ''
                 elif col_type in [dbi.STRING, dbi.TEXT, dbi.XML, dbi.BINARY]:
-                    row_map[str(k)] = str(row[col_num])
+                    try:
+                        # Chang Le: convert the string which actually store a hex, like MESSAGE_KEY
+                        if str(k) in hex_convert_columns:
+                            row_map[str(k)] = binascii.b2a_hex(row[col_num]).decode('utf-8').upper()
+                        else:
+                            row_map[str(k)] = str(row[col_num])
+                    except TypeError:
+                        row_map[str(k)] = str(row[col_num])
                 elif col_type in [dbi.NUMBER]:
                     row_map[str(k)] = int(row[col_num])
                 # elif col_type in [dbi.BIGINT]:
@@ -287,38 +307,219 @@ def fmtTo10(str):
     return str.ljust(10) if len(str) <= 10 else str[0:10]
 
 
-def log_debug(s, module_name="ibmi_util", ):
-    get_logger("ibmi_util", logging.DEBUG).debug(str(datetime.datetime.now()) + " " + module_name + ": " + s)
+def log_debug(s, module_name="ibmi_util"):
+    try:
+        get_logger("ibmi_util").debug(module_name + ": " + s)
+    except Exception:
+        pass
 
 
-def log_info(s, module_name="ibmi_util", ):
-    get_logger("ibmi_util", logging.DEBUG).info(str(datetime.datetime.now()) + " " + module_name + ": " + s)
+def log_info(s, module_name="ibmi_util"):
+    try:
+        get_logger("ibmi_util").info(module_name + ": " + s)
+    except Exception:
+        pass
 
 
-def log_error(s, module_name="ibmi_util", ):
-    get_logger("ibmi_util", logging.ERROR).error(str(datetime.datetime.now()) + " " + module_name + ": " + s)
+def log_error(s, module_name="ibmi_util"):
+    try:
+        get_logger("ibmi_util").error(module_name + ": " + s)
+    except Exception:
+        pass
 
 
-def log_warning(s, module_name="ibmi_util", ):
-    get_logger("ibmi_util", logging.WARNING).warning(str(datetime.datetime.now()) + " " + module_name + ": " + s)
+def log_warning(s, module_name="ibmi_util"):
+    try:
+        get_logger("ibmi_util").warning(module_name + ": " + s)
+    except Exception:
+        pass
+
+
+def log_critical(s, module_name="ibmi_util"):
+    try:
+        get_logger("ibmi_util").critical(module_name + ": " + s)
+    except Exception:
+        pass
 
 
 def get_logger(module_name, log_level=logging.INFO):
-    ibmi_logging = setup_logging(log_level)
+    ibmi_logging, no_log = setup_logging(log_level)
+    if no_log:
+        return
     return ibmi_logging.getLogger(module_name)
 
 
-def setup_logging(
-    default_level="INFO",
-):
-    """Setup logging configuration"""
-    env_log_path = "LOG_PATH"
-    env_log_level = "LOG_LEVEL"
+def ensure_dir(path, mode=0o0755):
+    ensured = set()
+    dirs_created = set()
+    path = os.path.abspath(path)
+    if path not in ensured and not os.path.exists(path):
+        ensured.add(path)
+        d, f = os.path.split(path)
+        ensure_dir(d, mode)
+        os.mkdir(path, mode)
+        dirs_created.add(path)
 
-    default_log_path = tempfile.gettempdir()
-    log_path = os.getenv(env_log_path, default_log_path)
-    log_level_str = os.getenv(env_log_level, default_level)
+
+def archive_log(log_path, log_file, max_log_size):
+    log_file_path = os.path.join(log_path, log_file)
+    if os.path.exists(log_file_path):
+        log_size = os.path.getsize(log_file_path)
+        if log_size > max_log_size:
+            zip_log_file = log_file + '_' + str(datetime.datetime.now()).replace(' ', '_').replace(':', '.')
+            zip_log_file_path = os.path.join(log_path, zip_log_file)
+            os.rename(log_file_path, zip_log_file_path)
+            z = zipfile.ZipFile(zip_log_file_path + '.zip', 'w', zipfile.ZIP_DEFLATED)
+            z.write(zip_log_file_path)
+            z.close()
+            os.remove(zip_log_file_path)
+
+
+def setup_logging(detault_log_level=logging.INFO):
+    """Default logging configuration in /etc/ansible/ibmi_ansible.cfg"""
+    """
+    {
+        "log_config":
+        {
+            "log_level": "INFO",
+            "log_dir": "/var/log",
+            "log_file": "ibmi_ansible_modules.log",
+            "no_log": false,
+            "max_log_size_mb": 5
+        }
+    }
+    """
+    default_log_config_path = IBMi_DEFAULT_CONFIG_DIR
+    log_path = IBMi_DEFAULT_LOG_DIR
+    try:
+        ensure_dir(log_path, mode=0o0777)
+    except Exception:
+        log_path = tempfile.gettempdir()
+
+    log_file = IBMi_DEFAULT_LOG_FILE
+    log_file_path = os.path.join(log_path, log_file)
+    log_level_str = IBMi_DEFAULT_LOG_LEVEL_STR
+    no_log = False
+    max_log_size = IBMi_DEFAULT_MAX_LOG_SIZE
+    """Setup logging configuration"""
+    try:
+        log_config_path = os.getenv('HOME', default_log_config_path)
+        log_config_file_path = os.path.join(log_config_path, IBMi_ANSIBLE_CONFIG_FILE)
+        # Try again to read from default log config path
+        if not os.path.exists(log_config_file_path):
+            log_config_file_path = os.path.join(default_log_config_path, IBMi_ANSIBLE_CONFIG_FILE)
+        with open(log_config_file_path, 'r') as load_f:
+            log_dict = json.load(load_f)
+        no_log = log_dict['log_config']['no_log']
+        log_path = log_dict['log_config']['log_dir']
+        log_file = log_dict['log_config']['log_file']
+        log_level_str = log_dict['log_config']['log_level']
+        max_log_size = log_dict['log_config']['max_log_size_mb']
+        max_log_size = max_log_size * 1024 * 1024
+        ensure_dir(log_path, mode=0o0777)
+        log_file_path = os.path.join(log_path, log_file)
+    except Exception:
+        pass
+
     log_level = logging.getLevelName(log_level_str)
-    log_file_path = os.path.join(log_path, "ibmi_ansible_module.log")
-    logging.basicConfig(filename=log_file_path, filemode="a", level=log_level)
-    return logging
+    archive_log(log_path, log_file, max_log_size)
+    logging.basicConfig(filename=log_file_path, filemode="a", level=log_level,
+                        format='%(asctime)s - %(levelname)s - %(message)s')
+    try:
+        os.chmod(log_file_path, 0o0777)
+    except Exception:
+        pass
+
+    return logging, no_log
+
+
+def rtvneta():
+    conn = None
+    out_dict = dict()
+    try:
+        conn = itoolkit_init(SYSBAS)
+        itransport = DatabaseTransport(conn)
+        itool = iToolKit(iparm=0, iret=0, ids=1, irow=0)
+        itool.add(iCmd('rtvneta', 'RTVNETA\
+            SYSNAME(?)\
+            PNDSYSNAME(?)\
+            LCLNETID(?)\
+            LCLCPNAME(?)\
+            LCLLOCNAME(?)\
+            DFTMODE(?)\
+            NODETYPE(?)\
+            DTACPR(?N)\
+            DTACPRINM(?N)\
+            MAXINTSSN(?N)\
+            RAR(?N)\
+            NETSERVER(?)\
+            ALRSTS(?)\
+            ALRPRIFP(?)\
+            ALRDFTFP(?)\
+            ALRLOGSTS(?)\
+            ALRBCKFP(?)\
+            ALRRQSFP(?)\
+            ALRCTLD(?)\
+            ALRHLDCNT(?N)\
+            ALRFTR(?)\
+            ALRFTRLIB(?)\
+            MSGQ(?)\
+            MSGQLIB(?)\
+            OUTQ(?)\
+            OUTQLIB(?)\
+            JOBACN(?)\
+            MAXHOP(?N)\
+            DDMACC(?)\
+            DDMACCLIB(?)\
+            PCSACC(?)\
+            PCSACCLIB(?)\
+            NWSDOMAIN(?)\
+            ALWVRTAPPN(?)\
+            ALWHPRTWR(?)\
+            VRTAUTODEV(?N)\
+            HPRPTHTMR(?)\
+            ALWADDCLU(?)\
+            MDMCNTRYID(?)\
+                '))
+        itool.call(itransport)
+        rtvneta = itool.dict_out('rtvneta')
+        if 'error' in rtvneta:
+            return IBMi_COMMAND_RC_ERROR, out_dict, str(rtvneta)
+        else:
+            del rtvneta['success']
+            return IBMi_COMMAND_RC_SUCCESS, rtvneta, ''
+    except ImportError as e_import:
+        return IBMi_PACKAGES_NOT_FOUND, out_dict, str(e_import)
+    except Exception as e_db_connect:
+        return IBMi_DB_CONNECTION_ERROR, out_dict, str(e_db_connect)
+    finally:
+        itoolkti_close_connection(conn)
+
+
+def rtv_command(command, args_dict):
+    conn = None
+    out_dict = dict()
+    try:
+        conn = itoolkit_init(SYSBAS)
+        itransport = DatabaseTransport(conn)
+        itool = iToolKit(iparm=0, iret=0, ids=1, irow=0)
+        args = ' '
+        for (k, v) in args_dict.items():
+            parm = '(?) '
+            if v == 'number':
+                parm = '(?N) '
+            args = args + k + parm
+        itool.add(iCmd('rtv_command', command + args))
+        itool.call(itransport)
+        rtv_command = itool.dict_out('rtv_command')
+        if 'error' in rtv_command:
+            return IBMi_COMMAND_RC_ERROR, out_dict, str(rtv_command)
+        else:
+            del rtv_command['success']
+            return IBMi_COMMAND_RC_SUCCESS, rtv_command, ''
+    except ImportError as e_import:
+        return IBMi_PACKAGES_NOT_FOUND, out_dict, str(e_import)
+    except Exception as e_db_connect:
+        return IBMi_DB_CONNECTION_ERROR, out_dict, str(e_db_connect)
+    finally:
+        itoolkti_close_connection(conn)

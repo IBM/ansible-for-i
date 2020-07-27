@@ -2,7 +2,7 @@ enable_offline_ibmi
 =========
  So online yum update doesn't work on 'offline' IBM i systems. The playbook is to setup required packages by Ansible on the system, such as yum, python, itoolkit, ibmi-db. An 'Offline' IBM i means that the IBM i system can't connect to the public network, for example, https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/.
 
-Prereuisites:
+Pre-requisites:
 -------------
 <br>1. Create a directory on the Ansible server, for example, /tmp/ibmi-packages.</br>
 <br>2. If yum is not installed on you IBM i systems, download those files and put them in the directory you just created </br>
@@ -12,7 +12,7 @@ https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.sh
 <br> bootstrap.tar.Z
 https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.tar.Z
 </br>
-<br> python, python-itoolkit, python-ibm_db
+<br> python, libutil, libncurses6, python-itoolkit, python-ibm_db
 https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/ppc64/
 </br>
 <br> python-six
