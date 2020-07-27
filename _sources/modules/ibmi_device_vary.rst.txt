@@ -81,7 +81,7 @@ Examples
    - name: start host server service
      ibmi_device_vary:
        device_list: ['IASP1', 'IASP2']
-       state: '*ON'
+       status: '*ON'
        joblog: True
 
 

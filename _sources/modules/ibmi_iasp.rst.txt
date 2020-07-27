@@ -119,7 +119,7 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: start host server service
+   - name: create an IASP
      ibmi_iasp:
        name: 'IASP1'
        operation: 'create'
