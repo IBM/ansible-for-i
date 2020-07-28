@@ -96,6 +96,7 @@ http://www-304.ibm.com/servers/eserver/ess/index.wss.
 2. python3, python3-itoolkit, python3-ibm_db are open source packages. There are a few ways to install these packages and you could choose from one of them.
 
 **Installing rpm packages manually**
+
     Rpm packages can be installed via 'yum' packages manager on IBM i. However, yum is not shipped by IBM i by default.
     Refer the guide here to install yum https://bitbucket.org/ibmi/opensource/src/master/docs/yum/. Then install these packages by below command:
 
@@ -115,6 +116,7 @@ http://www-304.ibm.com/servers/eserver/ess/index.wss.
     ansible-playbook -i host_ibmi.ini enable-ansible-for-i/setup.yml
 
 **Installing rpm packages automatically onto IBM i systems which are offline**
+
     An 'Offline' IBM i means that the IBM i system cannot connect to the internet and is not able to access https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/.
     Before installing them, you can download installation packages to Ansible server.
 
