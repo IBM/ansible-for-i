@@ -197,7 +197,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 
 
 def handle_list_to_sql(sql, item_list, param_name):
@@ -242,9 +242,9 @@ def main():
 
     ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
     operation = module.params['operation']
-    message_type = module.params['message_type']
+    message_type = module.params['message_type'].upper()
     message_queue = module.params['message_queue']
-    message_lib = module.params['message_lib']
+    message_lib = module.params['message_lib'].upper()
     message_id = module.params['message_id']
     message_text = module.params['message_text']
     joblog = module.params['joblog']
@@ -253,19 +253,21 @@ def main():
         sql = "SELECT MESSAGE_QUEUE_LIBRARY, MESSAGE_QUEUE_NAME, MESSAGE_ID, MESSAGE_TYPE, " + \
               "MESSAGE_SUBTYPE, MESSAGE_TEXT, SEVERITY, MESSAGE_TIMESTAMP, MESSAGE_KEY, ASSOCIATED_MESSAGE_KEY, " + \
               "FROM_USER, FROM_JOB, FROM_PROGRAM, MESSAGE_FILE_LIBRARY, MESSAGE_FILE_NAME, MESSAGE_SECOND_LEVEL_TEXT " + \
-              "FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_QUEUE_LIBRARY = '" + message_lib.upper() + "' AND "
+              "FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_QUEUE_LIBRARY = '" + message_lib + "' AND "
         sql = handle_list_to_sql(sql, message_queue, "MESSAGE_QUEUE_NAME")
         sql = handle_list_to_sql(sql, message_id, "MESSAGE_ID")
         if message_text:
+            message_text = message_text.upper()
             sql = sql + "(MESSAGE_TEXT LIKE '%" + message_text + "%' OR MESSAGE_SECOND_LEVEL_TEXT LIKE '%" + message_text + "%') AND "
         if message_type == "NO_REPLY":
             sql = sql + "MESSAGE_TYPE = 'INQUIRY' AND MESSAGE_KEY NOT IN " + \
                         "(SELECT ASSOCIATED_MESSAGE_KEY FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_TYPE = 'REPLY' " + \
-                        "AND MESSAGE_QUEUE_LIBRARY = '" + message_lib.upper() + "')"
+                        "AND MESSAGE_QUEUE_LIBRARY = '" + message_lib + "')"
         else:
-            sql = sql + "MESSAGE_TYPE = '" + message_type.upper() + "'"
+            sql = sql + "MESSAGE_TYPE = '" + message_type + "'"
 
-    rc, out, error, job_log = ibmi_util.itoolkit_run_sql_once(sql)
+    hex_convert_columns = ['MESSAGE_KEY', 'ASSOCIATED_MESSAGE_KEY']
+    rc, out, error, job_log = ibmi_util.itoolkit_run_sql_once(sql, '*SYSBAS', hex_convert_columns)
     endd = datetime.datetime.now()
     delta = endd - startd
 

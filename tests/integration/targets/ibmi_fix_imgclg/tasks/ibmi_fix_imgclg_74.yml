@@ -180,4 +180,3 @@
   register: ptf_status
   failed_when: "ptf_status.row | length != 0 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'NOT LOADED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'PERMANENTLY REMOVED')"
   loop: "{{(hiper_ptf_info.values() | join(' ')).split(' ')}}"
-

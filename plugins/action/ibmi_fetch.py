@@ -8,7 +8,6 @@ import base64
 import datetime
 
 from ansible.errors import AnsibleError
-from ansible.errors import AnsibleConnectionFailure
 from ansible.module_utils._text import to_text
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils.six import string_types
@@ -17,7 +16,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 
 ifs_dir = '/tmp/.ansible'
 display = Display()

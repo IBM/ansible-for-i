@@ -216,7 +216,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -548,7 +548,6 @@ def main():
                     # move all the objects to the target folder
                     for f in os.listdir(path):
                         source_file = os.path.join(path, f)
-                        target_file = os.path.join(tmp_dir, f)
                         if os.path.isfile(source_file):
                             shutil.copy(source_file, tmp_dir)
                 else:

@@ -21,13 +21,18 @@
         target_path: /tmp
 
     - name: Create the installation script on IBM i
-      raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
+      raw: "rm -rf /tmp/bootstrap.sql && /usr/bin/touch -C 819 /tmp/bootstrap.sql"
+      args:
+        executable: /qopensys/usr/bin/qsh
+
+    - name: Clear old package
+      raw: "rm -rf /QOpenSys/var/lib/rpm"
       args:
         executable: /qopensys/usr/bin/qsh
 
     - name: Write the content to the installation script on IBM i
       raw: "echo \"
-    CL:QSH CMD('touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstrap.sh > /tmp/bootstrap.log 2>&1');
+    CL:QSH CMD('/usr/bin/touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstrap.sh > /tmp/bootstrap.log 2>&1');
     \" >> /tmp/bootstrap.sql"
       args:
         executable: /qopensys/usr/bin/qsh 
@@ -38,5 +43,8 @@
         executable: /qopensys/usr/bin/qsh
       register: output_of_runsqlstm
       failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
+    
+    - set_fact:
+        yum_installed: true
 
   when: default_yum_existance.rc != 0

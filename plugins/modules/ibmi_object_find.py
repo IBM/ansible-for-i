@@ -67,7 +67,7 @@ options:
   iasp_name:
     description:
       - The auxiliary storage pool (ASP) where storage is allocated for the object.
-      - The default value is "*SYSBAS".
+      - The default value is C(*SYSBAS).
       - If an IASP name is specified, objects in this ASP group will be returned, including both SYSBAS and IASP.
     default: "*SYSBAS"
     type: str
@@ -238,7 +238,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

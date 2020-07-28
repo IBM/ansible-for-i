@@ -16,7 +16,7 @@
       when: package_path == ""
 
     - name: find out the name of python3 installation package
-      shell: ls {{package_path}}/{{python_version}}*.rpm 
+      shell: ls {{package_path}}/*.rpm 
       delegate_to: localhost
       register: python_file_list
 
@@ -37,7 +37,8 @@
       raw: ls -l {{remote_temp_dir}}/*.rpm 
 
     - name: install the package
-      raw: "/QOpensys/pkgs/bin/yum install {{remote_temp_dir}}/*.rpm -y"
+      raw: "/QOpensys/pkgs/bin/yum --disablerepo=ibm install {{remote_temp_dir}}/*.rpm -y"
+
   when: default_python_existance.rc != 0
 
 - block:
@@ -52,7 +53,7 @@
         loop_var: dependency
 
     - name: install the package
-      raw: "/QOpensys/pkgs/bin/yum install {{remote_temp_dir}}/*.rpm -y"
+      raw: "/QOpensys/pkgs/bin/yum --disablerepo=ibm install {{remote_temp_dir}}/*.rpm -y"
       when: has_rpm_to_be_installed
 
   when: default_python_existance.rc == 0

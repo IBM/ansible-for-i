@@ -25,7 +25,7 @@ options:
   name_list:
     description:
       - The name of the host server service.
-        The valid value are "*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP".
+        The valid value are C(*ALL), C(*CENTRAL), C(*DATABASE), C(*DTAQ), C(*FILE), C(*NETPRT), C(*RMTCMD), C(*SIGNON), C(*SVRMAP).
     type: list
     elements: str
     required: yes
@@ -147,7 +147,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 IBMi_STRSVR = "QSYS/STRHOSTSVR"
 IBMi_ENDSVR = "QSYS/ENDHOSTSVR"
 IBMi_HOST_SERVER_LIST = ["*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP"]

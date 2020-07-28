@@ -72,7 +72,7 @@ options:
     description:
       - The Accept Software Agreement command records the acceptance of the software agreement for a product.
         It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement.
-        This command cannot be used to accept the Licensed Internal Code or the IBM i *Base software agreements.
+        This command cannot be used to accept the Licensed Internal Code or the IBM i C(*Base) software agreements.
         If invalid command specificed, message CPDB6D5 with following reason will be received,
         'Product cannot be installed in a batch request because the software agreement has not been previously accepted'.
         In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don't know the command.
@@ -164,11 +164,10 @@ job_log:
     returned: always
 '''
 
-import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 
 
 def main():

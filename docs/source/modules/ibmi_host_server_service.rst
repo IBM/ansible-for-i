@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_host_server_service.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_host_server_service.pyy
 
 .. _ibmi_host_server_service_module:
 
+
 ibmi_host_server_service -- Manage host server
 ==============================================
+
 
 
 .. contents::
@@ -19,6 +18,8 @@ Synopsis
 --------
 - Manage and query IBM i host server service.
 - For non-IBM i targets, use the :ref:`service <service_module>` module instead.
+
+
 
 
 
@@ -47,7 +48,7 @@ joblog
 
      
 name_list
-  The name of the host server service. The valid value are "*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP".
+  The name of the host server service. The valid value are ``*ALL``, ``*CENTRAL``, ``*DATABASE``, ``*DTAQ``, ``*FILE``, ``*NETPRT``, ``*RMTCMD``, ``*SIGNON``, ``*SVRMAP``.
 
 
   | **required**: True
@@ -70,6 +71,7 @@ state
 
 
 
+
 Examples
 --------
 
@@ -85,12 +87,15 @@ Examples
 
 
 
+
+
 See Also
 --------
 
 .. seealso::
 
    - :ref:`service_module`
+
 
 
 Return Values
@@ -151,7 +156,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: +++ success STRHOSTSVR SERVER(*ALL)
+        | **sample**: +++ success STRHOSTSVR SERVER(\*ALL)
 
             
       
@@ -173,7 +178,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: STRHOSTSVR SERVER(*ALL)
+        | **sample**: STRHOSTSVR SERVER(\*ALL)
 
             
       

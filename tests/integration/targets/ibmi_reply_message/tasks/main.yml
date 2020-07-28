@@ -1,0 +1,123 @@
+# test code for the ibmi_query_message module
+# (c) 2020, zhaoyao <zhaoyao@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+#
+#Test procedure:
+#1. run CL on os400 to send an inquery message to QSYSOPR MSGQ
+#2. reply message with this module, verify the result
+#3. negative test:
+#   3.1 wrong parameter specified
+#
+  
+- block:
+  - set_fact:
+      random_number: "{{ 10000 | random }}"
+
+  - name: TC00 - Prepare msgq
+    ibmi_cl_command:
+      cmd: "CRTLIB CITST{{random_number}}"
+
+  - name: TC00 - prepare msgq
+    ibmi_cl_command:
+      cmd: "CRTMSGQ MSGQ(CITST{{random_number}}/CITESTMSGQ)"
+
+  - name: TC01 - Send an inquiry message to messsage queue
+
+    ibmi_cl_command: 
+      cmd: "QSYS/SNDMSG MSG('Ansible test for replying an inquiry message {{random_number}}') TOMSGQ(CITST{{random_number}}/CITESTMSGQ) MSGTYPE(*INQ) RPYMSGQ(CITST{{random_number}}/CITESTMSGQ)"
+
+  - name: TC01 - find the message sent just now      
+    ibmi_message:
+      operation: 'find'
+      message_queue: 'CITESTMSGQ'
+      message_lib: 'CITST{{random_number}}'
+      message_type: 'INQUIRY'  
+      message_text: 'Ansible test for replying an inquiry message {{random_number}}'
+    register: find_result
+
+  - set_fact:
+      returned_msg_key: "{{find_result.message_info[0]['MESSAGE_KEY']}}"
+      returned_msg_queue: "{{find_result.message_info[0]['MESSAGE_QUEUE_NAME']}}"
+      returned_msg_lib: "{{find_result.message_info[0]['MESSAGE_QUEUE_LIBRARY']}}"
+    when: find_result.message_info != []
+
+  - name: TC01 - reply a valid option to inquery message
+    ibmi_reply_message:
+      message_key: "{{returned_msg_key}}"
+      message_queue: "{{returned_msg_queue}}"
+      message_lib: "{{returned_msg_lib}}"
+      reply: OK
+      remove_message: "*NO"
+      joblog: True
+    register: rpl_result
+  
+  - name: TC01 - assert result
+    assert:
+      that:
+        - rpl_result.start is defined
+        - rpl_result.end is defined
+        - rpl_result.delta is defined
+        - rpl_result.stderr is defined
+        - rpl_result.rc == 0
+    #      - rpl_result.stdout_lines is defined
+    #      - rpl_result.stderr_lines is defined
+        - rpl_result.cmd is defined
+
+  - name: TC02 - negative test - send reply to a non-exist inquiry message - invalid lib
+    ibmi_reply_message:
+      message_key: "{{returned_msg_key}}"
+      message_queue: "{{returned_msg_queue}}"
+      message_lib: "DUMMYLIB"
+      reply: BAD_MSGLIB
+      joblog: True
+    ignore_errors: true
+    register: neg_result
+
+  - name: TC02 - assert result
+    assert:
+      that:
+        - neg_result.rc != 0
+        - neg_result.stderr != ""
+        - neg_result.job_log[0].MESSAGE_ID == "CPF2403"
+
+  - name: TC03 - negative test - send reply to a non-exist inquiry message - invalid key
+    ibmi_reply_message:
+      message_key: "9999"
+      message_queue: "{{returned_msg_queue}}"
+      message_lib: "{{returned_msg_lib}}"
+      reply: BAD_MSGKEY
+      joblog: True
+    ignore_errors: true
+    register: neg_result
+
+  - name: TC03 - assert result
+    assert:
+      that:
+        - neg_result.rc != 0
+        - neg_result.stderr != ""
+        - neg_result.job_log[0].MESSAGE_ID == "CPF2410"
+
+  - name: TC04 - negative test - send reply to a non-exist inquiry message - invalid msgq
+    ibmi_reply_message:
+      message_key: "{{returned_msg_key}}"
+      message_queue: "NONEXISTQ"
+      message_lib: "{{returned_msg_lib}}"
+      reply: BAD_MSGQ
+      joblog: True
+    ignore_errors: true
+    register: neg_result
+
+  - name: TC04 - assert result
+    assert:
+      that:
+        - neg_result.rc != 0
+        - neg_result.stderr != ""
+        - neg_result.job_log[0].MESSAGE_ID == "CPF2403"
+
+  always:     
+    - name: clear test env
+      ibmi_cl_command:
+        cmd: 'DLTLIB CITST{{random_number}}'
+      ignore_errors: true

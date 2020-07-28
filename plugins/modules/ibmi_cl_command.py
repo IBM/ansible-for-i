@@ -32,18 +32,18 @@ options:
     description:
       - Specifies the name of the ASP(Auxiliary Storage Pool) group to set for the current thread.
       - The ASP group name is the name of the primary ASP device within the ASP group.
-      - Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
+      - Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL, DSPHDWRSC.
     type: str
     default: '*SYSBAS'
   joblog:
     description:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
-      - Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL OUTPUT(*), DSPHDWRSC TYPE(*AHW) OUTPUT(*).
+      - Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL, DSPHDWRSC.
     type: bool
     default: False
 
 notes:
-    - CL command with OUTPUT parameter like 'DSPLIBL OUTPUT(*)', 'DSPHDWRSC TYPE(*AHW) OUTPUT(*)' does not have job log.
+    - CL command with OUTPUT parameter like DSPLIBL, DSPHDWRSC does not have job log.
     - CL command can also be run by C(command) module with simple stdout/stderr, put 'system' as the as first args in C(command) module.
     - The C(ibmi_cl_command) module can only run one CL command at a time.
 
@@ -148,7 +148,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 
 
 def main():

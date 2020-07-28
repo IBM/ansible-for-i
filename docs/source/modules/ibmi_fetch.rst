@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fetch.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fetch.pyy
 
 .. _ibmi_fetch_module:
 
+
 ibmi_fetch -- Fetch objects or a library from a remote IBM i node and store on local
 ====================================================================================
+
 
 
 .. contents::
@@ -20,6 +19,8 @@ Synopsis
 - The ``ibmi_feth`` is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in a file tree, organized by hostname.
 - Save file that already exists at dest will be overwritten if it is different than the new one.
 - For non-IBMi native targets, use the fetch module instead.
+
+
 
 
 
@@ -76,8 +77,8 @@ format
 
   | **required**: false
   | **type**: str
-  | **default**: *SAVF
-  | **choices**: *SAVF
+  | **default**: \*SAVF
+  | **choices**: \*SAVF
 
 
      
@@ -109,7 +110,7 @@ object_names
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
+  | **default**: \*ALL
 
 
      
@@ -121,7 +122,7 @@ object_types
 
   | **required**: false
   | **type**: str
-  | **default**: *ALL
+  | **default**: \*ALL
 
 
      
@@ -142,7 +143,7 @@ target_release
 
   | **required**: false
   | **type**: str
-  | **default**: *CURRENT
+  | **default**: \*CURRENT
 
 
      
@@ -153,6 +154,7 @@ validate_checksum
   | **required**: false
   | **type**: bool
   | **default**: True
+
 
 
 
@@ -180,6 +182,7 @@ Examples
 
 
 
+
 Notes
 -----
 
@@ -189,12 +192,14 @@ Notes
    Need install 5770SS1 option 39 on remote IBM i for regex usage
 
 
+
 See Also
 --------
 
 .. seealso::
 
    - :ref:`fetch_module`
+
 
 
 Return Values

@@ -19,7 +19,7 @@ short_description: Displays all currently active subsystems or currently active 
 version_added: '2.8'
 description:
     - The C(ibmi_display_subsystem) module displays all currently active subsystems or currently active jobs in a subsystem.
-    - In some ways it has equivalent results of WRKSBS if subsystem is C('*ALL'), otherwise, it has equivalent results of WRKSBSJOB.
+    - In some ways it has equivalent results of WRKSBS if subsystem is C(*ALL), otherwise, it has equivalent results of WRKSBSJOB.
 options:
   subsystem:
     description:
@@ -28,8 +28,8 @@ options:
     default: '*ALL'
   user:
     description:
-      - Specifies the name of the user whose jobs are displayed, C('*ALL') for all users.
-        If subsystem is C('*ALL'), this option is ignored.
+      - Specifies the name of the user whose jobs are displayed, C(*ALL) for all users.
+        If subsystem is C(*ALL), this option is ignored.
     type: str
     default: '*ALL'
   joblog:
@@ -112,7 +112,7 @@ job_log:
     returned: always
 subsystems:
     description: The list of the currently active subsystems.
-    returned: When rc as 0(success) and subsystem is C('*ALL').
+    returned: When rc as 0(success) and subsystem is C(*ALL).
     type: list
     sample: [
         "                                      Work with Subsystems                                       5/25/20 19:55:04        Page 0001",
@@ -131,7 +131,7 @@ subsystems:
     ]
 active_jobs:
     description: The result set
-    returned: When rc as 0(success) and subsystem is not C('*ALL').
+    returned: When rc as 0(success) and subsystem is not C(*ALL).
     type: list
     sample: [
         {
@@ -166,12 +166,10 @@ active_jobs:
     ]
 '''
 
-import datetime
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 
 
 def main():

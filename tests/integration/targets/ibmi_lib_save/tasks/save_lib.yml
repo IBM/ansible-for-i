@@ -106,17 +106,6 @@
       #failed_when: "'CPF5813' not in savlib_result.stderr"
       failed_when: "savlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF5813') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC07 Save lib with duplicated required options
-      ibmi_lib_save:
-        lib_name: 'SAVRST'
-        lib_name: 'ABC'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: true
-      register: savlib_result
-      #failed_when: "'ABC not found' not in savlib_result.stderr"
-      failed_when: "savlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3781') | map(attribute='MESSAGE_ID') | list | length == 0"
-
     - name: TC08 save lib with wrong library name
       ibmi_lib_save:
         lib_name: 'ABC'

@@ -4,10 +4,10 @@
 #ibmi-sql-sample.yml 
 #The sample file is to provide an example about how to create a table, insert a row, query the table and drop the table
 ---
-- hosts: ibmi
+- hosts: all
   gather_facts: no
   collections:
-   - ibm.power_ibmi
+    - ibm.power_ibmi
   
   tasks:
     - block:

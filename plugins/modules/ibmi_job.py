@@ -41,13 +41,13 @@ options:
     choices: ["*ALL", "*BATCH", "*INTERACT"]
   subsystem:
     description:
-      - The job subsystem filter. A valid subsystem name can be specified. Valid values are "*ALL" or subsystem name.
+      - The job subsystem filter. A valid subsystem name can be specified. Valid values are C(*ALL) or subsystem name.
     type: str
     default: "*ALL"
   user:
     description:
       - The user profile name to use as the job user filtering criteria.
-      - Valid values are user profile name, "*USER" or "*ALL".
+      - Valid values are user profile name, C(*USER) or C(*ALL).
     type: str
     default: "*ALL"
   submitter:
@@ -225,7 +225,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

@@ -45,7 +45,7 @@ options:
   scdday:
     description:
       - Specifies the day of the week on which the job is submitted.
-      - The valid value are '*NONE', '*ALL', '*MON', '*TUE', '*WED', '*THU', '*FRI', '*SAT', '*SUN'.
+      - The valid value are C(*NONE), C(*ALL), C(*MON), C(*TUE), C(*WED), C(*THU), C(*FRI), C(*SAT), C(*SUN).
     type: list
     elements: str
     default: "*NONE"
@@ -165,7 +165,7 @@ job_log:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 scdday_list = ['*NONE', '*ALL', '*MON', '*TUE', '*WED', '*THU', '*FRI', '*SAT', '*SUN']
 
 

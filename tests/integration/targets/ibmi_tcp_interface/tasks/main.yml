@@ -15,7 +15,7 @@
     subnet: "{{ip_interface_info.row[0]['SUBNET_MASK']}}"
     ifc_name: "ANSI_IFC1"
     ifc_ip_prefix: "192.168.0."
-    ip_postfix_list: [10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+    ip_postfix_list: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
 
 - name: Random generate an IP
   set_fact:
@@ -300,7 +300,7 @@
       assert:
         that:
           - 'tcp_result.cl_command == ""'
-          -  tcp_result.interface_info[0]['INTERFACE_STATUS'] == 'ACTIVE' 
+          - tcp_result.interface_info[0]['INTERFACE_STATUS'] == 'ACTIVE' 
 
     - name: TC11 start the ifc again
       ibmi_tcp_interface: 
@@ -365,5 +365,3 @@
     - include: cleanup.yml
       loop: '{{ifc_info.row}}'
       when: ifc_info.row | length > 0 
-
-

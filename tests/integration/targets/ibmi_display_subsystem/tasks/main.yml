@@ -177,5 +177,4 @@
       ibmi_display_subsystem: 
         abc: True
       register: neg_result
-      failed_when: "'Unsupported parameters' not in neg_result.msg" 
-
+      failed_when: "'Unsupported parameters' not in neg_result.msg"

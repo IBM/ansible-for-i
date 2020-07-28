@@ -1,4 +1,3 @@
-
 - name: TC21 display a not existing user profile 
   ibmi_user_and_group:
     operation: 'display'

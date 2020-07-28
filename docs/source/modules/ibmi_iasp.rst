@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_iasp.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_iasp.pyy
 
 .. _ibmi_iasp_module:
 
+
 ibmi_iasp -- Control IASP
 =========================
+
 
 
 .. contents::
@@ -24,6 +23,8 @@ Synopsis
 
 
 
+
+
 Parameters
 ----------
 
@@ -35,8 +36,8 @@ asp_type
 
   | **required**: false
   | **type**: str
-  | **default**: *PRIMARY
-  | **choices**: *PRIMARY, *SECONDARY, *UDFS
+  | **default**: \*PRIMARY
+  | **choices**: \*PRIMARY, \*SECONDARY, \*UDFS
 
 
      
@@ -111,17 +112,21 @@ synchronous
 
 
 
+
 Examples
 --------
 
 .. code-block:: yaml+jinja
 
    
-   - name: start host server service
+   - name: create an IASP
      ibmi_iasp:
        name: 'IASP1'
        operation: 'create'
        disks: ['DMP002', 'DMP019']
+
+
+
 
 
 
@@ -186,7 +191,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: CPCB719: Configure Device ASP *DELETE request completed.
+        | **sample**: CPCB719: Configure Device ASP \*DELETE request completed.
 
             
       
@@ -208,7 +213,7 @@ Return Values
       
         | **returned**: always
         | **type**: str
-        | **sample**: CFGDEVASP ASPDEV(YFTEST) ACTION(*DELETE) CONFIRM(*NO)
+        | **sample**: CFGDEVASP ASPDEV(YFTEST) ACTION(\*DELETE) CONFIRM(\*NO)
 
             
       

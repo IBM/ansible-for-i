@@ -64,7 +64,7 @@ options:
   controlled_end_delay_time:
     description:
       - Specifies the amount of time(1-99999), in seconds, that the system allows a controlled end to be performed by the active subsystems.
-      - If the value is greater than 99999, '*NOLIMIT' will be used in PWRDWNSYS commnad.
+      - If the value is greater than 99999, C(*NOLIMIT) will be used in PWRDWNSYS commnad.
     type: int
     default: 600
   reboot_type:
@@ -102,7 +102,7 @@ options:
     default: ''
 notes:
     - ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section.
-    - Be careful to use '*CNTRLD' for option how_to_end,
+    - Be careful to use C(*CNTRLD) for option how_to_end,
       you need to specify the appropriate value for all the timout options according to the system performance.
 seealso:
 - module: reboot

@@ -31,7 +31,7 @@ options:
     description:
       - The max time that the module waits for the submitted job is turned into expected status.
         It returns if the status of the submitted job is not turned into the expected status within the time_out time.
-        This option will be ignored if *NONE is specified for option status.
+        This option will be ignored if C(*NONE) is specified for option status.
     type: str
     default: "1m"
     required: false
@@ -39,15 +39,15 @@ options:
     description:
       - The expect status list. The module will wait for the job to be turned into one of the expected status specified.
         If one of the expect status specified matches the status of submitted job, it will return.
-        If *NONE is specified, the module will not wait for anything and return right after the job is submitted.
-        The valid options are "*NONE", "*ACTIVE", "*COMPLETE", "*JOBQ", "*OUTQ".
+        If C(*NONE) is specified, the module will not wait for anything and return right after the job is submitted.
+        The valid options are C(*NONE), C(*ACTIVE), C(*COMPLETE), C(*JOBQ), C(*OUTQ).
     type: list
     elements: str
     default: ["*NONE"]
   check_interval:
     description:
       - The time interval between current and next checks of the expected status of the submitted job.
-        This option will be ignored if *NONE is specified for option status.
+        This option will be ignored if C(*NONE) is specified for option status.
     type: str
     default: "1m"
     required: false
@@ -139,7 +139,7 @@ import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.0"
+__ibmi_module_version__ = "1.0.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
