@@ -3,7 +3,6 @@ __metaclass__ = type
 
 
 import os
-import re
 import json
 import datetime
 import tempfile
@@ -72,9 +71,13 @@ def itoolkit_init(db_name=SYSBAS):
             conn = dbi.connect(database='{db_pattern}'.format(db_pattern=db_name))
         else:
             conn = dbi.connect()
+        job_name_info = db2i_tools.get_current_job_name(conn)
+        log_info("Job of the connection to execute the task: {0}".format(job_name_info),
+                 "Connection Initialization")
     except Exception as e_db_connect:
         itoolkti_close_connection(conn)
-        raise Exception("Exception when connecting to IBM i Db2. {0}. Check if the database {1} existed or varied on".format(str(e_db_connect), db_name))
+        raise Exception("Exception when connecting to IBM i Db2. {0}. "
+                        "Check if the database {1} existed or varied on".format(str(e_db_connect), db_name))
     return conn
 
 

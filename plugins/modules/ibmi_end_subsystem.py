@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_end_subsystem
 short_description: End an active subsystem.
-version_added: "2.8"
+version_added: '2.8.0'
 description:
     - The C(ibmi_end_subsystem) module ends an active subsystem.
 options:

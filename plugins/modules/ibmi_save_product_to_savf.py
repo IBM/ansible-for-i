@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_save_product_to_savf
 short_description: Save the the licensed program(product) to a save file
-version_added: "2.8"
+version_added: '2.8.0'
 description:
     - the C(ibmi_save_product_to_savf) module saves the product to a save file.
 options:

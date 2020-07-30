@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_uninstall_product
 short_description: Delete the objects that make up the licensed program(product)
-version_added: "2.8"
+version_added: '2.8.0'
 description:
     - the C(ibmi_uninstall_product) module deletes the objects that make up the product.
 options:

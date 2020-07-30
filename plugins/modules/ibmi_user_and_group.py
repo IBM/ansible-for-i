@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_user_and_group
 short_description: Create, change or display a user(or group) profile
-version_added: '2.8'
+version_added: '2.8.0'
 description:
   - The C(ibmi_user_and_group) module can do the user(or group) profile management(create, change, delete and display).
   - A user profile contain a user's passwords, the list of special authorities assigned to a user, and the objects the user owns.

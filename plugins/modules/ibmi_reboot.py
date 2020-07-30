@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_reboot
 short_description: Reboot an IBM i machine
-version_added: "2.8"
+version_added: '2.8.0'
 description:
     - Reboot a IBM i machine, wait for it to go down, come back up, and respond to commands.
 options:

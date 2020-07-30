@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_install_product_from_savf
 short_description: Install the licensed program(product) from a save file.
-version_added: "2.8"
+version_added: '2.8.0'
 description:
     - The C(ibmi_install_product_from_savf) module installs the product from a save file.
 options:

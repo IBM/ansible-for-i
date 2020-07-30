@@ -143,6 +143,38 @@ def get_job_log(connection_id, job_name, time=None):
     return out
 
 
+def get_current_job_info(connection_id):
+    sql = "SELECT SUBSTR(JOB_NAME,1,6) AS JOB_NUMBER, " \
+          "SUBSTR(JOB_NAME,8,POSSTR(SUBSTR(JOB_NAME,8),'/')-1) AS JOB_USER, " \
+          "SUBSTR(SUBSTR(JOB_NAME,8),POSSTR(SUBSTR(JOB_NAME,8),'/')+1)  AS JOB_NAME, " \
+          "JOB_NAME AS FULL_JOB_NAME " \
+          "FROM TABLE (QSYS2.ACTIVE_JOB_INFO(JOB_NAME_FILTER => '*')) AS X"
+
+    out_result_set, err = ibm_dbi_sql_query(connection_id, sql)
+
+    out = []
+    if (out_result_set is None) and (err is None):
+        err = {"FATAL": "Job not found."}
+        out.append(err)
+    else:
+        for result in out_result_set:
+            result_map = {"JOB_NUMBER": result[0],
+                          "JOB_USER": result[1],
+                          "JOB_NAME": result[2],
+                          "FULL_JOB_NAME": result[3]
+                          }
+            out.append(result_map)
+    return out
+
+
+def get_current_job_name(connection_id):
+    out = get_current_job_info(connection_id)
+    if len(out) == 0:
+        return "Job name not available. "
+    else:
+        return out[0]["FULL_JOB_NAME"]
+
+
 def get_ibmi_release(connection_id):
     sql = "SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO"
     out_result_set, err = ibm_dbi_sql_query(connection_id, sql)

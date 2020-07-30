@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_iasp
 short_description: Control IASP
-version_added: '2.8'
+version_added: '2.8.0'
 description:
   - Control IASP.
   - For IBM i V7R2, PTF SI72162 is required.
