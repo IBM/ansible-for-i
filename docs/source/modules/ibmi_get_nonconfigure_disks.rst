@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_get_nonconfigure_disks.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_get_nonconfigure_disks.py
 
 .. _ibmi_get_nonconfigure_disks_module:
 
