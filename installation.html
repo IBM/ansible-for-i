@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
+  <title>Installing IBM i collection to Ansible server &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -84,10 +84,11 @@
             
               <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installing IBM i collection to Ansible server</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-using-ansible-galaxy">Installing using Ansible Galaxy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#enabling-ibm-i-nodes">Enabling IBM i nodes</a></li>
 </ul>
 </li>
 </ul>
@@ -141,7 +142,7 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Installation</li>
+      <li>Installing IBM i collection to Ansible server</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -162,11 +163,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>There are three options for installing the IBM i collection for Ansible:</p>
+  <div class="section" id="installing-ibm-i-collection-to-ansible-server">
+<h1>Installing IBM i collection to Ansible server<a class="headerlink" href="#installing-ibm-i-collection-to-ansible-server" title="Permalink to this headline">¶</a></h1>
+<p>There are two options to install IBM i collection for Ansible:</p>
 <ul>
-<li><p>Installing using Ansible Galaxy</p>
+<li><p>Installing from Ansible Galaxy</p>
 <p>Ansible Galaxy is the package manager for Ansible. The collection is published to Ansible Galaxy on a regular basis: <a class="reference external" href="https://galaxy.ansible.com/ibm/power_ibmi">https://galaxy.ansible.com/ibm/power_ibmi</a></p>
 <p>In order to install using Ansible Galaxy, you must:</p>
 <ol class="arabic simple">
@@ -185,7 +186,7 @@
 </ul>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p>In order to use this Ansible collection, you must have the following pre-requisite software installed and available:</p>
+<p>In order to use this Ansible collection, you must have the following pre-requisite software installed and available on your Ansible server:</p>
 <p><strong>Python v3.6+</strong></p>
 <blockquote>
 <div><p>Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc).
@@ -195,9 +196,9 @@ If you install Python from the package manager for your operating system, you mu
 <li><p>The unofficial Python version manager: <a class="reference external" href="https://github.com/pyenv/pyenv">https://github.com/pyenv/pyenv</a></p></li>
 </ul>
 </div></blockquote>
-<p><strong>Ansible v2.8+</strong></p>
+<p><strong>Ansible v2.9+</strong></p>
 <blockquote>
-<div><p>Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc). You can also install it using <code class="docutils literal notranslate"><span class="pre">pip</span></code>, the package manager for Python:</p>
+<div><p>Ansible can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc). You can also install it using <code class="docutils literal notranslate"><span class="pre">pip</span></code>, the package manager for Python:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">ansible</span>
 </pre></div>
 </div>
@@ -230,6 +231,55 @@ If you install Python from the package manager for your operating system, you mu
 <li><p>Install the collection, replacing <code class="docutils literal notranslate"><span class="pre">x.y.z</span></code> with the current version:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">ibm</span><span class="o">-</span><span class="n">power_ibmi</span><span class="o">-</span><span class="n">x</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="enabling-ibm-i-nodes">
+<h2>Enabling IBM i nodes<a class="headerlink" href="#enabling-ibm-i-nodes" title="Permalink to this headline">¶</a></h2>
+<p>Before IBM i systems can be managed-nodes of Ansible, a few dependencies have to be installed on IBM i.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>5733SC1 Base and Option 1</p></li>
+<li><p>5770DG1</p></li>
+<li><p>python3</p></li>
+<li><p>python3-itoolkit</p></li>
+<li><p>python3-ibm_db</p></li>
+</ul>
+</div></blockquote>
+<p>1. 5733SC1 and 5770DG1 are license programs, you can download them at
+<a class="reference external" href="http://www-304.ibm.com/servers/eserver/ess/index.wss">http://www-304.ibm.com/servers/eserver/ess/index.wss</a>.</p>
+<ol class="arabic simple" start="2">
+<li><p>python3, python3-itoolkit, python3-ibm_db are open source packages. There are a few ways to install these packages and you could choose from one of them.</p></li>
+</ol>
+<dl class="simple">
+<dt><strong>Installing rpm packages manually</strong></dt><dd><p>Rpm packages can be installed via ‘yum’ packages manager on IBM i. However, yum is not shipped by IBM i by default.
+Refer the guide here to install yum <a class="reference external" href="https://bitbucket.org/ibmi/opensource/src/master/docs/yum/">https://bitbucket.org/ibmi/opensource/src/master/docs/yum/</a>. Then install these packages by below command:</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Qopensys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">python3</span> <span class="n">python3</span><span class="o">-</span><span class="n">itoolkit</span> <span class="n">python3</span><span class="o">-</span><span class="n">ibm_db</span>
+</pre></div>
+</div>
+<p><strong>Installing rpm packages automatically onto IBM i systems which can access internet</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="p">)</span> <span class="n">Make</span> <span class="n">sure</span> <span class="n">you</span> <span class="n">have</span> <span class="n">IBM</span> <span class="n">i</span> <span class="n">collection</span> <span class="n">installed</span> <span class="n">on</span> <span class="n">your</span> <span class="n">Ansible</span> <span class="n">server</span><span class="o">.</span>
+<span class="mi">2</span><span class="p">)</span> <span class="n">Issue</span> <span class="n">below</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">order</span> <span class="n">to</span> <span class="n">use</span> <span class="n">setup</span> <span class="n">playbook</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">IBM</span> <span class="n">i</span><span class="p">:</span>
+<span class="n">cd</span> <span class="o">~/.</span><span class="n">ansible</span><span class="o">/</span><span class="n">collections</span><span class="o">/</span><span class="n">ansible_collections</span><span class="o">/</span><span class="n">ibm</span><span class="o">/</span><span class="n">power_ibmi</span><span class="o">/</span><span class="n">playbooks</span>
+<span class="mi">3</span><span class="p">)</span> <span class="n">Input</span> <span class="n">information</span> <span class="n">of</span> <span class="n">target</span> <span class="n">IBM</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">host_ibmi</span><span class="o">.</span><span class="n">ini</span> <span class="ow">in</span> <span class="n">order</span> <span class="n">to</span> <span class="n">run</span> <span class="n">playbooks</span><span class="o">.</span>
+<span class="mi">4</span><span class="p">)</span> <span class="n">Run</span> <span class="n">setup</span> <span class="n">play</span> <span class="n">book</span> <span class="k">with</span> <span class="n">below</span> <span class="n">command</span><span class="p">:</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">host_ibmi</span><span class="o">.</span><span class="n">ini</span> <span class="n">enable</span><span class="o">-</span><span class="n">ansible</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">i</span><span class="o">/</span><span class="n">setup</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Installing rpm packages automatically onto IBM i systems which are offline</strong></dt><dd><p>An ‘Offline’ IBM i means that the IBM i system cannot connect to the internet and is not able to access <a class="reference external" href="https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/">https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/</a>.
+Before installing them, you can download installation packages to Ansible server.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="p">)</span> <span class="n">Make</span> <span class="n">sure</span> <span class="n">you</span> <span class="n">have</span> <span class="n">IBM</span> <span class="n">i</span> <span class="n">collection</span> <span class="n">installed</span> <span class="n">on</span> <span class="n">your</span> <span class="n">Ansible</span> <span class="n">server</span><span class="o">.</span>
+<span class="mi">2</span><span class="p">)</span> <span class="n">Issue</span> <span class="n">below</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">order</span> <span class="n">to</span> <span class="n">use</span> <span class="n">setup</span> <span class="n">playbook</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">IBM</span> <span class="n">i</span><span class="p">:</span>
+<span class="n">cd</span> <span class="o">~/.</span><span class="n">ansible</span><span class="o">/</span><span class="n">collections</span><span class="o">/</span><span class="n">ansible_collections</span><span class="o">/</span><span class="n">ibm</span><span class="o">/</span><span class="n">power_ibmi</span><span class="o">/</span><span class="n">playbooks</span>
+<span class="mi">3</span><span class="p">)</span> <span class="n">Input</span> <span class="n">information</span> <span class="n">of</span> <span class="n">target</span> <span class="n">IBM</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">host_ibmi</span><span class="o">.</span><span class="n">ini</span> <span class="ow">in</span> <span class="n">order</span> <span class="n">to</span> <span class="n">run</span> <span class="n">playbooks</span><span class="o">.</span>
+<span class="mi">4</span><span class="p">)</span> <span class="n">Follow</span> <span class="n">the</span> <span class="n">steps</span> <span class="ow">in</span> <span class="o">~/.</span><span class="n">ansible</span><span class="o">/</span><span class="n">collections</span><span class="o">/</span><span class="n">ansible_collections</span><span class="o">/</span><span class="n">ibm</span><span class="o">/</span><span class="n">power_ibmi</span><span class="o">/</span><span class="n">playbooks</span><span class="o">/</span><span class="n">enable_offline_ibmi</span><span class="o">/</span><span class="n">README</span><span class="o">.</span><span class="n">md</span>
+<span class="mi">5</span><span class="p">)</span> <span class="n">Run</span> <span class="n">playbook</span> <span class="k">with</span> <span class="n">below</span> <span class="n">command</span><span class="o">.</span> <span class="n">The</span> <span class="n">command</span> <span class="n">assumes</span> <span class="n">that</span> <span class="n">the</span> <span class="n">installation</span> <span class="n">packages</span> <span class="n">are</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ibmi</span><span class="o">-</span><span class="n">packages</span> <span class="n">directory</span> <span class="n">of</span> <span class="n">Ansible</span> <span class="n">server</span><span class="o">.</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">inventory</span> <span class="n">enable_offline_ibmi</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;package_path=/tmp/ibmi-packages&#39;</span>
 </pre></div>
 </div>
 </div>

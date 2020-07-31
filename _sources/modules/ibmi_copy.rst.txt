@@ -1,13 +1,12 @@
-..
-.. SPDX-License-Identifier: Apache-2.0
-..
 
 :github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_copy.py
 
 .. _ibmi_copy_module:
 
+
 ibmi_copy -- Copy a save file from local to a remote IBM i node
 ===============================================================
+
 
 
 .. contents::
@@ -20,6 +19,8 @@ Synopsis
 - The ``ibmi_copy`` copies a save file from local to a remote IBM i node.
 - ``ibmi_copy`` will not restore save file on IBM i node.
 - For non-IBMi native targets, use the copy module instead.
+
+
 
 
 
@@ -74,6 +75,7 @@ src
 
 
 
+
 Examples
 --------
 
@@ -89,11 +91,13 @@ Examples
 
 
 
+
 Notes
 -----
 
 .. note::
    ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
+
 
 
 See Also
@@ -102,6 +106,7 @@ See Also
 .. seealso::
 
    - :ref:`copy_module`
+
 
 
 Return Values

@@ -84,7 +84,7 @@
             
               <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing IBM i collection to Ansible server</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Reference</span></p>
 <ul class="current">
@@ -95,6 +95,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL(Control language) command</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBM i node</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – Vary on or off target device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – Displays the PTF(Program Temporary Fix) information and also get the requisite PTFs information of the PTF</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – Displays all currently active subsystems or currently active jobs in a subsystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – End an active subsystem.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
@@ -108,11 +109,14 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_module_config.html">ibmi_module_config – Configures managed nodes settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, revoke or display object authority</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_query_job_log.html">ibmi_query_job_log – Query the specfic job log.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot an IBM i machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reply_message.html">ibmi_reply_message – Send a reply message to the sender of an inquiry message</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_save_product_to_savf.html">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file</a></li>
@@ -122,6 +126,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sysval.html">ibmi_sysval – Displays the specified system value</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_interface.html">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_tcp_server_service – Manage tcp server</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
@@ -213,22 +218,22 @@
 <span id="ibmi-tcp-server-service-module"></span><h1>ibmi_tcp_server_service – Manage tcp server<a class="headerlink" href="#ibmi-tcp-server-service-manage-tcp-server" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#synopsis" id="id77">Synopsis</a></p></li>
-<li><p><a class="reference internal" href="#parameters" id="id78">Parameters</a></p></li>
-<li><p><a class="reference internal" href="#examples" id="id79">Examples</a></p></li>
-<li><p><a class="reference internal" href="#see-also" id="id80">See Also</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id81">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id4">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id5">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id77">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Manage and query IBMi tcp server service.</p></li>
 <li><p>For non-IBMi targets, use the <span class="xref std std-ref">service</span> module instead.</p></li>
 </ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id78">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
 <dt>extra_parameters</dt><dd><p>Extra parameter is appended at the end of tcp server service command.</p>
 <div class="line-block">
@@ -243,7 +248,7 @@
 <div class="line"><strong>type</strong>: bool</div>
 </div>
 </dd>
-<dt>name_list</dt><dd><p>The name of the tcp server service. The valid value are “<a href="#id1"><span class="problematic" id="id2">*</span></a>ALL”, “<a href="#id3"><span class="problematic" id="id4">*</span></a>AUTOSTART”, “<a href="#id5"><span class="problematic" id="id6">*</span></a>BOOTP”, “<a href="#id7"><span class="problematic" id="id8">*</span></a>DBG”, “<a href="#id9"><span class="problematic" id="id10">*</span></a>DDM”, “<a href="#id11"><span class="problematic" id="id12">*</span></a>DHCP”, “<a href="#id13"><span class="problematic" id="id14">*</span></a>DIRSRV”, “<a href="#id15"><span class="problematic" id="id16">*</span></a>DLFM”, “<a href="#id17"><span class="problematic" id="id18">*</span></a>DNS”, “<a href="#id19"><span class="problematic" id="id20">*</span></a>DOMINO”, “<a href="#id21"><span class="problematic" id="id22">*</span></a>EDRSQL”, “<a href="#id23"><span class="problematic" id="id24">*</span></a>FTP”, “<a href="#id25"><span class="problematic" id="id26">*</span></a>HTTP”, “<a href="#id27"><span class="problematic" id="id28">*</span></a>HOD”, “<a href="#id29"><span class="problematic" id="id30">*</span></a>IAS”, “<a href="#id31"><span class="problematic" id="id32">*</span></a>INETD”, “<a href="#id33"><span class="problematic" id="id34">*</span></a>LPD”, “<a href="#id35"><span class="problematic" id="id36">*</span></a>MGTC”, “<a href="#id37"><span class="problematic" id="id38">*</span></a>NETSVR”, “<a href="#id39"><span class="problematic" id="id40">*</span></a>NSLD”, “<a href="#id41"><span class="problematic" id="id42">*</span></a>NTP”, “<a href="#id43"><span class="problematic" id="id44">*</span></a>ODPA”, “<a href="#id45"><span class="problematic" id="id46">*</span></a>OMPROUTED”, “<a href="#id47"><span class="problematic" id="id48">*</span></a>ONDMD”, “<a href="#id49"><span class="problematic" id="id50">*</span></a>POP”, “<a href="#id51"><span class="problematic" id="id52">*</span></a>QOS”, “<a href="#id53"><span class="problematic" id="id54">*</span></a>REXEC”, “<a href="#id55"><span class="problematic" id="id56">*</span></a>ROUTED”, “<a href="#id57"><span class="problematic" id="id58">*</span></a>SLP”, “<a href="#id59"><span class="problematic" id="id60">*</span></a>SMTP”, “<a href="#id61"><span class="problematic" id="id62">*</span></a>SNMP”, “<a href="#id63"><span class="problematic" id="id64">*</span></a>SRVSPTPRX”, “<a href="#id65"><span class="problematic" id="id66">*</span></a>SSHD”, “<a href="#id67"><span class="problematic" id="id68">*</span></a>TCM”, “<a href="#id69"><span class="problematic" id="id70">*</span></a>TELNET”, “<a href="#id71"><span class="problematic" id="id72">*</span></a>TFTP”, “<a href="#id73"><span class="problematic" id="id74">*</span></a>VPN”, “<a href="#id75"><span class="problematic" id="id76">*</span></a>WEBFACING”.</p>
+<dt>name_list</dt><dd><p>The name of the tcp server service. The valid value are <code class="docutils literal notranslate"><span class="pre">*ALL</span></code>, <code class="docutils literal notranslate"><span class="pre">*AUTOSTART</span></code>, <code class="docutils literal notranslate"><span class="pre">*BOOTP</span></code>, <code class="docutils literal notranslate"><span class="pre">*DBG</span></code>, <code class="docutils literal notranslate"><span class="pre">*DDM</span></code>, <code class="docutils literal notranslate"><span class="pre">*DHCP</span></code>, <code class="docutils literal notranslate"><span class="pre">*DIRSRV</span></code>, <code class="docutils literal notranslate"><span class="pre">*DLFM</span></code>, <code class="docutils literal notranslate"><span class="pre">*DNS</span></code>, <code class="docutils literal notranslate"><span class="pre">*DOMINO</span></code>, <code class="docutils literal notranslate"><span class="pre">*EDRSQL</span></code>, <code class="docutils literal notranslate"><span class="pre">*FTP</span></code>, <code class="docutils literal notranslate"><span class="pre">*HTTP</span></code>, <code class="docutils literal notranslate"><span class="pre">*HOD</span></code>, <code class="docutils literal notranslate"><span class="pre">*IAS</span></code>, <code class="docutils literal notranslate"><span class="pre">*INETD</span></code>, <code class="docutils literal notranslate"><span class="pre">*LPD</span></code>, <code class="docutils literal notranslate"><span class="pre">*MGTC</span></code>, <code class="docutils literal notranslate"><span class="pre">*NETSVR</span></code>, <code class="docutils literal notranslate"><span class="pre">*NSLD</span></code>, <code class="docutils literal notranslate"><span class="pre">*NTP</span></code>, <code class="docutils literal notranslate"><span class="pre">*ODPA</span></code>, <code class="docutils literal notranslate"><span class="pre">*OMPROUTED</span></code>, <code class="docutils literal notranslate"><span class="pre">*ONDMD</span></code>, <code class="docutils literal notranslate"><span class="pre">*POP</span></code>, <code class="docutils literal notranslate"><span class="pre">*QOS</span></code>, <code class="docutils literal notranslate"><span class="pre">*REXEC</span></code>, <code class="docutils literal notranslate"><span class="pre">*ROUTED</span></code>, <code class="docutils literal notranslate"><span class="pre">*SLP</span></code>, <code class="docutils literal notranslate"><span class="pre">*SMTP</span></code>, <code class="docutils literal notranslate"><span class="pre">*SNMP</span></code>, <code class="docutils literal notranslate"><span class="pre">*SRVSPTPRX</span></code>, <code class="docutils literal notranslate"><span class="pre">*SSHD</span></code>, <code class="docutils literal notranslate"><span class="pre">*TCM</span></code>, <code class="docutils literal notranslate"><span class="pre">*TELNET</span></code>, <code class="docutils literal notranslate"><span class="pre">*TFTP</span></code>, <code class="docutils literal notranslate"><span class="pre">*VPN</span></code>, <code class="docutils literal notranslate"><span class="pre">*WEBFACING</span></code>.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: True</div>
 <div class="line"><strong>type</strong>: list</div>
@@ -262,7 +267,7 @@
 </dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id79">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">start tcp server service</span>
   <span class="nt">ibmi_tcp_server_service</span><span class="p">:</span>
     <span class="nt">name_list</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;*SSH&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;*HTTP&#39;</span><span class="p p-Indicator">]</span>
@@ -272,7 +277,7 @@
 </div>
 </div>
 <div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id80">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -281,7 +286,7 @@
 </div>
 </div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id81">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl>
 <dt>job_log</dt><dd><div class="line-block">

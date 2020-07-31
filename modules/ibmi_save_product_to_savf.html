@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="ibmi_script – Execute a local cl/sql script file." href="ibmi_script.html" />
-    <link rel="prev" title="ibmi_reboot – Reboot an IBM i machine" href="ibmi_reboot.html" /> 
+    <link rel="prev" title="ibmi_reply_message – Send a reply message to the sender of an inquiry message" href="ibmi_reply_message.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,7 +84,7 @@
             
               <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing IBM i collection to Ansible server</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Reference</span></p>
 <ul class="current">
@@ -95,6 +95,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL(Control language) command</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBM i node</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – Vary on or off target device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – Displays the PTF(Program Temporary Fix) information and also get the requisite PTFs information of the PTF</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – Displays all currently active subsystems or currently active jobs in a subsystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – End an active subsystem.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
@@ -108,11 +109,14 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_module_config.html">ibmi_module_config – Configures managed nodes settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, revoke or display object authority</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_query_job_log.html">ibmi_query_job_log – Query the specfic job log.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot an IBM i machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reply_message.html">ibmi_reply_message – Send a reply message to the sender of an inquiry message</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
@@ -129,6 +133,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sysval.html">ibmi_sysval – Displays the specified system value</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_interface.html">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – Delete the objects that make up the licensed program(product)</a></li>
@@ -213,28 +218,28 @@
 <span id="ibmi-save-product-to-savf-module"></span><h1>ibmi_save_product_to_savf – Save the the licensed program(product) to a save file<a class="headerlink" href="#ibmi-save-product-to-savf-save-the-the-licensed-program-product-to-a-save-file" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#synopsis" id="id35">Synopsis</a></p></li>
-<li><p><a class="reference internal" href="#parameters" id="id36">Parameters</a></p></li>
-<li><p><a class="reference internal" href="#examples" id="id37">Examples</a></p></li>
-<li><p><a class="reference internal" href="#see-also" id="id38">See Also</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id39">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id4">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id5">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id35">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>the <code class="docutils literal notranslate"><span class="pre">ibmi_save_product_to_savf</span></code> module saves the product to a save file.</p></li>
 </ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id36">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
 <dt>check_signature</dt><dd><p>Specifies if the digital signatures of objects being saved with the licensed program are to be checked.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id1"><span class="problematic" id="id2">*</span></a>SIGNED</div>
-<div class="line"><strong>choices</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>SIGNED, <a href="#id5"><span class="problematic" id="id6">*</span></a>ALL, <a href="#id7"><span class="problematic" id="id8">*</span></a>NONE</div>
+<div class="line"><strong>default</strong>: *SIGNED</div>
+<div class="line"><strong>choices</strong>: *SIGNED, *ALL, *NONE</div>
 </div>
 </dd>
 <dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable job log even the rc is 0(success).</p>
@@ -245,31 +250,31 @@
 </dd>
 <dt>language</dt><dd><p>Specifies which national language version (NLV) is used for the save operation.</p>
 <p>It’s the IBM-supplied language feature codes, like German is 2924, English is 2924.</p>
-<p>This parameter is ignored when object_type(<a href="#id9"><span class="problematic" id="id10">*</span></a>PGM) is specified.</p>
+<p>This parameter is ignored when object_type <code class="docutils literal notranslate"><span class="pre">*PGM</span></code> is specified.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id11"><span class="problematic" id="id12">*</span></a>PRIMARY</div>
+<div class="line"><strong>default</strong>: *PRIMARY</div>
 </div>
 </dd>
 <dt>object_type</dt><dd><p>Specifies the type of licensed program objects being saved.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id13"><span class="problematic" id="id14">*</span></a>ALL</div>
-<div class="line"><strong>choices</strong>: <a href="#id15"><span class="problematic" id="id16">*</span></a>ALL, <a href="#id17"><span class="problematic" id="id18">*</span></a>PGM, <a href="#id19"><span class="problematic" id="id20">*</span></a>LNG</div>
+<div class="line"><strong>default</strong>: *ALL</div>
+<div class="line"><strong>choices</strong>: *ALL, *PGM, *LNG</div>
 </div>
 </dd>
 <dt>option</dt><dd><p>Specifies the optional parts of the licensed program given in the Product prompt (LICPGM parameter) that are saved.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id21"><span class="problematic" id="id22">*</span></a>BASE</div>
+<div class="line"><strong>default</strong>: *BASE</div>
 </div>
 </dd>
 <dt>parameters</dt><dd><p>The parameters that SAVLICPGM command will take. Other than options above, all other parameters need to be specified here.</p>
 <p>The default values of parameters for SAVLICPGM will be taken if not specified.</p>
-<p>Parameter CLEAR in SAVLICPGM command should not be specified here, ‘CLEAR(<a href="#id23"><span class="problematic" id="id24">*</span></a>ALL)’ already used.</p>
+<p>Parameter CLEAR in SAVLICPGM command should not be specified here, <code class="docutils literal notranslate"><span class="pre">CLEAR(*ALL</span></code>) already used.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
@@ -286,7 +291,7 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id25"><span class="problematic" id="id26">*</span></a>ONLY</div>
+<div class="line"><strong>default</strong>: *ONLY</div>
 </div>
 </dd>
 <dt>savf_library</dt><dd><p>Specify the name of the library where the save file is located, if it is not existed, will create it.</p>
@@ -305,13 +310,13 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id27"><span class="problematic" id="id28">*</span></a>CURRENT</div>
+<div class="line"><strong>default</strong>: *CURRENT</div>
 </div>
 </dd>
 </dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id37">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Saving Program using Defaults.</span>
   <span class="nt">ibmi_save_product_to_savf</span><span class="p">:</span>
     <span class="nt">product</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5770WDS</span>
@@ -328,7 +333,7 @@
 </div>
 </div>
 <div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id38">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -337,7 +342,7 @@
 </div>
 </div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id39">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl>
 <dt>stdout</dt><dd><div class="line-block">
@@ -346,7 +351,7 @@
 <div class="line-block">
 <div class="line"><strong>returned</strong>: When rc as 0(success)</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: +++ success SAVLICPGM LICPGM(5733D10) DEV(<a href="#id29"><span class="problematic" id="id30">*</span></a>SAVF) OPTION(<a href="#id31"><span class="problematic" id="id32">*</span></a>BASE) RSTOBJ(<a href="#id33"><span class="problematic" id="id34">*</span></a>ALL)</div>
+<div class="line"><strong>sample</strong>: +++ success SAVLICPGM LICPGM(5733D10) DEV(*SAVF) OPTION(*BASE) RSTOBJ(*ALL)</div>
 </div>
 </dd>
 <dt>stderr</dt><dd><div class="line-block">
@@ -425,7 +430,7 @@
         <a href="ibmi_script.html" class="btn btn-neutral float-right" title="ibmi_script – Execute a local cl/sql script file." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="ibmi_reboot.html" class="btn btn-neutral float-left" title="ibmi_reboot – Reboot an IBM i machine" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ibmi_reply_message.html" class="btn btn-neutral float-left" title="ibmi_reply_message – Send a reply message to the sender of an inquiry message" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

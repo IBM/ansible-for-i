@@ -36,8 +36,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ibmi_save_product_to_savf – Save the the licensed program(product) to a save file" href="ibmi_save_product_to_savf.html" />
-    <link rel="prev" title="ibmi_object_save – Save one or more objects" href="ibmi_object_save.html" /> 
+    <link rel="next" title="ibmi_reply_message – Send a reply message to the sender of an inquiry message" href="ibmi_reply_message.html" />
+    <link rel="prev" title="ibmi_query_job_log – Query the specfic job log." href="ibmi_query_job_log.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,7 +84,7 @@
             
               <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing IBM i collection to Ansible server</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Reference</span></p>
 <ul class="current">
@@ -95,6 +95,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL(Control language) command</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBM i node</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – Vary on or off target device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – Displays the PTF(Program Temporary Fix) information and also get the requisite PTFs information of the PTF</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – Displays all currently active subsystems or currently active jobs in a subsystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – End an active subsystem.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
@@ -108,10 +109,12 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_module_config.html">ibmi_module_config – Configures managed nodes settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, revoke or display object authority</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_query_job_log.html">ibmi_query_job_log – Query the specfic job log.</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_reboot – Reboot an IBM i machine</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
@@ -121,6 +124,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reply_message.html">ibmi_reply_message – Send a reply message to the sender of an inquiry message</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_save_product_to_savf.html">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file</a></li>
@@ -130,6 +134,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sysval.html">ibmi_sysval – Displays the specified system value</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_interface.html">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – Delete the objects that make up the licensed program(product)</a></li>
@@ -214,22 +219,22 @@
 <span id="ibmi-reboot-module"></span><h1>ibmi_reboot – Reboot an IBM i machine<a class="headerlink" href="#ibmi-reboot-reboot-an-ibm-i-machine" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#synopsis" id="id43">Synopsis</a></p></li>
-<li><p><a class="reference internal" href="#parameters" id="id44">Parameters</a></p></li>
-<li><p><a class="reference internal" href="#examples" id="id45">Examples</a></p></li>
-<li><p><a class="reference internal" href="#notes" id="id46">Notes</a></p></li>
-<li><p><a class="reference internal" href="#see-also" id="id47">See Also</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id48">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id4">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id5">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id6">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
-<h2><a class="toc-backref" href="#id43">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Reboot a IBM i machine, wait for it to go down, come back up, and respond to commands.</p></li>
 </ul>
 </div>
 <div class="section" id="parameters">
-<h2><a class="toc-backref" href="#id44">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
 <dt>connect_timeout</dt><dd><p>Maximum seconds to wait for a successful connection to the managed hosts before trying again.</p>
 <p>If unspecified, the default setting for the underlying connection plugin is used.</p>
@@ -240,7 +245,7 @@
 </div>
 </dd>
 <dt>controlled_end_delay_time</dt><dd><p>Specifies the amount of time(1-99999), in seconds, that the system allows a controlled end to be performed by the active subsystems.</p>
-<p>If the value is greater than 99999, ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>NOLIMIT’ will be used in PWRDWNSYS commnad.</p>
+<p>If the value is greater than 99999, <code class="docutils literal notranslate"><span class="pre">*NOLIMIT</span></code> will be used in PWRDWNSYS commnad.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: int</div>
@@ -251,24 +256,24 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id3"><span class="problematic" id="id4">*</span></a>DFT</div>
-<div class="line"><strong>choices</strong>: <a href="#id5"><span class="problematic" id="id6">*</span></a>DFT, <a href="#id7"><span class="problematic" id="id8">*</span></a>NOJOBLOG, <a href="#id9"><span class="problematic" id="id10">*</span></a>CHGPTY, <a href="#id11"><span class="problematic" id="id12">*</span></a>CHGTSL</div>
+<div class="line"><strong>default</strong>: *DFT</div>
+<div class="line"><strong>choices</strong>: *DFT, *NOJOBLOG, *CHGPTY, *CHGTSL</div>
 </div>
 </dd>
 <dt>how_to_end</dt><dd><p>Specifies whether the system allows the active subsystem to end processing of active jobs in a controlled manner. or whether the system ends the jobs immediately. In either case, the system does perform certain job-cleanup functions.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id13"><span class="problematic" id="id14">*</span></a>IMMED</div>
-<div class="line"><strong>choices</strong>: <a href="#id15"><span class="problematic" id="id16">*</span></a>IMMED, <a href="#id17"><span class="problematic" id="id18">*</span></a>CNTRLD</div>
+<div class="line"><strong>default</strong>: *IMMED</div>
+<div class="line"><strong>choices</strong>: *IMMED, *CNTRLD</div>
 </div>
 </dd>
 <dt>ipl_source</dt><dd><p>Specifies whether an initial-program-load (IPL) is started from the A-source, B-source or D-source of the system.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id19"><span class="problematic" id="id20">*</span></a>PANEL</div>
-<div class="line"><strong>choices</strong>: <a href="#id21"><span class="problematic" id="id22">*</span></a>PANEL, A, B, D, <a href="#id23"><span class="problematic" id="id24">*</span></a>IMGCLG</div>
+<div class="line"><strong>default</strong>: *PANEL</div>
+<div class="line"><strong>choices</strong>: *PANEL, A, B, D, *IMGCLG</div>
 </div>
 </dd>
 <dt>msg</dt><dd><p>Message to display to users before reboot.</p>
@@ -314,8 +319,8 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id25"><span class="problematic" id="id26">*</span></a>IPLA</div>
-<div class="line"><strong>choices</strong>: <a href="#id27"><span class="problematic" id="id28">*</span></a>IPLA, <a href="#id29"><span class="problematic" id="id30">*</span></a>SYS, <a href="#id31"><span class="problematic" id="id32">*</span></a>FULL</div>
+<div class="line"><strong>default</strong>: *IPLA</div>
+<div class="line"><strong>choices</strong>: *IPLA, *SYS, *FULL</div>
 </div>
 </dd>
 <dt>test_command</dt><dd><p>Command to run on the rebooted host and expect success from to determine the machine is ready for further tasks.</p>
@@ -330,14 +335,14 @@
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: <a href="#id33"><span class="problematic" id="id34">*</span></a>CONTINUE</div>
-<div class="line"><strong>choices</strong>: <a href="#id35"><span class="problematic" id="id36">*</span></a>CONTINUE, <a href="#id37"><span class="problematic" id="id38">*</span></a>MSD, <a href="#id39"><span class="problematic" id="id40">*</span></a>SYSREFCDE</div>
+<div class="line"><strong>default</strong>: *CONTINUE</div>
+<div class="line"><strong>choices</strong>: *CONTINUE, *MSD, *SYSREFCDE</div>
 </div>
 </dd>
 </dl>
 </div>
 <div class="section" id="examples">
-<h2><a class="toc-backref" href="#id45">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Unconditionally reboot the machine with all defaults</span>
   <span class="nt">reboot</span><span class="p">:</span>
 
@@ -348,15 +353,15 @@
 </div>
 </div>
 <div class="section" id="notes">
-<h2><a class="toc-backref" href="#id46">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section.</p>
-<p>Be careful to use ‘<a href="#id41"><span class="problematic" id="id42">*</span></a>CNTRLD’ for option how_to_end, you need to specify the appropriate value for all the timout options according to the system performance.</p>
+<p>Be careful to use <code class="docutils literal notranslate"><span class="pre">*CNTRLD</span></code> for option how_to_end, you need to specify the appropriate value for all the timout options according to the system performance.</p>
 </div>
 </div>
 <div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id47">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -365,7 +370,7 @@
 </div>
 </div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id48">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl>
 <dt>rebooted</dt><dd><div class="line-block">
@@ -404,10 +409,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="ibmi_save_product_to_savf.html" class="btn btn-neutral float-right" title="ibmi_save_product_to_savf – Save the the licensed program(product) to a save file" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="ibmi_reply_message.html" class="btn btn-neutral float-right" title="ibmi_reply_message – Send a reply message to the sender of an inquiry message" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="ibmi_object_save.html" class="btn btn-neutral float-left" title="ibmi_object_save – Save one or more objects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ibmi_query_job_log.html" class="btn btn-neutral float-left" title="ibmi_query_job_log – Query the specfic job log." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

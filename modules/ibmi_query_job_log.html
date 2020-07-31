@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ibmi_query_job_log – Query the specfic job log. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ibmi_reboot – Reboot an IBM i machine" href="ibmi_reboot.html" />
+    <link rel="prev" title="ibmi_object_save – Save one or more objects" href="ibmi_object_save.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> IBM power_ibmi collection
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing IBM i collection to Ansible server</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">Plugins</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../modules.html#module-reference">Module reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ibmi_at.html">ibmi_at – Schedule a batch job</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_cl_command.html">ibmi_cl_command – Executes a CL(Control language) command</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_copy.html">ibmi_copy – Copy a save file from local to a remote IBM i node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_device_vary.html">ibmi_device_vary – Vary on or off target device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_fix.html">ibmi_display_fix – Displays the PTF(Program Temporary Fix) information and also get the requisite PTFs information of the PTF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_display_subsystem.html">ibmi_display_subsystem – Displays all currently active subsystems or currently active jobs in a subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – End an active subsystem.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_install_product_from_savf.html">ibmi_install_product_from_savf – Install the licensed program(product) from a save file.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_job.html">ibmi_job – Returns job information according to inputs.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_restore.html">ibmi_lib_restore – Restore one library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_module_config.html">ibmi_module_config – Configures managed nodes settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, revoke or display object authority</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_query_job_log – Query the specfic job log.</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot an IBM i machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_reply_message.html">ibmi_reply_message – Send a reply message to the sender of an inquiry message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_save_product_to_savf.html">ibmi_save_product_to_savf – Save the the licensed program(product) to a save file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script.html">ibmi_script – Execute a local cl/sql script file.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_execute.html">ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sql_query.html">ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – Start an inactive subsystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sysval.html">ibmi_sysval – Displays the specified system value</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_interface.html">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – Delete the objects that make up the licensed program(product)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_user_and_group.html">ibmi_user_and_group – Create, change or display a user(or group) profile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">IBM power_ibmi collection</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../modules.html">Modules</a> &raquo;</li>
+        
+      <li>ibmi_query_job_log – Query the specfic job log.</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_query_job_log.py" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ibmi-query-job-log-query-the-specfic-job-log">
+<span id="ibmi-query-job-log-module"></span><h1>ibmi_query_job_log – Query the specfic job log.<a class="headerlink" href="#ibmi-query-job-log-query-the-specfic-job-log" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
+<li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id4">Return Values</a></p></li>
+</ul>
+</div>
+<div class="section" id="synopsis">
+<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Query the specfic job log.</p></li>
+</ul>
+</div>
+<div class="section" id="parameters">
+<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt>job_name</dt><dd><p>job name</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>job_number</dt><dd><p>Job number</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>job_user</dt><dd><p>job user</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Query the specfic job log</span>
+  <span class="nt">ibmi_query_job_log</span><span class="p">:</span>
+    <span class="nt">job_number</span><span class="p">:</span> <span class="s">&quot;025366&quot;</span>
+    <span class="nt">job_user</span><span class="p">:</span> <span class="s">&quot;QUSER&quot;</span>
+    <span class="nt">job_name</span><span class="p">:</span> <span class="s">&quot;QZDASOINIT&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="return-values">
+<h2><a class="toc-backref" href="#id4">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl>
+<dt>job_log</dt><dd><div class="line-block">
+<div class="line">The IBM i job log of the task executed.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;FROM_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;318F&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QWTCHGJB&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_USER&quot;</span><span class="p">:</span> <span class="s2">&quot;CHANGLE&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;QCPFMSG&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;CPD0912&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SECOND_LEVEL_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Cause . . . . . :   This message is used by application programs as a general escape message.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SUBTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Printer device PRT01 not found.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-05-20-21.41.40.845897&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;DIAGNOSTIC&quot;</span><span class="p">,</span> <span class="s2">&quot;ORDINAL_POSITION&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;SEVERITY&quot;</span><span class="p">:</span> <span class="s2">&quot;20&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;9369&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>sql</dt><dd><div class="line-block">
+<div class="line">the sql executed</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: SELECT ORDINAL_POSITION, MESSAGE_ID, MESSAGE_TYPE, MESSAGE_SUBTYPE, SEVERITY, MESSAGE_TIMESTAMP, FROM_LIBRARY, FROM_PROGRAM, FROM_MODULE, FROM_PROCEDURE, FROM_INSTRUCTION, TO_LIBRARY, TO_PROGRAM, TO_MODULE, TO_PROCEDURE, TO_INSTRUCTION, FROM_USER, MESSAGE_FILE, MESSAGE_LIBRARY, MESSAGE_TEXT, MESSAGE_SECOND_LEVEL_TEXT FROM TABLE(QSYS2.JOBLOG_INFO(‘025366/QUSER/QZDASOINIT’))</div>
+</div>
+</dd>
+<dt>start</dt><dd><div class="line-block">
+<div class="line">The command execution start time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
+</div>
+</dd>
+<dt>end</dt><dd><div class="line-block">
+<div class="line">The command execution end time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
+</div>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The command execution delta time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The command standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPF2111:Library TESTLIB already exists</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The command return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The command standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+</div>
+</dd>
+</dl>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ibmi_reboot.html" class="btn btn-neutral float-right" title="ibmi_reboot – Reboot an IBM i machine" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ibmi_object_save.html" class="btn btn-neutral float-left" title="ibmi_object_save – Save one or more objects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, IBM
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
