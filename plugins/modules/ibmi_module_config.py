@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_module_config
 short_description: Configures managed nodes settings
-version_added: '2.8'
+version_added: '2.8.0'
 description:
   - The C(ibmi_module_config) module configures the managed nodes settings, like module log settings.
 options:

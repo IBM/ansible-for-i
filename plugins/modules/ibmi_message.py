@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_message
 short_description: Search message
-version_added: '2.8'
+version_added: '2.8.0'
 description:
   - Search message.
   - For non-IBM i targets, no need.

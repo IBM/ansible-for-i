@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_object_authority
 short_description: Grant, revoke or display object authority
-version_added: '2.8'
+version_added: '2.8.0'
 description:
   - The C(ibmi_object_authority) module can do the named object(s) authority management(grant, revoke and display).
 options:

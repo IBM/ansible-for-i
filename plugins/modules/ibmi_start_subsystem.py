@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_start_subsystem
 short_description: Start an inactive subsystem
-version_added: "2.8"
+version_added: '2.8.0'
 description:
     - the C(ibmi_start_subsystem) module start an inactive subsystem.
 options:
