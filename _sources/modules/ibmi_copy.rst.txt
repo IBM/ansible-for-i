@@ -42,6 +42,26 @@ backup
 
 
      
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
 force
   Influence whether the remote save file must always be replaced.
 
@@ -82,12 +102,14 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Copy test.file on local to a remote IBM i.
+   - name: Copy test.file on local to a remote IBM i with become user.
      ibmi_copy:
        src: '/backup/test.file'
        lib_name: 'testlib'
        force: True
        backup: True
+       become_user: 'USER1'
+       become_user_password: 'yourpassword'
 
 
 
