@@ -11,7 +11,7 @@
 # Parameters:
   # sysvalue --  The list containing the system values to be checked
 ---
-- hosts: ibmi
+- hosts: all
   gather_facts: no
   collections:
    - ibm.power_ibmi
