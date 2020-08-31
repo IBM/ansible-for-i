@@ -269,6 +269,19 @@
 <div class="line"><strong>choices</strong>: *YES, *NO</div>
 </div>
 </dd>
+<dt>become_user</dt><dd><p>The name of the user profile that the IBM i task will run under.</p>
+<p>Use this option to set a user with desired privileges to run the task.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>become_user_password</dt><dd><p>Use this option to set the password of the user specified in <code class="docutils literal notranslate"><span class="pre">become_user</span></code>.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
 <dt>extra_params</dt><dd><p>The extra parameters that the user wants to pass into this module.</p>
 <p>These are the additional CL parameters that the user wants to pass to execute the CL commands.</p>
 <div class="line-block">
