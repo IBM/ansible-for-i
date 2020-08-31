@@ -258,18 +258,19 @@ def main():
             pattern_savf_library=savf_library.strip()), **result)
 
     # Call the The Accept Software Agreement command
-    command = acceptance_cmd
-    ibmi_util.log_info("Acceptance command to run: " + command, module._name)
-    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
-    if rc != 0:
-        result = dict(
-            command=command,
-            stderr=err,
-            rc=rc,
-            job_log=job_log,
-        )
-        module.fail_json(msg="The Accept Software Agreement command {acceptance_cmd} failed".format(
-            acceptance_cmd=acceptance_cmd), **result)
+    if acceptance_cmd.strip():
+        command = acceptance_cmd.strip()
+        ibmi_util.log_info("Acceptance command to run: " + command, module._name)
+        rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+        if rc != 0:
+            result = dict(
+                command=command,
+                stderr=err,
+                rc=rc,
+                job_log=job_log,
+            )
+            module.fail_json(msg="The Accept Software Agreement command {acceptance_cmd} failed".format(
+                acceptance_cmd=acceptance_cmd), **result)
 
     # run the RSTLICPGM command to install the product
     command = 'QSYS/RSTLICPGM LICPGM({pattern_product}) DEV(*SAVF) OPTION({pattern_option}) RSTOBJ({pattern_object_type}) \

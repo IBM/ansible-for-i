@@ -39,6 +39,26 @@ apply_type
 
 
      
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
 fix_omit_list
   The list of PTFs that will be omitted.
 
@@ -154,6 +174,8 @@ Examples
          - 'S2018V01.BIN'
        fix_omit_list:
          - 5733SC1: "SI70819"
+       become_user: "QSECOFR"
+       become_user_password: "yourpassword"
 
 
 

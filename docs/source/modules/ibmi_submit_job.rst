@@ -28,6 +28,26 @@ Parameters
 
 
      
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
 check_interval
   The time interval between current and next checks of the expected status of the submitted job. This option will be ignored if ``*NONE`` is specified for option status.
 
