@@ -24,7 +24,9 @@ description:
 options:
   sysvalue:
     description:
-      - Specifies the input system value names.
+      - Specifies the input system values. The detail explanations of the elements in the dict are as follows
+      - C(name) is the name of the system value. (required)
+      - C(expect) is the expected returned value. (optional)
     type: list
     elements: dict
     required: yes
@@ -33,6 +35,15 @@ options:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: False
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 author:
 - Xu Meng(@dmabupt)
@@ -44,6 +55,8 @@ EXAMPLES = r'''
     sysvalue:
       - {'name':'qmaxsgnacn', 'expect':'3'}
       - {'name':'qccsid'}
+    become_user: 'USER1'
+    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -105,8 +118,10 @@ system_values:
             }]
 '''
 
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
+import sys
 
 HAS_ITOOLKIT = True
 HAS_IBM_DB = True
@@ -125,7 +140,7 @@ try:
 except ImportError:
     HAS_IBM_DB = False
 
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 sysval_array = [
@@ -191,13 +206,9 @@ def chk_system_value(current, expect, check='equal'):
     return True
 
 
-def get_system_value(sysvaluename, expect=None, check='equal'):
-    conn = dbi.connect()
-    itransport = DatabaseTransport(conn)
-    itool = iToolKit()
-    sysvalue = {}
+def get_system_value(imodule, sysvaluename, expect=None, check='equal'):
+    sysvalue = dict()
     sysvalue['name'] = sysvaluename.strip().upper()
-
     for value in sysval_array:
         for key in value['key']:
             if (sysvalue['name'] == key):
@@ -211,6 +222,9 @@ def get_system_value(sysvaluename, expect=None, check='equal'):
     if sysvalue.get('type') is None:
         return -1, sysvalue, 'Unknown System Value Name'
 
+    conn = imodule.get_connection()
+    itransport = DatabaseTransport(conn)
+    itool = iToolKit()
     itool.add(
         iPgm('qwcrsval', 'QWCRSVAL', {'lib': 'QSYS'})
         .addParm(
@@ -239,15 +253,14 @@ def get_system_value(sysvaluename, expect=None, check='equal'):
             .addData(iData('reserved', '1A', ''))
         )
     )
-
     itool.call(itransport)
 
     qwcrsval = itool.dict_out('qwcrsval')
-    ibmi_util.log_debug(str(qwcrsval), 'get_system_value')
+    ibmi_util.log_debug(str(qwcrsval), sys._getframe().f_code.co_name)
 
     if 'success' in qwcrsval:
         qwcrsval_t = qwcrsval['QWCRSVAL_t']
-        ibmi_util.log_debug(str(qwcrsval_t), 'get_system_value')
+        ibmi_util.log_debug(str(qwcrsval_t), sys._getframe().f_code.co_name)
         if int(qwcrsval_t['count']) > 0:
             sysvalue['value'] = qwcrsval_t['data']
             if 'expect' in sysvalue:
@@ -255,7 +268,7 @@ def get_system_value(sysvaluename, expect=None, check='equal'):
                     sysvalue['value'], sysvalue['expect'])
             else:
                 sysvalue['atrisk'] = False
-            ibmi_util.log_debug(str(sysvalue), 'get_system_value')
+            ibmi_util.log_debug(str(sysvalue), sys._getframe().f_code.co_name)
         return 0, sysvalue, qwcrsval['success']
     return -1, sysvalue, qwcrsval['error']
 
@@ -265,6 +278,8 @@ def main():
         argument_spec=dict(
             sysvalue=dict(type='list', elements='dict', required=True),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -273,6 +288,8 @@ def main():
 
     sysvalue = module.params['sysvalue']
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     if len(sysvalue) == 0:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID,
@@ -285,9 +302,15 @@ def main():
     )
     rc = 0
 
+    try:
+        ibmi_module = imodule.IBMiModule(
+            become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        module.fail_json(rc=999, msg='Exception occurred: {0}'.format(str(inst)))
+
     for value in sysvalue:
         rc, sysval, message = get_system_value(
-            value.get('name'), value.get('expect'))
+            ibmi_module, value.get('name'), value.get('expect'))
         result['sysval'].append(sysval)
 
     if rc:

@@ -11,7 +11,7 @@
 
 - name: pause a few minutes to wait for the iasp configured
   pause:
-    minutes: 8
+    minutes: 10
 
 - name: display the iasp info
   ibmi_iasp:

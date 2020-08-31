@@ -1,0 +1,46 @@
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- name: retrieve hardware resource by command
+  ibmi_cl_command:
+    cmd: QSYS/DSPHDWRSC TYPE(*CMN)
+  register: command_result
+
+- name: display ethernet ports
+  ibmi_ethernet_port:
+  register: ethernet_port_result
+
+- name: TC01 assert the defined parameters are returned
+  assert:
+    that:
+      - ethernet_port_result.msg is defined
+      - ethernet_port_result.rc == 0
+      - ethernet_port_result.ethernet_ports | length >= 1 
+      - ethernet_port_result.ethernet_ports[0]["ADAPTER_ADDRESS"] is defined
+      - ethernet_port_result.ethernet_ports[0]["CARD_POSITION"] is defined
+      - ethernet_port_result.ethernet_ports[0]["DEFAULT_MAC_ADDRESS"] is defined
+      - ethernet_port_result.ethernet_ports[0]["EXPANDED_SERIAL_NUMBER"] is defined
+      - ethernet_port_result.ethernet_ports[0]["FRAME_ID"] is defined
+      - ethernet_port_result.ethernet_ports[0]["IO_BUS_ADDRESS"] is defined
+      - ethernet_port_result.ethernet_ports[0]["LAN_SPEED"] is defined
+      - ethernet_port_result.ethernet_ports[0]["LOCATION_CODE"] is defined
+      - ethernet_port_result.ethernet_ports[0]["PART_NUMBER"] is defined
+      - ethernet_port_result.ethernet_ports[0]["PORT_NUMBER"] is defined
+      - ethernet_port_result.ethernet_ports[0]["RESOURCE_NAME"] is defined
+      - ethernet_port_result.ethernet_ports[0]["SERIAL_NUMBER"] is defined
+      - ethernet_port_result.ethernet_ports[0]["SUPPORTS_LINK_AGGREGATION"] is defined
+      - ethernet_port_result.ethernet_ports[0]["SYSTEM_BOARD_NUMBER"] is defined
+      - ethernet_port_result.ethernet_ports[0]["SYSTEM_BUS_NUMBER"] is defined
+      - ethernet_port_result.ethernet_ports[0]["SYSTEM_CARD_NUMBER"] is defined
+
+- name: asser the returned ethernet port can be found in the CMN list
+  assert: 
+    that:
+      - item['RESOURCE_NAME'] in command_result.stdout 
+  loop: "{{ethernet_port_result['ethernet_ports']}}"
+
+- name: create a device description
+  ibmi_ethernet_port:
+    operation: 'display'
+  register: ethernet_port_result

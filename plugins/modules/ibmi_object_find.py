@@ -83,6 +83,15 @@ options:
       - The job log of the job executing the task will be returned even rc is zero if it is set to true.
     type: bool
     default: false
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 notes:
     - Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 seealso:
@@ -120,6 +129,8 @@ EXAMPLES = r'''
     iasp_name: 'WYTEST2'
     object_type_list: "*FILE"
     object_name: 'OBJABC'
+    become_user: 'USER1'
+    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -236,9 +247,9 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -318,6 +329,8 @@ def main():
             iasp_name=dict(type='str', default='*SYSBAS'),
             use_regex=dict(default=False, type='bool'),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -331,15 +344,19 @@ def main():
     input_obj_name = module.params['object_name']
     input_use_regex = module.params['use_regex']
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     startd = datetime.datetime.now()
 
-    connection_id = None
+    try:
+        ibmi_module = imodule.IBMiModule(
+            db_name=input_iasp_name, become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = 'Exception occurred: {0}'.format(str(inst))
+        module.fail_json(rc=999, msg=message)
 
-    if input_iasp_name.strip() != '*SYSBAS':
-        connection_id = ibmi_util.itoolkit_init(db_name='{db_pattern}'.format(db_pattern=input_iasp_name))
-    else:
-        connection_id = ibmi_util.itoolkit_init()
+    db_conn = ibmi_module.get_connection()
 
     # generate age where stmt
     if input_age is None:
@@ -359,7 +376,7 @@ def main():
             module.fail_json(msg="failed to process size: " + input_size)
 
     # get the version and release info
-    release_info, err = db2i_tools.get_ibmi_release(connection_id)
+    release_info, err = db2i_tools.get_ibmi_release(db_conn)
 
     if release_info["version_release"] < 7.4:
         lib_name_label = "(SELECT SYSTEM_SCHEMA_NAME FROM QSYS2.SYSSCHEMAS WHERE SCHEMA_NAME = OBJLONGSCHEMA)"
@@ -388,15 +405,12 @@ def main():
           sql_where_stmt_size + \
           sql_where_stmt_regex
 
-    rc, out_result_set, err = ibmi_util.itoolkit_run_sql(connection_id, sql)
+    rc, out_result_set, err = ibmi_module.itoolkit_run_sql(sql)
 
     if joblog or (rc != IBMi_COMMAND_RC_SUCCESS):
-        job_log = ibmi_util.itoolkit_get_job_log(connection_id, startd)
+        job_log = ibmi_module.itoolkit_get_job_log(startd)
     else:
         job_log = []
-
-    if connection_id is not None:
-        ibmi_util.itoolkti_close_connection(connection_id)
 
     endd = datetime.datetime.now()
     delta = endd - startd

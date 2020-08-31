@@ -21,7 +21,7 @@
 - name: assert the previous task failed because the target ibm i lacks of {{item}}
   assert:
     that:  
-      - "'{{item}} package is required' in sql_query_result_1.stderr"
+      - "'{{item}} package is required' in sql_query_result_1.msg"
 
 - name: run sql execute module
   ibmi_sql_execute:
@@ -32,7 +32,7 @@
 - name: assert the previous task failed because the target ibm i lacks of {{item}}
   assert:
     that:  
-      - "'{{item}} package is required' in sql_execute_result_1.stderr"
+      - "'{{item}} package is required' in sql_execute_result_1.msg"
 
 - name: Install {{item}}
   command: /QOpensys/pkgs/bin/yum install {{python}}-{{item}} -y

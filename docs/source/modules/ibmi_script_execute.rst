@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_script_execute.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_script_execute.pyy
 
 .. _ibmi_script_execute_module:
 
@@ -39,6 +39,26 @@ asp_group
   | **required**: false
   | **type**: str
   | **default**: \*SYSBAS
+
+
+     
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
 
 
      
@@ -100,10 +120,12 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Execute test.cl on a remote IBM i node.
+   - name: Execute test.cl on a remote IBM i node with become user.
      ibmi_script_execute:
        src: '/home/test.cl'
        type: 'CL'
+       become_user: 'USER1'
+       become_user_password: 'yourpassword'
 
    - name: Execute testsql.sql on a remote IBM i node.
      ibmi_script_execute:

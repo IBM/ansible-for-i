@@ -1,0 +1,271 @@
+- block:
+  - name: TC01 - run the SQL command to create a table
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: "CREATE TABLE PTFINFO (ID, PRODUCT, VRM, CHECKSUM)"
+    register: dsps_param_result_0
+
+  - name: TC01 - Display the returned parameters 0
+    debug:
+      msg: "{{ dsps_param_result_0 }}"
+
+  - name: TC01 - Assert return values
+    assert:
+      that: 
+        - dsps_param_result_0.changed == false
+        - dsps_param_result_0.database == "/tmp/testdb.sqlite3"
+        - dsps_param_result_0.delta is defined
+        - dsps_param_result_0.end is defined
+        - dsps_param_result_0.row_changed == -1
+        - dsps_param_result_0.sql == "CREATE TABLE PTFINFO (ID, PRODUCT, VRM, CHECKSUM)"
+        - dsps_param_result_0.sqlite3Runtime is defined
+        - dsps_param_result_0.sqlite3Version is defined
+        - dsps_param_result_0.start is defined
+
+  - name: TC02 - run the SQL command to insert some records
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: "INSERT INTO PTFINFO (ID, PRODUCT, VRM, CHECKSUM) VALUES (:ID, :PRODUCT, :VRM, :CHECKSUM)"
+      parameters:
+        - {"ID":"SI69375", "PRODUCT":"5770UME", "VRM":"V7R3M0", "CHECKSUM":"f2342345345"}
+        - {"ID":"SI69379", "PRODUCT":"5770DG1", "VRM":"V7R3M0", "CHECKSUM":"f2eqwe345345"}
+    register: dsps_param_result_1
+
+  - name: TC02 -Display the returned parameters 1
+    debug:
+      msg: "{{ dsps_param_result_1 }}"
+
+  - name: TC02 - Assert return values
+    assert:
+      that: 
+        - dsps_param_result_1.changed == false
+        - dsps_param_result_1.database == "/tmp/testdb.sqlite3"
+        - dsps_param_result_1.delta is defined
+        - dsps_param_result_1.end is defined
+        - dsps_param_result_1.row_changed == 2
+        - dsps_param_result_1.sql == "INSERT INTO PTFINFO (ID, PRODUCT, VRM, CHECKSUM) VALUES (:ID, :PRODUCT, :VRM, :CHECKSUM)"
+        - dsps_param_result_1.sqlite3Runtime is defined
+        - dsps_param_result_1.sqlite3Version is defined
+        - dsps_param_result_1.start is defined
+        - dsps_param_result_1.parameters[0].ID == "SI69375"
+        - dsps_param_result_1.parameters[0].PRODUCT == "5770UME"
+        - dsps_param_result_1.parameters[0].VRM == "V7R3M0"
+        - dsps_param_result_1.parameters[0].CHECKSUM == "f2342345345"
+        - dsps_param_result_1.parameters[1].ID == "SI69379"
+        - dsps_param_result_1.parameters[1].PRODUCT == "5770DG1"
+        - dsps_param_result_1.parameters[1].VRM == "V7R3M0"
+        - dsps_param_result_1.parameters[1].CHECKSUM == "f2eqwe345345"
+        
+  - name: TC03 - run the SQL command to query a table
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: "SELECT * FROM PTFINFO WHERE ID = :ID"
+      parameters:
+        - {"ID":"SI69379"}
+    register: dsps_param_result_2
+
+  - name: TC03 - Display the returned parameters 2
+    debug:
+      msg: "{{ dsps_param_result_2 }}"
+
+  - name: TC03 - Assert return values
+    assert:
+      that: 
+        - dsps_param_result_2.changed == false
+        - dsps_param_result_2.database == "/tmp/testdb.sqlite3"
+        - dsps_param_result_2.delta is defined
+        - dsps_param_result_2.end is defined
+        - dsps_param_result_2.row_changed == -1
+        - dsps_param_result_2.sql == "SELECT * FROM PTFINFO WHERE ID = :ID"
+        - dsps_param_result_2.sqlite3Runtime is defined
+        - dsps_param_result_2.sqlite3Version is defined
+        - dsps_param_result_2.start is defined
+        - dsps_param_result_2.parameters[0].ID == "SI69379" 
+        - dsps_param_result_2.rows is defined
+
+  - name: TC04 - run the SQL command to update a record
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: "UPDATE PTFINFO SET CHECKSUM=:CHECKSUM WHERE ID=:ID"
+      parameters:
+        - {"ID":"SI69379", "CHECKSUM":"abc123"}
+    register: dsps_param_result_3
+
+  - name: TC04 - Display the returned parameters 3
+    debug:
+      msg: "{{ dsps_param_result_3 }}"
+
+  - name: TC04 - Assert return values
+    assert:
+      that: 
+        - dsps_param_result_3.changed == false
+        - dsps_param_result_3.database == "/tmp/testdb.sqlite3"
+        - dsps_param_result_3.delta is defined
+        - dsps_param_result_3.end is defined
+        - dsps_param_result_3.row_changed == 1
+        - dsps_param_result_3.sql == "UPDATE PTFINFO SET CHECKSUM=:CHECKSUM WHERE ID=:ID"
+        - dsps_param_result_3.sqlite3Runtime is defined
+        - dsps_param_result_3.sqlite3Version is defined
+        - dsps_param_result_3.start is defined
+        - dsps_param_result_3.parameters[0].CHECKSUM == "abc123" #is defined
+        - dsps_param_result_3.parameters[0].ID == "SI69379" #is defined
+
+  - name: TC05 - run the SQL command to delete a record
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: "DELETE FROM PTFINFO WHERE ID=:ID"
+      parameters:
+        - {"ID":"SI69379"}
+    register: dsps_param_result_4
+
+  - name: TC05 - Display the returned parameters 4
+    debug:
+      msg: "{{ dsps_param_result_4 }}"
+
+  - name: TC05 - Assert return values
+    assert:
+      that: 
+        - dsps_param_result_4.changed == false
+        - dsps_param_result_4.database == "/tmp/testdb.sqlite3"
+        - dsps_param_result_4.delta is defined
+        - dsps_param_result_4.end is defined
+        - dsps_param_result_4.row_changed == 1
+        - dsps_param_result_4.sql == "DELETE FROM PTFINFO WHERE ID=:ID"
+        - dsps_param_result_4.sqlite3Runtime is defined
+        - dsps_param_result_4.sqlite3Version is defined
+        - dsps_param_result_4.start is defined
+        - dsps_param_result_4.parameters[0].ID == "SI69379" 
+
+  - name: TC06 - Negative test - operating an non-exist table in the system.
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: "INSERT INTO NONEXIST (ID, PRODUCT, VRM, CHECKSUM) VALUES (:ID, :PRODUCT, :VRM, :CHECKSUM)"
+      parameters:
+        - {"ID":"SI69375", "PRODUCT":"5770UME", "VRM":"V7R3M0", "CHECKSUM":"f2342345345"}
+        - {"ID":"SI69379", "PRODUCT":"5770DG1", "VRM":"V7R3M0", "CHECKSUM":"f2eqwe345345"}
+    register: dsps_param_result_5    
+    failed_when: dsps_param_result_5.failed == 0
+
+  - name: TC06 - Assert some values
+    assert:
+      that:
+        - '"no such table" in dsps_param_result_5.msg'
+        - dsps_param_result_5.changed == false
+        - dsps_param_result_5.database == "/tmp/testdb.sqlite3"
+        - dsps_param_result_5.sql == "INSERT INTO NONEXIST (ID, PRODUCT, VRM, CHECKSUM) VALUES (:ID, :PRODUCT, :VRM, :CHECKSUM)"
+        - dsps_param_result_5.sqlite3Runtime is defined
+        - dsps_param_result_5.sqlite3Version is defined
+        - dsps_param_result_5.parameters is defined
+
+  - name: TC07 - run the SQL command to create a table which already exists on the system
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: "CREATE TABLE PTFINFO (ID, PRODUCT, VRM, CHECKSUM)"
+    register: dsps_param_result_6
+    failed_when: dsps_param_result_6.failed == 0
+
+  - name: TC07 - Assert return values
+    assert:
+      that: 
+        - '"table PTFINFO already exists" in dsps_param_result_6.msg'
+        - dsps_param_result_6.changed == false
+        - dsps_param_result_6.database == "/tmp/testdb.sqlite3"
+        - dsps_param_result_6.sql == "CREATE TABLE PTFINFO (ID, PRODUCT, VRM, CHECKSUM)"
+        - dsps_param_result_6.sqlite3Runtime is defined
+        - dsps_param_result_6.sqlite3Version is defined
+
+  - name: TC08 - execute more than 1 statement at a time
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: 'CREATE TABLE us_states (id INTEGER PRIMARY KEY, name TEXT,flower TEXT); INSERT INTO us_states VALUES (1, "California", "California Poppy")'
+    register: dsps_param_result_7
+    failed_when: dsps_param_result_7.rc != 1
+
+  - name: TC08 - Assert return values
+    assert:
+      that: 
+        - '"You can only execute one statement at a time" is in dsps_param_result_7.module_stdout'
+
+  - name: TC09 - insert invalid data
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: 'CREATE TABLE us_states (id INTEGER PRIMARY KEY, name TEXT,flower TEXT)'
+    
+  - name: TC09 - insert
+    ibmi_sqlite3:
+      database: "/tmp/testdb.sqlite3"
+      sql: 'INSERT INTO us_states VALUES ("aa", "California", "California Poppy")'
+    register: dsps_param_result_8
+    failed_when: dsps_param_result_8.failed == 0
+
+  - name: TC09 - assert values  
+    assert:
+      that: 
+        - '"datatype mismatch" is in dsps_param_result_8.msg'
+
+  - name: TC10 - permission test - touch a new db file
+    file:
+      path: "/home/{{ansible_ssh_user}}/testdb.sqlite3"
+      state: touch
+      mode: 0700
+
+  - name: TC10 - permission test - set *USER profile credentials
+    no_log: true
+    set_fact:
+      ibmi_user: "ZHYAO"
+      ibmi_pass: '{{ansible_ssh_pass}}'
+    when: ansible_ssh_pass is defined
+    
+  - name: TC10 - create a *USER profile to do authority test
+    ibmi_user_and_group:
+      operation: 'create'
+      user: "{{ibmi_user}}"
+      special_authority: '*NONE'
+      password: "{{ibmi_pass}}"
+      user_class: '*USER'
+    register: crtusrprf
+    failed_when: crtusrprf.rc != 0  
+
+  - name: TC10 - switch to *USER created above(ibmi_user) for authority negative test
+    set_fact: 
+      superuser: "{{ansible_ssh_user}}"
+      super_user_db: "/home/{{ansible_ssh_user}}/testdb.sqlite3"
+      ansible_ssh_user: "{{ibmi_user}}"
+
+  - name: TC10 - run sqlite3 module, should fail
+    ibmi_sqlite3:
+      database: "{{super_user_db}}"
+      sql: "CREATE TABLE PTFINFO (ID, PRODUCT, VRM, CHECKSUM)"
+    register: dsps_param_result_9
+    failed_when: dsps_param_result_9.failed == 0
+
+  - name: TC10 - assert
+    assert:
+      that:
+        - '"unable to open database file" in dsps_param_result_9.msg'
+
+  always:
+    - name: switch to super user
+      set_fact: 
+        ansible_ssh_user: "{{superuser}}"
+
+    - name: run sql to drop the table
+      ibmi_sqlite3:
+        database: "/tmp/testdb.sqlite3"
+        sql: "DROP TABLE IF EXISTS PTFINFO"
+
+    - name: run sql to drop the table
+      ibmi_sqlite3:
+        database: "/tmp/testdb.sqlite3"
+        sql: "DROP TABLE IF EXISTS us_states"
+
+    - name: remove {{super_user_db}}
+      command: rm -f {{super_user_db}}
+      register: rmvf_result
+      failed_when: rmvf_result.rc != 0
+
+    - name: remove *USER profile
+      ibmi_cl_command:
+        cmd:  'DLTUSRPRF USRPRF({{ibmi_user}}) OWNOBJOPT(*DLT)'
+      register: dltusrprf
+      failed_when: dltusrprf.rc != 0

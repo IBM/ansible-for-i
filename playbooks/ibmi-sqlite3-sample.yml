@@ -1,0 +1,78 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+#ibmi-sqlite3-sample.yml 
+#The sample file is to provide an example about how to create a table, insert a row, query the table and drop the table
+---
+- hosts: ibmi
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
+  tasks:
+    - block:
+      - name: run the SQL command to create a table
+        ibmi_sqlite3:
+          database: "/tmp/testdb.sqlite3"
+          sql: "CREATE TABLE PTFINFO (ID, PRODUCT, VRM, CHECKSUM)"
+        register: dsps_param_result_0
+
+      - name: Display the returned parameters 0
+        debug: 
+          msg: "{{ dsps_param_result_0 }}"
+
+      - name: run the SQL command to insert some records
+        ibmi_sqlite3:
+          database: "/tmp/testdb.sqlite3"
+          sql: "INSERT INTO PTFINFO (ID, PRODUCT, VRM, CHECKSUM) VALUES (:ID, :PRODUCT, :VRM, :CHECKSUM)"
+          parameters:
+            - {"ID":"SI69375", "PRODUCT":"5770UME", "VRM":"V7R3M0", "CHECKSUM":"f2342345345"}
+            - {"ID":"SI69379", "PRODUCT":"5770DG1", "VRM":"V7R3M0", "CHECKSUM":"f2eqwe345345"}
+        register: dsps_param_result_1
+
+      - name: Display the returned parameters 1
+        debug: 
+          msg: "{{ dsps_param_result_1 }}"
+
+      - name: run the SQL command to query a table
+        ibmi_sqlite3:
+          database: "/tmp/testdb.sqlite3"
+          sql: "SELECT * FROM PTFINFO WHERE ID = :ID"
+          parameters: 
+            - {"ID":"SI69379"}
+        register: dsps_param_result_2
+
+      - name: Display the returned parameters 2
+        debug: 
+          msg: "{{ dsps_param_result_2 }}"
+
+      - name: run the SQL command to update a record
+        ibmi_sqlite3:
+          database: "/tmp/testdb.sqlite3"
+          sql: "UPDATE PTFINFO SET CHECKSUM=:CHECKSUM WHERE ID=:ID"
+          parameters: 
+            - {"ID":"SI69379", "CHECKSUM":"abc123"}
+        register: dsps_param_result_3
+
+      - name: Display the returned parameters 3
+        debug: 
+          msg: "{{ dsps_param_result_3 }}"
+
+      - name: run the SQL command to delete a record
+        ibmi_sqlite3:
+          database: "/tmp/testdb.sqlite3"
+          sql: "DELETE FROM PTFINFO WHERE ID=:ID"
+          parameters: 
+            - {"ID":"SI69379"}
+        register: dsps_param_result_4
+
+      - name: Display the returned parameters 4
+        debug: 
+          msg: "{{ dsps_param_result_4 }}"
+
+      always:
+      - name: run sql to drop the table
+        ibmi_sqlite3:
+          database: "/tmp/testdb.sqlite3"
+          sql: "DROP TABLE IF EXISTS PTFINFO"
+      

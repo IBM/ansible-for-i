@@ -14,7 +14,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 display = Display()
 
@@ -25,6 +25,8 @@ class ActionModule(ActionBase):
         'lib_name',
         'force',
         'backup',
+        'become_user',
+        'become_user_password'
     ))
 
     def _calculate_savf_path(self, savefile_name, lib_name):
@@ -85,7 +87,7 @@ class ActionModule(ActionBase):
         if task_vars is None:
             task_vars = dict()
 
-        result = super(ActionModule, self).run(tmp, task_vars)
+        result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
 
         try:
@@ -114,6 +116,8 @@ class ActionModule(ActionBase):
             lib_name = self._task.args.get('lib_name', None)
             force = boolean(self._task.args.get('force', False), strict=True)
             backup = boolean(self._task.args.get('backup', False), strict=True)
+            become_user = self._task.args.get('become_user', None)
+            become_user_password = self._task.args.get('become_user_password', None)
 
             if lib_name is None:
                 result['msg'] = "lib_name is required."
@@ -130,7 +134,7 @@ class ActionModule(ActionBase):
             try:
                 src = self._loader.get_real_file(self._find_needle('files', src))
             except AnsibleError as e:
-                raise AnsibleActionFail(to_native(e))
+                raise AnsibleActionFail(to_native(e)) from e
 
             lib_name = lib_name.upper()
             startd = datetime.datetime.now()
@@ -152,7 +156,9 @@ class ActionModule(ActionBase):
                             cmd = "QSYS/REN OBJ('{p_savefile_path}') NEWOBJ({p_rename_savf_name}.file)".format(
                                 p_savefile_path=savefile_path,
                                 p_rename_savf_name=rename_savf_name)
-                            module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
+                            module_output = self._execute_module(module_name='ibmi_cl_command',
+                                                                 module_args={'cmd': cmd, 'become_user': become_user,
+                                                                              'become_user_password': become_user_password})
                             save_result = module_output
                             rc = save_result['rc']
                             if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
@@ -169,7 +175,9 @@ class ActionModule(ActionBase):
                         cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savefile_name}) OBJTYPE(*FILE)'.format(
                             p_lib_name=lib_name,
                             p_savefile_name=savefile_name)
-                        module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
+                        module_output = self._execute_module(module_name='ibmi_cl_command',
+                                                             module_args={'cmd': cmd, 'become_user': become_user,
+                                                                          'become_user_password': become_user_password})
                         save_result = module_output
                         rc = save_result['rc']
                         if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
@@ -190,7 +198,9 @@ class ActionModule(ActionBase):
             cmd = 'QSYS/CRTSAVF FILE({p_lib_name}/{p_savefile_name})'.format(
                 p_lib_name=lib_name,
                 p_savefile_name=savefile_name)
-            module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
+            module_output = self._execute_module(module_name='ibmi_cl_command',
+                                                 module_args={'cmd': cmd, 'become_user': become_user,
+                                                              'become_user_password': become_user_password})
             save_result = module_output
             rc = save_result['rc']
             if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
@@ -229,7 +239,9 @@ class ActionModule(ActionBase):
                 cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savefile_name}) OBJTYPE(*FILE)'.format(
                     p_lib_name=lib_name,
                     p_savefile_name=savefile_name)
-                module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
+                module_output = self._execute_module(module_name='ibmi_cl_command',
+                                                     module_args={'cmd': cmd, 'become_user': become_user,
+                                                                  'become_user_password': become_user_password})
                 save_result = module_output
                 rc = save_result['rc']
                 if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS and ('CPF2105' not in save_result['stderr']):

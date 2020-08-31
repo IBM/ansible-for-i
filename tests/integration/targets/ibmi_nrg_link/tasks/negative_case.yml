@@ -1,0 +1,101 @@
+- name: TC00 neg run without options
+  ibmi_nrg_link:
+  register: nrg_result
+  failed_when: "'missing required arguments: operation, source_address' not in nrg_result.msg"
+
+- name: TC01 neg run without options
+  ibmi_nrg_link:
+    operation: add  
+  register: nrg_result
+  failed_when: "'missing required arguments: source_address' not in nrg_result.msg"
+
+- name: TC02 neg add nrg link with an not existing ip address
+  ibmi_nrg_link:
+    operation: add
+    source_address: '16.16.16.16'
+    target_address: 192.168.0.4
+    link_priority: 16 
+  register: nrg_result
+  failed_when: nrg_result.rc == 0
+
+- name: TC03 neg add nrg link without target_address
+  ibmi_nrg_link:
+    operation: add
+    source_address: '{{ifc_ip}}'
+    link_priority: 16
+  register: nrg_result
+  failed_when: "'operation is add but all of the following are missing: target_address' not in nrg_result.msg"
+
+- name: TC04 neg add nrg link without link_priority
+  ibmi_nrg_link:
+    operation: add
+    source_address: '{{ifc_ip}}'
+    target_address: 192.168.0.4
+  register: nrg_result
+  failed_when: "'operation is add but all of the following are missing: link_priority' not in nrg_result.msg"
+
+- name: TC05 neg add nrg link with invalid target_address
+  ibmi_nrg_link:
+    operation: add
+    source_address: '{{ifc_ip}}'
+    target_address: abc
+    link_priority: 16
+  register: nrg_result
+  failed_when: nrg_result.rc == 0
+
+- name: TC06 neg add nrg link with invalid link_priority
+  ibmi_nrg_link:
+    operation: add
+    source_address: '{{ifc_ip}}'
+    target_address: 192.168.0.4
+    link_priority: abc
+  register: nrg_result
+  failed_when: nrg_result.rc == 0
+
+- name: TC07 neg add nrg link with invalid source_address 
+  ibmi_nrg_link:
+    operation: add
+    source_address: 'abc'
+    target_address: 192.168.0.4
+    link_priority: 1
+  register: nrg_result
+  failed_when: nrg_result.rc == 0
+
+- name: TC08 neg add a duplicated nrg link
+  ibmi_nrg_link:
+    operation: add
+    nrg_name: MIRROR_DATABASE
+    source_address: '{{ifc_ip}}'
+    target_address: 192.168.0.4
+    link_priority: 16
+
+- name: TC08 neg add a duplicated nrg link
+  ibmi_nrg_link:
+    operation: add
+    nrg_name: '*MIRROR'
+    source_address: '{{ifc_ip}}'
+    target_address: 192.168.0.4
+    link_priority: 16
+  register: nrg_result
+  failed_when: nrg_result.rc == 0
+
+- name: TC0 neg remove without other options 
+  ibmi_nrg_link:
+    operation: remove
+  #failed_when: 
+  ignore_errors: true
+
+- name: TC08 neg remove with invalid source_address
+  ibmi_nrg_link:
+    operation: remove
+    source_address: 'abc'
+  register: nrg_result
+  failed_when: nrg_result.rc == 0
+
+- name: TC08 neg remove with an unmatched nrg_name
+  ibmi_nrg_link:
+    operation: remove
+    source_address: 'abc'
+    nrg_name: MIRROR_OTHER
+  register: nrg_result
+  failed_when: nrg_result.rc == 0

@@ -127,6 +127,15 @@ options:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: false
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 seealso:
 - module: ibmi_cl_command
@@ -140,6 +149,13 @@ EXAMPLES = r'''
   ibmi_user_and_group:
     operation: 'create'
     user: 'changle'
+
+- name: create user profile with become user
+  ibmi_user_and_group:
+    operation: 'create'
+    user: 'changle'
+    become_user: 'USER1'
+    become_user_password: 'yourpassword'
 
 - name: display user profile
   ibmi_user_and_group:
@@ -229,8 +245,9 @@ job_log:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -254,6 +271,8 @@ def main():
             text=dict(type='str', default='*SAME'),
             parameters=dict(type='str', default=' '),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -277,6 +296,8 @@ def main():
     text = module.params['text'].strip().upper()
     parameters = module.params['parameters'].strip().upper()
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     # handle value for special_authority
     if isinstance(special_authority, list) and len(special_authority) > 1:
@@ -311,11 +332,17 @@ def main():
         if text == '' or text == '*SAME':
             text = 'Create by Ansible'
 
+    try:
+        ibmi_module = imodule.IBMiModule(
+            become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = 'Exception occurred: {0}'.format(str(inst))
+        module.fail_json(rc=999, msg=message)
+
     # Check to see if the group exists
     chkobj_cmd = 'QSYS/CHKOBJ OBJ(QSYS/{p_group}) OBJTYPE(*USRPRF)'.format(p_group=user_group)
-    args = ['system', chkobj_cmd]
     ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
-    rc, out, err = module.run_command(args, use_unsafe_shell=False)
+    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(chkobj_cmd)
     if rc != 0:
         group_exist = False
     else:
@@ -323,9 +350,8 @@ def main():
 
     # Check to see if the user exists
     chkobj_cmd = 'QSYS/CHKOBJ OBJ(QSYS/{p_user}) OBJTYPE(*USRPRF)'.format(p_user=user)
-    args = ['system', chkobj_cmd]
     ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
-    rc, out, err = module.run_command(args, use_unsafe_shell=False)
+    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(chkobj_cmd)
     if rc != 0:
         user_exist = False
     else:
@@ -370,10 +396,10 @@ def main():
         command = "SELECT * FROM QSYS2.GROUP_PROFILE_ENTRIES WHERE GROUP_PROFILE_NAME = '{p_user}'".format(p_user=user)
 
     if operation == 'display' or operation == 'display_group_members':
-        rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(command)
+        rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(command)
     else:
         command = ' '.join(command.split())  # keep only one space between adjacent strings
-        rc, out, err, job_log = ibmi_util.itoolkit_run_command_once(command)
+        rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
 
     if operation == 'display' or operation == 'display_group_members':
         if rc:

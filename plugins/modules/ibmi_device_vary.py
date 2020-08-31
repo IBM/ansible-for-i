@@ -47,6 +47,15 @@ options:
       - If set to C(true), append JOBLOG to stderr/stderr_lines.
     type: bool
     default: False
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 seealso:
 - module: service
@@ -61,6 +70,8 @@ EXAMPLES = r'''
     device_list: ['IASP1', 'IASP2']
     status: '*ON'
     joblog: True
+    become_user: 'USER1'
+    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -145,8 +156,9 @@ stderr_lines:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -159,6 +171,8 @@ def main():
                         required=True),
             extra_parameters=dict(type='str', default=' '),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -168,19 +182,24 @@ def main():
     status = module.params['status']
     extra_parameters = module.params['extra_parameters']
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     startd = datetime.datetime.now()
+    try:
+        ibmi_module = imodule.IBMiModule(
+            become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = 'Exception occurred: {0}'.format(str(inst))
+        module.fail_json(rc=999, msg=message)
+
     if status in ["*OFF", "*DEALLOCATE"]:
         command = "QSYS/VRYCFG CFGOBJ(" + " ".join(device_list) + ") CFGTYPE(*DEV) STATUS(" + status + ") FRCVRYOFF(*YES) " + extra_parameters
     else:
         command = "QSYS/VRYCFG CFGOBJ(" + " ".join(device_list) + ") CFGTYPE(*DEV) STATUS(" + status + ") " + extra_parameters
 
     job_log = []
-    if joblog:
-        rc, out, error, job_log = ibmi_util.itoolkit_run_command_once(command)
-    else:
-        args = ['system', command]
-        rc, out, error = module.run_command(args, use_unsafe_shell=False)
+    rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
 
     endd = datetime.datetime.now()
     delta = endd - startd

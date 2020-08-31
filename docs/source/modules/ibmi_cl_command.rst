@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_cl_command.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_cl_command.pyy
 
 .. _ibmi_cl_command_module:
 
@@ -42,6 +42,26 @@ asp_group
 
 
      
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
 cmd
   The CL command to run.
 
@@ -72,6 +92,8 @@ Examples
    - name: Create a library by using CL command CRTLIB
      ibmi_cl_command:
        command: 'CRTLIB LIB(TESTLIB)'
+       become_user: 'USER1'
+       become_user_password: 'yourpassword'
 
 
 
@@ -80,7 +102,7 @@ Notes
 -----
 
 .. note::
-   CL command with OUTPUT parameter like DSPLIBL, DSPHDWRSC does not have job log.
+   CL command with OUTPUT parameter like DSPLIBL, DSPHDWRSC does not have job log and does not support become user.
 
    CL command can also be run by ``command`` module with simple stdout/stderr, put 'system' as the as first args in ``command`` module.
 

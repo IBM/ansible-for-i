@@ -12,7 +12,7 @@ from ansible.module_utils.six import string_types
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "9.9.9"
 display = Display()
 
 
@@ -25,7 +25,9 @@ class ActionModule(ActionBase):
         'asp_group',
         'type',
         'parameters',
-        'severity_level'
+        'severity_level',
+        'become_user',
+        'become_user_password'
     ))
 
     def run(self, tmp=None, task_vars=None):
@@ -38,7 +40,7 @@ class ActionModule(ActionBase):
         # _tmp_args is used for ibmi_sync module
         _tmp_args = self._task.args.copy()
 
-        result = super(ActionModule, self).run(tmp, task_vars)
+        result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
 
         try:
@@ -78,7 +80,7 @@ class ActionModule(ActionBase):
             try:
                 src = self._loader.get_real_file(self._find_needle('files', src))
             except AnsibleError as e:
-                raise AnsibleActionFail(to_native(e))
+                raise AnsibleActionFail(to_native(e)) from e
             tmp_src = self._connection._shell.join_path(self._connection._shell.tmpdir, os.path.basename(src))
             display.debug("ibm i debug: transfer script file {p_src} to {p_tmp_src}".format(p_src=src, p_tmp_src=tmp_src))
             self._transfer_file(src, tmp_src)

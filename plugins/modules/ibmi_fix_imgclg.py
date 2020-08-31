@@ -216,7 +216,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "9.9.9"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -585,7 +585,7 @@ def main():
         job_log = []
 
     if connection_id is not None:
-        ibmi_util.itoolkti_close_connection(connection_id)
+        ibmi_util.itoolkit_close_connection(connection_id)
 
     if rc > 0:
         result_failed = dict(
