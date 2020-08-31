@@ -26,8 +26,6 @@ class ActionModule(ActionBase):
         'type',
         'parameters',
         'severity_level',
-        'become_user',
-        'become_user_password'
     ))
 
     def run(self, tmp=None, task_vars=None):
