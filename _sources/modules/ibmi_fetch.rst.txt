@@ -38,26 +38,6 @@ backup
 
 
      
-become_user
-  The name of the user profile that the IBM i task will run under.
-
-  Use this option to set a user with desired privileges to run the task.
-
-
-  | **required**: false
-  | **type**: str
-
-
-     
-become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
-
-
-  | **required**: false
-  | **type**: str
-
-
-     
 dest
   A local directory to save the file into.
 
@@ -195,13 +175,11 @@ Examples
        backup: True
        target_release: 'V7R2M0'
 
-   - name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file with become user.
+   - name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.
      ibmi_fetch:
        lib_name: 'objlib'
        dest: '/backup'
        flat: True
-       become_user: 'USER1'
-       become_user_password: 'yourpassword'
 
 
 
