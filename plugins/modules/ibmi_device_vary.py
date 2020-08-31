@@ -25,6 +25,7 @@ options:
   device_list:
     description:
       - The name of the device.
+      - If the one of the device is IASP device, the become_user and become_user_password will be ignored.
     type: list
     elements: str
     required: yes
@@ -198,8 +199,29 @@ def main():
     else:
         command = "QSYS/VRYCFG CFGOBJ(" + " ".join(device_list) + ") CFGTYPE(*DEV) STATUS(" + status + ") " + extra_parameters
 
+    is_iasp = False
+    check_command = "QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD(*ASP)"
+    args = ['system', check_command]
+    rc, out, error = module.run_command(args, use_unsafe_shell=False)
+    ibmi_util.log_info("Command {check_command} return: rc={rc}, stdout={out}, stderr={error}.".format(
+        check_command=check_command, rc=rc, out=out, error=error), module._name)
+    if not rc:
+        for device in device_list:
+            if device.upper() in out:
+                ibmi_util.log_info("Device {0} is IASP device, does not support become user.".format(device), module._name)
+                is_iasp = True
     job_log = []
-    rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
+    if is_iasp:
+        args = ['system', command]
+        rc, out, error = module.run_command(args, use_unsafe_shell=False)
+    else:
+        try:
+            ibmi_module = imodule.IBMiModule(
+                become_user_name=become_user, become_user_password=become_user_password)
+        except Exception as inst:
+            message = 'Exception occurred: {0}'.format(str(inst))
+            module.fail_json(rc=999, msg=message)
+        rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
 
     endd = datetime.datetime.now()
     delta = endd - startd

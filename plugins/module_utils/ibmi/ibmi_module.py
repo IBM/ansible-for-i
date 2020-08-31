@@ -135,6 +135,7 @@ class IBMiModule(object):
     def __init__(self, db_name=ibmi_util.SYSBAS, become_user_name=None, become_user_password=None):
         self.ibmi_logon = None
         self.conn = None
+        self.startd = datetime.datetime.now()
 
         if not HAS_ITOOLKIT:
             raise ImportError("itoolkit package is required.")
@@ -210,7 +211,7 @@ class IBMiModule(object):
         '''This method equals to itoolkit_run_sql and itoolkit_get_job_log'''
         startd = datetime.datetime.now()
         rc, out_list, error = self.itoolkit_run_sql(sql, hex_convert_columns)
-        job_log = self.get_job_log('*', startd)
+        job_log = self.get_job_log('*', self.startd)
         return rc, out_list, error, job_log
 
     def itoolkit_sql_callproc(self, sql):
@@ -236,7 +237,7 @@ class IBMiModule(object):
         '''This method equals to itoolkit_sql_callproc and itoolkit_get_job_log'''
         startd = datetime.datetime.now()
         rc, out_list, error = self.itoolkit_sql_callproc(sql)
-        job_log = self.get_job_log('*', startd)
+        job_log = self.get_job_log('*', self.startd)
         return rc, out_list, error, job_log
 
     def itoolkit_run_command(self, command):
@@ -262,7 +263,7 @@ class IBMiModule(object):
         '''This method equals to itoolkit_run_command and itoolkit_get_job_log'''
         startd = datetime.datetime.now()
         rc, out, error = self.itoolkit_run_command(command)
-        job_log = self.get_job_log('*', startd)
+        job_log = self.get_job_log('*', self.startd)
         return rc, out, error, job_log
 
     def itoolkit_run_command5250(self, command):
@@ -291,7 +292,7 @@ class IBMiModule(object):
         '''This method equals to itoolkit_run_command5250 and itoolkit_get_job_log'''
         startd = datetime.datetime.now()
         rc, out, error = self.itoolkit_run_command5250(command)
-        job_log = self.get_job_log('*', startd)
+        job_log = self.get_job_log('*', self.startd)
         return rc, out, error, job_log
 
     def itoolkit_run_rtv_command(self, command, args_dict):
@@ -324,7 +325,7 @@ class IBMiModule(object):
         '''This method equals to itoolkit_run_rtv_command and itoolkit_get_job_log'''
         startd = datetime.datetime.now()
         rc, out, error = self.itoolkit_run_rtv_command(command, args_dict)
-        job_log = self.get_job_log('*', startd)
+        job_log = self.get_job_log('*', self.startd)
         return rc, out, error, job_log
 
     def db_get_result_list(self, sql, hex_convert_columns):

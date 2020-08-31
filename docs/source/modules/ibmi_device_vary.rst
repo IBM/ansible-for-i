@@ -51,6 +51,8 @@ become_user_password
 device_list
   The name of the device.
 
+  If the one of the device is IASP device, the become_user and become_user_password will be ignored.
+
 
   | **required**: True
   | **type**: list
