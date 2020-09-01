@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_nrg_link.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_nrg_link.py
 
 .. _ibmi_nrg_link_module:
 

@@ -136,7 +136,6 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – Start an inactive subsystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_sync_files.html">ibmi_sync_files – Synchronize a list of files from current IBM i node A to another IBM i node B.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize_files.html">ibmi_synchronize_files – Synchronize a list of files from IBM i node A to another IBM i node B</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sysval.html">ibmi_sysval – Displays the specified system value</a></li>
@@ -206,7 +205,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix.pyy" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -243,19 +242,6 @@
 <div class="section" id="parameters">
 <h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
-<dt>become_user</dt><dd><p>The name of the user profile that the IBM i task will run under.</p>
-<p>Use this option to set a user with desired privileges to run the task.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>become_user_password</dt><dd><p>Use this option to set the password of the user specified in <code class="docutils literal notranslate"><span class="pre">become_user</span></code>.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
 <dt>delayed_option</dt><dd><p>Controls whether the PTF is delayed apply or not</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
@@ -339,8 +325,6 @@
     <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;remove&#39;</span>
     <span class="nt">fix_list</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="s">&quot;SI72223&quot;</span>
-    <span class="nt">become_user</span><span class="p">:</span> <span class="s">&quot;QSECOFR&quot;</span>
-    <span class="nt">become_user_password</span><span class="p">:</span> <span class="s">&quot;yourpassword&quot;</span>
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Install a single PTF</span>
   <span class="nt">ibmi_fix</span><span class="p">:</span>
     <span class="nt">product_id</span><span class="p">:</span> <span class="s">&#39;5770DBM&#39;</span>
@@ -351,8 +335,6 @@
     <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;load_and_apply&#39;</span>
     <span class="nt">fix_list</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="s">&quot;SI72223&quot;</span>
-    <span class="nt">become_user</span><span class="p">:</span> <span class="s">&quot;QSECOFR&quot;</span>
-    <span class="nt">become_user_password</span><span class="p">:</span> <span class="s">&quot;yourpassword&quot;</span>
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">query ptf</span>
   <span class="nt">ibmi_fix</span><span class="p">:</span>
     <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;query&#39;</span>
