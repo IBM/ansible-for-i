@@ -1,0 +1,42 @@
+#ssh-addkey.yml 
+---
+- hosts: all
+  gather_facts: no 
+  vars:
+    target_user: '{{ansible_ssh_user}}' 
+
+  tasks:
+  - name: install ssh key
+    authorized_key: user={{target_user}} 
+                    key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}" 
+                    state=present
+
+  - name: find the home directory 
+    ibmi_user_and_group:
+      operation: 'display'
+      user: '{{target_user}}'
+    register: user_result
+
+  - set_fact:
+      home_dir: "{{user_result['result_set'][0]['HOME_DIRECTORY']}}"
+
+  - name: the authority of home directory has to be 0700
+    file:
+      path: '{{home_dir}}'
+      state: directory
+      mode: '0700'
+      owner: '{{target_user}}'
+
+  - name: the authority of .ssh directory has to be 0700
+    file:
+      path: '{{home_dir}}/.ssh'
+      state: directory
+      mode: '0700'
+      owner: '{{target_user}}'
+
+  - name: the authority of authorized_keys has to be 0600
+    file:
+      path: '{{home_dir}}/.ssh/authorized_keys'
+      state: file
+      mode: '0600'
+      owner: '{{target_user}}'
