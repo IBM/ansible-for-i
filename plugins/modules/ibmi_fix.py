@@ -408,7 +408,7 @@ def main():
         job_log = []
 
     if connection_id is not None:
-        ibmi_util.itoolkti_close_connection(connection_id)
+        ibmi_util.itoolkit_close_connection(connection_id)
 
     endd = datetime.datetime.now()
     delta = endd - startd

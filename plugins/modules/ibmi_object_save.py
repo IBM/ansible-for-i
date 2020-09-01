@@ -342,7 +342,7 @@ def main():
     except Exception as e:
         module.fail_json(rc=ibmi_util.IBMi_COMMAND_RC_UNEXPECTED, msg=str(e))
     finally:
-        ibmi_util.itoolkti_close_connection(conn)
+        ibmi_util.itoolkit_close_connection(conn)
 
 
 if __name__ == '__main__':

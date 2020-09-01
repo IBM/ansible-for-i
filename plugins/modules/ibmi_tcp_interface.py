@@ -526,7 +526,7 @@ def main():
     else:
         job_log = []
 
-    ibmi_util.itoolkti_close_connection(connection_id)
+    ibmi_util.itoolkit_close_connection(connection_id)
 
     endd = datetime.datetime.now()
     delta = endd - startd

@@ -259,7 +259,7 @@ def main():
                           p_to_text=to_text(e))})
         module.fail_json(**result)
     finally:
-        ibmi_util.itoolkti_close_connection(conn)
+        ibmi_util.itoolkit_close_connection(conn)
 
 
 if __name__ == '__main__':
