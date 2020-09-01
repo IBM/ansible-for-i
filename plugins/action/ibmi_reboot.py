@@ -43,8 +43,6 @@ class ActionModule(RebootActionModule, ActionBase):
         'end_subsystem_option',
         'timeout_option',
         'install_ptf_device',
-        'become_user',
-        'become_user_password',
     ))
 
     _INT_ARGS = (
@@ -95,29 +93,22 @@ class ActionModule(RebootActionModule, ActionBase):
                 validation.check_type_int(key_value)
                 if key_value < 0:
                     raise AnsibleError('The value of %s must not be less than 0' % (int_key))
-            except (TypeError, ValueError) as e:
-                raise AnsibleError("The value of argument %s is %s which can't be converted to int" % (int_key, key_value)) from e
+            except (TypeError, ValueError) as inst:
+                raise AnsibleError("The value of argument %s is %s which can't be converted to int" % (int_key, key_value)) from inst
         return None
 
     def get_shutdown_command(self, task_vars, distribution):
         return self.DEFAULT_SHUTDOWN_COMMAND
 
     def get_system_boot_time(self, distribution):
-        display.vvv('ibmi_reboot: get_system_boot_time: version: {0}'.format(__ibmi_module_version__))
-        become_user = self._task.args.get('become_user')
-        display.vvv('ibmi_reboot: get_system_boot_time: become to user: {0}'.format(become_user))
-        become_user_password = self._task.args.get('become_user_password')
+        display.vvv('ibmi_reboot: version: ' + __ibmi_module_version__)
         module_output = self._execute_module(
             module_name='ibmi_sql_query',
             module_args={
                 "sql": "SELECT job_entered_system_time FROM TABLE \
                     (qsys2.job_info(job_status_filter => '*ACTIVE', job_user_filter => 'QSYS')) x \
                     WHERE job_name = '000000/QSYS/SCPF'",
-                "expected_row_count": 1,
-                "become_user": become_user,
-                "become_user_password": become_user_password
-            }
-        )
+                "expected_row_count": 1})
         try:
             if module_output['rc'] != 0:
                 raise AnsibleError('Failed to determine system last boot time. {0}'.format(
@@ -180,10 +171,6 @@ class ActionModule(RebootActionModule, ActionBase):
         )
 
     def perform_reboot(self, task_vars, distribution):
-        display.vvv('ibmi_reboot: perform_reboot: version: {0}'.format(__ibmi_module_version__))
-        become_user = self._task.args.get('become_user')
-        display.vvv('ibmi_reboot: perform_reboot: become to user: {0}'.format(become_user))
-        become_user_password = self._task.args.get('become_user_password')
         result = {}
         try:
             self.validate_int()
@@ -204,12 +191,7 @@ class ActionModule(RebootActionModule, ActionBase):
             notify_message=notify_message, delay_time=delay_time)
         self._execute_module(
             module_name='ibmi_cl_command',
-            module_args={
-                "cmd": send_message_command,
-                "become_user": become_user,
-                "become_user_password": become_user_password
-            }
-        )
+            module_args={"cmd": send_message_command})
 
         time.sleep(int(delay_time))
         display.debug("{action}: rebooting server with command '{command}'".format(action=self._task.action, command=reboot_command))
@@ -217,12 +199,7 @@ class ActionModule(RebootActionModule, ActionBase):
         try:
             module_output = self._execute_module(
                 module_name='ibmi_cl_command',
-                module_args={
-                    "cmd": reboot_command,
-                    "become_user": become_user,
-                    "become_user_password": become_user_password
-                }
-            )
+                module_args={"cmd": reboot_command})
             reboot_result = module_output
             stdout = reboot_result['stdout']
             stderr = reboot_result['stderr']
