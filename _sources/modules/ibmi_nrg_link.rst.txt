@@ -27,26 +27,6 @@ Parameters
 
 
      
-become_user
-  The name of the user profile that the IBM i task will run under.
-
-  Use this option to set a user with desired privileges to run the task.
-
-
-  | **required**: false
-  | **type**: str
-
-
-     
-become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
-
-
-  | **required**: false
-  | **type**: str
-
-
-     
 change_load_balance_link_count
   Indicates whether to increment the load balance link count when ``add`` a new link to the NRG or decrement the load balance link count when ``remove`` a link from the NRG.
 
@@ -151,8 +131,6 @@ Examples
      ibmi_nrg_link:
        operation: remove
        source_address: 10.0.0.1
-       become_user: 'USER1'
-       become_user_password: 'yourpassword'
 
 
 
