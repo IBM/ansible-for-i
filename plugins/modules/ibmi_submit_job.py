@@ -245,6 +245,13 @@ def main():
     # rc, out, err = module.run_command(args, use_unsafe_shell=False)
     rc, out, err = ibmi_module.itoolkit_run_command(cl_sbmjob)
 
+    current_job_log = ibmi_module.itoolkit_get_job_log(startd)
+    message_description = ''
+    for i in current_job_log:
+        if i["MESSAGE_ID"] == "CPC1221":
+            message_description = i["MESSAGE_TEXT"]
+            break
+
     if rc != IBMi_COMMAND_RC_SUCCESS:
         result_failed = dict(
             # size=input_size,
@@ -257,7 +264,7 @@ def main():
         )
         module.fail_json(msg='Submit job failed. ', **result_failed)
     elif '*NONE' in wait_for_job_status:
-        submitted_job = re.search(r'\d{6}/[A-Za-z0-9#_]{1,10}/[A-Za-z0-9#_]{1,10}', out)
+        submitted_job = re.search(r'\d{6}/[A-Za-z0-9#_]{1,10}/[A-Za-z0-9#_]{1,10}', message_description)
         job_submitted = submitted_job.group()
 
         result_success = dict(
@@ -267,14 +274,6 @@ def main():
             # changed=True,
         )
         module.exit_json(**result_success)
-
-    current_job_log = ibmi_module.itoolkit_get_job_log(startd)
-
-    message_description = ''
-    for i in current_job_log:
-        if i["MESSAGE_ID"] == "CPC1221":
-            message_description = i["MESSAGE_TEXT"]
-            break
 
     submitted_job = re.search(r'\d{6}/[A-Za-z0-9#_]{1,10}/[A-Za-z0-9#_]{1,10}', message_description)
     job_submitted = submitted_job.group()
