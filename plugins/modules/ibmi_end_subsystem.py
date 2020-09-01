@@ -58,15 +58,6 @@ options:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: False
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 notes:
     - This module is NOT ALLOWED to end ALL subsystems, use the C(ibmi_cl_command) module instead.
     - This module is non-blocking, the ending subsystem may still be in progress, use C(ibmi_display_subsystem) module to check the status.
@@ -77,11 +68,9 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: End the subsystem QBATCH with another user.
+- name: End the subsystem QBATCH.
   ibmi_end_subsystem:
     subsystem: QBATCH
-    become_user: 'USER1'
-    become_user_password: 'yourpassword'
 
 - name: End a subsystem with options.
   ibmi_end_subsystem:
@@ -150,7 +139,6 @@ job_log:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
 __ibmi_module_version__ = "1.0.2"
 
@@ -164,8 +152,6 @@ def main():
             end_subsystem_option=dict(type='list', default=['*DFT'], choices=['*DFT', '*NOJOBLOG', '*CHGPTY', '*CHGTSL'], elements='str'),
             parameters=dict(type='str', default=''),
             joblog=dict(type='bool', default=False),
-            become_user=dict(type='str'),
-            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -189,8 +175,6 @@ def main():
     end_subsystem_option = ''
     for item in end_subsystem_option_list:
         end_subsystem_option = end_subsystem_option + item + ' '
-    become_user = module.params['become_user']
-    become_user_password = module.params['become_user_password']
 
     command = 'QSYS/ENDSBS SBS({subsystem}) \
         OPTION({how_to_end}) DELAY({controlled_end_delay_time}) ENDSBSOPT({end_subsystem_option}) \
@@ -202,13 +186,7 @@ def main():
         parameters=parameters)
 
     command = ' '.join(command.split())  # keep only one space between adjacent strings
-    try:
-        ibmi_module = imodule.IBMiModule(
-            become_user_name=become_user, become_user_password=become_user_password)
-    except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
-        module.fail_json(rc=999, msg=message)
-    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+    rc, out, err, job_log = ibmi_util.itoolkit_run_command_once(command)
 
     result = dict(
         command=command,

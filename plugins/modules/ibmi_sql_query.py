@@ -49,15 +49,6 @@ options:
     type: list
     elements: str
     default: []
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 notes:
     - This module can only run one statement at a time.
 seealso:
@@ -70,8 +61,6 @@ EXAMPLES = r'''
 - name: Query the data of table Persons.
   ibmi_sql_query:
     sql: 'select * from Persons'
-    become_user: 'USER1'
-    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -173,7 +162,6 @@ import datetime
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
 __ibmi_module_version__ = "1.0.2"
 
@@ -186,8 +174,6 @@ def main():
             expected_row_count=dict(type='int', default=-1),
             joblog=dict(type='bool', default=False),
             hex_columns=dict(type='list', default=[], elements='str'),
-            become_user=dict(type='str'),
-            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -202,19 +188,11 @@ def main():
         check_row_count = True
     joblog = module.params['joblog']
     hex_columns = module.params['hex_columns']
-    become_user = module.params['become_user']
-    become_user_password = module.params['become_user_password']
 
     startd = datetime.datetime.now()
-    try:
-        ibmi_module = imodule.IBMiModule(
-            db_name=database, become_user_name=become_user, become_user_password=become_user_password)
-    except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
-        module.fail_json(rc=999, msg=message)
 
     job_log = []
-    rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(sql, hex_columns)
+    rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(sql, database, hex_columns)
 
     endd = datetime.datetime.now()
     delta = endd - startd

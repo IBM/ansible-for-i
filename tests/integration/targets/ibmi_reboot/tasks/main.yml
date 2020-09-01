@@ -3,8 +3,6 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-- include: become.yml
-
 - name: Test with negative values for time setting
   ibmi_reboot: 
     pre_reboot_delay: -1 

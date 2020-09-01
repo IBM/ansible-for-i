@@ -4,7 +4,6 @@
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
 - block:
-    - include: become.yml
     - name: TC01 check whether QBATCH is running
       ibmi_sql_query:
         sql: "SELECT * 
@@ -37,26 +36,30 @@
           - endsbs_result.rc == 0
           - endsbs_result.job_log == []
   
-    - name: TC02 pause 20 seconds to wait for sbs end
-      pause: 
-        seconds: 20
-
-    - name: TC02 check whether QBATCH is running
+    - name: TC02 check whether QBATCH has been ended
       ibmi_sql_query:
         sql: "SELECT * 
     FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
                 SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result
-      failed_when: sql_result.row | length != 0 
+      register: sql_result_orig
+      until: sql_result_orig.row | length == 0
+      retries: 5
+      delay: 60   
 
     - name: TC03 start subsystem with all supported options
       ibmi_start_subsystem:
         subsystem: QBATCH
         library: QSYS
 
-    - name: TC03 pause 20 seconds to wait for sbs end
-      pause: 
-        seconds: 20
+    - name: TC03 check whether QBATCH has been started
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result_orig
+      until: sql_result_orig.row | length >= 1
+      retries: 5
+      delay: 60 
 
     - name: TC03 end subsystem with only required options
       ibmi_end_subsystem:
@@ -73,17 +76,29 @@
           - endsbs_result.rc == 0
           - endsbs_result.job_log != []
 
-    - name: TC03 pause 20 seconds to wait for sbs end
-      pause: 
-        seconds: 20
+    - name: TC03 check whether QBATCH has been ended
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result_orig
+      until: sql_result_orig.row | length == 0
+      retries: 5
+      delay: 60  
 
     - name: TC04 start subsystem with default options
       ibmi_start_subsystem:
         subsystem: QBATCH
 
-    - name: TC04 pause 20 seconds to wait for sbs start 
-      pause: 
-        seconds: 20
+    - name: TC04 check whether QBATCH has been started
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result_orig
+      until: sql_result_orig.row | length >= 1
+      retries: 5
+      delay: 60  
 
     - name: TC04 end the subsystem
       ibmi_end_subsystem:
@@ -101,6 +116,16 @@
           - endsbs_result.stderr_lines is defined 
           - endsbs_result.stdout_lines is defined
           - endsbs_result.rc == 0
+
+    - name: TC04 check whether QBATCH has been ended
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result_orig
+      until: sql_result_orig.row | length == 0
+      retries: 5
+      delay: 60  
 
     - name: TC05 end an inactive subsystem
       ibmi_end_subsystem:

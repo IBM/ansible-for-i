@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_host_server_service.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_host_server_service.py
 
 .. _ibmi_host_server_service_module:
 
@@ -25,26 +25,6 @@ Synopsis
 
 Parameters
 ----------
-
-
-     
-become_user
-  The name of the user profile that the IBM i task will run under.
-
-  Use this option to set a user with desired privileges to run the task.
-
-
-  | **required**: false
-  | **type**: str
-
-
-     
-become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
-
-
-  | **required**: false
-  | **type**: str
 
 
      
@@ -103,8 +83,6 @@ Examples
        name_list: ['*CENTRAL', '*DATABASE']
        state: 'started'
        joblog: True
-       become_user: 'USER1'
-       become_user_password: 'yourpassword'
 
 
 

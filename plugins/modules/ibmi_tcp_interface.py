@@ -114,15 +114,6 @@ options:
       - These are the additional CL parameters that the user wants to pass to execute the CL commands.
     type: str
     required: false
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
   state:
     description:
       - The state of the interface.
@@ -356,7 +347,7 @@ import datetime
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
 __ibmi_module_version__ = "1.0.2"
 
@@ -417,8 +408,6 @@ def main():
             sec_to_wait=dict(type='int', default=0),
             extra_params=dict(type='str', required=False),
             joblog=dict(type='bool', default=False),
-            become_user=dict(type='str'),
-            become_user_password=dict(type='str', no_log=True),
             state=dict(type='str', default='present', choices=["present", "absent", "inactive", "active"])
         ),
         required_one_of=[["internet_address", "alias_name"]],
@@ -440,15 +429,10 @@ def main():
     extra_params = module.params['extra_params']
     sec_to_wait = module.params['sec_to_wait']
     joblog = module.params['joblog']
-    become_user = module.params['become_user']
-    become_user_password = module.params['become_user_password']
 
     startd = datetime.datetime.now()
 
-    ibmi_module = imodule.IBMiModule(become_user_name=become_user,
-                                     become_user_password=become_user_password)
-
-    connection_id = ibmi_module.get_connection()
+    connection_id = ibmi_util.itoolkit_init()
 
     only_query = False
     cl_command = ""
@@ -524,7 +508,7 @@ def main():
         err = None
         rc = IBMi_COMMAND_RC_SUCCESS
     else:
-        rc, out, err = ibmi_module.itoolkit_run_command(cl_command)
+        rc, out, err = ibmi_util.itoolkit_run_command(connection_id, cl_command)
         if (rc == IBMi_COMMAND_RC_SUCCESS) and (state in ["present", "absent"]):
             is_changed = True
 
@@ -538,9 +522,11 @@ def main():
         err = query_err
 
     if joblog or (rc != IBMi_COMMAND_RC_SUCCESS):
-        job_log = ibmi_module.itoolkit_get_job_log(startd)
+        job_log = ibmi_util.itoolkit_get_job_log(connection_id, startd)
     else:
         job_log = []
+
+    ibmi_util.itoolkti_close_connection(connection_id)
 
     endd = datetime.datetime.now()
     delta = endd - startd

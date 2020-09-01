@@ -35,15 +35,6 @@ options:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: False
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 seealso:
 - module: ibmi_end_subsystem
 author:
@@ -59,8 +50,6 @@ EXAMPLES = r'''
   ibmi_start_subsystem:
     subsystem: MYSBS
     library: MYLIB
-    become_user: 'USER1'
-    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -124,7 +113,6 @@ job_log:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
 __ibmi_module_version__ = "1.0.2"
 
@@ -135,8 +123,6 @@ def main():
             subsystem=dict(type='str', required=True),
             library=dict(type='str', default='*LIBL'),
             joblog=dict(type='bool', default=False),
-            become_user=dict(type='str'),
-            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -146,23 +132,12 @@ def main():
     subsystem = module.params['subsystem'].strip().upper()
     library = module.params['library'].strip().upper()
     joblog = module.params['joblog']
-    become_user = module.params['become_user']
-    become_user_password = module.params['become_user_password']
-
     if len(subsystem) > 10:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of subsystem exceeds 10 characters")
     if len(library) > 10:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of library exceeds 10 characters")
     command = 'QSYS/STRSBS SBSD({library}/{subsystem})'.format(library=library, subsystem=subsystem)
-
-    try:
-        ibmi_module = imodule.IBMiModule(
-            become_user_name=become_user, become_user_password=become_user_password)
-    except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
-        module.fail_json(rc=999, msg=message)
-
-    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+    rc, out, err, job_log = ibmi_util.itoolkit_run_command_once(command)
 
     result = dict(
         command=command,

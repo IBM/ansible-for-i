@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_restore.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_restore.py
 
 .. _ibmi_object_restore_module:
 
@@ -38,26 +38,6 @@ asp_group
   | **required**: false
   | **type**: str
   | **default**: \*SYSBAS
-
-
-     
-become_user
-  The name of the user profile that the IBM i task will run under.
-
-  Use this option to set a user with desired privileges to run the task.
-
-
-  | **required**: false
-  | **type**: str
-
-
-     
-become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
-
-
-  | **required**: false
-  | **type**: str
 
 
      
@@ -149,15 +129,13 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Restore test1.pgm test2.srvpgm in savedlib libary from archive.savf in archlib libary with become user.
+   - name: Restore test1.pgm test2.srvpgm in savedlib libary from archive.savf in archlib libary.
      ibmi_object_restore:
        object_names: 'test1 test2'
        object_lib: 'savedlib'
        object_types: '*PGM *SRVPGM'
        savefile_name: 'archive'
        savefile_lib: 'archlib'
-       become_user: 'USER1'
-       become_user_password: 'yourpassword'
 
 
 

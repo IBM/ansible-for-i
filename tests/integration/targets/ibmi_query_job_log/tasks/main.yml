@@ -6,8 +6,8 @@
 
 - name: Get status of a list of jobs
   ibmi_job:
-    user: "QPGMR"
-    type: "*BATCH"
+    user: "{{ansible_ssh_user}}"
+    type: "*INTERACT"
     status: "*ACTIVE"
   register: job_list_info
 
@@ -47,6 +47,7 @@
   assert:
     that:
       - neg_result.sql is defined   
+      - neg_result.job_log == []
       - neg_result.rc == 301
       - '"non-zero return code" in neg_result.msg'  
     #failed_when: "'non-zero return code' not in query_job_log_info.msg"
@@ -65,12 +66,13 @@
   assert:
     that:
       - neg_result.sql is defined   
+      - neg_result.job_log == []
       - neg_result.rc == 301
       - '"non-zero return code" in neg_result.msg'  
 
 - name: TC04 Query the specific job log with a non-exist job name
   ibmi_query_job_log:
-    job_number: "{{returned_job_number[0]}}"
+    job_number: "{{returned_job_number[0]}}i"
     job_user: "{{returned_job_number[1]}}"
     job_name: "dummyjob"
   register: neg_result
@@ -82,5 +84,6 @@
   assert:
     that:
       - neg_result.sql is defined   
+      - neg_result.job_log == []
       - neg_result.rc == 301
       - '"non-zero return code" in neg_result.msg'  

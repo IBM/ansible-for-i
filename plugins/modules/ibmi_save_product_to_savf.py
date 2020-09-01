@@ -81,15 +81,6 @@ options:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: False
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 seealso:
 - module: ibmi_uninstall_product, ibmi_install_product_from_savf
 author:
@@ -109,8 +100,6 @@ EXAMPLES = r'''
     option: 11
     savf_name: MYFILE
     savf_library: MYLIB
-    become_user: 'USER1'
-    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -174,7 +163,6 @@ job_log:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
 __ibmi_module_version__ = "1.0.2"
 
@@ -193,8 +181,6 @@ def main():
             check_signature=dict(type='str', default='*SIGNED', choices=['*SIGNED', '*ALL', '*NONE']),
             joblog=dict(type='bool', default=False),
             parameters=dict(type='str', default=' '),
-            become_user=dict(type='str'),
-            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -212,8 +198,6 @@ def main():
     parameters = module.params['parameters'].upper()
     check_signature = module.params['check_signature'].upper()
     joblog = module.params['joblog']
-    become_user = module.params['become_user']
-    become_user_password = module.params['become_user_password']
 
     if len(product) > 7:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of product exceeds 7 characters")
@@ -230,30 +214,22 @@ def main():
     if len(savf_library) > 10:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of savf_library exceeds 10 characters")
 
-    try:
-        ibmi_module = imodule.IBMiModule(
-            become_user_name=become_user, become_user_password=become_user_password)
-    except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
-        module.fail_json(rc=999, msg=message)
-
     # Check if the library of savf is existed
     command = 'QSYS/CHKOBJ OBJ(QSYS/{pattern_savf_library}) OBJTYPE(*LIB)'.format(
         pattern_savf_library=savf_library.strip())
+    args = ['system', command]
     ibmi_util.log_info("Command to run: " + command, module._name)
-    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+    rc, out, err = module.run_command(args, use_unsafe_shell=False)
     if rc != 0:  # library not exist, create it
         command = "QSYS/CRTLIB LIB({pattern_savf_library}) TEXT('Create by Ansible')".format(
             pattern_savf_library=savf_library.strip())
+        args = ['system', command]
         ibmi_util.log_info("Command to run: " + command, module._name)
-        rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+        rc, out, err = module.run_command(args, use_unsafe_shell=False)
         if rc != 0:  # fail to create library
             result = dict(
-                command=command,
-                stdout=out,
                 stderr=err,
                 rc=rc,
-                job_log=job_log,
             )
             module.fail_json(msg="Fail to create library: {pattern_savf_library}".format(
                 pattern_savf_library=savf_library.strip()), **result)
@@ -263,21 +239,20 @@ def main():
         pattern_savf_name=savf_name.strip(),
         pattern_savf_library=savf_library.strip())
     # Check if the savf is existed
+    args = ['system', command]
     ibmi_util.log_info("Command to run: " + command, module._name)
-    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+    rc, out, err = module.run_command(args, use_unsafe_shell=False)
     if rc != 0:  # savf not existed
         command = "QSYS/CRTSAVF FILE({pattern_savf_library}/{pattern_savf_name}) TEXT('Create by Ansible')".format(
             pattern_savf_name=savf_name.strip(),
             pattern_savf_library=savf_library.strip())
+        args = ['system', command]
         ibmi_util.log_info("Command to run: " + command, module._name)
-        rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+        rc, out, err = module.run_command(args, use_unsafe_shell=False)
         if rc != 0:  # fail to create savf
             result = dict(
-                command=command,
-                stdout=out,
                 stderr=err,
                 rc=rc,
-                job_log=job_log,
             )
             module.fail_json(msg="Fail to create savf {pattern_savf_name} in library {pattern_savf_library}".format(
                 pattern_savf_name=savf_name.strip(),
@@ -299,7 +274,7 @@ def main():
         pattern_parameters=parameters)
 
     command = ' '.join(command.split())  # keep only one space between adjacent strings
-    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+    rc, out, err, job_log = ibmi_util.itoolkit_run_command_once(command)
 
     result = dict(
         command=command,

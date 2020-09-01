@@ -68,15 +68,6 @@ options:
       - If set to C(true), append JOBLOG to stderr/stderr_lines.
     type: bool
     default: False
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 
 author:
 - Jin Yifan(@jinyifan)
@@ -88,8 +79,6 @@ EXAMPLES = r'''
     name: 'IASP1'
     operation: 'create'
     disks: ['DMP002', 'DMP019']
-    become_user: 'USER1'
-    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -217,7 +206,6 @@ stderr_lines:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
 __ibmi_module_version__ = "1.0.2"
 
@@ -233,8 +221,6 @@ def main():
             extra_parameters=dict(type='str', default=' '),
             synchronous=dict(type='bool', default=True),
             joblog=dict(type='bool', default=False),
-            become_user=dict(type='str'),
-            become_user_password=dict(type='str', no_log=True),
         ),
         required_if=[
             ["operation", "create", ["disks", "asp_type"]],
@@ -253,17 +239,8 @@ def main():
     extra_parameters = module.params['extra_parameters']
     synchronous = module.params['synchronous']
     joblog = module.params['joblog']
-    become_user = module.params['become_user']
-    become_user_password = module.params['become_user_password']
 
     startd = datetime.datetime.now()
-    try:
-        ibmi_module = imodule.IBMiModule(
-            become_user_name=become_user, become_user_password=become_user_password)
-    except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
-        module.fail_json(rc=999, msg=message)
-
     command = ''
     rc = ''
     rc_msg = ''
@@ -273,7 +250,7 @@ def main():
     asp_info = ''
     job_log = []
     sql = "SELECT * FROM QSYS2.ASP_INFO WHERE RESOURCE_NAME = '" + name.upper() + "'"
-    rc, asp_info, error, job_log = ibmi_module.itoolkit_run_sql_once(sql)
+    rc, asp_info, error, job_log = ibmi_util.itoolkit_run_sql_once(sql)
     if asp_info:
         state = asp_info[0]['ASP_STATE']
         asp_number = asp_info[0]['ASP_NUMBER']
@@ -317,7 +294,7 @@ def main():
     if command:
         if not synchronous:
             command = "SBMJOB CMD(" + command + ")"
-        rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
+        rc, out, err, job_log = ibmi_util.itoolkit_run_command_once(command)
 
     endd = datetime.datetime.now()
     delta = endd - startd

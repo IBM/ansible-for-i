@@ -59,15 +59,6 @@ options:
       - Only works for sql script.
     type: str
     default: ' '
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 
 notes:
     - For cl script, the command supports line breaks.
@@ -79,12 +70,10 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: Execute test.cl on a remote IBM i node with become user.
+- name: Execute test.cl on a remote IBM i node.
   ibmi_script_execute:
     src: '/home/test.cl'
     type: 'CL'
-    become_user: 'USER1'
-    become_user_password: 'yourpassword'
 
 - name: Execute testsql.sql on a remote IBM i node.
   ibmi_script_execute:
@@ -159,7 +148,6 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 __ibmi_module_version__ = "1.0.2"
 
 try:
@@ -168,8 +156,8 @@ except ImportError:
     from pipes import quote
 
 
-def return_error(module, ibmi_module, error, out, startd, result):
-    job_log = ibmi_module.itoolkit_get_job_log(startd)
+def return_error(module, error, out, conn, startd, result):
+    job_log = ibmi_util.itoolkit_get_job_log(conn, startd)
     result.update({'rc': ibmi_util.IBMi_COMMAND_RC_ERROR, 'stderr': error, 'stdout': out, 'job_log': job_log})
     module.exit_json(**result)
 
@@ -182,8 +170,6 @@ def main():
             severity_level=dict(type='int', default=10),
             type=dict(type='str', required=True, choices=['CL', 'SQL']),
             parameters=dict(type='str', default=' '),
-            become_user=dict(type='str'),
-            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -195,32 +181,23 @@ def main():
         delta='',
         job_log=[]
     )
-
+    conn = None
     try:
         src = module.params['src']
         type = module.params['type']
         severity_level = module.params['severity_level']
         asp_group = module.params['asp_group'].strip().upper()
         parameters = module.params['parameters']
-        become_user = module.params['become_user']
-        become_user_password = module.params['become_user_password']
 
         startd = datetime.datetime.now()
-
-        try:
-            ibmi_module = imodule.IBMiModule(
-                db_name=asp_group, become_user_name=become_user, become_user_password=become_user_password)
-        except Exception as inst:
-            message = 'Exception occurred: {0}'.format(str(inst))
-            module.fail_json(rc=999, msg=message)
-
+        conn = ibmi_util.itoolkit_init(asp_group)
         src = os.path.realpath(src)
         if not os.path.isfile(src):
-            return_error(module, ibmi_module, "src {p_src} doesn't exist.".format(p_src=src), '', startd, result)
+            return_error(module, "src {p_src} doesn't exist.".format(p_src=src), '', conn, startd, result)
 
         f = open(src, "r")
         if not f:
-            return_error(module, ibmi_module, "Can't open src {p_src}.".format(p_src=src), '', startd, result)
+            return_error(module, "Can't open src {p_src}.".format(p_src=src), '', conn, startd, result)
 
         command = ''
         if type == 'CL':
@@ -234,40 +211,42 @@ def main():
                             command = command + line_command[:-1]
                         else:
                             command = command + line_command
-                        rc, out, error = ibmi_module.itoolkit_run_command(command)
+                        rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
                         if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
                             break
                         command = ''
                 elif command != '':
-                    rc, out, error = ibmi_module.itoolkit_run_command(command)
+                    rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
                     if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
                         break
                     command = ''
             if command != '':
-                rc, out, error = ibmi_module.itoolkit_run_command(command)
+                rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
                 ibmi_util.log_debug("run command: " + command, module._name)
         else:
             command = "QSYS/RUNSQLSTM SRCSTMF('{p_src}') ERRLVL({p_severity_level}) {p_parameters}".format(
                 p_src=src,
                 p_severity_level=severity_level,
                 p_parameters=parameters)
-            rc, out, error = ibmi_module.itoolkit_run_command(command)
+            rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
             ibmi_util.log_debug("RUNSQLSTM: " + command, module._name)
             if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-                return_error(module, ibmi_module, "Execute sql statement file {p_command} failed. err: \n {p_err}".format(
+                return_error(module, "Execute sql statement file {p_command} failed. err: \n {p_err}".format(
                     p_command=command,
                     p_err=error),
                     out,
+                    conn,
                     startd,
                     result)
 
         endd = datetime.datetime.now()
         delta = endd - startd
         if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-            return_error(module, ibmi_module, "Execute command {p_command} failed. err: {p_err}".format(
+            return_error(module, "Execute command {p_command} failed. err: {p_err}".format(
                 p_command=command,
                 p_err=error),
                 out,
+                conn,
                 startd,
                 result)
         result['stdout'] = "Successfully execute script file."
@@ -279,6 +258,8 @@ def main():
                       'stderr': "Unexpected exception happens. error: {p_to_text}. Use -vvv for more information.".format(
                           p_to_text=to_text(e))})
         module.fail_json(**result)
+    finally:
+        ibmi_util.itoolkti_close_connection(conn)
 
 
 if __name__ == '__main__':

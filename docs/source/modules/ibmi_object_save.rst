@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_save.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_save.py
 
 .. _ibmi_object_save_module:
 
@@ -38,26 +38,6 @@ asp_group
   | **required**: false
   | **type**: str
   | **default**: \*SYSBAS
-
-
-     
-become_user
-  The name of the user profile that the IBM i task will run under.
-
-  Use this option to set a user with desired privileges to run the task.
-
-
-  | **required**: false
-  | **type**: str
-
-
-     
-become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
-
-
-  | **required**: false
-  | **type**: str
 
 
      
@@ -164,7 +144,7 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary with become user.
+   - name: Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary.
      ibmi_object_save:
        object_names: 'test1 test2'
        object_lib: 'objlib'
@@ -173,8 +153,6 @@ Examples
        savefile_lib: 'archlib'
        force_save: True
        target_release: 'V7R2M0'
-       become_user: 'USER1'
-       become_user_password: 'yourpassword'
 
 
 

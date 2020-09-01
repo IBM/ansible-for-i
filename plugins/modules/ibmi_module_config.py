@@ -267,7 +267,7 @@ def main():
             os.chown(log_config_dir, pwd.getpwnam('QSYS').pw_uid, -1)
             os.chown(log_config_file_path, pwd.getpwnam('QSYS').pw_uid, -1)
         except Exception as e:
-            ibmi_util.log_info("chown to QSYS error: " + str(e), module._name)
+            pass
 
     module.exit_json(
         rc=0,

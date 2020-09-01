@@ -23,8 +23,8 @@ authors:
   - Wang Yun <cdlwangy@cn.ibm.com>
   - Jin Yifan <jinyifan@cn.ibm.com>
   - Xu Meng <mengxumx@cn.ibm.com>
-  - Zhang Yan <bjyanz@cn.ibm.com>
   - Zhao Yao <zhaoyao@cn.ibm.com>
+
 
 ### OPTIONAL but strongly recommended
 
@@ -52,7 +52,7 @@ tags: [infrastructure, ibmi, power, ibm]
 dependencies: {}
 
 # The URL of the originating SCM repository
-repository: https://github.com/IBM/ansible-for-i/tree/1.0.0
+repository: https://github.com/IBM/ansible-for-i/tree/1.0.1
 
 # The URL to any online docs
 documentation: https://ibm.github.io/ansible-for-i/index.html
@@ -74,4 +74,3 @@ build_ignore:
   - .script
   - .DS_Store
   - .gitkeep
-  - .github

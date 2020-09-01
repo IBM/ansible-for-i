@@ -14,8 +14,6 @@
 # 7. verify max_log_size_mb tower_settings
 # 8. verify each log_level prints right level of logs
 # 9. use an *USER user to run some test, permission denied error expected.
-# 10. lock cfg file, to see if module can run and log can be written. - YES/YES
-# 11. lock log file, to see if module can run and log can be written. - YES/NO
  
 - block:
   - set_fact:
@@ -57,7 +55,7 @@
     assert:
       that:
         - set_result.rc == 255
-        - '"Current user write permission denied" in set_result.msg' 
+        - '"Current user write permission denied for IBMi Ansible configuration directory" in set_result.msg' 
 
   - name: TC00 - write log to a dir with no authority to
     ibmi_module_config:
@@ -91,7 +89,7 @@
     assert:
       that:
         - cuz_result.rc == 255
-        - '"Current user write permission denied" in cuz_result.msg' 
+        - '"Current user write permission denied for IBMi Ansible log directory" in cuz_result.msg' 
 
   - name: TC01 - switch to superuser as {{ansible_ssh_user}}
     set_fact: 
@@ -311,6 +309,15 @@
     register: grep_newlog_result
     failed_when: '"- ibmi_message: version:" not in grep_newlog_result.stdout'
 
+#日志级别：
+#critical > error > warning > info > debug,notset
+#级别越高打印的日志越少
+#debug    : 打印全部的日志(notset等同于debug)
+#info     : 打印info,warning,error,critical级别的日志
+#warning  : 打印warning,error,critical级别的日志
+#error    : 打印error,critical级别的日志
+#critical : 打印critical级别 这次新加的
+
   - name: TC09A - set log_level to debug
     ibmi_module_config:
       section: log_config
@@ -343,11 +350,11 @@
   - name: TC09A - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - ibmi_message:" in grep_result.stdout'
+        - '"INFO - ibmi_message:" in grep_result.stdout'
+        - '"WARNING - ibmi_message:" in grep_result.stdout'
+        - '"ERROR - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
 
   - name: TC09B - set log_level to info
     ibmi_module_config:
@@ -381,11 +388,11 @@
   - name: TC09B - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - ibmi_message:" in grep_result.stdout'
+        - '"WARNING - ibmi_message:" in grep_result.stdout'
+        - '"ERROR - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
 
   - name: TC09C - set log_level to warning
     ibmi_module_config:
@@ -419,11 +426,11 @@
   - name: TC09C - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - ibmi_message:" in grep_result.stdout'
+        - '"ERROR - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
 
   - name: TC09D - set log_level to error
     ibmi_module_config:
@@ -457,11 +464,11 @@
   - name: TC09D - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - ibmi_message:" not in grep_result.stdout'
+        - '"ERROR - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
 
   - name: TC09E - set log_level to critical
     ibmi_module_config:
@@ -495,105 +502,16 @@
   - name: TC09E - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-
-  - name: TC10 - lock cfg file by CHKOUT on os400
-    ibmi_cl_command:
-      cmd: CHKOUT OBJ('/etc/ansible/ibmi_ansible.cfg') #When an object is checked out, other users can read and copy the object.  Only the user who has the object checked out can change the object until it is checked in (see the Check In Object (CHKIN) command).                                                            
-    register: chkout_result
-    failed_when: chkout_result.rc != 0
-
-  - name: TC10 - clear current log file 
-    shell: cat /dev/null > /var/ansible_log/ibmi_ansible_modules_cuz.log
-    register: clear_result
-    failed_when: clear_result.rc != 0
+        - '"DEBUG - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - ibmi_message:" not in grep_result.stdout'
+        - '"ERROR - ibmi_message:" not in grep_result.stdout'
+        - '"CRITICAL - ibmi_message:" in grep_result.stdout'
 
 
-  - name: TC10 - run a module to see if log is written
-    ibmi_message:
-      operation: 'find'
-      message_type: 'NO_REPLY'
-      message_lib: 'QUSRSYS'
-      message_queue: ['QPGMR', 'QSECOFR']
-    ignore_errors: true  #Just need the log, ignore any error
-
-
-  - name: TC10 - check if all logs are print except debug and info
-    shell: "grep -i ' - ibmi_message' /var/ansible_log/ibmi_ansible_modules_cuz.log"
-    register: grep_result
-    failed_when: grep_result.rc != 0
-
-  - name: TC10 - assert result
-    assert:
-      that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-
-  - name: TC10 - chkin the locked file on os400
-    ibmi_cl_command:
-      cmd: CHKIN OBJ('/etc/ansible/ibmi_ansible.cfg') #When an object is checked out, other users can read and copy the object.  Only the user who has the object checked out can change the object until it is checked in (see the Check In Object (CHKIN) command).                                                            
-    register: chkin_result
-    failed_when: chkin_result.rc != 0  
-
-  - name: TC11 - touch a new log file, since if you use existing log file, it's already locked while module is running
-    file:
-      path: "/var/ansible_log/ibmi_ansible_modules_new.log"
-      state: touch
-      mode: 0777
-    
-  - name: TC11 - lock the log file to see if module can run and log can be written - set a new log file  
-    ibmi_module_config:
-      section: log_config
-      config_dir: etc     # effective for current user only
-      log_level: critical
-      no_log: false
-      log_dir: /var/ansible_log
-      log_file: ibmi_ansible_modules_new.log
-    register: setinfo_result
-    failed_when: setinfo_result.rc != 0  
-
-
-  - name: TC11 - lock the new log file 
-    ibmi_cl_command:
-      cmd: CHKOUT OBJ('/var/ansible_log/ibmi_ansible_modules_new.log') #When an object is checked out, other users can read and copy the object.  Only the user who has the object checked out can change the object until it is checked in (see the Check In Object (CHKIN) command).                                                            
-    register: chkout_result
-    failed_when: chkout_result.rc != 0
-
-  - name: TC11 - switch to *USER created above(ibmi_user) for authority negative test
-    set_fact: 
-      ansible_ssh_user: "{{ibmi_user}}"
-   
-  - name: TC11 - try to run a module with the switched user and write a log entry to log file should be failed
-    ibmi_message:
-      operation: 'find'
-      message_type: 'NO_REPLY'
-      message_lib: 'QUSRSYS'
-      message_queue: ['QPGMR', 'QSECOFR']
-    ignore_errors: true  #Just need the log, ignore any error
-
-  - name: TC11 - check log file to see if any entry is written
-    shell: "grep -i ' - ibmi_message' /var/ansible_log/ibmi_ansible_modules_new.log"
-    register: grep_result
-    failed_when: grep_result.rc != 1      # rc=1 means nothing found
-
-  - name: TC11 - switch to superuser and check in the file for deletion
-    set_fact: 
-      ansible_ssh_user: "{{superuser}}"
-
-  - name: TC11 - chkin the locked log file on os400
-    ibmi_cl_command:
-      cmd: CHKIN OBJ('/var/ansible_log/ibmi_ansible_modules_new.log') #When an object is checked out, other users can read and copy the object.  Only the user who has the object checked out can change the object until it is checked in (see the Check In Object (CHKIN) command).                                                            
-    register: chkin_result
-    failed_when: chkin_result.rc != 0 
 
   always:
+
     - name: switch to superuser
       set_fact: 
         ansible_ssh_user: "{{superuser}}"

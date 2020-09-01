@@ -4,7 +4,6 @@
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
 # Test dependent packages 
-- include: become.yml
 - block: 
     - include: install_rpm.yml 
       vars: 
@@ -165,7 +164,7 @@
 
 - name: TC11 Run CL command with OUTPUT parameter DSPLIBL OUTPUT(*)
   ibmi_cl_command:
-    cmd: DSPLIBL
+    cmd: DSPLIBL OUTPUT(*)
   register: dsplibl_result_1
 
 - name: TC11 run CL command with OUTPUT parameter and joblog=True
@@ -182,4 +181,3 @@
   failed_when: "dltlib_result_2.rc != 0 and (dltlib_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length) == 0"
 
 - include: iasp.yml
-#- include: become.yml
