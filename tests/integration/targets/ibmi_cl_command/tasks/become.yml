@@ -1,6 +1,6 @@
 # Test become_user and become_user_password
 - set_fact:
-    becomeuser: 'ansibecome'
+    becomeuser: 'anbecome'
     becomepwd: 'password'
     libname: 'becomelib'
   no_log: true
@@ -49,6 +49,14 @@
         cmd: 'qsys/crtlib {{libname}}4'
         become_user: '{{becomeuser.upper()}}'
         become_user_password: 'abcdeft'
+      register: neg_result
+      failed_when: neg_result.failed != true
+
+    - name: TC03 create a library without a password
+      ibmi_cl_command:
+        cmd: 'qsys/crtlib {{libname}}4'
+        become_user: '{{becomeuser.upper()}}'
+        #become_user_password: 'abcdeft'
       register: neg_result
       failed_when: neg_result.failed != true
 
@@ -155,11 +163,13 @@
     - name: delete libraries
       ibmi_cl_command:
         cmd: qsys/dltlib {{item}}
-      ignore_errors: true
       loop:
         - "{{libname}}1"
         - "{{libname}}2" 
-        
+        - "{{libname}}3"
+        - "{{libname}}4" 
+      ignore_errors: true
+
     - name: delete the user profile
       ibmi_user_and_group:
         operation: 'delete'

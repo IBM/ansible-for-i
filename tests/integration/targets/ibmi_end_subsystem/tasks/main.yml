@@ -4,6 +4,7 @@
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
 - block:
+    - include: become.yml
     - name: TC01 check whether QBATCH is running
       ibmi_sql_query:
         sql: "SELECT * 
