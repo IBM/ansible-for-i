@@ -50,15 +50,6 @@ options:
       - Only works when force is C(True).
     type: bool
     default: False
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 
 notes:
     - ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
@@ -69,14 +60,12 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: Copy test.file on local to a remote IBM i with become user.
+- name: Copy test.file on local to a remote IBM i.
   ibmi_copy:
     src: '/backup/test.file'
     lib_name: 'testlib'
     force: True
     backup: True
-    become_user: 'USER1'
-    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''

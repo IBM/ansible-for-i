@@ -100,15 +100,6 @@ options:
       - If using multiple hosts with the same filename, the file will be overwritten for each host.
     type: bool
     default: False
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 
 notes:
     - ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
@@ -131,13 +122,11 @@ EXAMPLES = r'''
     backup: True
     target_release: 'V7R2M0'
 
-- name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file with become user.
+- name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.
   ibmi_fetch:
     lib_name: 'objlib'
     dest: '/backup'
     flat: True
-    become_user: 'USER1'
-    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''

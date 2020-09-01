@@ -36,8 +36,6 @@ class ActionModule(ActionBase):
         'dest',
         'flat',
         'validate_checksum',
-        'become_user',
-        'become_user_password'
     ))
 
     def _calculate_savf_path(self, object_names, lib_name):
@@ -156,8 +154,6 @@ class ActionModule(ActionBase):
             dest = self._task.args.get('dest', None)
             flat = boolean(self._task.args.get('flat', False), strict=True)
             validate_checksum = boolean(self._task.args.get('validate_checksum', True), strict=True)
-            become_user = self._task.args.get('become_user', None)
-            become_user_password = self._task.args.get('become_user_password', None)
 
             # validate dest are strings FIXME: use basic.py and module specs
             if not isinstance(dest, string_types):
@@ -192,8 +188,7 @@ class ActionModule(ActionBase):
             if len(object_names.split()) == 1 and is_lib is not True:
                 if object_types == '*ALL' or object_types == '*FILE':
                     if (object_names.split())[0][-1] == '*':
-                        module_args = {'object_name': object_names[0:-1] + '+', 'lib_name': lib_name, 'use_regex': True,
-                                       'become_user': become_user, 'become_user_password': become_user_password}
+                        module_args = {'object_name': object_names[0:-1] + '+', 'lib_name': lib_name, 'use_regex': True}
                         module_output = self._execute_module(module_name='ibmi_object_find', module_args=module_args)
                         save_result = module_output
                         if not save_result.get('failed'):
@@ -204,8 +199,7 @@ class ActionModule(ActionBase):
                                 savf_name = save_result['object_list'][0]['OBJNAME']
                                 is_savf = True
                     else:
-                        module_args = {'object_name': object_names, 'lib_name': lib_name, 'become_user': become_user,
-                                       'become_user_password': become_user_password}
+                        module_args = {'object_name': object_names, 'lib_name': lib_name}
                         module_output = self._execute_module(module_name='ibmi_object_find', module_args=module_args)
                         save_result = module_output
                         if not save_result.get('failed'):
@@ -226,15 +220,14 @@ class ActionModule(ActionBase):
                     omitfile = 'OMITOBJ(({p_lib_name}/{p_savf_name} *FILE))'.format(p_lib_name=lib_name, p_savf_name=savf_name)
                     module_args = {'lib_name': lib_name, 'savefile_name': savf_name, 'savefile_lib': lib_name,
                                    'target_release': target_release, 'force_save': force_save, 'joblog': True,
-                                   'parameters': omitfile, 'become_user': become_user, 'become_user_password': become_user_password}
+                                   'parameters': omitfile}
                     display.debug("ibm i debug: call ibmi_lib_save {p_module_args}".format(p_module_args=module_args))
                     module_output = self._execute_module(module_name='ibmi_lib_save', module_args=module_args)
                 else:
                     omitfile = 'OMITOBJ(({p_lib_name}/{p_savf_name} *FILE))'.format(p_lib_name=lib_name, p_savf_name=savf_name)
                     module_args = {'object_names': object_names, 'object_lib': lib_name, 'object_types': object_types,
                                    'savefile_name': savf_name, 'savefile_lib': lib_name, 'target_release': target_release,
-                                   'force_save': force_save, 'joblog': True, 'parameters': omitfile, 'become_user': become_user,
-                                   'become_user_password': become_user_password}
+                                   'force_save': force_save, 'joblog': True, 'parameters': omitfile}
                     display.debug("ibm i debug: call ibmi_object_save {p_module_args}".format(p_module_args=module_args))
                     module_output = self._execute_module(module_name='ibmi_object_save', module_args=module_args)
 
@@ -416,8 +409,7 @@ class ActionModule(ActionBase):
                 cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savf_name}) OBJTYPE(*FILE)'.format(
                     p_lib_name=lib_name,
                     p_savf_name=savf_name)
-                module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd,
-                                                     'become_user': become_user, 'become_user_password': become_user_password})
+                module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
                 save_result = module_output
                 rc = save_result['rc']
                 if rc != 0 and ('CPF2105' not in save_result['stderr']):
