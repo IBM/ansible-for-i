@@ -249,19 +249,6 @@
 <div class="line"><strong>type</strong>: bool</div>
 </div>
 </dd>
-<dt>become_user</dt><dd><p>The name of the user profile that the IBM i task will run under.</p>
-<p>Use this option to set a user with desired privileges to run the task.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>become_user_password</dt><dd><p>Use this option to set the password of the user specified in <code class="docutils literal notranslate"><span class="pre">become_user</span></code>.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
 <dt>dest</dt><dd><p>A local directory to save the file into.</p>
 <p>For example, if the dest directory is /backup save file named /qsys.lib/objlib.lib/test1.file on host host.example.com, would be saved into /backup/host.example.com/qsys.lib/objlib.lib/test1.file. The host name is based on the inventory name. If dest=’’, dest will be current directory.</p>
 <div class="line-block">
@@ -356,13 +343,11 @@
     <span class="nt">backup</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
     <span class="nt">target_release</span><span class="p">:</span> <span class="s">&#39;V7R2M0&#39;</span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file with become user.</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.</span>
   <span class="nt">ibmi_fetch</span><span class="p">:</span>
     <span class="nt">lib_name</span><span class="p">:</span> <span class="s">&#39;objlib&#39;</span>
     <span class="nt">dest</span><span class="p">:</span> <span class="s">&#39;/backup&#39;</span>
     <span class="nt">flat</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-    <span class="nt">become_user</span><span class="p">:</span> <span class="s">&#39;USER1&#39;</span>
-    <span class="nt">become_user_password</span><span class="p">:</span> <span class="s">&#39;yourpassword&#39;</span>
 </pre></div>
 </div>
 </div>
