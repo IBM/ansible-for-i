@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
+  <title>ibmi_sync_files – Synchronize a list of files from current IBM i node A to another IBM i node B. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server." href="ibmi_fix_group_check.html" />
-    <link rel="prev" title="ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local" href="ibmi_fetch.html" /> 
+    <link rel="next" title="ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B" href="ibmi_synchronize.html" />
+    <link rel="prev" title="ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B." href="ibmi_sync.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -100,15 +100,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – End an active subsystem.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_ethernet_port.html">ibmi_ethernet_port – Retrieves all the ethernet ports(both virtual and physical)information on the system.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_group_check.html">ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks</a></li>
@@ -137,7 +129,14 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – Start an inactive subsystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_sync_files.html">ibmi_sync_files – Synchronize a list of files from current IBM i node A to another IBM i node B.</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_sync_files – Synchronize a list of files from current IBM i node A to another IBM i node B.</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize_files.html">ibmi_synchronize_files – Synchronize a list of files from IBM i node A to another IBM i node B</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sysval.html">ibmi_sysval – Displays the specified system value</a></li>
@@ -199,7 +198,7 @@
         
           <li><a href="../modules.html">Modules</a> &raquo;</li>
         
-      <li>ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</li>
+      <li>ibmi_sync_files – Synchronize a list of files from current IBM i node A to another IBM i node B.</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -207,7 +206,7 @@
             
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_sync_files.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -221,128 +220,83 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ibmi-fix-install-remove-or-query-an-individual-fix-or-a-set-of-fixes-on-to-ibm-i-system">
-<span id="ibmi-fix-module"></span><h1>ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.<a class="headerlink" href="#ibmi-fix-install-remove-or-query-an-individual-fix-or-a-set-of-fixes-on-to-ibm-i-system" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="ibmi-sync-files-synchronize-a-list-of-files-from-current-ibm-i-node-a-to-another-ibm-i-node-b">
+<span id="ibmi-sync-files-module"></span><h1>ibmi_sync_files – Synchronize a list of files from current IBM i node A to another IBM i node B.<a class="headerlink" href="#ibmi-sync-files-synchronize-a-list-of-files-from-current-ibm-i-node-a-to-another-ibm-i-node-b" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
 <li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
 <li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
 <li><p><a class="reference internal" href="#notes" id="id4">Notes</a></p></li>
-<li><p><a class="reference internal" href="#see-also" id="id5">See Also</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id6">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id5">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_fix</span></code> module install fixes to target IBM i system.</p></li>
-<li><p>The installation file of the fixes should be in the format of save file.</p></li>
-<li><p>The fixes are normally known as PTFs for IBM i users.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_sync_files</span></code> module synchronize a list of files from current IBM i node to another IBM i node.</p></li>
+<li><p>Only supports SAVF(.file) format synchronize between QSYS and QSYS.</p></li>
 </ul>
 </div>
 <div class="section" id="parameters">
 <h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
-<dt>delayed_option</dt><dd><p>Controls whether the PTF is delayed apply or not</p>
+<dt>dest</dt><dd><p>Path on the destination host that will be synchronized from the source.</p>
+<p>The path must be absolute.</p>
+<p>If specify, all the src files will be synchronized to the directory that dest speicified. Individual dest key in src_list will be ignored.</p>
+<p>If not specify, individual dest will be the dest value inputted in src_list.</p>
+<p>If both dest and dest key in src_list are not specify, individual dest will be equal to individual src in src_list.</p>
+<p>Example ‘/test/dir/’</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: *NO</div>
-<div class="line"><strong>choices</strong>: *YES, *NO, *IMMDLY</div>
 </div>
 </dd>
-<dt>fix_list</dt><dd><p>PTF list that will be applied to the IBM i system.</p>
+<dt>private_key</dt><dd><p>Specifies SSH private key used to connect to remote IBM i host.</p>
+<p>The path can be absolute or relative.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: path</div>
+<div class="line"><strong>default</strong>: ~/.ssh/id_rsa</div>
+</div>
+</dd>
+<dt>remote_host</dt><dd><p>The remote IBM i node address.</p>
+<p>Can be IP or host name.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>remote_user</dt><dd><p>The user name to connect to the remote IBM i node.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>type</strong>: str</div>
+</div>
+</dd>
+<dt>src_list</dt><dd><p>src files information list on the source host.</p>
+<p>Evey src_list element should be a dict. dict can contain ‘src’ and ‘dest’. ‘dest’ is optional.</p>
+<p>The src key is the path to the src, and must be absolute.</p>
+<p>The dest key is the path on the destination host that will be synchronized from the source.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: True</div>
 <div class="line"><strong>type</strong>: list</div>
-<div class="line"><strong>elements</strong>: str</div>
-<div class="line"><strong>default</strong>: [‘*ALL’]</div>
-</div>
-</dd>
-<dt>fix_omit_list</dt><dd><p>The list of PTFs that will be omitted.</p>
-<p>The key of the dict should be the product ID of the fix that is omitted.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: False</div>
-<div class="line"><strong>type</strong>: list</div>
-<div class="line"><strong>elements</strong>: str</div>
-</div>
-</dd>
-<dt>joblog</dt><dd><p>The job log of the job executing the task will be returned even rc is zero if it is set to true.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: bool</div>
-</div>
-</dd>
-<dt>operation</dt><dd><p>The operation for the fix, the options are as follows</p>
-<p>load_and_apply will load the PTF and apply the PTF</p>
-<p>load_only will only load the PTF by LODPTF</p>
-<p>remove_and_delete will remove the PTF and delete the PTF</p>
-<p>remove_only will only remove the PTF</p>
-<p>delete_only will only delete the PTF</p>
-<p>query will return the specific PTF status</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: load_and_apply</div>
-<div class="line"><strong>choices</strong>: load_and_apply, apply_only, load_only, remove, query</div>
-</div>
-</dd>
-<dt>product_id</dt><dd><p>Product identifier to which PTFs are applied.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>save_file_lib</dt><dd><p>The library name of the save file to be installed.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: QGPL</div>
-</div>
-</dd>
-<dt>save_file_object</dt><dd><p>The object name of the save file to be installed.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>temp_or_perm</dt><dd><p>Controls whether the PTF will be permanent applied or temporary applied.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: *TEMP</div>
-<div class="line"><strong>choices</strong>: *TEMP, *PERM</div>
+<div class="line"><strong>elements</strong>: dict</div>
 </div>
 </dd>
 </dl>
 </div>
 <div class="section" id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Remove a single PTF</span>
-  <span class="nt">ibmi_fix</span><span class="p">:</span>
-    <span class="nt">product_id</span><span class="p">:</span> <span class="s">&#39;5770DBM&#39;</span>
-    <span class="nt">delayed_option</span><span class="p">:</span> <span class="s">&quot;*NO&quot;</span>
-    <span class="nt">temp_or_perm</span><span class="p">:</span> <span class="s">&quot;*PERM&quot;</span>
-    <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;remove&#39;</span>
-    <span class="nt">fix_list</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="s">&quot;SI72223&quot;</span>
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Install a single PTF</span>
-  <span class="nt">ibmi_fix</span><span class="p">:</span>
-    <span class="nt">product_id</span><span class="p">:</span> <span class="s">&#39;5770DBM&#39;</span>
-    <span class="nt">save_file_object</span><span class="p">:</span> <span class="s">&#39;QSI72223&#39;</span>
-    <span class="nt">save_file_lib</span><span class="p">:</span> <span class="s">&#39;QGPL&#39;</span>
-    <span class="nt">delayed_option</span><span class="p">:</span> <span class="s">&quot;*NO&quot;</span>
-    <span class="nt">temp_or_perm</span><span class="p">:</span> <span class="s">&quot;*TEMP&quot;</span>
-    <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;load_and_apply&#39;</span>
-    <span class="nt">fix_list</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="s">&quot;SI72223&quot;</span>
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">query ptf</span>
-  <span class="nt">ibmi_fix</span><span class="p">:</span>
-    <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;query&#39;</span>
-    <span class="nt">fix_list</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="s">&quot;SI72223&quot;</span>
-      <span class="p p-Indicator">-</span> <span class="s">&quot;SI70819&quot;</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Synchronize a list of different types of files to host.com.</span>
+  <span class="nt">ibmi_sync_files</span><span class="p">:</span>
+    <span class="nt">src_list</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/tmp/c1.file&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/qsys.lib/fish.lib/&#39;</span><span class="p p-Indicator">}</span>
+      <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/qsys.lib/fish.lib/test.file&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/qsys.lib/fish.lib&#39;</span><span class="p p-Indicator">}</span>
+      <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/tmp/c2.SAVF&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/qsys.lib/fish.lib/&#39;</span><span class="p p-Indicator">}</span>
+      <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/tmp/c3.bin&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/test/dir&#39;</span><span class="p p-Indicator">}</span>
+    <span class="nt">remote_host</span><span class="p">:</span> <span class="s">&#39;host.com&#39;</span>
+    <span class="nt">remote_user</span><span class="p">:</span> <span class="s">&#39;user&#39;</span>
+    <span class="nt">private_key</span><span class="p">:</span> <span class="s">&#39;/home/test/id_rsa&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -350,69 +304,45 @@
 <h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
-</div>
-</div>
-<div class="section" id="see-also">
-<h2><a class="toc-backref" href="#id5">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="ibmi_fix_imgclg.html#ibmi-fix-imgclg-module"><span class="std std-ref">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</span></a></p></li>
-</ul>
+<p>Need install paramiko package on target IBM i.</p>
+<p>Make sure ssh passwordless login works from IBM i node A to IBM i node B.</p>
+<p>private_key must be a rsa key in the legacy PEM private key format.</p>
+<p>Doesn’t support IASP by now.</p>
 </div>
 </div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id6">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl>
-<dt>start</dt><dd><div class="line-block">
-<div class="line">The task execution start time</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: When rc is zero</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
-</div>
-</dd>
-<dt>end</dt><dd><div class="line-block">
-<div class="line">The task execution end time</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: When rc is zero</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
-</div>
-</dd>
 <dt>delta</dt><dd><div class="line-block">
-<div class="line">The task execution delta time</div>
+<div class="line">The execution delta time.</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: When rc is zero</div>
+<div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
 <div class="line"><strong>sample</strong>: 0:00:00.307534</div>
 </div>
 </dd>
 <dt>stdout</dt><dd><div class="line-block">
-<div class="line">The task standard output</div>
+<div class="line">The standard output.</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: CPC2102: Library TESTLIB created</div>
+<div class="line"><strong>sample</strong>: Complete synchronize file list to remote host host.com</div>
 </div>
 </dd>
 <dt>stderr</dt><dd><div class="line-block">
-<div class="line">The task standard error</div>
+<div class="line">The standard error.</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: CPF2111:Library TESTLIB already exists</div>
+<div class="line"><strong>sample</strong>: Exception. not a valid RSA private key file. Use -vvv for more information.</div>
 </div>
 </dd>
 <dt>rc</dt><dd><div class="line-block">
-<div class="line">The task return code (0 means success, non-zero means failure)</div>
+<div class="line">The action return code. 0 means success.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
@@ -420,8 +350,17 @@
 <div class="line"><strong>sample</strong>: 255</div>
 </div>
 </dd>
-<dt>job_log</dt><dd><div class="line-block">
-<div class="line">The job log of the job executes the task.</div>
+<dt>msg</dt><dd><div class="line-block">
+<div class="line">The general message returned.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: No files were successfully transferred.</div>
+</div>
+</dd>
+<dt>success_list</dt><dd><div class="line-block">
+<div class="line">The success transferred list.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
@@ -429,35 +368,49 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;FROM_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;318F&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QWTCHGJB&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_USER&quot;</span><span class="p">:</span> <span class="s2">&quot;CHANGLE&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;QCPFMSG&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;CPD0912&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SECOND_LEVEL_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Cause . . . . . :   This message is used by application programs as a general escape message.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SUBTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Printer device PRT01 not found.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-05-20-21.41.40.845897&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;DIAGNOSTIC&quot;</span><span class="p">,</span> <span class="s2">&quot;ORDINAL_POSITION&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;SEVERITY&quot;</span><span class="p">:</span> <span class="s2">&quot;20&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;9369&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;dest&quot;</span><span class="p">:</span> <span class="s2">&quot;/qsys.lib/fish.lib/&quot;</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/c1.file&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;dest&quot;</span><span class="p">:</span> <span class="s2">&quot;/qsys.lib/fish.lib/&quot;</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/c2.SAVF&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/c3.log&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>fail_list</dt><dd><div class="line-block">
+<div class="line">The fail transferred list.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;dest&quot;</span><span class="p">:</span> <span class="s2">&quot;/qsys.lib/fish.lib/&quot;</span><span class="p">,</span> <span class="s2">&quot;fail_reason&quot;</span><span class="p">:</span> <span class="s2">&quot;Can</span><span class="se">\u0027</span><span class="s2">t sync file to /QSYS.LIB&quot;</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;/qsys.lib/fish.lib/test.file&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;dest&quot;</span><span class="p">:</span> <span class="s2">&quot;/qsys.lib/fish.lib/&quot;</span><span class="p">,</span> <span class="s2">&quot;fail_reason&quot;</span><span class="p">:</span> <span class="s2">&quot;src /qsys.lib/fish.lib/test.file doesn</span><span class="se">\u0027</span><span class="s2">t exist.&quot;</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/c4.SAVF&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
 </dd>
 <dt>stdout_lines</dt><dd><div class="line-block">
-<div class="line">The task standard output split in lines</div>
+<div class="line">The standard output split in lines.</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPC2102: Library TESTLIB created.&quot;</span><span class="p">]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;Complete synchronize file list to remote host host.com&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div></blockquote>
 </dd>
 <dt>stderr_lines</dt><dd><div class="line-block">
-<div class="line">The task standard error split in lines</div>
+<div class="line">The standard error split in lines.</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;Exception. not a valid RSA private key file. Use -vvv for more information.&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -475,10 +428,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="ibmi_fix_group_check.html" class="btn btn-neutral float-right" title="ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="ibmi_synchronize.html" class="btn btn-neutral float-right" title="ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="ibmi_fetch.html" class="btn btn-neutral float-left" title="ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ibmi_sync.html" class="btn btn-neutral float-left" title="ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
