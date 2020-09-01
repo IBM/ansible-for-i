@@ -27,15 +27,6 @@ options:
     choices: ['display']
     type: str
     default: 'display'
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 
 notes:
   - The following PTFs are required for getting the default MAC address of a port,
@@ -271,8 +262,6 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             operation=dict(type='str', choices=['display'], default='display'),
-            become_user=dict(type='str'),
-            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )

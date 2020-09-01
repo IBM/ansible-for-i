@@ -73,15 +73,6 @@ options:
         It is ignored for all other addresses.
     type: str
     default: ''
-  become_user:
-    description:
-      - The name of the user profile that the IBM i task will run under.
-      - Use this option to set a user with desired privileges to run the task.
-    type: str
-  become_user_password:
-    description:
-      - Use this option to set the password of the user specified in C(become_user).
-    type: str
 
 notes:
   - This module supports IBMi 7.4 and above release, and 5770SS1 option 48 is required.
@@ -108,8 +99,6 @@ EXAMPLES = r'''
   ibmi_nrg_link:
     operation: remove
     source_address: 10.0.0.1
-    become_user: 'USER1'
-    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -174,8 +163,6 @@ def main():
             change_load_balance_link_count=dict(type='bool', default=True),
             line_description=dict(type='str', default=''),
             virtual_lan_id=dict(type='str', default=''),
-            become_user=dict(type='str'),
-            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
         required_if=[
