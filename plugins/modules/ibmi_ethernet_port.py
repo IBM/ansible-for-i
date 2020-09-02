@@ -266,8 +266,10 @@ def main():
         supports_check_mode=True,
     )
     ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
-    become_user = module.params['become_user']
-    become_user_password = module.params['become_user_password']
+    # become_user = module.params['become_user']
+    # become_user_password = module.params['become_user_password']
+    become_user = None
+    become_user_password = None
 
     rc = SUCCESS
     ethernet_ports = []

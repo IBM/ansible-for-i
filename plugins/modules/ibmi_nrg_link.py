@@ -178,8 +178,10 @@ def main():
     change_load_balance_link_count = module.params['change_load_balance_link_count']
     line_description = module.params['line_description']
     virtual_lan_id = module.params['virtual_lan_id']
-    become_user = module.params['become_user']
-    become_user_password = module.params['become_user_password']
+    # become_user = module.params['become_user']
+    # become_user_password = module.params['become_user_password']
+    become_user = None
+    become_user_password = None
 
     if change_load_balance_link_count:
         change_load_balance_link_count_str = 'YES'
