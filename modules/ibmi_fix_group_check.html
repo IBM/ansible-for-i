@@ -250,6 +250,14 @@
 <div class="line"><strong>default</strong>: [‘*ALL’]</div>
 </div>
 </dd>
+<dt>validate_certs</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">False</span></code>, the SSL certificate verification will be disabled. It’s recommended for test scenario.</p>
+<p>It’s recommended to enable the SSL certificate verification for security concern.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
+</div>
+</dd>
 </dl>
 </div>
 <div class="section" id="examples">
@@ -258,6 +266,12 @@
   <span class="nt">ibmi_fix_group_check</span><span class="p">:</span>
     <span class="nt">groups</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="s">&quot;SF12345&quot;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Check the PTF groups without certificate verification</span>
+  <span class="nt">ibmi_fix_group_check</span><span class="p">:</span>
+    <span class="nt">groups</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;SF12345&quot;</span>
+    <span class="nt">validate_certs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
 </pre></div>
 </div>
 </div>
@@ -265,7 +279,8 @@
 <h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3.</p>
+<p>If the module is delegated to an IBM i server and SSL certificate verification is enabled, package <code class="docutils literal notranslate"><span class="pre">ca-certificates-mozilla</span></code> is required.</p>
 </div>
 </div>
 <div class="section" id="return-values">
