@@ -39,6 +39,18 @@ groups
   | **default**: ['\*ALL']
 
 
+     
+validate_certs
+  If set to ``False``, the SSL certificate verification will be disabled. It's recommended for test scenario.
+
+  It's recommended to enable the SSL certificate verification for security concern.
+
+
+  | **required**: False
+  | **type**: bool
+  | **default**: True
+
+
 
 
 Examples
@@ -52,6 +64,12 @@ Examples
        groups:
          - "SF12345"
 
+   - name: Check the PTF groups without certificate verification
+     ibmi_fix_group_check:
+       groups:
+         - "SF12345"
+       validate_certs: False
+
 
 
 
@@ -59,7 +77,9 @@ Notes
 -----
 
 .. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3.
+
+   If the module is delegated to an IBM i server and SSL certificate verification is enabled, package ``ca-certificates-mozilla`` is required.
 
 
 

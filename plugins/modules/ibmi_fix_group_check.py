@@ -28,9 +28,17 @@ options:
     elements: str
     default: ['*ALL']
     required: false
+  validate_certs:
+    description:
+      - If set to C(False), the SSL certificate verification will be disabled. It's recommended for test scenario.
+      - It's recommended to enable the SSL certificate verification for security concern.
+    type: bool
+    default: True
+    required: false
 
 notes:
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3
+   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3.
+   - If the module is delegated to an IBM i server and SSL certificate verification is enabled, package C(ca-certificates-mozilla) is required.
 
 author:
     - Zhang Yan (@bjyanz)
@@ -41,6 +49,12 @@ EXAMPLES = r'''
   ibmi_fix_group_check:
     groups:
       - "SF12345"
+
+- name: Check the PTF groups without certificate verification
+  ibmi_fix_group_check:
+    groups:
+      - "SF12345"
+    validate_certs: False
 '''
 
 RETURN = r'''
@@ -84,8 +98,8 @@ __ibmi_module_version__ = "1.0.2"
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 
 
-def get_psp_group_info():
-    response = urls.open_url(PSP_URL)
+def get_psp_group_info(validate_certs):
+    response = urls.open_url(PSP_URL, validate_certs=validate_certs)
     data = response.read().decode("utf-8")
 
     dom = parseString(data)
@@ -112,7 +126,8 @@ def get_psp_group_info():
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            groups=dict(type='list', elements='str', default=['*ALL'])
+            groups=dict(type='list', elements='str', default=['*ALL']),
+            validate_certs=dict(type='bool', default=True)
         ),
         supports_check_mode=True,
     )
@@ -125,8 +140,9 @@ def main():
         stderr=''
     )
     groups_num = module.params['groups']
+    validate_certs = module.params['validate_certs']
 
-    psp_groups = get_psp_group_info()
+    psp_groups = get_psp_group_info(validate_certs)
 
     if groups_num[0] == '*ALL':
         # check all the PTF groups
