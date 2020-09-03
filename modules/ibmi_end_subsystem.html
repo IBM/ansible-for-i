@@ -36,7 +36,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local" href="ibmi_fetch.html" />
+    <link rel="next" title="ibmi_ethernet_port – Retrieves all the ethernet ports(both virtual and physical)information on the system." href="ibmi_ethernet_port.html" />
     <link rel="prev" title="ibmi_display_subsystem – Displays all currently active subsystems or currently active jobs in a subsystem" href="ibmi_display_subsystem.html" /> 
 </head>
 
@@ -106,8 +106,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_ethernet_port.html">ibmi_ethernet_port – Retrieves all the ethernet ports(both virtual and physical)information on the system.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_group_check.html">ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all nonconfigure disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server</a></li>
@@ -118,6 +120,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_lib_save.html">ibmi_lib_save – Save one libary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_message.html">ibmi_message – Search message</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_module_config.html">ibmi_module_config – Configures managed nodes settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_nrg_link.html">ibmi_nrg_link – Manages NRGs(Network Redundancy Groups) links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, revoke or display object authority</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects</a></li>
@@ -130,10 +133,13 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_script_execute.html">ibmi_script_execute – Execute a cl/sql script file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sql_execute.html">ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sql_query.html">ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sqlite3.html">ibmi_sqlite3 – Executes a SQL statement via sqlite3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_start_subsystem.html">ibmi_start_subsystem – Start an inactive subsystem</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_submit_job.html">ibmi_submit_job – Submit a job on IBM i system. This module functions like SBMJOB.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sync.html">ibmi_sync – Synchronize a save file from current IBM i node A to another IBM i node B.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_sync_files.html">ibmi_sync_files – Synchronize a list of files from current IBM i node A to another IBM i node B.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize.html">ibmi_synchronize – Synchronize a save file from IBM i node A to another IBM i node B</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_synchronize_files.html">ibmi_synchronize_files – Synchronize a list of files from IBM i node A to another IBM i node B</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_sysval.html">ibmi_sysval – Displays the specified system value</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_interface.html">ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server</a></li>
@@ -396,7 +402,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="ibmi_fetch.html" class="btn btn-neutral float-right" title="ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="ibmi_ethernet_port.html" class="btn btn-neutral float-right" title="ibmi_ethernet_port – Retrieves all the ethernet ports(both virtual and physical)information on the system." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="ibmi_display_subsystem.html" class="btn btn-neutral float-left" title="ibmi_display_subsystem – Displays all currently active subsystems or currently active jobs in a subsystem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
