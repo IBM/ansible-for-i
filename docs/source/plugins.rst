@@ -21,3 +21,5 @@ Action
 * ``ibmi_script``: An action plugin that is to allow run CL scripts and SQL scripts on IBM i nodes .
 
 * ``ibmi_synchronize``: An action plugin that is to allow synchronize SAVF objects.
+
+* ``ibmi_synchronize_files``: An action plugin that is to allow synchronize multiple SAVF objects.
