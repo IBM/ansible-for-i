@@ -1,0 +1,187 @@
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+
+# Define group number of different target IBM i
+- set_fact:
+    group_74: ['SF99740', 'SF99739', 'SF99704', 'SF99665', 'SF99662', 'SF99738']
+    group_73: ['SF99730', 'SF99729', 'SF99703', 'SF99725', 'SF99722', 'SF99728']
+    group_72: ['SF99720', 'SF99719', 'SF99702', 'SF99716', 'SF99713', 'SF99718']
+
+- name: remove required packages from ibm i server
+  command: '/QOpensys/pkgs/bin/yum remove ca-certificates-mozilla -y'
+  ignore_errors: true
+- name: remove required packages from ibm i server
+  command: '/QOpensys/pkgs/bin/yum remove ca-certificates -y'
+  ignore_errors: true
+
+- name: TC00 run module with validate_certs
+  ibmi_fix_group_check:
+    validate_certs: false
+    groups: '{{group_74}}'
+  register: group_check_result
+  failed_when: group_check_result.failed == true 
+
+- name: TC00 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result.count == 6
+      - group_check_result.group_info | length == 6
+
+- name: TC00 run module with validate_certs
+  ibmi_fix_group_check:
+    groups: '{{group_74}}'
+  register: group_check_result
+  failed_when: group_check_result.failed != true 
+
+- name: TC00 run module with a single PTF group with validate_certs
+  ibmi_fix_group_check:
+    validate_certs: true
+    groups: '{{group_74}}'
+  register: group_check_result
+  failed_when: group_check_result.failed != true 
+
+- name: remove required packages from ibm i server
+  command: '/QOpensys/pkgs/bin/yum install ca-certificates-mozilla -y'
+
+- name: TC00 run module with a single PTF group with validate_certs
+  ibmi_fix_group_check:
+    validate_certs: true
+    groups: '{{group_74}}'
+  register: group_check_result
+  failed_when: group_check_result.failed == true 
+
+- name: TC00 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result.count == 6
+      - group_check_result.group_info | length == 6
+
+- name: TC01 run module without options
+  ibmi_fix_group_check:
+  register: group_check_result
+
+- name: TC01 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result.stderr is defined
+      - group_check_result.rc == 0
+      - group_check_result.count >= 18
+      - group_check_result.group_info | length >= 18
+      - group_check_result.group_info[0]["PTF_GROUP_NUMBER"] is defined
+      - group_check_result.group_info[0]["RELEASE"] is defined
+      - group_check_result.group_info[0]["TITLE"] is defined
+      - group_check_result.group_info[0]["RELEASE_DATE"] is defined
+      - group_check_result.group_info[0]["PTF_GROUP_LEVEL"] is defined
+
+- name: assert all groups defined in group_74 can be found in the returned list
+  assert:
+    that:
+      - (group_check_result.group_info | selectattr('PTF_GROUP_NUMBER', 'equalto', '{{item}}') | map(attribute='PTF_GROUP_NUMBER') | list | length) == 1
+  loop: '{{group_74}}'
+
+- name: TC02 run module with groups
+  ibmi_fix_group_check:
+    groups: ['*ALL']
+  delegate_to: localhost
+  register: group_check_result_local
+
+- name: TC02 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result_local.rc == 0
+      - group_check_result_local.count >= 18
+      - group_check_result_local.group_info | length >= 18
+      - group_check_result_local.group_info[0]["PTF_GROUP_NUMBER"] is defined
+      - group_check_result_local.group_info[0]["RELEASE"] is defined
+      - group_check_result_local.group_info[0]["TITLE"] is defined
+      - group_check_result_local.group_info[0]["RELEASE_DATE"] is defined
+      - group_check_result_local.group_info[0]["PTF_GROUP_LEVEL"] is defined
+      - group_check_result_local.group_info == group_check_result.group_info
+
+- name: TC03 run module with groups
+  ibmi_fix_group_check:
+    groups: '{{group_74[0:3]}}'
+  register: group_check_result
+
+- name: TC03 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result.count == 3
+      - group_check_result.group_info | length == 3
+
+- name: TC04 run module with a single PTF group
+  ibmi_fix_group_check:
+    groups: '{{group_74[0]}}'
+  register: group_check_result
+
+- name: TC04 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result.count == 1
+      - group_check_result.group_info | length == 1
+      - group_check_result.group_info[0]["PTF_GROUP_NUMBER"] == group_74[0] 
+
+# - name: TC05 run module with groups
+#   ibmi_fix_group_check:
+#     groups: '{{group_74[-1].lower()}}'
+#   register: group_check_result
+
+# - name: TC05 assert the defined parameters are returned
+#   assert:
+#     that:
+#       - group_check_result.count == 1
+#       - group_check_result.group_info | length == 1
+#       - group_check_result.group_info[0]["PTF_GROUP_NUMBER"] == group_74[-1]
+
+- name: TC06 run module with an invalid group name
+  ibmi_fix_group_check:
+    groups: 'abc'
+  register: group_check_result
+
+- name: TC06 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result.stderr is defined
+      - group_check_result.count == 0 
+      - group_check_result.group_info == []
+
+- name: TC07 run module with an invalid group name
+  ibmi_fix_group_check:
+    groups: ['abc']
+  register: group_check_result
+
+- name: TC07 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result.stderr is defined
+      - group_check_result.count == 0 
+      - group_check_result.group_info == []
+
+- name: TC08 run module with a single PTF group
+  ibmi_fix_group_check:
+    groups: 
+      - '{{group_74[0]}}'
+      - '{{group_73[0]}}'
+  register: group_check_result
+
+- name: TC08 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result.count == 2
+      - group_check_result.group_info | length == 2
+
+- name: TC09 run module with a single PTF group
+  ibmi_fix_group_check:
+    groups: 
+      - '{{group_74[0]}}'
+      - 'abc'
+  register: group_check_result
+
+- name: TC09 assert the defined parameters are returned
+  assert:
+    that:
+      - group_check_result.count == 1
+      - group_check_result.group_info | length == 1
+      - group_check_result.group_info[0]["PTF_GROUP_NUMBER"] == group_74[0]

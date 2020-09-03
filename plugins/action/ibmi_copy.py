@@ -14,7 +14,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "1.0.2"
 
 display = Display()
 
@@ -85,7 +85,7 @@ class ActionModule(ActionBase):
         if task_vars is None:
             task_vars = dict()
 
-        result = super(ActionModule, self).run(tmp, task_vars)
+        result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
 
         try:
@@ -130,7 +130,7 @@ class ActionModule(ActionBase):
             try:
                 src = self._loader.get_real_file(self._find_needle('files', src))
             except AnsibleError as e:
-                raise AnsibleActionFail(to_native(e))
+                raise AnsibleActionFail(to_native(e)) from e
 
             lib_name = lib_name.upper()
             startd = datetime.datetime.now()

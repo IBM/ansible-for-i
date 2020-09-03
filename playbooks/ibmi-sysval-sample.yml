@@ -1,0 +1,111 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # The sample file is to provide an example about how to query and check system values
+
+# Restriction: 
+  # You must have either all object (*ALLOBJ) or audit (*AUDIT) special authority to retrieve
+  # the values for QAUDCTL, QAUDENDACN, QAUDFRCLVL, QAUDLVL, QAUDLVL2, and QCRTOBJAUD
+
+# Parameters:
+  # sysvalue --  The list containing the system values to be checked
+---
+- hosts: all
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+
+  tasks:
+  - block:
+    - name: Display a system value 
+      ibmi_sysval:
+        sysvalue: 
+          - {'name':'qccsid'}
+      register: dspsysval_ccsid_result
+
+    - name: Display the returned parameters
+      debug: 
+        msg: "{{ dspsysval_ccsid_result.sysval }}"
+
+    - name: Assert the returned parameters
+      assert:
+        that: 
+          - dspsysval_ccsid_result.sysval | length == 1
+          - dspsysval_ccsid_result.sysval[0].name == 'QCCSID'
+          - dspsysval_ccsid_result.sysval[0].type == '10i0'
+          - dspsysval_ccsid_result.sysval[0].value | int >= 0 and dspsysval_ccsid_result.sysval[0].value | int <= 65535
+
+
+    - name: Check a system value with expected value
+      ibmi_sysval:
+        sysvalue: 
+          - {'name':'qmaxsign', 'expect':'000005'}
+      register: chksysval_qmaxsign_result
+
+    - name: Display the returned parameters
+      debug: 
+        msg: "{{ chksysval_qmaxsign_result.sysval }}"
+        
+    - name: Assert the returned parameters
+      assert:
+        that: 
+          - chksysval_qmaxsign_result.sysval | length == 1
+          - chksysval_qmaxsign_result.sysval[0].name == 'QMAXSIGN'
+          - chksysval_qmaxsign_result.sysval[0].type == '8A'
+          - chksysval_qmaxsign_result.sysval[0].value == chksysval_qmaxsign_result.sysval[0].expect
+          - chksysval_qmaxsign_result.sysval[0].atrisk | bool == false
+          
+
+    - name: Display many system values
+      ibmi_sysval:
+        sysvalue: 
+          - {'name':'qccsid'}
+          - {'name':'qmaxsign'}
+          - {'name':'qmaxsgnacn'}
+      register: dissysval_result
+
+    - name: Display the many returned parameters
+      debug: 
+        msg: "{{ dissysval_result.sysval }}"
+        
+    - name: Assert the many returned parameters
+      assert:
+        that: 
+          - dissysval_result.sysval | length == 3
+          - dissysval_result.sysval[0].name == 'QCCSID'
+          - dissysval_result.sysval[0].type == '10i0'
+          - dissysval_result.sysval[0].value | int >= 0 and dissysval_result.sysval[0].value | int <= 65535
+          - dissysval_result.sysval[1].name == 'QMAXSIGN'
+          - dissysval_result.sysval[1].type == '8A'
+          - dissysval_result.sysval[2].name == 'QMAXSGNACN'
+          - dissysval_result.sysval[2].type == '4A'
+
+
+    - name: Check many system values with expected values
+      ibmi_sysval:
+        sysvalue: 
+          - {'name':'qmaxsign', 'expect':'000005'}
+          - {'name':'qmaxsgnacn', 'expect':'3'}
+          - {'name':'qccsid'}
+      register: chksysval_result
+
+    - name: Display the many returned parameters
+      debug: 
+        msg: "{{ chksysval_result.sysval }}"
+        
+    - name: Assert the many returned parameters
+      assert:
+        that: 
+          - chksysval_result.sysval | length == 3
+          - chksysval_result.sysval[0].name == 'QMAXSIGN'
+          - chksysval_result.sysval[0].type == '8A'
+          - chksysval_result.sysval[0].value == chksysval_result.sysval[0].expect
+          - chksysval_result.sysval[0].atrisk | bool == false
+          - chksysval_result.sysval[1].name == 'QMAXSGNACN'
+          - chksysval_result.sysval[1].type == '4A'
+          - chksysval_result.sysval[1].value == chksysval_result.sysval[1].expect
+          - chksysval_result.sysval[1].atrisk | bool == false
+          - chksysval_result.sysval[2].name == 'QCCSID'
+          - chksysval_result.sysval[2].type == '10i0'
+          - chksysval_result.sysval[2].value | int >= 0 and chksysval_result.sysval[2].value | int <= 65535

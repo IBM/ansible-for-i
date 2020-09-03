@@ -10,6 +10,7 @@ import logging
 import logging.config
 import zipfile
 import binascii
+import socket
 
 HAS_ITOOLKIT = True
 HAS_IBM_DB = True
@@ -20,6 +21,10 @@ try:
     from itoolkit import iSqlFetch
     from itoolkit import iSqlQuery
     from itoolkit import iCmd
+    from itoolkit import iCmd5250
+    from itoolkit import iPgm
+    from itoolkit import iData
+    from itoolkit import iDS
     from itoolkit.transport import DatabaseTransport
 except ImportError:
     HAS_ITOOLKIT = False
@@ -75,9 +80,9 @@ def itoolkit_init(db_name=SYSBAS):
         log_info("Job of the connection to execute the task: {0}".format(job_name_info),
                  "Connection Initialization")
     except Exception as e_db_connect:
-        itoolkti_close_connection(conn)
+        itoolkit_close_connection(conn)
         raise Exception("Exception when connecting to IBM i Db2. {0}. "
-                        "Check if the database {1} existed or varied on".format(str(e_db_connect), db_name))
+                        "Check if the database {1} existed or varied on".format(str(e_db_connect), db_name)) from e_db_connect
     return conn
 
 
@@ -98,7 +103,7 @@ def itoolkit_run_sql_once(sql, db_name=SYSBAS, hex_convert_columns=None):
     except Exception as e_db_connect:
         return IBMi_DB_CONNECTION_ERROR, out_list, str(e_db_connect), job_log
     finally:
-        itoolkti_close_connection(conn)
+        itoolkit_close_connection(conn)
 
 
 def itoolkit_get_job_log(conn, time):
@@ -110,55 +115,12 @@ def itoolkit_run_sql(conn, sql, hex_convert_columns=None):
     return db_get_result_list(conn, sql, hex_convert_columns)
 
 
-def itoolkit_run_sql_old(conn, sql):
-    out_list = []
-    try:
-        itransport = DatabaseTransport(conn)
-        itool = iToolKit()
-        # itool.add(iSqlQuery('query', sql, {'error': 'on'}))
-        itool.add(iSqlQuery('query', sql))
-        itool.add(iSqlFetch('fetch'))
-        itool.add(iSqlFree('free'))
-        itool.call(itransport)
-        command_output = itool.dict_out('fetch')
-        command_error = ''
-        error = ''
-        out = ''
-        if 'error' in command_output:
-            command_error = command_output['error']
-            if 'joblog' in command_error:
-                rc = IBMi_COMMAND_RC_ERROR
-                error = command_error['joblog']
-            else:
-                rc = IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_JOBLOG
-                error = "iToolKit result dict does not have key 'joblog', the output is {0}".format(str(command_output))
-                # only for English enviroment
-                if "Row not found" in error:
-                    # treat as success but also indicate the Row not found message in stderr
-                    rc = IBMi_COMMAND_RC_SUCCESS
-                elif "xmlhint" in error:
-                    xmlhint = command_output['xmlhint']
-                    if len(xmlhint) < 100:
-                        # most of the time, the xmlhint error is 'Row not found' by different language, check the string length < 100
-                        rc = IBMi_COMMAND_RC_SUCCESS
-        else:
-            rc = IBMi_COMMAND_RC_SUCCESS
-            out = command_output['row']
-            if isinstance(out, dict):
-                out_list.append(out)
-            elif isinstance(out, list):
-                out_list = out
-    except Exception as e_db_connect:
-        raise Exception(str(e_db_connect))
-    return rc, out_list, error
-
-
-def itoolkti_close_connection(conn):
+def itoolkit_close_connection(conn):
     if conn is not None:
         try:
             conn.close()
         except Exception as e_disconnect:
-            raise Exception("ERROR: Unable to disconnect from the database. {0}".format(str(e_disconnect)))
+            raise Exception("ERROR: Unable to disconnect from the database. {0}".format(str(e_disconnect))) from e_disconnect
         finally:
             conn = None
 
@@ -180,7 +142,49 @@ def itoolkit_run_command_once(command, db_name=SYSBAS):
     except Exception as e_db_connect:
         return IBMi_DB_CONNECTION_ERROR, out, str(e_db_connect), job_log
     finally:
-        itoolkti_close_connection(conn)
+        itoolkit_close_connection(conn)
+
+
+def itoolkit_run_command5250_once(command, db_name=SYSBAS):
+    conn = None
+    out = ''
+    error = ''
+    job_log = []
+    rc = 999
+    try:
+        startd = datetime.datetime.now()
+        conn = itoolkit_init(db_name)
+        rc, out, error = itoolkit_run_command5250(conn, command)
+        job_log = db2i_tools.get_job_log(conn, '*', startd)
+        return rc, out, error, job_log
+    except ImportError as e_import:
+        return IBMi_PACKAGES_NOT_FOUND, out, str(e_import), job_log
+    except Exception as e_db_connect:
+        return IBMi_DB_CONNECTION_ERROR, out, str(e_db_connect), job_log
+    finally:
+        itoolkit_close_connection(conn)
+
+
+def itoolkit_run_command5250(conn, command):
+    try:
+        itool = iToolKit()
+        itransport = DatabaseTransport(conn)
+        itool.add(iCmd5250('command', command))
+        itool.call(itransport)
+        command_output = itool.dict_out('command')
+
+        out = ''
+        err = ''
+
+        if 'error' in command_output:
+            rc = IBMi_COMMAND_RC_ERROR
+            err = str(command_output)
+        else:
+            rc = IBMi_COMMAND_RC_SUCCESS
+            out = str(command_output['command'])
+    except Exception as e_disconnect:
+        raise Exception(str(e_disconnect)) from e_disconnect
+    return rc, out, err
 
 
 def itoolkit_run_command(conn, command):
@@ -201,7 +205,7 @@ def itoolkit_run_command(conn, command):
             rc = IBMi_COMMAND_RC_ERROR
             err = str(command_output)
     except Exception as e_disconnect:
-        raise Exception(str(e_disconnect))
+        raise Exception(str(e_disconnect)) from e_disconnect
     return rc, out, err
 
 
@@ -224,7 +228,7 @@ def itoolkit_sql_callproc(conn, sql):
             rc = IBMi_COMMAND_RC_ERROR
             err = str(command_output)
     except Exception as e_db_connect:
-        raise Exception(str(e_db_connect))
+        raise Exception(str(e_db_connect)) from e_db_connect
     return rc, out, err
 
 
@@ -244,7 +248,7 @@ def itoolkit_sql_callproc_once(sql, db_name=SYSBAS):
     except Exception as e_db_connect:
         return IBMi_DB_CONNECTION_ERROR, out_list, str(e_db_connect), job_log
     finally:
-        itoolkti_close_connection(conn)
+        itoolkit_close_connection(conn)
 
 
 def db_get_fields_from_cursor(cursor):
@@ -261,8 +265,11 @@ def db_get_fields_from_cursor(cursor):
 # returns the result list containing maps with column name as key, column value as value
 def db_get_result_list(connection_id, sql, hex_convert_columns):
     try:
+        # Already known hex column names
+        known_hex_convert_columns = ['MESSAGE_KEY', 'ASSOCIATED_MESSAGE_KEY', 'INTERNAL_JOB_ID']
         if hex_convert_columns is None:
             hex_convert_columns = []
+        hex_convert_columns.extend(known_hex_convert_columns)
         result_list = []
         cur = connection_id.cursor()
         cur.execute(sql)
@@ -310,37 +317,59 @@ def fmtTo10(str):
     return str.ljust(10) if len(str) <= 10 else str[0:10]
 
 
-def log_debug(s, module_name="ibmi_util"):
+def get_host_and_ip():
+    hostname = 'UNKNOWN_HOST'
+    ip = 'UNKNOWN_IP'
     try:
-        get_logger("ibmi_util").debug(module_name + ": " + s)
+        hostname = socket.gethostname()
+        ip = socket.gethostbyname(hostname)
+    except Exception:
+        pass
+    return hostname, ip
+
+
+def log_debug(s, module_name="ibmi_util"):
+    hostname = 'UNKNOWN_HOST'
+    ip = 'UNKNOWN_IP'
+    try:
+        hostname = socket.gethostname()
+        ip = socket.gethostbyname(hostname)
+    except Exception:
+        pass
+    try:
+        get_logger("ibmi_util").debug("%s(%s) - %s: %s", hostname, ip, module_name, s)
     except Exception:
         pass
 
 
 def log_info(s, module_name="ibmi_util"):
+    hostname, ip = get_host_and_ip()
     try:
-        get_logger("ibmi_util").info(module_name + ": " + s)
+        get_logger("ibmi_util").info("%s(%s) - %s: %s", hostname, ip, module_name, s)
     except Exception:
         pass
 
 
 def log_error(s, module_name="ibmi_util"):
+    hostname, ip = get_host_and_ip()
     try:
-        get_logger("ibmi_util").error(module_name + ": " + s)
+        get_logger("ibmi_util").error("%s(%s) - %s: %s", hostname, ip, module_name, s)
     except Exception:
         pass
 
 
 def log_warning(s, module_name="ibmi_util"):
+    hostname, ip = get_host_and_ip()
     try:
-        get_logger("ibmi_util").warning(module_name + ": " + s)
+        get_logger("ibmi_util").warning("%s(%s) - %s: %s", hostname, ip, module_name, s)
     except Exception:
         pass
 
 
 def log_critical(s, module_name="ibmi_util"):
+    hostname, ip = get_host_and_ip()
     try:
-        get_logger("ibmi_util").critical(module_name + ": " + s)
+        get_logger("ibmi_util").critical("%s(%s) - %s: %s", hostname, ip, module_name, s)
     except Exception:
         pass
 
@@ -496,7 +525,7 @@ def rtvneta():
     except Exception as e_db_connect:
         return IBMi_DB_CONNECTION_ERROR, out_dict, str(e_db_connect)
     finally:
-        itoolkti_close_connection(conn)
+        itoolkit_close_connection(conn)
 
 
 def rtv_command(command, args_dict):
@@ -525,4 +554,103 @@ def rtv_command(command, args_dict):
     except Exception as e_db_connect:
         return IBMi_DB_CONNECTION_ERROR, out_dict, str(e_db_connect)
     finally:
-        itoolkti_close_connection(conn)
+        itoolkit_close_connection(conn)
+
+
+class IBMiLogon(object):
+    def __init__(self, conn, name, pwd):
+        self.name = name
+        self.pwd = pwd
+        self.conn = conn
+        self.handle = None
+
+    def __del__(self):
+        if (self.handle is not None) and (self.conn is not None):
+            # self.release_profile_handle(self.conn, self.handle)
+            pass
+
+    def get_handle(self):
+        return self.handle
+
+    def qsygetph(self):
+        len_of_password = len(self.pwd)
+        input_user = self.name.ljust(10)
+        input_password_len = str(len_of_password) + 'A'
+
+        itransport = DatabaseTransport(self.conn)
+        itool = iToolKit()
+        itool.add(
+            iPgm('qsygetph', 'qsygetph')
+            .addParm(iData('userId', '10A', input_user))
+            .addParm(iData('pwd', input_password_len, self.pwd))
+            .addParm(iData('handle', '12A', '', {'hex': 'on'}))
+            .addParm(
+                iDS('ERRC0100_t', {'len': 'errlen'})
+                .addData(iData('errRet', '10i0', ''))
+                .addData(iData('errAvl', '10i0', ''))
+                .addData(iData('errExp', '7A', '', {'setlen': 'errlen'}))
+                .addData(iData('errRsv', '1A', ''))
+            )
+            .addParm(iData('len', '10i0', str(len_of_password)))
+            .addParm(iData('ccsid', '10i0', '37'))
+        )
+        itool.call(itransport)
+        qsygetph = itool.dict_out('qsygetph')
+        log_info(str(qsygetph), 'qsygetph')
+        if 'success' in qsygetph:
+            return qsygetph['handle']
+        else:
+            return None
+
+    def qwtsetp(self):
+        itransport = DatabaseTransport(self.conn)
+        itool = iToolKit()
+        itool.add(
+            iPgm('qwtsetp', 'QWTSETP')
+            .addParm(iData('handle', '12A', self.handle, {'hex': 'on'}))
+            .addParm(
+                iDS('ERRC0100_t', {'len': 'errlen'})
+                .addData(iData('errRet', '10i0', ''))
+                .addData(iData('errAvl', '10i0', ''))
+                .addData(iData('errExp', '7A', '', {'setlen': 'errlen'}))
+                .addData(iData('errRsv', '1A', ''))
+            )
+        )
+        itool.call(itransport)
+        qwtsetp = itool.dict_out('qwtsetp')
+        log_info(str(qwtsetp), 'qwtsetp')
+        if 'success' in qwtsetp:
+            return True
+        else:
+            return False
+
+    def switch(self):
+        self.handle = self.qsygetph()
+        if self.handle is not None:
+            return self.qwtsetp()
+        else:
+            return False
+
+    def release_profile_handle(self):
+        if self.handle is None:
+            return True
+        itransport = DatabaseTransport(self.conn)
+        itool = iToolKit()
+        itool.add(
+            iPgm('qsyrlsph', 'QSYRLSPH')
+            .addParm(iData('handle', '12A', self.handle, {'hex': 'on'}))
+            .addParm(
+                iDS('ERRC0100_t', {'len': 'errlen'})
+                .addData(iData('errRet', '10i0', ''))
+                .addData(iData('errAvl', '10i0', ''))
+                .addData(iData('errExp', '7A', '', {'setlen': 'errlen'}))
+                .addData(iData('errRsv', '1A', ''))
+            )
+        )
+        itool.call(itransport)
+        qsyrlsph = itool.dict_out('qsyrlsph')
+        log_info(str(qsyrlsph), 'qsyrlsph')
+        if 'success' in qsyrlsph:
+            return True
+        else:
+            return False

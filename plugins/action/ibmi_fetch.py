@@ -16,7 +16,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "1.0.2"
 
 ifs_dir = '/tmp/.ansible'
 display = Display()
@@ -109,7 +109,7 @@ class ActionModule(ActionBase):
         if task_vars is None:
             task_vars = dict()
 
-        result = super(ActionModule, self).run(tmp, task_vars)
+        result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
 
         try:
@@ -366,7 +366,7 @@ class ActionModule(ActionBase):
                         f.write(remote_data)
                         f.close()
                     except (IOError, OSError) as e:
-                        raise AnsibleError("Failed to fetch the file: {p_e}".format(p_e=e))
+                        raise AnsibleError("Failed to fetch the file: {p_e}".format(p_e=e)) from e
                 new_checksum = secure_hash(dest)
                 # For backwards compatibility. We'll return None on FIPS enabled systems
                 try:

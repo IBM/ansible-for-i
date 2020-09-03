@@ -16,7 +16,7 @@ You may want to check out below articles first if you are new to Ansible for IBM
 
 https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/
 
-https://ibm.github.io/cloud-i-blog/
+https://ibm.github.io/cloud-i-blog/archivers/2020_0602_automate_your_ibm_i_tasks_with_ansible
 
 :Dependencies on IBM i node:
  - 5733SC1 Base and Option 1

@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 
 display = Display()
 
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "1.0.2"
 
 
 class TimedOutException(Exception):
@@ -81,7 +81,7 @@ class ActionModule(RebootActionModule, ActionBase):
     DEFAULT_PARAMETERS = ''
 
     def __init__(self, *args, **kwargs):
-        super(ActionModule, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_distribution(self, task_vars):
         return {'name': 'ibmi', 'version': '', 'family': ''}
@@ -93,8 +93,8 @@ class ActionModule(RebootActionModule, ActionBase):
                 validation.check_type_int(key_value)
                 if key_value < 0:
                     raise AnsibleError('The value of %s must not be less than 0' % (int_key))
-            except (TypeError, ValueError):
-                raise AnsibleError("The value of argument %s is %s which can't be converted to int" % (int_key, key_value))
+            except (TypeError, ValueError) as inst:
+                raise AnsibleError("The value of argument %s is %s which can't be converted to int" % (int_key, key_value)) from inst
         return None
 
     def get_shutdown_command(self, task_vars, distribution):
@@ -118,7 +118,7 @@ class ActionModule(RebootActionModule, ActionBase):
             display.vvv("{action}: last boot time: {boot_time}".format(action=self._task.action, boot_time=last_boot_time))
             return last_boot_time
         except KeyError as ke:
-            raise AnsibleError('Failed to get last boot time information. Missing "{0}" in output.'.format(ke.args[0]))
+            raise AnsibleError('Failed to get last boot time information. Missing "{0}" in output.'.format(ke.args[0])) from ke
         return None
 
     def get_shutdown_command_args(self, distribution):

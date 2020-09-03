@@ -1,0 +1,180 @@
+# test code for the ibmi_sync_files module
+# (c) 2020, zhaoyao <zhaoyao@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+#
+# Test scope
+# 1. test prepare: install python3-paramiko/openssh on os400, use ssh-copy-id to coonfi
+# 2. check file transfer with checksum verification enabled, every checksum_algorithm should be covered
+# 3. check file transfer without checksum verification
+# 4. node A and B are different locale systems.
+# 5. neg test
+# 5.1 remote os400 is not pingable
+# 5.2 file is not exist in node A - both IFS and QSYS.LIB files should be covered
+# 5.3 file permission not satisfied in node A - both IFS and QSYS.LIB files should be covered
+# 6. non 2924 system related tests
+- block:
+  - set_fact:
+      superuser: "{{ansible_ssh_user}}"
+      nodeA: "{{ansible_ssh_host}}" #ENU 7.4
+      nodeB: "11.11.11.2" #FRA 7.3
+      nodeC: "11.11.11.3" #JPN 7.2
+      cuser: "CUSER" # common user with *USER authority, prepared on nodeC for permission test
+
+  - name: TC00 - install paramiko on os400 node A and B if not exists
+    command:
+      cmd: /QOpenSys/pkgs/bin/yum install python3-paramiko -y
+      warn: no
+    delegate_to: "{{item}}"
+    delegate_facts: True
+    with_items:
+      - "{{nodeA}}"
+      - "{{nodeB}}"
+      - "{{nodeC}}"
+    register: install_paramiko
+    failed_when: install_paramiko.rc != 0
+
+  - name: TC01A - Sync an IFS file from one os400 to another
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
+      remote_host: "{{nodeB}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_01
+    failed_when: result_01.rc != 0
+
+  - name: TC01B - Sync a SAVF from one os400 to another -  transfer prepared SAVF from local to source os400
+    ibmi_copy:
+      src: 'MYSAVF.FILE'
+      lib_name: 'qgpl'
+      force: True
+      backup: false
+
+  - name: TC01B - Sync a SAVF from one os400 to another
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/qsys.lib/qgpl.lib/MYSAVF.FILE', 'dest': '/qsys.lib/qgpl.lib/'}
+      remote_host: "{{nodeB}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_01A
+    failed_when: result_01A.rc != 0
+
+  - name: TC02A - Sync multiple supported files from one os400 to another.
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
+        - {'src': '/qsys.lib/qgpl.lib/MYSAVF.FILE', 'dest': '/qsys.lib/qgpl.lib/'}
+
+      remote_host: "{{nodeC}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_02a
+    failed_when: result_02a.rc != 0  
+
+  - name: TC02A - Assert return values
+    assert:
+      that:
+        - result_02a.fail_list == []
+        - result_02a.success_list | length == 2
+
+  - name: TC02B - Sync multiple unsupported files from one os400 to another, including IFS files and object-based members
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/bin', 'dest': '/home/{{ansible_ssh_user}}/'} #IFS dir - not supported for now
+        - {'src': '/home/{{ansible_ssh_user}}/bin/*', 'dest': '/home/{{ansible_ssh_user}}/'} #with wildcard - not supported for now
+        - {'src': '/QSYS.LIB/ZYLIB.LIB/QCLSRC.FILE/RMVPTF.MBR', 'dest': '/QSYS.LIB/ZYLIB.LIB/QCLSRC.FILE/'} #obj-based objects - mbr - not supported for now
+        - {'src': '/QSYS.LIB/ZYLIB.LIB/QCLSRC.FILE', 'dest': '/QSYS.LIB/ZYLIB.LIB'} #obj-based objects - PF - not supported for now
+
+      remote_host: "{{nodeB}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_02b
+    failed_when: result_02b.rc != 255  
+
+  - name: TC02B - Assert return values
+    assert:
+      that:
+        - result_02b.success_list == []
+        - '"No files were successfully transferred." in result_02b.msg'
+        - result_02b.fail_list | length == 4
+
+  - name: TC03 - Sync a file which doesn't exist on local os400
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg1.c', 'dest': '/home/{{ansible_ssh_user}}/'} # non-existing
+      remote_host: "{{nodeB}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_03
+    failed_when: result_03.rc == 0
+
+  - name: TC04 - Sync a file to remote os400 which a *USER should not be permitted to
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{superuser}}/sendMsg.c'} # no authority
+      remote_host: "{{nodeC}}"
+      remote_user: '{{cuser}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_04
+    failed_when: result_04.rc == 0
+
+  - name: TC04 - assert fail reason
+    assert:
+      that: 
+        - result_04.fail_list | selectattr('fail_reason', 'match', '^[Errno 13] Permission denied.$')
+
+  - name: TC05 - Sync to a non-pingable remote host
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'} 
+      remote_host: "not-pingable-host.com"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_05
+    failed_when: result_05.rc != 255
+
+  - name: TC05 - Assert return values
+    assert:
+      that:
+        - '"[Errno 8] Hostname and service name not provided or found" in result_05.stderr'  
+
+  - name: TC06 - Sync with an non-existing private key
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
+      remote_host: "{{nodeB}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa_non-existing'
+    register: result_06
+    failed_when: result_06.rc != 255
+
+  - name: TC06 - Assert return values
+    assert:
+      that:
+        - '"[Errno 2] No such file or directory:" in result_06.stderr'  
+        - result_06.fail_list == []
+        - result_06.success_list == []
+
+  - name: TC07 - Sync to 2962 system - DBCS system like CHN/KOR/JPN
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
+      remote_host: "{{nodeC}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_07
+    failed_when: result_07.rc != 0
+
+  - name: TC08 - Sync between 2 non-2924 systems (FRA and JPN in this case) 
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
+      remote_host: "{{nodeC}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    delegate_to: "{{nodeB}}"
+    register: result_08
+    failed_when: result_08.rc != 0

@@ -349,7 +349,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.0.1"
+__ibmi_module_version__ = "1.0.2"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -526,7 +526,7 @@ def main():
     else:
         job_log = []
 
-    ibmi_util.itoolkti_close_connection(connection_id)
+    ibmi_util.itoolkit_close_connection(connection_id)
 
     endd = datetime.datetime.now()
     delta = endd - startd
