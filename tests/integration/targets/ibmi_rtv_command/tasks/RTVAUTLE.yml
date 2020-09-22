@@ -1,0 +1,133 @@
+- block:
+    - set_fact:
+        new_user: [ANSIUSER1, ANSIUSER2]
+        au_list: [au_list1]
+        #os_version: "{{ansible_distribution_version}}{{ansible_distribution_release}}"
+
+    - name: create two user profiles
+      ibmi_cl_command:
+        cmd: "crtusrprf usrprf({{item}}) password(passw0rd) status(*enabled) usrcls(*user)"
+      loop: "{{new_user}}"
+
+    - name: create authority list
+      ibmi_cl_command:
+        cmd: QSYS/CRTAUTL AUTL({{item}})
+      loop: "{{au_list}}"
+
+    - name: add the new user profiles into AUL
+      ibmi_cl_command: 
+        cmd: ADDAUTLE AUTL({{au_list[0]}}) USER({{new_user[0]}}) AUT(*AUTLMGT *USE) 
+
+    # - name: add the new user profiles into AUL
+    #   ibmi_cl_command: 
+    #     cmd: ADDAUTLE AUTL({{au_list[0]}}) USER({{new_user[1]}}) AUT(*OBJREF) 
+
+    # - name: add the new user profiles into AUL
+    #   ibmi_cl_command: 
+    #     cmd: ADDAUTLE AUTL({{au_list[1]}}) USER({{new_user[0]}})
+
+    # - name: add the new user profiles into AUL
+    #   ibmi_cl_command: 
+    #     cmd: ADDAUTLE AUTL({{au_list[1]}}) USER({{new_user[1]}}) AUT(*EXCLUDE)
+
+    - name: RTVAUTLE_TC01 Call RTVAUTLE to get information of the authority list
+      ibmi_rtv_command:
+        cmd: 'RTVAUTLE AUTL({{au_list[0]}}) USER({{new_user[0]}})'
+        char_vars:
+          - 'USE'
+          - 'OBJOPR'
+          - 'AUTLMGT'
+          - 'OBJALTER'
+          - 'ALL'
+          - 'CHANGE'
+          - 'EXCLUDE'
+          - 'OBJEXIST'
+          - 'OBJMGT'
+          - 'OBJREF'
+          - 'READ'
+          - 'ADD'
+          - 'UPDATE'
+          - 'DELETE'
+          - 'EXECUTE'
+
+      register: TC01
+
+    - name: assert the returned options of TC01
+      assert:
+        that:
+          #- TC01.msg == ''
+          - TC01.rc == 0
+          - TC01.output is defined
+          - TC01.output.USE == '*USE'
+          - TC01.output['OBJOPR'] == '*OBJOPR'
+          - TC01.output['AUTLMGT'] == '*AUTLMGT' 
+          - TC01.output.OBJALTER == ''
+          - TC01.output['ALL'] == ''
+          - TC01.output['CHANGE'] == '' 
+          - TC01.output.EXCLUDE == ''
+          - TC01.output['OBJEXIST'] == ''
+          - TC01.output['OBJMGT'] == '' 
+          - TC01.output.OBJREF == ''
+          - TC01.output['READ'] == '*READ'
+          - TC01.output['ADD'] == ''
+          - TC01.output['UPDATE'] == ''
+          - TC01.output['DELETE'] == ''
+          - TC01.output['EXECUTE'] == '*EXECUTE'
+          - TC01.job_log == []
+
+    - name: RTVAUTLE_TC02 Call RTVAUTLE to get information of the authority list
+      ibmi_rtv_command:
+        cmd: 'RTVAUTLE AUTL({{au_list[0]}}) USER(*PUBLIC)'
+        joblog: true
+        char_vars:
+          - 'CHANGE'
+          - 'AUTLMGT'
+      register: TC02
+
+    - name: assert the returned options of TC01
+      assert:
+        that:
+          #- TC02.msg == ''
+          - TC02.rc == 0
+          - TC02.output is defined
+          - TC02.output.CHANGE == '*CHANGE'
+          - TC02.output['AUTLMGT'] == ''  
+          - TC02.job_log != []
+
+    - name: RTVAUTLE_TC03 Call RTVAUTLE with defining character values in number_vars
+      ibmi_rtv_command:
+        cmd: 'RTVAUTLE AUTL({{au_list[0]}}) USER(*PUBLIC)'
+        number_vars:
+          - 'USE'
+          - 'OBJOPR'
+          - 'AUTLMGT'
+      register: TC03
+
+    - name: RTVAUTLE_TC04 Call RTVAUTLE with a not existing users in the authority_list
+      ibmi_rtv_command:
+        cmd: 'RTVAUTLE AUTL({{au_list[0]}}) USER({{new_user[1]}})'
+        number_vars:
+          - 'EXCLUDE'
+      register: TC04
+      failed_when: (TC04.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF22A7') | map(attribute='MESSAGE_ID') | list | length) == 0
+
+    - name: RTVAUTLE_TC05 Call RTVAUTLE with an invalid variable
+      ibmi_rtv_command:
+        cmd: 'RTVAUTLE AUTL({{au_list[0]}}) USER({{new_user[1]}})'
+        char_vars:
+          - 'ABC'
+      register: TC05
+      failed_when: (TC05.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0043') | map(attribute='MESSAGE_ID') | list | length) == 0
+
+  always:
+    - name: remove AUL
+      ibmi_cl_command:
+        cmd: QSYS/DLTAUTL AUTL({{item}})
+      loop: "{{au_list}}"
+      ignore_errors: true
+
+    - name: remove user profiles
+      ibmi_cl_command:
+        cmd: "QSYS/dltusrprf usrprf({{item}})"
+      loop: "{{new_user}}"
+      ignore_errors: true

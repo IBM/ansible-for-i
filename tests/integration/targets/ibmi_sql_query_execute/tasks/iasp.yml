@@ -51,7 +51,7 @@
       database: "abc"
     register: sql_result
     # ANSIBLE in TRYIASP1 type *FILE not found."
-    failed_when: "'Exception when connecting to IBM i Db2' not in sql_result.stderr"
+    failed_when: "'Exception' not in sql_result.stderr"
     #failed_when: "sql_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length !=0"
 
   - name: TC23 run the SQL command to query a table
@@ -74,7 +74,7 @@
       sql: "select * from tryiasp1.ansible"
       database: "abc" 
     register: sql_query_result
-    failed_when: "'Exception when connecting to IBM i Db2' not in sql_query_result.stderr"
+    failed_when: "'Exception' not in sql_query_result.stderr"
     #failed_when: "sql_query_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length !=0"
 
   - name: TC26 run the SQL command to insert the row again

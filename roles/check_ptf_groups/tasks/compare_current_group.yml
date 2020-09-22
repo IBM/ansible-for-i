@@ -1,0 +1,65 @@
+---
+- name: initialize the variables
+  set_fact:
+    fix_list: []
+    ptfs_on_system: {}
+    product_list: []
+    ptf_not_installed: []
+
+- name: compose the ptf number list
+  set_fact:
+    fix_list: "{{ fix_list|default([]) + [ptf_info.ptf_id] }}"
+  with_list: "{{ group.ptf_list }}"
+  loop_control: 
+    loop_var: ptf_info
+
+- name: query ptf list from target system
+  ibm.power_ibmi.ibmi_fix:
+    operation: 'query'
+    fix_list: "{{ fix_list }}"
+  register: ptf_info
+
+- name: query product information from target system
+  ibm.power_ibmi.ibmi_sql_query:
+    sql: "SELECT DISTINCT PRODUCT_ID FROM QSYS2.LICENSE_INFO"
+  register: result
+
+- name: compose product list
+  set_fact:
+    product_list: "{{ product_list|default([]) + [record.PRODUCT_ID] }}"
+  with_list: "{{ result.row }}"
+  loop_control:
+    loop_var: record
+
+- name: compose ptf status list on targret system
+  set_fact:
+    ptfs_on_system: "{{ ptfs_on_system|default({}) | combine({ ptf.PTF_IDENTIFIER: ptf.PTF_LOADED_STATUS }) }}"
+  with_list: "{{ ptf_info.ptf_list }}"
+  loop_control:
+    loop_var: ptf
+
+- name: ptf does not exist
+  set_fact:
+    ptf_not_installed: "{{ ptf_not_installed|default([]) + [{ 'PTF_IDENTIFIER': ptf.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT' }] }}"
+  when: 
+    - not ptfs_on_system.get(ptf.ptf_id)
+    - ptf.product in product_list
+  with_list: "{{ group.ptf_list }}"
+  loop_control:
+    loop_var: ptf
+
+- name: ptf exists but status is not APPLIED, PERMANENTLY APPLIED or SUPERSEDED
+  set_fact:
+    ptf_not_installed: "{{ ptf_not_installed|default([]) + [{ 'PTF_IDENTIFIER': ptf.PTF_IDENTIFIER, 'PTF_LOADED_STATUS': ptf.PTF_LOADED_STATUS }] }}"
+  when:
+    - ptf.PTF_LOADED_STATUS != "APPLIED"
+    - ptf.PTF_LOADED_STATUS != "PERMANENTLY APPLIED"
+    - ptf.PTF_LOADED_STATUS != "SUPERSEDED"
+  with_list: "{{ ptf_info.ptf_list }}"
+  loop_control:
+    loop_var: ptf
+
+- set_fact:
+    group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level, 'PTF_GROUP_STATUS': 'NOT INSTALLED', 'PTF_NOT_INSTALLED': ptf_not_installed }] }}"
+
+  

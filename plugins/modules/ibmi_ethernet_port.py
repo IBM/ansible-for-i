@@ -27,6 +27,15 @@ options:
     choices: ['display']
     type: str
     default: 'display'
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 notes:
   - The following PTFs are required for getting the default MAC address of a port,
@@ -125,7 +134,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "1.1.0"
 
 
 def get_info_from_resource_name(imodule, resource_name):
@@ -262,14 +271,14 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             operation=dict(type='str', choices=['display'], default='display'),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
     ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
-    # become_user = module.params['become_user']
-    # become_user_password = module.params['become_user_password']
-    become_user = None
-    become_user_password = None
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     rc = SUCCESS
     ethernet_ports = []

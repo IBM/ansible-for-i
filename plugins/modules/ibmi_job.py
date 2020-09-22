@@ -61,6 +61,15 @@ options:
       - The job log of the job executing the task will be returned even rc is zero if it is set to true.
     type: bool
     default: false
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 notes:
    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
@@ -223,9 +232,9 @@ HAS_IBM_DB = True
 
 import datetime
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "1.1.0"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -247,6 +256,8 @@ def main():
             user=dict(type='str', default='*ALL'),
             submitter=dict(type='str', default='*ALL', choices=["*ALL", "*JOB", "*USER", "*WRKSTN"]),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -258,8 +269,15 @@ def main():
     job_user = module.params['user']
     job_submitter = module.params['submitter']
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     startd = datetime.datetime.now()
+
+    ibmi_module = imodule.IBMiModule(become_user_name=become_user,
+                                     become_user_password=become_user_password)
+
+    # connection_id = ibmi_module.get_connection()
 
     sql_job_columns = "SELECT JOB_NAME, JOB_INFORMATION, JOB_STATUS, JOB_TYPE, JOB_TYPE_ENHANCED, JOB_SUBSYSTEM, " \
                       " JOB_DATE, JOB_DESCRIPTION_LIBRARY, JOB_DESCRIPTION, JOB_ACCOUNTING_CODE, SUBMITTER_JOB_NAME, " \
@@ -290,8 +308,7 @@ def main():
 
     sql_to_run = sql_job_columns + sql_from + sql_where
 
-    # rc, out, err_msg = itoolkit_run_sql(sql_to_run)
-    rc, out, err_msg, job_log = ibmi_util.itoolkit_run_sql_once(sql_to_run)
+    rc, out, err_msg, job_log = ibmi_module.itoolkit_run_sql_once(sql_to_run)
     rt_job_log = []
     if joblog or (rc != IBMi_COMMAND_RC_SUCCESS):
         rt_job_log = job_log
@@ -301,9 +318,6 @@ def main():
 
     if rc != IBMi_COMMAND_RC_SUCCESS:
         result_failed = dict(
-            # size=input_size,
-            # age=input_age,
-            # age_stamp=input_age_stamp,
             stderr=err_msg,
             rc=rc,
             start=str(startd),

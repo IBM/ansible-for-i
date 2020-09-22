@@ -25,6 +25,7 @@ options:
   device_list:
     description:
       - The name of the device.
+      - If the one of the device is IASP device, the become_user and become_user_password will be ignored.
     type: list
     elements: str
     required: yes
@@ -47,6 +48,15 @@ options:
       - If set to C(true), append JOBLOG to stderr/stderr_lines.
     type: bool
     default: False
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 seealso:
 - module: service
@@ -61,6 +71,8 @@ EXAMPLES = r'''
     device_list: ['IASP1', 'IASP2']
     status: '*ON'
     joblog: True
+    become_user: 'USER1'
+    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -145,8 +157,9 @@ stderr_lines:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "1.1.0"
 
 
 def main():
@@ -159,6 +172,8 @@ def main():
                         required=True),
             extra_parameters=dict(type='str', default=' '),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -168,19 +183,39 @@ def main():
     status = module.params['status']
     extra_parameters = module.params['extra_parameters']
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     startd = datetime.datetime.now()
+
     if status in ["*OFF", "*DEALLOCATE"]:
         command = "QSYS/VRYCFG CFGOBJ(" + " ".join(device_list) + ") CFGTYPE(*DEV) STATUS(" + status + ") FRCVRYOFF(*YES) " + extra_parameters
     else:
         command = "QSYS/VRYCFG CFGOBJ(" + " ".join(device_list) + ") CFGTYPE(*DEV) STATUS(" + status + ") " + extra_parameters
 
+    is_iasp = False
+    check_command = "QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD(*ASP)"
+    args = ['system', check_command]
+    rc, out, error = module.run_command(args, use_unsafe_shell=False)
+    ibmi_util.log_info("Command {check_command} return: rc={rc}, stdout={out}, stderr={error}.".format(
+        check_command=check_command, rc=rc, out=out, error=error), module._name)
+    if not rc:
+        for device in device_list:
+            if device.upper() in out:
+                ibmi_util.log_info("Device {0} is IASP device, does not support become user.".format(device), module._name)
+                is_iasp = True
     job_log = []
-    if joblog:
-        rc, out, error, job_log = ibmi_util.itoolkit_run_command_once(command)
-    else:
+    if is_iasp:
         args = ['system', command]
         rc, out, error = module.run_command(args, use_unsafe_shell=False)
+    else:
+        try:
+            ibmi_module = imodule.IBMiModule(
+                become_user_name=become_user, become_user_password=become_user_password)
+        except Exception as inst:
+            message = 'Exception occurred: {0}'.format(str(inst))
+            module.fail_json(rc=999, msg=message)
+        rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
 
     endd = datetime.datetime.now()
     delta = endd - startd

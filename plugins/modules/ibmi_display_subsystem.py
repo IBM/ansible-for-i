@@ -37,6 +37,15 @@ options:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: False
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 seealso:
 - module: ibmi_end_subsystem, ibmi_start_subsystem
 author:
@@ -168,8 +177,9 @@ active_jobs:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "1.1.0"
 
 
 def main():
@@ -178,6 +188,8 @@ def main():
             subsystem=dict(type='str', default='*ALL'),
             user=dict(type='str', default='*ALL'),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -193,10 +205,20 @@ def main():
         module.fail_json(rc=256, msg="Value of user exceeds 10 characters")
     if subsystem == '*JOBQ' or subsystem == '*OUTQ':
         module.fail_json(rc=256, msg="Value of option subsystem can not be {subsystem_pattern}".format(subsystem_pattern=subsystem))
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
+
+    try:
+        ibmi_module = imodule.IBMiModule(
+            become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = 'Exception occurred: {0}'.format(str(inst))
+        module.fail_json(rc=999, msg=message)
 
     job_log = []
     if subsystem == '*ALL':
-        rc, out, err = module.run_command(['system', 'QSYS/WRKSBS'], use_unsafe_shell=False)
+        command = 'QSYS/WRKSBS'
+        rc, out, err, job_log = ibmi_module.itoolkit_run_command5250_once(command)
 
         if rc:
             result_failed = dict(
@@ -221,7 +243,7 @@ def main():
     else:
         sql = "SELECT J.SUBSYSTEM FROM TABLE (QSYS2.ACTIVE_JOB_INFO()) J WHERE JOB_TYPE = 'SBS'"
         ibmi_util.log_info("Command to run: " + sql, module._name)
-        rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(sql)
+        rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(sql)
 
         if rc:
             result_failed = dict(
@@ -250,7 +272,7 @@ def main():
                     CURRENT_USER_LIST_FILTER => '{user_pattern}')) J WHERE JOB_TYPE NOT IN ('SBS', 'SYS')".format(
                     subsystem_pattern=subsystem, user_pattern=user)
             ibmi_util.log_info("Command to run: " + sql, module._name)
-            rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(sql)
+            rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(sql)
             if rc:
                 result_failed = dict(
                     stdout=out,

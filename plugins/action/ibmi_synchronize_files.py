@@ -3,19 +3,10 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import os.path
-import datetime
-
 from ansible import constants as C
-from ansible.module_utils.six import string_types
-from ansible.module_utils._text import to_text
-from ansible.module_utils.common._collections_compat import MutableSequence
-from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.plugins.action import ActionBase
-from ansible.plugins.loader import connection_loader
 from ansible.utils.display import Display
-from ansible.inventory.host import Host
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "1.1.0"
 display = Display()
 
 
@@ -60,10 +51,6 @@ class ActionModule(ActionBase):
 
         # Store remote connection type
         self._remote_transport = self._connection.transport
-
-        remote_transport = False
-        if self._connection.transport != 'local':
-            remote_transport = True
 
         # Get the delegate_to. delegate_to is required on ibm i.
         try:

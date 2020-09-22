@@ -1,0 +1,129 @@
+---
+# tasks file for check_ptf_groups
+- fail:
+    msg: "repository server is not provided, please provide the repository server."
+  when: repo_server == ""
+
+- fail:
+    msg: "database name is not provided, please provide the database name."
+  when: database == ""
+
+- fail:
+    msg: "group_list is not provided, please provide the group list."
+  when: database == ""
+
+- name: initialize the variables
+  set_fact:
+    group_status: []
+    group_on_system: []
+    groups_installed: []
+    groups_not_installed: []
+    check_group_list: []
+
+- name: compare latest ptf group level against repository server
+  block:
+  - name: compose fix repo parameters
+    set_fact:
+      check_group_list: "{{ check_group_list|default([]) + [ {'ptf_group_number': group, 'additional_param':'ORDER BY ptf_group_level DESC LIMIT 1'} ] }}"
+    with_list: "{{ group_list }}"
+    loop_control:
+      loop_var: group
+
+  - name: retrieve latest group information from repository server
+    ibm.power_ibmi.ibmi_fix_repo:
+      database: "{{ database }}"
+      action: "find"
+      type: "ptf_group"
+      parameters: "{{ check_group_list }}"
+    delegate_to: "{{ repo_server }}"
+    register: group_info
+
+  - name: got record failed from repository server
+    set_fact:
+      group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'PTF_GROUP_STATUS': 'Record not found in repository DB'}] }}"
+    when: group_info.get('fail_list')
+    with_list: "{{ group_info.fail_list }}"
+    loop_control:
+      loop_var: group
+
+  - name: compare the group on target system
+    include_tasks: compare_latest_group.yml
+    with_list: "{{ group_info.success_list }}"
+    loop_control:
+      loop_var: group
+    when: group_info.get('success_list')
+
+  when: type == "latest"
+
+- name: compare current ptf group level against repository server
+  block:
+  - name: initialize group list for sql command
+    set_fact:
+      group_list_str: "{{ \"','\".join(group_list) }}"
+
+  - name: retrieve group information from target system
+    ibm.power_ibmi.ibmi_sql_query:
+      sql: "SELECT PTF_GROUP_NAME, PTF_GROUP_DESCRIPTION, PTF_GROUP_LEVEL, PTF_GROUP_STATUS FROM QSYS2.GROUP_PTF_INFO WHERE PTF_GROUP_LEVEL IN (SELECT MAX(PTF_GROUP_LEVEL) FROM QSYS2.GROUP_PTF_INFO WHERE PTF_GROUP_NAME IN ('{{ group_list_str }}') GROUP BY PTF_GROUP_NAME)"
+    register: result
+
+  - name: compose the group name list
+    set_fact:
+      group_on_system: "{{ group_on_system|default([]) + [group.PTF_GROUP_NAME.strip()] }}"
+    with_list: "{{ result.row }}"
+    loop_control:
+      loop_var: group
+
+  - name: PTF group does not exist 
+    set_fact:
+      group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group, 'PTF_GROUP_STATUS': 'NON-EXISTENT' }] }}"
+    when: group not in group_on_system
+    with_list: "{{ group_list }}"
+    loop_control:
+      loop_var: group
+
+  - name: compose the groups list which are already installed
+    set_fact:
+      group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.PTF_GROUP_NAME, 'CURRENT_PTF_GROUP_LEVEL': group.PTF_GROUP_LEVEL, 'PTF_GROUP_STATUS': group.PTF_GROUP_STATUS }] }}"
+    when: group.PTF_GROUP_STATUS.strip() == "INSTALLED"
+    with_list: "{{ result.row }}"
+    loop_control:
+      loop_var: group
+  
+  - debug: 
+      var: group_status
+
+  - name: compose group check list of 'NOT INSTALLED' for compare
+    set_fact:
+      check_group_list: "{{ check_group_list|default([]) + [{ 'ptf_group_number': group.PTF_GROUP_NAME.strip(), 'ptf_group_level': group.PTF_GROUP_LEVEL, 'additional_param':'ORDER BY release_date DESC LIMIT 1'}] }}"
+    when: group.PTF_GROUP_STATUS.strip() == "NOT INSTALLED"
+    with_list: "{{ result.row }}"
+    loop_control:
+      loop_var: group
+
+  - name: retrieve group's ptf list from repository server
+    ibm.power_ibmi.ibmi_fix_repo:
+      database: "{{ database }}"
+      action: "find"
+      type: "ptf_group"
+      parameters: "{{ check_group_list }}"
+    delegate_to: "{{ repo_server }}"
+    register: group_info
+
+  - name: got record failed from repository server
+    set_fact:
+      group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level, 'PTF_GROUP_STATUS': 'Record not found in repository DB' }] }}"
+    when: group_info.get('fail_list')
+    with_list: "{{ group_info.fail_list }}"
+    loop_control:
+      loop_var: group
+
+  - name: compare the group on target system
+    include_tasks: compare_current_group.yml
+    with_list: "{{ group_info.success_list }}"
+    loop_control:
+      loop_var: group
+    when: 
+      - group_info.get('success_list')
+      - group_info.success_list|length > 0
+
+  when: type == "current"

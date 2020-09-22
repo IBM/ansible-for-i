@@ -294,7 +294,7 @@
           - "*OBJEXIST"
         asp_group: "ABC"
       register: authority_result
-      #failed_when: "'Device ABC not found' not in authority_result.stderr"
+      failed_when: "'Check if IASP ABC is exist and varied on' not in authority_result.stderr"
       #failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length == 0"
 
     - name: grant 1 users 1 authority to a single object missing asp_group

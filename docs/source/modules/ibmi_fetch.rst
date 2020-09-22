@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fetch.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fetch.pyy
 
 .. _ibmi_fetch_module:
 
@@ -174,6 +174,7 @@ Examples
        dest: '/backup'
        backup: True
        target_release: 'V7R2M0'
+
    - name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.
      ibmi_fetch:
        lib_name: 'objlib'

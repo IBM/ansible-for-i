@@ -1,0 +1,23 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+# tasks file for apply_all_loaded_ptfs
+- name: ibmi_fix - apply all loaded ptfs
+  ibm.power_ibmi.ibmi_fix:
+    product_id: "*ALL"
+    delayed_option: '{{ delayed_option }}'
+    temp_or_perm: '{{ temp_or_perm }}'
+    operation: 'apply_only'
+  register: apply_fix_result
+
+- name: query the list of to-be-applied ptfs which require an IPL
+  ibm.power_ibmi.ibmi_sql_query:
+    sql: "SELECT PTF_IDENTIFIER, PTF_IPL_ACTION, A.*
+  FROM QSYS2.PTF_INFO A
+  WHERE PTF_IPL_ACTION = 'TEMPORARILY APPLIED' or PTF_IPL_ACTION = 'PERMANENTLY APPLIED'"
+  register: query_ptf_result
+  when: auto_ipl
+  
+- name: reboot the system immediately if auto_ipl is set to true and at least one to-be-applied PTF requires an IPL
+  ibm.power_ibmi.ibmi_reboot:
+  when: auto_ipl and query_ptf_result.row | length > 0

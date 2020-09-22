@@ -71,19 +71,30 @@ options:
       - If set to C(true), output the avaiable JOBLOG even the rc is 0(success).
     type: bool
     default: False
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 author:
     - Peng Zengyu (@pengzengyufish)
 '''
 
 EXAMPLES = r'''
-- name: Add a job schedule entry test.
+- name: Add a job schedule entry test with become user.
   ibmi_at:
     job_name: 'test'
     cmd: 'QSYS/WRKSRVAGT TYPE(*UAK)'
     frequency: '*WEEKLY'
     scddate: '*CURRENT'
     text: 'Test job schedule'
+    become_user: 'USER1'
+    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -165,7 +176,8 @@ job_log:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.0.2"
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
+__ibmi_module_version__ = "1.1.0"
 scdday_list = ['*NONE', '*ALL', '*MON', '*TUE', '*WED', '*THU', '*FRI', '*SAT', '*SUN']
 
 
@@ -180,7 +192,9 @@ def main():
             schtime=dict(type='str', default='*CURRENT'),
             text=dict(type='str', default='*BLANK'),
             parameters=dict(type='str', default=''),
-            joblog=dict(type='bool', default=False)
+            joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -196,6 +210,8 @@ def main():
     text = module.params['text']
     parameters = module.params['parameters']
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     if scddate not in ["*CURRENT", "*MONTHSTR", "*MONTHEND", "*NONE"]:
         scddate = "'{p_scddate}'".format(p_scddate=scddate)
@@ -243,7 +259,14 @@ def main():
         p_schtime=schtime,
         p_text=text,
         p_parameters=parameters)
-    rc, out, error, job_log = ibmi_util.itoolkit_run_command_once(' '.join(command.split()), '*SYSBAS')
+
+    try:
+        ibmi_module = imodule.IBMiModule(become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = 'Exception occurred: {0}'.format(str(inst))
+        module.fail_json(rc=999, msg=message)
+
+    rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
     endd = datetime.datetime.now()
     delta = endd - startd
 

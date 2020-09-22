@@ -27,6 +27,15 @@ options:
       - If set to C(true), append JOBLOG to stderr/stderr_lines.
     type: bool
     default: False
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 author:
 - Jin Yifan(@jinyifan)
@@ -101,21 +110,25 @@ rc_msg:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
+
+HAS_ITOOLKIT = True
+
 try:
     from itoolkit import iToolKit
-    from itoolkit.db2.idb2call import iDB2Call
     from itoolkit import iPgm
     from itoolkit import iData
     from itoolkit import iDS
+    from itoolkit.transport import DatabaseTransport
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "1.1.0"
 
 
-def getNonconfigureDisk(time):
-    conn = ibmi_util.itoolkit_init()
-    itransport = iDB2Call(conn)
+def getNonconfigureDisk(imodule, time):
+    conn = imodule.get_connection()
+    itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(iPgm('qyasrdi', 'QYASRDI')
               .addParm(iDS('DMIN0100_t', {'len': 'dmilen'})
@@ -162,7 +175,7 @@ def getNonconfigureDisk(time):
                     diskList += rec['resDurn'] + ' '
         if diskList.endswith(' '):
             diskList = diskList[:-1]
-    job_log = ibmi_util.itoolkit_get_job_log(conn, time)
+    job_log = imodule.itoolkit_get_job_log(time)
     return diskList, job_log
 
 
@@ -170,14 +183,27 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
 
     ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
+
     startd = datetime.datetime.now()
-    disk_list, job_log = getNonconfigureDisk(startd)
+
+    try:
+        ibmi_module = imodule.IBMiModule(
+            become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = 'Exception occurred: {0}'.format(str(inst))
+        module.fail_json(rc=999, msg=message)
+
+    disk_list, job_log = getNonconfigureDisk(ibmi_module, startd)
     if not disk_list:
         rc_msg = "Here is no un-configure disk."
         rc = 0

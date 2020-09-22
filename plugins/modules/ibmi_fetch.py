@@ -121,6 +121,7 @@ EXAMPLES = r'''
     dest: '/backup'
     backup: True
     target_release: 'V7R2M0'
+
 - name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.
   ibmi_fetch:
     lib_name: 'objlib'

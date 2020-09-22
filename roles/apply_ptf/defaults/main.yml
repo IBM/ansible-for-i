@@ -1,0 +1,8 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+# defaults value for apply_ptf
+temp_or_perm: '*TEMP'
+delayed_option: '*IMMDLY'
+auto_ipl: false
+apply_all_loaded_ptfs: false

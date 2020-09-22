@@ -1,0 +1,19 @@
+---
+# tasks file for download_individual_ptfs
+- set_fact:
+    download_success_list: []
+    download_fail_list: []
+
+- name: download ptfs from save file
+  include_tasks: download_individual_ptf.yml
+  loop: "{{ to_be_downloaded_list }}"
+  loop_control:
+    loop_var: download_ptf
+
+- name: Print the successful download list
+  debug:
+    var: download_success_list
+
+- name: Print the failed download list
+  debug:
+    var: download_fail_list

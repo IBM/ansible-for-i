@@ -1,0 +1,212 @@
+- name: TA01 compliance successfully
+  ibmi_user_compliance_check:
+    users:
+      - 'user1'
+      - 'user2'
+    fields:
+      - {'name':'status', 'expect':['*enabled']}
+  register: user_result
+
+- name: TA01 result assert
+  assert: 
+    that:
+      - user_result.stdout is not defined
+      - user_result.stderr is not defined
+      - user_result.rc == 0
+      - user_result.result_set | length == 0
+
+- name: TA02 compliance successfully with job_log
+  ibmi_user_compliance_check:
+    users:
+      - 'user1'
+      - 'user2'
+    fields:
+      - {'name':'status', 'expect':['*enabled']}
+    joblog: true
+  register: user_result
+
+- name: TA02 result assert
+  assert: 
+    that:
+      - user_result.stderr is not defined
+      - user_result.rc == 0
+      - user_result.result_set | length == 0
+
+- name: TA03 compliance failed with result
+  ibmi_user_compliance_check:
+    users:
+      - 'user3'
+    fields:
+      - {'name':'status', 'expect':['*enabled']}
+  register: user_result
+
+- name: TA03 result assert
+  assert: 
+    that:
+      - user_result.stderr is not defined
+      - user_result.rc == 0
+      - user_result.result_set | length != 0
+      - user_result.result_set[0]['STATUS'] == '*DISABLED'
+
+- name: TA04 compliance SUCCESS with valid value06
+  ibmi_user_compliance_check:
+    users:
+      - 'user3'
+    joblog: true
+    fields:
+      - {'name':'INITIAL_PROGRAM_LIBRARY_NAME', 'expect':['']}
+  register: user_result
+
+- name: TA04 result assert
+  assert: 
+    that:
+      - user_result.stderr is not defined
+      - user_result.rc == 0
+      - user_result.result_set | length == 0
+      - user_result.job_log | length == 0
+
+- name: TA05 compliance authorities 
+  ibmi_user_compliance_check:
+    users:
+      - 'user3'
+    fields:
+      - {'name':'SPECIAL_AUTHORITIES', 'expect':['*SECADM', '*ALLOBJ', '*AUDIT']}
+  register: user_result
+
+- name: Ta05 result assert
+  assert: 
+    that:
+      - user_result.rc == 0
+      - user_result.result_set | length == 0
+
+- name: TA06 compliance authorities 
+  ibmi_user_compliance_check:
+    users:
+      - 'user2'
+    fields:
+      - {'name':'USER_OPTIONS', 'expect':['*STSMSG', '*CLKW']}
+  register: user_result
+
+- name: Ta06 result assert
+  assert: 
+    that:
+      - user_result.rc == 0
+      - user_result.result_set | length == 0
+      - user_result.stderr is not defined
+ 
+- name: TA07 compliance authorities 
+  ibmi_user_compliance_check:
+    users:
+      - 'user3'
+    fields:
+      - {'name':'SPECIAL_AUTHORITIES', 'expect':['*SECADM', '*ALLOBJ', '*AUDIT']}
+      - {'name':'USER_EXPIRATION_ACTION', 'expect':['*NONE']}
+      - {'name':'HOME_DIRECTORY', 'expect':['/home/USER3']}
+      - {'name':'LOCALE_PATH_NAME', 'expect':['*SYSVAL']}
+      - {'name':'USER_DEFAULT_PASSWORD', 'expect':['NO']}
+      - {'name':'USER_OWNER', 'expect':['MOMO']}
+      - {'name':'USER_CREATOR', 'expect':['MOMO']}
+      - {'name':'SIZE', 'expect':['{{Size}}']}
+      - {'name':'AUTHORITY_COLLECTION_ACTIVE', 'expect':['NO']}
+      - {'name':'AUTHORITY_COLLECTION_REPOSITORY_EXISTS', 'expect':['NO']}
+      - {'name':'status', 'expect':['*disabled']}
+      - {'name':'NO_PASSWORD_INDICATOR', 'expect':['NO']}
+      - {'name':'PASSWORD_LEVEL_0_1', 'expect':['YES']}
+      - {'name':'PASSWORD_LEVEL_2_3', 'expect':['YES']}
+      - {'name':'SET_PASSWORD_TO_EXPIRE', 'expect':['NO']}
+      - {'name':'USER_CLASS_NAME', 'expect':['*USER']}
+      - {'name':'GROUP_PROFILE_NAME', 'expect':['*NONE']}
+      - {'name':'OWNER', 'expect':['*USRPRF']}
+      - {'name':'GROUP_AUTHORITY', 'expect':['*NONE']}
+      - {'name':'ASSISTANCE_LEVEL', 'expect':['*SYSVAL']}
+      - {'name':'CURRENT_LIBRARY_NAME', 'expect':['*CRTDFT']}
+      - {'name':'INITIAL_MENU_LIBRARY_NAME', 'expect':['*LIBL']}        
+      - {'name':'INITIAL_PROGRAM_NAME', 'expect':['*NONE']}
+      - {'name':'LIMIT_CAPABILITIES', 'expect':['*NO']}
+      - {'name':'TEXT_DESCRIPTION', 'expect':['TEST ACCOUNT!@#$%']}
+      - {'name':'DISPLAY_SIGNON_INFORMATION', 'expect':['*SYSVAL']}
+      - {'name':'LIMIT_DEVICE_SESSIONS', 'expect':['*SYSVAL']}
+      - {'name':'KEYBOARD_BUFFERING', 'expect':['*SYSVAL']}
+      - {'name':'MAXIMUM_ALLOWED_STORAGE', 'expect':['9223372036854775807']}
+      - {'name':'STORAGE_USED', 'expect':['12']}
+      - {'name':'HIGHEST_SCHEDULING_PRIORITY', 'expect':['3']}
+      - {'name':'JOB_DESCRIPTION_NAME', 'expect':['QDFTJOBD']}
+      - {'name':'JOB_DESCRIPTION_LIBRARY_NAME', 'expect':['QGPL']}
+      - {'name':'MESSAGE_QUEUE_NAME', 'expect':['USER3']}
+      - {'name':'MESSAGE_QUEUE_LIBRARY_NAME', 'expect':['QUSRSYS']}
+      - {'name':'MESSAGE_QUEUE_DELIVERY_METHOD', 'expect':['*NOTIFY']}
+      - {'name':'OUTPUT_QUEUE_NAME', 'expect':['*WRKSTN']}
+      - {'name':'PRINT_DEVICE', 'expect':['*WRKSTN']}
+      - {'name':'SPECIAL_ENVIRONMENT', 'expect':['*SYSVAL']}
+      - {'name':'ATTENTION_KEY_HANDLING_PROGRAM_NAME', 'expect':['*SYSVAL']}
+      - {'name':'LANGUAGE_ID', 'expect':['*SYSVAL']}
+      - {'name':'COUNTRY_OR_REGION_ID', 'expect':['*SYSVAL']}
+      - {'name':'CHARACTER_CODE_SET_ID', 'expect':['QCCSID']}
+      - {'name':'SORT_SEQUENCE_TABLE_NAME', 'expect':['*SYSVAL']}
+      - {'name':'OBJECT_AUDITING_VALUE', 'expect':['*NONE']}
+      - {'name':'GROUP_AUTHORITY_TYPE', 'expect':['*PRIVATE']}
+      - {'name':'USER_ID_NUMBER', 'expect': ['{{UserId}}']}
+      - {'name':'LOCALE_JOB_ATTRIBUTES', 'expect':['*SYSVAL']}
+      - {'name':'GROUP_MEMBER_INDICATOR', 'expect':['NO']}
+      - {'name':'DIGITAL_CERTIFICATE_INDICATOR', 'expect':['NO']}
+      - {'name':'CHARACTER_IDENTIFIER_CONTROL', 'expect':['*SYSVAL']}
+      - {'name':'LOCAL_PASSWORD_MANAGEMENT', 'expect':['YES']}
+      - {'name':'BLOCK_PASSWORD_CHANGE', 'expect':['*SYSVAL']}
+      - {'name':'USER_ENTITLEMENT_REQUIRED', 'expect':['YES']}  
+  register: user_result
+  ignore_errors: true
+
+- name: Ta07 result assert
+  assert: 
+    that:
+      - user_result.rc == 0
+      - user_result.result_set | length == 0
+      - user_result.stderr is not defined
+
+- name: TA08 compliance with all '0' fields
+  ibmi_user_compliance_check:
+    users:
+      - 'user3'
+      - 'user2'
+    fields:
+      - {'name':'DAYS_USED_COUNT', 'expect':['0']}
+      - {'name':'GROUP_ID_NUMBER', 'expect':['0']}
+      - {'name':'MESSAGE_QUEUE_SEVERITY', 'expect':['0']}
+      - {'name':'PASSWORD_EXPIRATION_INTERVAL', 'expect':['0']}
+      - {'name':'SIGN_ON_ATTEMPTS_NOT_VALID', 'expect':['0']}
+      - {'name':'SUPPLEMENTAL_GROUP_COUNT', 'expect':['0']}
+      - {'name':'USER_EXPIRATION_INTERVAL', 'expect':['0']}
+  register: user_result
+  ignore_errors: True
+
+- name: TA08 result assert
+  assert: 
+    that:
+      - user_result.stderr is not defined
+      - user_result.rc == 0
+      - user_result.result_set | length == 0
+
+- name: TA09 compliance with all fields
+  ibmi_user_compliance_check:
+    users:
+      - 'user3'
+    fields:
+      - {'name':'DAYS_UNTIL_PASSWORD_EXPIRES', 'expect':['']}
+      - {'name':'SUPPLEMENTAL_GROUP_LIST', 'expect':['']}
+      - {'name':'INITIAL_PROGRAM_LIBRARY_NAME', 'expect':['']}
+      - {'name':'ACCOUNTING_CODE', 'expect':['']}
+      - {'name':'OUTPUT_QUEUE_LIBRARY_NAME', 'expect':['']}
+      - {'name':'ATTENTION_KEY_HANDLING_PROGRAM_LIBRARY_NAME', 'expect':['']}
+      - {'name':'USER_OPTIONS', 'expect':['']}
+      - {'name':'SORT_SEQUENCE_TABLE_LIBRARY_NAME', 'expect':['']}
+      - {'name':'USER_ACTION_AUDIT_LEVEL', 'expect':['']}
+      - {'name':'PASE_SHELL_PATH', 'expect':['']}
+  register: user_result
+  ignore_errors: True
+
+- name: TA09 result assert
+  assert: 
+    that:
+      - user_result.stderr is not defined
+      - user_result.rc == 0
+      - user_result.result_set | length == 0

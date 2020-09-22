@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 
 display = Display()
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "1.1.0"
 
 
 class TimedOutException(Exception):
@@ -43,6 +43,8 @@ class ActionModule(RebootActionModule, ActionBase):
         'end_subsystem_option',
         'timeout_option',
         'install_ptf_device',
+        'become_user',
+        'become_user_password',
     ))
 
     _INT_ARGS = (
@@ -93,33 +95,52 @@ class ActionModule(RebootActionModule, ActionBase):
                 validation.check_type_int(key_value)
                 if key_value < 0:
                     raise AnsibleError('The value of %s must not be less than 0' % (int_key))
-            except (TypeError, ValueError) as inst:
-                raise AnsibleError("The value of argument %s is %s which can't be converted to int" % (int_key, key_value)) from inst
+            except (TypeError, ValueError) as e:
+                raise AnsibleError("The value of argument %s is %s which can't be converted to int" % (int_key, key_value)) from e
         return None
 
     def get_shutdown_command(self, task_vars, distribution):
         return self.DEFAULT_SHUTDOWN_COMMAND
 
     def get_system_boot_time(self, distribution):
-        display.vvv('ibmi_reboot: version: ' + __ibmi_module_version__)
-        module_output = self._execute_module(
-            module_name='ibmi_sql_query',
-            module_args={
-                "sql": "SELECT job_entered_system_time FROM TABLE \
-                    (qsys2.job_info(job_status_filter => '*ACTIVE', job_user_filter => 'QSYS')) x \
-                    WHERE job_name = '000000/QSYS/SCPF'",
-                "expected_row_count": 1})
+        display.vvv('{action}: get_system_boot_time: version: {version}'.format(action=self._task.action, version=__ibmi_module_version__))
+        become_user = self._task.args.get('become_user')
+        display.vvv('{action}: get_system_boot_time: become to user: {user}'.format(action=self._task.action, user=become_user))
+        become_user_password = self._task.args.get('become_user_password')
         try:
-            if module_output['rc'] != 0:
-                raise AnsibleError('Failed to determine system last boot time. {0}'.format(
-                    module_output['stderr']).strip())
-            last_boot_time = module_output['row'][0]['JOB_ENTERED_SYSTEM_TIME']
-            display.debug("{action}: last boot time: {boot_time}".format(action=self._task.action, boot_time=last_boot_time))
-            display.vvv("{action}: last boot time: {boot_time}".format(action=self._task.action, boot_time=last_boot_time))
-            return last_boot_time
-        except KeyError as ke:
-            raise AnsibleError('Failed to get last boot time information. Missing "{0}" in output.'.format(ke.args[0])) from ke
-        return None
+            sql = "SELECT JOB_ENTERED_SYSTEM_TIME FROM TABLE \
+                (QSYS2.JOB_INFO(JOB_STATUS_FILTER => '*ACTIVE', JOB_USER_FILTER => 'QSYS')) \
+                    X WHERE JOB_NAME = '000000/QSYS/SCPF'"
+            sql = ' '.join(sql.split())  # keep only one space between adjacent strings
+            command_result = self._execute_module(
+                module_name='ibmi_sql_query',
+                module_args={
+                    "sql": sql,
+                    "expected_row_count": 1,
+                    "become_user": become_user,
+                    "become_user_password": become_user_password
+                }
+            )
+        except Exception as inst:
+            raise AnsibleError("{action}: failed to run module ibmi_sql_query to get boot time info: {exp}".format(
+                action=self._task.action,
+                exp=str(inst))) from inst
+        display.vvv("{action}: command_output: {boot_time}".format(action=self._task.action, boot_time=str(command_result)))
+        if command_result['rc'] != 0:
+            if 'msg' in command_result:
+                stderr = command_result['msg']
+                stdout = ''
+            else:
+                stderr = command_result['stderr']
+                stdout = command_result['job_log']
+            raise AnsibleError("{action}: failed to get host boot time info, rc: {rc}, stdout: {out}, stderr: {err}".format(
+                action=self._task.action,
+                rc=command_result['rc'],
+                out=stdout,
+                err=stderr))
+        last_boot_time = command_result['row'][0]['JOB_ENTERED_SYSTEM_TIME']
+        display.vvv("{action}: last boot time: {boot_time}".format(action=self._task.action, boot_time=last_boot_time))
+        return last_boot_time
 
     def get_shutdown_command_args(self, distribution):
         args = self._get_value_from_facts('SHUTDOWN_COMMAND_ARGS', distribution, 'DEFAULT_SHUTDOWN_COMMAND_ARGS')
@@ -171,55 +192,75 @@ class ActionModule(RebootActionModule, ActionBase):
         )
 
     def perform_reboot(self, task_vars, distribution):
+        display.vvv('{action}: perform_reboot: version: {version}'.format(action=self._task.action, version=__ibmi_module_version__))
+        become_user = self._task.args.get('become_user')
+        display.vvv('{action}: perform_reboot: become to user: {user}'.format(action=self._task.action, user=become_user))
+        become_user_password = self._task.args.get('become_user_password')
         result = {}
+        result['start'] = datetime.utcnow()
         try:
             self.validate_int()
             shutdown_command_args = self.get_shutdown_command_args(distribution)
         except AnsibleError as e:
-            result['start'] = datetime.utcnow()
             result['failed'] = True
             result['rebooted'] = False
             result['msg'] = to_text(e)
             return result
         shutdown_command = self.get_shutdown_command(task_vars, distribution)
         reboot_command = "{0} {1}".format(shutdown_command, shutdown_command_args)
+        reboot_command = ' '.join(reboot_command.split())  # keep only one space between adjacent strings
 
         display.vvv("{action}: rebooting server...".format(action=self._task.action))
         delay_time = self._task.args.get('pre_reboot_delay', self.DEFAULT_PRE_REBOOT_DELAY)
         notify_message = self._task.args.get('msg', self.DEFAULT_MSG)
-        send_message_command = "QSYS/SNDBRKMSG MSG('{notify_message}, system going down in {delay_time} seconds') TOMSGQ(*ALLWS)".format(
+        send_message_command = "QSYS/SNDBRKMSG MSG('{notify_message}, SYSTEM GOING DOWN IN {delay_time} SECONDS') TOMSGQ(*ALLWS)".format(
             notify_message=notify_message, delay_time=delay_time)
-        self._execute_module(
-            module_name='ibmi_cl_command',
-            module_args={"cmd": send_message_command})
+        display.vvv("{action}: send rebooting notice message to all users...".format(action=self._task.action))
+        try:
+            self._execute_module(
+                module_name='ibmi_cl_command',
+                module_args={
+                    "cmd": send_message_command,
+                    "become_user": become_user,
+                    "become_user_password": become_user_password
+                }
+            )
+        except Exception as inst:
+            display.vvv("{action}: send rebooting notice message failed: '{exp}'".format(action=self._task.action, exp=str(inst)))
 
+        display.vvv("{action}: Waiting for {delay_time} seconds to reboot".format(action=self._task.action, delay_time=delay_time))
         time.sleep(int(delay_time))
-        display.debug("{action}: rebooting server with command '{command}'".format(action=self._task.action, command=reboot_command))
         display.vvv("{action}: rebooting server with command '{command}'".format(action=self._task.action, command=reboot_command))
+        result['start'] = datetime.utcnow()
         try:
             module_output = self._execute_module(
                 module_name='ibmi_cl_command',
-                module_args={"cmd": reboot_command})
-            reboot_result = module_output
-            stdout = reboot_result['stdout']
-            stderr = reboot_result['stderr']
+                module_args={
+                    "cmd": reboot_command,
+                    "become_user": become_user,
+                    "become_user_password": become_user_password
+                }
+            )
             result['start'] = datetime.utcnow()
-
-            if reboot_result['stdout'].startswith('CPF0901'):
+            reboot_result = module_output
+            if reboot_result['rc'] != 0:
+                stdout = reboot_result['stdout']
+                stderr = reboot_result['stderr']
+                job_log = reboot_result['job_log']
+                result['failed'] = True
+                result['rebooted'] = False
+                result['msg'] = "Reboot command failed, stdout: {stdout}, stderr: {stderr}, job_log: {job_log}".format(
+                    stdout=stdout.strip(),
+                    stderr=stderr.strip(),
+                    job_log=job_log)
+            else:
                 result['failed'] = False
                 result['rc'] = 0
                 result['msg'] = reboot_result['stdout']
-            else:
-                result['failed'] = True
-                result['rebooted'] = False
-                result['msg'] = "Reboot command failed, error was: {stdout} {stderr}".format(
-                    stdout=stdout.strip(),
-                    stderr=stderr.strip())
         except AnsibleConnectionFailure as e:
             display.vvv('{action}: AnsibleConnectionFailure caught and handled: {error}'.format(action=self._task.action, error=to_text(e)))
             result['failed'] = False
             result['rc'] = 0
             result['msg'] = to_text(e)
-            result['start'] = datetime.utcnow()
 
         return result

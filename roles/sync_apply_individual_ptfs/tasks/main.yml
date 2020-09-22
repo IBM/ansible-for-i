@@ -1,0 +1,41 @@
+---
+# role for sync_apply_individual_ptfs
+- set_fact:
+    sync_list: []
+
+- name: Compose sync list
+  set_fact:
+    sync_list: "{{ sync_list|default([]) + [ item | combine( {'src': item.file_path} )] }}"
+  loop: "{{ ptfs_info_list }}"
+
+- name: Print sync_list
+  debug:
+    var: sync_list
+
+- name: transfer ptf savfs to target ibm i system
+  ibmi_synchronize_files:
+    dest: "{{ dest }}"
+    src_list: "{{ sync_list }}"
+  delegate_to: "{{ src_host }}"
+  ignore_errors: True
+  register: sync_result
+
+- set_fact:
+    sync_success_list: "{{ sync_result.success_list }}"
+    sync_fail_list: "{{ sync_result.fail_list }}"
+
+- name: Print the list of successful sync
+  debug:
+    var: sync_success_list
+
+- name: Print the list of failed sync
+  debug:
+    var: sync_fail_list
+
+- name: Include load_apply_ptfs role to load and apply ptfs
+  include_role:
+    name: load_apply_ptfs
+  vars:
+    required_ptf_list: "{{ sync_success_list }}"
+    remote_lib: "{{ (dest | basename | splitext)[0] }}"
+  register: load_apply_result

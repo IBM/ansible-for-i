@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_sql_execute.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_sql_execute.pyy
 
 .. _ibmi_sql_execute_module:
 
@@ -24,6 +24,26 @@ Synopsis
 
 Parameters
 ----------
+
+
+     
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
 
 
      
@@ -67,6 +87,8 @@ Examples
    - name: Insert one record to table Persons
      ibmi_sql_execute:
        sql: "INSERT INTO Persons VALUES('919665', 'Le', 'Chang', 'Ring Building', 'Beijing')"
+       become_user: 'USER1'
+       become_user_password: 'yourpassword'
 
 
 

@@ -57,7 +57,7 @@
       cmd: CRTLIB LIB(TRYIASP3) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
       asp_group: "abc"
     register: cl_result
-    failed_when: "'Exception when connecting to IBM i Db2' not in cl_result.stderr"
+    failed_when: "'Exception' not in cl_result.msg"
   when: iasp_list.row_count != 0
 
   always:

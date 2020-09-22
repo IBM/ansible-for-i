@@ -83,6 +83,15 @@ options:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: False
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 seealso:
 - module: ibmi_uninstall_product, ibmi_save_product_to_savf
 author:
@@ -90,11 +99,13 @@ author:
 '''
 
 EXAMPLES = r'''
-- name: Restoring Program Using Defaults.
+- name: Restoring Program with become user.
   ibmi_install_product_from_savf:
     product: 5770WDS
     savf_name: MYFILE
     savf_library: MYLIB
+    become_user: 'USER1'
+    become_user_password: 'yourpassword'
 
 - name: Restoring Program with acceptance command.
   ibmi_install_product_from_savf:
@@ -166,8 +177,9 @@ job_log:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "1.1.0"
 
 
 def main():
@@ -184,6 +196,8 @@ def main():
             parameters=dict(type='str', default=' '),
             acceptance_cmd=dict(type='str', default=' '),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -201,6 +215,8 @@ def main():
     parameters = module.params['parameters'].upper()
     acceptance_cmd = module.params['acceptance_cmd'].upper()
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     if len(product) > 7:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of product exceeds 7 characters")
@@ -217,33 +233,44 @@ def main():
     if len(savf_library) > 10:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of savf_library exceeds 10 characters")
 
-    chkobj_cmd = 'QSYS/CHKOBJ OBJ({pattern_savf_library}/{pattern_savf_name}) OBJTYPE(*FILE)'.format(
+    try:
+        ibmi_module = imodule.IBMiModule(
+            become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = 'Exception occurred: {0}'.format(str(inst))
+        module.fail_json(rc=999, msg=message)
+
+    command = 'QSYS/CHKOBJ OBJ({pattern_savf_library}/{pattern_savf_name}) OBJTYPE(*FILE)'.format(
         pattern_savf_name=savf_name.strip(),
         pattern_savf_library=savf_library.strip())
     # Check to see if the savf is existed
-    args = ['system', chkobj_cmd]
-    ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
-    rc, out, err = module.run_command(args, use_unsafe_shell=False)
+    ibmi_util.log_info("Command to run: " + command, module._name)
+    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
     if rc != 0:
         result = dict(
+            command=command,
             stderr=err,
             rc=rc,
+            job_log=job_log,
         )
         module.fail_json(msg="File {pattern_savf_name} in library {pattern_savf_library} not found".format(
             pattern_savf_name=savf_name.strip(),
             pattern_savf_library=savf_library.strip()), **result)
 
     # Call the The Accept Software Agreement command
-    args = ['system', acceptance_cmd]
-    ibmi_util.log_info("Acceptance command to run: " + acceptance_cmd, module._name)
-    rc, out, err = module.run_command(args, use_unsafe_shell=False)
-    if rc != 0:
-        result = dict(
-            stderr=err,
-            rc=rc,
-        )
-        module.fail_json(msg="The Accept Software Agreement command {acceptance_cmd} failed".format(
-            acceptance_cmd=acceptance_cmd), **result)
+    if acceptance_cmd.strip():
+        command = acceptance_cmd.strip()
+        ibmi_util.log_info("Acceptance command to run: " + command, module._name)
+        rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+        if rc != 0:
+            result = dict(
+                command=command,
+                stderr=err,
+                rc=rc,
+                job_log=job_log,
+            )
+            module.fail_json(msg="The Accept Software Agreement command {acceptance_cmd} failed".format(
+                acceptance_cmd=acceptance_cmd), **result)
 
     # run the RSTLICPGM command to install the product
     command = 'QSYS/RSTLICPGM LICPGM({pattern_product}) DEV(*SAVF) OPTION({pattern_option}) RSTOBJ({pattern_object_type}) \
@@ -260,7 +287,7 @@ def main():
         pattern_parameters=parameters)
 
     command = ' '.join(command.split())  # keep only one space between adjacent strings
-    rc, out, err, job_log = ibmi_util.itoolkit_run_command_once(command)
+    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
 
     if rc:
         result = dict(
