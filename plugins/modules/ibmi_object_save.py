@@ -83,13 +83,22 @@ options:
         The default values of parameters for SAVOBJ will be taken if not specified.
     type: str
     default: ' '
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 author:
     - Peng Zengyu (@pengzengyufish)
 '''
 
 EXAMPLES = r'''
-- name: Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary.
+- name: Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary with become user.
   ibmi_object_save:
     object_names: 'test1 test2'
     object_lib: 'objlib'
@@ -98,6 +107,8 @@ EXAMPLES = r'''
     savefile_lib: 'archlib'
     force_save: True
     target_release: 'V7R2M0'
+    become_user: 'USER1'
+    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''
@@ -228,7 +239,8 @@ job_log:
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.0.2"
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -245,11 +257,12 @@ def main():
             joblog=dict(type='bool', default=False),
             asp_group=dict(type='str', default='*SYSBAS'),
             parameters=dict(type='str', default=' '),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
     ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
-    conn = None
     try:
         object_names = module.params['object_names']
         object_lib = module.params['object_lib']
@@ -262,15 +275,24 @@ def main():
         joblog = module.params['joblog']
         asp_group = module.params['asp_group'].strip().upper()
         parameters = module.params['parameters']
+        become_user = module.params['become_user']
+        become_user_password = module.params['become_user_password']
 
         startd = datetime.datetime.now()
-        conn = ibmi_util.itoolkit_init(asp_group)
+
+        try:
+            ibmi_module = imodule.IBMiModule(
+                db_name=asp_group, become_user_name=become_user, become_user_password=become_user_password)
+        except Exception as inst:
+            message = 'Exception occurred: {0}'.format(str(inst))
+            module.fail_json(rc=999, msg=message)
+
         # crtsavf
         command = 'QSYS/CRTSAVF FILE({p_savefile_lib}/{p_savefile_name})'.format(
             p_savefile_lib=savefile_lib,
             p_savefile_name=savefile_name)
-        rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
-        job_log = ibmi_util.itoolkit_get_job_log(conn, startd)
+        rc, out, error = ibmi_module.itoolkit_run_command(command)
+        job_log = ibmi_module.itoolkit_get_job_log(startd)
         ibmi_util.log_debug("CRTSAVF: " + command, module._name)
         if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
             # SAVOBJ
@@ -284,7 +306,7 @@ def main():
                 p_savefile_name=savefile_name,
                 p_target_release=target_release,
                 p_parameters=parameters)
-            rc, out, error = ibmi_util.itoolkit_run_command(conn, ' '.join(command.split()))
+            rc, out, error = ibmi_module.itoolkit_run_command(' '.join(command.split()))
         else:
             if 'CPF5813' in str(job_log):
                 ibmi_util.log_debug("SAVF " + savefile_name + " already exists", module._name)
@@ -293,7 +315,7 @@ def main():
                     command = 'QSYS/CLRSAVF FILE({p_savefile_lib}/{p_savefile_name})'.format(
                         p_savefile_lib=savefile_lib,
                         p_savefile_name=savefile_name)
-                    rc, out, error = ibmi_util.itoolkit_run_command(conn, command)
+                    rc, out, error = ibmi_module.itoolkit_run_command(command)
                     ibmi_util.log_debug("CLRSAVF: " + command, module._name)
                     if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
                         command = 'QSYS/SAVOBJ OBJ({p_object_names}) LIB({p_object_lib}) DEV({p_format}) OBJTYPE({p_object_types}) \
@@ -306,7 +328,7 @@ def main():
                             p_savefile_name=savefile_name,
                             p_target_release=target_release,
                             p_parameters=parameters)
-                        rc, out, error = ibmi_util.itoolkit_run_command(conn, ' '.join(command.split()))
+                        rc, out, error = ibmi_module.itoolkit_run_command(' '.join(command.split()))
                 else:
                     out = 'File {p_savefile_name} in library {p_savefile_lib} already exists. Set force_save to force save.'.format(
                         p_savefile_name=savefile_name,
@@ -314,7 +336,7 @@ def main():
 
         endd = datetime.datetime.now()
         delta = endd - startd
-        job_log = ibmi_util.itoolkit_get_job_log(conn, startd)
+        job_log = ibmi_module.itoolkit_get_job_log(startd)
         result = dict(
             object_names=object_names,
             object_lib=object_lib,
@@ -341,8 +363,6 @@ def main():
         module.exit_json(**result)
     except Exception as e:
         module.fail_json(rc=ibmi_util.IBMi_COMMAND_RC_UNEXPECTED, msg=str(e))
-    finally:
-        ibmi_util.itoolkit_close_connection(conn)
 
 
 if __name__ == '__main__':

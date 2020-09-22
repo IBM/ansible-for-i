@@ -1,0 +1,125 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+#ibmi-fix-repo-sample.yml 
+#The sample file is to provide an example about how to manipulate the PTF database
+---
+- hosts: all
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
+  tasks:
+    - block:
+      - name: query_some_group_info
+        ibmi_fix_group_check:
+          groups:
+            - "SF99740"
+        register: group_info
+        
+      - name: display_group_info
+        debug: 
+          msg: "{{ group_info.count }} group info returned"
+
+      - name: add_group_info_records
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: 'add'
+          type: 'ptf_group'
+          checksum: false
+          parameters:
+            - {'ptf_group_number':'{{ group_info.group_info[0].ptf_group_number }}', 'ptf_group_level':'{{ group_info.group_info[0].ptf_group_level }}', 'ptf_list':'{{ group_info.group_info[0].ptf_list }}', 'release_date':'{{ group_info.group_info[0].release_date }}'}
+        register: add_group_info_records
+        
+      - name: display_add_group_info_records
+        debug: 
+          msg: '{{ add_group_info_records.row_changed }} records added'
+
+      - name: query_group_info_records
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: 'find'
+          type: 'ptf_group'
+          parameters: 
+            - {'ptf_group_number':'SF99740', 'ptf_group_level':20121}
+        register: group_info_records
+
+      - name: display_query_group_info_records
+        debug: 
+          var: group_info_records.success_list | length
+      - name: display_query_group_info_records
+        debug:
+          var: group_info_records.success_list[0].ptf_group_number
+      - name: display_query_group_info_records
+        debug:
+          var: group_info_records.success_list[0].ptf_group_level
+      - name: display_query_group_info_records
+        debug:
+          var: group_info_records.success_list[0].release_date
+      - name: display_query_group_info_records
+        debug:
+          var: group_info_records.success_list[0].ptf_list | length
+
+      - name: change_group_info_records
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: 'update'
+          type: 'ptf_group'
+          checksum: true
+          parameters: 
+            - {'order_id':'2023177915', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2023177915', 'ptf_group_number':'{{ group_info.group_info[0].ptf_group_number }}', 'ptf_group_level':'{{ group_info.group_info[0].ptf_group_level }}', 'release_date':'{{ group_info.group_info[0].release_date }}'}
+        register: change_group_info_records
+
+      - name: display_change_group_info_records
+        debug: 
+          msg: '{{ change_group_info_records }}'
+
+      - name: query_updated_group_info_records
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: 'find'
+          type: 'ptf_group'
+          checksum: true
+          parameters: 
+            - {'ptf_group_number':'SF99740'}
+        register: query_updated_group_info_records
+
+      - name: display_updated_group_info_records
+        debug: 
+          # msg: '{{ query_updated_group_info_records }}'
+          var: query_updated_group_info_records.success_list | length
+      - name: display_updated_group_info_records
+        debug:
+          var: query_updated_group_info_records.success_list[0].ptf_group_number
+      - name: display_updated_group_info_records
+        debug:
+          var: query_updated_group_info_records.success_list[0].ptf_group_level
+      - name: display_updated_group_info_records
+        debug:
+          var: query_updated_group_info_records.success_list[0].release_date
+      - name: display_updated_group_info_records
+        debug:
+          var: query_updated_group_info_records.success_list[0].ptf_list | length
+      - name: display_updated_group_info_records
+        debug:
+          var: query_updated_group_info_records.success_list[0].checksum
+
+      # - name: delete some PTFs records
+      #   ibmi_fix_repo:
+      #     database: '/tmp/testdb.sqlite3'
+      #     action: "delete"
+      #     type: 'ptf_group'
+      #     parameters: 
+      #       - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
+      #   register: dsps_param_result_3
+
+      # - name: Display the returned parameters 3
+      #   debug: 
+      #     msg: '{{ dsps_param_result_3 }}'
+
+      always:
+      - name: drop_the_table
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: "clear"
+          type: 'ptf_group'

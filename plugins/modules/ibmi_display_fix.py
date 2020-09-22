@@ -47,6 +47,15 @@ options:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: False
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 seealso:
 - module: ibmi_fix
 
@@ -220,12 +229,10 @@ ptf_info:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 import sys
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
-
 try:
     from itoolkit import iToolKit
     from itoolkit import iPgm
@@ -235,21 +242,16 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
-
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "9.9.9"
 
 
-def get_ptf_info(ptf_id, product_id, release_level):
-    conn = dbi.connect()
+def get_ptf_info(imodule, ptf_id, product_id, release_level):
+    conn = imodule.get_connection()
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
-    system_release_info, err = db2i_tools.get_ibmi_release(conn)
-    ibmi_util.log_debug("db2i_tools.get_ibmi_release() return release_info: " + str(system_release_info), sys._getframe().f_code.co_name)
-    ibmi_util.log_debug("db2i_tools.get_ibmi_release() return err: " + str(err), sys._getframe().f_code.co_name)
+    system_release_info, err = imodule.get_ibmi_release()
+    ibmi_util.log_debug("get_ibmi_release() return release_info: " + str(system_release_info), sys._getframe().f_code.co_name)
+    ibmi_util.log_debug("get_ibmi_release() return err: " + str(err), sys._getframe().f_code.co_name)
     # Example output for system_release_info: {'version': 7, 'release': 2, 'version_release': 7.2}
     # Note, version_release is float but not string
     if system_release_info['version_release'] == 7.2:
@@ -424,6 +426,8 @@ def main():
             ptf=dict(type='str', required=True),
             release=dict(type='str', default='*ALL'),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -436,6 +440,8 @@ def main():
     if release:
         release = release.strip().upper()
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     if len(product) > 7:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID,
@@ -454,6 +460,12 @@ def main():
         job_log=[],
         stderr=''
     )
+    try:
+        ibmi_module = imodule.IBMiModule(
+            become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = 'Exception occurred: {0}'.format(str(inst))
+        module.fail_json(rc=999, msg=message)
 
     sql = "SELECT * FROM QSYS2.PTF_INFO WHERE PTF_IDENTIFIER = '{0}' ".format(ptf)
     if product != '*ONLY':
@@ -462,7 +474,7 @@ def main():
         sql = sql + "and PTF_PRODUCT_RELEASE_LEVEL = '{0}' ".format(release)
     ibmi_util.log_debug("SQL to run: {0}".format(sql), module._name)
 
-    rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(sql)
+    rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(sql)
 
     result.update({'job_log': job_log})
 
@@ -482,7 +494,7 @@ def main():
             release = out[0]['PTF_RELEASE_LEVEL']
         ibmi_util.log_debug("PTF release level: {0}, product id: {1}, ptf id: {2}".format(
             release, product, ptf), module._name)
-        rc, pre_req_list, api_result = get_ptf_info(ptf, product, release)
+        rc, pre_req_list, api_result = get_ptf_info(ibmi_module, ptf, product, release)
         ibmi_util.log_debug("Requisite PTFs info: " +
                             str(pre_req_list), module._name)
         if rc:

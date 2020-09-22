@@ -1,0 +1,30 @@
+---
+# tasks file for apply_ptfs
+- include: apply_all_loaded_ptfs.yml
+  when: apply_all_loaded_ptfs
+
+- block:
+  - set_fact:
+      apply_success_list: []
+      apply_fail_list: []
+      ipl_requested: false
+
+  - name: Apply ptfs
+    include_tasks: apply_individual_ptf.yml
+    loop: "{{ to_be_applied_list }}"
+    loop_control:
+      loop_var: apply_ptf
+    register: apply_result
+
+  - name: reboot the system immediately if auto_ipl is set to true and at least one to-be-applied PTF requires an IPL
+    ibm.power_ibmi.ibmi_reboot:
+    when: auto_ipl and ipl_requested
+
+  - name: Print the successfully apply list
+    debug:
+      var: apply_success_list
+
+  - name: Print the fail apply list
+    debug:
+      var: apply_fail_list
+  when: apply_all_loaded_ptfs == false

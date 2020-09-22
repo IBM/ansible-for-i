@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_tcp_interface.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_tcp_interface.pyy
 
 .. _ibmi_tcp_interface_module:
 
@@ -59,6 +59,26 @@ auto_start
   | **required**: False
   | **type**: str
   | **choices**: \*YES, \*NO
+
+
+     
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
 
 
      

@@ -54,7 +54,7 @@
           - chksysval_qmaxsign_result.sysval[0].name == 'QMAXSIGN'
           - chksysval_qmaxsign_result.sysval[0].type == '8A'
           - chksysval_qmaxsign_result.sysval[0].value == chksysval_qmaxsign_result.sysval[0].expect
-          - chksysval_qmaxsign_result.sysval[0].atrisk | bool == false
+          - chksysval_qmaxsign_result.sysval[0].compliant | bool == true
           
 
     - name: Display many system values
@@ -101,11 +101,24 @@
           - chksysval_result.sysval[0].name == 'QMAXSIGN'
           - chksysval_result.sysval[0].type == '8A'
           - chksysval_result.sysval[0].value == chksysval_result.sysval[0].expect
-          - chksysval_result.sysval[0].atrisk | bool == false
+          - chksysval_result.sysval[0].compliant | bool == true
           - chksysval_result.sysval[1].name == 'QMAXSGNACN'
           - chksysval_result.sysval[1].type == '4A'
           - chksysval_result.sysval[1].value == chksysval_result.sysval[1].expect
-          - chksysval_result.sysval[1].atrisk | bool == false
+          - chksysval_result.sysval[1].compliant | bool == true
           - chksysval_result.sysval[2].name == 'QCCSID'
           - chksysval_result.sysval[2].type == '10i0'
           - chksysval_result.sysval[2].value | int >= 0 and chksysval_result.sysval[2].value | int <= 65535
+
+    - name: Check with equal_as_list option
+      ibmi_sysval:
+        sysvalue: 
+          - {'name':'QATNPGM', 'expect':'QEZMAIN   QSYS'}
+          - {'name':'QATNPGM', 'expect':'QSYS  QEZMAIN'}
+          - {'name':'QATNPGM', 'expect':'QEZMAIN  QSYS', 'check':'equal_as_list'}
+          - {'name':'QATNPGM', 'expect':'QSYS QEZMAIN', 'check':'equal_as_list'}
+      register: chksysval_equal_as_list
+
+    - name: Display check with equal_as_list option
+      debug: 
+        msg: "{{ chksysval_equal_as_list.sysval }}"

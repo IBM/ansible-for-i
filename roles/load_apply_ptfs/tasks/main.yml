@@ -1,0 +1,16 @@
+---
+# role for load_apply_ptfs
+- name: Include load_ptf role to load ptfs
+  include_role:
+    name: load_ptf
+  vars:
+    to_be_loaded_list: "{{ required_ptf_list }}"
+  register: load_result
+
+- name: Include apply_ptf role to apply ptfs
+  include_role:
+    name: apply_ptf
+  vars:
+    to_be_applied_list: "{{ load_success_list }}"
+  register: apply_result
+  when: load_success_list != []

@@ -1,4 +1,9 @@
 - block:
+  - set_fact: 
+      superuser: "{{ansible_ssh_user}}"
+      ibmi_user: "ZHYAO"
+      ibmi_pass: '{{ansible_ssh_pass}}'
+
   - name: TC01 - run the SQL command to create a table
     ibmi_sqlite3:
       database: "/tmp/testdb.sqlite3"
@@ -208,14 +213,7 @@
       path: "/home/{{ansible_ssh_user}}/testdb.sqlite3"
       state: touch
       mode: 0700
-
-  - name: TC10 - permission test - set *USER profile credentials
-    no_log: true
-    set_fact:
-      ibmi_user: "ZHYAO"
-      ibmi_pass: '{{ansible_ssh_pass}}'
-    when: ansible_ssh_pass is defined
-    
+   
   - name: TC10 - create a *USER profile to do authority test
     ibmi_user_and_group:
       operation: 'create'
@@ -228,9 +226,8 @@
 
   - name: TC10 - switch to *USER created above(ibmi_user) for authority negative test
     set_fact: 
-      superuser: "{{ansible_ssh_user}}"
-      super_user_db: "/home/{{ansible_ssh_user}}/testdb.sqlite3"
       ansible_ssh_user: "{{ibmi_user}}"
+      super_user_db: "/home/{{superuser}}/testdb.sqlite3"
 
   - name: TC10 - run sqlite3 module, should fail
     ibmi_sqlite3:
@@ -258,6 +255,10 @@
       ibmi_sqlite3:
         database: "/tmp/testdb.sqlite3"
         sql: "DROP TABLE IF EXISTS us_states"
+
+    - name: set_fact
+      set_fact:
+        super_user_db: "/home/{{superuser}}/testdb.sqlite3"
 
     - name: remove {{super_user_db}}
       command: rm -f {{super_user_db}}

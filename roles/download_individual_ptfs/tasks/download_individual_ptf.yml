@@ -1,0 +1,22 @@
+---
+# tasks file for download_individual_ptf
+- name: Involve ibmi_download_fix to download ptfs
+  ibmi_download_fix:
+    ptf_id: "{{ download_ptf.ptf_id }}"
+    order: "{{ order|default('*PTFID') }}"
+  register: download_result
+  ignore_errors: True
+
+- name: compose successful list
+  set_fact:
+    download_success_list: "{{ download_success_list|default([]) + download_result.download_list }}"
+  when: download_result.download_list != []
+
+- name: compose failed list
+  set_fact:
+    download_fail_list: "{{ download_fail_list | default([]) + [ {'ptf_id': download_ptf.ptf_id, 'fail_reason': download_result.msg} ] }}"
+  when: download_result.failed == True or download_result.download_list == []
+
+- name: Print the failed download list
+  debug:
+    var: download_fail_list

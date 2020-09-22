@@ -1,0 +1,66 @@
+---
+- name: initialize the variables
+  set_fact:
+    ptf_list: []
+    ptf_on_system: {}
+    ptf_info_list: "{{ product_info.success_list }}"
+
+- name: query ptf information from target system
+  ibm.power_ibmi.ibmi_sql_query:
+    sql: "SELECT PTF_IDENTIFIER, PTF_LOADED_STATUS FROM QSYS2.PTF_INFO WHERE PTF_PRODUCT_ID = '{{ ptf_info_list[0].product }}'"
+  register: result
+
+- set_fact:
+    ptf_status: "{{ ptf_status|default([]) + [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'Product not installed on target system' }] }}"
+  when: result.row|length == 0
+  no_log: true
+  
+- name: start to check ptfs
+  block:
+  - name: compose ptf status list on target system
+    set_fact:
+      ptf_on_system: "{{ ptf_on_system|default({}) | combine({ record.PTF_IDENTIFIER: record.PTF_LOADED_STATUS }) }}"
+    with_list: "{{ result.row }}"
+    loop_control:
+      loop_var: record
+    when: result.row|length > 0
+    no_log: true
+
+  - name: ptf does not exist
+    set_fact:
+      ptf_list: "{{ ptf_list|default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT' }] }}"
+    when: not ptf_on_system.get(ptf_info.ptf_id)
+    with_list: "{{ ptf_info_list }}"
+    loop_control:
+      loop_var: ptf_info
+    no_log: true
+
+  - name: ptf not applied
+    set_fact:
+      ptf_list: "{{ ptf_list|default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id] }] }}"
+    when: 
+      - ptf_on_system.get(ptf_info.ptf_id)
+      - ptf_on_system[ptf_info.ptf_id] != 'APPLIED'
+      - ptf_on_system[ptf_info.ptf_id] != 'PERMANENTLY APPLIED'
+      - ptf_on_system[ptf_info.ptf_id] != 'SUPERSEDED'
+    with_list: "{{ ptf_info_list }}"
+    loop_control:
+      loop_var: ptf_info
+    no_log: true
+
+  - name: ptf applied
+    set_fact:
+      ptf_list: "{{ ptf_list|default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id] }] }}"
+    when: 
+      - ptf_on_system.get(ptf_info.ptf_id) 
+      - ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or ptf_on_system[ptf_info.ptf_id] == 'PERMANENTLY APPLIED' or ptf_on_system[ptf_info.ptf_id] == 'SUPERSEDED'
+    with_list: "{{ ptf_info_list }}"
+    loop_control:
+      loop_var: ptf_info
+    no_log: true
+
+  - set_fact:
+      ptf_status: "{{ ptf_status|default([]) + [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'OK', 'PTF_LIST': ptf_list }] }}"
+    no_log: true
+
+  when: result.row|length > 0

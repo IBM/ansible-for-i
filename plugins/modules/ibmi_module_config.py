@@ -123,7 +123,7 @@ import json
 import os
 import pwd
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -267,7 +267,7 @@ def main():
             os.chown(log_config_dir, pwd.getpwnam('QSYS').pw_uid, -1)
             os.chown(log_config_file_path, pwd.getpwnam('QSYS').pw_uid, -1)
         except Exception as e:
-            pass
+            ibmi_util.log_info("chown to QSYS error: " + str(e), module._name)
 
     module.exit_json(
         rc=0,

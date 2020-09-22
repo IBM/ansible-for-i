@@ -78,6 +78,15 @@ options:
       - The job log of the job executing the task will be returned even rc is zero if it is set to true.
     type: bool
     default: false
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 notes:
    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 seealso:
@@ -96,6 +105,8 @@ EXAMPLES = r'''
     operation: 'remove'
     fix_list:
       - "SI72223"
+    become_user: "QSECOFR"
+    become_user_password: "yourpassword"
 - name: Install a single PTF
   ibmi_fix:
     product_id: '5770DBM'
@@ -106,6 +117,8 @@ EXAMPLES = r'''
     operation: 'load_and_apply'
     fix_list:
       - "SI72223"
+    become_user: "QSECOFR"
+    become_user_password: "yourpassword"
 - name: query ptf
   ibmi_fix:
     operation: 'query'
@@ -196,9 +209,9 @@ HAS_IBM_DB = True
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "9.9.9"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -208,12 +221,12 @@ IBMi_COMMAND_RC_ITOOLKIT_NO_KEY_ERROR = 257
 IBMi_JOB_STATUS_NOT_EXPECTED = 258
 
 
-def itoolkit_run_command(connection_id, command):
-    rc, out, err = ibmi_util.itoolkit_run_command(connection_id, command)
+def itoolkit_run_command(ibmi_module, command):
+    rc, out, err = ibmi_module.itoolkit_run_command(command)
     return rc, out, err
 
 
-def remove_ptf(connection_id, module, product_id, ptf_selected_list, ptf_omit_list, temp_or_perm="*TEMP",
+def remove_ptf(ibmi_module, module, product_id, ptf_selected_list, ptf_omit_list, temp_or_perm="*TEMP",
                delayed_option="*NO"):
     cl_rmv_ptf_map = {"LICPGM": product_id, "RMV": temp_or_perm, "SELECT": "", "OMIT": "", "DELAYED": delayed_option}
 
@@ -231,12 +244,12 @@ def remove_ptf(connection_id, module, product_id, ptf_selected_list, ptf_omit_li
 
     module.log("Run CL Command: " + cl_rmv_ptf)
 
-    rc, out, err = itoolkit_run_command(connection_id, cl_rmv_ptf)
+    rc, out, err = itoolkit_run_command(ibmi_module, cl_rmv_ptf)
 
     return rc, out, err
 
 
-def install_ptf(connection_id, module, product_id, ptf_list_to_select, ptf_list_to_omit,
+def install_ptf(ibmi_module, module, product_id, ptf_list_to_select, ptf_list_to_omit,
                 device, save_file, delayed_option="*NO", temp_or_perm="*TEMP", load_ptf_only=False, apy_ptf_only=False):
 
     cl_load_ptf_map = {"LICPGM": product_id,
@@ -272,7 +285,7 @@ def install_ptf(connection_id, module, product_id, ptf_list_to_select, ptf_list_
         pass
     else:
         module.log("Running CL: " + cl_load_ptf)
-        rc, out, err = itoolkit_run_command(connection_id, cl_load_ptf)
+        rc, out, err = itoolkit_run_command(ibmi_module, cl_load_ptf)
         if rc > 0:
             return rc, out, err
 
@@ -280,7 +293,7 @@ def install_ptf(connection_id, module, product_id, ptf_list_to_select, ptf_list_
         pass
     else:
         module.log("Running CL: " + cl_apply_ptf)
-        rc, out, err = itoolkit_run_command(connection_id, cl_apply_ptf)
+        rc, out, err = itoolkit_run_command(ibmi_module, cl_apply_ptf)
 
     return rc, out, err
 
@@ -319,7 +332,7 @@ def return_fix_information(db_connection, product_id, ptf_list):
     out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
 
     out = []
-    if (out_result_set is not None):
+    if out_result_set is not None:
         for result in out_result_set:
             result_map = {"PTF_PRODUCT_ID": result[0], "PTF_IDENTIFIER": result[1],
                           "PTF_LOADED_STATUS": result[2], "PTF_SAVE_FILE": result[3],
@@ -347,6 +360,8 @@ def main():
                                                                           'load_only', 'apply_only',
                                                                           'remove',
                                                                           'query']),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         required_if=[
             ["operation", "apply_only", ["product_id"]],
@@ -366,6 +381,8 @@ def main():
     temp_or_perm = module.params['temp_or_perm']
     operation = module.params['operation']
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     if operation in ['load_and_apply', 'load_only', 'remove']:
         if product_id == '*ALL':
@@ -373,7 +390,10 @@ def main():
 
     startd = datetime.datetime.now()
     out = ''
-    connection_id = ibmi_util.itoolkit_init()
+    ibmi_module = imodule.IBMiModule(become_user_name=become_user,
+                                     become_user_password=become_user_password)
+
+    db_conn = ibmi_module.get_connection()
 
     if operation in ['load_and_apply', 'load_only', 'apply_only']:
         operation_bool_map = {'load_and_apply': [False, False], 'load_only': [True, False], 'apply_only': [False, True]}
@@ -381,17 +401,17 @@ def main():
 
         savf_obj = "" if operation == 'apply_only' else (save_file_lib + "/" + save_file_object)
 
-        rc, out, err = install_ptf(connection_id, module, product_id, ptf_list_to_select,
+        rc, out, err = install_ptf(ibmi_module, module, product_id, ptf_list_to_select,
                                    ptf_list_to_omit, "*SAVF", savf_obj, delayed_option, temp_or_perm,
                                    operation_bool_map[operation][0], operation_bool_map[operation][1])
 
     elif operation in ['remove']:
-        rc, out, err = remove_ptf(connection_id, module, product_id, ptf_list_to_select, ptf_list_to_omit,
+        rc, out, err = remove_ptf(ibmi_module, module, product_id, ptf_list_to_select, ptf_list_to_omit,
                                   temp_or_perm=temp_or_perm, delayed_option=delayed_option)
 
     # return the status of the ptf
     if ptf_list_to_select is not None:
-        ptf_list, query_err = return_fix_information(connection_id, product_id, ptf_list_to_select)
+        ptf_list, query_err = return_fix_information(db_conn, product_id, ptf_list_to_select)
     else:
         module.fail_json(msg="PTF list contains no PTF.")
 
@@ -403,12 +423,9 @@ def main():
             rc = IBMi_COMMAND_RC_SUCCESS
 
     if joblog or (rc != IBMi_COMMAND_RC_SUCCESS):
-        job_log = ibmi_util.itoolkit_get_job_log(connection_id, startd)
+        job_log = ibmi_module.itoolkit_get_job_log(startd)
     else:
         job_log = []
-
-    if connection_id is not None:
-        ibmi_util.itoolkit_close_connection(connection_id)
 
     endd = datetime.datetime.now()
     delta = endd - startd

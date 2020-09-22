@@ -1,0 +1,63 @@
+- block:
+    - name: call DSPNATA
+      shell: system "DSPNETA" | grep "Current system name" | head -n 1 | awk '{print $1}'
+      register: SYSNAME_result
+
+    - name: call DSPNATA
+      ibmi_cl_command: 
+        cmd: DSPNETA OUTPUT(*)
+      register: DSPNATA_result
+
+    - name: RTVNETA_TC01 Call RTVAUTLE to get information of the authority list
+      ibmi_rtv_command:
+        cmd: 'RTVNETA'
+        char_vars:
+          - 'SYSNAME'   
+          - 'PNDSYSNAME'
+          - 'LCLNETID'  
+          - 'LCLCPNAME' 
+          - 'LCLLOCNAME'
+          - 'DFTMODE'   
+          - 'NODETYPE'  
+        number_vars:
+          - 'DTACPR'    
+          - 'DTACPRINM' 
+          - 'MAXINTSSN' 
+          - 'RAR' 
+      register: TC01
+
+    - name: assert the returned options of TC01
+      assert:
+        that:
+          - TC01.rc == 0
+          - TC01.output['SYSNAME'] in DSPNATA_result.stdout_lines[2].split(':')[1]
+          - TC01.output['PNDSYSNAME'] in DSPNATA_result.stdout_lines[3].split(':')[1]
+          - TC01.output['LCLNETID'] in DSPNATA_result.stdout_lines[4].split(':')[1]
+          - TC01.output['LCLCPNAME'] in DSPNATA_result.stdout_lines[5].split(':')[1]
+          - TC01.output['LCLLOCNAME'] in DSPNATA_result.stdout_lines[6].split(':')[1]
+          - TC01.output['DFTMODE'] in DSPNATA_result.stdout_lines[7].split(':')[1]
+          - TC01.output['NODETYPE'] in DSPNATA_result.stdout_lines[8].split(':')[1]
+          - TC01.output['DTACPR'] in DSPNATA_result.stdout_lines[9].split(':')[1] or TC01.output['DTACPR'] == "0"
+          - TC01.output['DTACPRINM'] in DSPNATA_result.stdout_lines[10].split(':')[1] or TC01.output['DTACPRINM'] == "0"
+          - TC01.output['MAXINTSSN'] in DSPNATA_result.stdout_lines[11].split(':')[1] or TC01.output['MAXINTSSN'] == "0"
+          - TC01.output['RAR'] is defined 
+          - TC01.job_log == []
+
+    - name: RTVNETA_TC02 Call RTVAUTLE to get information of the authority list
+      ibmi_rtv_command:
+        cmd: 'RTVNETA'
+        number_vars:
+          - 'SYSNAME'   
+          - 'PNDSYSNAME'
+          - 'LCLNETID'  
+          - 'LCLCPNAME' 
+          - 'LCLLOCNAME'
+          - 'DFTMODE'   
+          - 'NODETYPE'  
+        char_vars:
+          - 'DTACPR'    
+          - 'DTACPRINM' 
+          - 'MAXINTSSN' 
+          - 'RAR' 
+      register: TC02
+      failed_when: (TC02.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0069') | map(attribute='MESSAGE_ID') | list | length) == 0

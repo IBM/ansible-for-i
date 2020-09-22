@@ -1,0 +1,36 @@
+---
+# role for fix_repo_extract_ptf_group_info
+# Call ibmi_fix_repo module to get the order information in download_status table, then call ibmi_fix_repo module again to extract
+# and update ptf group's information into ptf_group_image_info table in catalog.
+- name: Find the order information in download_status table
+  ibmi_fix_repo:
+    database: "{{ database }}"
+    type: "download_status"
+    checksum: True
+    action: "find"
+    parameters:
+      - "{{ {'order_id': order_id } }}"
+  register: fix_repo_find_result
+
+- name: Print order information
+  debug:
+    var: fix_repo_find_result
+
+- name: Update PTF group record into catalog
+  ibmi_fix_repo:
+    database: "{{ database }}"
+    type: "ptf_group"
+    action: "update"
+    checksum: True
+    parameters:
+      - "{{ {'order_id': fix_repo_find_result.success_list[0].order_id,
+      'file_path': fix_repo_find_result.success_list[0].file_path,
+      'ptf_group_number': fix_repo_find_result.success_list[0].ptf_group_number,
+      'ptf_group_level': fix_repo_find_result.success_list[0].ptf_group_level,
+      'release_date': fix_repo_find_result.success_list[0].release_date} }}"
+  register: fix_repo_update_result
+  when: fix_repo_find_result.success_list != []
+
+- name: Print PTF group record information
+  debug:
+    var: fix_repo_update_result

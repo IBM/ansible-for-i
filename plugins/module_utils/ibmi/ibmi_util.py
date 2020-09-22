@@ -18,7 +18,6 @@ HAS_IBM_DB = True
 try:
     from itoolkit import iToolKit
     from itoolkit import iSqlFree
-    from itoolkit import iSqlFetch
     from itoolkit import iSqlQuery
     from itoolkit import iCmd
     from itoolkit import iCmd5250
@@ -282,7 +281,8 @@ def db_get_result_list(connection_id, sql, hex_convert_columns):
                 # wy: convert the db data type to python data type
                 # do not do changes to those types we cannot find a python type to convert
                 col_type = v[1]
-                if not row[col_num]:
+                # if not row[col_num]:
+                if row[col_num] is None:
                     row_map[str(k)] = ''
                 elif col_type in [dbi.STRING, dbi.TEXT, dbi.XML, dbi.BINARY]:
                     try:

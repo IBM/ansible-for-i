@@ -1,0 +1,97 @@
+---
+- name: initialize the result list
+  set_fact:
+    fix_list: []
+    ptfs_on_system: {}
+    product_list: []
+    ptf_not_installed: []
+  
+- name: compose the ptf number list
+  set_fact:
+    fix_list: "{{ fix_list|default([]) + [ptf_info.ptf_id] }}"
+  with_list: "{{ group.ptf_list }}"
+  loop_control: 
+    loop_var: ptf_info
+
+- name: query ptf group information from target system
+  ibm.power_ibmi.ibmi_sql_query:
+    sql: "SELECT PTF_GROUP_NAME,PTF_GROUP_DESCRIPTION,PTF_GROUP_LEVEL,PTF_GROUP_STATUS FROM QSYS2.GROUP_PTF_INFO WHERE PTF_GROUP_NAME = '{{ group.ptf_group_number }}' ORDER BY PTF_GROUP_LEVEL DESC LIMIT 1"
+  register: result
+
+- name: ptf group does not exist
+  set_fact:
+    group_status: "{{ group_status|default([]) + [{'PTF_GROUP_NUMBER': group.ptf_group_number, 'PTF_GROUP_STATUS': 'NON-EXISTENT'}] }}"
+  when: result.row|length == 0
+
+- name: ptf group level does not match
+  set_fact:
+    group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_GROUP_LEVEL': result.row[0]['PTF_GROUP_LEVEL'], 'LATEST_GROUP_LEVEL': group.ptf_group_level, 'PTF_GROUP_STATUS': result.row[0]['PTF_GROUP_STATUS'] }] }}"
+  when: 
+    - result.row|length > 0
+    - result.row[0]['PTF_GROUP_LEVEL'] != group.ptf_group_level
+
+- name: ptf group level is latest, however status is not INSTALLED
+  block:
+  - name: query ptf list from target system
+    ibm.power_ibmi.ibmi_fix:
+      operation: 'query'
+      fix_list: "{{ fix_list }}"
+    register: ptf_info
+
+  - name: compose ptf list on targret system
+    set_fact:
+      ptfs_on_system: "{{ ptfs_on_system|default({}) | combine({ ptf.PTF_IDENTIFIER: ptf.PTF_LOADED_STATUS }) }}"
+    with_list: "{{ ptf_info.ptf_list }}"
+    loop_control:
+      loop_var: ptf
+
+  - name: query product information from target system
+    ibm.power_ibmi.ibmi_sql_query:
+      sql: "SELECT DISTINCT PRODUCT_ID FROM QSYS2.LICENSE_INFO"
+    register: product_result
+
+  - name: compose product list
+    set_fact:
+      product_list: "{{ product_list|default([]) + [record.PRODUCT_ID] }}"
+    with_list: "{{ product_result.row }}"
+    loop_control:
+      loop_var: record
+
+  - name: ptf does not exist
+    set_fact:
+      ptf_not_installed: "{{ ptf_not_installed|default([]) + [{ 'PTF_IDENTIFIER': ptf.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT' }] }}"
+    when: 
+      - not ptfs_on_system.get(ptf.ptf_id)
+      - ptf.product in product_list
+    with_list: "{{ group.ptf_list }}"
+    loop_control:
+      loop_var: ptf
+
+  - name: ptf exists but status is not APPLIED, PERMANENTLY APPLIED or SUPERSEDED
+    set_fact:
+      ptf_not_installed: "{{ ptf_not_installed|default([]) + [{ 'PTF_IDENTIFIER': ptf.PTF_IDENTIFIER, 'PTF_LOADED_STATUS': ptf.PTF_LOADED_STATUS }] }}"
+    when:
+      - ptf.PTF_LOADED_STATUS != "APPLIED"
+      - ptf.PTF_LOADED_STATUS != "PERMANENTLY APPLIED"
+      - ptf.PTF_LOADED_STATUS != "SUPERSEDED"
+    with_list: "{{ ptf_info.ptf_list }}"
+    loop_control:
+      loop_var: ptf
+
+  - set_fact:
+      group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': result.row[0]['PTF_GROUP_LEVEL'], 'LATEST_PTF_GROUP_LEVEL': group.ptf_group_level, 'PTF_GROUP_STATUS': result.row[0]['PTF_GROUP_STATUS'], 'PTF_NOT_INSTALLED': ptf_not_installed }] }}"
+
+  when:
+    - result.row|length > 0
+    - result.row[0]['PTF_GROUP_LEVEL']|int == group.ptf_group_level
+    - result.row[0]['PTF_GROUP_STATUS'] != "INSTALLED"
+
+- name: ptf group is installed
+  set_fact:
+    group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': result.row[0]['PTF_GROUP_LEVEL'], 'LATEST_PTF_GROUP_LEVEL': group.ptf_group_level, 'PTF_GROUP_STATUS': result.row[0]['PTF_GROUP_STATUS'] }] }}"
+  when:
+    - result.row|length > 0
+    - result.row[0]['PTF_GROUP_LEVEL']|int == group.ptf_group_level
+    - result.row[0]['PTF_GROUP_STATUS'] == "INSTALLED"
+
+  

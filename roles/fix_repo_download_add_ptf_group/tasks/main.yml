@@ -1,0 +1,28 @@
+---
+# role for fix_repo_download_add_ptf_group
+# Call ibmi_download_fix module to download ptf group, then call ibmi_fix_repo module to add information into download_status table in catalog.
+- name: Download PTF group
+  ibmi_download_fix:
+    ptf_id: "{{ ptf_group_number }}"
+    delivery_format: "*IMAGE"
+    reorder: "*YES"
+  register: download_fix_result
+
+- name: Print download information
+  debug:
+    var: download_fix_result
+
+- name: Add order information into download_status table
+  ibmi_fix_repo:
+    database: "{{ database }}"
+    type: "download_status"
+    action: "add"
+    parameters:
+      - "{{ {'order_id': download_fix_result.order_id, 'file_path': download_fix_result.file_path, 'ptf_group_number': ptf_group_number,
+      'ptf_group_level': ptf_group_level, 'release_date': release_date} }}"
+  register: download_status_add_result
+  when: download_fix_result.order_id is defined
+
+- name: Print add order information result
+  debug:
+    var: download_status_add_result

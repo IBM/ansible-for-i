@@ -1,0 +1,711 @@
+# test code for the ibmi_fix_repo module
+# (c) 2020, zhaoyao <zhaoyao@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+#
+
+- block:
+  - name: TC00 - get ansible host os400 version
+    shell: system "DSPSFWRSC" | grep "5770SS1" | head -n 1 | awk '{print $2}'
+    register: osinfo
+  - set_fact:
+      os400_ver: "{{osinfo.stdout}}"
+    failed_when: osinfo.rc != 0
+  - debug:
+      msg: "{{os400_ver}}"  
+  - set_fact:  # pre-define some ptfs/groups for each os version to test
+               # IBM i Group PTFs with level --> https://www.ibm.com/support/pages/node/6211843
+      ptfs: ['SI69340', 'SI71891', 'SI69764']
+      ptf_grps: ['SF99738', 'SF99739', 'SF99740']  # group 1, group 2( with different levels) , group 3 - cum
+    when: os400_ver == "V7R4M0"
+  - set_fact:  
+      ptfs: ['SI70439', 'SI70668', 'SI68580']
+      ptf_grps: ['SF99867', 'SF99723', 'SF99730']
+    when: os400_ver == "V7R3M0"
+  - set_fact:  
+      ptfs: ['SI70445', 'SI70447', 'SI61206']
+      ptf_grps: ['SF99767', 'SF99714', 'SF99720']
+    when: os400_ver == "V7R2M0"
+  - name: install sqlite3 and pip3 as needed
+    command:
+      cmd: /QOpenSys/pkgs/bin/yum install sqlite3 libsqlite3 python3-pip -y 
+    register: install_status
+    failed_when: install_status.rc != 0
+
+  - name: TC00 - install pip3-requests as needed
+    command:
+      cmd: /QOpenSys/pkgs/bin/pip3 install requests
+    register: install_status
+    failed_when: install_status.rc != 0
+
+  - name: TC01 - get latest group ptf info on PSP
+    ibmi_fix_group_check:
+      groups: '{{ptf_grps[0]}}'
+    register: fix_group_check_result
+    failed_when: fix_group_check_result.rc != 0
+
+  - name: TC01 - set fact
+    set_fact:
+      returned_ptf_group_number: "{{fix_group_check_result.group_info[0]['ptf_group_number']}}"
+      returned_ptf_group_level: "{{fix_group_check_result.group_info[0]['ptf_group_level']}}"
+      returned_ptf_group_release_date: "{{fix_group_check_result.group_info[0]['release_date']}}"
+      returned_ptf_group_ptf_list: "{{fix_group_check_result.group_info[0]['ptf_list']}}"
+    when: fix_group_check_result.group_info != []  
+    
+  - name: TC01 - add ptf group info to table from previous step, use checksum false to add to database, avoid waiting for the long downloading time.
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      type: 'ptf_group'
+      checksum: false
+      parameters:
+        - {'ptf_group_number':"{{returned_ptf_group_number}}", 'ptf_group_level':"{{returned_ptf_group_level}}", 'ptf_list':"{{returned_ptf_group_ptf_list}}", 'release_date':"{{returned_ptf_group_release_date}}"} 
+    register: add_result
+
+  - name: TC01 - add ptf group info to table from previous step, after downloading completes
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'update'
+      type: 'ptf_group'
+      checksum: true
+      parameters:
+        - {'order_id':'2023205812', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2023205812', 'ptf_group_number':"{{returned_ptf_group_number}}", 'ptf_group_level':"{{returned_ptf_group_level}}", 'release_date':"{{returned_ptf_group_release_date}}"} 
+    register: upd_result
+
+  - name: TC01 - Assert values
+    assert:
+      that:
+        - upd_result.parameters | selectattr('checksum', 'defined')
+        - upd_result.parameters | selectattr('description', 'defined')
+        - upd_result.parameters | selectattr('file_name', 'defined')
+        - upd_result.parameters | selectattr('checksum', 'defined')
+        - upd_result.parameters | selectattr('order_id','equalto', '2023205812')
+        - upd_result.parameters | selectattr('ptf_group_level', 'equalto',"{{returned_ptf_group_level}}")
+        - upd_result.parameters | selectattr('ptf_group_number', 'equalto',"{{returned_ptf_group_number}}")
+        - upd_result.parameters | selectattr('ptf_list', 'defined')
+        - upd_result.parameters | selectattr('release_date', 'equalto', "{{returned_ptf_group_release_date}}")
+        - upd_result.parameters | selectattr('url', 'defined')
+        - upd_result.parameters | selectattr('release', 'match','R[0-9][0-9][0-9]')
+        - upd_result.sql is defined
+        - upd_result.type == 'ptf_group'
+ 
+  - name: TC02 - query some PTFs records
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      checksum: true
+      action: "find"
+      type: 'ptf_group'
+      parameters:
+        - {'ptf_group_number':'{{returned_ptf_group_number}}', 'ptf_group_level':'{{returned_ptf_group_level}}'}
+    register: query_result    
+
+  - name: TC02 - Assert values
+    assert:
+      that:
+        - query_result.action == 'find'
+        - query_result.type == 'ptf_group'
+        - query_result.sql is defined
+        - query_result.success_list | selectattr('add_time','defined')
+        - query_result.success_list | selectattr('checksum','defined')
+        - query_result.success_list | selectattr('description','defined')
+        - query_result.success_list | selectattr('file_name','defined')
+        - query_result.success_list | selectattr('file_path','equalto','/QIBM/UserData/OS/Service/ECS/PTF/2023177915')
+        - query_result.success_list | selectattr('id','defined')
+        - query_result.success_list | selectattr('order_id','equalto','2023205812')
+        - query_result.success_list | selectattr('ptf_group_level','equalto',"{{returned_ptf_group_level}}")
+        - query_result.success_list | selectattr('ptf_group_number','equalto',"{{returned_ptf_group_number}}")
+        - query_result.success_list | selectattr('ptf_group_status','equalto','Match')
+        - query_result.success_list | selectattr('ptf_list','defined')
+        - query_result.success_list | selectattr('release','R[0-9][0-9][0-9]')
+        - query_result.success_list | selectattr('release_date','equalto',"{{returned_ptf_group_release_date}}") 
+
+  - name: TC03 - delete some PTFs records by using order_id and file_path
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: "delete"
+      type: 'ptf_group'
+      parameters:
+        - {'order_id':'2023205812', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2023205812'} 
+    register: delete_result
+
+  - name: TC03 - Assert values
+    assert:
+      that:
+        - delete_result.action == 'delete'
+        - delete_result.type == 'ptf_group'
+        - delete_result.sql is defined 
+        - delete_result.parameters | selectattr('order_id','equalto','2023205812')
+        - delete_result.parameters | selectattr('file_path','equalto','/QIBM/UserData/OS/Service/ECS/PTF/2023205812')
+        - delete_result.row_changed == 1
+
+  - name: TC04 - get latest group ptf info on PSP of group 2
+    ibmi_fix_group_check:
+      groups: '{{ptf_grps[1]}}'
+    register: fix_group_check_result
+    failed_when: fix_group_check_result.rc != 0
+
+  - name: TC04 - set fact
+    set_fact:
+      returned_ptf_group_number: "{{fix_group_check_result.group_info[0]['ptf_group_number']}}"
+      returned_ptf_group_level: "{{fix_group_check_result.group_info[0]['ptf_group_level']}}"
+      returned_ptf_group_release_date: "{{fix_group_check_result.group_info[0]['release_date']}}"
+      returned_ptf_group_ptf_list: "{{fix_group_check_result.group_info[0]['ptf_list']}}"
+    when: fix_group_check_result.group_info != []  
+
+  - name: TC04 - add another level of same PTF group to test additional_param of find
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      type: 'ptf_group'
+      checksum: false
+      parameters:
+        - {'release_date':'unknown', 'ptf_group_number':'{{ptf_grps[1]}}', 'ptf_group_level':'{{returned_ptf_group_level | int -1}}', 'order_id':'2023203121', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2023203121'}  #group 2 lower level
+        - {'release_date':'{{returned_ptf_group_release_date}}', 'ptf_group_number':'{{ptf_grps[1]}}', 'ptf_group_level':'{{returned_ptf_group_level}}', 'order_id':'2024602340', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2024602340'}  # group2 higher level
+
+  - name: TC04 - find with additional parameters
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      checksum: false
+      action: "find"
+      type: 'ptf_group'
+      parameters:
+        - {'ptf_group_number':'{{ptf_grps[1]}}', 'additional_param':'ORDER BY ptf_group_level DESC LIMIT 1' }
+    register: query_result           
+  
+  - name: TC04 - Assert values # make sure higher level is returned
+    assert:
+      that:
+        - query_result.action == "find"
+        - query_result.success_list | length == 1
+        - query_result.success_list | selectattr('db_record', 'equalto', 'Match')
+        - query_result.success_list | selectattr('file_path', 'equalto', '/QIBM/UserData/OS/Service/ECS/PTF/2024602340')
+        - query_result.success_list | selectattr('order_id', 'equalto', '2024602340')
+        - query_result.success_list | selectattr('ptf_group_number', 'equalto', '{{ptf_grps[1]}}')
+        - query_result.success_list | selectattr('ptf_group_level', 'equalto', '{{returned_ptf_group_level}}')
+        - query_result.row_changed == -1
+        - query_result.type == "ptf_group"
+        - query_result.fail_list is not defined
+
+  - name: TC04 - delete the record by using ptf_group_number and ptf_group_level
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: "delete"
+      type: 'ptf_group'
+      parameters:
+        - {'ptf_group_number':'{{ptf_grps[1]}}', 'ptf_group_level':'{{returned_ptf_group_level}}'}
+    register: delete_result
+
+  - name: TC04 - Assert values
+    assert:
+      that:
+        - delete_result.action == 'delete'
+        - delete_result.type == 'ptf_group'
+        - delete_result.sql is defined 
+        - delete_result.parameters | selectattr('ptf_group_level','equalto','{{returned_ptf_group_level}}')
+        - delete_result.parameters | selectattr('ptf_group_number','equalto','{{ptf_grps[1]}}')
+        - delete_result.row_changed == 1
+
+  - name: TC05 - copy a folder named 2023305199 under /QIBM/UserData/OS/Service/ECS/PTF to simulate there is a new version of PTF group downloaded
+    shell: cp -r /QIBM/UserData/OS/Service/ECS/PTF/2023305198 /QIBM/UserData/OS/Service/ECS/PTF/2023305199
+    register: cpy
+    failed_when: cpy.rc != 0
+
+  - name: TC05 - update some PTFs records
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: 'update'
+      checksum: true
+      type: 'ptf_group'
+      parameters:
+        - {'ptf_group_number':'{{ptf_grps[1]}}', 'ptf_group_level':'{{returned_ptf_group_level}}', 'release_date':'unknown', 'order_id':'2023305199', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2023305199'}
+    register: update_result    
+  - name: TC05 - Assert values
+    assert:
+      that:
+        - update_result.action == 'update'
+        - update_result.checksum == true
+        - update_result.type == 'ptf_group'
+        - update_result.sql is defined 
+        - update_result.parameters | selectattr('file_path','equalto','/QIBM/UserData/OS/Service/ECS/PTF/2023305199')
+        - update_result.parameters | selectattr('order_id','equalto','2023305199')
+        - update_result.row_changed == 1
+
+  - name: TC06 - add some download status records
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      type: 'download_status'
+      parameters:
+        - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181', 'download_status':'downloaded'}
+        - {'order_id':'2023203121', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2023203121', 'download_status':'downloading'}
+        - {'order_id':'999999', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/999999', 'download_status':'downloaded'}
+    register: add_ds
+
+  - name: TC07 - query some PTFs records
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: "find"
+      type: 'download_status'
+      parameters: 
+        - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
+        - {'order_id':'2023203121'}
+        - {'order_id':'1231231231'} # fake
+    register: find_ds
+
+  - name: TC07 - Assert values
+    assert:
+      that:
+        - find_ds.success_list | length == 2
+        - find_ds.fail_list | length == 1
+        - find_ds.fail_list | selectattr('db_record', 'equalto', 'RecordNotFound')
+        - find_ds.fail_list | selectattr('order_id', 'equalto', '1231231231')
+        - find_ds.type == "download_status"
+
+  - name: TC08 - query some download status with addtional parameters
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'find'
+      type: 'download_status'
+      parameters:
+        - {'download_status':'downloaded', 'additional_param':'ORDER BY order_id DESC LIMIT 1'}
+    register: find_ds
+
+  - name: TC08 - Assert values
+    assert:
+      that:
+        - find_ds.action == "find"
+        - find_ds.success_list | length == 1
+        - find_ds.success_list | selectattr('db_record', 'equalto', 'Match')
+        - find_ds.row_changed == -1
+        - find_ds.type == "download_status"
+        - find_ds.fail_list is not defined
+
+  - name: TC09 - delete some PTFs records
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: "delete"
+      type: 'download_status'
+      parameters: 
+        - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
+    register: del_ds
+
+  - name: TC10 - query some PTFs records
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: "find"
+      type: 'download_status'
+      parameters: 
+        - {'order_id':'2020579181'}
+        - {'order_id':'2023203121'}
+    register: find_ds
+
+  - name: TC11 - test single_ptf option of type - add a single ptf to db, ptf_id and file_path are required.
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      checksum: true 
+      type: 'single_ptf'
+      parameters:
+        - {'product':'5770SS1', 'ptf_id':'{{ptfs[0]}}', 'file_path':'/QSYS.LIB/QGPL.LIB/Q{{ptfs[0]}}.FILE'} 
+        - {'product':'5770SS1', 'ptf_id':'{{ptfs[1]}}', 'file_name':"Q{{ptfs[1]}}", 'file_path':'/QSYS.LIB/QGPL.LIB/Q{{ptfs[1]}}.FILE'} # default file_path
+        - {'product':'5770SS1', 'ptf_id':'{{ptfs[2]}}', 'file_name':"Q{{ptfs[2]}}", 'file_path':'/QSYS.LIB/ZYLIB.LIB/Q{{ptfs[2]}}.FILE'} # customized file_path
+
+    register: sp_result
+
+  - name: TC11 - Assert values
+    assert:
+      that:
+        - sp_result.action == "add"
+        - sp_result.row_changed == 3
+        - sp_result.type == "single_ptf"
+        - sp_result.sql != ""
+
+  - name: TC12 - query in single_ptf table
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'find'
+      checksum: true 
+      type: 'single_ptf'
+      parameters:
+        - {'ptf_id':'{{ptfs[0]}}'}
+        - {'ptf_id':'{{ptfs[1]}}', 'file_name':"Q{{ptfs[1]}}.FILE", 'file_path':'/QSYS.LIB/QGPL.LIB/Q{{ptfs[1]}}.FILE'} 
+        - {'ptf_id':'{{ptfs[2]}}'}
+        - {'ptf_id':'{{ptfs[2]}}', 'file_name':"Q{{ptfs[2]}}.FILE", 'file_path':'/QSYS.LIB/ZYLIB.LIB/Q{{ptfs[2]}}.FILE'}
+    register: sp_result  
+
+  - name: TC12 - Assert values
+    assert:
+      that:
+        - sp_result.action == "find"
+        - sp_result.success_list | length == 4
+        - sp_result.row_changed == -1
+        - sp_result.type == "single_ptf"
+        - sp_result.fail_list is not defined
+
+  - name: TC13 - query single_ptf with addtional parameters
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: "find"                                                                                                                   
+      type: 'single_ptf'
+      parameters:
+        - {'product':'5770SS1', 'additional_param':'ORDER BY ptf_id DESC LIMIT 1'}  
+    register: sp_result
+
+  - name: TC13 - Assert values
+    assert:
+      that:
+        - sp_result.action == "find"
+        - sp_result.success_list | length == 1
+        - sp_result.success_list | selectattr('db_record', 'equalto', 'Match')
+        - sp_result.row_changed == -1
+        - sp_result.type == "single_ptf"
+        - sp_result.fail_list is not defined
+
+  - name: TC14 - update in single_ptf table
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'update'
+      checksum: true 
+      type: 'single_ptf'
+      parameters:
+        - {'product':'5770SS1', 'ptf_id':'{{ptfs[2]}}', 'file_path':'/QSYS.LIB/ZYLIB.LIB/Q{{ptfs[2]}}.FILE'}
+    register: sp_result  
+
+  - name: TC14 - Assert values
+    assert:
+      that:
+        - sp_result.action == "update"
+        - sp_result.row_changed == 1
+        - sp_result.type == "single_ptf"
+
+  - name: TC15 - delete in single_ptf table
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'delete'
+      checksum: true 
+      type: 'single_ptf'
+      parameters:
+        - {'ptf_id':'{{ptfs[2]}}'}
+    register: sp_result  
+
+  - name: TC15 - Assert values
+    assert:
+      that:
+        - sp_result.action == "delete"
+        - sp_result.row_changed == 1
+        - sp_result.type == "single_ptf"
+
+  - name: TC16 - query latest CUM record on PSP
+    ibmi_fix_group_check:
+      groups:
+        - "{{ptf_grps[2]}}"
+    register: cum_info
+    failed_when: cum_info.rc != 0
+
+  - name: TC16 - set fact
+    set_fact:
+      returned_ptf_group_number: "{{cum_info.group_info[0]['ptf_group_number']}}"
+      returned_ptf_group_level: "{{cum_info.group_info[0]['ptf_group_level']}}"
+      returned_ptf_group_release_date: "{{cum_info.group_info[0]['release_date']}}"
+      returned_ptf_group_ptf_list: "{{cum_info.group_info[0]['ptf_list']}}"
+    when: cum_info.group_info != []  
+    
+  - name: TC16 - add ptf group info to table from previous step, use checksum false to add to database firstly since it'll take long time to download CUM packages.
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      type: 'ptf_group'
+      checksum: false
+      parameters:
+        - {'ptf_group_number':"{{returned_ptf_group_number}}", 'ptf_group_level':"{{returned_ptf_group_level}}", 'ptf_list':"{{returned_ptf_group_ptf_list}}", 'release_date':"{{returned_ptf_group_release_date}}"} 
+    register: add_cum_result
+
+  - name: TC16 - add ptf group info to table from previous step, after downloading completes
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      type: 'ptf_group'
+      checksum: true
+      parameters:
+        - {'order_id':'2023177915', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2023177915', 'ptf_list':"{{returned_ptf_group_ptf_list}}", 'ptf_group_number':"{{returned_ptf_group_number}}", 'ptf_group_level':"{{returned_ptf_group_level}}", 'release_date':"{{returned_ptf_group_release_date}}"} 
+    register: add_result
+
+  - name: TC16 - Assert values
+    assert:
+      that:
+        - add_result.parameters | selectattr('checksum', 'defined')
+        - add_result.parameters | selectattr('description', 'defined')
+        - add_result.parameters | selectattr('file_name', 'defined')
+        - add_result.parameters | selectattr('order_id','equalto', '2023177915')
+        - add_result.parameters | selectattr('ptf_group_level', 'equalto',"{{returned_ptf_group_level}}")
+        - add_result.parameters | selectattr('ptf_group_number', 'equalto',"{{returned_ptf_group_number}}")
+        - add_result.parameters | selectattr('ptf_list', 'defined')
+        - add_result.parameters | selectattr('release_date', 'equalto', "{{returned_ptf_group_release_date}}")
+        - add_result.parameters | selectattr('url', 'defined')
+        - add_result.parameters | selectattr('release', 'match','R[0-9][0-9][0-9]')
+        - add_result.sql is defined
+        - add_result.type == 'ptf_group'
+
+  - name: TC17 - query some PTFs records
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: "find"
+      type: 'ptf_group'
+      checksum: false
+      parameters: 
+        - {'ptf_group_number':'{{ptf_grps[2]}}'}
+    register: query_cum_result
+
+  - name: TC17 - assert values
+    assert:
+      that:
+        - query_cum_result.success_list | map(attribute='checksum') | list | length > 0
+        - query_cum_result.success_list | map(attribute='file_name') | list | length > 0
+        - query_cum_result.success_list | selectattr('file_path', 'equalto',"/QIBM/UserData/OS/Service/ECS/PTF/2023177915")
+        - query_cum_result.success_list | selectattr('order_id', 'equalto',"2023177915")
+        - query_cum_result.success_list | selectattr('ptf_group_level', 'equalto',"{{returned_ptf_group_level}}")
+        - query_cum_result.success_list | selectattr('ptf_group_level', 'equalto',"{{returned_ptf_group_number}}")
+        - query_cum_result.success_list | selectattr('release_date', 'equalto', "{{returned_ptf_group_release_date}}")
+        - query_cum_result.type == "ptf_group"
+
+  - name: TC18 - change some PTFs records
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: "update"
+      type: 'ptf_group'
+      checksum: false
+      parameters: 
+        - {'release_date':"{{returned_ptf_group_release_date}}", 'ptf_group_number':"{{returned_ptf_group_number}}", 'ptf_group_level':"{{returned_ptf_group_level}}", 'checksum':'123abc'}
+    register: update_cum_result
+    failed_when: update_cum_result.row_changed != 1
+
+  - name: TC19 - delete some PTFs records
+    ibmi_fix_repo:
+      database: "/tmp/testdb.sqlite3"
+      action: "delete"
+      type: 'ptf_group'
+      parameters: 
+        - {'ptf_group_number':'{{ptf_grps[2]}}', 'ptf_group_level':'{{returned_ptf_group_level}}'}
+    register: delete_cum_result
+    failed_when: delete_cum_result.row_changed != 1
+
+  - name: TC20A - download_status option use case, closing the loop test
+    ibmi_fix_repo:     
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      type: 'download_status'
+      parameters:
+        - {'order_id':'9999999999', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/9999999999'}  # a fake id for test purpose only
+    register: ds_status
+
+  - name: TC20A - Assert values
+    assert:
+      that:
+        - ds_status.type == "download_status"
+        - ds_status.row_changed == 1
+        - ds_status.parameters | selectattr('order_id','equalto', '9999999999')
+        - ds.status.parameters | selectattr('file_path', 'equalto','/QIBM/UserData/OS/Service/ECS/PTF/9999999999')
+        - ds_status.sql is defined
+        - ds_status.action == 'add'
+
+  - name: TC20B - query order_id 9999999999 in table after confirming the download is completed.
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'find'
+      type: 'download_status'
+      parameters:
+        - {'order_id':'9999999999', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/9999999999'}  
+    register: find_result
+  - name: TC20B - Assert values
+    assert:
+      that:
+        - find_result.action == "find"
+        - find_result.type == "download_status" 
+        - find_result.success_list | selectattr('add_time','defined')
+        - find_result.success_list | selectattr('download_status','equalto','null')
+        - find_result.success_list | selectattr('description','defined')
+        - find_result.success_list | selectattr('file_path','equalto','/QIBM/UserData/OS/Service/ECS/PTF/9999999999')
+        - find_result.success_list | selectattr('id','equalto','1')
+        - find_result.success_list | selectattr('order_id','equalto','9999999999')
+        - find_result.success_list | selectattr('ptf_group_status','equalto','Match')
+
+  - name: TC20C - copy a folder named 9999999999 under /QIBM/UserData/OS/Service/ECS/PTF to simulate the download is completed.
+    shell: cp -r /QIBM/UserData/OS/Service/ECS/PTF/2023305198 /QIBM/UserData/OS/Service/ECS/PTF/9999999999
+    register: cpy
+    failed_when: cpy.rc != 0
+
+  - name: TC20D - add order_id 9999999999 to table after confirming the download is completed.
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      type: 'ptf_group'
+      checksum: true
+      parameters:
+        - {'release_date':'unknown', 'ptf_group_level':'99999', 'ptf_group_number':'SF99999', 'order_id':'9999999999', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/9999999999'}  
+    register: add_result
+    failed_when: add_result.row_changed != 1
+
+  - name: TC20E - remove order_id 9999999999 from table
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'delete'
+      type: 'download_status'
+      parameters:
+        - {'order_id':'9999999999', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/9999999999'}  
+    register: del_result
+
+  - name: TC20E - Assert values
+    assert:
+      that:
+        - del_result.action == "delete"
+        - del_result.row_changed == 1
+        - del_result.type == "download_status"
+
+  - name: TC21 - Negative test - add a non-existing order id or path
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      checksum: true
+      type: 'ptf_group'
+      parameters:
+        - {'release_date':'unknown', 'ptf_group_level':'99999', 'ptf_group_number':'SF99999', 'order_id':'notexist', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/notexist'} 
+    register: neg_result  
+    
+  - name: TC21 - Assert values
+    assert:
+      that:
+        - neg_result.fail_list | selectattr('msg', 'equalto', 'Specified image path [/QIBM/UserData/OS/Service/ECS/PTF/notexist] is not a valid directory')
+        - neg_result.fail_list | selectattr('rc', 'equalto', '-2')
+
+  - name: TC22 - Negative test - missing required parameters
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'
+      type: "{{ item }}"
+      checksum: true
+      parameters:
+        - {'ptf_group_number':'{{returned_ptf_group_number}}', 'ptf_group_level':'{{returned_ptf_group_level}}'}  # missing order_id, file_path
+    register: neg_result 
+    with_items:
+      - 'ptf_group'
+      - 'download_status'
+      - 'single_ptf' 
+
+  - name: TC22 - Assert values
+    assert:
+      that:
+        - neg_result.fail_list | selectattr('msg', 'Match', 'Required parameter * is missing in parameters')
+        - neg_result.fail_list | selectattr('rc', 'equalto', '-1')
+
+  - name: TC23 - Negative test - delete a non-existing record from db
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'delete'
+      type: 'ptf_group'
+      checksum: true
+      parameters:
+        - {'ptf_group_number':'{{returned_ptf_group_number}}', 'ptf_group_level':'{{returned_ptf_group_level | int - 1}}'} # this record has been deleted in previous step
+    register: neg_result  
+
+  - name: TC23 - Assert values
+    assert:
+      that: 
+        - neg_result.row_changed == 0   
+
+  - name: TC24 - Negative test - invalid action provided
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'query'  # not a valid action
+      type: 'ptf_group'
+      checksum: true
+      parameters:
+        - {'order_id':'2023205812', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2023205812'}
+    register: neg_result
+    failed_when: neg_result.failed == 0  
+
+  - name: TC24 - Assert value
+    assert:
+      that:
+        - '"Unsupported action: query" in neg_result.msg'      
+
+  - name: TC25 - Negative test - when adding single_ptf record with invalid ptf_id/file_path/product id
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'add'  
+      type: 'single_ptf'
+      checksum: true
+      parameters:
+        - {'product':'5770SS1', 'ptf_id':'{{ptfs[0]}}', 'file_path':'/QSYS.LIB/QGPL.LIB/NOTEXIST.FILE'}  #invalid file_path
+        - {'product':'5770SS1', 'file_path':'/QSYS.LIB/QGPL.LIB/NOTEXIST.FILE'}  #missing required parameter - ptf_id
+        - {'ptf_id':'{{ptfs[0]}}', 'file_path':'/QSYS.LIB/QGPL.LIB/Q{{ptfs[0]}}.FILE'}  # missing required parameter - product
+        - {'product':'NONEXIST', 'ptf_id':'{{ptfs[0]}}'} # missing required parameter - file path
+    register: neg_result  
+
+  - name: TC25 - Assert Values
+    assert:
+      that:
+        - neg_result.fail_list | length == 4
+        - neg_result.fail_list[0] | selectattr('msg','equalto','Required parameter [file_path] is missing in parameters')
+        - neg_result.fail_list[0] | selectattr('rc','equalto','-1')
+        - neg_result.fail_list[0] | selectattr('ptf_id','equalto','{{ptfs[0]}}')
+        - neg_result.fail_list[1] | selectattr('msg','equalto','Target image file [/QSYS.LIB/QGPL.LIB/NOTEXIST.FILE] is not readable')
+        - neg_result.fail_list[1] | selectattr('rc','equalto','-3')
+        - neg_result.fail_list[1] | selectattr('ptf_id','equalto','{{ptfs[0]}}')
+
+  - name: TC26 - Negative test - try to find a non-exist single_ptf record 
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'find'  
+      type: 'single_ptf'
+      parameters:
+        - {'ptf_id':'{{ptfs[2]}}'}  
+    register: neg_result  
+
+  - name: TC26 - Assert Values
+    assert:
+      that:
+        - neg_result.parameters | selectattr('db_record','equalto', 'RecordNotFound')
+
+  - name: TC27 - Negative test - try to delete a non-exist single_ptf record    
+    ibmi_fix_repo:
+      database: '/tmp/testdb.sqlite3'
+      action: 'delete'  
+      type: 'single_ptf'
+      parameters:
+        - {'ptf_id':'{{ptfs[2]}}'}  
+    register: neg_result  
+
+  - name: TC27 - Assert Values
+    assert:
+      that:
+        - neg_result.row_changed == 0
+
+  always:
+    - name: remove the copied folder
+      file:
+        path: /QIBM/UserData/OS/Service/ECS/PTF/9999999999
+        state: absent
+
+    - name: remove the copied folder
+      file:
+        path: /QIBM/UserData/OS/Service/ECS/PTF/2023305199
+        state: absent
+
+    - name: run sql to drop the ptf_group table
+      ibmi_fix_repo:
+        database: "/tmp/testdb.sqlite3"
+        action: "clear"
+        type: 'ptf_group'
+
+    - name: run sql to drop the download status table
+      ibmi_fix_repo:
+        database: "/tmp/testdb.sqlite3"
+        action: "clear"
+        type: 'download_status'
+
+    - name: run sql to drop the single_ptf table
+      ibmi_fix_repo:
+        database: "/tmp/testdb.sqlite3"
+        action: "clear"
+        type: 'single_ptf'

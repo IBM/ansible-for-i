@@ -58,6 +58,15 @@ options:
     type: str
     required: false
     default: ""
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 notes:
    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
@@ -138,8 +147,9 @@ import re
 import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "9.9.9"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -191,6 +201,8 @@ def main():
             status=dict(type='list', default=["*NONE"], elements='str'),
             check_interval=dict(type='str', default='1m'),
             parameters=dict(type='str', default=''),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
@@ -202,6 +214,11 @@ def main():
     check_interval = module.params['check_interval']
     wait_for_job_status = module.params['status']
     parameters = module.params['parameters']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
+
+    ibmi_module = imodule.IBMiModule(become_user_name=become_user,
+                                     become_user_password=become_user_password)
 
     cl_sbmjob = "QSYS/SBMJOB CMD(" + command + ") " + parameters
 
@@ -224,8 +241,16 @@ def main():
 
     startd = datetime.datetime.now()
 
-    args = ['system', cl_sbmjob]
-    rc, out, err = module.run_command(args, use_unsafe_shell=False)
+    # args = ['system', cl_sbmjob]
+    # rc, out, err = module.run_command(args, use_unsafe_shell=False)
+    rc, out, err = ibmi_module.itoolkit_run_command(cl_sbmjob)
+
+    current_job_log = ibmi_module.itoolkit_get_job_log(startd)
+    message_description = ''
+    for i in current_job_log:
+        if i["MESSAGE_ID"] == "CPC1221":
+            message_description = i["MESSAGE_TEXT"]
+            break
 
     if rc != IBMi_COMMAND_RC_SUCCESS:
         result_failed = dict(
@@ -239,7 +264,7 @@ def main():
         )
         module.fail_json(msg='Submit job failed. ', **result_failed)
     elif '*NONE' in wait_for_job_status:
-        submitted_job = re.search(r'\d{6}/[A-Za-z0-9#_]{1,10}/[A-Za-z0-9#_]{1,10}', out)
+        submitted_job = re.search(r'\d{6}/[A-Za-z0-9#_]{1,10}/[A-Za-z0-9#_]{1,10}', message_description)
         job_submitted = submitted_job.group()
 
         result_success = dict(
@@ -250,7 +275,7 @@ def main():
         )
         module.exit_json(**result_success)
 
-    submitted_job = re.search(r'\d{6}/[A-Za-z0-9#_]{1,10}/[A-Za-z0-9#_]{1,10}', out)
+    submitted_job = re.search(r'\d{6}/[A-Za-z0-9#_]{1,10}/[A-Za-z0-9#_]{1,10}', message_description)
     job_submitted = submitted_job.group()
     ibmi_util.log_debug("job_submitted: " + job_submitted, module._name)
     sql_get_job_info = "SELECT V_JOB_STATUS as \"job_status\", " \
@@ -259,7 +284,7 @@ def main():
                        "V_SBS_NAME as \"sbs_name\", " \
                        "V_CLIENT_IP_ADDRESS as \"ip_address\"" \
                        " FROM TABLE(QSYS2.GET_JOB_INFO('" + job_submitted + "')) A"
-    rc, out, err_msg, query_job_log = ibmi_util.itoolkit_run_sql_once(sql_get_job_info)
+    rc, out, err_msg = ibmi_module.itoolkit_run_sql(sql_get_job_info)
 
     time_out_in_seconds = convert_wait_time_to_seconds(time_out)
     returned_job_status = ''
@@ -268,7 +293,7 @@ def main():
     ibmi_util.log_debug("job_status: " + returned_job_status, module._name)
 
     while returned_job_status not in wait_for_job_status:
-        rc, out, err_msg, query_job_log = ibmi_util.itoolkit_run_sql_once(sql_get_job_info)
+        rc, out, err_msg = ibmi_module.itoolkit_run_sql(sql_get_job_info)
         returned_job_status = ''
         if isinstance(out, list) and len(out) == 1:
             returned_job_status = out[0]['job_status'].strip()

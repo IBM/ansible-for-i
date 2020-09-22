@@ -1,0 +1,130 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+#ibmi-fix-repo-sample.yml 
+#The sample file is to provide an example about how to manipulate the PTF database
+---
+- hosts: all
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
+  tasks:
+    - block:
+      - name: add_a_non_existing_single_ptf_record
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: 'add'
+          type: 'single_ptf'
+          parameters:
+            - {'ptf_id':'notexist', 'file_path':'/QSYS.LIB/QGPL.LIB/notexist.FILE'}
+        register: add_a_non_existing_single_ptf_record_result
+        
+      - name: display_add_a_non_existing_single_ptf_record
+        debug: 
+          msg: "{{ add_a_non_existing_single_ptf_record_result }}"
+
+      - name: delete_a_non_existing_single_ptf_record
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: 'delete'
+          type: 'single_ptf'
+          parameters:
+            - {'ptf_id':'notexist', 'file_path':'/QSYS.LIB/QGPL.LIB/notexist.FILE'}
+        register: delete_a_non_existing_single_ptf_record_result
+        
+      - name: display_delete_a_non_existing_single_ptf_record
+        debug: 
+          msg: "{{ delete_a_non_existing_single_ptf_record_result }}"
+
+      - name: add_an_invalid_single_ptf_record
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: 'add'
+          type: 'single_ptf'
+          parameters:
+            - {'ptf_id':'notexist'}
+        register: add_an_invalid_single_ptf_record_result
+        
+      - name: display_add_an_invalid_single_ptf_record
+        debug: 
+          msg: "{{ add_an_invalid_single_ptf_record_result }}"
+
+      - name: add_single_ptf_records
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: 'add'
+          type: 'single_ptf'
+          parameters:
+            - {'ptf_id':'SI67955', 'file_path':'/QSYS.LIB/QGPL.LIB/QSI67955.FILE', 'product':'5770SS1'}
+            - {'ptf_id':'MF65472', 'file_path':'/QSYS.LIB/QGPL.LIB/QMF65472.FILE', 'product':'5770SS1'}
+            - {'ptf_id':'SI71806', 'file_path':'/QSYS.LIB/QGPL.LIB/QSI71806.FILE', 'product':'5733OPS'}
+        register: add_single_ptf_records_result
+        
+      - name: display_add_single_ptf_records_result
+        debug: 
+          msg: "{{ add_single_ptf_records_result }}"
+
+      - name: query_single_ptf_records
+        ibmi_fix_repo:
+          database: "/tmp/testdb.sqlite3"
+          action: "find"
+          type: 'single_ptf'
+          parameters: 
+            - {'ptf_id':'SI71806', 'file_path':'/QSYS.LIB/QGPL.LIB/QSI71806.FILE', 'file_name':'QSI71806.FILE'}
+            - {'product':'5770SS1', 'additional_param':'ORDER BY ptf_id DESC LIMIT 1'}
+        register: query_single_ptf_records_result
+
+      - name: display_query_single_ptf_records_result
+        debug: 
+          msg: "{{ query_single_ptf_records_result }}"
+
+      - name: delete_single_ptf_records
+        ibmi_fix_repo:
+          database: "/tmp/testdb.sqlite3"
+          action: "delete"
+          type: 'single_ptf'
+          parameters: 
+            - {'ptf_id':'MF65472'}
+        register: delete_single_ptf_records_result
+
+      - name: display_delete_single_ptf_records_result
+        debug: 
+          msg: "{{ delete_single_ptf_records_result }}"
+
+      - name: change_single_ptf_records
+        ibmi_fix_repo:
+          database: "/tmp/testdb.sqlite3"
+          action: "update"
+          type: 'single_ptf'
+          checksum: false
+          parameters: 
+            - {'ptf_id':'SI67955', 'checksum':'123abc'}
+        register: change_single_ptf_records_result
+
+      - name: display_change_single_ptf_records_result
+        debug: 
+          msg: "{{ change_single_ptf_records_result }}"
+
+      - name: query_single_ptf_records_2
+        ibmi_fix_repo:
+          database: "/tmp/testdb.sqlite3"
+          action: "find"
+          type: 'single_ptf'
+          checksum: true
+          parameters: 
+            - {'ptf_id':'SI67955'}
+            - {'ptf_id':'MF65472'}
+            - {'ptf_id':'SI71806'}
+        register: query_single_ptf_records_result_2
+
+      - name: display_query_single_ptf_records_result_2
+        debug: 
+          msg: "{{ query_single_ptf_records_result_2 }}"
+
+      always:
+      - name: run_sql_to_drop_the_table
+        ibmi_fix_repo:
+          database: "/tmp/testdb.sqlite3"
+          action: "clear"
+          type: 'single_ptf'

@@ -1,0 +1,34 @@
+---
+# tasks file for apply_individual_ptf
+- name: Involve ibmi_fix to apply individual ptf
+  ibmi_fix:
+    product_id: "{{ apply_ptf.product }}"
+    fix_list: "{{ apply_ptf.ptf_id }}"
+    operation: 'apply_only'
+    delayed_option: '{{ delayed_option }}'
+    temp_or_perm: '{{ temp_or_perm }}'
+  ignore_errors: True
+  register: apply_ptf_result
+
+- name: Log fail in result
+  set_fact:
+    apply_fail_list: "{{ apply_fail_list|default([]) + [ apply_ptf ] }}"
+  when: apply_ptf_result.failed != 0
+
+- block:
+  - name: Log success in result
+    set_fact:
+      apply_success_list: "{{ apply_success_list|default([]) + [ apply_ptf ] }}"
+
+  - name: query immed ptf with only requried options
+    ibmi_fix: 
+      fix_list: '{{ apply_ptf.ptf_id}}'
+      operation: 'query'
+    register: fix_result
+    when: auto_ipl 
+
+  - name: reboot the system immediately if auto_ipl is set to true and at least one to-be-applied PTF requires an IPL
+    set_fact:
+      ipl_requested: true      
+    when: auto_ipl and (fix_result['ptf_list'][0]['PTF_IPL_ACTION'] == 'TEMPORARILY APPLIED' or fix_result['ptf_list'][0]['PTF_IPL_ACTION'] == 'PERMANENTLY APPLIED')
+  when: apply_ptf_result.failed == 0

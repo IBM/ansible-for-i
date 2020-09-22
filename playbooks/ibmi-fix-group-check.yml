@@ -1,0 +1,53 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+#ibmi-fix-repo-sample.yml 
+#The sample file is to provide an example about how to manipulate the PTF database
+---
+- hosts: all
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
+  tasks:
+    - name: query_invalid_groups
+      ibmi_fix_group_check:
+        groups:
+          - "ABC123456"
+      register: invalid_groups
+      
+    - name: display_invalid_groups
+      debug: 
+        msg: "{{ invalid_groups }}"
+
+    - name: query_a_single_group
+      ibmi_fix_group_check:
+        groups:
+          - "SF99738"
+      register: single_group
+      
+    - name: display_a_single_group
+      debug: 
+        msg: "{{ single_group }}"
+
+    - name: query_a_group_and_a_cum
+      ibmi_fix_group_check:
+        groups:
+          - "SF99738"
+          - "SF99740"
+      register: a_group_and_a_cum
+      
+    - name: display_a_group_and_a_cum
+      debug: 
+        msg: "{{ a_group_and_a_cum }}"
+
+    # THIS IS UNBELIEVABLE SLOW!!!
+    # - name: query_all_groups
+    #   ibmi_fix_group_check:
+    #     groups:
+    #       - "*ALL"
+    #   register: all_groups
+      
+    # - name: display_all_groups
+    #   debug: 
+    #     msg: "{{ all_groups }}"

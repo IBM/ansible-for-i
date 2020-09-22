@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_message.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_message.pyy
 
 .. _ibmi_message_module:
 
@@ -25,6 +25,26 @@ Synopsis
 
 Parameters
 ----------
+
+
+     
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
 
 
      
@@ -130,12 +150,14 @@ Examples
        message_queue: ['QPGMR', 'QSECOFR']
        message_id: ['CPF1241', 'CPF1240']
 
-   - name: find all un-reply message with message type, message_lib and message_queue
+   - name: find all un-reply message with message type, message_lib and message_queue, run as another user
      ibmi_message:
        operation: 'find'
        message_type: 'NO_REPLY'
        message_lib: 'QUSRSYS'
        message_queue: ['QPGMR', 'QSECOFR']
+       become_user: 'USER1'
+       become_user_password: 'yourpassword'
 
 
 

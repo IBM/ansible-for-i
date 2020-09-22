@@ -12,7 +12,6 @@ HAS_IBM_DB = True
 try:
     from itoolkit import iToolKit
     from itoolkit import iSqlFree
-    from itoolkit import iSqlFetch
     from itoolkit import iSqlQuery
     from itoolkit import iCmd
     from itoolkit import iCmd5250
@@ -141,7 +140,6 @@ class IBMiModule(object):
             raise ImportError("itoolkit package is required.")
         if not HAS_IBM_DB:
             raise ImportError("ibm_db package is required.")
-
         try:
             if db_name != ibmi_util.SYSBAS:
                 self.conn = dbi.connect(database='{db_pattern}'.format(db_pattern=db_name))
@@ -162,7 +160,7 @@ class IBMiModule(object):
 
         if become_user_name and self.conn:
             self.ibmi_logon = IBMiLogon(
-                self.conn, become_user_name, become_user_password)
+                self.conn, become_user_name, "*NOPWD" if (become_user_password is None) else become_user_password)
             become_result = self.ibmi_logon.switch()
             if not become_result:
                 exp_msg = "Failed to become user {0} to excute the task. Invaild user or password or user is disabled".format(become_user_name)
@@ -209,7 +207,6 @@ class IBMiModule(object):
 
     def itoolkit_run_sql_once(self, sql, hex_convert_columns=None):
         '''This method equals to itoolkit_run_sql and itoolkit_get_job_log'''
-        startd = datetime.datetime.now()
         rc, out_list, error = self.itoolkit_run_sql(sql, hex_convert_columns)
         job_log = self.get_job_log('*', self.startd)
         return rc, out_list, error, job_log
@@ -235,7 +232,6 @@ class IBMiModule(object):
 
     def itoolkit_sql_callproc_once(self, sql):
         '''This method equals to itoolkit_sql_callproc and itoolkit_get_job_log'''
-        startd = datetime.datetime.now()
         rc, out_list, error = self.itoolkit_sql_callproc(sql)
         job_log = self.get_job_log('*', self.startd)
         return rc, out_list, error, job_log
@@ -261,7 +257,6 @@ class IBMiModule(object):
 
     def itoolkit_run_command_once(self, command):
         '''This method equals to itoolkit_run_command and itoolkit_get_job_log'''
-        startd = datetime.datetime.now()
         rc, out, error = self.itoolkit_run_command(command)
         job_log = self.get_job_log('*', self.startd)
         return rc, out, error, job_log
@@ -290,7 +285,6 @@ class IBMiModule(object):
 
     def itoolkit_run_command5250_once(self, command):
         '''This method equals to itoolkit_run_command5250 and itoolkit_get_job_log'''
-        startd = datetime.datetime.now()
         rc, out, error = self.itoolkit_run_command5250(command)
         job_log = self.get_job_log('*', self.startd)
         return rc, out, error, job_log
@@ -323,7 +317,6 @@ class IBMiModule(object):
 
     def itoolkit_run_rtv_command_once(self, command, args_dict):
         '''This method equals to itoolkit_run_rtv_command and itoolkit_get_job_log'''
-        startd = datetime.datetime.now()
         rc, out, error = self.itoolkit_run_rtv_command(command, args_dict)
         job_log = self.get_job_log('*', self.startd)
         return rc, out, error, job_log
@@ -348,7 +341,8 @@ class IBMiModule(object):
                     # wy: convert the db data type to python data type
                     # do not do changes to those types we cannot find a python type to convert
                     col_type = v[1]
-                    if not row[col_num]:
+                    # if not row[col_num]:
+                    if row[col_num] is None:
                         row_map[str(k)] = ''
                     elif col_type in [dbi.STRING, dbi.TEXT, dbi.XML, dbi.BINARY]:
                         try:

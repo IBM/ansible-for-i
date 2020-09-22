@@ -100,6 +100,15 @@ options:
       - Only Install PTF device(INSPTFDEV) is supported now for IBMi 7.3 and above.
     type: str
     default: ''
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 notes:
     - ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section.
     - Be careful to use C(*CNTRLD) for option how_to_end,
@@ -117,6 +126,11 @@ EXAMPLES = r'''
 - name: Reboot a slow machine that might have lots of updates to apply
   reboot:
     reboot_timeout: 3600
+
+- name: Unconditionally reboot the machine with become user
+  reboot:
+    become_user: 'USER'
+    become_user_password: 'yourpassword'
 '''
 
 RETURN = r'''

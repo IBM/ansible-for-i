@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_imgclg.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_imgclg.pyy
 
 .. _ibmi_fix_imgclg_module:
 
@@ -36,6 +36,26 @@ apply_type
   | **type**: str
   | **default**: \*DLYALL
   | **choices**: \*DLYALL, \*IMMDLY, \*IMMONLY
+
+
+     
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
 
 
      
@@ -154,6 +174,8 @@ Examples
          - 'S2018V01.BIN'
        fix_omit_list:
          - 5733SC1: "SI70819"
+       become_user: "QSECOFR"
+       become_user_password: "yourpassword"
 
 
 

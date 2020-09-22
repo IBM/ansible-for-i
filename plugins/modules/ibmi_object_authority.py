@@ -161,6 +161,15 @@ options:
       - If set to C(true), output the avaiable job log even the rc is 0(success).
     type: bool
     default: False
+  become_user:
+    description:
+      - The name of the user profile that the IBM i task will run under.
+      - Use this option to set a user with desired privileges to run the task.
+    type: str
+  become_user_password:
+    description:
+      - Use this option to set the password of the user specified in C(become_user).
+    type: str
 
 seealso:
 - module: ibmi_object_find
@@ -320,8 +329,9 @@ job_log:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.0.2"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -380,6 +390,8 @@ def main():
             ref_asp_device=dict(type='str', default='*'),
             asp_group=dict(type='str', default='*SYSBAS'),
             joblog=dict(type='bool', default=False),
+            become_user=dict(type='str'),
+            become_user_password=dict(type='str', no_log=True),
         ),
         required_if=[
             ['operation', 'grant', ['object_name', 'user', 'authority']],
@@ -433,6 +445,8 @@ def main():
     if len(asp_group) > 10:
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of asp_group exceeds 10 characters")
     joblog = module.params['joblog']
+    become_user = module.params['become_user']
+    become_user_password = module.params['become_user_password']
 
     if operation == 'GRANT' or operation == 'REVOKE':
         # handle single value for user
@@ -536,16 +550,22 @@ def main():
         if object_type != '*ALL':
             command = command + ' ' + "AND OBJECT_TYPE = '{p_type}'".format(p_type=object_type)
 
+    try:
+        ibmi_module = imodule.IBMiModule(
+            db_name=asp_group, become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = 'Exception occurred: {0}'.format(str(inst))
+        module.fail_json(rc=999, msg=message)
+
     if asp_group or operation == 'DISPLAY':
         if operation != 'DISPLAY':
             command = ' '.join(command.split())  # keep only one space between adjacent strings
-            rc, out, err, job_log = ibmi_util.itoolkit_run_command_once(command, asp_group)
+            rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
         else:
             command = ' '.join(command.split())  # keep only one space between adjacent strings
-            rc, out, err, job_log = ibmi_util.itoolkit_run_sql_once(command, asp_group)
+            rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(command)
     else:
-        args = ['system', command]
-        rc, out, err = module.run_command(args, use_unsafe_shell=False)
+        rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
 
     if operation == 'DISPLAY':
         if rc:

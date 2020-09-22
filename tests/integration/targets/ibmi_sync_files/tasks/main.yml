@@ -18,8 +18,8 @@
   - set_fact:
       superuser: "{{ansible_ssh_user}}"
       nodeA: "{{ansible_ssh_host}}" #ENU 7.4
-      nodeB: "11.11.11.2" #FRA 7.3
-      nodeC: "11.11.11.3" #JPN 7.2
+      nodeB: "9.5.162.33" #FRA 7.3
+      nodeC: "9.5.161.236" #JPN 7.2
       cuser: "CUSER" # common user with *USER authority, prepared on nodeC for permission test
 
   - name: TC00 - install paramiko on os400 node A and B if not exists

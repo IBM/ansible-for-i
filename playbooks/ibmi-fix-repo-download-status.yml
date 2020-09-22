@@ -1,0 +1,78 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+#ibmi-fix-repo-sample.yml 
+#The sample file is to provide an example about how to manipulate the PTF database
+---
+- hosts: all
+  gather_facts: no
+  collections:
+   - ibm.power_ibmi
+  
+  tasks:
+    - block:
+      - name: add some download status records
+        ibmi_fix_repo:
+          database: '/tmp/testdb.sqlite3'
+          action: 'add'
+          type: 'download_status'
+          checksum: true
+          parameters:
+            - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181', 'download_status':'downloaded'}
+            - {'order_id':'2023203121', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2023203121', 'download_status':'downloading'}
+            - {'order_id':'999999', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/999999', 'download_status':'downloaded'}
+        register: dsps_param_result_0
+        
+      - name: Display the returned parameters 0
+        debug: 
+          msg: "{{ dsps_param_result_0 }}"
+
+      - name: query some PTFs records
+        ibmi_fix_repo:
+          database: "/tmp/testdb.sqlite3"
+          action: "find"
+          type: 'download_status'
+          parameters: 
+            - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
+            - {'order_id':'2023203121'}
+            - {'order_id':'1231231231'}
+        register: dsps_param_result_2
+
+      - name: Display the returned parameters 2
+        debug: 
+          msg: "{{ dsps_param_result_2 }}"
+
+      - name: delete some PTFs records
+        ibmi_fix_repo:
+          database: "/tmp/testdb.sqlite3"
+          action: "delete"
+          type: 'download_status'
+          parameters: 
+            - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
+        register: dsps_param_result_3
+
+      - name: Display the returned parameters 3
+        debug: 
+          msg: "{{ dsps_param_result_3 }}"
+
+      - name: query some PTFs records
+        ibmi_fix_repo:
+          database: "/tmp/testdb.sqlite3"
+          action: "find"
+          type: 'download_status'
+          checksum: true
+          parameters: 
+            - {'order_id':'2020579181'}
+            - {'order_id':'2023203121'}
+        register: dsps_param_result_4
+
+      - name: Display the returned parameters 4
+        debug: 
+          msg: "{{ dsps_param_result_4 }}"
+
+      always:
+      - name: run sql to drop the table
+        ibmi_fix_repo:
+          database: "/tmp/testdb.sqlite3"
+          action: "clear"
+          type: 'download_status'
