@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_install_product_from_savf.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_install_product_from_savf.pyy
 
 .. _ibmi_install_product_from_savf_module:
 
@@ -34,6 +34,26 @@ acceptance_cmd
   | **required**: false
   | **type**: str
   | **default**:  
+
+
+     
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
 
 
      
@@ -141,11 +161,13 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: Restoring Program Using Defaults.
+   - name: Restoring Program with become user.
      ibmi_install_product_from_savf:
        product: 5770WDS
        savf_name: MYFILE
        savf_library: MYLIB
+       become_user: 'USER1'
+       become_user_password: 'yourpassword'
 
    - name: Restoring Program with acceptance command.
      ibmi_install_product_from_savf:

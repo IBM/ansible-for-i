@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix.py
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix.pyy
 
 .. _ibmi_fix_module:
 
@@ -26,6 +26,26 @@ Synopsis
 
 Parameters
 ----------
+
+
+     
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
 
 
      
@@ -149,6 +169,8 @@ Examples
        operation: 'remove'
        fix_list:
          - "SI72223"
+       become_user: "QSECOFR"
+       become_user_password: "yourpassword"
    - name: Install a single PTF
      ibmi_fix:
        product_id: '5770DBM'
@@ -159,6 +181,8 @@ Examples
        operation: 'load_and_apply'
        fix_list:
          - "SI72223"
+       become_user: "QSECOFR"
+       become_user_password: "yourpassword"
    - name: query ptf
      ibmi_fix:
        operation: 'query'
