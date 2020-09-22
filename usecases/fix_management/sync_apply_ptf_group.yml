@@ -1,0 +1,49 @@
+---
+- name: Transfer a PTF group files from repo server to target system, and apply
+# This playbook will get the PTF group information in catalog. Then call sync_apply_ptf_group role to transfer the ptf group files
+# to the target system. Then apply.
+
+# Command example: ansible-playbook /sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver',
+# 'database': '/ansible/repo.sqlite3', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
+  hosts: '{{ target_system }}'
+  gather_facts: No
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    repo_server: "{{ repo_server }}"
+    database: "{{ database }}"
+    ptf_group: "{{ ptf_group }}"
+    dest: "/ansible/image"
+
+  tasks:
+    - name: Get the PTF group information in catalog
+      ibmi_fix_repo:
+        database: "{{ database }}"
+        type: "ptf_group"
+        checksum: True
+        action: "find"
+        parameters:
+          - "{{ {'ptf_group_number': ptf_group.ptf_group_number, 'ptf_group_level': ptf_group.ptf_group_level} }}"
+      delegate_to: "{{ repo_server }}"
+      register: fix_repo_find_result
+
+    - name: Print the PTF group information
+      debug:
+        var: fix_repo_find_result
+
+    - name: End play when no ptf group information in catalog
+      fail:
+        msg: "PTF group information is not in catalog, quit play"
+      when: fix_repo_find_result.success_list is not defined or fix_repo_find_result.success_list == []
+
+    - name: Compose apply list
+      set_fact:
+        ptf_group_information: "{{ fix_repo_find_result.success_list[0] }}"
+
+    - name: Include sync_apply_ptf_group role to transfer PTF group files to target ibm i, and apply
+      include_role:
+        name: sync_apply_ptf_group
+      vars:
+        ptf_group_info: "{{ ptf_group_information }}"
+        src_host: "{{ repo_server }}"

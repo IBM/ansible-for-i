@@ -1,0 +1,58 @@
+---
+- name: Get the latest PTF group information from PSP website, and download ptf group
+# This playbook will get the latest PTF group information from IBM PSP website, and check if the latest PTF group already in repo
+# server, if not, download the latest PTF group and write download information into download_status table and part of the PTF
+# group information into ptf_group_image_info table.
+
+# Command example: ansible-playbook /check_download_ptf_group.yml -e "{'repo_server': 'reposerver',
+#'database': '/ansible/repo.sqlite3', 'ptf_group': 'SF99704'}"
+  hosts: "{{ repo_server }}"
+  gather_facts: No
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    database: "{{ database }}"
+    ptf_group: "{{ ptf_group }}"
+
+  tasks:
+    - name: Include fix_repo_check_ptf_group role to check if the latest ptf group is already in catalog
+      include_role:
+        name: fix_repo_check_ptf_group
+
+    - block:
+        - name: End play when no ptf group need to be downloaded
+          debug:
+            msg: "PTF group information is already in catalog or is already downloading, quit play"
+
+        - meta: end_host
+      when: ptf_group_find_result.fail_list is not defined or download_status_find_result.fail_list is not defined
+
+    - name: Include fix_repo_download_add_ptf_group role to download the ptf group and add information into catalog download_status table
+      include_role:
+        name: fix_repo_download_add_ptf_group
+      vars:
+        ptf_group_number: "{{ fix_group_check_result.group_info[0].ptf_group_number }}"
+        ptf_group_level: "{{ fix_group_check_result.group_info[0].ptf_group_level }}"
+        release_date: "{{ fix_group_check_result.group_info[0].release_date }}"
+
+    - name: Add part of PTF group information including ptf list into catalog
+      ibmi_fix_repo:
+        database: "{{ database }}"
+        type: "ptf_group"
+        action: "add"
+        checksum: False
+        parameters:
+          - "{{ {'order_id': download_fix_result.order_id,
+          'file_path': download_fix_result.file_path,
+          'ptf_group_number': fix_group_check_result.group_info[0].ptf_group_number,
+          'ptf_list': fix_group_check_result.group_info[0].ptf_list,
+          'ptf_group_level': fix_group_check_result.group_info[0].ptf_group_level,
+          'release_date': fix_group_check_result.group_info[0].release_date,
+          'description': fix_group_check_result.group_info[0].description,
+          'release': fix_group_check_result.group_info[0].release} }}"
+      register: ptf_group_update_result
+      when: download_fix_result.order_id is defined
+
+    - debug:
+        msg: "After order {{ download_fix_result.order_id }} is complete, call fix_repo_extract_ptf_group_info role to extract ptf group information into catalog."

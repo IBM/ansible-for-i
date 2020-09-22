@@ -1,0 +1,19 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- hosts: all
+  gather_facts: no
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    become_user_name: null
+    become_user_password: null
+  
+  tasks:
+  - name: Display the authority of QGPL
+    ibmi_object_authority:
+      operation: display
+      object_name: QGPL
+      object_library: QSYS
+      object_type: '*LIB'

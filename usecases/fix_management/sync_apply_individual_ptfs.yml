@@ -1,0 +1,70 @@
+---
+- name: Sync and apply a list of individual ptfs
+# This playbook will get the individual ptfs' information in catalog. Then call check_ptf role to check which ptfs are not already
+# applied or loaded on the target syste. Then call sync_apply_individual_ptfs role to transfer the unloaded or unapplied ptfs to
+# the target system. Then load and apply.
+
+# Command example: ansible-playbook /sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
+#'database': '/ansible/repo.sqlite3', 'ptfs_list': [{'ptf_id':'SI67856'}, {'ptf_id':'SI69375'}, {'ptf_id':'SI73751'}],
+#'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP', 'delayed_option': '*IMMDLY', 'auto_ipl': false}"
+  hosts: '{{ target_system }}'
+  gather_facts: No
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    repo_server: "{{ repo_server }}"
+    database: "{{ database }}"
+    ptfs_list: "{{ ptfs_list }}"
+
+  tasks:
+    - name: Get the individual ptfs' information in catalog
+      ibmi_fix_repo:
+        database: "{{ database }}"
+        type: "single_ptf"
+        checksum: True
+        action: "find"
+        parameters: "{{ ptfs_list }}"
+      delegate_to: "{{ repo_server }}"
+      register: fix_repo_find_result
+
+    - fail:
+        msg: "No available individual ptf in catalog, quit."
+      when: fix_repo_find_result.success_list is not defined
+
+    - name: Print find success list in catalog
+      debug:
+        var: fix_repo_find_result.success_list
+
+    - name: Include check_ptf role to determine which ptfs need to apply
+      include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list: "{{ fix_repo_find_result.success_list }}"
+      register: check_result
+
+    - block:
+        - debug:
+            msg: "No individual ptf need to apply, quit."
+
+        - meta: end_host
+      when: not_loaded_ptfs_list == []
+
+    - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply
+      include_role:
+        name: sync_apply_individual_ptfs
+      vars:
+        ptfs_info_list: "{{ not_loaded_ptfs_list }}"
+        src_host: "{{ repo_server }}"
+      register: sync_apply_result
+
+    - name: Include check_ptf role again to get the final applied result
+      include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list: "{{ fix_repo_find_result.success_list }}"
+      register: check_result
+
+    - name: Print find fail list in catalog
+      debug:
+        var: fix_repo_find_result.fail_list | default([])

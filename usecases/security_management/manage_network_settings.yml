@@ -1,0 +1,27 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- hosts: all
+  gather_facts: no
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    become_user_name: null
+    become_user_password: null
+  
+  tasks:
+  - name: Check network attribute JOBACN of network attribute
+    ibmi_rtv_command:
+      cmd: 'RTVNETA'
+      char_vars:
+        - 'JOBACN'
+    register: JOBACN
+
+  - name: Specifies the action taken for input streams received through the SNA network by the system.
+          The JOBACN value should be set to *REJECT to secure your system from job streams received through the network.
+    assert:
+      that:
+        - JOBACN.rc == 0
+        - JOBACN.output['JOBACN'] == '*REJECT'
+        - JOBACN.job_log == []

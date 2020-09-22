@@ -1,0 +1,53 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- hosts: ibmi
+  gather_facts: no
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    become_user_name: null
+    become_user_password: null
+  
+  tasks:
+  - name: Check a list of user profiles whether they are compliant
+    ibmi_user_compliance_check:
+      users:
+        - 'QSECOFR'
+      fields:
+        - {'name':'status', 'expect':['*DISABLED']}
+        - {'name':'NO_PASSWORD_INDICATOR', 'expect':['no']}
+        - {'name':'SPECIAL_AUTHORITIES', 'expect': ['*JOBCTL', '*SAVSYS']}
+      become_user: '{{ become_user_name }}'
+      become_user_password: '{{ become_user_password }}'
+
+
+  - name: All Private authorities to all user profiles other than the owner's and the profile itself should be removed.
+    ibmi_sql_query:
+      sql: "SELECT SYS_ONAME, OBJTYPE, USER_NAME, OBJ_AUTH FROM QSYS2.OBJ_PRIV LEFT OUTER JOIN QSYS2.GROUPLIST
+      ON SYS_ONAME = GROUPNAME WHERE OBJTYPE = '*USRPRF' AND SYS_ONAME <> USER_NAME AND USER_NAME <> OWNER
+      AND USER_NAME <> '*PUBLIC'
+      AND USERNAME IS NULL
+      AND SYS_ONAME CONCAT USER_NAME NOT IN
+      ('QGATEQSNADS', 'QMQMQMQMADM', 'QMSFQTCP',
+      'QSPLJOBQSPL', 'QTCPQMSF', 'QTMHHTTPQCLUSTER')"
+      expected_row_count: 1
+      become_user: '{{ become_user_name }}'
+      become_user_password: '{{ become_user_password }}'
+
+
+  - name: Default passwords provide an opportunity for someone to enter your system,
+          if someone knows your policy for assigning profile names and knows that a new person is joining
+          your organization. Additionally, accounts with default passwords are often used
+          for shared (non- unique) accounts. Tell the new user the password confidentially, such as
+          in a "Welcome to the System" letter that outlines your security policies. Require the user to change
+          the password the first time that the user signs on by setting the user profile to PWDEXP(*YES)
+    ibmi_sql_query:
+      sql: "SELECT ALL
+            USER_NAME, STATUS, DFTPWD, PWDEXP
+            FROM QSYS2.USER_INFO T01
+            WHERE DFTPWD = 'YES'"
+      expected_row_count: 0
+      become_user: '{{ become_user_name }}'
+      become_user_password: '{{ become_user_password }}'
