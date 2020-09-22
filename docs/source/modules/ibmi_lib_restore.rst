@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_lib_restore.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_lib_restore.py
 
 .. _ibmi_lib_restore_module:
 

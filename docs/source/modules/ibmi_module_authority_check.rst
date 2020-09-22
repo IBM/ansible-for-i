@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_module_authority_check.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_module_authority_check.py
 
 .. _ibmi_module_authority_check_module:
 

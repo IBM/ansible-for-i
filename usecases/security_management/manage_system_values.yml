@@ -1,0 +1,49 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- hosts: all
+  gather_facts: no
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    become_user_name: null
+    become_user_password: null
+  
+  tasks:
+  - name: Check system values whether they are compliant
+    ibmi_sysval:
+      sysvalue:
+        - {'name':'QALWOBJRST', 'expect':'*ALWPTF'}
+        - {'name':'QATNPGM', 'expect':'*NONE'}
+        - {'name':'QAUDCTL', 'expect':'*NOQTEMP *OBJAUD *AUDLVL'}
+        - {'name':'QAUDENDACN', 'expect':'*NOTIFY'}
+        - {'name':'QAUDFRCLVL', 'expect':'*SYS'}
+        - {'name':'QAUDLVL', 'expect':'*AUTFAIL *CREATE *DELETE *OBJMGT *PGMFAIL *SAVRST *SECURITY *SERVICE *SYSMGT'}
+        - {'name':'QAUDLVL2', 'expect':'*NONE'}
+        - {'name':'QAUTOCFG', 'expect':'0'}
+        - {'name':'QAUTORMT', 'expect':'0'}
+        - {'name':'QCRTAUT', 'expect':'*USE'}
+        - {'name':'QDSCJOBITV', 'expect':'30'}
+        - {'name':'QDSPSGNINF', 'expect':'1'}
+        - {'name':'QFRCCVNRST', 'expect':'3'}
+        - {'name':'QINACTITV', 'expect':'30'}
+        - {'name':'QINACTMSGQ', 'expect':'*DSCJOB'}
+        - {'name':'QLMTSECOFR', 'expect':'0'}
+        - {'name':'QMAXSGNACN', 'expect':'2'}
+        - {'name':'QMAXSIGN', 'expect':'5'}
+        - {'name':'QPWDCHGBLK', 'expect':'24'}
+        - {'name':'QPWDEXPITV', 'expect':'90'}
+        - {'name':'QPWDEXPWRN', 'expect':'7'}
+        - {'name':'QPWDLVL', 'expect':'1'}
+        - {'name':'QPWDRQDDIF', 'expect':'8'}
+        - {'name':'QPWDRULES', 'expect':'*ALLCRTCHG *DGTLMTAJC *DGTLMTFST *DGTLMTLST *DGTMIN1 *LMTPRFNAME *MAXLEN10 *MINLEN8 *REQANY3 *SPCCHRLMTAJC *SPCCHRLMTFST *SPCCHRLMTLST'}
+        - {'name':'QRETSVRSEC', 'expect':'1'}
+        - {'name':'QRMTIPL', 'expect':'0'}
+        - {'name':'QRMTSIGN', 'expect':'*VERIFY'}
+        - {'name':'QSCANFS', 'expect':'*ROOTOPNUD'}
+        - {'name':'QSCANFSCTL', 'expect':'*ERRFAIL *NOWRTUPG'}
+        - {'name':'QSECURITY', 'expect':'40'}
+        - {'name':'QSHRMEMCTL', 'expect':'1'}
+      become_user: '{{ become_user_name }}'
+      become_user_password: '{{ become_user_password }}'

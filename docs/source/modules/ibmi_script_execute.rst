@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_script_execute.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_script_execute.py
 
 .. _ibmi_script_execute_module:
 

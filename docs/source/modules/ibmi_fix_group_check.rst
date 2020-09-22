@@ -1,5 +1,5 @@
 
-:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_group_check.pyy
+:github_url: https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_group_check.py
 
 .. _ibmi_fix_group_check_module:
 

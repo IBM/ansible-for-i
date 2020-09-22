@@ -1,0 +1,91 @@
+---
+- name: Check if a set of individual PTFs are already in fix management catalog, then download non-existent PTFs
+# This playbook will check if requested individual PTFs are already in catalog, if not, will call download_individual_ptfs role
+# to download non-existent ptfs and write ndividual PTFs' information into catalog.
+
+# Command example: ansible-playbook /check_download_individual_ptfs.yml -e "{'repo_server': 'reposerver', 'database': '/ansible/repo.sqlite3',
+#'ptfs_list':[{'ptf_id':'SI67856'}, {'ptf_id':'SI69375'}, {'ptf_id':'SI73751'}]}"
+  hosts: "{{ repo_server }}"
+  gather_facts: No
+
+  vars:
+    database: "{{ database }}"
+    RecordNotFound_list: []
+    ptfs_list: "{{ ptfs_list }}"
+    order: '*PTFID'
+
+  tasks:
+    - name: Check if individual PTFs are already in catalog
+      ibmi_fix_repo:
+        database: "{{ database }}"
+        type: "single_ptf"
+        action: "find"
+        parameters: "{{ ptfs_list }}"
+        checksum: True
+      register: fix_repo_find_result
+
+    - name: Print the individual PTFs information in catalog
+      debug:
+        var: fix_repo_find_result
+
+    - block:
+        - name: End play when no ptf need to download
+          debug:
+            msg: "All ptfs are in catalog, quit play"
+
+        - meta: end_host
+      when: fix_repo_find_result.fail_list is not defined
+
+    - name: compose be downloaded ptfs list
+      set_fact:
+        RecordNotFound_list: "{{ RecordNotFound_list | default([]) + [ fail_record ] }}"
+      when: fail_record.db_record == 'RecordNotFound'
+      with_list: "{{ fix_repo_find_result.fail_list }}"
+      loop_control:
+        loop_var: fail_record
+
+    - name: compose fail_list with error reason
+      set_fact:
+        check_fail_list: "{{ fix_repo_find_result.fail_list | difference( RecordNotFound_list ) }}"
+
+    - name: Include download_individual_ptfs role to download a list of individual ptfs
+      include_role:
+        name: download_individual_ptfs
+      vars:
+        to_be_downloaded_list: "{{ RecordNotFound_list }}"
+      ignore_errors: True
+      when: RecordNotFound_list != []
+
+    - block:
+        - name: Download fail
+          debug:
+            msg: "No ptf is successfully downloaded, quit play"
+
+        - meta: end_host
+      when: download_success_list == []
+
+    - name: Add individual ptf record into catalog
+      ibmi_fix_repo:
+        database: "{{ database }}"
+        type: "single_ptf"
+        action: "add"
+        checksum: True
+        parameters: "{{ download_success_list }}"
+      register: fix_repo_add_result
+      when: download_success_list != []
+
+    - name: Print fail_list with other errors
+      debug:
+        var: check_fail_list
+
+    - name: Print be downloaded ptfs list
+      debug:
+        var: RecordNotFound_list
+
+    - name: Print fail downloadded ptfs list
+      debug:
+        var: download_fail_list
+
+    - name: Print successfully downloadded ptfs list
+      debug:
+        var: download_success_list
