@@ -41,6 +41,26 @@ asp_type
 
 
      
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
 disks
   The list of the unconfigure disks.
 
@@ -124,6 +144,8 @@ Examples
        name: 'IASP1'
        operation: 'create'
        disks: ['DMP002', 'DMP019']
+       become_user: 'USER1'
+       become_user_password: 'yourpassword'
 
 
 

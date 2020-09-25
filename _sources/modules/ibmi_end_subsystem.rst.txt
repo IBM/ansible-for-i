@@ -27,6 +27,26 @@ Parameters
 
 
      
+become_user
+  The name of the user profile that the IBM i task will run under.
+
+  Use this option to set a user with desired privileges to run the task.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
+become_user_password
+  Use this option to set the password of the user specified in ``become_user``.
+
+
+  | **required**: false
+  | **type**: str
+
+
+     
 controlled_end_delay_time
   Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, ``*NOLIMIT`` will be used in ENDSBS command DELAY parameter.
 
@@ -94,9 +114,11 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: End the subsystem QBATCH.
+   - name: End the subsystem QBATCH with another user.
      ibmi_end_subsystem:
        subsystem: QBATCH
+       become_user: 'USER1'
+       become_user_password: 'yourpassword'
 
    - name: End a subsystem with options.
      ibmi_end_subsystem:
