@@ -1,3 +1,9 @@
+Overview
+--------
+These roles are part of IBM i collections which can be installed directly from Galaxy or Red Hat Automation Hub. 
+The example below shows how to use playbook to invoke these roles. Please find details of each role by navigating into the subdirectories.  
+
+
 Example Playbook
 ----------------
 ```
