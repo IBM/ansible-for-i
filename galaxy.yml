@@ -76,3 +76,4 @@ build_ignore:
   - .DS_Store
   - .gitkeep
   - .github
+  - tests
