@@ -150,7 +150,7 @@ try:
 except ImportError:
     HAS_IBM_DB = False
 
-__ibmi_module_version__ = "1.1.0"
+__ibmi_module_version__ = "1.1.1"
 
 
 sysval_array = [
