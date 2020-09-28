@@ -46,6 +46,11 @@ class IBMiLogon(object):
         return self.handle
 
     def qsygetph(self):
+        special_value = False
+        if self.pwd in ['*NOPWD', '*NOPWDCHK', '*NOPWDSTS']:
+            self.pwd = ibmi_util.fmtTo10(self.pwd)
+            special_value = True
+
         len_of_password = len(self.pwd)
         # Chang Le: the user name should be converted to upper case
         input_user = self.name.ljust(10).upper()
@@ -53,21 +58,36 @@ class IBMiLogon(object):
 
         itransport = DatabaseTransport(self.conn)
         itool = iToolKit()
-        itool.add(
-            iPgm('qsygetph', 'qsygetph')
-            .addParm(iData('userId', '10A', input_user))
-            .addParm(iData('pwd', input_password_len, self.pwd))
-            .addParm(iData('handle', '12A', '', {'hex': 'on'}))
-            .addParm(
-                iDS('ERRC0100_t', {'len': 'errlen'})
-                .addData(iData('errRet', '10i0', ''))
-                .addData(iData('errAvl', '10i0', ''))
-                .addData(iData('errExp', '7A', '', {'setlen': 'errlen'}))
-                .addData(iData('errRsv', '1A', ''))
+        if not special_value:
+            itool.add(
+                iPgm('qsygetph', 'qsygetph')
+                .addParm(iData('userId', '10A', input_user))
+                .addParm(iData('pwd', input_password_len, self.pwd))
+                .addParm(iData('handle', '12A', '', {'hex': 'on'}))
+                .addParm(
+                    iDS('ERRC0100_t', {'len': 'errlen'})
+                    .addData(iData('errRet', '10i0', ''))
+                    .addData(iData('errAvl', '10i0', ''))
+                    .addData(iData('errExp', '7A', '', {'setlen': 'errlen'}))
+                    .addData(iData('errRsv', '1A', ''))
+                )
+                .addParm(iData('len', '10i0', str(len_of_password)))
+                .addParm(iData('ccsid', '10i0', '37'))
             )
-            .addParm(iData('len', '10i0', str(len_of_password)))
-            .addParm(iData('ccsid', '10i0', '37'))
-        )
+        else:
+            itool.add(
+                iPgm('qsygetph', 'qsygetph')
+                .addParm(iData('userId', '10A', input_user))
+                .addParm(iData('pwd', '10A', self.pwd))
+                .addParm(iData('handle', '12A', '', {'hex': 'on'}))
+                .addParm(
+                    iDS('ERRC0100_t', {'len': 'errlen'})
+                    .addData(iData('errRet', '10i0', ''))
+                    .addData(iData('errAvl', '10i0', ''))
+                    .addData(iData('errExp', '7A', '', {'setlen': 'errlen'}))
+                    .addData(iData('errRsv', '1A', ''))
+                )
+            )
         itool.call(itransport)
         qsygetph = itool.dict_out('qsygetph')
         if 'success' in qsygetph:
