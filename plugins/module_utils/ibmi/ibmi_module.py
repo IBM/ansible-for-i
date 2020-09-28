@@ -70,7 +70,6 @@ class IBMiLogon(object):
         )
         itool.call(itransport)
         qsygetph = itool.dict_out('qsygetph')
-        ibmi_util.log_info(str(qsygetph), 'qsygetph')
         if 'success' in qsygetph:
             return qsygetph['handle']
         else:
