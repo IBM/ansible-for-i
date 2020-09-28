@@ -1,0 +1,52 @@
+- name: query QSQSRVR job
+  ibmi_sql_query:
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+        JOB_NAME_FILTER => 'QSQSRVR',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+    expected_row_count: 0
+
+- name: put a cl script to remote IBM i
+  copy:
+    src: cl1.cl
+    dest: /tmp/
+
+- name: submit a long run script by ibmi_script_execute with async and poll
+  ibmi_script_execute:
+    src: '/tmp/cl1.cl'
+    type: 'CL'
+    become_user: '{{becomeuser}}'
+    become_user_password: '{{becomepwd}}'
+  async: 220
+  poll: 0
+  register: script_sleeper
+
+- name: query QSQSRVR job
+  ibmi_sql_query:
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+        JOB_NAME_FILTER => 'QSQSRVR',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+    expected_row_count: 1
+  retries: 4
+  delay: 5
+  
+- name: Check sync status
+  async_status:
+    jid: "{{script_sleeper.ansible_job_id}}"
+  register: job_result
+  until: job_result.finished
+  retries: 100
+  delay: 10
+
+- name: pause 20 seconds to wait for the job ends
+  pause:
+    seconds: 20
+
+- name: query QSQSRVR job
+  ibmi_sql_query:
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+        JOB_NAME_FILTER => 'QSQSRVR',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+    expected_row_count: 0
