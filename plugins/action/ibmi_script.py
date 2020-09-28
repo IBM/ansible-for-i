@@ -75,10 +75,17 @@ class ActionModule(ActionBase):
             if result.get('stderr'):
                 result['failed'] = True
                 return result
+
+            re_raise = False  # workaround to pass the raise-missing-from pylint issue
+            inst = None
             try:
                 src = self._loader.get_real_file(self._find_needle('files', src))
             except AnsibleError as e:
-                raise AnsibleActionFail(to_native(e)) from e
+                re_raise = True
+                inst = e
+            if re_raise:
+                raise AnsibleActionFail(to_native(inst))
+
             tmp_src = self._connection._shell.join_path(self._connection._shell.tmpdir, os.path.basename(src))
             display.debug("ibm i debug: transfer script file {p_src} to {p_tmp_src}".format(p_src=src, p_tmp_src=tmp_src))
             self._transfer_file(src, tmp_src)

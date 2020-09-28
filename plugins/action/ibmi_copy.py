@@ -127,10 +127,15 @@ class ActionModule(ActionBase):
                 result['failed'] = True
                 return result
 
+            re_raise = False
+            inst = None
             try:
                 src = self._loader.get_real_file(self._find_needle('files', src))
             except AnsibleError as e:
-                raise AnsibleActionFail(to_native(e)) from e
+                re_raise = True
+                inst = e
+            if re_raise:
+                raise AnsibleActionFail(to_native(inst))
 
             lib_name = lib_name.upper()
             startd = datetime.datetime.now()

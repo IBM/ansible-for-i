@@ -140,6 +140,8 @@ class IBMiModule(object):
             raise ImportError("itoolkit package is required.")
         if not HAS_IBM_DB:
             raise ImportError("ibm_db package is required.")
+        re_raise = False  # workaround to pass the raise-missing-from pylint issue
+        exp_msg = ''
         try:
             if db_name != ibmi_util.SYSBAS:
                 self.conn = dbi.connect(database='{db_pattern}'.format(db_pattern=db_name))
@@ -150,13 +152,15 @@ class IBMiModule(object):
                 job_name_info), "Connection Initialization")
         except Exception as inst:
             self.close_db_connection()
+            re_raise = True
             exp_msg = "Fail to connect to database {0}: {1}.".format(
                 db_name, str(inst))
             if db_name != ibmi_util.SYSBAS:
                 exp_msg = exp_msg + " Check if IASP {0} is exist and varied on.".format(db_name)
             else:
                 exp_msg = exp_msg + " Check if *LOCAL Relational Database Directory Entry(RDBDIRE) is exist."
-            raise Exception(exp_msg) from inst
+        if re_raise:
+            raise Exception(exp_msg)
 
         if become_user_name and self.conn:
             self.ibmi_logon = IBMiLogon(
@@ -181,23 +185,22 @@ class IBMiModule(object):
 
     def close_db_connection(self):
         if self.conn:
+            re_raise = False  # workaround to pass the raise-missing-from pylint issue
+            exp_msg = ''
             try:
                 self.conn.close()
             except Exception as inst:
+                re_raise = True
                 exp_msg = "Failed to close connect from database: {0}".format(
                     str(inst))
-                raise Exception(exp_msg) from inst
             finally:
                 self.conn = None
+                if re_raise:
+                    raise Exception(exp_msg)
 
     def itoolkit_close_connection(self):
         self.release_ibmi_logon_handler()
         self.close_db_connection()
-
-    # def become_user(self, become_user_name, become_user_password):
-    #     if (become_user_name is not None) and (self.conn is not None):
-    #         self.ibmi_logon = IBMiLogon(self.conn, become_user_name, become_user_password)
-    #         self.ibmi_logon.switch()
 
     def itoolkit_get_job_log(self, time):
         return self.get_job_log('*', str(time))
