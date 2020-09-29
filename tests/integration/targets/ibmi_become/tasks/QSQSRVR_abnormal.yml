@@ -19,8 +19,9 @@
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
         JOB_NAME_FILTER => 'QSQSRVR',
         CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
-    expected_row_count: 1
-  retries: 4
+  register: sql_result
+  until: sql_result.row | length == 1
+  retries: 10
   delay: 5
 
 - name: query QSQSRVR job
@@ -53,3 +54,8 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
   until: result.row | length == 0
   retries: 4
   delay: 5
+
+- set_fact:
+    ansible_ssh_user: '{{nopwd_user}}'
+    ansible_ssh_pass: '{{becomepwd}}'
+  no_log: True

@@ -33,17 +33,10 @@
   ibmi_fix_group_check:
     groups: '{{group_74}}'
   register: group_check_result
-  failed_when: group_check_result.failed != true 
-
-- name: TC00 run module with a single PTF group with validate_certs
-  ibmi_fix_group_check:
-    validate_certs: true
-    groups: '{{group_74}}'
-  register: group_check_result
-  failed_when: group_check_result.failed != true 
+  failed_when: group_check_result.group_info[0].error == ''
 
 - name: remove required packages from ibm i server
-  command: '/QOpensys/pkgs/bin/yum install ca-certificates-mozilla -y'
+  command: '/QOpensys/pkgs/bin/yum install ca-certificates* -y'
 
 - name: TC00 run module with a single PTF group with validate_certs
   ibmi_fix_group_check:
@@ -122,18 +115,6 @@
       - group_check_result.count == 1
       - group_check_result.group_info | length == 1
       - group_check_result.group_info[0]["PTF_GROUP_NUMBER"] == group_74[0] 
-
-# - name: TC05 run module with groups
-#   ibmi_fix_group_check:
-#     groups: '{{group_74[-1].lower()}}'
-#   register: group_check_result
-
-# - name: TC05 assert the defined parameters are returned
-#   assert:
-#     that:
-#       - group_check_result.count == 1
-#       - group_check_result.group_info | length == 1
-#       - group_check_result.group_info[0]["PTF_GROUP_NUMBER"] == group_74[-1]
 
 - name: TC06 run module with an invalid group name
   ibmi_fix_group_check:

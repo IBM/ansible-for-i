@@ -11,7 +11,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
     src: cl1.cl
     dest: /tmp/
 
-- name: submit a long run script by ibmi_script_execute with async and poll
+- name: QSQSRVR_TC01 submit a long run script by ibmi_script_execute with async and poll
   ibmi_script_execute:
     src: '/tmp/cl1.cl'
     type: 'CL'
@@ -21,16 +21,61 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
   poll: 0
   register: script_sleeper
 
-- name: query QSQSRVR job
+- name: QSQSRVR_TC01 query QSQSRVR job
   ibmi_sql_query:
     sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
         JOB_NAME_FILTER => 'QSQSRVR',
         CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
-    expected_row_count: 1
+  register: sql_result
+  until: sql_result.row | length == 1
   retries: 4
   delay: 5
-  
+
+- name: QSQSRVR_TC02 put a cl script to remote IBM i
+  copy:
+    src: cl2.cl
+    dest: /tmp/
+
+- name: QSQSRVR_TC02 submit a long run script by ibmi_script_execute with async and poll
+  ibmi_script_execute:
+    src: '/tmp/cl2.cl'
+    type: 'CL'
+    become_user: '{{becomeuser}}'
+    become_user_password: '{{becomepwd}}'
+  async: 220
+  poll: 0
+  register: script_sleeper_2
+
+- name: QSQSRVR_TC02 ensure a new job owned by becomeuser is lanuched
+  ibmi_sql_query:
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+        JOB_NAME_FILTER => 'QSQSRVR',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+  register: sql_result
+  until: sql_result.row | length == 2
+  retries: 4
+  delay: 5
+
+## Verify module functions when previous become job is running
+- name: QSQSRVR_TC03 create a library without become_user and become_user_password 
+  ibmi_cl_command:
+    cmd: 'qsys/crtlib {{libname}}d'
+
+- name: QSQSRVR_TC03 verify the job i is not owned by the become user even the previous QSQSRVR job owned by becomeuser is still running
+  ibmi_object_authority:
+    operation: 'display'
+    object_name: '{{libname}}d'
+    #object_library: 'TEMPLIB'
+    object_type: '*LIB'
+  register: authority_result
+
+- name: QSQSRVR_TC03 verify the job i is not owned by the become user even the previous QSQSRVR job owned by becomeuser is still running
+  assert:
+    that:
+      - authority_result.object_authority_list[0].OWNER == '{{ansible_ssh_user.upper()}}'
+
 - name: Check sync status
   async_status:
     jid: "{{script_sleeper.ansible_job_id}}"
@@ -39,9 +84,13 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
   retries: 100
   delay: 10
 
-- name: pause 20 seconds to wait for the job ends
-  pause:
-    seconds: 20
+- name: Check sync status
+  async_status:
+    jid: "{{script_sleeper_2.ansible_job_id}}"
+  register: job_result
+  until: job_result.finished
+  retries: 100
+  delay: 1
 
 - name: query QSQSRVR job
   ibmi_sql_query:
@@ -49,4 +98,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
         JOB_NAME_FILTER => 'QSQSRVR',
         CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
-    expected_row_count: 0
+  register: sql_result
+  until: sql_result.row | length == 0
+  retries: 10
+  delay: 5

@@ -1,0 +1,588 @@
+# test code for the ibmi_download_fix module
+# (c) 2020, zhaoyao <zhaoyao@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+#
+# test scopes:
+# ptf_id
+# delivery_format
+# order
+# reorder
+# check_PTF
+# image_directory
+# time_out - Only works when delivery_format is C(*SAVF).
+# become_user
+# become_user_password
+
+- block:
+  - name: TC00 - determine if the host is a 2924 - ENU system since this module only support 2924 systems.
+    shell: system "dspsfwrsc" | grep 5770SS1 | grep *BASE | grep *LNG | grep "QSYS " | awk '{print $3}'
+    register: lng
+
+  - name: TC00 - exit play if the primary language of host is not 2924
+    debug:
+      msg: "Exit play, the primary language of {{ansible_ssh_host}} is {{lng.stdout}}"
+    when: lng.stdout != "2924"
+
+  - meta: end_play
+    when: lng.stdout != "2924" 
+
+- block:
+  - name: TC00 - get ansible host os400 version
+    shell: system "DSPSFWRSC" | grep "5770SS1" | head -n 1 | awk '{print $2}'
+    register: osinfo
+  - set_fact:
+      os400_ver: "{{osinfo.stdout}}"
+      ptf_grps: ['*PFRGRP'] # valid options are: ['*CUMPKG', '*HIPERGRP', '*DB2GRP', '*BRSGRP', '*JVAGRP', '*HTTPGRP', '*ALLGRP', '*PFRGRP'], will not test all options since that takes too long time and too much ASP.
+    failed_when: osinfo.rc != 0
+  - debug:
+      msg: "{{os400_ver}}"  
+  - set_fact:  # pre-define some valid ptfs in systems for each os version, they should be ready on host for testing
+      ptfs: ['SI69940', 'SI73848'] # first one is valid, second one is invalid
+      vvrrmm: "070400"
+    when: os400_ver == "V7R4M0"
+  - set_fact:  
+      ptfs: ['SI73848', 'SI69940']
+      vvrrmm: "070300"
+    when: os400_ver == "V7R3M0"
+  - set_fact:  
+      ptfs: ['SI70547', 'SI69940']
+      vvrrmm: "070200"
+    when: os400_ver == "V7R2M0"
+
+  - name: TC00 - create a *USER profile for become test, set_fact first
+    no_log: true
+    set_fact:
+      ibmi_user: "CUSER"
+      ibmi_pass: '{{ansible_ssh_pass}}'
+      superuser: "{{ansible_ssh_user}}"
+      when: ansible_ssh_pass is defined
+      
+  - name: TC00 - create a *USER profile to do authority test
+    ibmi_user_and_group:
+      operation: 'create'
+      user: "{{ibmi_user}}"
+      special_authority: '*NONE'
+      password: "{{ibmi_pass}}"
+      user_class: '*USER'
+    register: crtusrprf
+    failed_when: crtusrprf.rc != 0  
+
+  - name: TC01 - Download a PTF with very basic infomation provided.    
+    ibmi_download_fix:
+      product: '5770SS1'
+      ptf_id: "{{ptfs[0]}}"
+      release: "{{os400_ver}}"
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc != 0
+
+  - name: TC01 - Assert value
+    assert:
+      that:
+        - dl_single_ptf_result.download_list | selectattr('file_name','equalto','Q"{{ptfs[0]}}"')
+        - dl_single_ptf_result.download_list | selectattr('file_path','equalto','/qsys.lib/qgpl.lib/Q"{{ptfs[0]}}".FILE')
+        - dl_single_ptf_result.download_list | selectattr('product','equalto','5770SS1')                
+        - dl_single_ptf_result.download_list | selectattr('release','equalto','{{os400_ver}}')
+        - dl_single_ptf_result.download_list | selectattr('ptf_id','equalto','"{{ptfs[0]}}"')
+        - dl_single_ptf_result.order_id is defined
+        - dl_single_ptf_result.command is defined
+        - '"REORDER(*YES)" in dl_single_ptf_result.command' #default value
+        - '"ORDER(*REQUIRED)" in dl_single_ptf_result.command' #default value
+        - '"DLVRYFMT(*SAVF)" in dl_single_ptf_result.command' #default value
+        - '"CHKPTF(*NO)" in dl_single_ptf_result.command' #default value
+        - '"IMGDIR(*DFT)" in dl_single_ptf_result.command' #default value
+        - dl_single_ptf_result.msg == "SNDPTFORD successfully ended."
+
+  - name: TC02 - Download a PTF with release VRM is specified - delete savf before testing 
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf    
+
+  - name: TC02 - Download a PTF with release VRM(vvrrmm) is specified.    
+    ibmi_download_fix:
+      release: "{{vvrrmm}}"
+      ptf_id: "{{ptfs[0]}}"
+      reorder: '*YES'
+      product: '5770SS1'
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc != 0
+
+  - name: TC03 - Download a single PTF with reorder *NO and joblog - delete savf before testing
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf
+
+  - name: TC03 - Download a single PTF with reorder *NO and joblog
+    ibmi_download_fix:
+      ptf_id: "{{ptfs[0]}}"
+      release: "{{os400_ver}}"
+      reorder: '*NO'
+      joblog: true
+      product: '5770SS1'
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc != 0
+  
+  - name: TC03 - Assert value
+    assert:
+      that:
+        - '"REORDER(*NO)" in dl_single_ptf_result.command'
+        - dl_single_ptf_result.msg == "SNDPTFORD successfully ended."
+  
+  - name: TC04 - Download a single PTF with reorder *YES - delete savf before testing reorder *YES
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf
+
+  - name: TC04 - Download a single PTF with reorder *YES
+    ibmi_download_fix:
+      ptf_id: '{{ptfs[0]}}'
+      release: "{{os400_ver}}"
+      reorder: '*YES'
+      product: '5770SS1'
+    register: reorder_result  
+    failed_when: reorder_result.rc != 0
+
+  - name: TC04 - Assert value
+    assert:
+      that:
+        - '"REORDER(*YES)" in reorder_result.command'
+        - reorder_result.msg == "SNDPTFORD successfully ended."
+
+  - name: TC05 - Download a single PTF with check_PTF *YES - delete savf before testing check_PTF *YES
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf
+
+  - name: TC05 - Download a single PTF with check_PTF *YES
+    ibmi_download_fix:
+      ptf_id: '{{ptfs[0]}}'
+      release: "{{os400_ver}}"
+      check_PTF: '*YES'
+      product: '5770SS1'
+    register: check_PTF_result  
+    failed_when: check_PTF_result.rc != 0
+
+  - name: TC05 - Assert value
+    assert:
+      that:
+        - '"CHKPTF(*YES)" in check_PTF_result.command'
+        - check_PTF_result.msg == "SNDPTFORD successfully ended."    
+
+  - name: TC06 - Test customized image_directory parameter - delete savf before 
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf
+
+  - name: TC06 - create a dir if not exist on system as customized image_directory
+    file:
+      path: '/home/{{ansible_ssh_user}}/PTFs'
+      state: directory
+      mode: '0700'
+
+  - name: TC06 - Download a single PTF with image_directory
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: '{{ptfs[0]}}'
+      delivery_format: '*IMAGE' # only valid when *IMAGE is specified.  CPD8C13
+      image_directory: '/home/{{ansible_ssh_user}}/PTFs' 
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc != 0
+
+  - name: TC06 - Assert values
+    assert:
+      that:
+        - dl_single_ptf_result.file_path == '/home/{{ansible_ssh_user}}/PTFs' 
+        - '"/home/tester/PTFs" in dl_single_ptf_result.command'
+        - dl_single_ptf_result.msg == 'SNDPTFORD successfully ended.'
+        - dl_single_ptf_result.order_id != ""
+
+  - name: TC10 - Download a single PTF with order *PTFID
+    ibmi_download_fix:
+      product: '5770SS1'
+      ptf_id: '{{ptfs[0]}}'
+      release: "{{os400_ver}}"
+      reorder: '*YES'
+      order: '*PTFID'
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc != 0
+
+  - name: TC11 - Download a single PTF with timeout - delete savf before testing wait parameter
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf
+
+  - name: TC11 -  Download a single PTF with timeout
+    ibmi_download_fix:
+      product: '5770SS1'
+      release: "{{os400_ver}}"
+      ptf_id: '{{ptfs[0]}}'
+      delivery_format: '*SAVF'
+      reorder: '*NO'
+      time_out: '1s' # make sure time out happens, however, the ptf will still be downloaded
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.msg != "Time up when waiting for SNDPTFORD complete."
+
+  - name: TC11 - wait until savf file is created in QGPL
+    wait_for:
+      path: /QSYS.LIB/QGPL.LIB/Q{{ptfs[0]}}.FILE
+      state: present  
+      msg: Timeout to find file /QSYS.LIB/QGPL.LIB/Q{{ptfs[0]}}.FILE
+
+  - name: TC11 - Cleanup - delete savf before testing wait parameter
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf
+
+  - name: TC12 - Download a single PTF with wait(false), download will continue after job submitted
+    ibmi_download_fix:
+      product: '5770SS1'
+      release: "{{os400_ver}}"
+      ptf_id: '{{ptfs[0]}}'
+      delivery_format: '*SAVF'
+      reorder: '*YES'
+      wait: false
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc != 0
+
+  - name: TC12 - assert value
+    assert:
+      that:
+        - dl_single_ptf_result.msg == "SNDPTFORD successfully ended."
+
+  - name: TC12 - wait until savf file is created in QGPL
+    wait_for:
+      path: /QSYS.LIB/QGPL.LIB/Q{{ptfs[0]}}.FILE
+      state: present  
+      msg: Timeout to find file /QSYS.LIB/QGPL.LIB/Q{{ptfs[0]}}.FILE
+
+  - name: TC12 - Cleanup - delete savf before testing wait parameter
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf
+
+  - name: TC13 - Download a PTF group with delivery_format '*SAVF' #by default wait=true, ptf cannot be exist under QGPL
+    ibmi_download_fix:
+      ptf_id: "{{ ptf_grps[0] }}"
+      delivery_format: '*SAVF'
+    register: download_ptf_group_result  
+    failed_when: download_ptf_group_result.rc != 0
+
+  - name: TC13 - Assert value
+    assert:
+      that:
+        - '"DLVRYFMT(*SAVF)" in download_ptf_group_result.command'
+        - '"*ONLYPRD *ONLYRLS" in download_ptf_group_result.command' 
+        - '"ORDER(*REQUIRED)" in download_ptf_group_result.command' #default
+        - '"REORDER(*YES)" in download_ptf_group_result.command' #default
+        - '"CHKPTF(*NO)" in download_ptf_group_result.command' #default
+        - '"IMGDIR(*DFT)" in download_ptf_group_result.command' #default
+        - download_ptf_group_result.msg == "SNDPTFORD successfully ended."   
+        - download_ptf_group_result.download_list is defined
+
+  - name: TC13 - cleanup
+    set_fact:
+      ptfs_downloaded: "{{ ptfs_downloaded | default([]) + [item['file_path']]}}"
+    loop: "{{download_ptf_group_result.download_list}}"
+
+  - name: TC13 - remove downloaded ptf under QGPL 
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop: "{{ptfs_downloaded}}"
+
+  - name: TC14 - Download a PTF group with delivery_format '*IMAGE'
+    ibmi_download_fix:
+      ptf_id: "{{ ptf_grps[0] }}"
+      delivery_format: '*IMAGE'
+    register: download_ptf_group_result  
+    failed_when: download_ptf_group_result.rc != 0
+
+  - name: TC14 - Assert value
+    assert:
+      that:
+        - '"DLVRYFMT(*IMAGE)" in download_ptf_group_result.command'
+        - '"*ONLYPRD *ONLYRLS" in download_ptf_group_result.command' #default
+        - '"ORDER(*REQUIRED)" in download_ptf_group_result.command' #default
+        - '"REORDER(*YES)" in download_ptf_group_result.command' #default
+        - '"CHKPTF(*NO)" in download_ptf_group_result.command' #default
+        - download_ptf_group_result.msg == "SNDPTFORD successfully ended."
+        - '"/QIBM/UserData/OS/Service/ECS/PTF/" in download_ptf_group_result.file_path'
+
+  - name: TC15 - Download a PTF group with reorder *YES
+    ibmi_download_fix:
+      ptf_id: '{{ptf_grps[0]}}'   
+      delivery_format: '*IMAGE'
+      reorder: "*YES"
+    register: download_ptf_group_result  
+    failed_when: download_ptf_group_result.rc != 0
+
+  - name: TC15 - Assert value
+    assert:
+      that:
+        - '"REORDER(*YES)" in download_ptf_group_result.command'
+        - download_ptf_group_result.msg == "SNDPTFORD successfully ended."
+
+  - name: TC16 - Download a PTF group to customized dir
+    ibmi_download_fix:
+      ptf_id: '{{ptf_grps[0]}}'   
+      delivery_format: '*IMAGE'
+      reorder: "*YES"
+      image_directory: '/home/{{ansible_ssh_user}}/PTFs' 
+    register: download_ptf_group_result  
+    failed_when: download_ptf_group_result.rc != 0
+
+  - name: TC16 - Assert value
+    assert:
+      that:
+        - '"/home/{{ansible_ssh_user}}/PTFs" in download_ptf_group_result.command'
+        - download_ptf_group_result.msg == "SNDPTFORD successfully ended."
+
+  - name: TC17 - Download a PTF group with timeout, however download will continue
+    ibmi_download_fix:
+      ptf_id: '{{ptf_grps[0]}}'   
+      delivery_format: '*SAVF'
+      reorder: "*YES"
+      wait: true
+      time_out: '10s'
+    register: download_ptf_group_result  
+    failed_when: download_ptf_group_result.rc != 255
+
+  - name: TC17 - Assert value
+    assert:
+      that:
+        - download_ptf_group_result.msg == "Time up when waiting for SNDPTFORD complete."
+
+  - name: TC17 - wait for all PTFs downloaded 
+    wait_for:
+      path: "{{ item }}" 
+      msg: wait for PTF "{{ item }}" downloaded
+    loop: "{{ptfs_downloaded}}"
+
+  - name: TC17 - remove all PTF downloaded previously
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop: "{{ptfs_downloaded}}"
+
+  - name: TC18 - become a superuser to download a PTF - switch to common user
+    set_fact:
+      ansible_ssh_user: "{{ibmi_user}}"
+
+  - name: TC18 - become a superuser to download a PTF
+    ibmi_download_fix:
+      product: '5770SS1'
+      ptf_id: "{{ptfs[0]}}"
+      release: "{{os400_ver}}"
+      become_user: "{{superuser}}"
+      become_user_password: "{{ibmi_pass}}"
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc != 0    
+
+  - name: TC18 - become a superuser to download a PTF group
+    ibmi_download_fix:
+      ptf_id: "{{ptf_grps[0]}}"
+      delivery_format: "*IMAGE"
+      release: "{{os400_ver}}"
+      become_user: "{{superuser}}"
+      become_user_password: "{{ibmi_pass}}"
+    register: dl_ptf_grp_result  
+    failed_when: dl_ptf_grp_result.rc != 0    
+
+  - name: TC18 - switch back to superuser
+    set_fact:
+      ansible_ssh_user: "{{superuser}}"      
+
+  - name: TC18 - Cleanup - delete ptf after testing
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf
+
+  - name: TC19 - Negative test - try to download mulitiple fixes
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: '{{ptfs[0]}} {{ptfs[1]}}'
+      reorder: '*NO'
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc == 0
+
+  - name: TC19 - Assert values
+    assert:
+      that:
+        - dl_single_ptf_result.msg == "Submit job failed." 
+        - dl_single_ptf_result.job_log |selectattr('MESSAGE_ID', 'equalto', 'CPD0046') | list | length == 1
+        
+  - name: TC20 - Negative test - try to download a non-existing PTF
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: 'SIABCDE'
+      reorder: '*NO'
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc == 0  
+
+  - name: TC20 - Assert values
+    assert:
+      that:
+        - dl_single_ptf_result.msg == "PTF *ONLYPRD-SIABCDE *ONLYRLS not available on the service provider system." 
+        - dl_single_ptf_result.command == ""
+        
+  - name: TC21 - Negative test - try to download a wrong VRM PTF
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: '{{ptfs[1]}}'
+      reorder: '*NO'
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc == 0  
+
+  - name: TC21 - Assert values
+    assert:
+      that:
+        - dl_single_ptf_result.msg == "PTF *ONLYPRD-{{ptfs[1]}} *ONLYRLS not available on the service provider system." 
+        - dl_single_ptf_result.command == ""
+
+  - name: TC22 - Negative test - try to download a non-existing PTF 
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: 'SFABCDE'
+      reorder: '*NO'
+    register: dl_ptf_grp_result  
+    failed_when: dl_ptf_grp_result.rc == 0  
+
+  - name: TC22 - Assert values
+    assert:
+      that:
+        - dl_ptf_grp_result.msg == "PTF *ONLYPRD-SFABCDE *ONLYRLS not available on the service provider system."
+        - dl_ptf_grp_result.command == ""
+
+  - name: TC23 - Negative test - try to download an PTF group with invalid ptf group option
+    ibmi_download_fix:
+      ptf_id: '*AVAGRP'
+      reorder: '*NO'
+    register: dl_ptf_grp_result  
+    failed_when: dl_ptf_grp_result.rc == 0  
+
+  - name: TC23 - Assert values
+    assert:
+      that:
+        - dl_ptf_grp_result.job_log |selectattr('MESSAGE_TEXT', 'equalto', '*AVAGRP not valid for parameter PTFID.') | map(attribute='MESSAGE_TEXT') | list | length == 1
+        - dl_ptf_grp_result.command == ""
+
+  - name: TC24 - Negative test - try to download PTF to a folder that is not exist
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: '{{ptfs[0]}}'
+      reorder: '*NO'
+      delivery_format: '*IMAGE'
+      image_directory: '/home/{{ansible_ssh_user}}/notexist' 
+    register: dl_ptf_grp_result  
+    failed_when: dl_ptf_grp_result.rc == 0    
+  
+  - name: TC24 - Assert values
+    assert:
+      that:
+        - dl_ptf_grp_result.msg == "PTF order cannot be processed. See joblog"
+        - dl_ptf_grp_result.job_log |selectattr('MESSAGE_TEXT', 'equalto', 'Object not found.  Object is /home/{{ansible_ssh_user}}/notexist.') | map(attribute='MESSAGE_TEXT') | list | length == 1
+
+  - name: TC25A - Negative test - invalid value of each parameter, take single_ptf download for instance
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: "{{ptfs[0]}}"
+      delivery_format: '*IMAGES'
+    register: dl_single_ptf_result
+    failed_when:  '"value of delivery_format must be one of" not in dl_single_ptf_result.msg'
+    
+  - name: TC25B - Negative test - invalid value of each parameter, take single_ptf download for instance
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: "{{ptfs[0]}}"
+      delivery_format: '*IMAGE'
+      reorder: false
+    register: dl_single_ptf_result  
+    failed_when:  '"value of reorder must be one of" not in dl_single_ptf_result.msg'
+ 
+  - name: TC25C - Negative test - invalid value of each parameter, take single_ptf download for instance
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: "{{ptfs[0]}}"
+      delivery_format: '*IMAGE'
+      reorder: '*YES'
+      order: '*PTF_ID'
+    register: dl_single_ptf_result  
+    failed_when:  '"value of order must be one of" not in dl_single_ptf_result.msg'
+   
+  - name: TC25D - Negative test - invalid value of each parameter, take single_ptf download for instance
+    ibmi_download_fix:
+      product: '5770SS1'  
+      release: "{{os400_ver}}"
+      ptf_id: "{{ptfs[0]}}"
+      delivery_format: '*IMAGE'
+      reorder: '*YES'
+      order: '*PTFID'
+      check_PTF: true
+    register: dl_single_ptf_result  
+    failed_when:  '"value of check_PTF must be one of" not in dl_single_ptf_result.msg'
+
+  - name: TC26 - Negative test - Download a PTF with become to swith to a non-*ALLOBJ authority user     
+    ibmi_download_fix:
+      product: '5770SS1'
+      ptf_id: "{{ptfs[0]}}"
+      release: "{{os400_ver}}"
+      become_user: "{{ibmi_user}}"
+      become_user_password: "{{ibmi_pass}}"
+    register: dl_single_ptf_result  
+    failed_when: dl_single_ptf_result.rc == 0
+  
+  - name: TC26 - assert values
+    assert:
+      that:
+        - dl_single_ptf_result.job_log |selectattr('MESSAGE_TEXT', 'equalto', 'Not authorized to command SNDPTFORD in library *LIBL.') | list | length == 1
+
+  - name: TC27 - Negative test - Download a PTF group with become to swith to a non-*ALLOBJ authority user  
+    ibmi_download_fix:
+      ptf_id: "{{ptf_grps[0]}}"
+      release: "{{os400_ver}}"
+      become_user: "{{ibmi_user}}"
+      become_user_password: "{{ibmi_pass}}"
+    register: dl_ptf_grp_result  
+    failed_when: dl_ptf_grp_result.rc == 0
+  
+  - name: TC27 - assert values
+    assert:
+      that:
+        - dl_ptf_grp_result.job_log |selectattr('MESSAGE_TEXT', 'equalto', 'Not authorized to command SNDPTFORD in library *LIBL.') | list | length == 1
+
+  always:
+  - name:  Find Q{{ptfs[0]}} under QGPL
+    ibmi_object_find:
+      object_name: Q{{ptfs[0]}}
+      object_type_list: '*FILE'
+      lib_name: 'QGPL'
+    register: find_result
+
+  - name: delete savf in case of exception
+    ibmi_cl_command:
+      cmd: 'dltptf {{ptfs[0]}}'
+    register: dltptf      
+    when: find_result.object_list | length == 1
+
+  - name: check if *USER profile exists
+    ibmi_user_and_group:
+      operation: 'display'
+      user: "{{ibmi_user}}"
+    register: dsp_usr  
+
+  - name: remove *USER profile created
+    ibmi_cl_command:
+      cmd:  'DLTUSRPRF USRPRF({{ibmi_user}}) OWNOBJOPT(*DLT)'
+    register: dltusrprf
+    when: dsp_usr.rc == 0  # can display, exist
+    failed_when: dltusrprf.rc != 0
