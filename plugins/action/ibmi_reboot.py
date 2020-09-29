@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 
 display = Display()
 
-__ibmi_module_version__ = "1.1.1"
+__ibmi_module_version__ = "1.1.2"
 
 
 class TimedOutException(Exception):
@@ -91,12 +91,15 @@ class ActionModule(RebootActionModule, ActionBase):
     def validate_int(self):
         for int_key in self._INT_ARGS:
             key_value = self._task.args.get(int_key, 1)
+            re_raise = False  # workaround to pass the raise-missing-from pylint issue
             try:
                 validation.check_type_int(key_value)
                 if key_value < 0:
                     raise AnsibleError('The value of %s must not be less than 0' % (int_key))
-            except (TypeError, ValueError) as e:
-                raise AnsibleError("The value of argument %s is %s which can't be converted to int" % (int_key, key_value)) from e
+            except (TypeError, ValueError):
+                re_raise = True  # workaround to pass the raise-missing-from pylint issue
+            if re_raise:
+                raise AnsibleError("The value of argument %s is %s which can't be converted to int" % (int_key, key_value))
         return None
 
     def get_shutdown_command(self, task_vars, distribution):
@@ -107,6 +110,8 @@ class ActionModule(RebootActionModule, ActionBase):
         become_user = self._task.args.get('become_user')
         display.vvv('{action}: get_system_boot_time: become to user: {user}'.format(action=self._task.action, user=become_user))
         become_user_password = self._task.args.get('become_user_password')
+        re_raise = False  # workaround to pass the raise-missing-from pylint issue
+        inst = None
         try:
             sql = "SELECT JOB_ENTERED_SYSTEM_TIME FROM TABLE \
                 (QSYS2.JOB_INFO(JOB_STATUS_FILTER => '*ACTIVE', JOB_USER_FILTER => 'QSYS')) \
@@ -121,10 +126,13 @@ class ActionModule(RebootActionModule, ActionBase):
                     "become_user_password": become_user_password
                 }
             )
-        except Exception as inst:
+        except Exception as e:
+            re_raise = True  # workaround to pass the raise-missing-from pylint issue
+            inst = e
+        if re_raise:
             raise AnsibleError("{action}: failed to run module ibmi_sql_query to get boot time info: {exp}".format(
                 action=self._task.action,
-                exp=str(inst))) from inst
+                exp=str(inst)))
         display.vvv("{action}: command_output: {boot_time}".format(action=self._task.action, boot_time=str(command_result)))
         if command_result['rc'] != 0:
             if 'msg' in command_result:

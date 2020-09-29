@@ -14,7 +14,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.1.1"
+__ibmi_module_version__ = "1.1.2"
 
 display = Display()
 
@@ -127,10 +127,15 @@ class ActionModule(ActionBase):
                 result['failed'] = True
                 return result
 
+            re_raise = False
+            inst = None
             try:
                 src = self._loader.get_real_file(self._find_needle('files', src))
             except AnsibleError as e:
-                raise AnsibleActionFail(to_native(e)) from e
+                re_raise = True
+                inst = e
+            if re_raise:
+                raise AnsibleActionFail(to_native(inst))
 
             lib_name = lib_name.upper()
             startd = datetime.datetime.now()

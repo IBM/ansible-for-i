@@ -1,0 +1,48 @@
+# Test when all dependent packages are in place  
+- name: Query the iASP existing
+  ibmi_sql_query:
+    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+  register: iasp_list
+
+- block:
+  - name: IASP - run CL command module with asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB(TRYIASP1) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      become_user: '{{becomeuser.upper()}}'
+      become_user_password: '{{becomepwd}}'      
+      #joblog: true
+
+  - ibmi_cl_command:
+      cmd: CRTDTAARA DTAARA(TRYIASP1/{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}) TYPE(*DEC)
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      become_user: '{{becomeuser.upper()}}'
+      become_user_password: '{{becomepwd}}'  
+
+  - name: IASP TC01 - check obj with asp_group
+    ibmi_cl_command:
+      cmd: CHKOBJ OBJ(TRYIASP1/{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}) OBJTYPE(*DTAARA)
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: true
+
+  - name: TC01 verify the object is owned by the become user
+    ibmi_object_authority:
+      operation: 'display'
+      object_name: 'TRYIASP1'
+      object_type: '*LIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"   
+    register: authority_result
+
+  - name: TC01 assert the returned options of display
+    assert:
+      that:
+        - authority_result.object_authority_list[0].OWNER == '{{becomeuser.upper()}}'
+  when: iasp_list.row | length >= 1 
+
+  always:
+    - name: rmvlib
+      ibmi_cl_command:
+        cmd: dltlib lib(TRYIASP1)
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        joblog: true
+      ignore_errors: true

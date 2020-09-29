@@ -1,0 +1,61 @@
+- name: put a cl script to remote IBM i
+  copy:
+    src: cl1.cl
+    dest: /tmp/
+
+- name: submit a long run script by ibmi_script_execute with async and poll
+  ibmi_script_execute:
+    src: '/tmp/cl1.cl'
+    type: 'CL'
+    become_user: '{{becomeuser}}'
+    become_user_password: '{{becomepwd}}'
+  async: 220
+  poll: 0
+  register: script_sleeper
+
+- name: query QSQSRVR job
+  ibmi_sql_query:
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+        JOB_NAME_FILTER => 'QSQSRVR',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+  register: sql_result
+  until: sql_result.row | length == 1
+  retries: 10
+  delay: 5
+
+- name: query QSQSRVR job
+  ibmi_sql_query:
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME, FUNCTION
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+        JOB_NAME_FILTER => 'QP0ZSPWP',
+        CURRENT_USER_LIST_FILTER => '{{ansible_ssh_user.upper()}}')) X;"
+  register: sql_data
+
+- set_fact:
+    ansible_ssh_user: '{{ansible_ssh_user_org}}'
+    ansible_ssh_pass: '{{ansible_ssh_pass_org}}'
+  no_log: True
+
+- name: search the python3 job
+  ibmi_cl_command:
+    cmd: 'ENDJOB JOB({{item.JOB_NAME}})  OPTION(*CNTRLD)'
+  ignore_errors: true
+  when: "'python3' in item.FUNCTION"
+  loop: '{{sql_data.row}}'
+
+- name: query QSQSRVR job
+  ibmi_sql_query:
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+        JOB_NAME_FILTER => 'QSQSRVR',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+  register: result
+  until: result.row | length == 0
+  retries: 4
+  delay: 5
+
+- set_fact:
+    ansible_ssh_user: '{{nopwd_user}}'
+    ansible_ssh_pass: '{{becomepwd}}'
+  no_log: True

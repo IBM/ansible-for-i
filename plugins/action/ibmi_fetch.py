@@ -16,7 +16,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
-__ibmi_module_version__ = "1.1.1"
+__ibmi_module_version__ = "1.1.2"
 
 ifs_dir = '/tmp/.ansible'
 display = Display()
@@ -361,12 +361,17 @@ class ActionModule(ActionBase):
                 if remote_data is None:
                     self._connection.fetch_file(source, dest)
                 else:
+                    re_raise = False  # workaround to pass the raise-missing-from pylint issue
+                    inst = None
                     try:
                         f = open(to_bytes(dest, errors='surrogate_or_strict'), 'wb')
                         f.write(remote_data)
                         f.close()
                     except (IOError, OSError) as e:
-                        raise AnsibleError("Failed to fetch the file: {p_e}".format(p_e=e)) from e
+                        re_raise = True
+                        inst = e
+                    if re_raise:
+                        raise AnsibleError("Failed to fetch the file: {p_e}".format(p_e=inst))
                 new_checksum = secure_hash(dest)
                 # For backwards compatibility. We'll return None on FIPS enabled systems
                 try:

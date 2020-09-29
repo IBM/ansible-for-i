@@ -1,8 +1,11 @@
 - block:
-  - set_fact: 
+  - name: set some variables for test
+    no_log: true
+    set_fact: 
       superuser: "{{ansible_ssh_user}}"
       ibmi_user: "ZHYAO"
       ibmi_pass: '{{ansible_ssh_pass}}'
+      when: ansible_ssh_pass is defined
 
   - name: TC01 - run the SQL command to create a table
     ibmi_sqlite3:
@@ -112,8 +115,8 @@
         - dsps_param_result_3.sqlite3Runtime is defined
         - dsps_param_result_3.sqlite3Version is defined
         - dsps_param_result_3.start is defined
-        - dsps_param_result_3.parameters[0].CHECKSUM == "abc123" #is defined
-        - dsps_param_result_3.parameters[0].ID == "SI69379" #is defined
+        - dsps_param_result_3.parameters[0].CHECKSUM == "abc123"
+        - dsps_param_result_3.parameters[0].ID == "SI69379"
 
   - name: TC05 - run the SQL command to delete a record
     ibmi_sqlite3:
@@ -186,10 +189,10 @@
     register: dsps_param_result_7
     failed_when: dsps_param_result_7.rc != 1
 
-  - name: TC08 - Assert return values
+  - name: TC08 - assert value
     assert:
-      that: 
-        - '"You can only execute one statement at a time" is in dsps_param_result_7.module_stdout'
+      that:
+        - '"You can only execute one statement at a time" in dsps_param_result_7.module_stdout'  
 
   - name: TC09 - insert invalid data
     ibmi_sqlite3:
@@ -206,7 +209,7 @@
   - name: TC09 - assert values  
     assert:
       that: 
-        - '"datatype mismatch" is in dsps_param_result_8.msg'
+        - dsps_param_result_8.msg == "datatype mismatch"
 
   - name: TC10 - permission test - touch a new db file
     file:
@@ -265,8 +268,16 @@
       register: rmvf_result
       failed_when: rmvf_result.rc != 0
 
+    - name: check if *USER profile exists
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{ibmi_user}}'
+      register: dspusr  
+      ignore_errors: yes
+
     - name: remove *USER profile
       ibmi_cl_command:
         cmd:  'DLTUSRPRF USRPRF({{ibmi_user}}) OWNOBJOPT(*DLT)'
       register: dltusrprf
+      when: dspusr.rc == 0
       failed_when: dltusrprf.rc != 0
