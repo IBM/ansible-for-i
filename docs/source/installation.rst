@@ -44,7 +44,7 @@ In order to use this Ansible collection, you must have the following pre-requisi
 
     ::
 
-        pip install ansible
+        pip3 install ansible
 
 Installing using Ansible Galaxy
 -------------------------------
