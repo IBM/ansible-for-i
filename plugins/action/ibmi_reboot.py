@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 
 display = Display()
 
-__ibmi_module_version__ = "1.1.2"
+__ibmi_module_version__ = "9.9.9"
 
 
 class TimedOutException(Exception):
@@ -42,7 +42,7 @@ class ActionModule(RebootActionModule, ActionBase):
         'ipl_source',
         'end_subsystem_option',
         'timeout_option',
-        'install_ptf_device',
+        'parameters',
         'become_user',
         'become_user_password',
     ))

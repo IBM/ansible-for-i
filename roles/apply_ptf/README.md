@@ -38,7 +38,6 @@ Example Playbook
     - name: apply a list of single ptfs
       include_role:
         name: apply_ptf
-      register: load_result
 ```
 
 ```
@@ -57,7 +56,6 @@ Example Playbook
     - name: apply a list of single ptfs
       include_role:
         name: apply_ptf
-      register: load_result
 ```
 
 ```

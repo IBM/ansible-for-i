@@ -9,6 +9,8 @@ Role Variables
 | Variable               | Type          | Description                                                            |
 |------------------------|---------------|------------------------------------------------------------------------|
 | `to_be_downloaded_list`| list          | The list of ptfs that will be downloaded. Only ptf_id is required.     |
+| `order`| str          | Specifies if requisite PTFs should be included with the ordered PTFs. Default value is '*PTFID'.     |
+| `download_server`| str          | Specifies the SNDPTFORD server used to download ptfs.     |
 
 Return Variables
 --------------

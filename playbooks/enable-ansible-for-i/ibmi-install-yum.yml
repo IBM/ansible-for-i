@@ -1,18 +1,12 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-- name: Check whether yum has been installed. If not, install it in following tasks.
-  raw: ls -l /QOpensys/pkgs/bin/yum
-  args:
-    executable: /qopensys/usr/bin/qsh
-  register: default_yum_existance
-  ignore_errors: True
+
 
 - name: Create the installation script on IBM i
   raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
   args:
     executable: /qopensys/usr/bin/qsh
-  when: "'No such path or directory' in default_yum_existance.stdout"
 
 - name: Write the content to the installation script on IBM i
   raw: "echo \"
@@ -40,14 +34,12 @@ CL:QSH CMD('touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstra
 \" >> /tmp/bootstrap.sql"
   args:
     executable: /qopensys/usr/bin/qsh 
-  when: "'No such path or directory' in default_yum_existance.stdout"
 
 - name: Run the installation script to install yum
   raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
   args: 
     executable: /qopensys/usr/bin/qsh
   register: output_of_runsqlstm
-  when: "'No such path or directory' in default_yum_existance.stdout"
   failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
 
 - name: Run /QOpensys/pkgs/bin/yum to confirm yum has been installed properly
@@ -56,3 +48,6 @@ CL:QSH CMD('touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstra
     executable: /qopensys/usr/bin/qsh
   register: output_of_yum
   failed_when: "'No such path or directory' in output_of_yum"
+
+- set_fact:
+    yum_installed: true

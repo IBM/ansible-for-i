@@ -1,5 +1,9 @@
 ---
 # tasks file for apply_ptfs
+- set_fact:
+    requisite_list: []
+    apply_fail_dict: {}
+
 - include: apply_all_loaded_ptfs.yml
   when: apply_all_loaded_ptfs
 
@@ -28,3 +32,12 @@
     debug:
       var: apply_fail_list
   when: apply_all_loaded_ptfs == false
+
+- debug:
+    var: apply_fail_with_requisite_list
+
+- debug:
+    var: apply_fail_dict
+
+- debug:
+    var: requisite_list

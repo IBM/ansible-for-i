@@ -161,7 +161,7 @@ from ansible.module_utils.basic import AnsibleModule
 import sqlite3
 import datetime
 
-__ibmi_module_version__ = "1.1.2"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -193,7 +193,7 @@ def main():
     startd = datetime.datetime.now()
     try:
         conn = sqlite3.connect(database)
-    except sqlite3.Error as e:
+    except (sqlite3.Error, sqlite3.Warning) as e:
         module.fail_json(msg=e.args[0], **result)
     if (conn is not None):
         c = conn.cursor()
@@ -206,7 +206,7 @@ def main():
                     c.execute(sql, parameters[0])
             else:                               # no input parameters provided.
                 c.execute(sql)
-        except sqlite3.Error as e:
+        except (sqlite3.Error, sqlite3.Warning) as e:
             module.fail_json(msg=e.args[0], **result)
         else:
             result['row_changed'] = c.rowcount

@@ -14,7 +14,6 @@
 
 - name: Add order information into download_status table
   ibmi_fix_repo:
-    database: "{{ database }}"
     type: "download_status"
     action: "add"
     parameters:

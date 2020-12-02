@@ -91,8 +91,8 @@ For some special tables or actions, the option **checksum** will be ignored or o
 
 ### add / update
 
-**add**: Insert a new record into the specified table of the PTF repostory's database.
-**update**: Update records of the specified table of the PTF repostory's database.
+**add**: Insert a new record into the specified table of the PTF repository database.
+**update**: Update records of the specified table of the PTF repository database.
 
 This module processes the action **add** and **update** using an unique SQL syntax **UPSERT**. For more details, please refer to [the SQLite3 manual](https://www.sqlite.org/lang_UPSERT.html "the SQLite3 manual").
 
@@ -107,7 +107,7 @@ This module processes the action **add** and **update** using an unique SQL synt
 |    ptf_group    |   true   | ptf_group_number, ptf_group_level, release_date, file_path |
 | download_status |   true   |                     order_id, file_path                    |
 
-For type `ptf_group`, some of its input parameters should be retrieved from websites throught the module **ibmi_fix_group_check**.
+For type `ptf_group`, some of its input parameters should be retrieved from websites through the module **ibmi_fix_group_check**.
 
 #### Where the ptf_group data come from
 
@@ -138,29 +138,29 @@ For type `ptf_group`, some of its input parameters should be retrieved from webs
 
 ### find
 
-Query records from the specified table of the PTF repostory's database.
+Query records from the specified table of the PTF repository database.
 
-The query paramters are used to filter out the matched database records. The **find** action allows you to use any column name as searching criterias. ( When the option **checksum** is `true`, the input parameters should at least contain the **file_path** field.)
+The query parameters are used to filter out the matched database records. The **find** action allows you to use any column name as searching criteria. ( When the option **checksum** is `true`, the input parameters should at least contain the **file_path** field.)
 
-**Note**: When the option **checksum** is `true`, the **ibmi_fix_repo** module not only use the input parameters as searching criteria, but also compare the checksum data from speicfied physical files with the input paramters. If the physical files are damaged, the output paramter **db_record** has value `FileNotFound` or `FileNotMatch`.
+**Note**: When the option **checksum** is `true`, the **ibmi_fix_repo** module not only use the input parameters as searching criteria, but also compare the checksum data from specified physical files with the input parameters. If the physical files are damaged, the output parameter **db_record** has value `FileNotFound` or `FileNotMatch`.
 
 The matched query result can be found in **success_list** of the output parameters.
 
 ### delete
 
-Delete existing records from the specified table of the PTF repostory's database.
+Delete existing records from the specified table of the PTF database.
 
-The query paramters are used to filter out the database records to delete. If more than one record match, all of them will be deleted.
+The queries are used to filter out the database records to delete. If more than one record return, all of them will be deleted.
 
-The **delete** action allows you to use any column name as searching criterias.
+The **delete** action allows you to use any column name as searching criteria.
 
 ### clear
 
-Clear all the records in the specified table. You only need to specify the type of the table. Any other paramters are unnecessary and will be ignored.
+Clear all the records in the specified table. You only need to specify the type of the table. Any other es are unnecessary and will be ignored.
 
 ## Parameter list
 
-To get better performance, the action add, update and delete execute mulitple SQL statements in batch. That requires the input parameters to follow the same pattern --
+To get better performance, the action add, update and delete execute multiple SQL statements in the batch. That requires the input parameters to follow the same pattern --
 ```
 action: "delete"
 type: 'ptf_group'
@@ -169,7 +169,7 @@ parameters:
   - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
   - {'ptf_group_number':'SF99723', 'ptf_group_level':'20'}
 ```
-But the action **find** is different. It executes mulitple SQL statements one by one. So the input parameters can be flexible --
+But the action **find** is different. It executes SQL statements one by one. So the input parameters can be flexible --
 ```
 action: "find"
 type: 'download_status'
@@ -194,7 +194,7 @@ This example retrieves data from module **ibmi_fix_group_check** and then insert
 
 For the first time, the example uses the action **add** and set **checksum** to `false` to insert the records without checksum date in case that the PTF group image files are not ready. 
 
-When the image files have been downloaded, it calls action **update** and set **checksum** to `true` to calculate the checksum data and update previous record.
+When the image files have been downloaded, it calls action **update** and set **checksum** to `true` to calculate the checksum data and update the previous record.
 
 ```
 ---

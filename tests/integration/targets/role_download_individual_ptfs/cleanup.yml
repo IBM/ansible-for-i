@@ -1,0 +1,25 @@
+# cleanup before testing
+- name: delete savf before testing, attempting Q{{ptfs[0]}}
+  ibmi_cl_command:
+    cmd: 'dltptf Q{{ptfs[0]}}'
+  register: dltptfq
+  ignore_errors: true
+  
+- name: delete savf before testing, attempting {{ptfs[0]}}
+  ibmi_cl_command:
+    cmd: 'dltptf {{ptfs[0]}}'
+  register: dltptf
+  when: dltptfq.rc != 0
+
+
+- name: delete savf before testing, attempting Q{{ptfs[1]}}
+  ibmi_cl_command:
+    cmd: 'dltptf Q{{ptfs[1]}}'
+  register: dltptfq
+  ignore_errors: true
+  
+- name: delete savf before testing, attempting {{ptfs[1]}}
+  ibmi_cl_command:
+    cmd: 'dltptf {{ptfs[1]}}'
+  register: dltptf
+  when: dltptfq.rc != 0

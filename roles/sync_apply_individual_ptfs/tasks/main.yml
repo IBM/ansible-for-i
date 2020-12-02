@@ -5,8 +5,10 @@
 
 - name: Compose sync list
   set_fact:
-    sync_list: "{{ sync_list|default([]) + [ item | combine( {'src': item.file_path} )] }}"
-  loop: "{{ ptfs_info_list }}"
+    sync_list: "{{ sync_list|default([]) + [ not_loaded_list_var | combine( {'src': not_loaded_list_var.file_path} )] }}"
+  loop: "{{ not_loaded_list }}"
+  loop_control:
+    loop_var: not_loaded_list_var
 
 - name: Print sync_list
   debug:
@@ -17,12 +19,13 @@
     dest: "{{ dest }}"
     src_list: "{{ sync_list }}"
   delegate_to: "{{ src_host }}"
+  when: sync_list != []
   ignore_errors: True
   register: sync_result
 
 - set_fact:
-    sync_success_list: "{{ sync_result.success_list }}"
-    sync_fail_list: "{{ sync_result.fail_list }}"
+    sync_success_list: "{{ sync_result.success_list | default([]) }}"
+    sync_fail_list: "{{ sync_result.fail_list | default([]) }}"
 
 - name: Print the list of successful sync
   debug:
@@ -36,6 +39,8 @@
   include_role:
     name: load_apply_ptfs
   vars:
-    required_ptf_list: "{{ sync_success_list }}"
+    to_be_loaded_ptf_list: "{{ sync_success_list }}"
     remote_lib: "{{ (dest | basename | splitext)[0] }}"
+    loaded_list: "{{ already_loaded_list }}"
   register: load_apply_result
+  when: sync_success_list != [] or already_loaded_list != []

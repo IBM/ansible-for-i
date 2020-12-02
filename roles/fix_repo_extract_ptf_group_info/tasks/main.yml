@@ -4,7 +4,6 @@
 # and update ptf group's information into ptf_group_image_info table in catalog.
 - name: Find the order information in download_status table
   ibmi_fix_repo:
-    database: "{{ database }}"
     type: "download_status"
     checksum: True
     action: "find"
@@ -18,7 +17,6 @@
 
 - name: Update PTF group record into catalog
   ibmi_fix_repo:
-    database: "{{ database }}"
     type: "ptf_group"
     action: "update"
     checksum: True
@@ -29,8 +27,13 @@
       'ptf_group_level': fix_repo_find_result.success_list[0].ptf_group_level,
       'release_date': fix_repo_find_result.success_list[0].release_date} }}"
   register: fix_repo_update_result
-  when: fix_repo_find_result.success_list != []
+  when: fix_repo_find_result.success_list | default([]) != []
 
 - name: Print PTF group record information
   debug:
     var: fix_repo_update_result
+
+- name: Print find error msg if any
+  debug:
+    msg: Find order fail in download_status table
+  when: fix_repo_find_result.fail_list | default([]) != []

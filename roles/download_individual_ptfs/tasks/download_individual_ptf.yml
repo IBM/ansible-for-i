@@ -5,6 +5,7 @@
     ptf_id: "{{ download_ptf.ptf_id }}"
     order: "{{ order|default('*PTFID') }}"
   register: download_result
+  delegate_to: "{{ download_server }}"
   ignore_errors: True
 
 - name: compose successful list
@@ -16,7 +17,3 @@
   set_fact:
     download_fail_list: "{{ download_fail_list | default([]) + [ {'ptf_id': download_ptf.ptf_id, 'fail_reason': download_result.msg} ] }}"
   when: download_result.failed == True or download_result.download_list == []
-
-- name: Print the failed download list
-  debug:
-    var: download_fail_list

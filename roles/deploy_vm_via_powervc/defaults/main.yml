@@ -1,0 +1,15 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+# defaults value for display_vm_info_via_powervc
+project: ibm-default
+project_domain: Default
+user_domain: Default
+verify_cert: true
+flavor_name_or_id: tiny
+deploy_timeout: 300
+Deploy_userdata: |
+  {%- raw -%}#!/bin/sh
+  system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"  
+  system "strtcpsvr *sshd"
+  {% endraw %}

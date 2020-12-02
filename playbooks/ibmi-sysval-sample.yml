@@ -26,7 +26,7 @@
 
     - name: Display the returned parameters
       debug: 
-        msg: "{{ dspsysval_ccsid_result.sysval }}"
+        msg: "{{ dspsysval_ccsid_result }}"
 
     - name: Assert the returned parameters
       assert:
@@ -45,7 +45,7 @@
 
     - name: Display the returned parameters
       debug: 
-        msg: "{{ chksysval_qmaxsign_result.sysval }}"
+        msg: "{{ chksysval_qmaxsign_result }}"
         
     - name: Assert the returned parameters
       assert:
@@ -67,7 +67,7 @@
 
     - name: Display the many returned parameters
       debug: 
-        msg: "{{ dissysval_result.sysval }}"
+        msg: "{{ dissysval_result }}"
         
     - name: Assert the many returned parameters
       assert:
@@ -92,7 +92,7 @@
 
     - name: Display the many returned parameters
       debug: 
-        msg: "{{ chksysval_result.sysval }}"
+        msg: "{{ chksysval_result }}"
         
     - name: Assert the many returned parameters
       assert:
@@ -121,4 +121,4 @@
 
     - name: Display check with equal_as_list option
       debug: 
-        msg: "{{ chksysval_equal_as_list.sysval }}"
+        msg: "{{ chksysval_equal_as_list }}"

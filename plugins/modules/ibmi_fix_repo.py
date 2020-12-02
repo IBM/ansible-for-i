@@ -41,7 +41,7 @@ options:
     description:
       - Specified database file name, e.g. '/tmp/testdb.sqlite3'
     type: str
-    default: '/tmp/testdb.sqlite3'
+    default: '/etc/ibmi_ansible/fix_management/repo.sqlite3'
   parameters:
     description:
       - The binding parameters for the action executed by the task.
@@ -55,7 +55,6 @@ author:
 EXAMPLES = r'''
 - name: add some group records
   ibmi_fix_repo:
-    database: '/tmp/testdb.sqlite3'
     action: 'add'
     type: 'ptf_group'
     checksum: true
@@ -63,21 +62,18 @@ EXAMPLES = r'''
       - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
 - name: query some PTFs records
   ibmi_fix_repo:
-    database: "/tmp/testdb.sqlite3"
     action: "find"
     type: 'ptf_group'
     parameters:
       - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
 - name: delete some PTFs records
   ibmi_fix_repo:
-    database: "/tmp/testdb.sqlite3"
     action: "delete"
     type: 'ptf_group'
     parameters:
       - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
 - name: run sql to drop the table
   ibmi_fix_repo:
-    database: "/tmp/testdb.sqlite3"
     action: "clear"
     type: 'ptf_group'
 '''
@@ -142,7 +138,8 @@ rows:
                 "SI73482"
             ],
             "release": "R740",
-            "release_date": "07/07/2020"
+            "release_date": "07/07/2020",
+            "source": "fix_management"
         }
     ]
 sql:
@@ -172,7 +169,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = "1.1.2"
+__ibmi_module_version__ = "9.9.9"
 
 single_ptf_table = 'single_ptf_info'
 ptf_group_image_table = 'ptf_group_image_info'
@@ -192,6 +189,7 @@ single_ptf_dict = {
     'ptf_status': 'CHAR(10)',
     'download_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
     'add_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'source': 'CHAR(20) DEFAULT "fix_management"',
 }
 
 
@@ -211,6 +209,7 @@ ptf_group_image_dict = {
     'ptf_group_status': 'CHAR(20)',
     'download_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
     'add_time': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'source': 'CHAR(20) DEFAULT "fix_management"',
 }
 
 
@@ -331,6 +330,8 @@ def get_group_name_from_txt(file_path):
 def check_param(module, parameters, _type, checksum):
     success_list = []
     fail_list = []
+    ptfid_pattern = r'^[a-zA-Z0-9]{7}$'
+    productid_pattern = r'^[a-zA-Z0-9]{7}$'
     required_params = required_params_disable_checksum.get(_type)
     if checksum is True:
         required_params = required_params_enable_checksum.get(_type)
@@ -339,17 +340,32 @@ def check_param(module, parameters, _type, checksum):
         rc = 0
         for required_param in required_params:
             if not parameter.get(required_param):
-                group_item['msg'] = 'Required parameter [' + required_param + '] is missing in parameters'
                 rc = -1
-                group_item['rc'] = rc
-                fail_list.append(group_item)
+                group_item['msg'] = 'Required parameter [' + required_param + '] is missing in parameters'
                 break
+        if group_item.get('ptf_id'):
+            if not re.match(ptfid_pattern, group_item.get('ptf_id')):
+                rc = -2
+                group_item['msg'] = 'Input parameter (ptf_id) [' + group_item.get('ptf_id') + '] is not valid'
+        if group_item.get('product'):
+            if not re.match(productid_pattern, group_item.get('product')):
+                rc = -2
+                group_item['msg'] = 'Input parameter (product) [' + group_item.get('product') + '] is not valid'
         if rc < 0:
+            group_item['rc'] = rc
+            fail_list.append(group_item)
             continue
         if isinstance(group_item.get('ptf_list'), list):
             group_item['ptf_list'] = obj2json(parameter.get('ptf_list'))
-        if isinstance(group_item.get('ptf_group_level'), str):
-            group_item['ptf_group_level'] = int(parameter.get('ptf_group_level'))
+        group_level = group_item.get('ptf_group_level')
+        if isinstance(group_level, str):
+            try:
+                group_item['ptf_group_level'] = int(group_level)
+            except ValueError as ex:
+                group_item['msg'] = 'Group level [%s] cannot be converted to int. %s' % (group_level, ex)
+                group_item['rc'] = -5
+                fail_list.append(group_item)
+                continue
         success_list.append(group_item)
     return success_list, fail_list
 
@@ -361,12 +377,13 @@ def check_sum(module, parameters, _type):
     if _type == 'ptf_group':
         for parameter in parameters:
             # if input parameters at least contains order_id and file_path, check the files now
-            group_item = dict()
             if not parameter.get('file_path'):
+                group_item = parameter.copy()
                 group_item['msg'] = 'Required parameter [file_path] is missing'
                 group_item['rc'] = -1
                 fail_list.append(group_item)
                 continue
+            group_item = dict()
             if parameter.get('order_id'):
                 group_item['order_id'] = parameter.get('order_id')
             path = parameter.get('file_path')
@@ -378,14 +395,37 @@ def check_sum(module, parameters, _type):
                 fail_list.append(group_item)
                 continue
             image_paths = path_object.get('images')
+            if len(image_paths) == 0:
+                group_item['msg'] = 'Specified image path [' + path + '] is empty'
+                if group_item.get('db_record'):
+                    group_item['db_record'] += '_NOT_FOUND'
+                else:
+                    group_item['db_record'] = 'FILE_NOT_FOUND'
+                group_item['rc'] = -4
+                fail_list.append(group_item)
+                continue
             checksums = []
             file_names = []
             rc = 0
             for image_path in image_paths:
+                if not os.path.isfile(image_path):
+                    group_item['msg'] = 'Target image file [' + image_path + '] not found'
+                    if group_item.get('db_record'):
+                        group_item['db_record'] += '_NOT_FOUND'
+                    else:
+                        group_item['db_record'] = 'FILE_NOT_FOUND'
+                    rc = -4
+                    group_item['rc'] = rc
+                    fail_list.append(group_item)
+                    break
                 checksum = module.sha1(image_path)
                 file_name = os.path.basename(image_path)
                 if not checksum:
                     group_item['msg'] = 'Target image file [' + image_path + '] is not readable'
+                    if group_item.get('db_record'):
+                        group_item['db_record'] += '_NOT_READABLE'
+                    else:
+                        group_item['db_record'] = 'FILE_NOT_READABLE'
                     rc = -3
                     group_item['rc'] = rc
                     fail_list.append(group_item)
@@ -420,11 +460,29 @@ def check_sum(module, parameters, _type):
         for parameter in parameters:
             # if input parameters are valid, check the file now
             ptf_item = parameter.copy()
+            if not parameter.get('file_path'):
+                ptf_item['msg'] = 'Required parameter [file_path] is missing'
+                ptf_item['rc'] = -1
+                fail_list.append(ptf_item)
+                continue
             path = parameter.get('file_path')
+            if not os.path.isfile(path):
+                ptf_item['msg'] = 'Target image file [' + path + '] not found'
+                if ptf_item.get('db_record'):
+                    ptf_item['db_record'] += '_NOT_FOUND'
+                else:
+                    ptf_item['db_record'] = 'FILE_NOT_FOUND'
+                ptf_item['rc'] = -4
+                fail_list.append(ptf_item)
+                continue
             ptf_item['file_name'] = os.path.basename(path)
             ptf_item['checksum'] = module.sha1(path)
             if not ptf_item.get('checksum'):
                 ptf_item['msg'] = 'Target image file [' + path + '] is not readable'
+                if ptf_item.get('db_record'):
+                    ptf_item['db_record'] += '_NOT_READABLE'
+                else:
+                    ptf_item['db_record'] = 'FILE_NOT_READABLE'
                 ptf_item['rc'] = -3
                 fail_list.append(ptf_item)
                 continue
@@ -492,8 +550,8 @@ def build_sql_find(_type, parameter):
     unique_keys = []
     where = ''
     additional_param = ''
-    for param_key in parameter.keys():
-        if param_key in table_dict.keys():
+    for param_key, param_val in parameter.items():
+        if param_key in table_dict.keys() and param_val is not None:
             unique_keys.append(param_key)
         if param_key == 'additional_param':
             additional_param = parameter.get(param_key)
@@ -518,6 +576,12 @@ def run_sql(module, database, parameters, action, _type):
     success_list = []
     fail_list = []
     table, table_dict, constraints = select_table_dict(_type)
+
+    try:
+        ibmi_util.ensure_dir(os.path.dirname(database))
+    except Exception:
+        module.fail_json(msg='Failed to create path ' + database)
+
     try:
         conn = sqlite3.connect(database)
         # if the database file not exist, it will be created automatically.
@@ -549,7 +613,7 @@ def run_sql(module, database, parameters, action, _type):
                         if isinstance(rs, list):
                             if len(rs) > 0:
                                 for row in rs:
-                                    row['db_record'] = 'Match'
+                                    row['db_record'] = 'MATCH'
                                     if row.get('ptf_list'):
                                         row['ptf_list'] = json2obj(row.get('ptf_list'))
                                     elif row.get('ptf_group_level'):
@@ -562,11 +626,11 @@ def run_sql(module, database, parameters, action, _type):
                                     success_list.append(row)
                             else:
                                 fail_item = param.copy()
-                                fail_item['db_record'] = 'RecordNotFound'
+                                fail_item['db_record'] = 'RECORD_NOT_FOUND'
                                 fail_list.append(fail_item)
                         else:
                             fail_item = param.copy()
-                            fail_item['db_record'] = 'Unknown'
+                            fail_item['db_record'] = 'UNKNOWN'
                             fail_list.append(fail_item)
                 else:
                     c.executemany(sql, parameters)
@@ -581,36 +645,42 @@ def run_sql(module, database, parameters, action, _type):
         return 0, '', c.rowcount, success_list, fail_list, sql
 
 
-# This is only called on action insert or update
-def checksum_before_upsert(_type, list_from_db, list_from_file):
-    for db_item in list_from_db:
-        for file_item in list_from_file:
+# This is only called on action insert or update and checksum is enabled
+def merge_param_before_upsert(_type, param_from_input, param_from_file):
+    success_list = []
+    fail_list = []
+    for in_param in param_from_input:
+        match_param = None
+        # Find if the input parameter's image file exist
+        for fs_param in param_from_file:
             if (
-                (_type == 'ptf_group' and db_item.get('ptf_group_number') == file_item.get('ptf_group_number') and
-                 int(db_item.get('ptf_group_level')) == int(file_item.get('ptf_group_level')))
+                (_type == 'ptf_group' and in_param.get('ptf_group_number') == fs_param.get('ptf_group_number') and
+                 int(in_param.get('ptf_group_level')) == int(fs_param.get('ptf_group_level')))
                 or
                 (_type == 'single_ptf' and
-                 db_item.get('ptf_id') == file_item.get('ptf_id'))
+                 in_param.get('ptf_id') == fs_param.get('ptf_id'))
             ):
-                for key, val in file_item.items():
+                for key, val in fs_param.items():
                     # if the input checksum not match with the calculated checksum,
                     # override the input with the real checksum for the db record and no error thrown.
-                    if db_item.get(key) is None or db_item.get(key) != val:
-                        db_item[key] = val
-    return list_from_db
+                    if in_param.get(key) is None or in_param.get(key) != val:
+                        in_param[key] = val
+                match_param = in_param
+                break
+        if match_param is None:
+            in_param['db_record'] = 'FILE_NOT_FOUND'
+            fail_list.append(in_param)
+        else:
+            success_list.append(match_param)
+    return success_list, fail_list
 
 
-# This is only called on action find
+# This is only called on action find and checksum is enabled
 def checksum_after_find(_type, list_from_db, list_from_file):
     success_list = []
     fail_list = []
-    if not list_from_file or len(list_from_file) == 0:
+    for file_item in list_from_file:
         for db_item in list_from_db:
-            db_item['db_record'] = 'FileNotFound'
-            fail_list.append(db_item)
-        return success_list, fail_list
-    for db_item in list_from_db:
-        for file_item in list_from_file:
             if _type == 'ptf_group':
                 if db_item.get('ptf_group_number') == file_item.get('ptf_group_number') and \
                    int(db_item.get('ptf_group_level')) == int(file_item.get('ptf_group_level')):
@@ -618,14 +688,14 @@ def checksum_after_find(_type, list_from_db, list_from_file):
                     db_item_checksum = json2obj(db_item.get('checksum'))
                     file_item_checksum = json2obj(file_item.get('checksum'))
                     if [i for i in db_item_checksum if i not in file_item_checksum] == []:
-                        db_item['db_record'] = 'Match'
+                        db_item['db_record'] = 'MATCH'
                         db_item['checksum'] = file_item_checksum
                         success_list.append(db_item)
                     else:
                         if file_item.get('checksum'):
-                            db_item['db_record'] = 'FileNotMatch'
+                            db_item['db_record'] = 'FILE_NOT_MATCH'
                         else:
-                            db_item['db_record'] = 'FileNotFound'
+                            db_item['db_record'] = 'FILE_NOT_FOUND'
                         db_item['checksum'] = db_item_checksum
                         fail_list.append(db_item)
                     break
@@ -633,13 +703,13 @@ def checksum_after_find(_type, list_from_db, list_from_file):
                 new_item = db_item.copy()
                 if db_item.get('ptf_id') == file_item.get('ptf_id'):
                     if new_item.get('checksum') == file_item.get('checksum'):
-                        new_item['db_record'] = 'Match'
+                        new_item['db_record'] = 'MATCH'
                         success_list.append(new_item)
                     else:
                         if file_item.get('checksum'):
-                            new_item['db_record'] = 'FileNotMatch'
+                            new_item['db_record'] = 'FILE_NOT_MATCH'
                         else:
-                            new_item['db_record'] = 'FileNotFound'
+                            new_item['db_record'] = 'FILE_NOT_FOUND'
                         fail_list.append(new_item)
                     break
 
@@ -651,7 +721,7 @@ def main():
         argument_spec=dict(
             action=dict(type='str', required=True),
             type=dict(type='str'),
-            database=dict(type='str', default='/tmp/testdb.sqlite3'),
+            database=dict(type='str', default='/etc/ibmi_ansible/fix_management/repo.sqlite3'),
             parameters=dict(type='list', elements='dict'),
             checksum=dict(type='bool', default=False),
         ),
@@ -682,8 +752,9 @@ def main():
     row_changed = -1
     success_list = []
     fail_list = []
-    invalid_parameters = []
-    fail_list_before_run_sql = []
+    invalid_params = []
+    checksum_failed_params = []
+    unmatch_params = []
     fail_list_after_run_sql = []
     list_to_sqlite = []
     sql = ''
@@ -693,16 +764,16 @@ def main():
     # for adding/updating records, retrieve file's checksum first when checksum == True.
     if action == 'add' or action == 'update':
         # filter out the invalid parameters without required input parameters
-        valid_parameters, invalid_parameters = check_param(module, parameters, _type, checksum)
+        valid_parameters, invalid_params = check_param(module, parameters, _type, checksum)
         if checksum is True:  # filter out the not existing files
-            valid_parameters, fail_list_before_run_sql = check_sum(module, valid_parameters, _type)
+            valid_parameters, checksum_failed_params = check_sum(module, valid_parameters, _type)
         if len(valid_parameters) > 0:
             if action == 'add':  # all the parameter data come from the physical files.
                 list_to_sqlite = valid_parameters
-            elif action == 'update':  # merge the data the physical files into db records as new paramters.
-                list_to_sqlite = checksum_before_upsert(_type, parameters, valid_parameters)
+            elif action == 'update' and checksum is True:  # merge physical files data into input paramters.
+                list_to_sqlite, unmatch_params = merge_param_before_upsert(_type, parameters, valid_parameters)
         else:
-            result['fail_list'] = invalid_parameters + fail_list_before_run_sql
+            result['fail_list'] = invalid_params + checksum_failed_params
             module.exit_json(**result)
     else:
         list_to_sqlite = parameters
@@ -728,8 +799,8 @@ def main():
                 result['success_list'] = success_list_checksum_matched
             else:
                 result['success_list'] = success_list
-    if len(fail_list) > 0 or len(invalid_parameters) > 0 or len(fail_list_before_run_sql) > 0 or len(fail_list_after_run_sql) > 0:
-        result['fail_list'] = fail_list + invalid_parameters + fail_list_before_run_sql + fail_list_after_run_sql
+    if len(fail_list) > 0 or len(invalid_params) > 0 or len(checksum_failed_params) > 0 or len(fail_list_after_run_sql) > 0 or len(unmatch_params) > 0:
+        result['fail_list'] = fail_list + invalid_params + checksum_failed_params + fail_list_after_run_sql + unmatch_params
 
     endd = datetime.datetime.now()
     delta = endd - startd

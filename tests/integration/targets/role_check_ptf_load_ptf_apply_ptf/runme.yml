@@ -7,6 +7,7 @@
   vars:
     test_positive_ptf_list_1:
       - {'ptf_id':'SI73751', 'product':'5733SC1', 'file_name':'QSI73751.FILE'}
+      
     temp_lib: testlib
 
     test_positive_ptf_list_2:
@@ -14,15 +15,8 @@
       - {'ptf_id':'SI71691', 'product':'5770SS1', 'file_name':'QSI71691'}
       - {'ptf_id':'SI70544', 'product':'5770SS1', 'file_name':'QSI70544.FILE'} # It is a deployed ptf
 
-    test_neg_ptf_list_1:
-      - {'ptf_id':'SI73751', 'product':'5733SC1'}
-
-    test_neg_ptf_list_2:   
-      - {'ptf_id':'SI73751', 'file_name':'QSI73751'}
-
   tasks:
       - block:
-        
         - include: query_remove_ptf.yml
           loop: '{{test_positive_ptf_list_1}}'
 
@@ -47,7 +41,8 @@
           assert:
             that:
               - not_loaded_ptfs_list == test_positive_ptf_list_1 
-
+              - loaded_ptfs_list is defined and loaded_ptfs_list == []
+              
         - name: create temporary remotelib
           ibmi_cl_command: 
             cmd: CRTLIB LIB({{temp_lib}})
@@ -82,8 +77,8 @@
             that:
               - ptfs_info | length == 1 
               - ptfs_info[0].PTF_LOADED_STATUS == 'LOADED'
-              - ptfs_info[0].PTF_IDENTIFIER == test_positive_ptf_list_1[0].ptf_id 
-
+              - ptfs_info[0].PTF_IDENTIFIER == test_positive_ptf_list_1[0].ptf_id
+              
         - name: assert ptf_status
           assert:
             that:
@@ -92,7 +87,8 @@
         - name: assert the returned parameters
           assert:
             that:
-              - not_loaded_ptfs_list ==  []
+              - not_loaded_ptfs_list is defined and not_loaded_ptfs_list ==  []
+              - loaded_ptfs_list == test_positive_ptf_list_1
 
         - include_role:
             name: apply_ptf
@@ -126,7 +122,6 @@
           assert:
             that:
               - not_loaded_ptfs_list ==  []
-              #- not_applied_ptf == []
 
         ## Load PTFs again.
         - include_role:
@@ -140,33 +135,6 @@
             that:
               - load_success_list == []
               - load_fail_list == test_positive_ptf_list_1
-
-        # - include: query_remove_ptf.yml
-        #   loop: '{{test_positive_ptf_list_1}}'
-
-        - include_role:
-            name: load_ptf
-          vars: 
-            to_be_loaded_list: '{{test_neg_ptf_list_1}}'
-            remote_lib: '{{temp_lib}}'
-          ignore_errors: true
-
-        - name: assert the returned list correct
-          assert:
-            that:
-              - load_fail_list == test_neg_ptf_list_1
-
-        - include_role:
-            name: load_ptf
-          vars: 
-            to_be_loaded_list: '{{test_neg_ptf_list_2}}'
-            remote_lib: '{{temp_lib}}'
-          ignore_errors: true
-
-        - name: assert the returned list correct
-          assert:
-            that:
-              - load_fail_list == test_neg_ptf_list_2
 
         always:
           - name: delete_lib
@@ -205,6 +173,7 @@
               - ptfs_info | length == test_positive_ptf_list_2 | length + test_positive_ptf_list_1 | length 
               - ptfs_status | dict2items | length == ptfs_info | length
               - not_loaded_ptfs_list | length == test_positive_ptf_list_2 | length
+              - loaded_ptfs_list == test_positive_ptf_list_1
               
         - name: verify each ptf is correct
           assert:
@@ -335,6 +304,9 @@
           vars: 
             check_ptf_list: '{{test_positive_ptf_list_2}}'
 
+        - name: negative testing
+          include: neg_case.yml
+          
         always:
           - name: cleanup SAVF file from QGPL
             ibmi_cl_command:
@@ -343,4 +315,4 @@
             loop: '{{test_positive_ptf_list_2}}' 
             loop_control:
               loop_var: target_ptf_info 
-        when: os_version == '74' 
+        when: os_version == '74'

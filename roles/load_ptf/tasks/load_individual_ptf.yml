@@ -9,12 +9,22 @@
   ignore_errors: True
   register: load_result
 
+# - debug:
+#     var: load_result
+
 - name: log success in result
   set_fact:
     load_success_list: "{{ load_success_list|default([]) + [ load_ptf ] }}"
   when: load_result.failed == 0
 
-- name: log fail in result
-  set_fact:
-    load_fail_list: "{{ load_fail_list|default([]) + [ load_ptf ] }}"
+- set_fact:
+    load_fail_dict: "{{ load_fail_dict | default({}) | combine({ load_ptf.ptf_id: 'LOAD_FAIL' }) }}"
+    load_fail_list: "{{ load_fail_list | default([]) + [ load_ptf ]}}"
+  when: load_result.failed != 0
+
+- name: log fail dict in result
+  include_tasks: log_load_fail_info.yml
+  loop: "{{ load_result.job_log }}"
+  loop_control:
+    loop_var: job_log_var
   when: load_result.failed != 0

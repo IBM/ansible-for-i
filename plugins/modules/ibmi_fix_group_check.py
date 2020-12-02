@@ -3,6 +3,7 @@
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # Author, Zhang Yan <bjyanz@cn.ibm.com>
+# Author, Xu Meng <mengxumx@cn.ibm.com>
 
 from __future__ import absolute_import, division, print_function
 
@@ -92,12 +93,11 @@ group_info:
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 import ansible.module_utils.urls as urls
-from xml.dom.minidom import parseString
 import datetime
 import re
 
 
-__ibmi_module_version__ = "1.1.2"
+__ibmi_module_version__ = "9.9.9"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"
@@ -106,7 +106,14 @@ ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"
 # url: https://www.ibm.com/support/pages/node/6211843
 # group: 'SF99738'
 def get_group_info_from_web(groups, validate_certs):
-    pattern_link = r'>(?P<rel>[A-Z]\d{3})<.+(?P<url>https?:\/\/\S+)".+>(?P<grp>[A-Z]{2}\d{5}): (?P<dsc>.+)</a>.+>(?P<lvl>\d+)<.+>.+(?P<d>\d{2}\/\d{2}\/\d{4})<'
+    pattern_link = re.compile(
+        r'>(?P<rel>R\d{3})<.+?'
+        r'(?P<url>https:\/\/\S+?)\".+?>'
+        r'(?P<grp>[A-Z]{2}\d{5}):.+?'
+        r'(?P<dsc>\w.+?)<.+?'
+        r'(?P<lvl>\d{1,5})<.+?>'
+        r'(?P<d>\d{2}\/\d{2}\/\d{4})<'
+    )
     response = ''
     try:
         response = urls.open_url(ALL_GROUP_PAGE, validate_certs=validate_certs)
@@ -123,8 +130,7 @@ def get_group_info_from_web(groups, validate_certs):
     if '*ALL' in groups:
         list_all = True
     for line in lines:
-        ptf_line = re.search(pattern_link, line)
-        if ptf_line:
+        for ptf_line in re.finditer(pattern_link, line):
             if list_all or ptf_line.group('grp') in groups:
                 group_list.append(dict(
                     ptf_group_number=ptf_line.group('grp'),
@@ -133,15 +139,22 @@ def get_group_info_from_web(groups, validate_certs):
                     release_date=ptf_line.group('d'),
                     url=ptf_line.group('url'),
                     description=ptf_line.group('dsc'),
-                    ptf_list=get_ptf_list_from_web(ptf_line.group('url'), validate_certs),
+                    ptf_list=get_ptf_list_from_web(
+                        ptf_line.group('url'), validate_certs),
                 ))
     return group_list
 
 
 # url: https://www.ibm.com/support/pages/uid/nas4SF99738
 def get_ptf_list_from_web(url, validate_certs):
-    pattern_link = r'(?P<url>https?:\/\/\S+)".+>(?P<ptf>[A-Z]{2}\d{5})<.+(?P<date>\d{2}\/\d{2}\/\d{2}).+(?P<apar>[A-Z]{2}\d{5}).+(?P<product>\d{4}\w{3})'
-    pattern_packid = r'PACKAGE ID:.+(?P<packid>[A-Z]\d{7})'
+    pattern_link = re.compile(
+        r'(?P<url>https://www.ibm.com/support/pages/ptf/\S+?)\".+?'
+        r'(?P<ptf>[A-Z]{2}\d{5})<.+?'
+        r'(?P<date>\d{2}\/\d{2}\/\d{2}).+?'
+        r'(?P<apar>[A-Z]{2}\d{5}).+?'
+        r'(?P<product>\d{4}\w{3})'
+    )
+    pattern_packid = r'PACKAGE ID:.+?(?P<packid>[A-Z]\d{7})'
     response = ''
     try:
         response = urls.open_url(url, validate_certs=validate_certs)
@@ -159,8 +172,7 @@ def get_ptf_list_from_web(url, validate_certs):
         if cum_pack_id:
             return get_cum_ptf_list_from_web(cum_pack_id.group('packid'), validate_certs)
         # common ptf groups
-        ptf_line = re.search(pattern_link, line)
-        if ptf_line:
+        for ptf_line in re.finditer(pattern_link, line):
             ptf_list.append(dict(
                 ptf_id=ptf_line.group('ptf'),
                 product=ptf_line.group('product'),
@@ -172,7 +184,13 @@ def get_ptf_list_from_web(url, validate_certs):
 
 # url: https://www.ibm.com/support/pages/uid/nas4C0128730
 def get_cum_ptf_list_from_web(pack_id, validate_certs):
-    pattern_link = r'(?P<url>https?:\/\/\S+)>(?P<ptf>[A-Z]{2}\d{5})<.+(?P<lvl>\d{5}).+(?P<product>\d{4}\w{3}).+(?P<rel>V\dR\dM\d)'
+    pattern_link = re.compile(
+        r'(?P<url>https?:\/\/\S+)>'
+        r'(?P<ptf>[A-Z]{2}\d{5})<.+'
+        r'(?P<lvl>\d{5}).+'
+        r'(?P<product>\d{4}\w{3}).+'
+        r'(?P<rel>V\dR\dM\d)'
+    )
     response = ''
     url = 'https://www.ibm.com/support/pages/uid/nas4' + pack_id
     try:
@@ -186,8 +204,7 @@ def get_cum_ptf_list_from_web(pack_id, validate_certs):
     lines = r.splitlines()
     ptf_list = []
     for line in lines:
-        ptf_line = re.search(pattern_link, line)
-        if ptf_line:
+        for ptf_line in re.finditer(pattern_link, line):
             ptf_list.append(dict(
                 ptf_id=ptf_line.group('ptf'),
                 product=ptf_line.group('product'),
@@ -195,31 +212,6 @@ def get_cum_ptf_list_from_web(pack_id, validate_certs):
                 release=ptf_line.group('rel'),
             ))
     return ptf_list
-
-
-# def get_psp_group_info(validate_certs):
-#     response = urls.open_url(PSP_URL, validate_certs=validate_certs)
-#     data = response.read().decode("utf-8")
-
-#     dom = parseString(data)
-#     groups_dict = dict()
-#     groups = dom.getElementsByTagName('psp')
-#     for group in groups:
-#         release = group.getElementsByTagName("release")[0].childNodes[0].data
-#         number = group.getElementsByTagName("number")[0].childNodes[0].data.upper()
-#         title = group.getElementsByTagName("title")[0].childNodes[0].data
-#         level = group.getElementsByTagName("level")[0].childNodes[0].data
-#         date = group.getElementsByTagName("date")[0].childNodes[0].data
-
-#         group_info = {
-#             'PTF_GROUP_NUMBER': number,
-#             'RELEASE': release,
-#             'TITLE': title,
-#             'PTF_GROUP_LEVEL': level,
-#             'RELEASE_DATE': date
-#         }
-#         groups_dict.update({number: group_info})
-#     return groups_dict
 
 
 def main():
@@ -241,7 +233,6 @@ def main():
     groups_num = module.params['groups']
     validate_certs = module.params['validate_certs']
 
-    # psp_groups = get_psp_group_info(validate_certs)
     startd = datetime.datetime.now()
     psp_groups = get_group_info_from_web(groups_num, validate_certs)
     result.update({'group_info': psp_groups})

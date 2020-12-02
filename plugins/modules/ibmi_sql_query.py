@@ -167,6 +167,11 @@ job_log:
             "TO_PROCEDURE": "QSQSRVR",
             "TO_PROGRAM": "QSQSRVR"
         }]
+job_name:
+    description: The QSQSRVR job information which the SQL statement executed.
+    returned: always
+    type: str
+    sample: '188624/QUSER/QSQSRVR'
 '''
 
 import datetime
@@ -175,7 +180,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.1.2"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -215,6 +220,7 @@ def main():
 
     job_log = []
     rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(sql, hex_columns)
+    job_name_info = ibmi_module.get_current_job_name()
 
     endd = datetime.datetime.now()
     delta = endd - startd
@@ -263,6 +269,7 @@ def main():
                 delta=str(delta),
                 row_count=row_count,
                 job_log=job_log,
+                job_name=job_name_info,
             )
             module.exit_json(**result_success)
 

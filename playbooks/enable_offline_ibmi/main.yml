@@ -35,13 +35,48 @@
       - include: ibmi_install_yum.yml
       - include: ibmi_install_python.yml
 
-      - name: disable the ibm repository
-        lineinfile:
-          path: "/QOpenSys/etc/yum/repos.d/ibm.repo"
-          regexp: "enabled=1" 
-          line: "enabled=0"
+      - block: 
+          - name: disable the ibm repository
+            lineinfile:
+              path: "/QOpenSys/etc/yum/repos.d/ibm.repo"
+              regexp: "enabled=1" 
+              line: "enabled=0"
+
+          - name: find the home directory 
+            ibmi_user_and_group:
+              operation: 'display'
+              user: '{{ansible_ssh_user}}'
+            register: user_result
+
+          - set_fact:
+              home_dir: "{{user_result['result_set'][0]['HOME_DIRECTORY']}}"
+
+          - name: Ensure home directory exist
+            file:
+              path: '{{home_dir}}'
+              state: directory
+              owner: '{{ansible_ssh_user}}'
+
+          - name: Ensure .profile exist
+            file:
+              path: '{{home_dir}}/.profile'
+              state: touch
+              owner: '{{ansible_ssh_user}}'
+
+          - name: Export PATH to ssh user profile permanently
+            raw: echo 'PATH=/QOpenSys/pkgs/bin:$PATH' >> $HOME/.profile
+            args:
+              executable: /qopensys/usr/bin/qsh
+
+          - name: Export PATH to ssh user profile permanently
+            raw: echo 'export PATH' >> $HOME/.profile
+            args:
+              executable: /qopensys/usr/bin/qsh
         when: yum_installed
 
+      - name: change SSHD server auto-started
+        command: 'system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"'
+        
       - name: Verify 5770DG1
         command: system "DSPSFWRSC"
         register: installed_native_products

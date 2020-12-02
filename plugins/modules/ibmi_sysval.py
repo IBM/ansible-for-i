@@ -108,7 +108,7 @@ job_log:
                 "TO_PROCEDURE": "QSQSRVR",
                 "TO_PROGRAM": "QSQSRVR"
             }]
-system_values:
+sysval:
     description: the system value information
     returned: always
     type: list
@@ -126,6 +126,18 @@ system_values:
                 "type": "10i0",
                 "value": "65535"
             }]
+fail_list:
+    description: the failed parameters
+    returned: when there are failed parameters
+    type: list
+    elements: dict
+    sample: [{
+                "compliant": false,
+                "expect": "3",
+                "name": "QMAXSGNACN",
+                "type": "4A",
+                "value": "1"
+            }]
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -134,7 +146,6 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_mo
 import sys
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
 
 try:
     from itoolkit import iToolKit
@@ -145,12 +156,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
-
-__ibmi_module_version__ = "1.1.2"
+__ibmi_module_version__ = "9.9.9"
 
 
 sysval_array = [
@@ -222,6 +228,7 @@ def chk_system_value(current, expect, check='equal'):
 
 def get_system_value(imodule, sysvaluename, expect=None, check='equal'):
     sysvalue = dict()
+    sysvalue['rc'] = 0
     sysvalue['name'] = sysvaluename.strip().upper()
     for value in sysval_array:
         for key in value['key']:
@@ -235,7 +242,9 @@ def get_system_value(imodule, sysvaluename, expect=None, check='equal'):
                 break
 
     if sysvalue.get('type') is None:
-        return -1, sysvalue, 'Unknown System Value Name'
+        sysvalue['msg'] = 'Unknown System Value Name'
+        sysvalue['rc'] = -1
+        return sysvalue
 
     conn = imodule.get_connection()
     itransport = DatabaseTransport(conn)
@@ -275,15 +284,22 @@ def get_system_value(imodule, sysvaluename, expect=None, check='equal'):
 
     if 'success' in qwcrsval:
         qwcrsval_t = qwcrsval['QWCRSVAL_t']
+        sysvalue['msg'] = qwcrsval['success']
         ibmi_util.log_debug(str(qwcrsval_t), sys._getframe().f_code.co_name)
         if int(qwcrsval_t['count']) > 0:
             sysvalue['value'] = qwcrsval_t['data']
             if 'expect' in sysvalue:
                 sysvalue['compliant'] = chk_system_value(
                     sysvalue['value'], sysvalue['expect'], check)
+                if sysvalue['compliant'] is False:
+                    sysvalue['msg'] = 'Compliant check failed'
+                    sysvalue['rc'] = -2
+                    return sysvalue
             ibmi_util.log_debug(str(sysvalue), sys._getframe().f_code.co_name)
-        return 0, sysvalue, qwcrsval['success']
-    return -1, sysvalue, qwcrsval['error']
+        return sysvalue
+    sysvalue['msg'] = qwcrsval['error']
+    sysvalue['rc'] = -1
+    return sysvalue
 
 
 def main():
@@ -309,9 +325,10 @@ def main():
                          msg="Not found input system value name")
 
     result = dict(
-        sysval=[],
         rc=0,
-        message=''
+        message='',
+        sysval=[],
+        fail_list=[]
     )
     rc = 0
 
@@ -322,20 +339,22 @@ def main():
         module.fail_json(rc=999, msg='Exception occurred: {0}'.format(str(inst)))
 
     for value in sysvalue:
-        rc, sysval, message = get_system_value(
+        sysval = get_system_value(
             ibmi_module, value.get('name'), value.get('expect'), value.get('check'))
-        result['sysval'].append(sysval)
+        if sysval['rc'] < 0:
+            rc = sysval['rc']
+            result['fail_list'].append(sysval)
+        else:
+            result['sysval'].append(sysval)
 
     if rc:
         result.update({'rc': rc})
+        message = 'non-zero return code when get system value:{rc}'.format(rc=rc)
         result.update({'stderr': message})
-        message = 'non-zero return code when get system value:{rc}'.format(
-            rc=rc)
         module.fail_json(msg=message, **result)
 
     if not joblog:
-        empty_list = []
-        result.update({'job_log': empty_list})
+        result.update({'job_log': []})
     else:
         result.update({'job_log': message})
 

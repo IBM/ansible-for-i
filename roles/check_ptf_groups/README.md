@@ -11,7 +11,6 @@ Role Variables
 | `group_list`          | list          | groups will be checked.                                   |
 | `type`                | string        | compare the ptf groups by level. Value can be 'current' or 'latest'. Default value is 'latest'.|
 | `repo_server`         | string        | repository server name registered in inventory.           |
-| `database`            | string        | database name of repository server.                       |
 
 Return Variables
 --------------

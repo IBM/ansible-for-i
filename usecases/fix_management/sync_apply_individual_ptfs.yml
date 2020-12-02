@@ -5,8 +5,8 @@
 # the target system. Then load and apply.
 
 # Command example: ansible-playbook /sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
-#'database': '/ansible/repo.sqlite3', 'ptfs_list': [{'ptf_id':'SI67856'}, {'ptf_id':'SI69375'}, {'ptf_id':'SI73751'}],
-#'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP', 'delayed_option': '*IMMDLY', 'auto_ipl': false}"
+#'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP',
+#'delayed_option': '*IMMDLY', 'auto_ipl': false}"
   hosts: '{{ target_system }}'
   gather_facts: No
   collections:
@@ -14,17 +14,19 @@
 
   vars:
     repo_server: "{{ repo_server }}"
-    database: "{{ database }}"
     ptfs_list: "{{ ptfs_list }}"
 
   tasks:
+    - set_fact:
+        list: "{{ list|default([]) + [{'ptf_id': item }] }}"
+      loop: "{{ ptfs_list }}"
+
     - name: Get the individual ptfs' information in catalog
       ibmi_fix_repo:
-        database: "{{ database }}"
         type: "single_ptf"
         checksum: True
         action: "find"
-        parameters: "{{ ptfs_list }}"
+        parameters: "{{ list }}"
       delegate_to: "{{ repo_server }}"
       register: fix_repo_find_result
 
@@ -36,6 +38,10 @@
       debug:
         var: fix_repo_find_result.success_list
 
+    - name: Print find failed list in catalog
+      debug:
+        var: fix_repo_find_result.fail_list
+
     - name: Include check_ptf role to determine which ptfs need to apply
       include_role:
         name: check_ptf
@@ -45,17 +51,18 @@
 
     - block:
         - debug:
-            msg: "No individual ptf need to apply, quit."
+            msg: "No individual ptf need to be applied, quit."
 
         - meta: end_host
-      when: not_loaded_ptfs_list == []
+      when: not_loaded_ptfs_list == [] and loaded_ptfs_list == []
 
     - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply
       include_role:
         name: sync_apply_individual_ptfs
       vars:
-        ptfs_info_list: "{{ not_loaded_ptfs_list }}"
+        not_loaded_list: "{{ not_loaded_ptfs_list }}"
         src_host: "{{ repo_server }}"
+        already_loaded_list: "{{ loaded_ptfs_list }}"
       register: sync_apply_result
 
     - name: Include check_ptf role again to get the final applied result

@@ -52,8 +52,8 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
         CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
   register: result
   until: result.row | length == 0
-  retries: 4
-  delay: 5
+  retries: 5
+  delay: 10
 
 - set_fact:
     ansible_ssh_user: '{{nopwd_user}}'

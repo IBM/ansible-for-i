@@ -1,5 +1,5 @@
 # test code for the ibmi_sysval module
-# (c) 2020, Xu Meng <mengxumx@cn.ibm.com>
+# (c) 2020, Yao Zhao <zhaoyao@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
@@ -43,7 +43,7 @@
         - chksysval_qmaxsign_result.sysval[0].name == 'QMAXSIGN'
         - chksysval_qmaxsign_result.sysval[0].type == '8A'
         - chksysval_qmaxsign_result.sysval[0].value == chksysval_qmaxsign_result.sysval[0].expect
-        - chksysval_qmaxsign_result.sysval[0].atrisk | bool == false
+        - chksysval_qmaxsign_result.sysval | selectattr('compliant', 'equalto', true)
         
 
   - name: TC03 - Display many system values
@@ -131,7 +131,7 @@
         - chksysval_qmaxsign_result.sysval[0].name == 'QMAXSIGN'
         - chksysval_qmaxsign_result.sysval[0].type == '8A'
         - chksysval_qmaxsign_result.sysval[0].value != chksysval_qmaxsign_result.sysval[0].expect
-        - chksysval_qmaxsign_result.sysval[0].atrisk | bool == true
+        - chksysval_qmaxsign_result.sysval | selectattr('compliant', 'equalto', false)
 
 
   always:

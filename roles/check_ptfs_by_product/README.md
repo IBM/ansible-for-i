@@ -10,7 +10,6 @@ Role Variables
 |-----------------------|---------------|-----------------------------------------------------------|
 | `product`             | string        | the product of PTFs will be checked.                      |
 | `repo_server`         | string        | repository server name registered in inventory.           |
-| `database`            | string        | database name of repository server.                       |
 
 Return Variables
 --------------
@@ -28,7 +27,6 @@ Example Playbook
   vars:
     product: "5770SS1"
     repo_server: "repo_server_name"
-    database: "/tmp/testdb.sqlite3"
 
   tasks:
     - name: check product ptf

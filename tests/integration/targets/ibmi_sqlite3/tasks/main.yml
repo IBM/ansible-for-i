@@ -187,12 +187,12 @@
       database: "/tmp/testdb.sqlite3"
       sql: 'CREATE TABLE us_states (id INTEGER PRIMARY KEY, name TEXT,flower TEXT); INSERT INTO us_states VALUES (1, "California", "California Poppy")'
     register: dsps_param_result_7
-    failed_when: dsps_param_result_7.rc != 1
+    ignore_errors: true
 
   - name: TC08 - assert value
     assert:
       that:
-        - '"You can only execute one statement at a time" in dsps_param_result_7.module_stdout'  
+        - '"You can only execute one statement at a time" in dsps_param_result_7.msg'
 
   - name: TC09 - insert invalid data
     ibmi_sqlite3:

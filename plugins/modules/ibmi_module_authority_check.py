@@ -67,9 +67,8 @@ authority_result:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.1.2"
+__ibmi_module_version__ = "9.9.9"
 
 module_authority_map = {
     'ibmi_at': ['*NONE'],

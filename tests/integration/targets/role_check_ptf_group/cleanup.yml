@@ -1,0 +1,19 @@
+# clean up the system before test starts, remove the latest applied ptf group if exists
+- block:
+  - name: get the current PTF group level of {{group_name}} on {{ansible_ssh_host}}
+    ibmi_sql_query:
+      sql: select * from SYSTOOLS.GROUP_PTF_CURRENCY where PTF_GROUP_ID='{{group_name}}'
+    register: current
+
+  - name: get the latest PTF group level from PSP website
+    ibmi_fix_group_check:
+      validate_certs: true
+      groups: '{{group_name}}'
+    register: group_check_result
+
+  - name: remove the PTF group level info if matches, skip cleanup elsewise
+    ibmi_cl_command:
+      cmd: "DLTPTFGRP PTFGRP({{group_name}})"
+    register: dltptfgrp
+    when: current.row[0]['PTF_GROUP_LEVEL_INSTALLED'] == group_check_result.group_info[0]['ptf_group_level']
+    failed_when: dltptfgrp.rc != 0  

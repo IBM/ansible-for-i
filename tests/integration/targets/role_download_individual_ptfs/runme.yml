@@ -1,0 +1,32 @@
+- name: testcase for role download_individual_ptfs
+  hosts: testhost
+  gather_facts: no
+  collections:
+    - ibm.power_ibmi
+
+  tasks:
+    - set_fact: 
+        ptfs: ['SI73990', 'SI73107']
+    - include: cleanup.yml
+    - name: IBM i download a list of individual PTFs
+      include_role:
+        name: download_individual_ptfs
+      vars:
+        to_be_downloaded_list:
+          - {'ptf_id': "{{ptfs[0]}}"}
+          - {'ptf_id': "{{ptfs[1]}}"}
+          
+    - name: assert values
+      assert:
+        that:
+          - download_success_list | length == 2
+          - download_fail_list | length == 0
+          - download_success_list[0]['ptf_id'] == "{{ptfs[0]}}"
+          - download_success_list[1]['ptf_id'] == "{{ptfs[1]}}"
+          - download_success_list[0]['release'] != ""
+          - download_success_list[1]['release'] != ""
+        
+    - name: negative test
+      include: neg_case.yml      
+
+      

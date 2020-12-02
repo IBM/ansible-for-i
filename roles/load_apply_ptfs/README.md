@@ -8,8 +8,9 @@ Role Variables
 
 | Variable              | Type          | Description                                                                    |
 |-----------------------|---------------|--------------------------------------------------------------------------------|
-| `required_ptf_list`   | list          | The ptfs' information list. ptf_id, product, file_name, file_path are required.|
+| `tobe_loaded_ptf_list`   | list       | The not loaded ptfs' information list. ptf_id, product, file_name are required.|
 | `remote_lib`          | str           | The remote lib stores ptfs' savf, default is QGPL.                             |
+| `loaded_list`              | list     | Already loaded but not apllied ptf list. ptf_id and product are required.        |
 | `apply_all_loaded_ptf`| bool          | Used by apply_ptf role. Controls whether all loaded ptf will be applied. When the value is true, 'to_be_applied_list' will be ignored. Default value is false.    |
 | `temp_or_perm`        | str           | Used by apply_ptf role. Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.                     |
 | `delayed_option`      | str           | Used by apply_ptf role. Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.                     |
@@ -32,9 +33,12 @@ Example Playbook
   hosts: desthost
 
   vars:
-    required_ptf_list:
-      - {'ptf_id':'SI73543', 'product':'5770UME', 'file_name':'QSI73543.file', 'file_path': '/qsys.lib/qgpl.lib/QSI73543.FILE'}
-      - {'ptf_id':'SI73430', 'product':'5733SC1', 'file_name':'QSI73430.file', 'file_path': '/qsys.lib/qgpl.lib/QSI73430.FILE'}
+    tobe_loaded_ptf_list:
+      - {'ptf_id':'SI73543', 'product':'5770UME', 'file_name':'QSI73543.file'}
+      - {'ptf_id':'SI73430', 'product':'5733SC1', 'file_name':'QSI73430.file'}
+    loaded_list:
+      - {'ptf_id':'SI63556', 'product':'5770UME'}
+      - {'ptf_id':'SI71714', 'product':'5733SC1'}
     temp_or_perm: '*PERM'
     delayed_option: '*IMMDLY'
     auto_ipl: False
