@@ -7,7 +7,3 @@
   with_list: "{{ check_ptf_list }}"
   loop_control:
     loop_var: ptf_info
-
-- name: print compose_list
-  debug:
-    var: compose_list

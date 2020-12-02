@@ -29,5 +29,5 @@
       loop_control:
         loop_var: sequence_var
 
-    - debug:
+    - fail:
         msg: "Loop already 5 times. quit."
