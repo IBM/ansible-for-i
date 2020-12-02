@@ -1,0 +1,12 @@
+# negative test of the role
+- name: ptf group name that does not exist
+  include_role:
+    name: fix_repo_check_ptf_group
+  vars:
+    ptf_group: "ABCD123"
+
+- name: assert the returned value of the fix_repo_check_ptf_group
+  assert:
+    that:
+      - fix_group_check_result.group_info == []
+      - check_ptf_group_fail == false

@@ -1,16 +1,16 @@
 ---
 # tasks file for check_ptf_groups
 - fail:
-    msg: "repository server is not provided, please provide the repository server."
-  when: repo_server == ""
-
-- fail:
-    msg: "database name is not provided, please provide the database name."
-  when: database == ""
+    msg: "Repository server is not provided, please provide the repository server."
+  when: repo_server == "" or repo_server is undefined
 
 - fail:
     msg: "group_list is not provided, please provide the group list."
-  when: database == ""
+  when: group_list == "" or group_list is undefined
+
+- fail:
+    msg: "Invalid input of type '{{ type }}'. Available options for type: 'current' and 'latest'."
+  when: type != 'current' and type != 'latest'
 
 - name: initialize the variables
   set_fact:
@@ -31,7 +31,6 @@
 
   - name: retrieve latest group information from repository server
     ibm.power_ibmi.ibmi_fix_repo:
-      database: "{{ database }}"
       action: "find"
       type: "ptf_group"
       parameters: "{{ check_group_list }}"
@@ -102,7 +101,6 @@
 
   - name: retrieve group's ptf list from repository server
     ibm.power_ibmi.ibmi_fix_repo:
-      database: "{{ database }}"
       action: "find"
       type: "ptf_group"
       parameters: "{{ check_group_list }}"

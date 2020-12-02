@@ -1,0 +1,68 @@
+# test code for the ibmi_download_fix_status module
+# (c) 2020, zhaoyao <zhaoyao@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block:
+  - set_fact:
+      ptf_group_number: 'SF99663'    # 7.4 performance ptf group to be downloaded, it's small and good for testing
+  - name: check the latest ptf group info from PSP
+    ibmi_fix_group_check:
+      validate_certs: true
+      groups: '{{ptf_group_number}}'
+    register: group_check_result
+
+  - name: delete ptf_group result if it is already exist in fix repo
+    ibmi_fix_repo:
+      checksum: false
+      action: "delete"
+      type: 'ptf_group'
+      parameters:
+        - {'ptf_group_number':'{{ptf_group_number}}', 'ptf_group_level':"{{group_check_result.group_info[0]['ptf_group_level']}}"}
+    register: delete_result
+    ignore_errors: true      
+
+  - name: download with module to fix_repo  
+    ibmi_download_fix:
+      ptf_id: "{{ptf_group_number}}"
+      delivery_format: '*IMAGE'
+      wait: false
+    register: download_ptf_group_result  
+    failed_when: download_ptf_group_result.rc != 0
+
+  - name: use ibmi_download_fix_status to determine if the downloading is completed.
+    ibmi_download_fix_status:
+      order_list: "{{download_ptf_group_result.order_id}}"
+    register: ds     
+    failed_when: ds.rc != 0
+    until: ds.status[0]['download_status'] == "COMPLETE"
+    retries: 100
+    delay: 30
+
+  - name: assert values
+    assert:
+      that:
+        - ds.status is defined 
+        - ds.status[0]['order_id'] == "{{download_ptf_group_result.order_id}}"
+        - ds.status[0]['download_status'] == "COMPLETE"
+        - ds.status[0]['complete_time'] != "UNKNOWN"
+
+  - name: check a non-exist order id 
+    ibmi_download_fix_status:
+      order_list: 6
+    register: ds     
+    failed_when: ds.rc != 0
+
+  - name: assert values
+    assert:
+      that:
+        - ds.status is defined
+        - ds.status[0]['order_id'] == "{{download_ptf_group_result.order_id}}"        
+        - ds.status[0]['complete_time'] == "UNKNOWN"        
+        - ds.status[0]['download_status'] == "UNKNOWN"
+
+  always:
+    - name: cleanup
+      ibmi_fix_repo:
+        action: "clear"
+        type: 'ptf_group'

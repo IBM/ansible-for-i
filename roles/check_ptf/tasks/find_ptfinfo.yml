@@ -1,8 +1,8 @@
 ---
 # tasks file for find_ptfinfo
-- name: compose not_loaded_ptfs_list
+- name: compose compose_list
   set_fact:
-    not_loaded_ptfs_list: "{{ not_loaded_ptfs_list|default([]) + [ptf_info] }}"
+    compose_list: "{{ compose_list|default([]) + [ptf_info] }}"
   when: ptf_info.ptf_id == ptf_id
   with_list: "{{ check_ptf_list }}"
   loop_control:

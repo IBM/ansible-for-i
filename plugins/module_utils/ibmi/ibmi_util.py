@@ -9,31 +9,7 @@ import tempfile
 import logging
 import logging.config
 import zipfile
-import binascii
 import socket
-
-HAS_ITOOLKIT = True
-HAS_IBM_DB = True
-
-try:
-    from itoolkit import iToolKit
-    from itoolkit import iSqlFree
-    from itoolkit import iSqlQuery
-    from itoolkit import iCmd
-    from itoolkit import iCmd5250
-    from itoolkit import iPgm
-    from itoolkit import iData
-    from itoolkit import iDS
-    from itoolkit.transport import DatabaseTransport
-except ImportError:
-    HAS_ITOOLKIT = False
-
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
-
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 
 # Constants
 IBMi_COMMAND_RC_SUCCESS = 0

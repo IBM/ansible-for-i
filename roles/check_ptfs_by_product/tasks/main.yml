@@ -2,22 +2,17 @@
 # tasks file for check_ptfs_by_product
 - fail:
     msg: "repository server is not provided, please provide the repository server."
-  when: repo_server == ""
-
-- fail:
-    msg: "database name is not provided, please provide the database name."
-  when: database == ""
+  when: repo_server == "" or repo_server is undefined
 
 - fail:
     msg: "product is not provided, please provide the product id."
-  when: product == ""
+  when: product == "" or product is undefined
 
 - set_fact:
     ptf_status: []
 
 - name: retrieve the PTF list by product from repository server
   ibm.power_ibmi.ibmi_fix_repo:
-    database: "{{ database }}"
     action: "find"
     type: "single_ptf"
     parameters: 

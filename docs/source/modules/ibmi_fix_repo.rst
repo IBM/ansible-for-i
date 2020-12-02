@@ -55,7 +55,7 @@ database
 
   | **required**: false
   | **type**: str
-  | **default**: /tmp/testdb.sqlite3
+  | **default**: /etc/ibmi_ansible/fix_management/repo.sqlite3
 
 
      
@@ -87,7 +87,6 @@ Examples
    
    - name: add some group records
      ibmi_fix_repo:
-       database: '/tmp/testdb.sqlite3'
        action: 'add'
        type: 'ptf_group'
        checksum: true
@@ -95,21 +94,18 @@ Examples
          - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
    - name: query some PTFs records
      ibmi_fix_repo:
-       database: "/tmp/testdb.sqlite3"
        action: "find"
        type: 'ptf_group'
        parameters:
          - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
    - name: delete some PTFs records
      ibmi_fix_repo:
-       database: "/tmp/testdb.sqlite3"
        action: "delete"
        type: 'ptf_group'
        parameters:
          - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
    - name: run sql to drop the table
      ibmi_fix_repo:
-       database: "/tmp/testdb.sqlite3"
        action: "clear"
        type: 'ptf_group'
 
@@ -180,7 +176,7 @@ Return Values
 
               .. code-block::
 
-                       [{"add_time": "2020-08-17 00:26:01", "checksum": "d02367d07c5ef43a5722a1ad2c36034409aad2fe", "description": "SF99738 740 Group Security", "download_time": "2020-08-17 00:26:01", "file_name": "S6582V01.BIN", "file_path": "/QIBM/UserData/OS/Service/ECS/PTF/2020579181", "id": 1, "order_id": "2020579181", "product": null, "ptf_group_level": 10, "ptf_group_number": "SF99738", "ptf_group_status": null, "ptf_list": ["SI69187", "SI69189", "SI69886", "SI70103", "SI70725", "SI70734", "SI70767", "SI70819", "SI70961", "SI71097", "SI71746", "SI72577", "SI72646", "SI73284", "SI73415", "SI73430", "SI73482"], "release": "R740", "release_date": "07/07/2020"}]
+                       [{"add_time": "2020-08-17 00:26:01", "checksum": "d02367d07c5ef43a5722a1ad2c36034409aad2fe", "description": "SF99738 740 Group Security", "download_time": "2020-08-17 00:26:01", "file_name": "S6582V01.BIN", "file_path": "/QIBM/UserData/OS/Service/ECS/PTF/2020579181", "id": 1, "order_id": "2020579181", "product": null, "ptf_group_level": 10, "ptf_group_number": "SF99738", "ptf_group_status": null, "ptf_list": ["SI69187", "SI69189", "SI69886", "SI70103", "SI70725", "SI70734", "SI70767", "SI70819", "SI70961", "SI71097", "SI71746", "SI72577", "SI72646", "SI73284", "SI73415", "SI73430", "SI73482"], "release": "R740", "release_date": "07/07/2020", "source": "fix_management"}]
             
       
       

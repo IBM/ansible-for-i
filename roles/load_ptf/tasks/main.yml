@@ -3,6 +3,7 @@
 - set_fact:
     load_success_list: []
     load_fail_list: []
+    option_not_installed: []
 
 - name: load ptfs from save file
   include_tasks: load_individual_ptf.yml
@@ -17,3 +18,7 @@
 - name: Print the fail load list
   debug:
     var: load_fail_list
+
+- name: Print the fail load dict
+  debug:
+    var: load_fail_dict

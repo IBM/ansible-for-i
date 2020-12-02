@@ -23,7 +23,7 @@
     - name: query_a_single_group
       ibmi_fix_group_check:
         groups:
-          - "SF99738"
+          - "SF99713"
       register: single_group
       
     - name: display_a_single_group

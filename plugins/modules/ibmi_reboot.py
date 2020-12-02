@@ -121,14 +121,14 @@ author:
 
 EXAMPLES = r'''
 - name: Unconditionally reboot the machine with all defaults
-  reboot:
+  ibmi_reboot:
 
 - name: Reboot a slow machine that might have lots of updates to apply
-  reboot:
+  ibmi_reboot:
     reboot_timeout: 3600
 
 - name: Unconditionally reboot the machine with become user
-  reboot:
+  ibmi_reboot:
     become_user: 'USER'
     become_user_password: 'yourpassword'
 '''

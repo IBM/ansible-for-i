@@ -1,18 +1,16 @@
 ---
 - name: Get the latest PTF group information from PSP website, and download ptf group
 # This playbook will get the latest PTF group information from IBM PSP website, and check if the latest PTF group already in repo
-# server, if not, download the latest PTF group and write download information into download_status table and part of the PTF
-# group information into ptf_group_image_info table.
+# server. If not, download the latest PTF group, add download record to download_status table and add PTF group information to ptf_group_image_info table.
 
-# Command example: ansible-playbook /check_download_ptf_group.yml -e "{'repo_server': 'reposerver',
-#'database': '/ansible/repo.sqlite3', 'ptf_group': 'SF99704'}"
-  hosts: "{{ repo_server }}"
+# Command example: ansible-playbook ./check_download_ptf_group.yml -e "{'ptf_group': 'SF99663'}"
+
+  hosts: reposerver
   gather_facts: No
   collections:
     - ibm.power_ibmi
 
   vars:
-    database: "{{ database }}"
     ptf_group: "{{ ptf_group }}"
 
   tasks:
@@ -38,8 +36,7 @@
 
     - name: Add part of PTF group information including ptf list into catalog
       ibmi_fix_repo:
-        database: "{{ database }}"
-        type: "ptf_group"
+        type: "ptf_group_image_info"
         action: "add"
         checksum: False
         parameters:

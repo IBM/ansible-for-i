@@ -26,7 +26,6 @@
 - block:
     - name: Check if ptf group information is already in catalog's ptf group information table
       ibmi_fix_repo:
-        database: "{{ database }}"
         type: "ptf_group"
         action: "find"
         parameters:
@@ -43,7 +42,6 @@
     - block:
         - name: Check if ptf group information is already in catalog's download_status table, which means ptf group is downloading.
           ibmi_fix_repo:
-            database: "{{ database }}"
             type: "download_status"
             action: "find"
             parameters:

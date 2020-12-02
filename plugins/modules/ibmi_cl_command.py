@@ -153,6 +153,11 @@ job_log:
             "TO_PROCEDURE": "QSQSRVR",
             "TO_PROGRAM": "QSQSRVR"
         }]
+job_name:
+    description: The QSQSRVR job information which the CL command executed.
+    returned: always
+    type: str
+    sample: '188624/QUSER/QSQSRVR'
 '''
 
 import datetime
@@ -160,7 +165,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.1.2"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -212,6 +217,7 @@ def main():
             message = 'Exception occurred: {0}'.format(str(inst))
             module.fail_json(rc=999, msg=message)
         rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+        job_name_info = ibmi_module.get_current_job_name()
 
     endd = datetime.datetime.now()
     delta = endd - startd
@@ -226,6 +232,7 @@ def main():
         start=str(startd),
         end=str(endd),
         delta=str(delta),
+        job_name=job_name_info,
     )
 
     if rc:

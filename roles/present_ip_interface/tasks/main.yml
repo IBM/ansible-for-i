@@ -1,0 +1,88 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+## The role is to configure an IP interface
+---
+
+- name: Fail the task if internet_address is not provided.
+  fail:
+    msg: 'Required parameter ip_address is not provided or its value is "", please check it'
+  when: ip_address is undefined or ip_address == '' 
+
+- name: Set a returned variable to indicate if the interface be configured successfully
+  set_fact:
+    configured_result: pass
+    interface_exists: false
+    lind_exists: false
+    lind_active: false
+    resource_name: ''
+
+- name: query ip interfaces from source system
+  ibmi_sql_query:
+    sql: "SELECT INTERNET_ADDRESS,CONNECTION_TYPE,SUBNET_MASK,PREFIX_LENGTH,LINE_DESCRIPTION,VIRTUAL_LAN_ID,PREFIX_LENGTH from QSYS2.NETSTAT_INTERFACE_INFO WHERE (INTERNET_ADDRESS = '{{ip_address}}') AND (INTERFACE_LINE_TYPE = 'ELAN' OR INTERFACE_LINE_TYPE = 'VETH' OR LINE_DESCRIPTION = '*VIRTUALIP') AND INTERNET_ADDRESS not in ('*IP6SAC', '*IP4DHCP')"
+  register: existing_ip_interfaces
+
+- name: Create a new IP interface when it doesn't exist
+  block:
+    - debug: 
+        msg: Start creating IP interface
+
+    - name: Find the resource name of ethernet port when line description name is not provided
+      include: find_resource_name_of_ethernet_port.yml
+      when: line_description is undefined or line_description == None
+
+    - name: run WRKCFGSTS
+      ibmi_cl_command:
+        cmd: "QSYS/WRKCFGSTS CFGTYPE(*LIN)"
+      register: all_line_descriptions_result
+      when: line_description is undefined or line_description == None
+
+    - name: Give a default name of the line_description if the input value is not correct
+      set_fact:
+        line_description: 'DEF{{resource_name}}'
+      when: line_description is undefined or line_description == None
+
+    - include: find_existing_line_description.yml
+      loop: '{{all_line_descriptions_result.stdout_lines}}'
+      loop_control:
+        loop_var: lind_line
+      when: line_description == 'DEF{{resource_name}}' 
+
+    - debug: var=line_description
+
+    - include: vary_on_line_description.yml
+
+    - name: Create IP interface
+      ibmi_tcp_interface: 
+        line_description: '{{line_description}}'
+        vlan_id: '{{vlanid}}'
+        subnet_mask: '{{netmask}}'
+        internet_address: '{{ip_address}}'
+        state: 'present'
+        associated_local_interface: '{{associatedLocalInterface}}'
+        type_of_service: '{{typeOfService}}'
+        max_transmission_unit: '{{maxTransmissionUnit}}'
+        auto_start: '{{autoStart}}'
+        preferred_interface: '{{preferredInterface}}'
+        text_description: '{{textDescription}}'
+        sec_to_wait: '{{secToWait | int}}'
+        extra_params: '{{extraParams}}'
+        joblog: true  
+
+    - name: Query existing route
+      ibmi_sql_query:
+        sql: "SELECT * FROM QSYS2.NETSTAT_ROUTE_INFO
+  WHERE NEXT_HOP = '{{next_hop}}'"
+      register: route_info
+
+    - name: Create route if next_hop is provided.
+      ibmi_cl_command:
+        cmd: "ADDTCPRTE RTEDEST('{{route_destination}}') NEXTHOP('{{next_hop}}') {{addition_options_for_ADDTCPRTE}}"
+      when: (next_hop is defined or next_hop != '') and route_info.row | length == 0 
+
+  when: existing_ip_interfaces.row|length == 0 
+
+- name: Ensure the IP interface is active
+  ibmi_tcp_interface:
+    internet_address: '{{ip_address}}'
+    state: 'active' 

@@ -1,0 +1,76 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+# 
+# Description:
+  # The playbook file is to provide an example about how to query all PTFs requring IPL to  be applied or removed, then IPL system per required.
+
+# Parameters:
+  # auto_ipl --  Specifies if an IPL is launched automatically when there is/are PTF(s) requiring IPL to be applied or removed.
+  # All options supported by ibmi_reboot.
+
+# Command example: ansible-playbook ./ipl_system_to_conduct_ipl_action_of_ptfs.yml
+---
+# tasks file for ipl_system_to_conduct_ipl_action_of_ptfs
+
+- hosts: testhost
+  gather_facts: No
+  collections:
+    - ibm.power_ibmi
+  
+  vars:
+    auto_ipl: false
+    pre_reboot_delay: 60
+    post_reboot_delay: 60
+    reboot_timeout: 1800
+    connect_timeout: 300
+    test_command: 'uname'
+    msg: 'Reboot initiated by Ansible'
+    how_to_end: '*IMMED'
+    controlled_end_delay_time: 600
+    reboot_type: '*IPLA'
+    ipl_source: '*PANEL'
+    end_subsystem_option: '*DFT'
+    timeout_option: '*CONTINUE'
+    parameters: ''
+   
+  tasks:
+
+    - name: Query the list of ptfs which requires an IPL
+      ibmi_sql_query:
+        sql: "SELECT PTF_IDENTIFIER, PTF_PRODUCT_ID, PTF_IPL_ACTION, A.* 
+        FROM QSYS2.PTF_INFO A
+        WHERE PTF_IPL_ACTION <> 'NONE'"
+      register: query_ptf_result
+
+    - debug:
+        msg: 'No PTFs require an IPL.'
+      when: query_ptf_result.row | length == 0 
+
+    - block:
+        - name: Display ptf list which require an IPL 
+          debug: var=query_ptf_result.row
+
+        - debug:
+            msg: 'At least one PTF requires an IPL, but auto_ipl is false. Please IPL the system manually.'
+          when: auto_ipl == false
+
+        - debug:
+            msg: 'At least one PTF requires an IPL and auto_ipl is true. The system is going to be IPLed soon.'
+          when: auto_ipl | bool
+        
+        - name: Reboot the system immediately if auto_ipl is set to true and at least one PTF requires an IPL
+          ibmi_reboot:
+            pre_reboot_delay: '{{pre_reboot_delay}}'
+            post_reboot_delay: '{{post_reboot_delay}}'
+            reboot_timeout: '{{reboot_timeout}}'
+            connect_timeout: '{{connect_timeout}}'
+            test_command: '{{test_command}}'
+            msg: '{{msg}}'
+            how_to_end: '{{how_to_end}}'
+            controlled_end_delay_time: '{{controlled_end_delay_time}}'
+            reboot_type: '{{reboot_type}}'
+            ipl_source: '{{ipl_source}}'
+            end_subsystem_option: '{{end_subsystem_option}}'
+            timeout_option: '{{timeout_option}}'
+          when: auto_ipl | bool 
+      when: query_ptf_result.row | length > 0

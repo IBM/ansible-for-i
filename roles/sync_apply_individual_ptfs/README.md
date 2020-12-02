@@ -8,11 +8,11 @@ Role Variables
 
 | Variable              | Type          | Description                                                                      |
 |-----------------------|---------------|----------------------------------------------------------------------------------|
-| `ptfs_info_list`      | list          | The ptfs' information list. ptf_id, product, file_name and file_path are required.  |
+| `not_loaded_list`      | list          | The not loaded ptfs' information list. ptf_id, product, file_name and file_path are required.  |
+| `already_loaded_list`    | list        | The already loaded ptfs' information list. ptf_id, product are required.  |
 | `src_host`            | str           | The system that has the src ptf savfs, which will be transferred to target system.|
 | `dest`                | str           | The libray that savfs would be transferred to. Default is "/qsys.lib/qgpl.lib".  |
 | `apply_all_loaded_ptf`| bool          | Used by apply_ptf role. Used by apply_ptf role. Controls whether all loaded ptf will be applied. When the value is true, 'to_be_applied_list' will be ignored. Default value is false.    |
-| `to_be_applied_list`  | list          | ptfs list will be applied. ptf_id and product are required.           |
 | `temp_or_perm`        | str           | Used by apply_ptf role. Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.                     |
 | `delayed_option`      | str           | Used by apply_ptf role. Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.                      |
 | `auto_ipl`            | bool          | Used by apply_ptf role. Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. Default value is false. |
@@ -37,9 +37,11 @@ Example Playbook
 
   vars:
     src_host: "srchost"
-    ptfs_info_list:
+    not_loaded_list:
       - {'ptf_id':'SI73543', 'product':'5770UME', 'file_name':'QSI73543.file', 'file_path': '/qsys.lib/qgpl.lib/QSI73543.FILE'}
       - {'ptf_id':'SI73430', 'product':'5733SC1', 'file_name':'QSI73430.file', 'file_path': '/qsys.lib/qgpl.lib/QSI73430.FILE'}
+    already_loaded_list:
+      - {'ptf_id':'SI63556', 'product':'5770UME'}
     temp_or_perm: '*PERM'
     delayed_option: '*IMMDLY'
     auto_ipl: False

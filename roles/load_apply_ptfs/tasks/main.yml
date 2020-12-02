@@ -4,13 +4,14 @@
   include_role:
     name: load_ptf
   vars:
-    to_be_loaded_list: "{{ required_ptf_list }}"
+    to_be_loaded_list: "{{ to_be_loaded_ptf_list }}"
+  when: to_be_loaded_ptf_list | default([]) != []
   register: load_result
 
 - name: Include apply_ptf role to apply ptfs
   include_role:
     name: apply_ptf
   vars:
-    to_be_applied_list: "{{ load_success_list }}"
+    to_be_applied_list: "{{ load_success_list | default([]) + loaded_list }}"
   register: apply_result
-  when: load_success_list != []
+  when: load_success_list | default([]) + loaded_list != []

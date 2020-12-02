@@ -1,25 +1,23 @@
 ---
 - name: Transfer a PTF group files from repo server to target system, and apply
-# This playbook will get the PTF group information in catalog. Then call sync_apply_ptf_group role to transfer the ptf group files
+# This playbook will get the PTF group information in the PTF database. Then call sync_apply_ptf_group role to transfer the PTF group files
 # to the target system. Then apply.
 
-# Command example: ansible-playbook /sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver',
-# 'database': '/ansible/repo.sqlite3', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
-  hosts: '{{ target_system }}'
+# Command example: ansible-playbook ./sync_apply_ptf_group.yml -e "{'repo_server': 'my.repo.server.com', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
+
+  hosts: testhost
   gather_facts: No
   collections:
     - ibm.power_ibmi
 
   vars:
     repo_server: "{{ repo_server }}"
-    database: "{{ database }}"
     ptf_group: "{{ ptf_group }}"
     dest: "/ansible/image"
 
   tasks:
     - name: Get the PTF group information in catalog
       ibmi_fix_repo:
-        database: "{{ database }}"
         type: "ptf_group"
         checksum: True
         action: "find"

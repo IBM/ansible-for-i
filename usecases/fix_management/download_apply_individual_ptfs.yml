@@ -1,0 +1,33 @@
+---
+- name: Download and apply a list of individual ptfs
+# This playbook will check if requested individual PTFs are already in catalog, if not, will call download_individual_ptfs role
+# to download non-existent ptfs and write ndividual PTFs' information into catalog.
+
+# Command example: ansible-playbook /check_download_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver',
+#'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
+  hosts: "{{ target_system }}"
+  gather_facts: No
+
+  vars:
+    ptfs_list_parm: "{{ ptfs_list }}"
+    repo_server: "{{ repo_server }}"
+    final_ptfs_status: {}
+
+  tasks:
+    - block:
+        - debug:
+            msg: "ptfs_list is []. quit."
+        - meta: end_host
+      when: ptfs_list_parm == []
+
+    - name: Include fix_repo_download_apply_individual_ptfs role to download and apply a list of individual ptfs
+      include_role:
+        name: fix_repo_download_apply_individual_ptfs
+      ignore_errors: True
+      register: download_apply_result
+      loop: "{{ query('sequence', 'start=1 end=5') }}"
+      loop_control:
+        loop_var: sequence_var
+
+    - fail:
+        msg: "Loop already 5 times. quit."

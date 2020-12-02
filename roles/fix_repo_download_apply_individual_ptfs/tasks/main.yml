@@ -1,0 +1,189 @@
+---
+# tasks file for fix_repo_download_apply_individual_ptfs
+- set_fact:
+    next_not_loaded_ptfs_list: []
+    next_loaded_ptfs_list: []
+
+- set_fact:
+    all_ptfs_list: "{{ ptfs_list_parm }}"
+    original_ptfs_list: "{{ ptfs_list_parm }}"
+  when: sequence_var|int == 1
+
+- set_fact:
+    all_ptfs_list: "{{ all_ptfs_list + requisite_list | default([]) }}"
+    all_requisite_ptfs_list: "{{ all_requisite_ptfs_list | default([]) + requisite_list | default([]) }}"
+
+- name: Include fix_repo_check_download_individual_ptfs role to check and download a list of individual ptfs
+  include_role:
+    name: fix_repo_check_download_individual_ptfs
+  ignore_errors: True
+
+- name: compose final_ptfs_status add find fail list
+  set_fact:
+    final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ fail_list_var.ptf_id: fail_list_var.db_record })}}"
+  loop: "{{ final_find_result.fail_list }}"
+  loop_control:
+    loop_var: fail_list_var
+  when: final_find_result.fail_list is defined
+
+- name: compose final_ptfs_status add download fail list
+  set_fact:
+    final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ download_fail_list_var.ptf_id: 'DOWNLOAD_FAIL' })}}"
+  loop: "{{ download_fail_list }}"
+  loop_control:
+    loop_var: download_fail_list_var
+  when: download_fail_list != []
+
+- name: Include check_ptf role to determine which ptfs need to apply
+  include_role:
+    name: check_ptf
+  vars:
+    check_ptf_list: "{{ final_find_result.success_list }}"
+  register: check_result
+
+- name: compose final_ptfs_status download fail list
+  set_fact:
+    final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ product_not_installed_ptfs_var.ptf_id: 'PRODUCT_NOT_INSTALLED' })}}"
+  loop: "{{ product_not_installed_ptfs }}"
+  loop_control:
+    loop_var: product_not_installed_ptfs_var
+  when: product_not_installed_ptfs != []
+
+- set_fact:
+    tmp_not_loaded_ptfs_list: "{{ not_loaded_ptfs_list }}"
+    tmp_loaded_ptfs_list: "{{ loaded_ptfs_list }}"
+
+- block:
+    - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply
+      include_role:
+        name: sync_apply_individual_ptfs
+      vars:
+        not_loaded_list: "{{ not_loaded_ptfs_list }}"
+        src_host: "{{ repo_server }}"
+        already_loaded_list: "{{ loaded_ptfs_list }}"
+      register: sync_apply_result
+
+    - name: compose final_ptfs_status load fail list
+      set_fact:
+        final_ptfs_status: "{{ final_ptfs_status | default({}) | combine( load_fail_dict | default({})) }}"
+
+    - set_fact:
+        load_fail_simple_list: "{{ load_fail_simple_list | default([]) + [ load_fail_list_var.ptf_id ] }}"
+      loop: "{{ load_fail_list }}"
+      loop_control:
+         loop_var: load_fail_list_var
+      when: load_fail_list | default([]) != []
+
+    - debug:
+        var: load_fail_simple_list
+
+    - set_fact:
+        next_not_loaded_ptfs_list: "{{ next_not_loaded_ptfs_list | default([]) + [not_loaded_ptfs_list_var.ptf_id] }}"
+      loop: "{{ not_loaded_ptfs_list }}"
+      loop_control:
+        loop_var: not_loaded_ptfs_list_var
+
+    - set_fact:
+        next_loaded_ptfs_list: "{{ next_loaded_ptfs_list | default([]) + [loaded_ptfs_list_var.ptf_id] }}"
+      loop: "{{ loaded_ptfs_list }}"
+      loop_control:
+        loop_var: loaded_ptfs_list_var
+
+    - name: print next_not_loaded_ptfs_list
+      debug:
+        var: next_not_loaded_ptfs_list
+
+    - name: print next_loaded_ptfs_list
+      debug:
+        var: next_loaded_ptfs_list
+
+    - name: print requisite_list
+      debug:
+        var: requisite_list
+
+    - name: Compose the new ptfs_list
+      set_fact:
+        ptfs_list_parm: []
+
+    - name: Compose the new ptfs_list
+      set_fact:
+        ptfs_list_parm: "{{ ( next_not_loaded_ptfs_list | default([]) + next_loaded_ptfs_list | default([]) + requisite_list | default([]) ) | difference( load_fail_simple_list | default([])) }}"
+
+    - name: print ptfs_list
+      debug:
+        var: ptfs_list_parm
+
+  when: tmp_not_loaded_ptfs_list != [] or tmp_loaded_ptfs_list != []
+
+- name: print final ptfs status
+  debug:
+    var: final_ptfs_status
+
+- block:
+    - set_fact:
+        all_ptfs: "{{ all_ptfs|default([]) + [{'ptf_id': all_ptfs_list_var }] }}"
+      loop: "{{ all_ptfs_list }}"
+      loop_control:
+            loop_var: all_ptfs_list_var
+
+    - name: Include check_ptf role to get the final ptfs status
+      include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list: "{{ all_ptfs }}"
+        check_product: False
+      register: check_result
+
+    - name: print ptfs status
+      debug:
+        var: ptfs_status
+
+    - name: compose final_ptfs_status_with_requisite add final check_ptf output
+      set_fact:
+        final_ptfs_status_with_requisite: "{{ ptfs_status | default({}) | combine( final_ptfs_status ) }}"
+
+    - name: compose final_ptfs_status_with_requisite add sync fail list
+      set_fact:
+        final_ptfs_status_with_requisite: "{{ final_ptfs_status_with_requisite | default({}) | combine( { sync_fail_list_var.ptf_id: 'SYNC_FAIL' }) }}"
+      loop: "{{ sync_fail_list }}"
+      loop_control:
+        loop_var: sync_fail_list_var
+      when: sync_fail_list | default([]) != []
+
+    - name: compose final_ptfs_status_with_requisite add apply fail list
+      set_fact:
+        final_ptfs_status_with_requisite: "{{ final_ptfs_status_with_requisite | default({}) | combine(apply_fail_dict) }}"
+      when: apply_fail_dict | default({}) != {}
+
+    - name: compose original_ptfs_status
+      set_fact:
+        original_ptfs_status: "{{ original_ptfs_status | default({}) | combine( { original_ptfs_list_var: final_ptfs_status_with_requisite[original_ptfs_list_var] }) }}"
+      loop: "{{ original_ptfs_list }}"
+      loop_control:
+        loop_var: original_ptfs_list_var
+
+    - name: compose requisite_ptfs_status
+      set_fact:
+        requisite_ptfs_status: "{{ requisite_ptfs_status | default({}) | combine({ all_requisite_ptfs_list_var: final_ptfs_status_with_requisite[all_requisite_ptfs_list_var] }) }}"
+      loop: "{{ all_requisite_ptfs_list }}"
+      loop_control:
+        loop_var: all_requisite_ptfs_list_var
+
+    - debug:
+        msg: "No more ptfs need to be applied. quit."
+
+    - name: print final ptfs status
+      debug:
+        var: final_ptfs_status_with_requisite
+
+    - name: print original ptfs status
+      debug:
+        var: original_ptfs_status
+
+    - name: print requisite ptfs status
+      debug:
+        var: requisite_ptfs_status
+
+    - meta: end_host
+
+  when: ( tmp_not_loaded_ptfs_list == [] and tmp_loaded_ptfs_list == [] ) or ptfs_list_parm == [] or requisite_list | default([]) == []

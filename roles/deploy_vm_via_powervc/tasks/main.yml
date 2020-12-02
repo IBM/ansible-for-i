@@ -1,0 +1,19 @@
+---
+# New vm info from OpenStack
+- name: Deploy a new VM
+  os_server:
+    auth:
+      auth_url: https://{{ansible_ssh_host}}:5000/v3
+      username: '{{ansible_ssh_user}}'      
+      password: '{{ansible_ssh_pass}}'
+      project_name: '{{project}}'
+      project_domain_name: '{{project_domain}}'
+      user_domain_name: '{{user_domain}}'
+    name: '{{vm_name}}'
+    image: '{{image_name_or_id}}'
+    flavor: '{{flavor_name_or_id}}'
+    verify: '{{verify_cert}}'
+    nics: '{{nic_list}}'
+    timeout: '{{deploy_timeout}}'
+    userdata: '{{deploy_userdata}}' 
+  register: server_info
