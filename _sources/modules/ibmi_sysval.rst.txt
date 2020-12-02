@@ -147,7 +147,7 @@ Return Values
       
       
                               
-       system_values
+       sysval
         | the system value information
       
         | **returned**: always
@@ -157,6 +157,20 @@ Return Values
               .. code-block::
 
                        [{"compliant": true, "expect": "3", "name": "QMAXSGNACN", "type": "4A", "value": "3"}, {"compliant": true, "name": "QCCSID", "type": "10i0", "value": "65535"}]
+            
+      
+      
+                              
+       fail_list
+        | the failed parameters
+      
+        | **returned**: when there are failed parameters
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"compliant": false, "expect": "3", "name": "QMAXSGNACN", "type": "4A", "value": "1"}]
             
       
         
