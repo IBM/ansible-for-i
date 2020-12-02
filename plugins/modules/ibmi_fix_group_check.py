@@ -36,6 +36,12 @@ options:
     type: bool
     default: True
     required: false
+  timeout:
+    description:
+      - Timeout in seconds for URL request.
+    type: int
+    default: 10
+    required: false
 
 notes:
    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3.
@@ -105,7 +111,7 @@ ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"
 
 # url: https://www.ibm.com/support/pages/node/6211843
 # group: 'SF99738'
-def get_group_info_from_web(groups, validate_certs):
+def get_group_info_from_web(groups, validate_certs, timeout):
     pattern_link = re.compile(
         r'>(?P<rel>R\d{3})<.+?'
         r'(?P<url>https:\/\/\S+?)\".+?>'
@@ -116,7 +122,7 @@ def get_group_info_from_web(groups, validate_certs):
     )
     response = ''
     try:
-        response = urls.open_url(ALL_GROUP_PAGE, validate_certs=validate_certs)
+        response = urls.open_url(ALL_GROUP_PAGE, validate_certs=validate_certs, timeout=timeout)
     except Exception as e:
         return [dict(
                 url=ALL_GROUP_PAGE,
@@ -140,13 +146,13 @@ def get_group_info_from_web(groups, validate_certs):
                     url=ptf_line.group('url'),
                     description=ptf_line.group('dsc'),
                     ptf_list=get_ptf_list_from_web(
-                        ptf_line.group('url'), validate_certs),
+                        ptf_line.group('url'), validate_certs, timeout),
                 ))
     return group_list
 
 
 # url: https://www.ibm.com/support/pages/uid/nas4SF99738
-def get_ptf_list_from_web(url, validate_certs):
+def get_ptf_list_from_web(url, validate_certs, timeout):
     pattern_link = re.compile(
         r'(?P<url>https://www.ibm.com/support/pages/ptf/\S+?)\".+?'
         r'(?P<ptf>[A-Z]{2}\d{5})<.+?'
@@ -157,7 +163,7 @@ def get_ptf_list_from_web(url, validate_certs):
     pattern_packid = r'PACKAGE ID:.+?(?P<packid>[A-Z]\d{7})'
     response = ''
     try:
-        response = urls.open_url(url, validate_certs=validate_certs)
+        response = urls.open_url(url, validate_certs=validate_certs, timeout=timeout)
     except Exception as e:
         return [dict(
                 url=url,
@@ -170,7 +176,7 @@ def get_ptf_list_from_web(url, validate_certs):
         # if it is a cum package
         cum_pack_id = re.search(pattern_packid, line)
         if cum_pack_id:
-            return get_cum_ptf_list_from_web(cum_pack_id.group('packid'), validate_certs)
+            return get_cum_ptf_list_from_web(cum_pack_id.group('packid'), validate_certs, timeout)
         # common ptf groups
         for ptf_line in re.finditer(pattern_link, line):
             ptf_list.append(dict(
@@ -183,7 +189,7 @@ def get_ptf_list_from_web(url, validate_certs):
 
 
 # url: https://www.ibm.com/support/pages/uid/nas4C0128730
-def get_cum_ptf_list_from_web(pack_id, validate_certs):
+def get_cum_ptf_list_from_web(pack_id, validate_certs, timeout):
     pattern_link = re.compile(
         r'(?P<url>https?:\/\/\S+)>'
         r'(?P<ptf>[A-Z]{2}\d{5})<.+'
@@ -194,7 +200,7 @@ def get_cum_ptf_list_from_web(pack_id, validate_certs):
     response = ''
     url = 'https://www.ibm.com/support/pages/uid/nas4' + pack_id
     try:
-        response = urls.open_url(url, validate_certs=validate_certs)
+        response = urls.open_url(url, validate_certs=validate_certs, timeout=timeout)
     except Exception as e:
         return [dict(
                 url=url,
@@ -218,7 +224,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             groups=dict(type='list', elements='str', default=['*ALL']),
-            validate_certs=dict(type='bool', default=True)
+            validate_certs=dict(type='bool', default=True),
+            timeout=dict(type='int', default=10)
         ),
         supports_check_mode=True,
     )
@@ -232,9 +239,10 @@ def main():
     )
     groups_num = module.params['groups']
     validate_certs = module.params['validate_certs']
+    timeout = module.params['timeout']
 
     startd = datetime.datetime.now()
-    psp_groups = get_group_info_from_web(groups_num, validate_certs)
+    psp_groups = get_group_info_from_web(groups_num, validate_certs, timeout)
     result.update({'group_info': psp_groups})
     result.update({'count': len(psp_groups)})
 
