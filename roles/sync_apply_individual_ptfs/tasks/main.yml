@@ -42,5 +42,4 @@
     to_be_loaded_ptf_list: "{{ sync_success_list }}"
     remote_lib: "{{ (dest | basename | splitext)[0] }}"
     loaded_list: "{{ already_loaded_list }}"
-  register: load_apply_result
   when: sync_success_list != [] or already_loaded_list != []

@@ -33,7 +33,7 @@
         order_list: "{{download_fix_result.order_id}}"
       register: ds     
       failed_when: ds.rc != 0
-      until: ds.status[0]['download_status'] == "COMPLETE"
+      until: ds.status[0]['download_status'] == "DOWNLOADED"
       retries: 100
       delay: 30
 

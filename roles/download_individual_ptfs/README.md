@@ -8,8 +8,8 @@ Role Variables
 
 | Variable               | Type          | Description                                                            |
 |------------------------|---------------|------------------------------------------------------------------------|
-| `to_be_downloaded_list`| list          | The list of ptfs that will be downloaded. Only ptf_id is required.     |
-| `order`| str          | Specifies if requisite PTFs should be included with the ordered PTFs. Default value is '*PTFID'.     |
+| `to_be_downloaded_list`| list          | The list of the ptfs that will be downloaded. Only ptf_id is required.     |
+| `order`| str          | Specifies if requisite PTFs should be included with the ordered PTFs. The default value is '*PTFID'.     |
 | `download_server`| str          | Specifies the SNDPTFORD server used to download ptfs.     |
 
 Return Variables
@@ -35,7 +35,6 @@ Example Playbook
     - name: Include download_individual_ptfs role to download a list of individual ptfs
       include_role:
         name: download_individual_ptfs
-      register: download_result
 ```
 
 License

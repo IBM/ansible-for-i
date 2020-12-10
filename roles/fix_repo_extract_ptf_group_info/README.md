@@ -9,7 +9,6 @@ Role Variables
 | Variable              | Type          | Description                                                          |
 |-----------------------|---------------|----------------------------------------------------------------------|
 | `order_id`    | str           | The ptf group number will be download.                               |
-| `database`            | str           | The path of fix management sqlite3 database.                         |
 
 Return Variables
 --------------
@@ -27,7 +26,6 @@ Example Playbook
 
   vars:
     order_id: "2376543543"
-    database: "/tmp/repo.sqlite3"
 
     - name: Include fix_repo_extract_ptf_group_info role to extract PTF group information and update into catalog
       include_role:

@@ -28,7 +28,7 @@ addition_options_for_CRTLINETH: ''
 ##################################
 ##       Route varaibles        ##
 ##################################
-route_dest: '*DFTROUTE'
+route_destination: '*DFTROUTE'
 next_hop: ''
 # By default the command to add routes only has two options RTEDEST and NEXTHOP. 
 # For example, ADDTCPRTE RTEDEST(*DFTROUTE) NEXTHOP('9.123.97.1').

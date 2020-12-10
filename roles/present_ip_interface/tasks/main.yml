@@ -78,7 +78,7 @@
     - name: Create route if next_hop is provided.
       ibmi_cl_command:
         cmd: "ADDTCPRTE RTEDEST('{{route_destination}}') NEXTHOP('{{next_hop}}') {{addition_options_for_ADDTCPRTE}}"
-      when: (next_hop is defined or next_hop != '') and route_info.row | length == 0 
+      when: (next_hop is defined and next_hop != '') and route_info.row | length == 0 
 
   when: existing_ip_interfaces.row|length == 0 
 

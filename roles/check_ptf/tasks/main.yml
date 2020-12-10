@@ -34,9 +34,9 @@
   set_fact:
     ptfs_info: "{{ check.ptf_list }}"
 
-- name: print ptfs_info
-  debug:
-    var: ptfs_info
+# - name: print ptfs_info
+#   debug:
+#     var: ptfs_info
 
 - name: compose ptfs status dict
   set_fact:
@@ -45,9 +45,9 @@
   loop_control:
     loop_var: ptfs_info_var
 
-- name: print checked_ptf
-  debug:
-    var: checked_ptf
+# - name: print checked_ptf
+#   debug:
+#     var: checked_ptf
 
 - name: combine the query result and unknown ptf
   set_fact:
@@ -68,12 +68,12 @@
   loop_control:
     loop_var: ptf_status
 
-- debug:
-    var: loaded
+# - debug:
+#     var: loaded
 
-- name: print to_be_loadednumber
-  debug:
-    var: to_be_loadednumber
+# - name: print to_be_loadednumber
+#   debug:
+#     var: to_be_loadednumber
 
 - set_fact:
     compose_list: []
@@ -87,8 +87,8 @@
 - set_fact:
     to_be_loaded: "{{ compose_list }}"
 
-- debug:
-    var: to_be_loaded
+# - debug:
+#     var: to_be_loaded
 
 - name: call ibmi_fix_product_check to filter uninstalled product
   ibmi_fix_product_check:

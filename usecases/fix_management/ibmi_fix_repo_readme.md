@@ -217,7 +217,6 @@ When the image files have been downloaded, it calls action **update** and set **
 
       - name: add_group_info_records
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: 'add'
           type: 'ptf_group'
           checksum: false
@@ -231,7 +230,6 @@ When the image files have been downloaded, it calls action **update** and set **
 
       - name: query_group_info_records
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: 'find'
           type: 'ptf_group'
           parameters:
@@ -244,7 +242,6 @@ When the image files have been downloaded, it calls action **update** and set **
 
       - name: change_group_info_records
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: 'update'
           type: 'ptf_group'
           checksum: true
@@ -258,7 +255,6 @@ When the image files have been downloaded, it calls action **update** and set **
 
       - name: query_updated_group_info_records
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: 'find'
           type: 'ptf_group'
           checksum: true
@@ -273,7 +269,6 @@ When the image files have been downloaded, it calls action **update** and set **
       always:
       - name: drop_the_table
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: "clear"
           type: 'ptf_group'
 ```

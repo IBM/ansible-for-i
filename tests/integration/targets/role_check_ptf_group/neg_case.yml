@@ -8,7 +8,6 @@
       - "SF12345"
     type: "latest"
     repo_server: "repo_server_name"
-    database: "/tmp/repo.sqlite3"
 
 - name: assert the returned group_status
   assert:
@@ -19,43 +18,19 @@
       - group_status[0]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
       - group_status[1]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
 
-- name: invalid type
-  include_role:
-    name: check_ptf_groups
-  vars: 
-    group_list:
-      - "{{group_name}}"
-    type: "newest"
-    repo_server: "repo_server_name"
-    database: "/tmp/repo.sqlite3"
+- block:
+  - name: invalid type
+    include_role:
+      name: check_ptf_groups
+    vars: 
+      group_list:
+        - "{{group_name}}"
+      type: "newest"
+      repo_server: "repo_server_name"
 
-- name: assert the returned group_status
-  assert:
-    that:
-      - group_status | length == 1
-      - group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
-      - group_status[0]['PTF_GROUP_NUMBER'] is not defined
-      - group_status[0]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
-      - group_status[0]['PTF_NOT_INSTALLED'] is not defined  
-
-- name: invalid repo_server
-  include_role:
-    name: check_ptf_groups
-  vars: 
-    group_list:
-      - "{{group_name}}"
-    type: "newest"
-    repo_server: "i.am.invalid"
-    database: "/tmp/repo.sqlite3"
-
-- debug: var=group_status
-
-
-- name: assert the returned group_status
-  assert:
-    that:
-      - group_status | length == 0
-      - group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
-      - group_status[0]['PTF_GROUP_NUMBER'] is not defined
-      - group_status[0]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
-      - group_status[0]['PTF_NOT_INSTALLED'] is not defined   
+  - name: assert the returned group_status
+    assert:
+      that:
+        - group_status == []
+  ignore_errors: true
+     

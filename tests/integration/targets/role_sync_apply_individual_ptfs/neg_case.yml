@@ -1,0 +1,85 @@
+# negative test of the role
+- block:
+  - name: Include download_individual_ptfs role to download a list of individual ptfs
+    import_role:
+      name: download_individual_ptfs
+    vars:
+      to_be_downloaded_list:
+        - {'ptf_id':'SI74229'}
+    delegate_to: "fix_repo"
+
+  - debug:
+      var: download_success_list
+
+  - name: negative test of sync_apply_individual_ptfs role - not_loaded_list of PTF not exists on repo
+    include_role:
+      name: sync_apply_individual_ptfs
+    vars:
+      not_loaded_list: 
+        - {'ptf_id':'SI99999', 'product':'5770SS1', 'file_name':'QSI99999.file', 'file_path': '/qsys.lib/qgpl.lib/QSI99999.FILE'}
+      src_host: "fix_repo"
+      temp_or_perm: '*TEMP'
+      apply_all_loaded_ptf: true
+      auto_ipl: false
+  
+  - name: assert values
+    assert:
+      that:
+        - sync_fail_list | length == 1
+        - sync_success_list | length == 0
+        - sync_fail_list[0]['fail_reason'] == "src {{sync_fail_list[0]['file_path']}} doesn't exist."
+
+  - name: negative test of sync_apply_individual_ptfs role - already_loaded_list PTF not exists on repo
+    include_role:
+      name: sync_apply_individual_ptfs
+    vars:
+      not_loaded_list: []
+      already_loaded_list: 
+        - {'ptf_id':'SI99999', 'product':'5770SS1'}
+      src_host: "fix_repo"
+      temp_or_perm: '*TEMP'
+      apply_all_loaded_ptf: true
+      auto_ipl: false
+
+  - name: assert values
+    assert:
+      that:
+        - sync_fail_list | length == 1
+        - sync_success_list | length == 0
+        - sync_fail_list[0]['fail_reason'] == "src {{sync_fail_list[0]['file_path']}} doesn't exist."
+      
+  - name: negative test of sync_apply_individual_ptfs role - incorrect parameter of temp_or_perm
+    include_role:
+      name: sync_apply_individual_ptfs
+    vars:
+      not_loaded_list: {'ptf_id':'SI74229', 'product':"{{download_success_list[0]['product']}}", 'file_name': "{{download_success_list[0]['file_name']}}", 'file_path': "{{download_success_list[0]['file_path']}}"}
+      src_host: "fix_repo"
+      temp_or_perm: 'TEMP'
+      apply_all_loaded_ptf: true
+      auto_ipl: false
+
+  - name: negative test of sync_apply_individual_ptfs role - incorrect parameter of apply_all_loaded_ptf
+    include_role:
+      name: sync_apply_individual_ptfs
+    vars:
+      not_loaded_list: {'ptf_id':'SI74229', 'product':"{{download_success_list[0]['product']}}", 'file_name': "{{download_success_list[0]['file_name']}}", 'file_path': "{{download_success_list[0]['file_path']}}"}
+      src_host: "fix_repo"
+      temp_or_perm: '*TEMP'
+      apply_all_loaded_ptf: 'yes'
+      auto_ipl: false
+              
+  - name: negative test of sync_apply_individual_ptfs role - incorrect parameter of auto_ipl
+    include_role:
+      name: sync_apply_individual_ptfs
+    vars:
+      not_loaded_list: {'ptf_id':'SI74229', 'product':"{{download_success_list[0]['product']}}", 'file_name': "{{download_success_list[0]['file_name']}}", 'file_path': "{{download_success_list[0]['file_path']}}"}
+      src_host: "fix_repo"
+      temp_or_perm: '*TEMP'
+      apply_all_loaded_ptf: true
+      auto_ipl: '*no'
+    
+  always:
+    - name: cleanup the fix downloaded on the fix repo
+      ibmi_cl_command:
+        cmd: "DLTOBJ {{download_success_list[0]['file_name']}}"
+      when: download_success_list is defined    

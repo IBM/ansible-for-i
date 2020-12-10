@@ -5,7 +5,6 @@
   vars:
     product: "ABCD123"
     repo_server: "repo_server_name"
-    database: "/tmp/repo.sqlite3"
 
 - name: debug
   debug:
@@ -25,7 +24,6 @@
   vars:
     product: "ABCD1234"
     repo_server: "repo_server_name"
-    database: "/tmp/repo.sqlite3"
 
 - name: debug
   debug:
@@ -44,7 +42,6 @@
       name: check_ptfs_by_product
     vars:
       repo_server: "repo_server_name"
-      database: "/tmp/repo.sqlite3"
  
   - name: debug
     debug:
@@ -60,7 +57,6 @@
       name: check_ptfs_by_product
     vars:
       product: "5770SS1"
-      database: "/tmp/repo.sqlite3"
 
   - name: debug
     debug:
@@ -87,5 +83,4 @@
     vars:
       product: "5770SS1"    
       repo_server: "www.google.com"
-      database: "/tmp/repo.sqlite3"
   ignore_errors: true      

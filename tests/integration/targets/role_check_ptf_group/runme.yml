@@ -52,7 +52,6 @@
         ansible_python_interpreter: /QOpensys/pkgs/bin/python3
 
     - include: cleanup.yml 
-
    ## At that moment, the repo doesn't have the ptf group and IBM i nodes don't have it.
     - name: compare ptf group with latest
       include_role:
@@ -62,7 +61,6 @@
           - "{{group_name}}"
         type: "latest"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
     
     - name: assert the returned group_status
       assert:
@@ -81,7 +79,6 @@
           - "{{group_name}}"
         type: "current"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
 
     - debug: var=group_status
 
@@ -111,16 +108,13 @@
 
     - name: set the ptf group to be used
       set_fact:
-        group_name: 'SF99663'
-        #group_name: "{{ lookup('vars', 'group_' + sql_query['row'][0]['OS_VERSION'] + sql_query['row'][0]['OS_RELEASE']) }}"
+        group_name: "{{ lookup('vars', 'group_' + sql_query['row'][0]['OS_VERSION'] + sql_query['row'][0]['OS_RELEASE']) }}"
 
     - name: check and download ptf group into role 
       include_role:
         name: fix_repo_check_ptf_group
       vars:
         ptf_group: "{{group_name}}"
-        #ptf_group: "SF99663"
-        database: "/tmp/repo.sqlite3"
 
     - name: assert the returned value of the fix_repo_check_ptf_group
       assert:
@@ -143,7 +137,6 @@
         ptf_group_number: "{{group_name}}"
         ptf_group_level: "{{fix_group_check_result.group_info[0]['ptf_group_level']}}"
         release_date: "{{fix_group_check_result.group_info[0]['release_date']}}"
-        database: "/tmp/repo.sqlite3"
 
     - name: assert returned value of the above role
       assert:
@@ -156,7 +149,6 @@
         name: fix_repo_check_ptf_group
       vars:
         ptf_group: "{{group_name}}"
-        database: "/tmp/repo.sqlite3"
 
     - name: assert the returned value of the fix_repo_check_ptf_group
       assert:
@@ -166,8 +158,6 @@
           - fix_group_check_result.group_info[0].ptf_group_level is defined
           - fix_group_check_result.group_info[0].description is defined
           - fix_group_check_result.group_info[0].ptf_list | length > 1 
-          #- ptf_group_find_result.fail_list | length == 0
-          #- ptf_group_find_result.fail_list[0].db_record = 'RecordNotFound' 
           - check_ptf_group_fail == false
           - download_status_find_result is defined
 
@@ -176,7 +166,7 @@
         order_list: "{{download_fix_result.order_id}}"
       register: ds     
       failed_when: ds.rc != 0
-      until: ds.status[0]['download_status'] == "COMPLETE"
+      until: ds.status[0]['download_status'] == "DOWNLOADED"
       retries: 100
       delay: 30
 
@@ -185,8 +175,6 @@
         name: fix_repo_extract_ptf_group_info
       vars:
         order_id: "{{download_fix_result.order_id}}"
-        #order_id: "2026531375"
-        database: "/tmp/repo.sqlite3"
 
     - name: assert the info has been added to fix repo
       assert:
@@ -199,7 +187,6 @@
         name: fix_repo_check_ptf_group
       vars:
         ptf_group: "{{group_name}}"
-        database: "/tmp/repo.sqlite3"
 
     - name: assert the returned value of the fix_repo_check_ptf_group
       assert:
@@ -216,7 +203,6 @@
 
     - name: add information
       ibmi_fix_repo:
-        database: "/tmp/repo.sqlite3"
         type: "ptf_group"
         action: "add"
         checksum: False
@@ -245,7 +231,6 @@
           - "{{group_name}}"
         type: "latest"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
     
     - name: assert the returned group_status
       assert:
@@ -262,7 +247,6 @@
           - "{{group_name}}"
         type: "current"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
     
     - name: assert the returned group_status
       assert:
@@ -276,7 +260,6 @@
 
     - name: Get the PTF group information in catalog
       ibmi_fix_repo:
-        database: "/tmp/repo.sqlite3"
         type: "ptf_group"
         checksum: false 
         action: "find"
@@ -305,7 +288,6 @@
     #     ptf_group: {'ptf_group_number': '{{group_name}}', 'ptf_group_level': "{{group_check_result.group_info[0]['ptf_group_level']}}" }
     #     dest: "files/"
     #     repo_server: "repo_server_name"
-    #     database: "/tmp/repo.sqlite3"
  
 
     ### Now PTF Group exists on fix repo and remote IBM i
@@ -318,7 +300,6 @@
           - "{{group_name}}"
         type: "latest"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
     
     - name: assert the returned group_status
       assert:
@@ -338,7 +319,6 @@
           - "{{group_name}}"
         type: "current"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
     
     - name: assert the returned group_status
       assert:
@@ -363,7 +343,6 @@
           - "{{group_name}}"
         type: "latest"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
     
     - name: assert the returned group_status
       assert:
@@ -383,7 +362,6 @@
           - "{{group_name}}"
         type: "current"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
     
     - name: assert the returned group_status
       assert:

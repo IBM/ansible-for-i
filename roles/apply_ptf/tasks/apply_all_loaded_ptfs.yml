@@ -11,8 +11,8 @@
   ignore_errors: True
   register: apply_fix_result
 
-- debug:
-    msg: apply all
+# - debug:
+#     msg: apply all
 
 # - debug:
 #     var: apply_fix_result

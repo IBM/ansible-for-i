@@ -8,7 +8,7 @@ Role Variables
 
 | Variable              | Type          | Description                                                        |
 |-----------------------|---------------|--------------------------------------------------------------------|
-| `ptf_group_info`      | dict          | The ptf group's information. Only file_path is required. file_path must be a folder, and all of this
+| `ptf_group_info`      | dict          | The ptf group's information. file_path and file_name are required. file_path must be a folder, and all of this
 ptf group's files should be in this folder. |
 | `src_host`            | str           | The system that has the src ptf group's files, which will be transferred to target system.|
 | `dest`                | str           | The path that ptf group files would be transferred to. Default is "/ansible/image".  |
@@ -29,7 +29,7 @@ Example Playbook
   hosts: testhost
 
   vars:
-    ptf_group_info: "{ 'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2025910369' }"
+    ptf_group_info: "{ 'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2025910369', 'file_name': ['S8404V01.BIN'] }"
     src_host: "{{ src_host }}"
 
   tasks:

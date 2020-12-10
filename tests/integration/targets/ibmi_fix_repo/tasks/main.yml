@@ -55,7 +55,6 @@
     
   - name: TC01 - add ptf group info to table from previous step, use checksum false to add to database, avoid waiting for the long downloading time.
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       type: 'ptf_group'
       checksum: false
@@ -65,7 +64,6 @@
 
   - name: TC01 - add ptf group info to table from previous step, after downloading completes
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'update'
       type: 'ptf_group'
       checksum: true
@@ -92,7 +90,6 @@
  
   - name: TC02 - query some PTFs records
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       checksum: true
       action: "find"
       type: 'ptf_group'
@@ -122,7 +119,6 @@
 
   - name: TC03 - delete some PTFs records by using order_id and file_path
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: "delete"
       type: 'ptf_group'
       parameters:
@@ -155,7 +151,6 @@
 
   - name: TC04 - add another level of same PTF group to test additional_param of find
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       type: 'ptf_group'
       checksum: false
@@ -165,7 +160,6 @@
 
   - name: TC04 - find with additional parameters
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       checksum: false
       action: "find"
       type: 'ptf_group'
@@ -189,7 +183,6 @@
 
   - name: TC04 - delete the record by using ptf_group_number and ptf_group_level
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: "delete"
       type: 'ptf_group'
       parameters:
@@ -213,7 +206,6 @@
 
   - name: TC05 - update some PTFs records
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: 'update'
       checksum: true
       type: 'ptf_group'
@@ -233,7 +225,6 @@
 
   - name: TC06 - add some download status records
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       type: 'download_status'
       parameters:
@@ -244,7 +235,6 @@
 
   - name: TC07 - query some PTFs records
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: "find"
       type: 'download_status'
       parameters: 
@@ -264,7 +254,6 @@
 
   - name: TC08 - query some download status with addtional parameters
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'find'
       type: 'download_status'
       parameters:
@@ -283,7 +272,6 @@
 
   - name: TC09 - delete some PTFs records
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: "delete"
       type: 'download_status'
       parameters: 
@@ -292,7 +280,6 @@
 
   - name: TC10 - query some PTFs records
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: "find"
       type: 'download_status'
       parameters: 
@@ -302,7 +289,6 @@
 
   - name: TC11 - test single_ptf option of type - add a single ptf to db, ptf_id and file_path are required.
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       checksum: true 
       type: 'single_ptf'
@@ -323,7 +309,6 @@
 
   - name: TC12 - query in single_ptf table
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'find'
       checksum: true 
       type: 'single_ptf'
@@ -345,7 +330,6 @@
 
   - name: TC13 - query single_ptf with addtional parameters
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: "find"                                                                                                                   
       type: 'single_ptf'
       parameters:
@@ -364,7 +348,6 @@
 
   - name: TC14 - update in single_ptf table
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'update'
       checksum: true 
       type: 'single_ptf'
@@ -381,7 +364,6 @@
 
   - name: TC15 - delete in single_ptf table
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'delete'
       checksum: true 
       type: 'single_ptf'
@@ -413,7 +395,6 @@
     
   - name: TC16 - add ptf group info to table from previous step, use checksum false to add to database firstly since it'll take long time to download CUM packages.
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       type: 'ptf_group'
       checksum: false
@@ -423,7 +404,6 @@
 
   - name: TC16 - add ptf group info to table from previous step, after downloading completes
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       type: 'ptf_group'
       checksum: true
@@ -449,7 +429,6 @@
 
   - name: TC17 - query some PTFs records
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: "find"
       type: 'ptf_group'
       checksum: false
@@ -471,7 +450,6 @@
 
   - name: TC18 - change some PTFs records
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: "update"
       type: 'ptf_group'
       checksum: false
@@ -482,7 +460,6 @@
 
   - name: TC19 - delete some PTFs records
     ibmi_fix_repo:
-      database: "/tmp/testdb.sqlite3"
       action: "delete"
       type: 'ptf_group'
       parameters: 
@@ -492,7 +469,6 @@
 
   - name: TC20A - download_status option use case, closing the loop test
     ibmi_fix_repo:     
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       type: 'download_status'
       parameters:
@@ -511,7 +487,6 @@
 
   - name: TC20B - query order_id 9999999999 in table after confirming the download is completed.
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'find'
       type: 'download_status'
       parameters:
@@ -537,7 +512,6 @@
 
   - name: TC20D - add order_id 9999999999 to table after confirming the download is completed.
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       type: 'ptf_group'
       checksum: true
@@ -548,7 +522,6 @@
 
   - name: TC20E - remove order_id 9999999999 from table
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'delete'
       type: 'download_status'
       parameters:
@@ -564,7 +537,6 @@
 
   - name: TC21 - Negative test - add a non-existing order id or path
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       checksum: true
       type: 'ptf_group'
@@ -580,7 +552,6 @@
 
   - name: TC22 - Negative test - missing required parameters
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'
       type: "{{ item }}"
       checksum: true
@@ -600,7 +571,6 @@
 
   - name: TC23 - Negative test - delete a non-existing record from db
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'delete'
       type: 'ptf_group'
       checksum: true
@@ -615,7 +585,6 @@
 
   - name: TC24 - Negative test - invalid action provided
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'query'  # not a valid action
       type: 'ptf_group'
       checksum: true
@@ -631,7 +600,6 @@
 
   - name: TC25 - Negative test - when adding single_ptf record with invalid ptf_id/file_path/product id
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'add'  
       type: 'single_ptf'
       checksum: true
@@ -655,7 +623,6 @@
 
   - name: TC26 - Negative test - try to find a non-exist single_ptf record 
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'find'  
       type: 'single_ptf'
       parameters:
@@ -669,7 +636,6 @@
 
   - name: TC27 - Negative test - try to delete a non-exist single_ptf record    
     ibmi_fix_repo:
-      database: '/tmp/testdb.sqlite3'
       action: 'delete'  
       type: 'single_ptf'
       parameters:
@@ -694,18 +660,15 @@
 
     - name: run sql to drop the ptf_group table
       ibmi_fix_repo:
-        database: "/tmp/testdb.sqlite3"
         action: "clear"
         type: 'ptf_group'
 
     - name: run sql to drop the download status table
       ibmi_fix_repo:
-        database: "/tmp/testdb.sqlite3"
         action: "clear"
         type: 'download_status'
 
     - name: run sql to drop the single_ptf table
       ibmi_fix_repo:
-        database: "/tmp/testdb.sqlite3"
         action: "clear"
         type: 'single_ptf'

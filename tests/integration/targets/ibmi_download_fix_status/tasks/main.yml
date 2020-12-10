@@ -8,7 +8,6 @@
       ptf_group_number: 'SF99663'    # 7.4 performance ptf group to be downloaded, it's small and good for testing
   - name: check the latest ptf group info from PSP
     ibmi_fix_group_check:
-      validate_certs: true
       groups: '{{ptf_group_number}}'
     register: group_check_result
 
@@ -35,7 +34,7 @@
       order_list: "{{download_ptf_group_result.order_id}}"
     register: ds     
     failed_when: ds.rc != 0
-    until: ds.status[0]['download_status'] == "COMPLETE"
+    until: ds.status[0]['download_status'] == "DOWNLOADED"
     retries: 100
     delay: 30
 
@@ -44,7 +43,8 @@
       that:
         - ds.status is defined 
         - ds.status[0]['order_id'] == "{{download_ptf_group_result.order_id}}"
-        - ds.status[0]['download_status'] == "COMPLETE"
+        - ds.status[0]['file_path'] == "{{download_ptf_group_result.file_path}}"
+        - ds.status[0]['download_status'] == "DOWNLOADED"
         - ds.status[0]['complete_time'] != "UNKNOWN"
 
   - name: check a non-exist order id 
@@ -57,7 +57,7 @@
     assert:
       that:
         - ds.status is defined
-        - ds.status[0]['order_id'] == "{{download_ptf_group_result.order_id}}"        
+        - ds.status[0]['order_id'] == "6"
         - ds.status[0]['complete_time'] == "UNKNOWN"        
         - ds.status[0]['download_status'] == "UNKNOWN"
 

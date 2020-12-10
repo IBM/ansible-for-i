@@ -82,7 +82,6 @@ sync_apply_ptf_group playbook does the following things:
   1. Get the PTF group information in the PTF database
   2. Call sync_apply_ptf_group role to transfer the PTF group files to the target system.
   3. Apply on the target.
-
 ```
 
 #### Variables
@@ -96,15 +95,14 @@ sync_apply_ptf_group playbook does the following things:
 
 ```
 ansible-playbook ./sync_apply_ptf_group.yml -e "{'repo_server': 'my.repo.server.com', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
-
 ```
 
 ## sync_apply_individual_ptfs
 ```
 sync_apply_individual_ptfs playbook does the following:
-  1.  Get the individual PTFs' information from the PTF repository server. 
+  1.  Get the individual PTFs' information from the PTF repository server.
   2.  Call check_ptf role to check which PTFs are not already applied or loaded on the target system.
-  3.  Call sync_apply_individual_ptfs role to transfer the unloaded or unapplied PTFs to the target system. 
+  3.  Call sync_apply_individual_ptfs role to transfer the unloaded or unapplied PTFs to the target system.
   4.  Load and apply the PTFs on the target.
 ```
 #### Variables
@@ -118,7 +116,26 @@ sync_apply_individual_ptfs playbook does the following:
 
 ```
 ansible-playbook ./sync_apply_individual_ptfs.yml -e "{'repo_server': 'my.repo.server.com', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP', 'delayed_option': '*IMMDLY', 'auto_ipl': false}"
+```
 
+## download_apply_individual_ptfs
+```
+download_apply_individual_ptfs playbook playbook does the following:
+  1.  Check if requested individual PTFs are already in catalog. If not, will download non-existent PTFs and write information into catalog.
+  2.  Transfer savfs to target server.
+  3.  Load and apply PTFs.
+```
+#### Variables
+
+| Variable              | Type          | Description                                                                    |
+|-----------------------|---------------|--------------------------------------------------------------------------------|
+| `ptfs_list_parm`| list          | The list of PTFs that need to be applied.     |
+| `repo_server`| str          | Specifies the SNDPTFORD server used to download ptfs.     |
+
+### Example
+
+```
+ansible-playbook /check_download_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
 ```
 
 Reference

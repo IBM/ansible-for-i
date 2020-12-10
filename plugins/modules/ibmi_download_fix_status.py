@@ -68,12 +68,14 @@ status:
     sample: [
         {
             'order_id': '2029604329',
-            'download_status': 'COMPLETE',
+            'download_status': 'DOWNLOADED',
+            'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2029604329',
             'complete_time': '2020-11-01 00:59:58'
         },
         {
             'order_id': '2020579181',
             'download_status': 'UNKNOWN',
+            'file_path': 'UNKNOWN',
             'complete_time': 'UNKNOWN'
         }
     ]
@@ -154,8 +156,8 @@ def main():
                     re_list = re.findall(r"/[0-9a-zA-Z]+", item['MESSAGE_SECOND_LEVEL_TEXT'])
                     for id_temp in re_list:
                         if id_temp[1:] == order_id:
-                            # message exists. set the download_status to 'COMPLETE'
-                            download_status = 'COMPLETE'
+                            # message exists. set the download_status to 'DOWNLOADED'
+                            download_status = 'DOWNLOADED'
                             complete_time = out[0]['MESSAGE_TIMESTAMP'].strip()[:-7]
                             file_path = ''.join(re_list)
 

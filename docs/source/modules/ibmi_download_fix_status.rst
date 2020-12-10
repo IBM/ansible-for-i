@@ -109,7 +109,7 @@ Return Values
 
               .. code-block::
 
-                       [{"complete_time": "2020-11-01 00:59:58", "download_status": "COMPLETE", "order_id": "2029604329"}, {"complete_time": "UNKNOWN", "download_status": "UNKNOWN", "order_id": "2020579181"}]
+                       [{"complete_time": "2020-11-01 00:59:58", "download_status": "DOWNLOADED", "file_path": "/QIBM/UserData/OS/Service/ECS/PTF/2029604329", "order_id": "2029604329"}, {"complete_time": "UNKNOWN", "download_status": "UNKNOWN", "file_path": "UNKNOWN", "order_id": "2020579181"}]
             
       
       

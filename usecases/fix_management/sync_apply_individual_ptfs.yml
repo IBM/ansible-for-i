@@ -47,7 +47,6 @@
         name: check_ptf
       vars:
         check_ptf_list: "{{ fix_repo_find_result.success_list }}"
-      register: check_result
 
     - block:
         - debug:
@@ -63,14 +62,12 @@
         not_loaded_list: "{{ not_loaded_ptfs_list }}"
         src_host: "{{ repo_server }}"
         already_loaded_list: "{{ loaded_ptfs_list }}"
-      register: sync_apply_result
 
     - name: Include check_ptf role again to get the final applied result
       include_role:
         name: check_ptf
       vars:
         check_ptf_list: "{{ fix_repo_find_result.success_list }}"
-      register: check_result
 
     - name: Print find fail list in catalog
       debug:

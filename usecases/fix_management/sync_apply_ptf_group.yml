@@ -3,9 +3,9 @@
 # This playbook will get the PTF group information in the PTF database. Then call sync_apply_ptf_group role to transfer the PTF group files
 # to the target system. Then apply.
 
-# Command example: ansible-playbook ./sync_apply_ptf_group.yml -e "{'repo_server': 'my.repo.server.com', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
+# Command example: ansible-playbook ./sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
 
-  hosts: testhost
+  hosts: '{{ target_system }}'
   gather_facts: No
   collections:
     - ibm.power_ibmi

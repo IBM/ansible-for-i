@@ -6,7 +6,9 @@
 # Command example: ansible-playbook /check_download_individual_ptfs.yml -e "{'repo_server': 'reposerver'，'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
   hosts: "{{ repo_server }}"
   gather_facts: No
-
+  collections:
+   - ibm.power_ibmi
+   
   vars:
     ptfs_list_parm: "{{ ptfs_list }}"
 
