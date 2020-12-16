@@ -301,10 +301,9 @@
 </dd>
 <dt>operation</dt><dd><p>The operation for the fix, the options are as follows</p>
 <p>load_and_apply will load the PTF and apply the PTF</p>
+<p>apply_only will only apply the PTF</p>
 <p>load_only will only load the PTF by LODPTF</p>
-<p>remove_and_delete will remove the PTF and delete the PTF</p>
-<p>remove_only will only remove the PTF</p>
-<p>delete_only will only delete the PTF</p>
+<p>remove will remove the PTF</p>
 <p>query will return the specific PTF status</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
@@ -487,6 +486,34 @@
 </div>
 <blockquote>
 <div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>ptf_not_on_system_list</dt><dd><div class="line-block">
+<div class="line">The PTF list contains the ones that are not on the system.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When use option query.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;MF98212&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>ptf_list</dt><dd><div class="line-block">
+<div class="line">The PTF list returned by the query option.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When use option query.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;PTF_ACTION_PENDING&quot;</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_ACTION_REQUIRED&quot;</span><span class="p">:</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_CREATION_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">&quot;PTF_IDENTIFIER&quot;</span><span class="p">:</span> <span class="s2">&quot;SI70819&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IPL_ACTION&quot;</span><span class="p">:</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IPL_REQUIRED&quot;</span><span class="p">:</span> <span class="s2">&quot;UNKNOWN&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_LOADED_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;SUPERSEDED&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_PRODUCT_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;5733SC1&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_SAVE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_STATUS_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-09-01T01:15:42&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_TEMPORARY_APPLY_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;PTF_ACTION_PENDING&quot;</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_ACTION_REQUIRED&quot;</span><span class="p">:</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_CREATION_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">&quot;PTF_IDENTIFIER&quot;</span><span class="p">:</span> <span class="s2">&quot;SI72223&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IPL_ACTION&quot;</span><span class="p">:</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IPL_REQUIRED&quot;</span><span class="p">:</span> <span class="s2">&quot;UNKNOWN&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_LOADED_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;SUPERSEDED&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_PRODUCT_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;5770DBM&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_SAVE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_STATUS_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-09-01T23:01:04&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_TEMPORARY_APPLY_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
