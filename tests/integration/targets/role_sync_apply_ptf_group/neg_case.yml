@@ -2,108 +2,21 @@
 - set_fact:
     neg_group: "SF99769"
 
-- name: non-exist file_path
-  include_role:
-    name: sync_apply_ptf_group
-  vars:
-    ptf_group_info: "{ 'file_path': '/1233211234567', 'file_name': ['S8404V01.BIN'] }"
-    src_host: "fix_repo"   
-
-- block: 
-  - set_fact:
-      superuser: "{{ansible_ssh_user}}"
-
-  - name: set ibmi_pass for *USER to be created
-    no_log: true
-    set_fact:
-      ibmi_user: "ZHYAO"
-      ibmi_pass: '{{ansible_ssh_pass}}'
-      when: ansible_ssh_pass is defined
-      
-  - name: create a *USER profile to do authority test
-    ibmi_user_and_group:
-      operation: 'create'
-      user: "{{ibmi_user}}"
-      special_authority: '*NONE'
-      password: "{{ibmi_pass}}"
-      user_class: '*USER'
-    register: crtusrprf
-    failed_when: crtusrprf.rc != 0  
-
-  - name: switch to *USER created above(ibmi_user) for authority negative test
-    set_fact: 
-      ansible_ssh_user: "{{ibmi_user}}"
-
-  - name: not authorized file_path
-    include_role:
-      name: sync_apply_ptf_group
-    vars:
-      ptf_group_info: "{ 'file_path': '/HOME/{{superuser}}/1233211234567', 'file_name': ['S8404V01.BIN'] }" # not authorized to superuser's home dir
-      src_host: "fix_repo"
-
-  always:
-    - name: switch to superuser
-      set_fact: 
-        ansible_ssh_user: "{{superuser}}"
-
-    - name: remove *USER profile created
-      ibmi_cl_command:
-        cmd:  'DLTUSRPRF USRPRF({{ibmi_user}}) OWNOBJOPT(*DLT)'
-      register: dltusrprf
-      failed_when: dltusrprf.rc != 0    
-
 - block:
-  - name: download {{neg_group}} and add part of group information into fix repo catalog
-    delegate_to: "fix_repo"
-    import_role:
-      name: fix_repo_download_add_ptf_group
-    vars:
-      ptf_group_number: "{{neg_group}}"
-      ptf_group_level: "{{fix_group_check_result.group_info[0]['ptf_group_level']}}"
-      release_date: "{{fix_group_check_result.group_info[0]['release_date']}}"
-
-  - name: use ibmi_download_fix_status to determine if the downloading is completed.
-    ibmi_download_fix_status:
-      order_list: "{{download_fix_result.order_id}}"
-    register: ds     
-    failed_when: ds.rc != 0
-    delegate_to: "fix_repo"
-
-  - name: sync when a ptf group is still in downloading
+  - name: non-exist file_path
     include_role:
       name: sync_apply_ptf_group
     vars:
-      ptf_group_info: "{ 'file_path': '{{download_fix_result.file_path}}' }"
-      src_host: "fix_repo" 
-    when: ds.status[0]['download_status'] == "UNKNOWN"  
-  
-  always:
-    - name: wait downloading {{neg_group}} completes
-      ibmi_download_fix_status:
-        order_list: "{{download_fix_result.order_id}}"
-      register: ds     
-      failed_when: ds.rc != 0
-      until: ds.status[0]['download_status'] == "DOWNLOADED"
-      retries: 100
-      delay: 30          
-      delegate_to: "fix_repo"  
+      ptf_group_info: { 'file_path': '/1233211234567', 'file_name': ['S8404V01.BIN'] }
+      src_host: "fix_repo"     
 
-    - name: check if ptf group folder exists
-      stat:
-        path: "{{download_fix_result.file_path}}"
-      register: p
+  - name: assert values
+    assert:
+      that:
+        - sync_result.failed == 255
+        - sync_result.msg == "No files were successfully transferred."
+        - sync_result.fail_list is defined
+        - sync_result.fail_list[0]['fail_reason'] == "src /1233211234567/S8404V01.BIN doesn't exist."
+        - sync_result.fail_list[0]['src'] == "/1233211234567/S8404V01.BIN"
 
-    - name: remove after downloading {{neg_group}} completes
-      ibmi_cl_command: 'rm -rf {{download_fix_result.file_path}}'
-      delegate_to: "fix_repo" 
-      when: p.stat.isdir is defined and p.stat.isdir
-
-    - name: clear ptf_group table
-      ibmi_fix_repo:
-        action: "clear"
-        type: 'ptf_group'
-
-    - name: run sql to drop the download status table
-      ibmi_fix_repo:
-        action: "clear"
-        type: 'download_status'
+  ignore_errors: true

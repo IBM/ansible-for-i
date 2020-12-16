@@ -232,7 +232,7 @@ download_status_dict = {
 required_params_enable_checksum = {
     'single_ptf': ['file_path', 'ptf_id', 'product'],
     'ptf_group': ['file_path', 'ptf_group_number', 'ptf_group_level', 'release_date'],
-    'download_status': ['file_path', 'order_id'],
+    'download_status': ['order_id'],
 }
 
 

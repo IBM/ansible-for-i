@@ -94,7 +94,7 @@
   ibmi_fix_product_check:
     ptfs: '{{ to_be_loaded }}'
   register: fix_product_check_result
-  when: to_be_loaded != [] and check_product is true
+  when: to_be_loaded != [] and check_product == true
 
 - set_fact:
     not_loaded_ptfs_list: "{{ fix_product_check_result.ptfs_with_product_installed | default([]) }}"

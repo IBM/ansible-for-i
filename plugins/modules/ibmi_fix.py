@@ -59,10 +59,9 @@ options:
     description:
       - The operation for the fix, the options are as follows
       - load_and_apply will load the PTF and apply the PTF
+      - apply_only will only apply the PTF
       - load_only will only load the PTF by LODPTF
-      - remove_and_delete will remove the PTF and delete the PTF
-      - remove_only will only remove the PTF
-      - delete_only will only delete the PTF
+      - remove will remove the PTF
       - query will return the specific PTF status
     choices: ['load_and_apply', 'apply_only', 'load_only', 'remove', 'query']
     type: str
@@ -201,6 +200,45 @@ stderr_lines:
         "CPF2111:Library TESTLIB already exists."
     ]
     returned: When error occurs.
+ptf_not_on_system_list:
+    description: The PTF list contains the ones that are not on the system.
+    type: list
+    sample: [
+        "MF98212"
+    ]
+    returned: When use option query.
+ptf_list:
+    description: The PTF list returned by the query option.
+    type: list
+    sample: [
+        {
+            "PTF_ACTION_PENDING": "NO",
+            "PTF_ACTION_REQUIRED": "NONE",
+            "PTF_CREATION_TIMESTAMP": null,
+            "PTF_IDENTIFIER": "SI70819",
+            "PTF_IPL_ACTION": "NONE",
+            "PTF_IPL_REQUIRED": "UNKNOWN",
+            "PTF_LOADED_STATUS": "SUPERSEDED",
+            "PTF_PRODUCT_ID": "5733SC1",
+            "PTF_SAVE_FILE": "NO",
+            "PTF_STATUS_TIMESTAMP": "2020-09-01T01:15:42",
+            "PTF_TEMPORARY_APPLY_TIMESTAMP": null
+        },
+        {
+            "PTF_ACTION_PENDING": "NO",
+            "PTF_ACTION_REQUIRED": "NONE",
+            "PTF_CREATION_TIMESTAMP": null,
+            "PTF_IDENTIFIER": "SI72223",
+            "PTF_IPL_ACTION": "NONE",
+            "PTF_IPL_REQUIRED": "UNKNOWN",
+            "PTF_LOADED_STATUS": "SUPERSEDED",
+            "PTF_PRODUCT_ID": "5770DBM",
+            "PTF_SAVE_FILE": "NO",
+            "PTF_STATUS_TIMESTAMP": "2020-09-01T23:01:04",
+            "PTF_TEMPORARY_APPLY_TIMESTAMP": null
+        }
+    ]
+    returned: When use option query.
 '''
 
 HAS_ITOOLKIT = True
@@ -332,6 +370,8 @@ def return_fix_information(db_connection, product_id, ptf_list):
     out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
 
     out = []
+    not_on_system = []
+    on_system = []
     if out_result_set is not None:
         for result in out_result_set:
             result_map = {"PTF_PRODUCT_ID": result[0], "PTF_IDENTIFIER": result[1],
@@ -341,8 +381,10 @@ def return_fix_information(db_connection, product_id, ptf_list):
                           "PTF_STATUS_TIMESTAMP": result[8],
                           "PTF_CREATION_TIMESTAMP": result[9], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[10]
                           }
+            on_system.append(result[1])
             out.append(result_map)
-    return out, err
+    not_on_system = list(set(ptf_list) ^ set(on_system))
+    return out, err, not_on_system
 
 
 def main():
@@ -411,7 +453,7 @@ def main():
 
     # return the status of the ptf
     if ptf_list_to_select is not None:
-        ptf_list, query_err = return_fix_information(db_conn, product_id, ptf_list_to_select)
+        ptf_list, query_err, ptf_not_on_system = return_fix_information(db_conn, product_id, ptf_list_to_select)
     else:
         module.fail_json(msg="PTF list contains no PTF.")
 
@@ -448,6 +490,7 @@ def main():
             end=str(endd),
             delta=str(delta),
             ptf_list=ptf_list,
+            ptf_not_on_system_list=ptf_not_on_system,
             rc=rc,
             job_log=job_log,
             # changed=True,

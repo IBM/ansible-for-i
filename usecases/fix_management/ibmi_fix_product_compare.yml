@@ -4,7 +4,7 @@
 #ibmi-fix-product-compare.yml 
 #The sample file is to provide an example about how to compare the single ptf by product between repo server and IBM i.
 
-# Command example: ansible-playbook ./ibmi-fix-group-compare.yml -e "{'repo_server': 'my.repo.server.com'}"
+# Command example: ansible-playbook ./ibmi-fix-group-compare.yml -e "{'product': '5770SS1', 'repo_server': 'my.repo.server.com'}"
 
 ---
 - hosts: '{{ target_system }}'
@@ -13,7 +13,7 @@
     - ibm.power_ibmi
 
   vars:
-    product: ""
+    product: "{{product}}"
     repo_server: "{{repo_server}}"
 
   tasks:

@@ -38,7 +38,6 @@
 
     - name: Run module to check the latest level
       ibmi_fix_group_check:
-        validate_certs: true
         groups: '{{group_name}}'
       register: group_check_result
 

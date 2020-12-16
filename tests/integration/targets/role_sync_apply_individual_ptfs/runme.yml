@@ -8,12 +8,11 @@
     - name: Add VM to Ansible in-memory inventory for host - the target of sync
       add_host:
         name: "fix_repo"
-        ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
+        ansible_ssh_host: my.repo.server
         ansible_user: zhaoyao 
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
         ansible_python_interpreter: /QOpensys/pkgs/bin/python3  
 
-    # positive cases is covered in role_check_ptf_group, only run negative testcase here. 
-    #negative cases      
+    # positive cases is covered in role_check_ptf_group, only run negative testcase here.     
     - include: neg_case.yml

@@ -8,7 +8,7 @@ Role Variables
 
 | Variable              | Type          | Description                                               |
 |-----------------------|---------------|-----------------------------------------------------------|
-| `check_ptf_list`      | list          | ptfs list will be checked. ptf_id is required. product is required if check_product is true.|
+| `check_ptf_list`      | list          | ptfs list will be checked. ptf_id is required. product and release are required if check_product is true.|
 | `check_product`       | bool          | Specify if need to check product installed or not. The default value is True.        |
 
 Return Variables
@@ -30,10 +30,10 @@ Example Playbook
 
   vars:
     check_ptf_list:
-      - {'ptf_id':'SI73543', 'product':'5770UME'}
-      - {'ptf_id':'SI73430', 'product':'5733SC1'}
-      - {'ptf_id':'SI73751', 'product':'5733SC1'}
-      - {'ptf_id':'SI63489', 'product':'5770UME'}
+      - {'ptf_id':'SI73543', 'product':'5770UME', 'release': 'V1R4M0'}
+      - {'ptf_id':'SI73430', 'product':'5733SC1', 'release': 'V7R2M0'}
+      - {'ptf_id':'SI73751', 'product':'5733SC1', 'release': 'V7R2M0'}
+      - {'ptf_id':'SI63489', 'product':'5770UME', 'release': 'V1R4M0'}
 
   tasks:
     - name: check ptf status
@@ -109,15 +109,15 @@ Example Returned Variables
 }
 
 "not_loaded_ptfs_list": [
-    {'ptf_id':'SI73430', 'product':'5733SC1'}
+    {"ptf_id": "SI73430", "product": "5733SC1", "release": "V7R2M0"}
     ]
 
 "loaded_ptfs_list": [
-    {'ptf_id':'SI73751', 'product':'5733SC1'}
+    {'ptf_id": "SI73751", "product":'5733SC1", "release": "V7R2M0"}
     ]
 
 "product_not_installed_ptfs": [
-    {"ptf_id": "SI63489", "product": "5770UME",}
+    {"ptf_id": "SI63489", "product": "5770UME", "release": "V1R4M0"}
     ]
 ```
 

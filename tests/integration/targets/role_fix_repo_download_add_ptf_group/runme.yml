@@ -7,7 +7,6 @@
   tasks:
     - name: Run module to check the latest level
       ibmi_fix_group_check:
-        validate_certs: true
         groups: 'SF99663'  # select a small ptf group to test
       register: group_check_result
 

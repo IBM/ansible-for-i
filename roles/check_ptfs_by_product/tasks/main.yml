@@ -11,12 +11,21 @@
 - set_fact:
     ptf_status: []
 
+- name: query system release
+  ibm.power_ibmi.ibmi_sql_query:
+    sql: "SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO"
+  register: result
+
+- name: compose parameter release
+  set_fact: 
+    release: "{{ 'V' + result['row'][0]['OS_VERSION'] + 'R' + result['row'][0]['OS_RELEASE'] + 'M0' }}"
+
 - name: retrieve the PTF list by product from repository server
   ibm.power_ibmi.ibmi_fix_repo:
     action: "find"
     type: "single_ptf"
     parameters: 
-      - { 'product': '{{ product }}' }
+      - { 'product': '{{ product }}', 'release': '{{ release }}' }
   delegate_to: "{{ repo_server }}"
   register: product_info
 

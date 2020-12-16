@@ -105,7 +105,6 @@ This module processes the action **add** and **update** using an unique SQL synt
 | download_status |   false  |                          order_id                          |
 |    single_ptf   |   true   |                 ptf_id, product, file_path                 |
 |    ptf_group    |   true   | ptf_group_number, ptf_group_level, release_date, file_path |
-| download_status |   true   |                     order_id, file_path                    |
 
 For type `ptf_group`, some of its input parameters should be retrieved from websites through the module **ibmi_fix_group_check**.
 

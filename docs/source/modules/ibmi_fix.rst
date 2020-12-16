@@ -97,13 +97,11 @@ operation
 
   load_and_apply will load the PTF and apply the PTF
 
+  apply_only will only apply the PTF
+
   load_only will only load the PTF by LODPTF
 
-  remove_and_delete will remove the PTF and delete the PTF
-
-  remove_only will only remove the PTF
-
-  delete_only will only delete the PTF
+  remove will remove the PTF
 
   query will return the specific PTF status
 
@@ -320,6 +318,34 @@ Return Values
               .. code-block::
 
                        ["CPF2111:Library TESTLIB already exists."]
+            
+      
+      
+                              
+       ptf_not_on_system_list
+        | The PTF list contains the ones that are not on the system.
+      
+        | **returned**: When use option query.
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       ["MF98212"]
+            
+      
+      
+                              
+       ptf_list
+        | The PTF list returned by the query option.
+      
+        | **returned**: When use option query.
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"PTF_ACTION_PENDING": "NO", "PTF_ACTION_REQUIRED": "NONE", "PTF_CREATION_TIMESTAMP": null, "PTF_IDENTIFIER": "SI70819", "PTF_IPL_ACTION": "NONE", "PTF_IPL_REQUIRED": "UNKNOWN", "PTF_LOADED_STATUS": "SUPERSEDED", "PTF_PRODUCT_ID": "5733SC1", "PTF_SAVE_FILE": "NO", "PTF_STATUS_TIMESTAMP": "2020-09-01T01:15:42", "PTF_TEMPORARY_APPLY_TIMESTAMP": null}, {"PTF_ACTION_PENDING": "NO", "PTF_ACTION_REQUIRED": "NONE", "PTF_CREATION_TIMESTAMP": null, "PTF_IDENTIFIER": "SI72223", "PTF_IPL_ACTION": "NONE", "PTF_IPL_REQUIRED": "UNKNOWN", "PTF_LOADED_STATUS": "SUPERSEDED", "PTF_PRODUCT_ID": "5770DBM", "PTF_SAVE_FILE": "NO", "PTF_STATUS_TIMESTAMP": "2020-09-01T23:01:04", "PTF_TEMPORARY_APPLY_TIMESTAMP": null}]
             
       
         

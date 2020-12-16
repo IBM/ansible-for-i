@@ -9,7 +9,7 @@ Role Variables
 | Variable              | Type          | Description                                                            |
 |-----------------------|---------------|------------------------------------------------------------------------|
 | `to_be_applied_list`| list           | ptfs list will be applied. ptf_id and product are required.|
-| `apply_all_loaded_ptfs`| bool          | Controls whether all loaded ptf will be applied. When its value is true, 'to_be_applied_list' will be ignored. The default value is false.    |
+| `apply_all_loaded_ptfs`| bool          | Controls whether all loaded ptf will be applied. When its value is true, 'to_be_applied_list' will be ignored. The default value is true.    |
 | `to_be_applied_list`  | list          | ptfs list will be applied. ptf_id and product are required. ptfs in the list will be applied one by one.          |
 | `temp_or_perm`         | str          | Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.                     |
 | `delayed_option`       | str          | Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.                      |
