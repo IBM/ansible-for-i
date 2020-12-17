@@ -1,4 +1,4 @@
-check_ptfs_by_product
+check_ptfs_by_product_against_fix_repo
 =========
 
 Compare the PTF status with specific product id on IBM i against fix repository, and returned the PTFs' status list

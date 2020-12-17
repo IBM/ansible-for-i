@@ -1,4 +1,4 @@
-check_ptf_groups
+check_ptf_groups_against_fix_repo
 =========
 
 Compare the installed PTF groups on IBM i against the fix repository by the method of "current" or "latest" level, and returned the PTF group status and a ptf_not_installed list.
