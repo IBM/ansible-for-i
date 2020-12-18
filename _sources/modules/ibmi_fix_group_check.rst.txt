@@ -40,6 +40,16 @@ groups
 
 
      
+timeout
+  Timeout in seconds for URL request.
+
+
+  | **required**: False
+  | **type**: int
+  | **default**: 10
+
+
+     
 validate_certs
   If set to ``False``, the SSL certificate verification will be disabled. It's recommended for test scenario.
 
