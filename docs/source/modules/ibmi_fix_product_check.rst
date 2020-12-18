@@ -16,7 +16,7 @@ ibmi_fix_product_check -- Check the software product installation status for a f
 
 Synopsis
 --------
-- The ``ibmi_fix_product_check`` module checks if the software product of a fix is intalled.
+- The ``ibmi_fix_product_check`` module checks if the software product of a fix is installed.
 
 
 

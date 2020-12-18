@@ -18,7 +18,7 @@
     action: "add"
     parameters:
       - "{{ {'order_id': download_fix_result.order_id, 'file_path': download_fix_result.file_path, 'ptf_group_number': ptf_group_number,
-      'ptf_group_level': ptf_group_level, 'release_date': release_date} }}"
+      'ptf_group_level': ptf_group_level, 'release_date': release_date, 'download_status': 'DOWNLOADING'} }}"
   register: download_status_add_result
   when: download_fix_result.order_id is defined
 

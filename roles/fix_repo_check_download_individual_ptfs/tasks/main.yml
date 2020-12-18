@@ -38,7 +38,7 @@
       loop_control:
         loop_var: fail_record
 
-    - name: compose fail_list with error reason
+    - name: compose check_fail_list with error reason
       set_fact:
         check_fail_list: "{{ fix_repo_find_result.fail_list | difference( RecordNotFound_list ) }}"
 
@@ -62,13 +62,13 @@
           when: download_success_list != []
           delegate_to: "{{ repo_server }}"
 
-        - name: Print fail_list with other errors
-          debug:
-            var: check_fail_list
+        # - name: Print fail_list with other errors
+        #   debug:
+        #     var: check_fail_list
 
-        - name: Print be downloaded ptfs list
-          debug:
-            var: RecordNotFound_list
+        # - name: Print be downloaded ptfs list
+        #   debug:
+        #     var: RecordNotFound_list
 
         - name: Print fail downloadded ptfs list
           debug:

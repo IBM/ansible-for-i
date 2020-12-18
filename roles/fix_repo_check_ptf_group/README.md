@@ -9,7 +9,6 @@ Role Variables
 | Variable              | Type          | Description                                                          |
 |-----------------------|---------------|----------------------------------------------------------------------|
 | `ptf_group`           | str           | The ptf group number will be checked.                                |
-| `database`            | str           | The path of fix management sqlite3 database.                         |
 
 Return Variables
 --------------
@@ -29,7 +28,6 @@ Example Playbook
 
   vars:
     ptf_group: "SF99740"
-    database: "/tmp/repo.sqlite3"
 
   tasks:
     - name: Include fix_repo_check_ptf_group role to check if the latest ptf group is already in catalog
@@ -249,7 +247,7 @@ Returned variables example
     "action": "find",
     "changed": false,
     "checksum": false,
-    "database": "/tmp/repo.sqlite3",
+    "database": "/etc/ibmi_ansible/fix_management/repo.sqlite3",
     "delta": "0:00:00.000866",
     "end": "2020-09-21 08:56:25.418431",
     "fail_list": [
@@ -280,7 +278,7 @@ Returned variables example
     "action": "find",
     "changed": false,
     "checksum": false,
-    "database": "/tmp/repo.sqlite3",
+    "database": "/etc/ibmi_ansible/fix_management/repo.sqlite3",
     "delta": "0:00:00.000863",
     "end": "2020-09-21 08:56:33.432791",
     "fail_list": [

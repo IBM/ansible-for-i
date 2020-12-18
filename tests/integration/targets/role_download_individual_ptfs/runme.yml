@@ -8,6 +8,7 @@
     - set_fact: 
         ptfs: ['SI73990', 'SI73107']
     - include: cleanup.yml
+
     - name: IBM i download a list of individual PTFs
       include_role:
         name: download_individual_ptfs
@@ -15,7 +16,9 @@
         to_be_downloaded_list:
           - {'ptf_id': "{{ptfs[0]}}"}
           - {'ptf_id': "{{ptfs[1]}}"}
-          
+        order: '*PTFID'
+        download_server: "my.repo.server"
+
     - name: assert values
       assert:
         that:
@@ -28,5 +31,3 @@
         
     - name: negative test
       include: neg_case.yml      
-
-      

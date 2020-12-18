@@ -4,7 +4,6 @@
     name: fix_repo_extract_ptf_group_info
   vars:
     order_id: "ABCD1234"
-    database: "/tmp/aaa.sqlite3" 
 
 - name: assert values
   assert:

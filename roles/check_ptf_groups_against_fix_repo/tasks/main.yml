@@ -6,7 +6,7 @@
 
 - fail:
     msg: "group_list is not provided, please provide the group list."
-  when: group_list == "" or group_list is undefined
+  when: group_list == [] or group_list is undefined
 
 - fail:
     msg: "Invalid input of type '{{ type }}'. Available options for type: 'current' and 'latest'."

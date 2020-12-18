@@ -165,7 +165,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.2.0"
 
 
 def main():
@@ -205,10 +205,10 @@ def main():
     if is_cmd5250:
         ibmi_util.log_info(
             "Command {0} starts with 'WRK' or 'DSP' or contains 'OUTPUT' keyword, call system utility to run".format(command), module._name)
-        # rc, out, err, job_log = ibmi_module.itoolkit_run_command5250_once(command)
         args = ['system', command]
         rc, out, err = module.run_command(args, use_unsafe_shell=False)
         job_log = []
+        job_name_info = ''
     else:
         try:
             ibmi_module = imodule.IBMiModule(

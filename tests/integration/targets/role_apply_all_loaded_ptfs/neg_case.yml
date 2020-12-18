@@ -4,7 +4,6 @@
     name: fix_repo_check_ptf_group
   vars:
     ptf_group: "ABCD123"
-    database: "/tmp/repo.sqlite3"
 
 - name: assert the returned value of the fix_repo_check_ptf_group
   assert:

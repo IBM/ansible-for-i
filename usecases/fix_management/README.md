@@ -34,12 +34,13 @@ check_download_ptf_group playbook will get the latest PTF group information from
 
 | Variable              | Type          | Description                                                                    |
 |-----------------------|---------------|--------------------------------------------------------------------------------|
+| `repo_server`         | str           | The IBM i server which can use SNDPTFORD to download PTF and PTF group, and stores PTFs and PTF groups.   |
 | `ptf_group`           | str           | The PTF group number which will be downloaded.   |
 
 ### Example
 
 ```
-ansible-playbook ./check_download_ptf_group.yml -e "{'ptf_group': 'SF99704'}"
+ansible-playbook ./check_download_ptf_group.yml -e "{'repo_server': 'reposerver', 'ptf_group': 'SF99704'}"
 ```
 
 ## check_download_individual_ptfs
@@ -50,12 +51,13 @@ check_download_individual_ptfs playbook will check if requested individual PTFs 
 
 | Variable              | Type          | Description                                                                    |
 |-----------------------|---------------|--------------------------------------------------------------------------------|
+| `repo_server`         | str           | The IBM i server which can use SNDPTFORD to download PTF and PTF group, and stores PTFs and PTF groups.   |
 | `ptfs_list`           | list          | The to be downloaded PTFs' ID list.  |
 
 ### Example
 
 ```
-ansible-playbook ./check_download_individual_ptfs.yml -e "{'ptfs_list':['SI67856', 'SI69375', 'SI73751']}"
+ansible-playbook ./check_download_individual_ptfs.yml -e "{'repo_server': 'reposerver'，'ptfs_list':['SI67856', 'SI69375', 'SI73751']}"
 ```
 
 ## extract_ptf_group_info
@@ -67,12 +69,13 @@ Please call extract_ptf_group_info playbook after the order status becomes DOWNL
 
 | Variable              | Type          | Description                                                                    |
 |-----------------------|---------------|--------------------------------------------------------------------------------|
+| `repo_server`         | str           | The IBM i server which can use SNDPTFORD to download PTF and PTF group, and stores PTFs and PTF groups.   |
 | `order_id`            | str           | order_id returned from the ibmi_download_fix module.  |
 
 ### Example
 
 ```
-ansible-playbook ./extract_ptf_group_info.yml -e "{'order_id': '2025910369'}"
+ansible-playbook ./extract_ptf_group_info.yml -e "{'repo_server': 'reposerver', 'order_id': '2025910369'}"
 ```
 
 ## sync_apply_ptf_group
@@ -82,43 +85,67 @@ sync_apply_ptf_group playbook does the following things:
   1. Get the PTF group information in the PTF database
   2. Call sync_apply_ptf_group role to transfer the PTF group files to the target system.
   3. Apply on the target.
-
 ```
 
 #### Variables
 
 | Variable              | Type          | Description                                                                    |
 |-----------------------|---------------|--------------------------------------------------------------------------------|
-| `repo_server`         | str           | The IBM i server where PTFs stored and managed.                    |
+| `target_system`       | str           | The target IBM i server that receives and applies the PTF groups.|
+| `repo_server`         | str           | The IBM i server which can use SNDPTFORD to download PTF and PTF group, and stores PTFs and PTF groups.   |
 | `ptf_group`           | dict          | The information of the PTF groups to be synced and applied on the target. ptf_group_number and ptf_group_level are required.  |
 
 ### Example
 
 ```
-ansible-playbook ./sync_apply_ptf_group.yml -e "{'repo_server': 'my.repo.server.com', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
-
+ansible-playbook ./sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
 ```
 
 ## sync_apply_individual_ptfs
 ```
 sync_apply_individual_ptfs playbook does the following:
-  1.  Get the individual PTFs' information from the PTF repository server. 
+  1.  Get the individual PTFs' information from the PTF repository server.
   2.  Call check_ptf role to check which PTFs are not already applied or loaded on the target system.
-  3.  Call sync_apply_individual_ptfs role to transfer the unloaded or unapplied PTFs to the target system. 
+  3.  Call sync_apply_individual_ptfs role to transfer the unloaded or unapplied PTFs to the target system.
   4.  Load and apply the PTFs on the target.
 ```
 #### Variables
 
 | Variable              | Type          | Description                                                                    |
 |-----------------------|---------------|--------------------------------------------------------------------------------|
-| `repo_server`         | str           | The IBM i server where PTFs stored and managed.     |
+| `target_system`       | str           | The target IBM i server that receives and applies the PTFs.|
+| `repo_server`         | str           | The IBM i server which can use SNDPTFORD to download PTF and PTF group, and stores PTFs and PTF groups.     |
 | `ptfs_list`           | list          | The list of PTFs to be processed.  |
+| `apply_all_loaded_ptf`| bool          | Used by apply_ptf role. Used by apply_ptf role. Controls whether all loaded ptf will be applied. When the value is true, 'to_be_applied_list' will be ignored. The default value is True.    |
+| `temp_or_perm`        | str           | Used by apply_ptf role. Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.                     |
+| `delayed_option`      | str           | Used by apply_ptf role. Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.                      |
+| `auto_ipl`            | bool          | Used by apply_ptf role. Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. The default value is false. |
 
 ### Example
 
 ```
-ansible-playbook ./sync_apply_individual_ptfs.yml -e "{'repo_server': 'my.repo.server.com', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP', 'delayed_option': '*IMMDLY', 'auto_ipl': false}"
+ansible-playbook ./sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'my.repo.server.com', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP', 'delayed_option': '*IMMDLY', 'auto_ipl': false}"
+```
 
+## download_apply_individual_ptfs
+```
+download_apply_individual_ptfs playbook playbook does the following:
+  1.  Check if requested individual PTFs are already in catalog. If not, will download non-existent PTFs and write information into catalog.
+  2.  Transfer savfs to target server.
+  3.  Load and apply PTFs.
+```
+#### Variables
+
+| Variable              | Type          | Description                                                                    |
+|-----------------------|---------------|--------------------------------------------------------------------------------|
+| `target_system`       | str           | The target IBM i server that receives and applies the PTFs.|
+| `repo_server`| str          | The IBM i server which can use SNDPTFORD to download PTF and PTF group, and stores PTFs and PTF groups.      |
+| `ptfs_list_parm`| list          | The list of PTFs that need to be applied.     |
+
+### Example
+
+```
+ansible-playbook /check_download_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
 ```
 
 Reference

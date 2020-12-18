@@ -169,7 +169,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.2.0"
 
 single_ptf_table = 'single_ptf_info'
 ptf_group_image_table = 'ptf_group_image_info'
@@ -232,7 +232,7 @@ download_status_dict = {
 required_params_enable_checksum = {
     'single_ptf': ['file_path', 'ptf_id', 'product'],
     'ptf_group': ['file_path', 'ptf_group_number', 'ptf_group_level', 'release_date'],
-    'download_status': ['file_path', 'order_id'],
+    'download_status': ['order_id'],
 }
 
 
@@ -760,7 +760,6 @@ def main():
     sql = ''
 
     startd = datetime.datetime.now()
-
     # for adding/updating records, retrieve file's checksum first when checksum == True.
     if action == 'add' or action == 'update':
         # filter out the invalid parameters without required input parameters
@@ -768,7 +767,7 @@ def main():
         if checksum is True:  # filter out the not existing files
             valid_parameters, checksum_failed_params = check_sum(module, valid_parameters, _type)
         if len(valid_parameters) > 0:
-            if action == 'add':  # all the parameter data come from the physical files.
+            if action == 'add' or _type == 'download_status':  # all the parameter data come from the physical files.
                 list_to_sqlite = valid_parameters
             elif action == 'update' and checksum is True:  # merge physical files data into input paramters.
                 list_to_sqlite, unmatch_params = merge_param_before_upsert(_type, parameters, valid_parameters)

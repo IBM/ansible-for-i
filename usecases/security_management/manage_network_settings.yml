@@ -11,12 +11,19 @@
     become_user_password: null
   
   tasks:
-  - name: Check network attribute JOBACN of network attribute
+  - name: 4.2.1 Check network attribute JOBACN of network attribute
     ibmi_rtv_command:
       cmd: 'RTVNETA'
       char_vars:
         - 'JOBACN'
     register: JOBACN
+    tags: JOBACN
+    ignore_errors: True
+
+  - name: Get network attribute JOBACN of network attribute
+    debug: msg={{JOBACN.output['JOBACN']}}
+    tags: JOBACN
+    ignore_errors: True
 
   - name: Specifies the action taken for input streams received through the SNA network by the system.
           The JOBACN value should be set to *REJECT to secure your system from job streams received through the network.
@@ -25,3 +32,190 @@
         - JOBACN.rc == 0
         - JOBACN.output['JOBACN'] == '*REJECT'
         - JOBACN.job_log == []
+    tags: JOBACN
+    ignore_errors: True
+
+
+  - name: 4.4.1 Configuring SSH – server protocol 2
+          /QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config file and allow the SSH2
+          protocol only. This is the SSH server configuration file.
+    find:
+      paths: '/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc'
+      patterns: 'sshd_config'
+      contains: '^Protocol 2$'
+    tags: ssh_server_protocol_2
+    register: ssh_server_protocol
+    ignore_errors: True
+
+  - name: /QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config file and allow the SSH2
+          protocol only. This is the SSH server configuration file.
+    assert:
+      that:
+        - "'/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config' in (ssh_server_protocol.files | map(attribute='path') | join(', '))"
+    tags: ssh_server_protocol_2
+    ignore_errors: True
+
+
+  - name: 4.4.2 Configuring SSH – banner configuration
+          The recommendation is to edit the /QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config file
+          and configure a path to a login herald message
+    find:
+      paths: '/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc'
+      patterns: 'sshd_config'
+      contains: '^Banner /QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/ssh_banner$'
+    tags: ssh_server_banner
+    register: ssh_server_banner
+    ignore_errors: True
+
+  - name: The recommendation is to edit the /QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config file
+          and configure a path to a login herald message
+    assert:
+      that:
+        - "'/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config' in (ssh_server_banner.files | map(attribute='path') | join(', '))"
+    tags: ssh_server_banner
+    ignore_errors: True
+
+
+  - name: 4.4.3 Configuring SSH – disallow host based authentication
+          The recommendation is to edit the /QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config file to
+          ensure that host-based authentication is disallowed.
+    find:
+      paths: '/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc'
+      patterns: 'sshd_config'
+      contains: '^HostbasedAuthentication no$'
+    tags: disallow_host_based_auth
+    register: disallow_host_based_auth
+    ignore_errors: True
+
+  - name: The recommendation is to edit the /QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config file to
+          ensure that host-based authentication is disallowed.
+    assert:
+      that:
+        - "'/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config' in (disallow_host_based_auth.files | map(attribute='path') | join(', '))"
+    tags: disallow_host_based_auth
+    ignore_errors: True
+
+  - name: 4.4.4 Configuring SSH – set privilege separation
+          The recommendation is to edit the /QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config file to ensure
+          that privilege separation is enabled. Note, that as of OpenSSH 7.5 this configuration directive
+          has been deprecated.
+    find:
+      paths: '/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc'
+      patterns: 'sshd_config'
+      contains: '^UsePrivilegeSeparation yes$'
+    tags: privilege_separation
+    register: privilege_separation
+    ignore_errors: True
+
+  - name: Setting privilege separation helps to secure remote ssh access. Once a user is authenticated the sshd daemon
+          creates a child process which has the privileges of the authenticated user and this then handles incoming
+          network traffic. The aim of this is to prevent privilege escalation through the initial root process.
+          The recommendation is to edit the /QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config file to ensure
+          that privilege separation is enabled. Note, that as of OpenSSH 7.5 this configuration directive
+          has been deprecated.
+    assert:
+      that:
+        - "'/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config' in (privilege_separation.files | map(attribute='path') | join(', '))"
+    tags: privilege_separation
+    ignore_errors: True
+
+  - name: 4.4.5 Configuring SSH – set MaxAuthTries to 4 or Less
+          The MaxAuthTries parameter specifies the maximum number of authentication attempts permitted per connection.
+          When the login failure count reaches half the number, error messages will be written to the syslog
+          file detailing the login failure.
+    find:
+      paths: '/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc'
+      patterns: 'sshd_config'
+      contains: '^MaxAuthTries 4$'
+    tags: max_auth_retries
+    register: max_auth_retries
+    ignore_errors: True
+
+  - name: The MaxAuthTries parameter specifies the maximum number of authentication attempts permitted per connection.
+          When the login failure count reaches half the number, error messages will be written to the syslog
+          file detailing the login failure.
+    assert:
+      that:
+        - "'/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config' in (max_auth_retries.files | map(attribute='path') | join(', '))"
+    tags: max_auth_retries
+    ignore_errors: True
+
+
+  - name: 4.4.6 Configuring SSH – set Idle Timeout Interval for User Login Profile Applicability
+          The two options ClientAliveInterval and ClientAliveCountMax control the timeout of ssh sessions.
+          When the ClientAliveInterval variable is set, ssh sessions that have no activity for the specified
+          length of time are terminated. When the ClientAliveCountMax variable is set, sshd will send client
+          alive messages at every ClientAliveInterval interval. When the number of consecutive client alive messages
+          are sent with no response from the client, the ssh session is terminated. For example, if the
+          ClientAliveInterval is set to 15 seconds and the ClientAliveCountMax is set to 3,
+          the client ssh session will be terminated after 45 seconds of idle time.
+    find:
+      paths: '/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc'
+      patterns: 'sshd_config'
+      contains: '^ClientAliveCountMax 0$'
+    tags: idle_timeout
+    register: idle_timeout
+    ignore_errors: True
+
+  - name: The two options ClientAliveInterval and ClientAliveCountMax control the timeout of ssh sessions.
+          When the ClientAliveInterval variable is set, ssh sessions that have no activity for the specified
+          length of time are terminated. When the ClientAliveCountMax variable is set, sshd will send client
+          alive messages at every ClientAliveInterval interval. When the number of consecutive client alive messages
+          are sent with no response from the client, the ssh session is terminated. For example, if the
+          ClientAliveInterval is set to 15 seconds and the ClientAliveCountMax is set to 3,
+          the client ssh session will be terminated after 45 seconds of idle time.
+          Verify ClientAliveCountMax is 0.
+    assert:
+      that:
+        - "'/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config' in (idle_timeout.files | map(attribute='path') | join(', '))"
+    tags: idle_timeout
+    ignore_errors: True
+
+  - name: 4.4.6 Configuring SSH – set Idle Timeout Interval for User Login Profile Applicability
+          The two options ClientAliveInterval and ClientAliveCountMax control the timeout of ssh sessions.
+          When the ClientAliveInterval variable is set, ssh sessions that have no activity for the specified
+          length of time are terminated. When the ClientAliveCountMax variable is set, sshd will send client
+          alive messages at every ClientAliveInterval interval. When the number of consecutive client alive messages
+          are sent with no response from the client, the ssh session is terminated. For example, if the
+          ClientAliveInterval is set to 15 seconds and the ClientAliveCountMax is set to 3,
+          the client ssh session will be terminated after 45 seconds of idle time.
+          Verify ClientAliveInterval is between 1 and 300.
+    find:
+      paths: '/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc'
+      patterns: 'sshd_config'
+      contains: '^ClientAliveInterval \b[1-9]\d{0,1}\b|\b[1-2]\d\d\b|\b300\b$'
+    tags: idle_timeout
+    register: idle_timeout2
+    ignore_errors: True
+
+  - name: The two options ClientAliveInterval and ClientAliveCountMax control the timeout of ssh sessions.
+          When the ClientAliveInterval variable is set, ssh sessions that have no activity for the specified
+          length of time are terminated. When the ClientAliveCountMax variable is set, sshd will send client
+          alive messages at every ClientAliveInterval interval. When the number of consecutive client alive messages
+          are sent with no response from the client, the ssh session is terminated. For example, if the
+          ClientAliveInterval is set to 15 seconds and the ClientAliveCountMax is set to 3,
+          the client ssh session will be terminated after 45 seconds of idle time.
+    assert:
+      that:
+        - "'/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config' in (idle_timeout2.files | map(attribute='path') | join(', '))"
+    tags: idle_timeout
+    ignore_errors: True
+
+
+  - name: 4.4.7 Configuring SSH – restrict Cipher list
+          This variable limits the types of ciphers that SSH can use during communication.
+    find:
+      paths: '/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc'
+      patterns: 'sshd_config'
+      contains: '^Ciphers aes256-ctr,aes192-ctr,aes128-ctr$'
+    tags: ciphers
+    register: ciphers
+    ignore_errors: True
+
+  - name: This variable limits the types of ciphers that SSH can use during communication.
+          Verify the ciphers value should be Ciphers aes256-ctr,aes192-ctr,aes128-ctr
+    assert:
+      that:
+        - "'/QOpenSys/QIBM/UserData/SC1/OpenSSH/etc/sshd_config' in (ciphers.files | map(attribute='path') | join(', '))"
+    tags: ciphers
+    ignore_errors: True

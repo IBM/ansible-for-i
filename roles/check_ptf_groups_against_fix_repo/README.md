@@ -1,4 +1,4 @@
-check_ptf_groups
+check_ptf_groups_against_fix_repo
 =========
 
 Compare the installed PTF groups on IBM i against the fix repository by the method of "current" or "latest" level, and returned the PTF group status and a ptf_not_installed list.
@@ -10,7 +10,6 @@ Role Variables
 |-----------------------|---------------|-----------------------------------------------------------|
 | `group_list`          | list          | groups will be checked.                                   |
 | `type`                | string        | compare the ptf groups by level. Value can be 'current' or 'latest'. Default value is 'latest'.|
-| `repo_server`         | string        | repository server name registered in inventory.           |
 
 Return Variables
 --------------
@@ -33,7 +32,6 @@ Example Playbook
       - "SF99704"
     type: "current"
     repo_server: "repo_server_name"
-    database: "/tmp/testdb.sqlite3"
 
   tasks:
     - name: check ptf groups

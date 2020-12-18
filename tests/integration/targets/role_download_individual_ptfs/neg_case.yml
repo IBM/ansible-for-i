@@ -9,6 +9,8 @@
     to_be_downloaded_list:
       - {'ptf_id': "{{neg_ptfs[0]}}"}
       - {'ptf_id': "{{neg_ptfs[1]}}"}
+    order: '*PTFID'
+    download_server: "my.repo.server"
 
 - name: assert values
   assert:

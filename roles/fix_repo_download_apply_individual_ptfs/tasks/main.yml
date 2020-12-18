@@ -39,7 +39,6 @@
     name: check_ptf
   vars:
     check_ptf_list: "{{ final_find_result.success_list }}"
-  register: check_result
 
 - name: compose final_ptfs_status download fail list
   set_fact:
@@ -61,7 +60,6 @@
         not_loaded_list: "{{ not_loaded_ptfs_list }}"
         src_host: "{{ repo_server }}"
         already_loaded_list: "{{ loaded_ptfs_list }}"
-      register: sync_apply_result
 
     - name: compose final_ptfs_status load fail list
       set_fact:
@@ -74,8 +72,8 @@
          loop_var: load_fail_list_var
       when: load_fail_list | default([]) != []
 
-    - debug:
-        var: load_fail_simple_list
+    # - debug:
+    #     var: load_fail_simple_list
 
     - set_fact:
         next_not_loaded_ptfs_list: "{{ next_not_loaded_ptfs_list | default([]) + [not_loaded_ptfs_list_var.ptf_id] }}"
@@ -89,17 +87,17 @@
       loop_control:
         loop_var: loaded_ptfs_list_var
 
-    - name: print next_not_loaded_ptfs_list
-      debug:
-        var: next_not_loaded_ptfs_list
+    # - name: print next_not_loaded_ptfs_list
+    #   debug:
+    #     var: next_not_loaded_ptfs_list
 
-    - name: print next_loaded_ptfs_list
-      debug:
-        var: next_loaded_ptfs_list
+    # - name: print next_loaded_ptfs_list
+    #   debug:
+    #     var: next_loaded_ptfs_list
 
-    - name: print requisite_list
-      debug:
-        var: requisite_list
+    # - name: print requisite_list
+    #   debug:
+    #     var: requisite_list
 
     - name: Compose the new ptfs_list
       set_fact:
@@ -109,15 +107,15 @@
       set_fact:
         ptfs_list_parm: "{{ ( next_not_loaded_ptfs_list | default([]) + next_loaded_ptfs_list | default([]) + requisite_list | default([]) ) | difference( load_fail_simple_list | default([])) }}"
 
-    - name: print ptfs_list
-      debug:
-        var: ptfs_list_parm
+    # - name: print ptfs_list
+    #   debug:
+    #     var: ptfs_list_parm
 
   when: tmp_not_loaded_ptfs_list != [] or tmp_loaded_ptfs_list != []
 
-- name: print final ptfs status
-  debug:
-    var: final_ptfs_status
+# - name: print final ptfs status
+#   debug:
+#     var: final_ptfs_status
 
 - block:
     - set_fact:
@@ -132,11 +130,10 @@
       vars:
         check_ptf_list: "{{ all_ptfs }}"
         check_product: False
-      register: check_result
 
-    - name: print ptfs status
-      debug:
-        var: ptfs_status
+    # - name: print ptfs status
+    #   debug:
+    #     var: ptfs_status
 
     - name: compose final_ptfs_status_with_requisite add final check_ptf output
       set_fact:
@@ -183,6 +180,7 @@
     - name: print requisite ptfs status
       debug:
         var: requisite_ptfs_status
+      when: requisite_ptfs_status is defined
 
     - meta: end_host
 

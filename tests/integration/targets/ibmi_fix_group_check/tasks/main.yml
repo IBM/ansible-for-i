@@ -40,7 +40,6 @@
 
 - name: TC00 run module with a single PTF group with validate_certs
   ibmi_fix_group_check:
-    validate_certs: true
     groups: '{{group_74}}'
   register: group_check_result
   failed_when: group_check_result.failed == true 

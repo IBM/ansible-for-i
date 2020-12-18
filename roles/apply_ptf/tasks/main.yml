@@ -3,6 +3,7 @@
 - set_fact:
     requisite_list: []
     apply_fail_dict: {}
+    apply_fail_with_requisite_list: []
 
 - include: apply_all_loaded_ptfs.yml
   when: apply_all_loaded_ptfs

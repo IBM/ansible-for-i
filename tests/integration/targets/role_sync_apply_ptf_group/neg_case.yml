@@ -1,0 +1,22 @@
+# negative test of the role
+- set_fact:
+    neg_group: "SF99769"
+
+- block:
+  - name: non-exist file_path
+    include_role:
+      name: sync_apply_ptf_group
+    vars:
+      ptf_group_info: { 'file_path': '/1233211234567', 'file_name': ['S8404V01.BIN'] }
+      src_host: "fix_repo"     
+
+  - name: assert values
+    assert:
+      that:
+        - sync_result.failed == 255
+        - sync_result.msg == "No files were successfully transferred."
+        - sync_result.fail_list is defined
+        - sync_result.fail_list[0]['fail_reason'] == "src /1233211234567/S8404V01.BIN doesn't exist."
+        - sync_result.fail_list[0]['src'] == "/1233211234567/S8404V01.BIN"
+
+  ignore_errors: true

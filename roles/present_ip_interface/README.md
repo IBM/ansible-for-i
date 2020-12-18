@@ -26,10 +26,9 @@ Role Variables
 | `location_code_of_ethernet_port`      | str          | False |  ''    |The location code of the ethernet port that will be used to find or create line description. |
 | `resource_name_of_ethernet_port`      | str          | False |  ''   |The resouce name of the ethernet port that will be used to find or create line description.                      |
 | `mac_address_of_ethernet_port`      | str          | False |  ''   |The mac address of the ethernet port that will be used to find or create line description.                      |
-| `addition_options_for_CRTLINETH`     | str          | False |  　''   |The virtual LAN identifier of the associated line. |
+| `addition_options_for_CRTLINETH`     | str          | False |  　''   |Addtion options for CRTLINETH. |
 | `route_destination`      | str          | False  |  *DFTROUTE   |Specifies the route destination being added. |
-| `next_hop`      | str          | False |     |Specifies the internet address of the next system
-(gateway) on the route.                          .                      |
+| `next_hop`      | str          | False |     |Specifies the internet address of the next system (gateway) on the route.                          .                      |
 | `addition_options_for_ADDTCPRTE`               | str          | False |  ''  |Addtion options for ADDTCPRTE. |
 
 Example Playbooks
@@ -41,7 +40,7 @@ Example Playbooks
   roles:
     - role: present_ip_interface
       vars:
-        internet_address: '10.10.10.10'
+        ip_address: '10.10.10.10'
 ```
 
 ```

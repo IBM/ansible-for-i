@@ -7,7 +7,6 @@
   tasks:
     - name: Run module to check the latest level
       ibmi_fix_group_check:
-        validate_certs: true
         groups: 'SF99663'  # select a small ptf group to test
       register: group_check_result
 
@@ -33,7 +32,7 @@
         order_list: "{{download_fix_result.order_id}}"
       register: ds     
       failed_when: ds.rc != 0
-      until: ds.status[0]['download_status'] == "COMPLETE"
+      until: ds.status[0]['download_status'] == "DOWNLOADED"
       retries: 100
       delay: 30
 

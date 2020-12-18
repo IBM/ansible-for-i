@@ -1,0 +1,19 @@
+# negative test of the role
+- block:
+  - name: negative test of sync_apply_individual_ptfs role - not_loaded_list of PTF not exists on repo
+    include_role:
+      name: sync_apply_individual_ptfs
+    vars:
+      not_loaded_list: 
+        - {'ptf_id':'SI99999', 'product':'5770SS1', 'file_name':'QSI99999.file', 'file_path': '/qsys.lib/qgpl.lib/QSI99999.FILE'}
+      src_host: "fix_repo"
+      temp_or_perm: '*TEMP'
+      apply_all_loaded_ptf: true
+      auto_ipl: false
+  
+  - name: assert values
+    assert:
+      that:
+        - sync_fail_list | length == 1
+        - sync_success_list | length == 0
+        - sync_fail_list[0]['fail_reason'] == "src {{sync_fail_list[0]['file_path']}} doesn't exist."

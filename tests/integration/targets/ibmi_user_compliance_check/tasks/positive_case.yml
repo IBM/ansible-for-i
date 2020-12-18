@@ -112,7 +112,6 @@
       - {'name':'status', 'expect':['*disabled']}
       - {'name':'NO_PASSWORD_INDICATOR', 'expect':['NO']}
       - {'name':'PASSWORD_LEVEL_0_1', 'expect':['YES']}
-      - {'name':'PASSWORD_LEVEL_2_3', 'expect':['YES']}
       - {'name':'SET_PASSWORD_TO_EXPIRE', 'expect':['NO']}
       - {'name':'USER_CLASS_NAME', 'expect':['*USER']}
       - {'name':'GROUP_PROFILE_NAME', 'expect':['*NONE']}

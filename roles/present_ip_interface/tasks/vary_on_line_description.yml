@@ -15,7 +15,7 @@
 - name: Vary on the line_description if it is not active
   ibmi_cl_command:
     cmd: VRYCFG CFGOBJ({{line_description}}) CFGTYPE(*LIN) STATUS(*ON)
-  when: lind_exists is true and lined_state == 'ACTIVE'
+  when: lind_exists is true and lined_state != 'ACTIVE'
 
 - name: Create a new line description if it doesn't exist
   block:

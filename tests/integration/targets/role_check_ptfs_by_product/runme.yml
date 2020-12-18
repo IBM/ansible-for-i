@@ -16,24 +16,19 @@
       - {'ptf_id':'SI69149', 'product':'5770SS1'} # It is a requisite ptf of SI74593
       - {'ptf_id':'SI74593', 'product':'5770SS1'}      
 
-# - name: set the ptf group to be used
-#   set_fact:
-#     group_name: "{{ lookup('vars', 'individual_ptfs' + sql_query['row'][0]['OS_VERSION'] + sql_query['row'][0]['OS_RELEASE']) }}"
-
   tasks:      
-    # - name: query the os version of target IBM i
-    #   ibmi_sql_query:
-    #     sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
-    #   register: sql_query
+    - name: query the os version of target IBM i
+      ibmi_sql_query:
+        sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+      register: sql_query
 
-    # - set_fact:
-    #     individual_ptfs: "{{ lookup('vars', 'individual_ptfs_' + sql_query['row'][0]['OS_VERSION'] + sql_query['row'][0]['OS_RELEASE']) }}" 
+    - set_fact:
+        individual_ptfs: "{{ lookup('vars', 'individual_ptfs_' + sql_query['row'][0]['OS_VERSION'] + sql_query['row'][0]['OS_RELEASE']) }}" 
+    - include: query_remove_ptf.yml
+      loop: '{{[]+ [individual_ptfs[1]]}}'
 
-    # - include: query_remove_ptf.yml
-    #   loop: '{{[]+ [individual_ptfs[1]]}}'
-
-    # - include: query_remove_ptf.yml
-    #   loop: '{{[]+ [individual_ptfs[0]]}}'
+    - include: query_remove_ptf.yml
+      loop: '{{[]+ [individual_ptfs[0]]}}'
 
     - name: Add VM to Ansible in-memory inventory
       add_host:
@@ -43,15 +38,15 @@
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
         ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+
     - name: negative test
       include: neg_case.yml 
-    - meta: end_play      
+  
     - include_role: 
         name: check_ptfs_by_product
       vars:
         product: "5770SS1"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
 
     - debug: var=ptf_status
 
@@ -103,7 +98,6 @@
 
     - name: Add individual ptf record into catalog
       ibmi_fix_repo:
-        database: "/tmp/repo.sqlite3"
         type: "single_ptf"
         action: "add"
         checksum: True
@@ -139,7 +133,6 @@
 
     - name: Get the individual ptfs' information in catalog
       ibmi_fix_repo:
-        database: "/tmp/repo.sqlite3"
         type: "single_ptf"
         checksum: True
         action: "find"
@@ -172,7 +165,6 @@
       vars:
         product: "5770SS1"
         repo_server: "repo_server_name"
-        database: "/tmp/repo.sqlite3"
 
     - debug: var=ptf_status
 

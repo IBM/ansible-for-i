@@ -19,7 +19,7 @@ module: ibmi_fix_product_check
 short_description: Check the software product installation status for a fix
 version_added: '2.8.0'
 description:
-  - The C(ibmi_fix_product_check) module checks if the software product of a fix is intalled.
+  - The C(ibmi_fix_product_check) module checks if the software product of a fix is installed.
 options:
   ptfs:
     description:
@@ -105,7 +105,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.2.0"
 
 
 def get_product_info(imodule, product_id, release_level, product_option, load_id):

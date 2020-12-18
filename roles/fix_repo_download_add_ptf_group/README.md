@@ -8,9 +8,8 @@ Role Variables
 | Variable              | Type          | Description                                                          |
 |-----------------------|---------------|----------------------------------------------------------------------|
 | `ptf_group_number`    | str           | The ptf group number will be download.                               |
-| `ptf_group_level`     | str           | The ptf group level of the ptf group.                                |
+| `ptf_group_level`     | int           | The ptf group level of the ptf group.                                |
 | `release_date`        | str           | The release date of the ptf group.                                   |
-| `database`            | str           | The path of fix management sqlite3 database.                         |
 
 Return Variables
 --------------
@@ -28,9 +27,8 @@ Example Playbook
 
   vars:
     ptf_group_number: "SF99740"
-    ptf_group_level: "7"
+    ptf_group_level: 7
     release_date: "5/14/20"
-    database: "/tmp/repo.sqlite3"
 
     - name: Include fix_repo_download_add_ptf_group role to download the ptf group and add information into catalog download_status table
       include_role:

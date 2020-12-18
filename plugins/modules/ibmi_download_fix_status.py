@@ -68,12 +68,14 @@ status:
     sample: [
         {
             'order_id': '2029604329',
-            'download_status': 'COMPLETE',
+            'download_status': 'DOWNLOADED',
+            'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2029604329',
             'complete_time': '2020-11-01 00:59:58'
         },
         {
             'order_id': '2020579181',
             'download_status': 'UNKNOWN',
+            'file_path': 'UNKNOWN',
             'complete_time': 'UNKNOWN'
         }
     ]
@@ -90,7 +92,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.2.0"
 
 HAS_ITOOLKIT = True
 
@@ -154,8 +156,8 @@ def main():
                     re_list = re.findall(r"/[0-9a-zA-Z]+", item['MESSAGE_SECOND_LEVEL_TEXT'])
                     for id_temp in re_list:
                         if id_temp[1:] == order_id:
-                            # message exists. set the download_status to 'COMPLETE'
-                            download_status = 'COMPLETE'
+                            # message exists. set the download_status to 'DOWNLOADED'
+                            download_status = 'DOWNLOADED'
                             complete_time = out[0]['MESSAGE_TIMESTAMP'].strip()[:-7]
                             file_path = ''.join(re_list)
 

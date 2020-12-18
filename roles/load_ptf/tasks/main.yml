@@ -4,6 +4,7 @@
     load_success_list: []
     load_fail_list: []
     option_not_installed: []
+    load_fail_dict: {}
 
 - name: load ptfs from save file
   include_tasks: load_individual_ptf.yml

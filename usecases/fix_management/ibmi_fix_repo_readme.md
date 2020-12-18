@@ -105,7 +105,6 @@ This module processes the action **add** and **update** using an unique SQL synt
 | download_status |   false  |                          order_id                          |
 |    single_ptf   |   true   |                 ptf_id, product, file_path                 |
 |    ptf_group    |   true   | ptf_group_number, ptf_group_level, release_date, file_path |
-| download_status |   true   |                     order_id, file_path                    |
 
 For type `ptf_group`, some of its input parameters should be retrieved from websites through the module **ibmi_fix_group_check**.
 
@@ -217,7 +216,6 @@ When the image files have been downloaded, it calls action **update** and set **
 
       - name: add_group_info_records
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: 'add'
           type: 'ptf_group'
           checksum: false
@@ -231,7 +229,6 @@ When the image files have been downloaded, it calls action **update** and set **
 
       - name: query_group_info_records
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: 'find'
           type: 'ptf_group'
           parameters:
@@ -244,7 +241,6 @@ When the image files have been downloaded, it calls action **update** and set **
 
       - name: change_group_info_records
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: 'update'
           type: 'ptf_group'
           checksum: true
@@ -258,7 +254,6 @@ When the image files have been downloaded, it calls action **update** and set **
 
       - name: query_updated_group_info_records
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: 'find'
           type: 'ptf_group'
           checksum: true
@@ -273,7 +268,6 @@ When the image files have been downloaded, it calls action **update** and set **
       always:
       - name: drop_the_table
         ibmi_fix_repo:
-          database: '/tmp/testdb.sqlite3'
           action: "clear"
           type: 'ptf_group'
 ```

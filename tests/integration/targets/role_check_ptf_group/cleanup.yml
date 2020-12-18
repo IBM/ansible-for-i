@@ -7,7 +7,6 @@
 
   - name: get the latest PTF group level from PSP website
     ibmi_fix_group_check:
-      validate_certs: true
       groups: '{{group_name}}'
     register: group_check_result
 

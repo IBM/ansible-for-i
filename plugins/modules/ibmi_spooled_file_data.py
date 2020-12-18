@@ -132,7 +132,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.2.0"
 
 
 def main():
@@ -166,7 +166,9 @@ def main():
         message = 'Exception occurred: {0}'.format(str(inst))
         module.fail_json(rc=999, msg=message)
 
-    ifs_spooled_file_path = '/TMP/{0}.TXT'.format(spooled_file_name)
+    ifs_spooled_file_path = '/TMP/ANSIBLE_{0}_{1}.TXT'.format(spooled_file_name, job_name.replace('/', '_'))
+    if os.path.exists(ifs_spooled_file_path):
+        os.remove(ifs_spooled_file_path)
     command = "QSYS/CPYSPLF FILE({0}) TOFILE(*TOSTMF) JOB({1}) SPLNBR({2}) TOSTMF('{3}') STMFOPT(*REPLACE)".format(
         spooled_file_name, job_name, spooled_file_number, ifs_spooled_file_path)
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
