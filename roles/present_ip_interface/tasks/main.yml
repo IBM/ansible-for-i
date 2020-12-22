@@ -19,7 +19,7 @@
 
 - name: query ip interfaces from source system
   ibmi_sql_query:
-    sql: "SELECT INTERNET_ADDRESS,CONNECTION_TYPE,SUBNET_MASK,PREFIX_LENGTH,LINE_DESCRIPTION,VIRTUAL_LAN_ID,PREFIX_LENGTH from QSYS2.NETSTAT_INTERFACE_INFO WHERE (INTERNET_ADDRESS = '{{ip_address}}') AND (INTERFACE_LINE_TYPE = 'ELAN' OR INTERFACE_LINE_TYPE = 'VETH' OR LINE_DESCRIPTION = '*VIRTUALIP') AND INTERNET_ADDRESS not in ('*IP6SAC', '*IP4DHCP')"
+    sql: "SELECT INTERNET_ADDRESS,CONNECTION_TYPE,SUBNET_MASK,PREFIX_LENGTH,LINE_DESCRIPTION,VIRTUAL_LAN_ID,PREFIX_LENGTH from QSYS2.NETSTAT_INTERFACE_INFO WHERE (INTERNET_ADDRESS = '{{ ip_address }}') AND (INTERFACE_LINE_TYPE = 'ELAN' OR INTERFACE_LINE_TYPE = 'VETH' OR LINE_DESCRIPTION = '*VIRTUALIP') AND INTERNET_ADDRESS not in ('*IP6SAC', '*IP4DHCP')"
   register: existing_ip_interfaces
 
 - name: Create a new IP interface when it doesn't exist
@@ -39,14 +39,14 @@
 
     - name: Give a default name of the line_description if the input value is not correct
       set_fact:
-        line_description: 'DEF{{resource_name}}'
+        line_description: 'DEF{{ resource_name }}'
       when: line_description is undefined or line_description == None
 
     - include: find_existing_line_description.yml
-      loop: '{{all_line_descriptions_result.stdout_lines}}'
+      loop: '{{ all_line_descriptions_result.stdout_lines }}'
       loop_control:
         loop_var: lind_line
-      when: line_description == 'DEF{{resource_name}}' 
+      when: line_description == 'DEF{{ resource_name }}' 
 
     - debug: var=line_description
 
@@ -54,35 +54,35 @@
 
     - name: Create IP interface
       ibmi_tcp_interface: 
-        line_description: '{{line_description}}'
-        vlan_id: '{{vlanid}}'
-        subnet_mask: '{{netmask}}'
-        internet_address: '{{ip_address}}'
+        line_description: '{{ line_description }}'
+        vlan_id: '{{ vlanid }}'
+        subnet_mask: '{{ netmask }}'
+        internet_address: '{{ ip_address }}'
         state: 'present'
-        associated_local_interface: '{{associatedLocalInterface}}'
-        type_of_service: '{{typeOfService}}'
-        max_transmission_unit: '{{maxTransmissionUnit}}'
-        auto_start: '{{autoStart}}'
-        preferred_interface: '{{preferredInterface}}'
-        text_description: '{{textDescription}}'
-        sec_to_wait: '{{secToWait | int}}'
-        extra_params: '{{extraParams}}'
+        associated_local_interface: '{{ associatedLocalInterface }}'
+        type_of_service: '{{ typeOfService  }}'
+        max_transmission_unit: '{{ maxTransmissionUnit  }}'
+        auto_start: '{{ autoStart  }}'
+        preferred_interface: '{{ preferredInterface }}'
+        text_description: '{{ textDescription }}'
+        sec_to_wait: '{{ secToWait | int }}'
+        extra_params: '{{ extraParams }}'
         joblog: true  
 
     - name: Query existing route
       ibmi_sql_query:
         sql: "SELECT * FROM QSYS2.NETSTAT_ROUTE_INFO
-  WHERE NEXT_HOP = '{{next_hop}}'"
+  WHERE NEXT_HOP = '{{ next_hop }}'"
       register: route_info
 
     - name: Create route if next_hop is provided.
       ibmi_cl_command:
-        cmd: "ADDTCPRTE RTEDEST('{{route_destination}}') NEXTHOP('{{next_hop}}') {{addition_options_for_ADDTCPRTE}}"
+        cmd: "ADDTCPRTE RTEDEST('{{ route_destination }}') NEXTHOP('{{ next_hop }}') {{ addition_options_for_ADDTCPRTE }}"
       when: (next_hop is defined and next_hop != '') and route_info.row | length == 0 
 
   when: existing_ip_interfaces.row|length == 0 
 
 - name: Ensure the IP interface is active
   ibmi_tcp_interface:
-    internet_address: '{{ip_address}}'
+    internet_address: '{{ ip_address }}'
     state: 'active' 
