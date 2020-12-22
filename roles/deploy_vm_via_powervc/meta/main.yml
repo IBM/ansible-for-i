@@ -38,7 +38,12 @@ galaxy_info:
   #   - 1.0
   #   - 7
   #   - 99.99
-
+  platforms:
+  - name: IBM i
+    versions:
+    - 7.2
+    - 7.3
+    - 7.4
   galaxy_tags: 
   - powervc
   - ibmi

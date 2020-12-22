@@ -77,3 +77,5 @@ build_ignore:
   - .gitkeep
   - .github
   - tests
+  - usecases/db2mirror_setup_via_powervc
+  - roles/*_powervc
