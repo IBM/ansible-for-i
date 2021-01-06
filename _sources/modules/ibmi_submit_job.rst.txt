@@ -105,7 +105,7 @@ Examples
 
    
    - name: Submit a batch job and run CALL QGPL/PGM1
-     ibmi_submit_job:
+     ibmi_ibm.power_ibmi.ibmi_submit_job:
        cmd: 'CALL QGPL/PGM1'
        parameters: 'JOB(TEST)'
        check_interval: '30s'
@@ -131,6 +131,7 @@ See Also
    - :ref:`ibmi_job_module`
 
 
+  
 
 Return Values
 -------------

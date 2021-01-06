@@ -146,7 +146,7 @@ Examples
 
    
    - name: config db2 mirror on source node
-     ibmi_mirror_setup_source:
+     ibm.power_ibmi.ibmi_mirror_setup_source:
        termination_level: RECLONE
        primary_node: NODEA
        secondary_node: NODEB
@@ -169,6 +169,7 @@ See Also
    - :ref:`ibmi_mirror_setup_copy_module`
 
 
+  
 
 Return Values
 -------------

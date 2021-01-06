@@ -146,7 +146,7 @@ Examples
 
    
    - name:  Find all journals and journal receivers in library WYTEST.
-     ibmi_object_find:
+     ibm.power_ibmi.ibmi_object_find:
        object_name: '*ALL'
        object_type_list: '*JRN *JRNRCV'
        lib_name: 'WYTEST'
@@ -154,21 +154,21 @@ Examples
        age_stamp: 'ctime'
 
    - name:  Find all the object names that contains 'ABC' with regex.
-     ibmi_object_find:
+     ibm.power_ibmi.ibmi_object_find:
        object_name: 'ABC+'
        object_type_list: '*ALL'
        lib_name: '*ALL'
        use_regex: true
 
    - name: find library WYTEST in sysbas
-     ibmi_object_find:
+     ibm.power_ibmi.ibmi_object_find:
        lib_name: 'QSYS'
        iasp_name: '*SYSBAS'
        object_name: 'WYTEST'
        object_type_list: "*LIB"
 
    - name: find object OBJABC in asp group WYTEST2
-     ibmi_object_find:
+     ibm.power_ibmi.ibmi_object_find:
        lib_name: '*ALL'
        iasp_name: 'WYTEST2'
        object_type_list: "*FILE"
@@ -195,6 +195,7 @@ See Also
    - :ref:`find_module`
 
 
+  
 
 Return Values
 -------------

@@ -96,7 +96,7 @@ Examples
 
    
    - name: Call RTVJOBA to get job information
-     ibmi_rtv_command:
+     ibm.power_ibmi.ibmi_rtv_command:
        cmd: 'RTVJOBA'
        char_vars:
          - 'JOB'
@@ -106,7 +106,7 @@ Examples
          - 'JOBMSGQMX'
 
    - name: Call RTVAUTLE to get information of the authority list
-     ibmi_rtv_command:
+     ibm.power_ibmi.ibmi_rtv_command:
        cmd: 'RTVAUTLE AUTL(PAYROLL) USER(TOM)'
        char_vars:
          - 'USE'
@@ -114,7 +114,7 @@ Examples
          - 'AUTLMGT'
 
    - name: Call RTVDTAARA to get content of a data area
-     ibmi_rtv_command:
+     ibm.power_ibmi.ibmi_rtv_command:
        cmd: 'RTVDTAARA DTAARA(QSYS/QAENGWTTM)'
        char_vars:
          - 'RTNVAR'
@@ -142,6 +142,7 @@ See Also
    - :ref:`ibmi_cl_command_module`
 
 
+  
 
 Return Values
 -------------

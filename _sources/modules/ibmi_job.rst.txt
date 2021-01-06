@@ -130,12 +130,12 @@ Examples
 
    
    - name: Get status of a list of jobs
-     ibmi_job:
+     ibm.power_ibmi.ibmi_job:
        user: "WANGYUN"
        type: "*BATCH"
 
    - name: List job information
-     ibmi_job:
+     ibm.power_ibmi.ibmi_job:
        name: "556235/WANGYUN/TEST"
 
 
@@ -157,6 +157,7 @@ See Also
    - :ref:`ibmi_submit_job_module`
 
 
+  
 
 Return Values
 -------------

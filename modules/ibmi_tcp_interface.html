@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>ibmi_tcp_interface – Add, change, remove or query a tcp/ip interface. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -50,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> IBM power_ibmi collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -201,6 +204,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -214,7 +219,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             
               <!-- User defined GitHub URL -->
               <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_tcp_interface.py" class="fa fa-github"> Edit on GitHub</a>
@@ -394,7 +399,7 @@
 <div class="section" id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 1</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.11&#39;</span>
     <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.255.0&#39;</span>
     <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
@@ -402,7 +407,7 @@
     <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 2</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.12&#39;</span>
     <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
     <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.255.0&#39;</span>
@@ -410,7 +415,7 @@
     <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 3</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.13&#39;</span>
     <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
     <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.255.0&#39;</span>
@@ -420,7 +425,7 @@
     <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias13&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 4</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.14&#39;</span>
     <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
     <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.255.0&#39;</span>
@@ -431,7 +436,7 @@
     <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias14&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">create an interface 5</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.15&#39;</span>
     <span class="nt">line_description</span><span class="p">:</span> <span class="s">&#39;LIND1&#39;</span>
     <span class="nt">vlan_id</span><span class="p">:</span> <span class="s">&#39;2&#39;</span>
@@ -443,20 +448,20 @@
     <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias15&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">change an interface 1</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.11&#39;</span>
     <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.0.0&#39;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">change an interface 2</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.12&#39;</span>
     <span class="nt">subnet_mask</span><span class="p">:</span> <span class="s">&#39;255.255.0.0&#39;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
     <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias2&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">change an interface 3</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.11&#39;</span>
     <span class="nt">preferred_interface</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="s">&quot;9.5.155.12&quot;</span>
@@ -464,28 +469,28 @@
     <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">change an interface 4</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.12&#39;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
     <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias2&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">query an interface by ip</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.12&#39;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">query an interface by alias name</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias14&#39;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;present&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">remove an interface by ip</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">internet_address</span><span class="p">:</span> <span class="s">&#39;9.5.155.11&#39;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;absent&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">remove an interface by alias name</span>
-  <span class="nt">ibmi_tcp_interface</span><span class="p">:</span>
+  <span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_interface</span><span class="p">:</span>
     <span class="nt">alias_name</span><span class="p">:</span> <span class="s">&#39;alias2&#39;</span>
     <span class="nt">state</span><span class="p">:</span> <span class="s">&#39;absent&#39;</span>
 </pre></div>
@@ -631,29 +636,21 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="ibmi_tcp_server_service.html" class="btn btn-neutral float-right" title="ibmi_tcp_server_service – Manage tcp server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="ibmi_sysval.html" class="btn btn-neutral float-left" title="ibmi_sysval – Displays the specified system value" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="ibmi_tcp_server_service.html" class="btn btn-neutral float-right" title="ibmi_tcp_server_service – Manage tcp server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ibmi_sysval.html" class="btn btn-neutral float-left" title="ibmi_sysval – Displays the specified system value" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, IBM
+        &#169; Copyright 2020, IBM.
 
     </p>
   </div> 
 
 </footer>
-
         </div>
       </div>
 

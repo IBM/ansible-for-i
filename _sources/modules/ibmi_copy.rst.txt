@@ -83,7 +83,7 @@ Examples
 
    
    - name: Copy test.file on local to a remote IBM i.
-     ibmi_copy:
+     ibm.power_ibmi.ibmi_copy:
        src: '/backup/test.file'
        lib_name: 'testlib'
        force: True
@@ -108,6 +108,7 @@ See Also
    - :ref:`copy_module`
 
 
+  
 
 Return Values
 -------------

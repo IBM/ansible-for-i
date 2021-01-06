@@ -99,7 +99,7 @@ Examples
 
    
    - name: start host server service
-     ibmi_host_server_service:
+     ibm.power_ibmi.ibmi_host_server_service:
        name_list: ['*CENTRAL', '*DATABASE']
        state: 'started'
        joblog: True
@@ -119,6 +119,7 @@ See Also
    - :ref:`service_module`
 
 
+  
 
 Return Values
 -------------

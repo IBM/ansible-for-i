@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>ibmi_object_find – Find specific IBM i object(s). &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -50,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> IBM power_ibmi collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -202,6 +205,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -215,7 +220,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             
               <!-- User defined GitHub URL -->
               <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_find.py" class="fa fa-github"> Edit on GitHub</a>
@@ -333,7 +338,7 @@
 <div class="section" id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">Find all journals and journal receivers in library WYTEST.</span>
-  <span class="nt">ibmi_object_find</span><span class="p">:</span>
+  <span class="nt">ibm.power_ibmi.ibmi_object_find</span><span class="p">:</span>
     <span class="nt">object_name</span><span class="p">:</span> <span class="s">&#39;*ALL&#39;</span>
     <span class="nt">object_type_list</span><span class="p">:</span> <span class="s">&#39;*JRN</span><span class="nv"> </span><span class="s">*JRNRCV&#39;</span>
     <span class="nt">lib_name</span><span class="p">:</span> <span class="s">&#39;WYTEST&#39;</span>
@@ -341,21 +346,21 @@
     <span class="nt">age_stamp</span><span class="p">:</span> <span class="s">&#39;ctime&#39;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">Find all the object names that contains &#39;ABC&#39; with regex.</span>
-  <span class="nt">ibmi_object_find</span><span class="p">:</span>
+  <span class="nt">ibm.power_ibmi.ibmi_object_find</span><span class="p">:</span>
     <span class="nt">object_name</span><span class="p">:</span> <span class="s">&#39;ABC+&#39;</span>
     <span class="nt">object_type_list</span><span class="p">:</span> <span class="s">&#39;*ALL&#39;</span>
     <span class="nt">lib_name</span><span class="p">:</span> <span class="s">&#39;*ALL&#39;</span>
     <span class="nt">use_regex</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">find library WYTEST in sysbas</span>
-  <span class="nt">ibmi_object_find</span><span class="p">:</span>
+  <span class="nt">ibm.power_ibmi.ibmi_object_find</span><span class="p">:</span>
     <span class="nt">lib_name</span><span class="p">:</span> <span class="s">&#39;QSYS&#39;</span>
     <span class="nt">iasp_name</span><span class="p">:</span> <span class="s">&#39;*SYSBAS&#39;</span>
     <span class="nt">object_name</span><span class="p">:</span> <span class="s">&#39;WYTEST&#39;</span>
     <span class="nt">object_type_list</span><span class="p">:</span> <span class="s">&quot;*LIB&quot;</span>
 
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">find object OBJABC in asp group WYTEST2</span>
-  <span class="nt">ibmi_object_find</span><span class="p">:</span>
+  <span class="nt">ibm.power_ibmi.ibmi_object_find</span><span class="p">:</span>
     <span class="nt">lib_name</span><span class="p">:</span> <span class="s">&#39;*ALL&#39;</span>
     <span class="nt">iasp_name</span><span class="p">:</span> <span class="s">&#39;WYTEST2&#39;</span>
     <span class="nt">object_type_list</span><span class="p">:</span> <span class="s">&quot;*FILE&quot;</span>
@@ -502,29 +507,21 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="ibmi_object_restore.html" class="btn btn-neutral float-right" title="ibmi_object_restore – Restore one or more objects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="ibmi_object_authority.html" class="btn btn-neutral float-left" title="ibmi_object_authority – Grant, revoke or display object authority" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="ibmi_object_restore.html" class="btn btn-neutral float-right" title="ibmi_object_restore – Restore one or more objects" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ibmi_object_authority.html" class="btn btn-neutral float-left" title="ibmi_object_authority – Grant, revoke or display object authority" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, IBM
+        &#169; Copyright 2020, IBM.
 
     </p>
   </div> 
 
 </footer>
-
         </div>
       </div>
 

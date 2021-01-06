@@ -121,14 +121,14 @@ Examples
 
    
    - name: Execute test.cl on a remote IBM i node with become user.
-     ibmi_script_execute:
+     ibm.power_ibmi.ibmi_script_execute:
        src: '/home/test.cl'
        type: 'CL'
        become_user: 'USER1'
        become_user_password: 'yourpassword'
 
    - name: Execute testsql.sql on a remote IBM i node.
-     ibmi_script_execute:
+     ibm.power_ibmi.ibmi_script_execute:
        src: '/home/testsql.sql'
        type: 'SQL'
        severity_level: 40
@@ -151,6 +151,7 @@ Notes
 
 
 
+  
 
 Return Values
 -------------

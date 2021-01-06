@@ -93,7 +93,7 @@ Examples
 
    
    - name: Synchronize c1 save file to host.com.
-     ibmi_sync:
+     ibmi_ibm.power_ibmi.ibmi_sync:
        src: '/qsys.lib/test.lib/c1.file'
        remote_host: 'host.com'
        remote_user: 'user'
@@ -118,6 +118,7 @@ Notes
 
 
 
+  
 
 Return Values
 -------------

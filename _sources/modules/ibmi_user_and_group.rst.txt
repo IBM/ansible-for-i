@@ -240,24 +240,24 @@ Examples
 
    
    - name: create user profile
-     ibmi_user_and_group:
+     ibmi_ibm.power_ibmi.ibmi_user_and_group:
        operation: 'create'
        user: 'changle'
 
    - name: create user profile with become user
-     ibmi_user_and_group:
+     ibmi_ibm.power_ibmi.ibmi_user_and_group:
        operation: 'create'
        user: 'changle'
        become_user: 'USER1'
        become_user_password: 'yourpassword'
 
    - name: display user profile
-     ibmi_user_and_group:
+     ibmi_ibm.power_ibmi.ibmi_user_and_group:
        operation: 'display'
        user: 'changle'
 
    - name: display group members
-     ibmi_user_and_group:
+     ibmi_ibm.power_ibmi.ibmi_user_and_group:
        operation: 'display_group_members'
        user: 'group1'
 
@@ -274,6 +274,7 @@ See Also
    - :ref:`ibmi_cl_command_module`
 
 
+  
 
 Return Values
 -------------

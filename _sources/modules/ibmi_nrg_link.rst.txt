@@ -141,14 +141,14 @@ Examples
 
    
    - name: add a link to the db2 mirror nrg
-     ibmi_nrg_link:
+     ibm.power_ibmi.ibmi_nrg_link:
        operation: add
        source_address: 10.0.0.1
        target_address: 10.0.0.2
        link_priority: 1
 
    - name: remove a link from the db2 mirror nrg with become user
-     ibmi_nrg_link:
+     ibm.power_ibmi.ibmi_nrg_link:
        operation: remove
        source_address: 10.0.0.1
        become_user: 'USER1'
@@ -177,6 +177,7 @@ See Also
    - :ref:`ibmi_sql_query_module`
 
 
+  
 
 Return Values
 -------------

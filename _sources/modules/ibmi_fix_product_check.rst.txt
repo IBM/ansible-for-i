@@ -65,7 +65,7 @@ Examples
 
    
    - name: Get PTF products installation status
-     ibmi_fix_product_check:
+     ibm.power_ibmi.ibmi_fix_product_check:
        ptfs:
          - {
            "product": "5770UME",
@@ -91,6 +91,7 @@ See Also
    - :ref:`ibmi_fix_module`
 
 
+  
 
 Return Values
 -------------
