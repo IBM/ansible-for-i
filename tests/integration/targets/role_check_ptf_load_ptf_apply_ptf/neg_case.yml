@@ -1,11 +1,11 @@
-# negative test of the role check_ptf_groups
+# negative test of the role check_ptf_groups_against_fix_repo
 - set_fact:
     repo_server_name: "ut2026p8.rch.stglabs.ibm.com"
 
 - block:
   - name: invalid group_list
     include_role:
-      name: check_ptf_groups
+      name: check_ptf_groups_against_fix_repo
     vars: 
       group_list:
         - "INVALID"
@@ -23,8 +23,9 @@
         - group_status[1]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
 
   - name: invalid type
-    include_role:
-      name: check_ptf_groups
+    ignore_errors: true
+    import_role:
+      name: check_ptf_groups_against_fix_repo
     vars: 
       group_list:
         - "SF99704"
@@ -37,20 +38,8 @@
         - group_status | length == 0
         - group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
         - group_status[0]['PTF_GROUP_NUMBER'] is not defined
-       # - group_status[0]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
         - group_status[0]['PTF_GROUP_STATUS'] is not defined
         - group_status[0]['PTF_NOT_INSTALLED'] is not defined  
-
-  - name: invalid repo_server
-    include_role:
-      name: check_ptf_groups
-    vars: 
-      group_list:
-        - "SF99703"
-      type: "newest"
-      repo_server: "i.am.invalid"
-
-  - debug: var=group_status
 
   - name: assert the returned group_status
     assert:
@@ -60,30 +49,25 @@
         - group_status[0]['PTF_GROUP_NUMBER'] is not defined
         - group_status[0]['PTF_GROUP_STATUS'] is not defined
         - group_status[0]['PTF_NOT_INSTALLED'] is not defined   
-# negative test of the role check_ptf, hold check_ptf testing, big change pending by fish. 2020/11/6
-  - block:
-    - set_fact:
-        neg_list:
-          - {'ptf_id':'ABCDEFG', 'product':'5733SC1', 'file_name':'QSI73751.FILE'} # invalid ptf_id
-          - {'product':'5733SC1', 'file_name':'QSI73751'} # missing ptf_id which is required
-          - {'product':'5733SC1', 'file_name':'NONEXIST', 'ptf_id':'SI73751'} #invalid file_name
-          - {'product':'INVALID', 'file_name':'QSI73751', 'ptf_id':'SI73751'} #invalid product id
-          - {'product':'TOOLOONG', 'file_name':'QSI73751', 'ptf_id':'SI73751'} # product id length longer than 7
-          - {'product':'5733SC1', 'file_name':'TOOLOOOOONG', 'ptf_id':'SI73751'} # obj length longer than 10
-          - {'product':'5733SC1', 'file_name':'QSI73751', 'ptf_id':'ABCDEF123456'} # ptf_id obj length longer than 10
- 
-    - name: negative test for check_ptf
-      include_role:
-        name: check_ptf
-      vars:
-        check_ptf_list: '{{neg_list}}'
 
-    - name: assert the returned parameters
-      assert:
-        that:
-          - ptfs_info | length == neg_list | length
-          - not_loaded_ptfs_list | length == neg_list | length
-          - ptfs_status | length == 0
+- block:
+  - set_fact:
+      neg_list:
+        - {'product':'5733SC1', 'release':'V7R2M0'} 
+
+  - name: negative test for check_ptf
+    ignore_errors: true
+    import_role:
+      name: check_ptf
+    vars:
+      check_ptf_list: '{{neg_list}}'
+
+  - name: assert the returned parameters
+    assert:
+      that:
+        - ptfs_info == []
+        - not_loaded_ptfs_list == []
+        - ptfs_status == {}
 
 # negative test of the role load_ptf
 
@@ -92,15 +76,10 @@
       neg_list:
         - {'ptf_id':'SI73751', 'product':'5733SC1'} #lack of file_name
         - {'ptf_id':'SI73751', 'file_name':'QSI73751'} #lack of product
-        - {'product':'5733SC1', 'file_name':'QSI73751'} #lack of ptf_id
-        - {'product':'5733SC1', 'file_name':'NONEXIST', 'ptf_id':'SI73751'} #invalid file_name
-        - {'product':'INVALID', 'file_name':'QSI73751', 'ptf_id':'SI73751'} #invalid product id
-        - {'product':'5733SC1', 'file_name':'QSI73751', 'ptf_id':'ABCD1234'} #invalid ptf id
-        - {'product':'TOOLOONG', 'file_name':'QSI73751', 'ptf_id':'SI73751'} # product id length longer than 7
-        - {'product':'5733SC1', 'file_name':'TOOLOOOOONG', 'ptf_id':'SI73751'} # obj length longer than 10
-        - {'product':'5733SC1', 'file_name':'QSI73751', 'ptf_id':'ABCDEF123456'} # ptf_id obj length longer than 10 
+
   - name: load ptf with role
-    include_role:
+    ignore_errors: true
+    import_role:
       name: load_ptf
     vars: 
       to_be_loaded_list: '{{neg_list}}'
@@ -116,10 +95,6 @@
 - block:
   - set_fact:
       neg_list:
-        - {'ptf_id':'SI12345', 'product':'5770UME'} # non-exist ptf_id
-        - {'ptf_id':'ABCDEFG', 'product':'5733SC1'} # invalid ptf_id
-        - {'ptf_id':'SI73430', 'product':'ABCDEFG'} # non-exist product
-        - {'ptf_id':'SI73430', 'product':'ABCDEFGH'} # invalid product - length > 7
         - {'ptf_id':'SI73430', 'product':'5733SS1', 'file_name':'QSI73430'} # more parameter provided
         - {'ptf_id':'SI73430'} # insufficient parameter provided   
         - {'product':'5770UME'} # insufficient parameter provided      
@@ -128,6 +103,7 @@
       name: apply_ptf
     vars: 
       to_be_applied_list: '{{neg_list}}'
+      apply_all_loaded_ptfs: false
 
   - name: assert the returned list correct
     assert:
@@ -144,6 +120,7 @@
       temp_or_perm: '*TAMP' # invalid option
       delayed_option: '*NO' 
       auto_ipl: false     
+      apply_all_loaded_ptfs: false
 
   - name: assert the returned list correct
     assert:
@@ -159,7 +136,8 @@
         - {'ptf_id':'SI73543', 'product':'5770UME'}
       temp_or_perm: '*TEMP'
       delayed_option: false # invalid option 
-      auto_ipl: false     
+      auto_ipl: false    
+      apply_all_loaded_ptfs: false 
 
   - name: assert the returned list correct
     assert:
@@ -176,6 +154,7 @@
       temp_or_perm: '*TEMP'
       delayed_option: '*NO' 
       auto_ipl: '*NO'   # invalid option   
+      apply_all_loaded_ptfs: false
 
   - name: assert the returned list correct
     assert:
@@ -197,6 +176,7 @@
       temp_or_perm: '*PERM'
       delayed_option: '*NO' 
       auto_ipl: false
+      apply_all_loaded_ptfs: false
     when: sql_query.row_count >= 1 
 
   - name: assert the returned list correct
@@ -219,6 +199,7 @@
       temp_or_perm: '*TEMP'
       delayed_option: '*NO' 
       auto_ipl: false
+      apply_all_loaded_ptfs: false
     when: sql_query.row_count >= 1    
 
   - name: assert the returned list correct

@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix_imgclg
 short_description: Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_fix) module install fixes to target IBM i system by image catalog.
      - Single PTF, PTF group and TR PTF are supported.
@@ -101,7 +101,7 @@ author:
 
 EXAMPLES = r'''
 - name: Install a list of PTFs of LPP 5733SC1 from image catalog
-  ibmi_fix_imgclg:
+  ibm.power_ibmi.ibmi_fix_imgclg:
     product_id:
       - '5733SC1'
     src: '{{ fix_install_path }}'
@@ -227,7 +227,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255

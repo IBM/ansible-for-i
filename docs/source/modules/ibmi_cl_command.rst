@@ -90,7 +90,7 @@ Examples
 
    
    - name: Create a library by using CL command CRTLIB
-     ibmi_cl_command:
+     ibm.power_ibmi.ibmi_cl_command:
        cmd: 'CRTLIB LIB(TESTLIB)'
        become_user: 'USER1'
        become_user_password: 'yourpassword'
@@ -118,6 +118,7 @@ See Also
    - :ref:`command_module`
 
 
+  
 
 Return Values
 -------------

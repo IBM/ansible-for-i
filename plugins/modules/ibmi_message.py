@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_message
 short_description: Search message
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
   - Search message.
   - For non-IBM i targets, no need.
@@ -91,7 +91,7 @@ author:
 
 EXAMPLES = r'''
 - name: find a message with message type, message_lib, message_queue and message_id
-  ibmi_message:
+  ibm.power_ibmi.ibmi_message:
     operation: 'find'
     message_type: 'INFORMATIONAL'
     message_lib: 'QUSRSYS'
@@ -99,7 +99,7 @@ EXAMPLES = r'''
     message_id: ['CPF1241', 'CPF1240']
 
 - name: find all un-reply message with message type, message_lib and message_queue, run as another user
-  ibmi_message:
+  ibm.power_ibmi.ibmi_message:
     operation: 'find'
     message_type: 'NO_REPLY'
     message_lib: 'QUSRSYS'
@@ -209,7 +209,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 
 def handle_list_to_sql(sql, item_list, param_name):

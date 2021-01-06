@@ -8,7 +8,7 @@
   gather_facts: no
   collections:
    - ibm.power_ibmi
-  
+
   tasks:
     - block:
       - name: run the SQL command to create a table
@@ -17,7 +17,7 @@
         register: dsps_param_result_0
 
       - name: Display the returned parameters 0
-        debug: 
+        debug:
           msg: "{{ dsps_param_result_0 }}"
 
       - name: run the SQL command to insert some records
@@ -29,44 +29,43 @@
         register: dsps_param_result_1
 
       - name: Display the returned parameters 1
-        debug: 
+        debug:
           msg: "{{ dsps_param_result_1 }}"
 
       - name: run the SQL command to query a table
         ibmi_sqlite3:
           sql: "SELECT * FROM PTFINFO WHERE ID = :ID"
-          parameters: 
+          parameters:
             - {"ID":"SI69379"}
         register: dsps_param_result_2
 
       - name: Display the returned parameters 2
-        debug: 
+        debug:
           msg: "{{ dsps_param_result_2 }}"
 
       - name: run the SQL command to update a record
         ibmi_sqlite3:
           sql: "UPDATE PTFINFO SET CHECKSUM=:CHECKSUM WHERE ID=:ID"
-          parameters: 
+          parameters:
             - {"ID":"SI69379", "CHECKSUM":"abc123"}
         register: dsps_param_result_3
 
       - name: Display the returned parameters 3
-        debug: 
+        debug:
           msg: "{{ dsps_param_result_3 }}"
 
       - name: run the SQL command to delete a record
         ibmi_sqlite3:
           sql: "DELETE FROM PTFINFO WHERE ID=:ID"
-          parameters: 
+          parameters:
             - {"ID":"SI69379"}
         register: dsps_param_result_4
 
       - name: Display the returned parameters 4
-        debug: 
+        debug:
           msg: "{{ dsps_param_result_4 }}"
 
       always:
       - name: run sql to drop the table
         ibmi_sqlite3:
           sql: "DROP TABLE IF EXISTS PTFINFO"
-      

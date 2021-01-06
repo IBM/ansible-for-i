@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_download_fix_status
 short_description: Checking whether the fix downloading complete
-version_added: '2.8.0'
+version_added: '1.2.0'
 description:
      - The C(ibmi_download_fix_status) module check the downloading fix's status.
 options:
@@ -46,13 +46,13 @@ author:
 
 EXAMPLES = r'''
 - name: Check the fix order status
-  ibmi_download_fix_status:
+  ibm.power_ibmi.ibmi_download_fix_status:
     order_list:
       - '2029604329'
       - '2020579181'
 
 - name: Check the fix order status with become user
-  ibmi_download_fix_status:
+  ibm.power_ibmi.ibmi_download_fix_status:
     order_list:
       - '2029604329'
       - '2020579181'
@@ -92,7 +92,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 HAS_ITOOLKIT = True
 

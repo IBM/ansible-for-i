@@ -85,14 +85,14 @@ Examples
 
    
    - name: Display all the active subsystems in this system.
-     ibmi_display_subsystem:
+     ibm.power_ibmi.ibmi_display_subsystem:
 
    - name: Display all the active jobs of subsystem QINTER.
-     ibmi_display_subsystem:
+     ibm.power_ibmi.ibmi_display_subsystem:
        subsystem: QINTER
 
    - name: Display With One User's Job of subsystem QBATCH.
-     ibmi_display_subsystem:
+     ibm.power_ibmi.ibmi_display_subsystem:
        subsystem: QBATCH
        user: 'JONES'
 
@@ -109,6 +109,7 @@ See Also
    - :ref:`ibmi_end_subsystem, ibmi_start_subsystem_module`
 
 
+  
 
 Return Values
 -------------

@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_lib_save
 short_description: Save one libary
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_lib_save) module create an save file on a remote IBM i nodes.
      - The save file is not copied to the local host.
@@ -87,7 +87,7 @@ author:
 
 EXAMPLES = r'''
 - name: Force to save test libary to archive.savf in archlib libary with become user.
-  ibmi_lib_save:
+  ibm.power_ibmi.ibmi_lib_save:
     lib_name: 'test'
     savefile_name: 'archive'
     savefile_lib: 'archlib'
@@ -211,7 +211,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

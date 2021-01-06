@@ -65,13 +65,13 @@ Examples
 
    
    - name: Check the fix order status
-     ibmi_download_fix_status:
+     ibm.power_ibmi.ibmi_download_fix_status:
        order_list:
          - '2029604329'
          - '2020579181'
 
    - name: Check the fix order status with become user
-     ibmi_download_fix_status:
+     ibm.power_ibmi.ibmi_download_fix_status:
        order_list:
          - '2029604329'
          - '2020579181'
@@ -93,6 +93,7 @@ Notes
 
 
 
+  
 
 Return Values
 -------------

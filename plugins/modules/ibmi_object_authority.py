@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_object_authority
 short_description: Grant, revoke or display object authority
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
   - The C(ibmi_object_authority) module can do the named object(s) authority management(grant, revoke and display).
 options:
@@ -180,7 +180,7 @@ author:
 
 EXAMPLES = r'''
 - name: Grant 1 user 1 authority on object
-  ibmi_object_authority:
+  ibm.power_ibmi.ibmi_object_authority:
     operation: grant
     object_name: testobj
     object_library: testlib
@@ -189,7 +189,7 @@ EXAMPLES = r'''
     authority: '*ALL'
 
 - name: Revoke 1 user's 2 authorities on object
-  ibmi_object_authority:
+  ibm.power_ibmi.ibmi_object_authority:
     operation: 'revoke'
     object_name: 'ANSIBLE'
     object_library: 'CHANGLE'
@@ -200,14 +200,14 @@ EXAMPLES = r'''
       - '*DLT'
 
 - name: Display the authority
-  ibmi_object_authority:
+  ibm.power_ibmi.ibmi_object_authority:
     operation: display
     object_name: testobj
     object_library: testlib
     object_type: '*DTAARA'
 
 - name: Grant the reference object authority
-  ibmi_object_authority:
+  ibm.power_ibmi.ibmi_object_authority:
     operation: grant_ref
     object_name: testobj
     object_library: testlib
@@ -217,7 +217,7 @@ EXAMPLES = r'''
     ref_object_type: '*DTAARA'
 
 - name: Revoke the authority list on object
-  ibmi_object_authority:
+  ibm.power_ibmi.ibmi_object_authority:
     operation: revoke_autl
     object_name: testobj
     object_library: testlib
@@ -225,7 +225,7 @@ EXAMPLES = r'''
     authorization_list: 'MYAUTL'
 
 - name: grant user 2 authority on an iasp
-  ibmi_object_authority:
+  ibm.power_ibmi.ibmi_object_authority:
     operation: 'grant'
     object_name: 'iasp1'
     object_library: 'CHANGLE2'
@@ -331,7 +331,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

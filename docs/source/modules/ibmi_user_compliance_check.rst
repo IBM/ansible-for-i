@@ -236,7 +236,7 @@ Examples
 
    
    - name: Do user profile compliance check
-     ibmi_user_compliance_check:
+     ibmi_ibm.power_ibmi.ibmi_user_compliance_check:
          users:
            - 'ibmiuser1'
            - 'ibmiuser2'
@@ -254,6 +254,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

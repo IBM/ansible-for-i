@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_lib_restore
 short_description: Restore one library
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_lib_restore) module restore a save file.
      - The restored library and save file are on the remote host.
@@ -77,7 +77,7 @@ author:
 
 EXAMPLES = r'''
 - name: Restore savedlib libary from archive.savf in archlib libary with become user.
-  ibmi_lib_restore:
+  ibm.power_ibmi.ibmi_lib_restore:
     saved_lib: 'savedlib'
     savefile_name: 'archive'
     savefile_lib: 'archlib'
@@ -189,7 +189,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

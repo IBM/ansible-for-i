@@ -145,7 +145,7 @@ Examples
 
    
    - name: Force to save test libary to archive.savf in archlib libary with become user.
-     ibmi_lib_save:
+     ibm.power_ibmi.ibmi_lib_save:
        lib_name: 'test'
        savefile_name: 'archive'
        savefile_lib: 'archlib'
@@ -161,6 +161,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

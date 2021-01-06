@@ -1,9 +1,9 @@
 ---
 # role for fix_repo_extract_ptf_group_info
-# Call ibmi_fix_repo module to get the order information in download_status table, then call ibmi_fix_repo module again to extract
+# Call ibm.power_ibmi.ibmi_fix_repo module to get the order information in download_status table, then call ibm.power_ibmi.ibmi_fix_repo module again to extract
 # and update ptf group's information into ptf_group_image_info table in catalog.
 - name: Find the order information in download_status table
-  ibmi_fix_repo:
+  ibm.power_ibmi.ibmi_fix_repo:
     type: "download_status"
     checksum: True
     action: "find"
@@ -16,7 +16,7 @@
     var: fix_repo_find_result
 
 - name: Update PTF group record into catalog
-  ibmi_fix_repo:
+  ibm.power_ibmi.ibmi_fix_repo:
     type: "ptf_group"
     action: "update"
     checksum: True

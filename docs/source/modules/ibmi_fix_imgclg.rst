@@ -162,7 +162,7 @@ Examples
 
    
    - name: Install a list of PTFs of LPP 5733SC1 from image catalog
-     ibmi_fix_imgclg:
+     ibm.power_ibmi.ibmi_fix_imgclg:
        product_id:
          - '5733SC1'
        src: '{{ fix_install_path }}'
@@ -196,6 +196,7 @@ See Also
    - :ref:`ibmi_fix, ibmi_fix_savf_module`
 
 
+  
 
 Return Values
 -------------

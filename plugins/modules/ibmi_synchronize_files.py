@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_synchronize_files
 short_description: Synchronize a list of files from IBM i node A to another IBM i node B
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_synchronize_files) plugin synchronize a list of files from IBM i node A to another IBM i node B.
      - C(ibmi_synchronize_files) plugin calls ibmi_sync_files module.
@@ -71,7 +71,7 @@ author:
 
 EXAMPLES = r'''
 - name: Synchronize a list of different types of files to host.com.
-  ibmi_synchronize_files:
+  ibmi_ibm.power_ibmi.ibmi_synchronize_files:
     src_list:
       - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/fish.lib/'}
       - {'src': '/qsys.lib/fish.lib/test.file', 'dest': '/qsys.lib/fish.lib'}

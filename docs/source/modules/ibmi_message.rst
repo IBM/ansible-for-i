@@ -143,7 +143,7 @@ Examples
 
    
    - name: find a message with message type, message_lib, message_queue and message_id
-     ibmi_message:
+     ibm.power_ibmi.ibmi_message:
        operation: 'find'
        message_type: 'INFORMATIONAL'
        message_lib: 'QUSRSYS'
@@ -151,7 +151,7 @@ Examples
        message_id: ['CPF1241', 'CPF1240']
 
    - name: find all un-reply message with message type, message_lib and message_queue, run as another user
-     ibmi_message:
+     ibm.power_ibmi.ibmi_message:
        operation: 'find'
        message_type: 'NO_REPLY'
        message_lib: 'QUSRSYS'
@@ -172,6 +172,7 @@ See Also
    - :ref:`service_module`
 
 
+  
 
 Return Values
 -------------

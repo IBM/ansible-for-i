@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_mirror_warm_clone_activity
 short_description: Performs suspend and resume activity for warm clone.
-version_added: '2.8.0'
+version_added: '1.2.0'
 description:
   - The C(ibmi_mirror_warm_clone_activity) module performs the suspend and resume activity for a warm clone
     to reach a quiesce point before the clone and resume from that point after clone.
@@ -54,7 +54,7 @@ author:
 
 EXAMPLES = r'''
 - name: suspend the system for a warm clone to do a clone
-  ibmi_mirror_warm_clone_activity:
+  ibm.power_ibmi.ibmi_mirror_warm_clone_activity:
     operation: suspend
 '''
 
@@ -108,7 +108,7 @@ MrdbConfigComplete = 2
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 
 def mrdb_retrieve_mirror_state(imodule):

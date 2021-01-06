@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fetch
 short_description: Fetch objects or a library from a remote IBM i node and store on local
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_feth) is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in
        a file tree, organized by hostname.
@@ -113,7 +113,7 @@ author:
 EXAMPLES = r'''
 - name: Fetch obja.pgm and objb.srvpgm in objlib libary as test1.savf(target release V7R2M0) on a remote IBM i to local. Store
         as /backup/host.example.com/qsys.lib/objlib.lib/test1.file and keep the save file on remote.
-  ibmi_fetch:
+  ibm.power_ibmi.ibmi_fetch:
     object_names: 'obj1 obj2'
     lib_name: 'objlib'
     object_types: '*PGM *SRVPGM'
@@ -123,7 +123,7 @@ EXAMPLES = r'''
     target_release: 'V7R2M0'
 
 - name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.
-  ibmi_fetch:
+  ibm.power_ibmi.ibmi_fetch:
     lib_name: 'objlib'
     dest: '/backup'
     flat: True

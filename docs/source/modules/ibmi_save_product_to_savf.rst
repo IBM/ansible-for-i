@@ -171,13 +171,13 @@ Examples
 
    
    - name: Saving Program using Defaults.
-     ibmi_save_product_to_savf:
+     ibm.power_ibmi.ibmi_save_product_to_savf:
        product: 5770WDS
        savf_name: MYFILE
        savf_library: MYLIB
 
    - name: Saving Program 5733D10 option 11.
-     ibmi_save_product_to_savf:
+     ibm.power_ibmi.ibmi_save_product_to_savf:
        product: 5733D10
        option: 11
        savf_name: MYFILE
@@ -198,6 +198,7 @@ See Also
    - :ref:`ibmi_uninstall_product, ibmi_install_product_from_savf_module`
 
 
+  
 
 Return Values
 -------------

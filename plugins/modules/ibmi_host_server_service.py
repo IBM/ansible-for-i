@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_host_server_service
 short_description: Manage host server
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
   - Manage and query IBM i host server service.
   - For non-IBM i targets, use the M(service) module instead.
@@ -67,7 +67,7 @@ author:
 
 EXAMPLES = r'''
 - name: start host server service
-  ibmi_host_server_service:
+  ibm.power_ibmi.ibmi_host_server_service:
     name_list: ['*CENTRAL', '*DATABASE']
     state: 'started'
     joblog: True
@@ -159,7 +159,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 IBMi_STRSVR = "QSYS/STRHOSTSVR"
 IBMi_ENDSVR = "QSYS/ENDHOSTSVR"
 IBMi_HOST_SERVER_LIST = ["*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP"]

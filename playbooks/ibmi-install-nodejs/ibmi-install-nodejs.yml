@@ -1,12 +1,12 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-- hosts: all 
+- hosts: all
   gather_facts: no
   collections:
     - ibm.power_ibmi
-  
-  vars: 
+
+  vars:
     checkout_dir: 'tmp_nodejs'
 
   tasks:
@@ -21,7 +21,7 @@
 
   - name: Install git if it is not there
     command: /QOpensys/pkgs/bin/yum install git -y
-    when: git_stat.stat.exists == false
+    when: not git_stat.stat.exists
 
   - name: upgrade yum in case EC_POINT_copy error
     command: /QOpensys/pkgs/bin/yum upgrade -y

@@ -1,13 +1,34 @@
-- name: Capture an image from an existing vm
-  ibmi_powervc_os_server_capture:
-    name: '{{image_name}}' 
-    auth: 
-      auth_url: https://{{ansible_ssh_host}}:5000/v3
-      username: '{{ansible_ssh_user}}'      
-      password: '{{ansible_ssh_pass}}'
-      project_name: '{{project}}'
-      project_domain_name: '{{project_domain}}'
-      user_domain_name: '{{user_domain}}'
-    verify: '{{verify_cert}}'
-    server: '{{vm_name}}'
+- name: generate a ramdom number
+  set_fact:
+    random_postfix: '{{9999999 | random}}'
+    
+- name: compose image name
+  set_fact:
+    image_name_to_be_created: '{{ image_name }}_{{random_postfix}}'
+
+- name: create VM snapshot
+  shell: . /opt/ibm/powervc/powervcrc  && nova --os-username={{ ansible_ssh_user }} --os-password={{ ansible_ssh_pass }}
+            --os-project-name={{project}}  --os-project-domain-name={{ project_domain }} --os-user-domain-name={{ user_domain }}
+            image-create {{ vm_name }} {{image_name_to_be_created}}
+  register: image_create_result
+  no_log: true
+  changed_when: image_create_result.rc == 0
+
+- name: Gather information about a previously created image named {{image_name_to_be_created}}
+  os_image_info:
+    auth:
+      auth_url: https://{{ ansible_ssh_host }}:5000/v3
+      username: '{{ ansible_ssh_user }}'
+      password: '{{ ansible_ssh_pass }}'
+      project_name: '{{ project }}'
+      project_domain_name: '{{ project_domain }}'
+      user_domain_name: '{{ user_domain }}'
+    image: '{{image_name_to_be_created}}'
+    verify: '{{ verify_cert }}'
   register: image_info
+
+- name: compose openstack_image
+  set_fact:
+    openstack_image: '{{image_info.openstack_image}}'
+
+- debug: var=openstack_image

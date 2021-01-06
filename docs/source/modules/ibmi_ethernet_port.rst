@@ -66,7 +66,7 @@ Examples
 
    
    - name: list all the ethernet port information
-     ibmi_ethernet_port:
+     ibm.power_ibmi.ibmi_ethernet_port:
 
 
 
@@ -89,6 +89,7 @@ See Also
    - :ref:`ibmi_cl_command_module`
 
 
+  
 
 Return Values
 -------------

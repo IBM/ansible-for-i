@@ -9,7 +9,7 @@ namespace: ibm
 name: power_ibmi
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.2.0
+version: 9.9.9
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -80,3 +80,4 @@ build_ignore:
   - usecases/db2mirror_setup_via_powervc
   - roles/*_powervc
   - plugins/modules/ibmi_powervc_os_server_capture.py
+  - changelogs/.plugin-cache.yaml

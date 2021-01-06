@@ -10,7 +10,7 @@
   set_fact:
     fix_list: "{{ fix_list|default([]) + [ptf_info.ptf_id] }}"
   with_list: "{{ group.ptf_list }}"
-  loop_control: 
+  loop_control:
     loop_var: ptf_info
 
 - name: query ptf list from target system
@@ -41,7 +41,7 @@
 - name: ptf does not exist
   set_fact:
     ptf_not_installed: "{{ ptf_not_installed|default([]) + [{ 'PTF_IDENTIFIER': ptf.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT' }] }}"
-  when: 
+  when:
     - not ptfs_on_system.get(ptf.ptf_id)
     - ptf.product in product_list
   with_list: "{{ group.ptf_list }}"
@@ -59,7 +59,7 @@
   loop_control:
     loop_var: ptf
 
-- set_fact:
-    group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level, 'PTF_GROUP_STATUS': 'NOT INSTALLED', 'PTF_NOT_INSTALLED': ptf_not_installed }] }}"
-
-  
+- name: compose group_status
+  set_fact:
+    group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level,
+    'PTF_GROUP_STATUS': 'NOT INSTALLED', 'PTF_NOT_INSTALLED': ptf_not_installed }] }}"

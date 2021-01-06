@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_user_compliance_check
 short_description: Check if the value of a field of user profile is expected
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
   - The C(ibmi_user_compliance_check) module can do the user profile compliance check.
   - Check if the value of a field of user profile is matched with the value of customer input.
@@ -133,7 +133,7 @@ author:
 
 EXAMPLES = r'''
 - name: Do user profile compliance check
-  ibmi_user_compliance_check:
+  ibmi_ibm.power_ibmi.ibmi_user_compliance_check:
       users:
         - 'ibmiuser1'
         - 'ibmiuser2'
@@ -217,7 +217,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 parmname_array = [
     'SIGN_ON_ATTEMPTS_NOT_VALID',

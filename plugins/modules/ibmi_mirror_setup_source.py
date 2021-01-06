@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_mirror_setup_source
 short_description: Configures the Db2 Mirror on the source node
-version_added: '2.8.0'
+version_added: '1.2.0'
 description:
   - The C(ibmi_mirror_setup_source) module configures the Db2 Mirror on the source node and
     sets the configuration state to initializing.
@@ -102,7 +102,7 @@ author:
 
 EXAMPLES = r'''
 - name: config db2 mirror on source node
-  ibmi_mirror_setup_source:
+  ibm.power_ibmi.ibmi_mirror_setup_source:
     termination_level: RECLONE
     primary_node: NODEA
     secondary_node: NODEB
@@ -194,7 +194,7 @@ ERROR = -1
 
 CLOUDINIT_METADATA_DIR = '/QOpenSys/pkgs/lib/cloudinit/cloud/seed/config_drive/openstack/latest'
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 
 def get_mirror_state_text(state):

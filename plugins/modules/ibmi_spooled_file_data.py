@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_spooled_file_data
 short_description: Returns the content of a spooled file.
-version_added: '2.8.0'
+version_added: '1.2.0'
 description:
   - The C(ibmi_spooled_file_data) returns the content of a spooled file.
 options:
@@ -63,7 +63,7 @@ author:
 
 EXAMPLES = r'''
 - name: print the spooled file data
-  ibmi_spooled_file_data:
+  ibmi_ibm.power_ibmi.ibmi_spooled_file_data:
     job_name: '024800/CHANGLE/QDFTJOBD'
     spooled_file_name: 'QPSECUSR'
 '''
@@ -132,7 +132,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

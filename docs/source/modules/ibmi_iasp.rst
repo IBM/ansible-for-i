@@ -140,7 +140,7 @@ Examples
 
    
    - name: create an IASP
-     ibmi_iasp:
+     ibm.power_ibmi.ibmi_iasp:
        name: 'IASP1'
        operation: 'create'
        disks: ['DMP002', 'DMP019']
@@ -154,6 +154,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

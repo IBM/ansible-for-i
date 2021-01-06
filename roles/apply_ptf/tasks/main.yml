@@ -1,6 +1,7 @@
 ---
 # tasks file for apply_ptfs
-- set_fact:
+- name: Initialize variables
+  set_fact:
     requisite_list: []
     apply_fail_dict: {}
     apply_fail_with_requisite_list: []
@@ -9,7 +10,8 @@
   when: apply_all_loaded_ptfs
 
 - block:
-  - set_fact:
+  - name: Initialize variables
+    set_fact:
       apply_success_list: []
       apply_fail_list: []
       ipl_requested: false
@@ -21,7 +23,7 @@
       loop_var: apply_ptf
     register: apply_result
 
-  - name: reboot the system immediately if auto_ipl is set to true and at least one to-be-applied PTF requires an IPL
+  - name: Reboot the system immediately if auto_ipl is set to true and at least one to-be-applied PTF requires an IPL
     ibm.power_ibmi.ibmi_reboot:
     when: auto_ipl and ipl_requested
 
@@ -32,7 +34,7 @@
   - name: Print the fail apply list
     debug:
       var: apply_fail_list
-  when: apply_all_loaded_ptfs == false
+  when: not apply_all_loaded_ptfs
 
 - debug:
     var: apply_fail_with_requisite_list

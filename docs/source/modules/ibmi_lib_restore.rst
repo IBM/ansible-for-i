@@ -126,7 +126,7 @@ Examples
 
    
    - name: Restore savedlib libary from archive.savf in archlib libary with become user.
-     ibmi_lib_restore:
+     ibm.power_ibmi.ibmi_lib_restore:
        saved_lib: 'savedlib'
        savefile_name: 'archive'
        savefile_lib: 'archlib'
@@ -140,6 +140,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

@@ -8,7 +8,7 @@
   gather_facts: no
   collections:
    - ibm.power_ibmi
-  
+
   tasks:
     - block:
       - name: add_single_ptf_records
@@ -22,9 +22,9 @@
             - {'ptf_id':'SI71806', 'file_path':'/QSYS.LIB/QGPL.LIB/QSI71806.FILE', 'product':'5733OPS'}
             - {'ptf_id':'SI00000', 'file_path':'/QSYS.LIB/QGPL.LIB/QSI00000.FILE', 'product':'5770SS1'}
         register: add_single_ptf_records_result
-        
+
       - name: display_add_single_ptf_records_result
-        debug: 
+        debug:
           msg: "{{ add_single_ptf_records_result }}"
 
       # - name: delete_single_ptf_records
@@ -43,14 +43,14 @@
         ibmi_fix_repo:
           action: "find"
           type: 'single_ptf'
-          parameters: 
+          parameters:
             - {'ptf_id':'SI67955'}
             - {'ptf_id':'MF65472'}
             - {'ptf_id':'SI71806'}
         register: query_single_ptf_records_result_2
 
       - name: display_query_single_ptf_records_result_2
-        debug: 
+        debug:
           msg: "{{ query_single_ptf_records_result_2 }}"
 
       always:

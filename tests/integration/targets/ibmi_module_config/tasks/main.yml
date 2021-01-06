@@ -340,14 +340,18 @@
     register: grep_result
     failed_when: grep_result.rc != 0
 
+  - name: TC09A - get host IP
+    shell: system "ping {{ansible_ssh_host}}" | grep TCP3215 |cut -d ' ' -f 6 |uniq
+    register: ipaddress
+
   - name: TC09A - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
 
   - name: TC09B - set log_level to info
     ibmi_module_config:
@@ -381,11 +385,11 @@
   - name: TC09B - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
 
   - name: TC09C - set log_level to warning
     ibmi_module_config:
@@ -419,11 +423,11 @@
   - name: TC09C - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
 
   - name: TC09D - set log_level to error
     ibmi_module_config:
@@ -457,11 +461,11 @@
   - name: TC09D - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
+        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
 
   - name: TC09E - set log_level to critical
     ibmi_module_config:
@@ -495,11 +499,11 @@
   - name: TC09E - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
 
   - name: TC10 - lock cfg file by CHKOUT on os400
     ibmi_cl_command:
@@ -530,11 +534,11 @@
   - name: TC10 - assert result
     assert:
       that:
-        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" not in grep_result.stdout'
-        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ansible_ssh_host}}) - ibmi_message:" in grep_result.stdout'
+        - '"DEBUG - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"INFO - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"WARNING - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"ERROR - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" not in grep_result.stdout'
+        - '"CRITICAL - {{ansible_hostname}}.{{ansible_domain}}({{ipaddress.stdout}}) - ibmi_message:" in grep_result.stdout'
 
   - name: TC10 - chkin the locked file on os400
     ibmi_cl_command:

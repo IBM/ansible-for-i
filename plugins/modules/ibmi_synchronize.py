@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_synchronize
 short_description: Synchronize a save file from IBM i node A to another IBM i node B
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_synchronize) plugin synchronize a save file from IBM i node A to another IBM i node B.
      - C(ibmi_synchronize) plugin calls ibmi_sync module.
@@ -65,7 +65,7 @@ author:
 
 EXAMPLES = r'''
 - name: Synchronize c1 save file from IBM i node A to another IBM i node B.
-  ibmi_synchronize:
+  ibmi_ibm.power_ibmi.ibmi_synchronize:
     src: '/qsys.lib/test.lib/c1.file'
     remote_user: 'user'
     private_key: '/home/test/id_rsa'

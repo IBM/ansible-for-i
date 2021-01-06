@@ -150,7 +150,7 @@ Examples
 
    
    - name: Restore test1.pgm test2.srvpgm in savedlib libary from archive.savf in archlib libary with become user.
-     ibmi_object_restore:
+     ibm.power_ibmi.ibmi_object_restore:
        object_names: 'test1 test2'
        object_lib: 'savedlib'
        object_types: '*PGM *SRVPGM'
@@ -166,6 +166,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

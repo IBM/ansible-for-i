@@ -3,65 +3,69 @@
 
 # setup offline ibmi
 ---
-- hosts: all 
-  gather_facts: no 
+- hosts: all
+  gather_facts: no
   vars:
     package_path: ""
-    ibmi_host: "{{ansible_ssh_host}}"
-    ibmi_user: "{{ansible_ssh_user}}"
+    ibmi_host: "{{ ansible_ssh_host }}"
+    ibmi_user: "{{ ansible_ssh_user }}"
     ibmi_pass: ""
     required_rpms: [six, itoolkit, ibm_db]
-    python_version: "{{ansible_python_interpreter.split('/')[-1]}}"
+    python_version: "{{ ansible_python_interpreter.split('/')[-1] }}"
     yum_packages: ['bootstrap.sh', 'bootstrap.tar.Z']
     remote_temp_dir: /tmp/ansible-rpm
 
   tasks:
   - block:
       - name: Create a local temporary directory
-        raw: mkdir -p {{remote_temp_dir}} 
+        file: 
+          path: '{{ remote_temp_dir }}'
+          state: directory
+          mode: 0755
         args:
           executable: /qopensys/usr/bin/qsh
         register: tempfile_result
 
       - name: initialize ibmi_pass
         no_log: true
-        set_fact: 
-          ibmi_pass: '{{ansible_ssh_pass}}'
+        set_fact:
+          ibmi_pass: '{{ ansible_ssh_pass }}'
         when: ansible_ssh_pass is defined
 
-      - set_fact:
+      - name: set yum_installed to false
+        set_fact:
           yum_installed: false
 
       - include: ibmi_install_yum.yml
       - include: ibmi_install_python.yml
 
-      - block: 
+      - block:
           - name: disable the ibm repository
             lineinfile:
               path: "/QOpenSys/etc/yum/repos.d/ibm.repo"
-              regexp: "enabled=1" 
+              regexp: "enabled=1"
               line: "enabled=0"
 
-          - name: find the home directory 
+          - name: find the home directory
             ibmi_user_and_group:
               operation: 'display'
-              user: '{{ansible_ssh_user}}'
+              user: '{{ ansible_ssh_user }}'
             register: user_result
 
           - set_fact:
-              home_dir: "{{user_result['result_set'][0]['HOME_DIRECTORY']}}"
+              home_dir: "{{ user_result['result_set'][0]['HOME_DIRECTORY'] }}"
 
           - name: Ensure home directory exist
             file:
-              path: '{{home_dir}}'
+              path: '{{ home_dir }}'
               state: directory
-              owner: '{{ansible_ssh_user}}'
+              owner: '{{ ansible_ssh_user }}'
 
           - name: Ensure .profile exist
             file:
-              path: '{{home_dir}}/.profile'
+              path: '{{ home_dir }}/.profile'
               state: touch
-              owner: '{{ansible_ssh_user}}'
+              owner: '{{ ansible_ssh_user }}'
 
           - name: Export PATH to ssh user profile permanently
             raw: echo 'PATH=/QOpenSys/pkgs/bin:$PATH' >> $HOME/.profile
@@ -76,7 +80,7 @@
 
       - name: change SSHD server auto-started
         command: 'system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"'
-        
+
       - name: Verify 5770DG1
         command: system "DSPSFWRSC"
         register: installed_native_products
@@ -93,4 +97,6 @@
 
     always:
       - name: remove temp dir
-        raw: rm -rf {{remote_temp_dir}} 
+        file:
+          path: '{{ remote_temp_dir }}'
+          state: absent

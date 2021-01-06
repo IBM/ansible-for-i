@@ -82,7 +82,7 @@ Examples
 
    
    - name: Get System Value information
-     ibmi_sysval:
+     ibmi_ibm.power_ibmi.ibmi_sysval:
        sysvalue:
          - {'name':'qmaxsgnacn', 'expect':'3'}
          - {'name':'qccsid'}
@@ -90,7 +90,7 @@ Examples
        become_user_password: 'yourpassword'
 
    - name: Compare the returned system valus as list
-     ibmi_sysval:
+     ibmi_ibm.power_ibmi.ibmi_sysval:
        sysvalue:
          - {'name':'QATNPGM', 'expect':'QEZMAIN   QSYS'}
          - {'name':'QATNPGM', 'expect':'QSYS  QEZMAIN'}
@@ -104,6 +104,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

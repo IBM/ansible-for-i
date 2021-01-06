@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_rtv_command
 short_description: Executes a command which is valid only within a CL program or REXX procedure
-version_added: '2.8.0'
+version_added: '1.1.0'
 description:
   - The C(ibmi_rtv_command) module executes command which used in a CL program or REXX procedure.
   - Usually, this kind of commands can not run directly from the 5250 console, like RTVJOBA, RTVNETA.
@@ -70,7 +70,7 @@ author:
 
 EXAMPLES = r'''
 - name: Call RTVJOBA to get job information
-  ibmi_rtv_command:
+  ibm.power_ibmi.ibmi_rtv_command:
     cmd: 'RTVJOBA'
     char_vars:
       - 'JOB'
@@ -80,7 +80,7 @@ EXAMPLES = r'''
       - 'JOBMSGQMX'
 
 - name: Call RTVAUTLE to get information of the authority list
-  ibmi_rtv_command:
+  ibm.power_ibmi.ibmi_rtv_command:
     cmd: 'RTVAUTLE AUTL(PAYROLL) USER(TOM)'
     char_vars:
       - 'USE'
@@ -88,7 +88,7 @@ EXAMPLES = r'''
       - 'AUTLMGT'
 
 - name: Call RTVDTAARA to get content of a data area
-  ibmi_rtv_command:
+  ibm.power_ibmi.ibmi_rtv_command:
     cmd: 'RTVDTAARA DTAARA(QSYS/QAENGWTTM)'
     char_vars:
       - 'RTNVAR'
@@ -147,7 +147,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

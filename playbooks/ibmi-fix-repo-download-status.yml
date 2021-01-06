@@ -8,7 +8,7 @@
   gather_facts: no
   collections:
    - ibm.power_ibmi
-  
+
   tasks:
     - block:
       - name: add some download status records
@@ -23,14 +23,14 @@
 
       - name: Assert the returned parameters
         assert:
-          that: 
+          that:
             - dsps_param_result_0.row_changed | int == 3
 
       - name: query some PTFs records
         ibmi_fix_repo:
           action: "find"
           type: 'download_status'
-          parameters: 
+          parameters:
             - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
             - {'order_id':'2023203121'}
             - {'order_id':'1231231231'}
@@ -38,7 +38,7 @@
 
       - name: Assert the returned parameters
         assert:
-          that: 
+          that:
             - dsps_param_result_2.fail_list | length == 1
             - dsps_param_result_2.fail_list[0].db_record == 'RECORD_NOT_FOUND'
             - dsps_param_result_2.fail_list[0].order_id == '1231231231'
@@ -48,27 +48,27 @@
         ibmi_fix_repo:
           action: "delete"
           type: 'download_status'
-          parameters: 
+          parameters:
             - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
         register: dsps_param_result_3
 
       - name: Assert the returned parameters
         assert:
-          that: 
+          that:
             - dsps_param_result_3.row_changed | int == 1
 
       - name: query some PTFs records
         ibmi_fix_repo:
           action: "find"
           type: 'download_status'
-          parameters: 
+          parameters:
             - {'order_id':'2020579181'}
             - {'order_id':'2023203121'}
         register: dsps_param_result_4
 
       - name: Assert the returned parameters
         assert:
-          that: 
+          that:
             - dsps_param_result_4.fail_list | length == 1
             - dsps_param_result_4.fail_list[0].db_record == 'RECORD_NOT_FOUND'
             - dsps_param_result_4.fail_list[0].order_id == '2020579181'
@@ -78,26 +78,26 @@
         ibmi_fix_repo:
           action: "update"
           type: 'download_status'
-          parameters: 
+          parameters:
             - {'order_id':'2023203121', 'download_status':'downloaded'}
         register: dsps_param_result_5
 
       - name: Assert the returned parameters
         assert:
-          that: 
+          that:
             - dsps_param_result_5.row_changed | int == 1
 
       - name: query some PTFs records
         ibmi_fix_repo:
           action: "find"
           type: 'download_status'
-          parameters: 
+          parameters:
             - {'order_id':'2023203121'}
         register: dsps_param_result_6
 
       - name: Assert the returned parameters
         assert:
-          that: 
+          that:
             - dsps_param_result_6.success_list | length == 1
             - dsps_param_result_6.success_list[0].download_status == 'downloaded'
             - dsps_param_result_6.success_list[0].order_id == '2023203121'

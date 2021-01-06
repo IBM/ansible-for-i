@@ -1,6 +1,7 @@
 ---
 # tasks file for download_individual_ptfs
-- set_fact:
+- name: initialize download_success_list and download_fail_list
+  set_fact:
     download_success_list: []
     download_fail_list: []
 

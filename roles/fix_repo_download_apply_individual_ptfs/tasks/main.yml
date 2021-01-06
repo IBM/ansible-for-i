@@ -1,15 +1,18 @@
 ---
 # tasks file for fix_repo_download_apply_individual_ptfs
-- set_fact:
+- name: compose next_not_loaded_ptfs_list and next_loaded_ptfs_list
+  set_fact:
     next_not_loaded_ptfs_list: []
     next_loaded_ptfs_list: []
 
-- set_fact:
+- name: compose all_ptfs_list and original_ptfs_list
+  set_fact:
     all_ptfs_list: "{{ ptfs_list_parm }}"
     original_ptfs_list: "{{ ptfs_list_parm }}"
   when: sequence_var|int == 1
 
-- set_fact:
+- name: compose all_ptfs_list and all_requisite_ptfs_list
+  set_fact:
     all_ptfs_list: "{{ all_ptfs_list + requisite_list | default([]) }}"
     all_requisite_ptfs_list: "{{ all_requisite_ptfs_list | default([]) + requisite_list | default([]) }}"
 
@@ -20,7 +23,7 @@
 
 - name: compose final_ptfs_status add find fail list
   set_fact:
-    final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ fail_list_var.ptf_id: fail_list_var.db_record })}}"
+    final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ fail_list_var.ptf_id: fail_list_var.db_record }) }}"
   loop: "{{ final_find_result.fail_list }}"
   loop_control:
     loop_var: fail_list_var
@@ -28,7 +31,7 @@
 
 - name: compose final_ptfs_status add download fail list
   set_fact:
-    final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ download_fail_list_var.ptf_id: 'DOWNLOAD_FAIL' })}}"
+    final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ download_fail_list_var.ptf_id: 'DOWNLOAD_FAIL' }) }}"
   loop: "{{ download_fail_list }}"
   loop_control:
     loop_var: download_fail_list_var
@@ -42,13 +45,14 @@
 
 - name: compose final_ptfs_status download fail list
   set_fact:
-    final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ product_not_installed_ptfs_var.ptf_id: 'PRODUCT_NOT_INSTALLED' })}}"
+    final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ product_not_installed_ptfs_var.ptf_id: 'PRODUCT_NOT_INSTALLED' }) }}"
   loop: "{{ product_not_installed_ptfs }}"
   loop_control:
     loop_var: product_not_installed_ptfs_var
   when: product_not_installed_ptfs != []
 
-- set_fact:
+- name: compose tmp_not_loaded_ptfs_list and tmp_loaded_ptfs_list
+  set_fact:
     tmp_not_loaded_ptfs_list: "{{ not_loaded_ptfs_list }}"
     tmp_loaded_ptfs_list: "{{ loaded_ptfs_list }}"
 
@@ -65,7 +69,8 @@
       set_fact:
         final_ptfs_status: "{{ final_ptfs_status | default({}) | combine( load_fail_dict | default({})) }}"
 
-    - set_fact:
+    - name: compose load_fail_simple_list
+      set_fact:
         load_fail_simple_list: "{{ load_fail_simple_list | default([]) + [ load_fail_list_var.ptf_id ] }}"
       loop: "{{ load_fail_list }}"
       loop_control:
@@ -75,13 +80,15 @@
     # - debug:
     #     var: load_fail_simple_list
 
-    - set_fact:
+    - name: compose next_not_loaded_ptfs_list
+      set_fact:
         next_not_loaded_ptfs_list: "{{ next_not_loaded_ptfs_list | default([]) + [not_loaded_ptfs_list_var.ptf_id] }}"
       loop: "{{ not_loaded_ptfs_list }}"
       loop_control:
         loop_var: not_loaded_ptfs_list_var
 
-    - set_fact:
+    - name: compose next_loaded_ptfs_list
+      set_fact:
         next_loaded_ptfs_list: "{{ next_loaded_ptfs_list | default([]) + [loaded_ptfs_list_var.ptf_id] }}"
       loop: "{{ loaded_ptfs_list }}"
       loop_control:
@@ -105,7 +112,8 @@
 
     - name: Compose the new ptfs_list
       set_fact:
-        ptfs_list_parm: "{{ ( next_not_loaded_ptfs_list | default([]) + next_loaded_ptfs_list | default([]) + requisite_list | default([]) ) | difference( load_fail_simple_list | default([])) }}"
+        ptfs_list_parm: "{{ ( next_not_loaded_ptfs_list | default([]) + next_loaded_ptfs_list |
+        default([]) + requisite_list | default([]) ) | difference( load_fail_simple_list | default([])) }}"
 
     # - name: print ptfs_list
     #   debug:
@@ -118,7 +126,8 @@
 #     var: final_ptfs_status
 
 - block:
-    - set_fact:
+    - name: compose all_ptfs
+      set_fact:
         all_ptfs: "{{ all_ptfs|default([]) + [{'ptf_id': all_ptfs_list_var }] }}"
       loop: "{{ all_ptfs_list }}"
       loop_control:
@@ -149,19 +158,22 @@
 
     - name: compose final_ptfs_status_with_requisite add apply fail list
       set_fact:
-        final_ptfs_status_with_requisite: "{{ final_ptfs_status_with_requisite | default({}) | combine(apply_fail_dict) }}"
+        final_ptfs_status_with_requisite: "{{ final_ptfs_status_with_requisite | default({}) |
+        combine(apply_fail_dict) }}"
       when: apply_fail_dict | default({}) != {}
 
     - name: compose original_ptfs_status
       set_fact:
-        original_ptfs_status: "{{ original_ptfs_status | default({}) | combine( { original_ptfs_list_var: final_ptfs_status_with_requisite[original_ptfs_list_var] }) }}"
+        original_ptfs_status: "{{ original_ptfs_status | default({}) |
+        combine( { original_ptfs_list_var: final_ptfs_status_with_requisite[original_ptfs_list_var] }) }}"
       loop: "{{ original_ptfs_list }}"
       loop_control:
         loop_var: original_ptfs_list_var
 
     - name: compose requisite_ptfs_status
       set_fact:
-        requisite_ptfs_status: "{{ requisite_ptfs_status | default({}) | combine({ all_requisite_ptfs_list_var: final_ptfs_status_with_requisite[all_requisite_ptfs_list_var] }) }}"
+        requisite_ptfs_status: "{{ requisite_ptfs_status | default({}) |
+        combine({ all_requisite_ptfs_list_var: final_ptfs_status_with_requisite[all_requisite_ptfs_list_var] }) }}"
       loop: "{{ all_requisite_ptfs_list }}"
       loop_control:
         loop_var: all_requisite_ptfs_list_var

@@ -14,7 +14,7 @@
       when: package_path == ""
 
     - include: transfer_files.yml
-      loop: '{{yum_packages}}'
+      loop: '{{ yum_packages }}'
       loop_control:
         loop_var: package
       vars:
@@ -26,7 +26,9 @@
         executable: /qopensys/usr/bin/qsh
 
     - name: Clear old package
-      raw: "rm -rf /QOpenSys/var/lib/rpm"
+      file:
+        path: '/QOpenSys/var/lib/rpm' 
+        state: absent
       args:
         executable: /qopensys/usr/bin/qsh
 
@@ -35,16 +37,17 @@
     CL:QSH CMD('/usr/bin/touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstrap.sh > /tmp/bootstrap.log 2>&1');
     \" >> /tmp/bootstrap.sql"
       args:
-        executable: /qopensys/usr/bin/qsh 
+        executable: /qopensys/usr/bin/qsh
 
     - name: Run the installation script to install yum
       raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
-      args: 
+      args:
         executable: /qopensys/usr/bin/qsh
       register: output_of_runsqlstm
       failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
-    
-    - set_fact:
+
+    - name: set yum_installed to true
+      set_fact:
         yum_installed: true
 
   when: default_yum_existance.rc != 0

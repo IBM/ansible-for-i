@@ -165,7 +165,7 @@ Examples
 
    
    - name: Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary with become user.
-     ibmi_object_save:
+     ibm.power_ibmi.ibmi_object_save:
        object_names: 'test1 test2'
        object_lib: 'objlib'
        object_types: '*PGM *SRVPGM'
@@ -183,6 +183,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

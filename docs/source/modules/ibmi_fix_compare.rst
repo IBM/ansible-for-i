@@ -66,7 +66,7 @@ Examples
    
 
    - name: Check the PTFs' status
-     ibmi_fix_compare:
+     ibm.power_ibmi.ibmi_fix_compare:
        ptfs:
          - 'SI12345'
          - 'SI67890'
@@ -84,6 +84,7 @@ Notes
 
 
 
+  
 
 Return Values
 -------------

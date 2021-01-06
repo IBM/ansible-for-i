@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_download_fix
 short_description: Download fix through SNDPTFORD
-version_added: '2.8.0'
+version_added: '1.1.0'
 description:
      - The C(ibmi_download_fix) module download fix through SNDPTFORD.
      - The supported fixs are individual PTFs, cumulative PTF package and PTF Groups.
@@ -136,13 +136,13 @@ author:
 
 EXAMPLES = r'''
 - name: Download a single PTF
-  ibmi_download_fix:
+  ibm.power_ibmi.ibmi_download_fix:
     ptf_id: 'SI63556'
     reorder: '*YES'
     order: '*PTFID'
 
 - name: Download a PTF group with become user
-  ibmi_download_fix:
+  ibm.power_ibmi.ibmi_download_fix:
     ptf_id: 'SF99740'
     delivery_format: '*IMAGE'
     become_user: 'USER1'
@@ -280,7 +280,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 
 HAS_ITOOLKIT = True
 

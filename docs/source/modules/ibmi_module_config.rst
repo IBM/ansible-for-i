@@ -124,7 +124,7 @@ Examples
 
    
    - name: Config the logging as debug level
-     ibmi_module_config:
+     ibm.power_ibmi.ibmi_module_config:
        section: log_config
        config_dir: home
        log_level: debug
@@ -142,6 +142,7 @@ See Also
    - :ref:`ibmi_cl_command_module`
 
 
+  
 
 Return Values
 -------------

@@ -1,15 +1,18 @@
 ---
 # tasks file for fix_repo_check_download_individual_ptfs
-- set_fact:
+- name: initialize list
+  set_fact:
     list: []
 
-- set_fact:
+- name: compose list
+  set_fact:
     list: "{{ list|default([]) + [{'ptf_id': ptfs_list_parm_var }] }}"
   loop: "{{ ptfs_list_parm }}"
   loop_control:
         loop_var: ptfs_list_parm_var
 
-- set_fact:
+- name: initialize rc, check_fail_list, RecordNotFound_list, download_fail_list and download_success_list
+  set_fact:
     rc: 0
     check_fail_list: []
     RecordNotFound_list: []
@@ -17,7 +20,7 @@
     download_success_list: []
 
 - name: Check if individual PTFs are already in catalog
-  ibmi_fix_repo:
+  ibm.power_ibmi.ibmi_fix_repo:
     type: "single_ptf"
     action: "find"
     parameters: "{{ list }}"
@@ -53,7 +56,7 @@
 
     - block:
         - name: Add individual ptf record into catalog
-          ibmi_fix_repo:
+          ibm.power_ibmi.ibmi_fix_repo:
             type: "single_ptf"
             action: "add"
             checksum: True
@@ -95,7 +98,7 @@
   when: fix_repo_find_result.fail_list is not defined
 
 - name: Get the final result of PTFs in catalog
-  ibmi_fix_repo:
+  ibm.power_ibmi.ibmi_fix_repo:
     type: "single_ptf"
     action: "find"
     parameters: "{{ list }}"

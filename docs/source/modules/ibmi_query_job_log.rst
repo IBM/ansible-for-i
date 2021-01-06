@@ -82,7 +82,7 @@ Examples
 
    
    - name: Query the specfic job log
-     ibmi_query_job_log:
+     ibm.power_ibmi.ibmi_query_job_log:
        job_number: "025366"
        job_user: "QUSER"
        job_name: "QZDASOINIT"
@@ -94,6 +94,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

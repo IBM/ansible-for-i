@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sync
 short_description: Synchronize a save file from current IBM i node A to another IBM i node B.
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_sync) module synchronize a save file from current IBM i node to another IBM i node.
      - Only support to synchronize save file by now.
@@ -66,7 +66,7 @@ author:
 
 EXAMPLES = r'''
 - name: Synchronize c1 save file to host.com.
-  ibmi_sync:
+  ibmi_ibm.power_ibmi.ibmi_sync:
     src: '/qsys.lib/test.lib/c1.file'
     remote_host: 'host.com'
     remote_user: 'user'
@@ -111,7 +111,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "9.9.9"
 HAS_PARAMIKO = True
 
 try:

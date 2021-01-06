@@ -1,7 +1,7 @@
 ---
 # tasks file for load_individual_ptf
-- name: Involve ibmi_fix to load ptfs
-  ibmi_fix:
+- name: Involve ibm.power_ibmi.ibmi_fix to load ptfs
+  ibm.power_ibmi.ibmi_fix:
     product_id: "{{ load_ptf.product }}"
     save_file_object: "{{ (load_ptf.file_name | splitext)[0] }}"
     save_file_lib: '{{ remote_lib }}'
@@ -17,9 +17,10 @@
     load_success_list: "{{ load_success_list|default([]) + [ load_ptf ] }}"
   when: load_result.failed == 0
 
-- set_fact:
+- name: log load_fail_dict in load_fail_list
+  set_fact:
     load_fail_dict: "{{ load_fail_dict | default({}) | combine({ load_ptf.ptf_id: 'LOAD_FAIL' }) }}"
-    load_fail_list: "{{ load_fail_list | default([]) + [ load_ptf ]}}"
+    load_fail_list: "{{ load_fail_list | default([]) + [ load_ptf ] }}"
   when: load_result.failed != 0
 
 - name: log fail dict in result
