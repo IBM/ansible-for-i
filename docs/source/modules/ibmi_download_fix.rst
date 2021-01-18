@@ -202,13 +202,13 @@ Examples
 
    
    - name: Download a single PTF
-     ibmi_download_fix:
+     ibm.power_ibmi.ibmi_download_fix:
        ptf_id: 'SI63556'
        reorder: '*YES'
        order: '*PTFID'
 
    - name: Download a PTF group with become user
-     ibmi_download_fix:
+     ibm.power_ibmi.ibmi_download_fix:
        ptf_id: 'SF99740'
        delivery_format: '*IMAGE'
        become_user: 'USER1'
@@ -229,6 +229,7 @@ Notes
 
 
 
+  
 
 Return Values
 -------------

@@ -7,7 +7,9 @@
   tasks:
     - set_fact: 
         ptfs: ['SI73990', 'SI73107']
+
     - include: cleanup.yml
+      delegate_to: "ut2026p8.rch.stglabs.ibm.com"
 
     - name: IBM i download a list of individual PTFs
       include_role:
@@ -17,7 +19,7 @@
           - {'ptf_id': "{{ptfs[0]}}"}
           - {'ptf_id': "{{ptfs[1]}}"}
         order: '*PTFID'
-        download_server: "my.repo.server"
+        download_server: "ut2026p8.rch.stglabs.ibm.com"
 
     - name: assert values
       assert:
@@ -31,3 +33,4 @@
         
     - name: negative test
       include: neg_case.yml      
+      delegate_to: "ut2026p8.rch.stglabs.ibm.com"

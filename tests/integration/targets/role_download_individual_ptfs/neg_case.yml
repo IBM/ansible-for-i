@@ -10,7 +10,7 @@
       - {'ptf_id': "{{neg_ptfs[0]}}"}
       - {'ptf_id': "{{neg_ptfs[1]}}"}
     order: '*PTFID'
-    download_server: "my.repo.server"
+    download_server: "ut2026p8.rch.stglabs.ibm.com"
 
 - name: assert values
   assert:

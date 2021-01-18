@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix_group_check
 short_description: Retrieve the latest PTF group information from PSP server.
-version_added: '2.8.0'
+version_added: '1.1.0'
 description:
      - The C(ibmi_fix_group_check) module retrieve latest PTF group information from PSP(Preventive Service Planning) server.
      - Refer to https://www.ibm.com/support/pages/node/667567 for more details of PSP.
@@ -54,12 +54,12 @@ author:
 
 EXAMPLES = r'''
 - name: Check specific PTF groups
-  ibmi_fix_group_check:
+  ibm.power_ibmi.ibmi_fix_group_check:
     groups:
       - "SF12345"
 
 - name: Check the PTF groups without certificate verification
-  ibmi_fix_group_check:
+  ibm.power_ibmi.ibmi_fix_group_check:
     groups:
       - "SF12345"
     validate_certs: False
@@ -103,7 +103,7 @@ import datetime
 import re
 
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"

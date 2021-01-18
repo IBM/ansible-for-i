@@ -135,7 +135,7 @@ Examples
 
    
    - name: start host server service
-     ibmi_reply_message:
+     ibm.power_ibmi.ibmi_reply_message:
        message_key: 1990
        message_queue: QSECOFR
        message_lib: QUSRSYS
@@ -149,6 +149,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

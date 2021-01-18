@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_cl_command
 short_description: Executes a CL(Control language) command
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
   - The C(ibmi_cl_command) module takes the CL command followed by a list of space-delimited arguments.
   - For PASE(Portable Application Solutions Environment for i) or QSHELL(Unix/Linux-liked) commands,
@@ -65,7 +65,7 @@ author:
 
 EXAMPLES = r'''
 - name: Create a library by using CL command CRTLIB
-  ibmi_cl_command:
+  ibm.power_ibmi.ibmi_cl_command:
     cmd: 'CRTLIB LIB(TESTLIB)'
     become_user: 'USER1'
     become_user_password: 'yourpassword'
@@ -165,7 +165,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():
@@ -182,7 +182,7 @@ def main():
 
     ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
 
-    command = module.params['cmd'].strip().upper()
+    command = module.params['cmd'].strip()
     asp_group = module.params['asp_group'].strip().upper()
     joblog = module.params['joblog']
     become_user = module.params['become_user']

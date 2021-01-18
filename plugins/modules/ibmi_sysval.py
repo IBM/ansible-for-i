@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sysval
 short_description: Displays the specified system value
-version_added: '2.8.0'
+version_added: '1.0.1'
 description:
   - The C(ibmi_sysval) module displays the information of the specified system value.
   - Type of requisite values meaning refer to https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/apis/qwcrsval.htm
@@ -53,7 +53,7 @@ author:
 
 EXAMPLES = r'''
 - name: Get System Value information
-  ibmi_sysval:
+  ibmi_ibm.power_ibmi.ibmi_sysval:
     sysvalue:
       - {'name':'qmaxsgnacn', 'expect':'3'}
       - {'name':'qccsid'}
@@ -61,7 +61,7 @@ EXAMPLES = r'''
     become_user_password: 'yourpassword'
 
 - name: Compare the returned system valus as list
-  ibmi_sysval:
+  ibmi_ibm.power_ibmi.ibmi_sysval:
     sysvalue:
       - {'name':'QATNPGM', 'expect':'QEZMAIN   QSYS'}
       - {'name':'QATNPGM', 'expect':'QSYS  QEZMAIN'}
@@ -156,7 +156,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 sysval_array = [

@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_reply_message
 short_description: Send a reply message to the sender of an inquiry message
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
   - Send a reply message to the sender of an inquiry message.
   - For non-IBM i targets, use the M(service) module instead.
@@ -80,7 +80,7 @@ author:
 
 EXAMPLES = r'''
 - name: start host server service
-  ibmi_reply_message:
+  ibm.power_ibmi.ibmi_reply_message:
     message_key: 1990
     message_queue: QSECOFR
     message_lib: QUSRSYS
@@ -172,7 +172,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():

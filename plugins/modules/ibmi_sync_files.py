@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sync_files
 short_description: Synchronize a list of files from current IBM i node A to another IBM i node B.
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_sync_files) module synchronize a list of files from current IBM i node to another IBM i node.
      - Only supports SAVF(.file) format synchronize between QSYS and QSYS.
@@ -73,7 +73,7 @@ author:
 
 EXAMPLES = r'''
 - name: Synchronize a list of different types of files to host.com.
-  ibmi_sync_files:
+  ibmi_ibm.power_ibmi.ibmi_sync_files:
     src_list:
       - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/fish.lib/'}
       - {'src': '/qsys.lib/fish.lib/test.file', 'dest': '/qsys.lib/fish.lib'}
@@ -160,7 +160,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 HAS_PARAMIKO = True
 
 try:

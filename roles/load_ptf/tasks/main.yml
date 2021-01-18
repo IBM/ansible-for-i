@@ -1,6 +1,7 @@
 ---
 # tasks file for load_ptf
-- set_fact:
+- name: Initialize some variables
+  set_fact:
     load_success_list: []
     load_fail_list: []
     option_not_installed: []

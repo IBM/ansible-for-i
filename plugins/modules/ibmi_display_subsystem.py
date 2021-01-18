@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_display_subsystem
 short_description: Displays all currently active subsystems or currently active jobs in a subsystem
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
     - The C(ibmi_display_subsystem) module displays all currently active subsystems or currently active jobs in a subsystem.
     - In some ways it has equivalent results of WRKSBS if subsystem is C(*ALL), otherwise, it has equivalent results of WRKSBSJOB.
@@ -54,14 +54,14 @@ author:
 
 EXAMPLES = r'''
 - name: Display all the active subsystems in this system.
-  ibmi_display_subsystem:
+  ibm.power_ibmi.ibmi_display_subsystem:
 
 - name: Display all the active jobs of subsystem QINTER.
-  ibmi_display_subsystem:
+  ibm.power_ibmi.ibmi_display_subsystem:
     subsystem: QINTER
 
 - name: Display With One User's Job of subsystem QBATCH.
-  ibmi_display_subsystem:
+  ibm.power_ibmi.ibmi_display_subsystem:
     subsystem: QBATCH
     user: 'JONES'
 '''
@@ -179,7 +179,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():

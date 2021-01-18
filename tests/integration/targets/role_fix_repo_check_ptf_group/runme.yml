@@ -6,5 +6,8 @@
 
   tasks:
     # positive cases is covered in role_check_ptf_group, only run negative testcase here. 
-    #negative cases      
+    #negative cases
+    - name: install ca-certificates as needed
+      command: '/QOpensys/pkgs/bin/yum install ca-certificates* -y'
+            
     - include: neg_case.yml

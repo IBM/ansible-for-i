@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix_product_check
 short_description: Check the software product installation status for a fix
-version_added: '2.8.0'
+version_added: '1.2.0'
 description:
   - The C(ibmi_fix_product_check) module checks if the software product of a fix is installed.
 options:
@@ -45,7 +45,7 @@ author:
 
 EXAMPLES = r'''
 - name: Get PTF products installation status
-  ibmi_fix_product_check:
+  ibm.power_ibmi.ibmi_fix_product_check:
     ptfs:
       - {
         "product": "5770UME",
@@ -105,7 +105,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def get_product_info(imodule, product_id, release_level, product_option, load_id):

@@ -10,11 +10,12 @@
     sql: "SELECT PTF_IDENTIFIER, PTF_LOADED_STATUS FROM QSYS2.PTF_INFO WHERE PTF_PRODUCT_ID = '{{ ptf_info_list[0].product }}'"
   register: result
 
-- set_fact:
+- name: compose ptf_status
+  set_fact:
     ptf_status: "{{ ptf_status|default([]) + [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'Product not installed on target system' }] }}"
   when: result.row|length == 0
   no_log: true
-  
+
 - name: start to check ptfs
   block:
   - name: compose ptf status list on target system
@@ -38,7 +39,7 @@
   - name: ptf not applied
     set_fact:
       ptf_list: "{{ ptf_list|default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id] }] }}"
-    when: 
+    when:
       - ptf_on_system.get(ptf_info.ptf_id)
       - ptf_on_system[ptf_info.ptf_id] != 'APPLIED'
       - ptf_on_system[ptf_info.ptf_id] != 'PERMANENTLY APPLIED'
@@ -51,15 +52,16 @@
   - name: ptf applied
     set_fact:
       ptf_list: "{{ ptf_list|default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id] }] }}"
-    when: 
-      - ptf_on_system.get(ptf_info.ptf_id) 
+    when:
+      - ptf_on_system.get(ptf_info.ptf_id)
       - ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or ptf_on_system[ptf_info.ptf_id] == 'PERMANENTLY APPLIED' or ptf_on_system[ptf_info.ptf_id] == 'SUPERSEDED'
     with_list: "{{ ptf_info_list }}"
     loop_control:
       loop_var: ptf_info
     no_log: true
 
-  - set_fact:
+  - name: compose ptf_status
+    set_fact:
       ptf_status: "{{ ptf_status|default([]) + [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'OK', 'PTF_LIST': ptf_list }] }}"
     no_log: true
 

@@ -146,7 +146,7 @@ Examples
 
    
    - name: Add a job schedule entry test with become user.
-     ibmi_at:
+     ibm.power_ibmi.ibmi_at:
        job_name: 'test'
        cmd: 'QSYS/WRKSRVAGT TYPE(*UAK)'
        frequency: '*WEEKLY'
@@ -162,6 +162,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

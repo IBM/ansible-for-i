@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_device_vary
 short_description: Vary on or off target device
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
   - Vary on or off target device.
   - For non-IBM i targets, no need.
@@ -67,7 +67,7 @@ author:
 
 EXAMPLES = r'''
 - name: start host server service
-  ibmi_device_vary:
+  ibm.power_ibmi.ibmi_device_vary:
     device_list: ['IASP1', 'IASP2']
     status: '*ON'
     joblog: True
@@ -159,7 +159,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():

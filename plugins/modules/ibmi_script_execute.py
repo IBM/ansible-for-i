@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_script_execute
 short_description: Execute a cl/sql script file
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_script_execute) module execute a cl/sql script file on a remote ibm i node.
      - Only support cl/sql script file by now.
@@ -80,14 +80,14 @@ author:
 
 EXAMPLES = r'''
 - name: Execute test.cl on a remote IBM i node with become user.
-  ibmi_script_execute:
+  ibm.power_ibmi.ibmi_script_execute:
     src: '/home/test.cl'
     type: 'CL'
     become_user: 'USER1'
     become_user_password: 'yourpassword'
 
 - name: Execute testsql.sql on a remote IBM i node.
-  ibmi_script_execute:
+  ibm.power_ibmi.ibmi_script_execute:
     src: '/home/testsql.sql'
     type: 'SQL'
     severity_level: 40
@@ -160,7 +160,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def return_error(module, ibmi_module, error, out, startd, result):

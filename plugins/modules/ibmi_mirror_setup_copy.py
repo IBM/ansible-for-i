@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_mirror_setup_copy
 short_description: Configures the Db2 Mirror on the target node.
-version_added: '2.8.0'
+version_added: '1.2.0'
 description:
   - The C(ibmi_mirror_setup_copy) module configures the Db2 Mirror on the target node after the clone.
 options:
@@ -51,7 +51,7 @@ author:
 
 EXAMPLES = r'''
 - name: config the db2 mirror on the copy node
-  ibmi_mirror_setup_copy:
+  ibm.power_ibmi.ibmi_mirror_setup_copy:
     ip_address: 192.168.100.2
     rdma_subnet_mask: 255.255.252.0
 '''
@@ -130,7 +130,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def _is_ipv4_addr(ip):

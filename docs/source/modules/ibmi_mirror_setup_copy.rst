@@ -74,7 +74,7 @@ Examples
 
    
    - name: config the db2 mirror on the copy node
-     ibmi_mirror_setup_copy:
+     ibm.power_ibmi.ibmi_mirror_setup_copy:
        ip_address: 192.168.100.2
        rdma_subnet_mask: 255.255.252.0
 
@@ -91,6 +91,7 @@ See Also
    - :ref:`ibmi_mirror_setup_source_module`
 
 
+  
 
 Return Values
 -------------

@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_module_authority_check
 short_description: Check the authority of executing a module.
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
   - The C(ibmi_module_authority_check) module can do the module authority check.
   - This module returns the authority of executing the module specified in the parameter
@@ -36,7 +36,7 @@ author:
 
 EXAMPLES = r'''
 - name: Do module authority check
-  ibmi_user_compliance_check:
+  ibm.power_ibmi.ibmi_user_compliance_check:
        modulelist:
         - 'ibmi_copy'
         - 'ibmi_display_subsystem'
@@ -68,7 +68,7 @@ authority_result:
 
 from ansible.module_utils.basic import AnsibleModule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 module_authority_map = {
     'ibmi_at': ['*NONE'],

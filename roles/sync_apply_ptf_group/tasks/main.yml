@@ -1,8 +1,9 @@
 ---
 # role for sync_apply_ptf_group
-# Call ibmi_synchronize_files to tranfer the exists ptf group files to an ibm i system, then call ibmi_fix_imgclg to apply this
+# Call ibm.power_ibmi.ibmi_synchronize_files to tranfer the exists ptf group files to an ibm i system, then call ibm.power_ibmi.ibmi_fix_imgclg to apply this
 # ptf group. And return the result.
-- set_fact:
+- name: Initialize sync_list and sync_apply_fail
+  set_fact:
     sync_list: []
     sync_apply_fail: False
 
@@ -14,6 +15,7 @@
   file:
     path: "{{ path }}"
     state: directory
+    mode: 0755
   register: file_result
   ignore_errors: True
 
@@ -22,12 +24,14 @@
       debug:
         msg: "{{ 'Make receive dir ' + path + ' fail, skip the rest of this role.' }}"
 
-    - set_fact:
+    - name: Initialize sync_apply_fail
+      set_fact:
         sync_apply_fail: True
   when: file_result.failed == 1
 
 - block:
-    - set_fact:
+    - name: compose src_list
+      set_fact:
         src_list: "{{ src_list | default([]) + [{ 'src': ptf_group_info.file_path + '/' + item }] }}"
       loop: "{{ ptf_group_info.file_name }}"
 
@@ -35,7 +39,7 @@
         var: src_list
 
     - name: Transfer image to target_system
-      ibmi_synchronize_files:
+      ibm.power_ibmi.ibmi_synchronize_files:
         dest: "{{ path }}"
         src_list: "{{ src_list }}"
       delegate_to: "{{ src_host }}"
@@ -44,7 +48,7 @@
     - name: Print transfer
       debug:
         var: sync_result
-        
+
     - block:
         - name: skip when transfer failed
           debug:
@@ -56,7 +60,7 @@
 
     - block:
         - name: Apply PTF group
-          ibmi_fix_imgclg:
+          ibm.power_ibmi.ibmi_fix_imgclg:
             src: '{{ path }}'
           register: apply_result
 

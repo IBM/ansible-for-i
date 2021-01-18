@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_ethernet_port
 short_description: Retrieves all the ethernet ports(both virtual and physical)information on the system.
-version_added: '2.8.0'
+version_added: '1.1.0'
 description:
   - The C(ibmi_ethernet_port) module lists the ethernet ports information of the system.
 options:
@@ -54,7 +54,7 @@ author:
 
 EXAMPLES = r'''
 - name: list all the ethernet port information
-  ibmi_ethernet_port:
+  ibm.power_ibmi.ibmi_ethernet_port:
 '''
 
 RETURN = r'''
@@ -134,7 +134,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def get_info_from_resource_name(imodule, resource_name):

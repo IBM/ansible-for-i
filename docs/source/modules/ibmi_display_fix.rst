@@ -98,7 +98,7 @@ Examples
 
    
    - name: Get PTF information
-     ibmi_display_fix:
+     ibm.power_ibmi.ibmi_display_fix:
        product: '5770SS1'
        ptf: 'SI70439'
        release: 'V7R4M0'
@@ -116,6 +116,7 @@ See Also
    - :ref:`ibmi_fix_module`
 
 
+  
 
 Return Values
 -------------

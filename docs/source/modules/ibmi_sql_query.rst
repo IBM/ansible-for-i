@@ -109,7 +109,7 @@ Examples
 
    
    - name: Query the data of table Persons.
-     ibmi_sql_query:
+     ibmi_ibm.power_ibmi.ibmi_sql_query:
        sql: 'select * from Persons'
        become_user: 'USER1'
        become_user_password: 'yourpassword'
@@ -133,6 +133,7 @@ See Also
    - :ref:`ibmi_sql_execute_module`
 
 
+  
 
 Return Values
 -------------

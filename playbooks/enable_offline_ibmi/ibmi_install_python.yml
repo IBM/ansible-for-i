@@ -4,7 +4,7 @@
 # setup ibmi off line
 ---
 - name: Check whether yum has been installed. If not, install it in following tasks.
-  raw: ls -l /QOpensys/pkgs/bin/{{python_version}}
+  raw: ls -l /QOpensys/pkgs/bin/{{ python_version }}
   args:
     executable: /qopensys/usr/bin/qsh
   register: default_python_existance
@@ -16,28 +16,28 @@
       when: package_path == ""
 
     - name: find out the name of python3 installation package
-      shell: ls {{package_path}}/*.rpm 
+      shell: ls {{ package_path }}/*.rpm 
       delegate_to: localhost
       register: python_file_list
 
     - set_fact: 
-        rpm_list: "{{ rpm_list|default([]) + [rpm_full_path.split('/')[-1]] }}"
-      loop: '{{python_file_list.stdout_lines}}'
+        rpm_list: "{{  rpm_list|default([]) + [rpm_full_path.split('/')[-1]]  }}"
+      loop: '{{ python_file_list.stdout_lines }}'
       loop_control:
         loop_var: rpm_full_path
 
     - include: transfer_files.yml
-      loop: '{{rpm_list}}'
+      loop: '{{ rpm_list }}'
       loop_control:
         loop_var: package
       vars:
-        target_path: '{{remote_temp_dir}}'
+        target_path: '{{ remote_temp_dir }}'
 
     - name: find out the name of python3 installation package
-      raw: ls -l {{remote_temp_dir}}/*.rpm 
+      raw: ls -l {{ remote_temp_dir }}/*.rpm 
 
     - name: install the package
-      raw: "/QOpensys/pkgs/bin/yum --disablerepo=ibm install {{remote_temp_dir}}/*.rpm -y"
+      raw: "/QOpensys/pkgs/bin/yum --disablerepo=ibm install {{ remote_temp_dir }}/*.rpm -y"
 
   when: default_python_existance.rc != 0
 
@@ -47,13 +47,13 @@
 
     - include: ibmi_install_dependencies.yml
       vars: 
-        python: "{{python_version}}"
-      loop: "{{required_rpms}}"   
+        python: "{{ python_version }}"
+      loop: "{{ required_rpms }}"   
       loop_control:
         loop_var: dependency
 
     - name: install the package
-      raw: "/QOpensys/pkgs/bin/yum --disablerepo=ibm install {{remote_temp_dir}}/*.rpm -y"
+      raw: "/QOpensys/pkgs/bin/yum --disablerepo=ibm install {{ remote_temp_dir }}/*.rpm -y"
       when: has_rpm_to_be_installed
 
   when: default_python_existance.rc == 0

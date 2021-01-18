@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_display_fix
 short_description: Displays the PTF(Program Temporary Fix) information and also get the requisite PTFs information of the PTF
-version_added: '2.8.0'
+version_added: '1.1.0'
 description:
   - The C(ibmi_display_fix) module displays the information of the PTF and also get the requisite PTFs.
   - Type of requisite values meaning refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/apis/qpzrtvfx.htm#HDRPTFLLH2
@@ -65,7 +65,7 @@ author:
 
 EXAMPLES = r'''
 - name: Get PTF information
-  ibmi_display_fix:
+  ibm.power_ibmi.ibmi_display_fix:
     product: '5770SS1'
     ptf: 'SI70439'
     release: 'V7R4M0'
@@ -242,7 +242,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def get_ptf_info(imodule, ptf_id, product_id, release_level):

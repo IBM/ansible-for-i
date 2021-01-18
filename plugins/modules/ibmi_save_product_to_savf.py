@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_save_product_to_savf
 short_description: Save the the licensed program(product) to a save file
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
     - the C(ibmi_save_product_to_savf) module saves the product to a save file.
 options:
@@ -98,13 +98,13 @@ author:
 
 EXAMPLES = r'''
 - name: Saving Program using Defaults.
-  ibmi_save_product_to_savf:
+  ibm.power_ibmi.ibmi_save_product_to_savf:
     product: 5770WDS
     savf_name: MYFILE
     savf_library: MYLIB
 
 - name: Saving Program 5733D10 option 11.
-  ibmi_save_product_to_savf:
+  ibm.power_ibmi.ibmi_save_product_to_savf:
     product: 5733D10
     option: 11
     savf_name: MYFILE
@@ -176,7 +176,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():

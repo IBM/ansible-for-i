@@ -10,6 +10,6 @@ flavor_name_or_id: tiny
 deploy_timeout: 300
 Deploy_userdata: |
   {%- raw -%}#!/bin/sh
-  system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"  
+  system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"
   system "strtcpsvr *sshd"
   {% endraw %}

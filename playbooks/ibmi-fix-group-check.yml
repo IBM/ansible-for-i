@@ -8,16 +8,16 @@
   gather_facts: no
   collections:
    - ibm.power_ibmi
-  
+
   tasks:
     - name: query_invalid_groups
       ibmi_fix_group_check:
         groups:
           - "ABC123456"
       register: invalid_groups
-      
+
     - name: display_invalid_groups
-      debug: 
+      debug:
         msg: "{{ invalid_groups }}"
 
     - name: query_a_single_group
@@ -25,9 +25,9 @@
         groups:
           - "SF99713"
       register: single_group
-      
+
     - name: display_a_single_group
-      debug: 
+      debug:
         msg: "{{ single_group }}"
 
     - name: query_a_group_and_a_cum
@@ -36,9 +36,9 @@
           - "SF99738"
           - "SF99740"
       register: a_group_and_a_cum
-      
+
     - name: display_a_group_and_a_cum
-      debug: 
+      debug:
         msg: "{{ a_group_and_a_cum }}"
 
     # THIS IS UNBELIEVABLE SLOW!!!
@@ -47,7 +47,6 @@
     #     groups:
     #       - "*ALL"
     #   register: all_groups
-      
     # - name: display_all_groups
     #   debug: 
     #     msg: "{{ all_groups }}"

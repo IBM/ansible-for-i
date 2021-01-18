@@ -509,7 +509,7 @@
   - name: TC04G - Assert Values
     assert:
       that:
-        - neg_result.parameters | selectattr('db_record','equalto', 'RecordNotFound')
+        - neg_result.parameters | selectattr('db_record','equalto', 'RECORD_NOT_FOUND')
 
   - name: TC04H - Negative test - try to delete a non-exist single_ptf record    
     ibmi_fix_repo:

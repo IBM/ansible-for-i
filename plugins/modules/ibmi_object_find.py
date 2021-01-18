@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_object_find
 short_description: Find specific IBM i object(s).
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - Return a list of IBM i objects based on specific criteria. Multiple criteria are AND'd together.
 options:
@@ -102,7 +102,7 @@ author:
 
 EXAMPLES = r'''
 - name:  Find all journals and journal receivers in library WYTEST.
-  ibmi_object_find:
+  ibm.power_ibmi.ibmi_object_find:
     object_name: '*ALL'
     object_type_list: '*JRN *JRNRCV'
     lib_name: 'WYTEST'
@@ -110,21 +110,21 @@ EXAMPLES = r'''
     age_stamp: 'ctime'
 
 - name:  Find all the object names that contains 'ABC' with regex.
-  ibmi_object_find:
+  ibm.power_ibmi.ibmi_object_find:
     object_name: 'ABC+'
     object_type_list: '*ALL'
     lib_name: '*ALL'
     use_regex: true
 
 - name: find library WYTEST in sysbas
-  ibmi_object_find:
+  ibm.power_ibmi.ibmi_object_find:
     lib_name: 'QSYS'
     iasp_name: '*SYSBAS'
     object_name: 'WYTEST'
     object_type_list: "*LIB"
 
 - name: find object OBJABC in asp group WYTEST2
-  ibmi_object_find:
+  ibm.power_ibmi.ibmi_object_find:
     lib_name: '*ALL'
     iasp_name: 'WYTEST2'
     object_type_list: "*FILE"
@@ -249,7 +249,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_object_restore
 short_description: Restore one or more objects
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_object_restore) module restore an save file on a remote IBM i nodes
      - The restored objects and save file are on the remote host.
@@ -89,7 +89,7 @@ author:
 
 EXAMPLES = r'''
 - name: Restore test1.pgm test2.srvpgm in savedlib libary from archive.savf in archlib libary with become user.
-  ibmi_object_restore:
+  ibm.power_ibmi.ibmi_object_restore:
     object_names: 'test1 test2'
     object_lib: 'savedlib'
     object_types: '*PGM *SRVPGM'
@@ -217,7 +217,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():

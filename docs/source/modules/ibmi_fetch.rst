@@ -166,7 +166,7 @@ Examples
    
    - name: Fetch obja.pgm and objb.srvpgm in objlib libary as test1.savf(target release V7R2M0) on a remote IBM i to local. Store
            as /backup/host.example.com/qsys.lib/objlib.lib/test1.file and keep the save file on remote.
-     ibmi_fetch:
+     ibm.power_ibmi.ibmi_fetch:
        object_names: 'obj1 obj2'
        lib_name: 'objlib'
        object_types: '*PGM *SRVPGM'
@@ -176,7 +176,7 @@ Examples
        target_release: 'V7R2M0'
 
    - name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.
-     ibmi_fetch:
+     ibm.power_ibmi.ibmi_fetch:
        lib_name: 'objlib'
        dest: '/backup'
        flat: True
@@ -202,6 +202,7 @@ See Also
    - :ref:`fetch_module`
 
 
+  
 
 Return Values
 -------------

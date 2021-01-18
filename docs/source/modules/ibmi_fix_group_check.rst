@@ -70,12 +70,12 @@ Examples
 
    
    - name: Check specific PTF groups
-     ibmi_fix_group_check:
+     ibm.power_ibmi.ibmi_fix_group_check:
        groups:
          - "SF12345"
 
    - name: Check the PTF groups without certificate verification
-     ibmi_fix_group_check:
+     ibm.power_ibmi.ibmi_fix_group_check:
        groups:
          - "SF12345"
        validate_certs: False
@@ -95,6 +95,7 @@ Notes
 
 
 
+  
 
 Return Values
 -------------

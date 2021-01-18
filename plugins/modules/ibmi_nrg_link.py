@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_nrg_link
 short_description: Manages NRGs(Network Redundancy Groups) links
-version_added: '2.8.0'
+version_added: '1.2.0'
 description:
   - The C(ibmi_nrg_link) module adds or removes a link to one or all of the Db2 Mirror Network Redundancy Groups (NRGs).
 options:
@@ -98,14 +98,14 @@ author:
 
 EXAMPLES = r'''
 - name: add a link to the db2 mirror nrg
-  ibmi_nrg_link:
+  ibm.power_ibmi.ibmi_nrg_link:
     operation: add
     source_address: 10.0.0.1
     target_address: 10.0.0.2
     link_priority: 1
 
 - name: remove a link from the db2 mirror nrg with become user
-  ibmi_nrg_link:
+  ibm.power_ibmi.ibmi_nrg_link:
     operation: remove
     source_address: 10.0.0.1
     become_user: 'USER1'
@@ -157,7 +157,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():

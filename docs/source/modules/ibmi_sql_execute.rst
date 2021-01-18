@@ -85,7 +85,7 @@ Examples
 
    
    - name: Insert one record to table Persons
-     ibmi_sql_execute:
+     ibmi_ibm.power_ibmi.ibmi_sql_execute:
        sql: "INSERT INTO Persons VALUES('919665', 'Le', 'Chang', 'Ring Building', 'Beijing')"
        become_user: 'USER1'
        become_user_password: 'yourpassword'
@@ -109,6 +109,7 @@ See Also
    - :ref:`IBMi_sql_query_module`
 
 
+  
 
 Return Values
 -------------

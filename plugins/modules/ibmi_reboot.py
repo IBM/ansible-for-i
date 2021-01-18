@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_reboot
 short_description: Reboot an IBM i machine
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
     - Reboot a IBM i machine, wait for it to go down, come back up, and respond to commands.
 options:
@@ -121,14 +121,14 @@ author:
 
 EXAMPLES = r'''
 - name: Unconditionally reboot the machine with all defaults
-  ibmi_reboot:
+  ibm.power_ibmi.ibmi_reboot:
 
 - name: Reboot a slow machine that might have lots of updates to apply
-  ibmi_reboot:
+  ibm.power_ibmi.ibmi_reboot:
     reboot_timeout: 3600
 
 - name: Unconditionally reboot the machine with become user
-  ibmi_reboot:
+  ibm.power_ibmi.ibmi_reboot:
     become_user: 'USER'
     become_user_password: 'yourpassword'
 '''

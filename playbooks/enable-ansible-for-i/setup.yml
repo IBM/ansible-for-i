@@ -22,34 +22,34 @@
   - block:
       - include: ibmi-install-rpm.yml 
         vars: 
-          python: "{{python_version}}"
-        with_list: "{{required_rpms}}"     
+          python: "{{ python_version }}"
+        with_list: "{{ required_rpms }}"     
       
     vars:
       required_rpms: [itoolkit, ibm_db]
-      python_version: "{{ansible_python_interpreter.split('/')[-1]}}"
+      python_version: "{{ ansible_python_interpreter.split('/')[-1] }}"
 
   - block:
     - name: find the home directory 
       ibmi_user_and_group:
         operation: 'display'
-        user: '{{ansible_ssh_user}}'
+        user: '{{ ansible_ssh_user }}'
       register: user_result
 
     - set_fact:
-        home_dir: "{{user_result['result_set'][0]['HOME_DIRECTORY']}}"
+        home_dir: "{{ user_result['result_set'][0]['HOME_DIRECTORY'] }}"
 
     - name: ensure home directory exist
       file:
-        path: '{{home_dir}}'
+        path: '{{ home_dir }}'
         state: directory
-        owner: '{{ansible_ssh_user}}'
+        owner: '{{ ansible_ssh_user }}'
 
     - name: ensure .profile exist
       file:
-        path: '{{home_dir}}/.profile'
+        path: '{{ home_dir }}/.profile'
         state: touch
-        owner: '{{ansible_ssh_user}}'
+        owner: '{{ ansible_ssh_user }}'
 
     - name: export PATH to ssh user profile permanently
       raw: echo 'PATH=/QOpenSys/pkgs/bin:$PATH' >> $HOME/.profile

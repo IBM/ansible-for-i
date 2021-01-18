@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix
 short_description: Install, remove or query an individual fix or a set of fixes on to IBM i system.
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_fix) module install fixes to target IBM i system.
      - The installation file of the fixes should be in the format of save file.
@@ -97,7 +97,7 @@ author:
 
 EXAMPLES = r'''
 - name: Remove a single PTF
-  ibmi_fix:
+  ibm.power_ibmi.ibmi_fix:
     product_id: '5770DBM'
     delayed_option: "*NO"
     temp_or_perm: "*PERM"
@@ -107,7 +107,7 @@ EXAMPLES = r'''
     become_user: "QSECOFR"
     become_user_password: "yourpassword"
 - name: Install a single PTF
-  ibmi_fix:
+  ibm.power_ibmi.ibmi_fix:
     product_id: '5770DBM'
     save_file_object: 'QSI72223'
     save_file_lib: 'QGPL'
@@ -119,7 +119,7 @@ EXAMPLES = r'''
     become_user: "QSECOFR"
     become_user_password: "yourpassword"
 - name: query ptf
-  ibmi_fix:
+  ibm.power_ibmi.ibmi_fix:
     operation: 'query'
     fix_list:
       - "SI72223"
@@ -249,7 +249,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

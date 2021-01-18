@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 module: ibmi_end_subsystem
 short_description: End an active subsystem.
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
     - The C(ibmi_end_subsystem) module ends an active subsystem.
 options:
@@ -78,13 +78,13 @@ author:
 
 EXAMPLES = r'''
 - name: End the subsystem QBATCH with another user.
-  ibmi_end_subsystem:
+  ibm.power_ibmi.ibmi_end_subsystem:
     subsystem: QBATCH
     become_user: 'USER1'
     become_user_password: 'yourpassword'
 
 - name: End a subsystem with options.
-  ibmi_end_subsystem:
+  ibm.power_ibmi.ibmi_end_subsystem:
     subsystem: QBATCH
     how_to_end: '*IMMED'
 '''
@@ -152,7 +152,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():

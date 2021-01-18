@@ -14,7 +14,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix_compare
 short_description: Verify whether the PTFs are installed.
-version_added: '2.8.0'
+version_added: '1.2.0'
 description:
      - The C(ibmi_fix_compare) module compare the PTF list to target system to see whether the PTF is applied.
 options:
@@ -44,7 +44,7 @@ author:
 EXAMPLES = r'''
 
 - name: Check the PTFs' status
-  ibmi_fix_compare:
+  ibm.power_ibmi.ibmi_fix_compare:
     ptfs:
       - 'SI12345'
       - 'SI67890'
@@ -100,7 +100,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def get_ptf_info(db_connection, ptf_list):

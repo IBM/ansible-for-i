@@ -12,6 +12,6 @@
       - fix_repo_update_result is defined
       - fix_repo_find_result.sql != ""
       - fix_repo_find_result.type == "download_status"
-      - fix_repo_find_result.fail_list[0]['db_record'] == "RecordNotFound"
+      - fix_repo_find_result.fail_list[0]['db_record'] == "RECORD_NOT_FOUND"
       - fix_repo_find_result.fail_list[0]['order_id'] == "ABCD1234"
       - fix_repo_update_result.skipped == true

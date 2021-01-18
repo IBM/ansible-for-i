@@ -93,7 +93,7 @@ Examples
 
    
    - name: print the spooled file data
-     ibmi_spooled_file_data:
+     ibmi_ibm.power_ibmi.ibmi_spooled_file_data:
        job_name: '024800/CHANGLE/QDFTJOBD'
        spooled_file_name: 'QPSECUSR'
 
@@ -110,6 +110,7 @@ See Also
    - :ref:`ibmi_submit_job_module`
 
 
+  
 
 Return Values
 -------------

@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix_repo
 short_description: Manipulate the PTF database via sqlite3
-version_added: '2.8.0'
+version_added: '1.1.0'
 description:
      - The C(ibmi_fix_repo) module manipulate the PTF database via sqlite3.
      - Required dependencies are C(SQLite3 >= 3.26) and python module C(requests).
@@ -54,26 +54,26 @@ author:
 
 EXAMPLES = r'''
 - name: add some group records
-  ibmi_fix_repo:
+  ibm.power_ibmi.ibmi_fix_repo:
     action: 'add'
     type: 'ptf_group'
     checksum: true
     parameters:
       - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
 - name: query some PTFs records
-  ibmi_fix_repo:
+  ibm.power_ibmi.ibmi_fix_repo:
     action: "find"
     type: 'ptf_group'
     parameters:
       - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
 - name: delete some PTFs records
-  ibmi_fix_repo:
+  ibm.power_ibmi.ibmi_fix_repo:
     action: "delete"
     type: 'ptf_group'
     parameters:
       - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
 - name: run sql to drop the table
-  ibmi_fix_repo:
+  ibm.power_ibmi.ibmi_fix_repo:
     action: "clear"
     type: 'ptf_group'
 '''
@@ -169,7 +169,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 single_ptf_table = 'single_ptf_info'
 ptf_group_image_table = 'ptf_group_image_info'

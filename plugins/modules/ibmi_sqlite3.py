@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sqlite3
 short_description: Executes a SQL statement via sqlite3
-version_added: '2.8.0'
+version_added: '1.0.2'
 description:
      - The C(ibmi_sqlite3) module takes the SQL statement as argument.
 options:
@@ -45,12 +45,12 @@ author:
 
 EXAMPLES = r'''
 - name: Create table PTFINFO
-  ibmi_sqlite3:
+  ibmi_ibm.power_ibmi.ibmi_sqlite3:
     database: "/tmp/testdb.sqlite3"
     sql: "CREATE TABLE PTFINFO (ID CHAR(10) PRIMARY KEY NOT NULL, PRODUCT CHAR(10) NOT NULL, VRM CHAR(10) NOT NULL, CHECKSUM CHAR(256))"
 
 - name: Insert some records to table PTFINFO
-  ibmi_sqlite3:
+  ibmi_ibm.power_ibmi.ibmi_sqlite3:
     database: "/tmp/testdb.sqlite3"
     sql: "INSERT INTO PTFINFO (ID, PRODUCT, VRM, CHECKSUM) VALUES (:ID, :PRODUCT, :VRM, :CHECKSUM)"
     parameters: [
@@ -69,25 +69,25 @@ EXAMPLES = r'''
     ]
 
 - name: Find a record to table PTFINFO
-  ibmi_sqlite3:
+  ibmi_ibm.power_ibmi.ibmi_sqlite3:
     database: "/tmp/testdb.sqlite3"
     sql: "SELECT ID FROM PTFINFO WHERE ID = :ID"
     parameters: {"ID": "SI69379"}
 
 - name: Update a record in table PTFINFO
-  ibmi_sqlite3:
+  ibmi_ibm.power_ibmi.ibmi_sqlite3:
     database: "/tmp/testdb.sqlite3"
     sql: "UPDATE PTFINFO SET CHECKSUM=:CHECKSUM WHERE ID=:ID"
     parameters: {"ID": "SI69379", "CHECKSUM": "abc123"}
 
 - name: Delete a record in table PTFINFO
-  ibmi_sqlite3:
+  ibmi_ibm.power_ibmi.ibmi_sqlite3:
     database: "/tmp/testdb.sqlite3"
     sql: "DELETE FROM PTFINFO WHERE ID=:ID"
     parameters: {"ID": "SI69379"}
 
 - name: Delete table PTFINFO
-  ibmi_sqlite3:
+  ibmi_ibm.power_ibmi.ibmi_sqlite3:
     database: "/tmp/testdb.sqlite3"
     sql: "DROP TABLE IF EXISTS PTFINFO"
 '''
@@ -161,7 +161,7 @@ from ansible.module_utils.basic import AnsibleModule
 import sqlite3
 import datetime
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():

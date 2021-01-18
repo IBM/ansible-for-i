@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_script
 short_description: Execute a local cl/sql script file.
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
      - The C(ibmi_script) plugin transfer a local cl/sql script file to a remote ibm i node and execute.
      - Only support cl/sql script file by now.
@@ -81,14 +81,14 @@ author:
 
 EXAMPLES = r'''
 - name: Execute test.cl on a remote IBM i node with become user.
-  ibmi_script:
+  ibm.power_ibmi.ibmi_script:
     src: '/tmp/test.cl'
     type: 'CL'
     become_user: 'USER1'
     become_user_password: 'yourpassword'
 
 - name: Execute testsql.sql on a remote IBM i node.
-  ibmi_script_execute:
+  ibm.power_ibmi.ibmi_script:
     src: '/home/testsql.sql'
     type: 'SQL'
     severity_level: 40

@@ -77,7 +77,7 @@ Examples
 
    
    - name: suspend the system for a warm clone to do a clone
-     ibmi_mirror_warm_clone_activity:
+     ibm.power_ibmi.ibmi_mirror_warm_clone_activity:
        operation: suspend
 
 
@@ -93,6 +93,7 @@ See Also
    - :ref:`ibmi_mirror_setup_source_module`
 
 
+  
 
 Return Values
 -------------

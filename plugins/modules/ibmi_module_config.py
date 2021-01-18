@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_module_config
 short_description: Configures managed nodes settings
-version_added: '2.8.0'
+version_added: '1.1.0'
 description:
   - The C(ibmi_module_config) module configures the managed nodes settings, like module log settings.
 options:
@@ -78,7 +78,7 @@ author:
 
 EXAMPLES = r'''
 - name: Config the logging as debug level
-  ibmi_module_config:
+  ibm.power_ibmi.ibmi_module_config:
     section: log_config
     config_dir: home
     log_level: debug
@@ -123,7 +123,7 @@ import json
 import os
 import pwd
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():

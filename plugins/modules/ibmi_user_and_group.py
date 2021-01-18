@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_user_and_group
 short_description: Create, change or display a user(or group) profile
-version_added: '2.8.0'
+version_added: '1.0.0'
 description:
   - The C(ibmi_user_and_group) module can do the user(or group) profile management(create, change, delete and display).
   - A user profile contain a user's passwords, the list of special authorities assigned to a user, and the objects the user owns.
@@ -146,24 +146,24 @@ author:
 
 EXAMPLES = r'''
 - name: create user profile
-  ibmi_user_and_group:
+  ibmi_ibm.power_ibmi.ibmi_user_and_group:
     operation: 'create'
     user: 'changle'
 
 - name: create user profile with become user
-  ibmi_user_and_group:
+  ibmi_ibm.power_ibmi.ibmi_user_and_group:
     operation: 'create'
     user: 'changle'
     become_user: 'USER1'
     become_user_password: 'yourpassword'
 
 - name: display user profile
-  ibmi_user_and_group:
+  ibmi_ibm.power_ibmi.ibmi_user_and_group:
     operation: 'display'
     user: 'changle'
 
 - name: display group members
-  ibmi_user_and_group:
+  ibmi_ibm.power_ibmi.ibmi_user_and_group:
     operation: 'display_group_members'
     user: 'group1'
 '''
@@ -247,7 +247,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.0"
+__ibmi_module_version__ = "1.2.1"
 
 
 def main():
