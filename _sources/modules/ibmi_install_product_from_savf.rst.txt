@@ -162,7 +162,7 @@ Examples
 
    
    - name: Restoring Program with become user.
-     ibmi_install_product_from_savf:
+     ibm.power_ibmi.ibmi_install_product_from_savf:
        product: 5770WDS
        savf_name: MYFILE
        savf_library: MYLIB
@@ -170,7 +170,7 @@ Examples
        become_user_password: 'yourpassword'
 
    - name: Restoring Program with acceptance command.
-     ibmi_install_product_from_savf:
+     ibm.power_ibmi.ibmi_install_product_from_savf:
        product: 5733D10
        option: 11
        savf_name: MYFILE
@@ -190,6 +190,7 @@ See Also
    - :ref:`ibmi_uninstall_product, ibmi_save_product_to_savf_module`
 
 
+  
 
 Return Values
 -------------

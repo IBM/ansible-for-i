@@ -160,7 +160,7 @@ Examples
 
    
    - name: Remove a single PTF
-     ibmi_fix:
+     ibm.power_ibmi.ibmi_fix:
        product_id: '5770DBM'
        delayed_option: "*NO"
        temp_or_perm: "*PERM"
@@ -170,7 +170,7 @@ Examples
        become_user: "QSECOFR"
        become_user_password: "yourpassword"
    - name: Install a single PTF
-     ibmi_fix:
+     ibm.power_ibmi.ibmi_fix:
        product_id: '5770DBM'
        save_file_object: 'QSI72223'
        save_file_lib: 'QGPL'
@@ -182,7 +182,7 @@ Examples
        become_user: "QSECOFR"
        become_user_password: "yourpassword"
    - name: query ptf
-     ibmi_fix:
+     ibm.power_ibmi.ibmi_fix:
        operation: 'query'
        fix_list:
          - "SI72223"
@@ -207,6 +207,7 @@ See Also
    - :ref:`ibmi_fix_imgclg_module`
 
 
+  
 
 Return Values
 -------------

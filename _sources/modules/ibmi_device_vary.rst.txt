@@ -101,7 +101,7 @@ Examples
 
    
    - name: start host server service
-     ibmi_device_vary:
+     ibm.power_ibmi.ibmi_device_vary:
        device_list: ['IASP1', 'IASP2']
        status: '*ON'
        joblog: True
@@ -121,6 +121,7 @@ See Also
    - :ref:`service_module`
 
 
+  
 
 Return Values
 -------------

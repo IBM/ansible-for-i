@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -51,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> IBM power_ibmi collection
+            <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
           
 
           
@@ -203,6 +205,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -216,7 +220,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             
               <!-- User defined GitHub URL -->
               <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_imgclg.py" class="fa fa-github"> Edit on GitHub</a>
@@ -344,7 +348,7 @@
 <div class="section" id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Install a list of PTFs of LPP 5733SC1 from image catalog</span>
-  <span class="nt">ibmi_fix_imgclg</span><span class="p">:</span>
+  <span class="nt">ibm.power_ibmi.ibmi_fix_imgclg</span><span class="p">:</span>
     <span class="nt">product_id</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="s">&#39;5733SC1&#39;</span>
     <span class="nt">src</span><span class="p">:</span> <span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">fix_install_path</span> <span class="cp">}}</span><span class="s">&#39;</span>
@@ -501,29 +505,21 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="ibmi_fix_product_check.html" class="btn btn-neutral float-right" title="ibmi_fix_product_check – Check the software product installation status for a fix" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="ibmi_fix_group_check.html" class="btn btn-neutral float-left" title="ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="ibmi_fix_product_check.html" class="btn btn-neutral float-right" title="ibmi_fix_product_check – Check the software product installation status for a fix" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ibmi_fix_group_check.html" class="btn btn-neutral float-left" title="ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, IBM
+        &#169; Copyright 2020, IBM.
 
     </p>
   </div> 
 
 </footer>
-
         </div>
       </div>
 

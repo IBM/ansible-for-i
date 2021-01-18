@@ -86,26 +86,26 @@ Examples
 
    
    - name: add some group records
-     ibmi_fix_repo:
+     ibm.power_ibmi.ibmi_fix_repo:
        action: 'add'
        type: 'ptf_group'
        checksum: true
        parameters:
          - {'order_id':'2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181'}
    - name: query some PTFs records
-     ibmi_fix_repo:
+     ibm.power_ibmi.ibmi_fix_repo:
        action: "find"
        type: 'ptf_group'
        parameters:
          - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
    - name: delete some PTFs records
-     ibmi_fix_repo:
+     ibm.power_ibmi.ibmi_fix_repo:
        action: "delete"
        type: 'ptf_group'
        parameters:
          - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
    - name: run sql to drop the table
-     ibmi_fix_repo:
+     ibm.power_ibmi.ibmi_fix_repo:
        action: "clear"
        type: 'ptf_group'
 
@@ -116,6 +116,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------

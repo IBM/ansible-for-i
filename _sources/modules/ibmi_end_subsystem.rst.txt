@@ -115,13 +115,13 @@ Examples
 
    
    - name: End the subsystem QBATCH with another user.
-     ibmi_end_subsystem:
+     ibm.power_ibmi.ibmi_end_subsystem:
        subsystem: QBATCH
        become_user: 'USER1'
        become_user_password: 'yourpassword'
 
    - name: End a subsystem with options.
-     ibmi_end_subsystem:
+     ibm.power_ibmi.ibmi_end_subsystem:
        subsystem: QBATCH
        how_to_end: '*IMMED'
 
@@ -146,6 +146,7 @@ See Also
    - :ref:`ibmi_display_subsystem, ibmi_start_subsystem_module`
 
 
+  
 
 Return Values
 -------------

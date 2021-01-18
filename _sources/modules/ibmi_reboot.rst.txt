@@ -205,14 +205,14 @@ Examples
 
    
    - name: Unconditionally reboot the machine with all defaults
-     ibmi_reboot:
+     ibm.power_ibmi.ibmi_reboot:
 
    - name: Reboot a slow machine that might have lots of updates to apply
-     ibmi_reboot:
+     ibm.power_ibmi.ibmi_reboot:
        reboot_timeout: 3600
 
    - name: Unconditionally reboot the machine with become user
-     ibmi_reboot:
+     ibm.power_ibmi.ibmi_reboot:
        become_user: 'USER'
        become_user_password: 'yourpassword'
 
@@ -237,6 +237,7 @@ See Also
    - :ref:`reboot_module`
 
 
+  
 
 Return Values
 -------------

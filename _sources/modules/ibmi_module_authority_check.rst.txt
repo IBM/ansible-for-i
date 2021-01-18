@@ -46,7 +46,7 @@ Examples
 
    
    - name: Do module authority check
-     ibmi_user_compliance_check:
+     ibm.power_ibmi.ibmi_user_compliance_check:
           modulelist:
            - 'ibmi_copy'
            - 'ibmi_display_subsystem'
@@ -60,6 +60,7 @@ Examples
 
 
 
+  
 
 Return Values
 -------------
