@@ -2,6 +2,8 @@
 ---
 - hosts: all
   gather_facts: no
+  collections:
+   - ibm.power_ibmi
   vars:
     target_user: '{{ ansible_ssh_user }}'
 
