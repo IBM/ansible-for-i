@@ -17,7 +17,7 @@ ibmi_sync_files -- Synchronize a list of files from current IBM i node A to anot
 Synopsis
 --------
 - The ``ibmi_sync_files`` module synchronize a list of files from current IBM i node to another IBM i node.
-- Only supports SAVF(.file) format synchronize between QSYS and QSYS.
+- Only supports SAVF(.file) and MBR(.mbr) format synchronize between QSYS and QSYS.
 
 
 
@@ -105,10 +105,11 @@ Examples
    - name: Synchronize a list of different types of files to host.com.
      ibmi_ibm.power_ibmi.ibmi_sync_files:
        src_list:
-         - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/fish.lib/'}
-         - {'src': '/qsys.lib/fish.lib/test.file', 'dest': '/qsys.lib/fish.lib'}
-         - {'src': '/tmp/c2.SAVF', 'dest': '/qsys.lib/fish.lib/'}
+         - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/test.lib/'}
+         - {'src': '/qsys.lib/test.lib/test.file', 'dest': '/qsys.lib/test.lib'}
+         - {'src': '/tmp/c2.SAVF', 'dest': '/qsys.lib/test.lib/'}
          - {'src': '/tmp/c3.bin', 'dest': '/test/dir'}
+         - {'src': '/qsys.lib/c4.file/test.mbr', 'dest': '/qsys.lib/test.lib/c5.file'}
        remote_host: 'host.com'
        remote_user: 'user'
        private_key: '/home/test/id_rsa'

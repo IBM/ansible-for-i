@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>ibmi_user_compliance_check – Check if the value of a field of user profile is expected &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
+  <title>ibmi_fix_check – Retrieve the latest PTF group information from PSP server. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -38,7 +38,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="ibmi_user_and_group – Create, change or display a user(or group) profile" href="ibmi_user_and_group.html" /> 
+    <link rel="next" title="ibmi_fix_compare – Verify whether the PTFs are installed." href="ibmi_fix_compare.html" />
+    <link rel="prev" title="ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system." href="ibmi_fix.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -105,7 +106,14 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_facts.html">ibmi_facts – Gathering ibmi facts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_check.html">ibmi_fix_check – Retrieve the latest PTF group information from PSP server.</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fix_check – Retrieve the latest PTF group information from PSP server.</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_compare.html">ibmi_fix_compare – Verify whether the PTFs are installed.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_group_check.html">ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
@@ -151,13 +159,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_tcp_server_service.html">ibmi_tcp_server_service – Manage tcp server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_uninstall_product.html">ibmi_uninstall_product – Delete the objects that make up the licensed program(product)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_user_and_group.html">ibmi_user_and_group – Create, change or display a user(or group) profile</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_user_compliance_check – Check if the value of a field of user profile is expected</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_user_compliance_check.html">ibmi_user_compliance_check – Check if the value of a field of user profile is expected</a></li>
 </ul>
 </li>
 </ul>
@@ -214,7 +216,7 @@
         
           <li><a href="../modules.html">Modules</a> &raquo;</li>
         
-      <li>ibmi_user_compliance_check – Check if the value of a field of user profile is expected</li>
+      <li>ibmi_fix_check – Retrieve the latest PTF group information from PSP server.</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -222,7 +224,7 @@
           
             
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_user_compliance_check.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_check.py" class="fa fa-github"> Edit on GitHub</a>
             
           
         
@@ -236,224 +238,142 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ibmi-user-compliance-check-check-if-the-value-of-a-field-of-user-profile-is-expected">
-<span id="ibmi-user-compliance-check-module"></span><h1>ibmi_user_compliance_check – Check if the value of a field of user profile is expected<a class="headerlink" href="#ibmi-user-compliance-check-check-if-the-value-of-a-field-of-user-profile-is-expected" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="ibmi-fix-check-retrieve-the-latest-ptf-group-information-from-psp-server">
+<span id="ibmi-fix-check-module"></span><h1>ibmi_fix_check – Retrieve the latest PTF group information from PSP server.<a class="headerlink" href="#ibmi-fix-check-retrieve-the-latest-ptf-group-information-from-psp-server" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
 <li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
 <li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id4">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id4">Notes</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id5">Return Values</a></p></li>
 </ul>
 </div>
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_user_compliance_check</span></code> module can do the user profile compliance check.</p></li>
-<li><p>Check if the value of a field of user profile is matched with the value of customer input.</p></li>
-<li><p>User can input multi value for the multi-value fields. It includes field</p></li>
-<li><p>SPECIAL_AUTHORITIES, USER_ACTION_AUDIT_LEVEL, USER_OPTIONS, SUPPLEMENTAL_GROUP_LIST, LOCALE_JOB_ATTRIBUTES.</p></li>
-<li><p>If some fields value do not match the user’s expected value, the list of users will be returned</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_fix_check</span></code> module retrieve latest PTF group information from PSP(Preventive Service Planning) server.</p></li>
+<li><p>Refer to <a class="reference external" href="https://www.ibm.com/support/pages/node/667567">https://www.ibm.com/support/pages/node/667567</a> for more details of PSP.</p></li>
+<li><p>ALL PTF groups or specific PTF groups are supported.</p></li>
 </ul>
 </div>
 <div class="section" id="parameters">
 <h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
 <dl>
-<dt>become_user</dt><dd><p>The name of the user profile that the IBM i task will run under.</p>
-<p>Use this option to set a user with desired privileges to run the task.</p>
+<dt>expanded_requisites</dt><dd><p>Deep search all its required PTFs.</p>
 <div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>become_user_password</dt><dd><p>Use this option to set the password of the user specified in <code class="docutils literal notranslate"><span class="pre">become_user</span></code>.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>fields</dt><dd><p>Specifies a set of fields which are checked.</p>
-<p>Customer need to input field name and expected value</p>
-<p>Following fields are all we support now</p>
-<p>SIGN_ON_ATTEMPTS_NOT_VALID</p>
-<p>STATUS</p>
-<p>NO_PASSWORD_INDICATOR</p>
-<p>PASSWORD_LEVEL_0_1</p>
-<p>PASSWORD_LEVEL_2_3</p>
-<p>PASSWORD_EXPIRATION_INTERVAL</p>
-<p>DAYS_UNTIL_PASSWORD_EXPIRES</p>
-<p>SET_PASSWORD_TO_EXPIRE</p>
-<p>USER_CLASS_NAME</p>
-<p>SPECIAL_AUTHORITIES</p>
-<p>GROUP_PROFILE_NAME</p>
-<p>SUPPLEMENTAL_GROUP_COUNT</p>
-<p>SUPPLEMENTAL_GROUP_LIST</p>
-<p>OWNER</p>
-<p>GROUP_AUTHORITY</p>
-<p>ASSISTANCE_LEVEL</p>
-<p>CURRENT_LIBRARY_NAME</p>
-<p>INITIAL_MENU_NAME</p>
-<p>INITIAL_MENU_LIBRARY_NAME</p>
-<p>INITIAL_PROGRAM_NAME</p>
-<p>INITIAL_PROGRAM_LIBRARY_NAME</p>
-<p>LIMIT_CAPABILITIES</p>
-<p>TEXT_DESCRIPTION</p>
-<p>DISPLAY_SIGNON_INFORMATION</p>
-<p>LIMIT_DEVICE_SESSIONS</p>
-<p>KEYBOARD_BUFFERING</p>
-<p>MAXIMUM_ALLOWED_STORAGE</p>
-<p>STORAGE_USED</p>
-<p>HIGHEST_SCHEDULING_PRIORITY</p>
-<p>JOB_DESCRIPTION_NAME</p>
-<p>JOB_DESCRIPTION_LIBRARY_NAME</p>
-<p>ACCOUNTING_CODE</p>
-<p>MESSAGE_QUEUE_NAME</p>
-<p>MESSAGE_QUEUE_LIBRARY_NAME</p>
-<p>MESSAGE_QUEUE_DELIVERY_METHOD</p>
-<p>MESSAGE_QUEUE_SEVERITY</p>
-<p>OUTPUT_QUEUE_NAME</p>
-<p>OUTPUT_QUEUE_LIBRARY_NAME</p>
-<p>PRINT_DEVICE</p>
-<p>SPECIAL_ENVIRONMENT</p>
-<p>ATTENTION_KEY_HANDLING_PROGRAM_NAME</p>
-<p>ATTENTION_KEY_HANDLING_PROGRAM_LIBRARY_NAME</p>
-<p>LANGUAGE_ID</p>
-<p>COUNTRY_OR_REGION_ID</p>
-<p>CHARACTER_CODE_SET_ID</p>
-<p>USER_OPTIONS</p>
-<p>SORT_SEQUENCE_TABLE_NAME</p>
-<p>SORT_SEQUENCE_TABLE_LIBRARY_NAME</p>
-<p>OBJECT_AUDITING_VALUE</p>
-<p>USER_ACTION_AUDIT_LEVEL</p>
-<p>GROUP_AUTHORITY_TYPE</p>
-<p>USER_ID_NUMBER</p>
-<p>GROUP_ID_NUMBER</p>
-<p>LOCALE_JOB_ATTRIBUTES</p>
-<p>GROUP_MEMBER_INDICATOR</p>
-<p>DIGITAL_CERTIFICATE_INDICATOR</p>
-<p>CHARACTER_IDENTIFIER_CONTROL</p>
-<p>LOCAL_PASSWORD_MANAGEMENT</p>
-<p>BLOCK_PASSWORD_CHANGE</p>
-<p>USER_ENTITLEMENT_REQUIRED</p>
-<p>USER_EXPIRATION_INTERVAL</p>
-<p>USER_EXPIRATION_ACTION</p>
-<p>HOME_DIRECTORY</p>
-<p>LOCALE_PATH_NAME</p>
-<p>USER_DEFAULT_PASSWORD</p>
-<p>USER_OWNER</p>
-<p>USER_CREATOR</p>
-<p>SIZE</p>
-<p>DAYS_USED_COUNT</p>
-<p>AUTHORITY_COLLECTION_ACTIVE</p>
-<p>AUTHORITY_COLLECTION_REPOSITORY_EXISTS</p>
-<p>PASE_SHELL_PATH</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: True</div>
-<div class="line"><strong>type</strong>: list</div>
-<div class="line"><strong>elements</strong>: dict</div>
-</div>
-</dd>
-<dt>joblog</dt><dd><p>The job log of the job executing the task will be returned even rc is zero if it is set to true.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>required</strong>: False</div>
 <div class="line"><strong>type</strong>: bool</div>
 </div>
 </dd>
-<dt>users</dt><dd><p>Specifies a list of user names.</p>
+<dt>groups</dt><dd><p>The list of the PTF groups number.</p>
 <div class="line-block">
-<div class="line"><strong>required</strong>: True</div>
+<div class="line"><strong>required</strong>: False</div>
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>elements</strong>: str</div>
+</div>
+</dd>
+<dt>ptfs</dt><dd><p>The list of the PTF number.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+</div>
+</dd>
+<dt>timeout</dt><dd><p>Timeout in seconds for URL request.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>default</strong>: 10</div>
+</div>
+</dd>
+<dt>validate_certs</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">False</span></code>, the SSL certificate verification will be disabled. It’s recommended for test scenario.</p>
+<p>It’s recommended to enable the SSL certificate verification for security concern.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
 </div>
 </dd>
 </dl>
 </div>
 <div class="section" id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Do user profile compliance check</span>
-  <span class="nt">ibmi_ibm.power_ibmi.ibmi_user_compliance_check</span><span class="p">:</span>
-      <span class="nt">users</span><span class="p">:</span>
-        <span class="p p-Indicator">-</span> <span class="s">&#39;ibmiuser1&#39;</span>
-        <span class="p p-Indicator">-</span> <span class="s">&#39;ibmiuser2&#39;</span>
-        <span class="p p-Indicator">-</span> <span class="s">&#39;ibmiuser3&#39;</span>
-      <span class="nt">fields</span><span class="p">:</span>
-        <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="s">&#39;status&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;expect&#39;</span><span class="p p-Indicator">:[</span><span class="s">&#39;*enabled&#39;</span><span class="p p-Indicator">]}</span>
-        <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="s">&#39;NO_PASSWORD_INDICATOR&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;expect&#39;</span><span class="p p-Indicator">:[</span><span class="s">&#39;no&#39;</span><span class="p p-Indicator">]}</span>
-        <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;name&#39;</span><span class="p p-Indicator">:</span><span class="s">&#39;SPECIAL_AUTHORITIES&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;expect&#39;</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;*JOBCTL&#39;</span><span class="p p-Indicator">,</span><span class="s">&#39;*SAVSYS&#39;</span><span class="p p-Indicator">]}</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Check specific PTF groups</span>
+  <span class="nt">ibm.power_ibmi.ibmi_fix_check</span><span class="p">:</span>
+    <span class="nt">groups</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;SF12345&quot;</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Check the PTF groups without certificate verification</span>
+  <span class="nt">ibm.power_ibmi.ibmi_fix_check</span><span class="p">:</span>
+    <span class="nt">groups</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;SF12345&quot;</span>
+    <span class="nt">validate_certs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
 </pre></div>
 </div>
 </div>
+<div class="section" id="notes">
+<h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3.</p>
+<p>If the module is delegated to an IBM i server and SSL certificate verification is enabled, package <code class="docutils literal notranslate"><span class="pre">ca-certificates-mozilla</span></code> is required.</p>
+</div>
+</div>
 <div class="section" id="return-values">
-<h2><a class="toc-backref" href="#id4">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl>
 <dt>stderr</dt><dd><div class="line-block">
-<div class="line">The standard error</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: when rc as no-zero(failure)</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>stderr_lines</dt><dd><div class="line-block">
-<div class="line">The command standard error split in lines.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: list</div>
-</div>
-</dd>
-<dt>sql1</dt><dd><div class="line-block">
-<div class="line">The sql statement executed by the task.</div>
+<div class="line">The task standard error</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: select * from Persons</div>
-</div>
-</dd>
-<dt>sql2</dt><dd><div class="line-block">
-<div class="line">The sql statement executed by the task.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: select * from Persons</div>
+<div class="line"><strong>sample</strong>: PTF groups SF12345 does not exist</div>
 </div>
 </dd>
 <dt>rc</dt><dd><div class="line-block">
-<div class="line">The return code (0 means success, non-zero means failure)</div>
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: int</div>
-<div class="line"><strong>sample</strong>: 255</div>
 </div>
 </dd>
-<dt>result_set</dt><dd><div class="line-block">
-<div class="line">The result set of user information includes all fields specified by user.</div>
+<dt>count</dt><dd><div class="line-block">
+<div class="line">The number of PTF groups which has been retrieved</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: When rc as 0(success) and the value of field of user who is specified by users parameter does not match the user’s expected value</div>
+<div class="line"><strong>returned</strong>: always.</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 1</div>
+</div>
+</dd>
+<dt>group_info</dt><dd><div class="line-block">
+<div class="line">PTF group information.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero.</div>
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;AUTHORIZATION_NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;ZHOUYU&quot;</span><span class="p">,</span> <span class="s2">&quot;NO_PASSWORD_INDICATOR&quot;</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;SPECIAL_AUTHORITIES&quot;</span><span class="p">:</span> <span class="s2">&quot;*JOBCTL    *SAVSYS    &quot;</span><span class="p">,</span> <span class="s2">&quot;STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;*DISABLED&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;PTF_GROUP_LEVEL&quot;</span><span class="p">:</span> <span class="s2">&quot;46&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_GROUP_NUMBER&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99115&quot;</span><span class="p">,</span> <span class="s2">&quot;RELEASE&quot;</span><span class="p">:</span> <span class="s2">&quot;R610&quot;</span><span class="p">,</span> <span class="s2">&quot;RELEASE_DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;09/28/2015&quot;</span><span class="p">,</span> <span class="s2">&quot;TITLE&quot;</span><span class="p">:</span> <span class="s2">&quot;610 IBM HTTP Server for i&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
 </dd>
-<dt>job_log</dt><dd><div class="line-block">
-<div class="line">The IBM i job log of the task executed.</div>
+<dt>ptf_info</dt><dd><div class="line-block">
+<div class="line">PTF information.</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>returned</strong>: When rc is zero.</div>
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;FROM_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;8964&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_USER&quot;</span><span class="p">:</span> <span class="s2">&quot;ZHOUYU1&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;QCPFMSG&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;CPF9898&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SECOND_LEVEL_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\u0026</span><span class="s2">N Cause . . . . . :   This message is used by application programs as a general escape message.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SUBTYPE&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;SERVER MODE CONNECTING JOB IS 236764/QSECOFR/QP0ZSPWP.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-08-21T18:19:37.135231&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;COMPLETION&quot;</span><span class="p">,</span> <span class="s2">&quot;ORDINAL_POSITION&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;SEVERITY&quot;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s2">&quot;TO_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;8964&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;ptf_id&quot;</span><span class="p">:</span> <span class="s2">&quot;SI71691&quot;</span><span class="p">,</span> <span class="s2">&quot;req_list&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;ptf_id&quot;</span><span class="p">:</span> <span class="s2">&quot;SI70931&quot;</span><span class="p">,</span> <span class="s2">&quot;req_type&quot;</span><span class="p">:</span> <span class="s2">&quot;PRE&quot;</span><span class="p">}]}]</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -469,7 +389,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="ibmi_user_and_group.html" class="btn btn-neutral float-left" title="ibmi_user_and_group – Create, change or display a user(or group) profile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ibmi_fix_compare.html" class="btn btn-neutral float-right" title="ibmi_fix_compare – Verify whether the PTFs are installed." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ibmi_fix.html" class="btn btn-neutral float-left" title="ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

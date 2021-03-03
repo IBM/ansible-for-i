@@ -86,7 +86,7 @@ log_level
 
      
 max_log_size_mb
-  The maximum size of the modules log file, if the log file is larger that this value, an archieve(zip) will be occurred.
+  The maximum size of the modules log file, if the log file is larger that this value, an archive(zip) will be occurred.
 
 
   | **required**: false

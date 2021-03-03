@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>ibmi_get_nonconfigure_disks – Get all nonconfigure disks &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
+  <title>ibmi_get_nonconfigure_disks – Get all un-configure disks &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
   
 
   
@@ -103,14 +103,16 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_download_fix_status.html">ibmi_download_fix_status – Checking whether the fix downloading complete</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – End an active subsystem.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_ethernet_port.html">ibmi_ethernet_port – Retrieves all the ethernet ports(both virtual and physical)information on the system.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_facts.html">ibmi_facts – Gathering ibmi facts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_check.html">ibmi_fix_check – Retrieve the latest PTF group information from PSP server.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_compare.html">ibmi_fix_compare – Verify whether the PTFs are installed.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_group_check.html">ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_product_check.html">ibmi_fix_product_check – Check the software product installation status for a fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo.html">ibmi_fix_repo – Manipulate the PTF database via sqlite3</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_get_nonconfigure_disks – Get all nonconfigure disks</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_get_nonconfigure_disks – Get all un-configure disks</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
@@ -134,7 +136,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_query_job_log.html">ibmi_query_job_log – Query the specfic job log.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_query_job_log.html">ibmi_query_job_log – Query the specific job log.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot an IBM i machine</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_reply_message.html">ibmi_reply_message – Send a reply message to the sender of an inquiry message</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_rtv_command.html">ibmi_rtv_command – Executes a command which is valid only within a CL program or REXX procedure</a></li>
@@ -213,7 +215,7 @@
         
           <li><a href="../modules.html">Modules</a> &raquo;</li>
         
-      <li>ibmi_get_nonconfigure_disks – Get all nonconfigure disks</li>
+      <li>ibmi_get_nonconfigure_disks – Get all un-configure disks</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -235,8 +237,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ibmi-get-nonconfigure-disks-get-all-nonconfigure-disks">
-<span id="ibmi-get-nonconfigure-disks-module"></span><h1>ibmi_get_nonconfigure_disks – Get all nonconfigure disks<a class="headerlink" href="#ibmi-get-nonconfigure-disks-get-all-nonconfigure-disks" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="ibmi-get-nonconfigure-disks-get-all-un-configure-disks">
+<span id="ibmi-get-nonconfigure-disks-module"></span><h1>ibmi_get_nonconfigure_disks – Get all un-configure disks<a class="headerlink" href="#ibmi-get-nonconfigure-disks-get-all-un-configure-disks" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
@@ -248,7 +250,7 @@
 <div class="section" id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Get all nonconfigure disks.</p></li>
+<li><p>Get all un-configure disks.</p></li>
 <li><p>For non-IBM i targets, no need.</p></li>
 </ul>
 </div>
