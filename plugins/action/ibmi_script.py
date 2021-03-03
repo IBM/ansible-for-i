@@ -12,7 +12,7 @@ from ansible.module_utils.six import string_types
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 display = Display()
 
 
@@ -103,7 +103,7 @@ class ActionModule(ActionBase):
                 return result
 
             _tmp_args['src'] = tmp_src
-            result.update(self._execute_module('ibmi_script_execute', module_args=_tmp_args))
+            result.update(self._execute_module('ibmi_script_execute', module_args=_tmp_args, task_vars=task_vars))
             endd = datetime.datetime.now()
             delta = endd - startd
 

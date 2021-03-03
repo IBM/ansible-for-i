@@ -19,7 +19,7 @@
 - name: Include fix_repo_check_download_individual_ptfs role to check and download a list of individual ptfs
   include_role:
     name: fix_repo_check_download_individual_ptfs
-  ignore_errors: True
+  ignore_errors: true
 
 - name: compose final_ptfs_status add find fail list
   set_fact:
@@ -74,7 +74,7 @@
         load_fail_simple_list: "{{ load_fail_simple_list | default([]) + [ load_fail_list_var.ptf_id ] }}"
       loop: "{{ load_fail_list }}"
       loop_control:
-         loop_var: load_fail_list_var
+        loop_var: load_fail_list_var
       when: load_fail_list | default([]) != []
 
     # - debug:
@@ -131,14 +131,14 @@
         all_ptfs: "{{ all_ptfs|default([]) + [{'ptf_id': all_ptfs_list_var }] }}"
       loop: "{{ all_ptfs_list }}"
       loop_control:
-            loop_var: all_ptfs_list_var
+        loop_var: all_ptfs_list_var
 
     - name: Include check_ptf role to get the final ptfs status
       include_role:
         name: check_ptf
       vars:
         check_ptf_list: "{{ all_ptfs }}"
-        check_product: False
+        check_product: false
 
     # - name: print ptfs status
     #   debug:

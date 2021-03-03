@@ -59,7 +59,7 @@ check_signature
 
      
 joblog
-  If set to ``true``, output the avaiable job log even the rc is 0(success).
+  If set to ``true``, output the available job log even the rc is 0(success).
 
 
   | **required**: false

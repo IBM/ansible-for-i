@@ -86,7 +86,7 @@ options:
 notes:
   - This module supports IBMi 7.4 and above release, and 5770SS1 option 48 is required.
   - NRG_INFO and NRG_LINK_INFO view can be used to retrieve the NRG and NRG links information by using module ibmi_sql_query.
-  - More information about NRG releated services refer to
+  - More information about NRG related services refer to
     https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/db2mi/db2mservicesnrg.htm
 
 seealso:
@@ -114,7 +114,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 msg:
-    description: The message that descript the error or success
+    description: The message that describes the error or success
     returned: always
     type: str
     sample: 'Error occurred when retrieving the mirror state'
@@ -157,7 +157,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

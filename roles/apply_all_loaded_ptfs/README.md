@@ -9,7 +9,7 @@ Role Variables
 |-----------------------|---------------|--------------------------------------------------|
 | `temp_or_perm`      | str          | Controls whether the loaded PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.                     |
 | `delayed_option`      | str          | Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.                      |
-| `auto_ipl`          | bool           | Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. Default value is false. |
+| `auto_ipl`          | bool           | Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. The default value is false. |
 
 Example Playbooks
 ----------------

@@ -9,7 +9,7 @@ Role Variables
 | Variable              | Type          | Description                                               |
 |-----------------------|---------------|-----------------------------------------------------------|
 | `group_list`          | list          | groups will be checked.                                   |
-| `type`                | string        | compare the ptf groups by level. Value can be 'current' or 'latest'. Default value is 'latest'.|
+| `type`                | string        | compare the ptf groups by level. Value can be 'current' or 'latest'. The default value is 'latest'.|
 
 Return Variables
 --------------
@@ -57,7 +57,7 @@ Example for type "latest":
         "PTF_GROUP_NUMBER": "SF99740",
         "PTF_GROUP_STATUS": "Record not found in repository DB"
     },
-    # PTF group does not exist on target system
+    # PTF group does not exist on the target system
     {
         "PTF_GROUP_NUMBER": "SF99704",
         "PTF_GROUP_STATUS": "NON-EXISTENT"
@@ -98,18 +98,18 @@ Example for type "latest":
 
 Example for type "current":
 "group_status": [
-    # PTF group with specific level does not exist in fix repository
+    # PTF group with a specific level does not exist in fix repository
     {
         "CURRENT_PTF_GROUP_LEVEL": 19340
         "PTF_GROUP_NUMBER": "SF99740",
         "PTF_GROUP_STATUS": "Record not found in repository DB"
     },
-    # PTF group does not exist on target system
+    # PTF group does not exist on the target system
     {
         "PTF_GROUP_NUMBER": "SF99704",
         "PTF_GROUP_STATUS": "NON-EXISTENT"
     },
-    # PTF group is installed on target system
+    # PTF group is installethe d on target system
     {
         "CURRENT_PTF_GROUP_LEVEL": 30,
         "PTF_GROUP_NUMBER": "SF99722",

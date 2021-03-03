@@ -27,7 +27,7 @@
       cmd: /QOpenSys/pkgs/bin/yum install python3-paramiko -y
       warn: no
     delegate_to: "{{item}}"
-    delegate_facts: True
+    delegate_facts: true
     with_items:
       - "{{nodeA}}"
       - "{{nodeB}}"

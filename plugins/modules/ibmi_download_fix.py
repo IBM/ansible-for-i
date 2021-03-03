@@ -280,7 +280,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 HAS_ITOOLKIT = True
 
@@ -292,11 +292,6 @@ try:
     from itoolkit.transport import DatabaseTransport
 except ImportError:
     HAS_ITOOLKIT = False
-
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
 
 
 def remove_pending_joblog(conn, job_name, user_name, job_number):
@@ -501,7 +496,7 @@ def main():
             j = 0
             while order_id == 0:
                 for i in range(len(job_log) - 1, -1, -1):
-                    if job_log[i]['MESSAGE_ID'] == 'CPF8C07':
+                    if job_log[i]['MESSAGE_ID'] == 'CPF8C07' or job_log[i]['MESSAGE_ID'] == 'CPI8C02' or job_log[i]['MESSAGE_ID'] == 'CPF8C88':
                         return_error(module, conn, '', '', job_log[i]['MESSAGE_TEXT'], job_log,
                                      ibmi_util.IBMi_COMMAND_RC_ERROR, job_submitted_split, wait, delivery_format, result)
                     elif job_log[i]['MESSAGE_ID'] == 'CPZ8C38':
@@ -520,9 +515,6 @@ def main():
                         success = True
                     elif job_log[i]['MESSAGE_ID'] == 'CPF1164':
                         order_end_time = job_log[i]['MESSAGE_TIMESTAMP']
-                    elif job_log[i]['MESSAGE_ID'] == 'CPI8C02':
-                        return_error(module, conn, '', '', job_log[i]['MESSAGE_TEXT'], job_log,
-                                     ibmi_util.IBMi_COMMAND_RC_ERROR, job_submitted_split, wait, delivery_format, result)
                     elif job_log[i]['MESSAGE_ID'] == 'CPF8C32':
                         return_error(module, conn, '', '', 'PTF order cannot be processed. See joblog', job_log,
                                      ibmi_util.IBMi_COMMAND_RC_ERROR, job_submitted_split, wait, delivery_format, result)
@@ -536,6 +528,9 @@ def main():
                         success = True
                     elif job_log[i]['MESSAGE_ID'] == 'CPF8C32':
                         return_error(module, conn, '', '', 'PTF order cannot be processed. See joblog', job_log,
+                                     ibmi_util.IBMi_COMMAND_RC_ERROR, job_submitted_split, wait, delivery_format, result)
+                    elif job_log[i]['MESSAGE_ID'] == 'CPF8C07' or job_log[i]['MESSAGE_ID'] == 'CPI8C02' or job_log[i]['MESSAGE_ID'] == 'CPF8C88':
+                        return_error(module, conn, '', '', job_log[i]['MESSAGE_TEXT'], job_log,
                                      ibmi_util.IBMi_COMMAND_RC_ERROR, job_submitted_split, wait, delivery_format, result)
             else:
                 return_error(module, conn, error, out, 'No joblog returned.', job_log, ibmi_util.IBMi_COMMAND_RC_ERROR,

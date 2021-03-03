@@ -78,9 +78,9 @@
 - name: TC04 run CL command module to delete an not existing module
   ibmi_cl_command:
     cmd: dltlib lib(ansible1)
-    joblog: True
+    joblog: true
   register: dltlib_result_2
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TC04 assert returned parameters with joblog = True
   assert:
@@ -93,7 +93,7 @@
 - name: TC05 run CL command module without any options
   ibmi_cl_command:
   register: crtlib_result_2
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TC05 assert the previous task failed because lacks of required parameter cmd
   assert:
@@ -102,9 +102,9 @@
 
 - name: TC06 run CL command with joblog but without cmd
   ibmi_cl_command:
-    joblog: True
+    joblog: true
   register: crtlib_result_3
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TC06 assert the previous task failed because lacks of required parameter cmd
   assert:
@@ -114,9 +114,9 @@
 - name: TC07 run CL command module with an invalid command and joblog=False
   ibmi_cl_command:
     cmd: abcdefg
-    joblog: False
+    joblog: false
   register: crtlib_result_4
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TC07 assert the previous task failed because lacks of required parameter cmd
   assert:
@@ -127,9 +127,9 @@
 - name: TC08 run CL command module with an invalid command and joblog = True
   ibmi_cl_command:
     cmd: abcdefg
-    joblog: True
+    joblog: true
   register: crtlib_result_5
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TC08 assert the previous task failed because lacks of required parameter cmd
   assert:
@@ -142,7 +142,7 @@
     cmd: dsplib ansible1
     joblog: abcdefg
   register: dsplib_result_2
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TC09 assert the previous task failed because lacks of required parameter cmd
   assert:
@@ -152,10 +152,10 @@
 - name: TC10 run CL command module with valid cmd, joblog=True and an invalid option abc
   ibmi_cl_command:
     cmd: dsplib ansible1
-    joblog: True
+    joblog: true
     invalid_opt: 123
   register: dsplib_result_3
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TC10 assert the previous task failed because lacks of required parameter cmd
   assert:
@@ -170,9 +170,9 @@
 - name: TC11 run CL command with OUTPUT parameter and joblog=True
   ibmi_cl_command:
     cmd: DSPLIBL OUTPUT(*)
-    joblog: True
+    joblog: true
   register: dsplibl_result_2
-  ignore_errors: True
+  ignore_errors: true
 
 - name: cleanup
   ibmi_cl_command:

@@ -7,7 +7,7 @@ Role Variables
 
 | Variable              | Type          | Description                                      |
 |-----------------------|---------------|--------------------------------------------------|
-| `image_name`      | str          | Specifies prefix of new generated image. The final image name is composed by image_name + '_' + a random number. So that the image name can be unique.                   |
+| `image_name`      | str          | Specifies the prefix of the new generated image. The final image name is composed by image_name + '_' + a random number. So that the image name can be unique.                   |
 | `vm_name`      | str          | Specifies the vm name or id which is to be captured.                      |
 
 

@@ -55,7 +55,7 @@ options:
     default: ''
   joblog:
     description:
-      - If set to C(true), output the avaiable job log even the rc is 0(success).
+      - If set to C(true), output the available job log even the rc is 0(success).
     type: bool
     default: False
   become_user:
@@ -152,7 +152,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

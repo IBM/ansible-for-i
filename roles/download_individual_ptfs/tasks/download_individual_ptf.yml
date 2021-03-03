@@ -6,7 +6,7 @@
     order: "{{ order|default('*PTFID') }}"
   register: download_result
   delegate_to: "{{ download_server }}"
-  ignore_errors: True
+  ignore_errors: true
 
 - name: compose successful list
   set_fact:

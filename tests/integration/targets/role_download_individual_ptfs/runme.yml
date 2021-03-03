@@ -1,6 +1,6 @@
 - name: testcase for role download_individual_ptfs
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 

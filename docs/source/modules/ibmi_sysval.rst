@@ -50,7 +50,7 @@ become_user_password
 
      
 joblog
-  If set to ``true``, output the avaiable job log even the rc is 0(success).
+  If set to ``true``, output the available job log even the rc is 0(success).
 
 
   | **required**: false
@@ -89,7 +89,7 @@ Examples
        become_user: 'USER1'
        become_user_password: 'yourpassword'
 
-   - name: Compare the returned system valus as list
+   - name: Compare the returned system values as list
      ibmi_ibm.power_ibmi.ibmi_sysval:
        sysvalue:
          - {'name':'QATNPGM', 'expect':'QEZMAIN   QSYS'}

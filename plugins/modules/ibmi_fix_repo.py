@@ -143,7 +143,7 @@ rows:
         }
     ]
 sql:
-    description: The formated sql statement executed by the task.
+    description: The formatted sql statement executed by the task.
     returned: always
     type: str
     sample: "SELECT * FROM ptf_group_image_info WHERE ptf_group_number=:ptf_group_number AND ptf_group_level=:ptf_group_level"
@@ -169,7 +169,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 single_ptf_table = 'single_ptf_info'
 ptf_group_image_table = 'ptf_group_image_info'
@@ -510,7 +510,7 @@ def build_sql_init(_type):
     return sql
 
 
-def build_sql_udpate(_type, parameters):
+def build_sql_update(_type, parameters):
     table, table_dict, constraints = select_table_dict(_type)
     names = ''
     values = ''
@@ -595,7 +595,7 @@ def run_sql(module, database, parameters, action, _type):
         c.execute(sql)
 
         if action == 'add' or action == 'update':
-            sql = build_sql_udpate(_type, parameters)
+            sql = build_sql_update(_type, parameters)
         elif action == 'delete':
             sql = build_sql_delete(_type, parameters)
         elif action == 'clear':
@@ -754,7 +754,7 @@ def main():
     fail_list = []
     invalid_params = []
     checksum_failed_params = []
-    unmatch_params = []
+    mismatched_params = []
     fail_list_after_run_sql = []
     list_to_sqlite = []
     sql = ''
@@ -769,8 +769,8 @@ def main():
         if len(valid_parameters) > 0:
             if action == 'add' or _type == 'download_status':  # all the parameter data come from the physical files.
                 list_to_sqlite = valid_parameters
-            elif action == 'update' and checksum is True:  # merge physical files data into input paramters.
-                list_to_sqlite, unmatch_params = merge_param_before_upsert(_type, parameters, valid_parameters)
+            elif action == 'update' and checksum is True:  # merge physical files data into input parameters.
+                list_to_sqlite, mismatched_params = merge_param_before_upsert(_type, parameters, valid_parameters)
         else:
             result['fail_list'] = invalid_params + checksum_failed_params
             module.exit_json(**result)
@@ -798,8 +798,8 @@ def main():
                 result['success_list'] = success_list_checksum_matched
             else:
                 result['success_list'] = success_list
-    if len(fail_list) > 0 or len(invalid_params) > 0 or len(checksum_failed_params) > 0 or len(fail_list_after_run_sql) > 0 or len(unmatch_params) > 0:
-        result['fail_list'] = fail_list + invalid_params + checksum_failed_params + fail_list_after_run_sql + unmatch_params
+    if len(fail_list) > 0 or len(invalid_params) > 0 or len(checksum_failed_params) > 0 or len(fail_list_after_run_sql) > 0 or len(mismatched_params) > 0:
+        result['fail_list'] = fail_list + invalid_params + checksum_failed_params + fail_list_after_run_sql + mismatched_params
 
     endd = datetime.datetime.now()
     delta = endd - startd

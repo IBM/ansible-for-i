@@ -30,5 +30,4 @@
 
 - name: Compose interface_info
   set_fact:
-    interface_info: {'fixed_ips': '{{ port_info.openstack_ports[0].fixed_ips }}',
-    'mac_addr': "{{ mac_addr }}", 'subnet': "{{  subnet_info.results |map(attribute='openstack_subnets')|join(', ') }}"}
+    interface_info: {'fixed_ips': '{{ port_info.openstack_ports[0].fixed_ips }}', 'mac_addr': "{{ mac_addr }}", 'subnet': "{{  subnet_info.results |map(attribute='openstack_subnets')|join(', ') }}"}

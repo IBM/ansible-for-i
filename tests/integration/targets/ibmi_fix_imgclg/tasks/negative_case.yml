@@ -63,7 +63,7 @@
   failed_when: "'The path specified in src does not exist' not in fix_result.msg"
 
 - command: mkdir /tmp/abcdesfg
-  ignore_errors: True
+  ignore_errors: true
 
 - name: install fix with existing src folder but no image files
   ibmi_fix_imgclg:

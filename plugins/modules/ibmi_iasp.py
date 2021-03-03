@@ -40,7 +40,7 @@ options:
     required: yes
   disks:
     description:
-      - The list of the unconfigure disks.
+      - The list of the un-configure disks.
     type: list
     elements: str
   asp_type:
@@ -219,7 +219,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -286,12 +286,12 @@ def main():
             command = command + "UNITS(" + " ".join(disks) + ") CONFIRM(*NO) " + extra_parameters
         else:
             rc = ibmi_util.IBMi_COMMAND_RC_ERROR
-            out = "ASP " + name + " already exsit."
+            out = "ASP " + name + " already exists."
             error = out
     elif operation == "add_disks":
         if not state:
             rc = ibmi_util.IBMi_COMMAND_RC_ERROR
-            out = "ASP " + name + " does not exsit"
+            out = "ASP " + name + " does not exist"
             error = out
         else:
             command = "CALL PGM(QSYS/QAENGADDDU) PARM('{p_name}' '{p_asp_number}' '0' ".format(
@@ -312,7 +312,7 @@ def main():
             out = rc_msg
         else:
             rc = ibmi_util.IBMi_COMMAND_RC_ERROR
-            out = "ASP " + name + " does not exsit."
+            out = "ASP " + name + " does not exist."
             error = out
     if command:
         if not synchronous:

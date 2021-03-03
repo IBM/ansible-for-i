@@ -16,10 +16,10 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_query_job_log
-short_description: Query the specfic job log.
+short_description: Query the specific job log.
 version_added: '1.0.0'
 description:
-  - Query the specfic job log.
+  - Query the specific job log.
 options:
   job_number:
     description:
@@ -130,7 +130,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

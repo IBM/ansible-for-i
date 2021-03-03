@@ -16,19 +16,6 @@
 # become_user_password
 
 - block:
-  - name: TC00 - determine if the host is a 2924 - ENU system since this module only support 2924 systems.
-    shell: system "dspsfwrsc" | grep 5770SS1 | grep *BASE | grep *LNG | grep "QSYS " | awk '{print $3}'
-    register: lng
-
-  - name: TC00 - exit play if the primary language of host is not 2924
-    debug:
-      msg: "Exit play, the primary language of {{ansible_ssh_host}} is {{lng.stdout}}"
-    when: lng.stdout != "2924"
-
-  - meta: end_play
-    when: lng.stdout != "2924" 
-
-- block:
   - name: TC00 - get ansible host os400 version
     shell: system "DSPSFWRSC" | grep "5770SS1" | head -n 1 | awk '{print $2}'
     register: osinfo
@@ -68,6 +55,30 @@
       user_class: '*USER'
     register: crtusrprf
     failed_when: crtusrprf.rc != 0  
+
+  - name: TC00 - Check if the PTF is already on the system
+    ibmi_fix:
+      operation: 'query'
+      fix_list:
+        - 'SI69940'
+    register: qryptf
+
+  - block:
+    - name: TC00 - Remove the PTF if it's already on the system for reorder *YES
+      ibmi_fix:
+        operation: 'remove'
+        product_id: '5770SS1'
+        delayed_option: "*NO"
+        temp_or_perm: "*PERM"
+        fix_list:
+          - "{{ptfs[0]}}"
+      register: rmvptf
+
+    - name: TC00 - DLTPTF
+      ibmi_cl_command:
+        cmd: DLTPTF "{{ptfs[0]}}"
+      when: rmvptf.rc == 0
+    when: qryptf.ptf_not_on_system_list | length == 0
 
   - name: TC01 - Download a PTF with very basic infomation provided.    
     ibmi_download_fix:
@@ -194,7 +205,7 @@
     assert:
       that:
         - dl_single_ptf_result.file_path == '/home/{{ansible_ssh_user}}/PTFs' 
-        - '"/home/tester/PTFs" in dl_single_ptf_result.command'
+        - '"/home/{{ansible_ssh_user}}/PTFs" in dl_single_ptf_result.command'
         - dl_single_ptf_result.msg == 'SNDPTFORD successfully ended.'
         - dl_single_ptf_result.order_id != ""
 
@@ -342,29 +353,12 @@
   - name: TC17 - Download a PTF group with timeout, however download will continue
     ibmi_download_fix:
       ptf_id: '{{ptf_grps[0]}}'   
-      delivery_format: '*SAVF'
+      delivery_format: '*IMAGE'
       reorder: "*YES"
       wait: true
       time_out: '10s'
     register: download_ptf_group_result  
     failed_when: download_ptf_group_result.rc != 255
-
-  - name: TC17 - Assert value
-    assert:
-      that:
-        - download_ptf_group_result.msg == "Time up when waiting for SNDPTFORD complete."
-
-  - name: TC17 - wait for all PTFs downloaded 
-    wait_for:
-      path: "{{ item }}" 
-      msg: wait for PTF "{{ item }}" downloaded
-    loop: "{{ptfs_downloaded}}"
-
-  - name: TC17 - remove all PTF downloaded previously
-    file:
-      path: "{{ item }}"
-      state: absent
-    loop: "{{ptfs_downloaded}}"
 
   - name: TC18 - become a superuser to download a PTF - switch to common user
     set_fact:
@@ -375,8 +369,9 @@
       product: '5770SS1'
       ptf_id: "{{ptfs[0]}}"
       release: "{{os400_ver}}"
+      wait: true
       become_user: "{{superuser}}"
-      become_user_password: "{{ibmi_pass}}"
+      become_user_password: "{{ibmi_pass}}"   
     register: dl_single_ptf_result  
     failed_when: dl_single_ptf_result.rc != 0    
 
@@ -384,7 +379,7 @@
     ibmi_download_fix:
       ptf_id: "{{ptf_grps[0]}}"
       delivery_format: "*IMAGE"
-      release: "{{os400_ver}}"
+      release: "*ONLYRLS"
       become_user: "{{superuser}}"
       become_user_password: "{{ibmi_pass}}"
     register: dl_ptf_grp_result  
@@ -421,56 +416,38 @@
       ptf_id: 'SIABCDE'
       reorder: '*NO'
     register: dl_single_ptf_result  
-    failed_when: dl_single_ptf_result.rc == 0  
+    failed_when: dl_single_ptf_result.rc != 255  
 
   - name: TC20 - Assert values
     assert:
       that:
-        - dl_single_ptf_result.msg == "PTF *ONLYPRD-SIABCDE *ONLYRLS not available on the service provider system." 
-        - dl_single_ptf_result.command == ""
+        - '"PTF *ONLYPRD-SIABCDE *ONLYRLS" in  dl_single_ptf_result.msg'
         
-  - name: TC21 - Negative test - try to download a wrong VRM PTF
-    ibmi_download_fix:
-      product: '5770SS1'  
-      release: "{{os400_ver}}"
-      ptf_id: '{{ptfs[1]}}'
-      reorder: '*NO'
-    register: dl_single_ptf_result  
-    failed_when: dl_single_ptf_result.rc == 0  
-
-  - name: TC21 - Assert values
-    assert:
-      that:
-        - dl_single_ptf_result.msg == "PTF *ONLYPRD-{{ptfs[1]}} *ONLYRLS not available on the service provider system." 
-        - dl_single_ptf_result.command == ""
-
   - name: TC22 - Negative test - try to download a non-existing PTF 
     ibmi_download_fix:
       product: '5770SS1'  
       release: "{{os400_ver}}"
       ptf_id: 'SFABCDE'
       reorder: '*NO'
-    register: dl_ptf_grp_result  
-    failed_when: dl_ptf_grp_result.rc == 0  
+    register: dl_none_ptf_result  
+    failed_when: dl_none_ptf_result.rc == 0  
 
   - name: TC22 - Assert values
     assert:
       that:
-        - dl_ptf_grp_result.msg == "PTF *ONLYPRD-SFABCDE *ONLYRLS not available on the service provider system."
-        - dl_ptf_grp_result.command == ""
+        - '"PTF *ONLYPRD-SFABCDE *ONLYRLS" in  dl_none_ptf_result.msg'
 
   - name: TC23 - Negative test - try to download an PTF group with invalid ptf group option
     ibmi_download_fix:
       ptf_id: '*AVAGRP'
       reorder: '*NO'
     register: dl_ptf_grp_result  
-    failed_when: dl_ptf_grp_result.rc == 0  
+    failed_when: dl_ptf_grp_result.rc != 255  
 
   - name: TC23 - Assert values
     assert:
       that:
-        - dl_ptf_grp_result.job_log |selectattr('MESSAGE_TEXT', 'equalto', '*AVAGRP not valid for parameter PTFID.') | map(attribute='MESSAGE_TEXT') | list | length == 1
-        - dl_ptf_grp_result.command == ""
+        - dl_ptf_grp_result.job_log |selectattr('MESSAGE_ID', 'equalto', 'CPD8C11') | map(attribute='MESSAGE_ID') | list | length == 1
 
   - name: TC24 - Negative test - try to download PTF to a folder that is not exist
     ibmi_download_fix:
@@ -487,7 +464,7 @@
     assert:
       that:
         - dl_ptf_grp_result.msg == "PTF order cannot be processed. See joblog"
-        - dl_ptf_grp_result.job_log |selectattr('MESSAGE_TEXT', 'equalto', 'Object not found.  Object is /home/{{ansible_ssh_user}}/notexist.') | map(attribute='MESSAGE_TEXT') | list | length == 1
+        - dl_ptf_grp_result.job_log |selectattr('MESSAGE_ID', 'equalto', 'CPFA0A9') | map(attribute='MESSAGE_ID') | list | length == 1
 
   - name: TC25A - Negative test - invalid value of each parameter, take single_ptf download for instance
     ibmi_download_fix:
@@ -544,7 +521,7 @@
   - name: TC26 - assert values
     assert:
       that:
-        - dl_single_ptf_result.job_log |selectattr('MESSAGE_TEXT', 'equalto', 'Not authorized to command SNDPTFORD in library *LIBL.') | list | length == 1
+        - dl_single_ptf_result.job_log |selectattr('MESSAGE_ID', 'equalto', 'CPD0032') | map(attribute='MESSAGE_ID') | list | length == 1
 
   - name: TC27 - Negative test - Download a PTF group with become to swith to a non-*ALLOBJ authority user  
     ibmi_download_fix:
@@ -558,7 +535,7 @@
   - name: TC27 - assert values
     assert:
       that:
-        - dl_ptf_grp_result.job_log |selectattr('MESSAGE_TEXT', 'equalto', 'Not authorized to command SNDPTFORD in library *LIBL.') | list | length == 1
+        - dl_single_ptf_result.job_log |selectattr('MESSAGE_ID', 'equalto', 'CPD0032') | map(attribute='MESSAGE_ID') | list | length == 1
 
   always:
   - name:  Find Q{{ptfs[0]}} under QGPL

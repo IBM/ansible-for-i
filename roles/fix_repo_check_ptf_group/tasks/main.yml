@@ -4,7 +4,7 @@
 # in ptf_group_image table or already downloading.
 - name: Initialize check_ptf_group_fail
   set_fact:
-    check_ptf_group_fail: False
+    check_ptf_group_fail: false
 
 - name: Check and get the latest PTF group information on PSP
   ibm.power_ibmi.ibmi_fix_group_check:
@@ -22,7 +22,7 @@
 
     - name: Set check_ptf_group_fail to True
       set_fact:
-        check_ptf_group_fail: True
+        check_ptf_group_fail: true
   when: fix_group_check_result.group_info is not defined
 
 - block:

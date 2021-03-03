@@ -28,7 +28,7 @@
     action: "find"
     type: "single_ptf"
     parameters:
-      - { 'product': '{{ product }}', 'release': '{{ release }}' }
+      - {'product': '{{ product }}', 'release': '{{ release }}'}
   delegate_to: "{{ repo_server }}"
   register: product_info
 

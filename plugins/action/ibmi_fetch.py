@@ -16,7 +16,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 ifs_dir = '/tmp/.ansible'
 display = Display()
@@ -189,7 +189,7 @@ class ActionModule(ActionBase):
                 if object_types == '*ALL' or object_types == '*FILE':
                     if (object_names.split())[0][-1] == '*':
                         module_args = {'object_name': object_names[0:-1] + '+', 'lib_name': lib_name, 'use_regex': True}
-                        module_output = self._execute_module(module_name='ibmi_object_find', module_args=module_args)
+                        module_output = self._execute_module(module_name='ibmi_object_find', module_args=module_args, task_vars=task_vars)
                         save_result = module_output
                         if not save_result.get('failed'):
                             if len(save_result['object_list']) == 1 and save_result['object_list'][0]['OBJTYPE'] == '*FILE' \
@@ -200,7 +200,7 @@ class ActionModule(ActionBase):
                                 is_savf = True
                     else:
                         module_args = {'object_name': object_names, 'lib_name': lib_name}
-                        module_output = self._execute_module(module_name='ibmi_object_find', module_args=module_args)
+                        module_output = self._execute_module(module_name='ibmi_object_find', module_args=module_args, task_vars=task_vars)
                         save_result = module_output
                         if not save_result.get('failed'):
                             if len(save_result['object_list']) == 1 and save_result['object_list'][0]['OBJTYPE'] == '*FILE' and \
@@ -222,14 +222,14 @@ class ActionModule(ActionBase):
                                    'target_release': target_release, 'force_save': force_save, 'joblog': True,
                                    'parameters': omitfile}
                     display.debug("ibm i debug: call ibmi_lib_save {p_module_args}".format(p_module_args=module_args))
-                    module_output = self._execute_module(module_name='ibmi_lib_save', module_args=module_args)
+                    module_output = self._execute_module(module_name='ibmi_lib_save', module_args=module_args, task_vars=task_vars)
                 else:
                     omitfile = 'OMITOBJ(({p_lib_name}/{p_savf_name} *FILE))'.format(p_lib_name=lib_name, p_savf_name=savf_name)
                     module_args = {'object_names': object_names, 'object_lib': lib_name, 'object_types': object_types,
                                    'savefile_name': savf_name, 'savefile_lib': lib_name, 'target_release': target_release,
                                    'force_save': force_save, 'joblog': True, 'parameters': omitfile}
                     display.debug("ibm i debug: call ibmi_object_save {p_module_args}".format(p_module_args=module_args))
-                    module_output = self._execute_module(module_name='ibmi_object_save', module_args=module_args)
+                    module_output = self._execute_module(module_name='ibmi_object_save', module_args=module_args, task_vars=task_vars)
 
                 save_result = module_output
                 rc = save_result['rc']
@@ -247,7 +247,7 @@ class ActionModule(ActionBase):
             commandmk = 'mkdir {p_ifs_dir}'.format(p_ifs_dir=ifs_dir)
             command = 'cp {p_savf_path} {p_ifs_dir}'.format(p_savf_path=savf_path, p_ifs_dir=ifs_dir)
 
-            module_output = self._execute_module(module_name='command', module_args={'_raw_params': commandmk})
+            module_output = self._execute_module(module_name='command', module_args={'_raw_params': commandmk}, task_vars=task_vars)
             save_result = module_output
             rc = save_result['rc']
             if rc != 0 and ('exists' not in save_result['stderr']):
@@ -256,7 +256,7 @@ class ActionModule(ActionBase):
                 result['rc'] = save_result['rc']
                 result['failed'] = True
                 return result
-            module_output = self._execute_module(module_name='command', module_args={'_raw_params': command})
+            module_output = self._execute_module(module_name='command', module_args={'_raw_params': command}, task_vars=task_vars)
             save_result = module_output
             rc = save_result['rc']
             if rc != 0:
@@ -414,7 +414,7 @@ class ActionModule(ActionBase):
                 cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savf_name}) OBJTYPE(*FILE)'.format(
                     p_lib_name=lib_name,
                     p_savf_name=savf_name)
-                module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd})
+                module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd}, task_vars=task_vars)
                 save_result = module_output
                 rc = save_result['rc']
                 if rc != 0 and ('CPF2105' not in save_result['stderr']):
@@ -422,7 +422,7 @@ class ActionModule(ActionBase):
             if ifs_created is True:
                 cmd = 'rm {p_ifs_dir}/{p_os}'.format(p_ifs_dir=ifs_dir, p_os=os.path.basename(savf_path))
                 try:
-                    module_output = self._execute_module(module_name='command', module_args={'_raw_params': cmd})
+                    module_output = self._execute_module(module_name='command', module_args={'_raw_params': cmd}, task_vars=task_vars)
                     save_result = module_output
                     rc = save_result['rc']
                     if rc != 0:

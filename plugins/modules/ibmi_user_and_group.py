@@ -31,7 +31,7 @@ options:
       - The user or group profile operation.
       - Operation create to create user(group) profile.
       - Operation change to change user(group) profile.
-      - Operation display to display user(group) profile inforamtion.
+      - Operation display to display user(group) profile information.
       - Operation display_group_menbers to display the members of a group profile.
     choices: ['create', 'change', 'delete', 'display', 'display_group_members']
     type: str
@@ -124,7 +124,7 @@ options:
     default: ' '
   joblog:
     description:
-      - If set to C(true), output the avaiable job log even the rc is 0(success).
+      - If set to C(true), output the available job log even the rc is 0(success).
     type: bool
     default: false
   become_user:
@@ -247,7 +247,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():

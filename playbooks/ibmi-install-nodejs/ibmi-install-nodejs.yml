@@ -2,7 +2,7 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
@@ -12,7 +12,7 @@
   tasks:
   - name: Install Node js
     command: /QOpensys/pkgs/bin/yum install nodejs10 -y
-    ignore_errors: True
+    ignore_errors: true
 
   - name: verify git has been installed
     stat:
@@ -42,14 +42,14 @@
   - name: npm i
     shell: "(/QOpensys/pkgs/lib/nodejs10/bin/npm  i  --scripts-prepend-node-path)"
     args:
-      warn: False
+      warn: false
       chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
       executable: /usr/bin/sh
 
   - name: Start the demo application
     shell: "(nohup /QOpensys/pkgs/lib/nodejs10/bin/node index.js >/dev/null 2>&1 &)"
     args:
-      warn: False
+      warn: false
       chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
       executable: /usr/bin/sh
     async: 10

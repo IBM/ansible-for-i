@@ -60,7 +60,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 msg:
-    description: The message that descript the error or success
+    description: The message that describes the error or success
     returned: always
     type: str
     sample: 'Error occurred when retrieving the mirror state'
@@ -78,7 +78,6 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_mo
 import sys
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
 
 try:
     from itoolkit import iToolKit
@@ -88,11 +87,6 @@ try:
     from itoolkit.transport import DatabaseTransport
 except ImportError:
     HAS_ITOOLKIT = False
-
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
 
 # The mirror state
 MRDB_NOT_MIRRORED = 0
@@ -108,7 +102,7 @@ MrdbConfigComplete = 2
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def mrdb_retrieve_mirror_state(imodule):
@@ -200,8 +194,6 @@ def main():
 
     if not HAS_ITOOLKIT:
         module.fail_json(rc=999, msg="itoolkit package is required.")
-    if not HAS_IBM_DB:
-        module.fail_json(rc=999, msg="ibm_db package is required.")
 
     try:
         ibmi_module = imodule.IBMiModule(

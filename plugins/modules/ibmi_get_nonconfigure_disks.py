@@ -16,10 +16,10 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = r'''
 ---
 module: ibmi_get_nonconfigure_disks
-short_description: Get all nonconfigure disks
+short_description: Get all un-configure disks
 version_added: '1.0.0'
 description:
-  - Get all nonconfigure disks.
+  - Get all un-configure disks.
   - For non-IBM i targets, no need.
 options:
   joblog:
@@ -123,7 +123,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def getNonconfigureDisk(imodule, time):

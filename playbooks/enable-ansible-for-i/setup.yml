@@ -3,8 +3,10 @@
 ---
 
 - hosts: all 
-  gather_facts: no 
-
+  gather_facts: false 
+  collections:
+   - ibm.power_ibmi
+   
   tasks:
   - set_fact:
       yum_installed: false
@@ -14,7 +16,7 @@
     args:
       executable: /qopensys/usr/bin/qsh
     register: default_yum_existance
-    ignore_errors: True
+    ignore_errors: true
 
   - include: ibmi-install-yum.yml
     when: "'No such path or directory' in default_yum_existance.stdout"

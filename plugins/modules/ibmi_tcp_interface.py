@@ -357,8 +357,9 @@ import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
+from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -559,18 +560,73 @@ def main():
         )
         module.fail_json(msg='Non zero return code.', **result_failed)
     else:
-        result_success = dict(
-            changed=is_changed,
-            stdout=out,
-            rc=rc,
-            start=str(startd),
-            end=str(endd),
-            delta=str(delta),
-            interface_info=rs,
-            cl_command=cl_command,
-            job_log=job_log,
-        )
-        module.exit_json(**result_success)
+        # need to wait for STARTING status
+        current_interface_status = ''
+        if len(rs) != 0:
+            current_interface_status = rs[0]["INTERFACE_STATUS"]
+            ibmi_util.log_info("Interface status is {0} in first retrieving".format(
+                current_interface_status), module._name)
+            wait_for_starting_timeout = 120
+            while((current_interface_status == 'STARTING') and (wait_for_starting_timeout > 0)):
+                ibmi_util.log_info("Interface status is {0}, timeout is {1}".format(
+                    current_interface_status, wait_for_starting_timeout), module._name)
+                time.sleep(5)
+                rs, query_err = return_interface_information(
+                    connection_id, internet_address, alias_name)
+                current_interface_status = rs[0]["INTERFACE_STATUS"]
+                wait_for_starting_timeout = wait_for_starting_timeout - 5
+            ibmi_util.log_info("Interface status is {0}, timeout is {1}".format(
+                current_interface_status, wait_for_starting_timeout), module._name)
+
+        if current_interface_status == 'STARTING':  # Still STARTING status
+            ibmi_util.log_info("Interface status is still {0}".format(
+                current_interface_status), module._name)
+            endd = datetime.datetime.now()
+            delta = endd - startd
+            result_success = dict(
+                changed=is_changed,
+                stdout=out,
+                rc=rc,
+                start=str(startd),
+                end=str(endd),
+                delta=str(delta),
+                interface_info=rs,
+                cl_command=cl_command,
+                job_log=job_log,
+            )
+            module.exit_json(
+                msg='WARNING: Interface is still in STARTING progress, using option present to query the status later.', **result_success)
+
+        if current_interface_status != 'FAILED':
+            endd = datetime.datetime.now()
+            delta = endd - startd
+            result_success = dict(
+                changed=is_changed,
+                stdout=out,
+                rc=rc,
+                start=str(startd),
+                end=str(endd),
+                delta=str(delta),
+                interface_info=rs,
+                cl_command=cl_command,
+                job_log=job_log,
+            )
+            module.exit_json(**result_success)
+        else:
+            endd = datetime.datetime.now()
+            delta = endd - startd
+            result_failed = dict(
+                changed=is_changed,
+                stdout=out,
+                rc=rc,
+                start=str(startd),
+                end=str(endd),
+                delta=str(delta),
+                interface_info=rs,
+                cl_command=cl_command,
+                job_log=job_log,
+            )
+            module.fail_json(msg='Interface started but turned to failed.', **result_failed)
 
 
 if __name__ == '__main__':

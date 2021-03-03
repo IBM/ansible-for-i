@@ -6,7 +6,7 @@
 # Command example: ansible-playbook ./check_download_ptf_group.yml -e "{'repo_server': 'reposerver', 'ptf_group': 'SF99663'}"
 
   hosts: "{{ repo_server }}"
-  gather_facts: No
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
@@ -30,26 +30,7 @@
       include_role:
         name: fix_repo_download_add_ptf_group
       vars:
-        ptf_group_number: "{{ fix_group_check_result.group_info[0].ptf_group_number }}"
-        ptf_group_level: "{{ fix_group_check_result.group_info[0].ptf_group_level }}"
-        release_date: "{{ fix_group_check_result.group_info[0].release_date }}"
-
-    - name: Add part of PTF group information including ptf list into catalog
-      ibmi_fix_repo:
-        type: "ptf_group"
-        action: "add"
-        checksum: False
-        parameters:
-          - "{{ {'order_id': download_fix_result.order_id,
-          'file_path': download_fix_result.file_path,
-          'ptf_group_number': fix_group_check_result.group_info[0].ptf_group_number,
-          'ptf_list': fix_group_check_result.group_info[0].ptf_list,
-          'ptf_group_level': fix_group_check_result.group_info[0].ptf_group_level,
-          'release_date': fix_group_check_result.group_info[0].release_date,
-          'description': fix_group_check_result.group_info[0].description,
-          'release': fix_group_check_result.group_info[0].release} }}"
-      register: ptf_group_update_result
-      when: download_fix_result.order_id is defined
+        ptf_group_info: "{{ fix_group_check_result.group_info[0] }}"
 
     - debug:
         msg: "After order {{ download_fix_result.order_id }} is complete, call fix_repo_extract_ptf_group_info role to extract ptf group information into catalog."

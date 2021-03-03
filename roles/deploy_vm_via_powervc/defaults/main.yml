@@ -8,6 +8,7 @@ user_domain: Default
 verify_cert: true
 flavor_name_or_id: tiny
 deploy_timeout: 300
+availability_zone_name: 'Default Group'
 Deploy_userdata: |
   {%- raw -%}#!/bin/sh
   system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"

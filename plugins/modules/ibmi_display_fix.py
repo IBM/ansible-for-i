@@ -44,7 +44,7 @@ options:
     default: '*ALL'
   joblog:
     description:
-      - If set to C(true), output the avaiable job log even the rc is 0(success).
+      - If set to C(true), output the available job log even the rc is 0(success).
     type: bool
     default: False
   become_user:
@@ -73,7 +73,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 requisite_ptf_info:
-    description: The requisite PTFs infomation.
+    description: The requisite PTFs information.
     returned: always, empty list if there is no requisite ptf
     type: list
     sample: [
@@ -82,8 +82,8 @@ requisite_ptf_info:
             "REQUISITE_IS_CONDITIONAL": "0",
             "REQUISITE_IS_REQUIRED": "1",
             "REQUISITE_LOAD_ID": "5050",
-            "REQUISITE_MAX_LEVLE": "00",
-            "REQUISITE_MIN_LEVLE": "00",
+            "REQUISITE_MAX_LEVEL": "00",
+            "REQUISITE_MIN_LEVEL": "00",
             "REQUISITE_OPTION": "0000",
             "REQUISITE_PRODUCT_ID": "5770SS1",
             "REQUISITE_PTF_ID": "SI69832",
@@ -94,8 +94,8 @@ requisite_ptf_info:
             "REQUISITE_IS_CONDITIONAL": "0",
             "REQUISITE_IS_REQUIRED": "1",
             "REQUISITE_LOAD_ID": "5050",
-            "REQUISITE_MAX_LEVLE": "00",
-            "REQUISITE_MIN_LEVLE": "00",
+            "REQUISITE_MAX_LEVEL": "00",
+            "REQUISITE_MIN_LEVEL": "00",
             "REQUISITE_OPTION": "0000",
             "REQUISITE_PRODUCT_ID": "5770SS1",
             "REQUISITE_PTF_ID": "SI69837",
@@ -106,8 +106,8 @@ requisite_ptf_info:
             "REQUISITE_IS_CONDITIONAL": "0",
             "REQUISITE_IS_REQUIRED": "1",
             "REQUISITE_LOAD_ID": "5050",
-            "REQUISITE_MAX_LEVLE": "00",
-            "REQUISITE_MIN_LEVLE": "00",
+            "REQUISITE_MAX_LEVEL": "00",
+            "REQUISITE_MIN_LEVEL": "00",
             "REQUISITE_OPTION": "0000",
             "REQUISITE_PRODUCT_ID": "5770SS1",
             "REQUISITE_PTF_ID": "SI69616",
@@ -118,8 +118,8 @@ requisite_ptf_info:
             "REQUISITE_IS_CONDITIONAL": "0",
             "REQUISITE_IS_REQUIRED": "1",
             "REQUISITE_LOAD_ID": "5050",
-            "REQUISITE_MAX_LEVLE": "00",
-            "REQUISITE_MIN_LEVLE": "00",
+            "REQUISITE_MAX_LEVEL": "00",
+            "REQUISITE_MIN_LEVEL": "00",
             "REQUISITE_OPTION": "0000",
             "REQUISITE_PRODUCT_ID": "5770SS1",
             "REQUISITE_PTF_ID": "SI69618",
@@ -130,8 +130,8 @@ requisite_ptf_info:
             "REQUISITE_IS_CONDITIONAL": "0",
             "REQUISITE_IS_REQUIRED": "1",
             "REQUISITE_LOAD_ID": "5050",
-            "REQUISITE_MAX_LEVLE": "00",
-            "REQUISITE_MIN_LEVLE": "00",
+            "REQUISITE_MAX_LEVEL": "00",
+            "REQUISITE_MIN_LEVEL": "00",
             "REQUISITE_OPTION": "0000",
             "REQUISITE_PRODUCT_ID": "5770SS1",
             "REQUISITE_PTF_ID": "SI69619",
@@ -142,8 +142,8 @@ requisite_ptf_info:
             "REQUISITE_IS_CONDITIONAL": "0",
             "REQUISITE_IS_REQUIRED": "1",
             "REQUISITE_LOAD_ID": "5050",
-            "REQUISITE_MAX_LEVLE": "00",
-            "REQUISITE_MIN_LEVLE": "00",
+            "REQUISITE_MAX_LEVEL": "00",
+            "REQUISITE_MIN_LEVEL": "00",
             "REQUISITE_OPTION": "0000",
             "REQUISITE_PRODUCT_ID": "5770SS1",
             "REQUISITE_PTF_ID": "SI69416",
@@ -242,7 +242,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def get_ptf_info(imodule, ptf_id, product_id, release_level):
@@ -299,8 +299,8 @@ def get_ptf_info(imodule, ptf_id, product_id, release_level):
                          .addData(iData('REQUISITE_PRODUCT_ID', '7A', ''))
                          .addData(iData('REQUISITE_PTF_ID', '7A', ''))
                          .addData(iData('RELEASE_OF_REQUISITE', '6A', ''))
-                         .addData(iData('REQUISITE_MIN_LEVLE', '2A', ''))
-                         .addData(iData('REQUISITE_MAX_LEVLE', '2A', ''))
+                         .addData(iData('REQUISITE_MIN_LEVEL', '2A', ''))
+                         .addData(iData('REQUISITE_MAX_LEVEL', '2A', ''))
                          .addData(iData('TYPE_OF_REQUISITE', '1A', ''))
                          .addData(iData('REQUISITE_IS_CONDITIONAL', '1A', ''))
                          .addData(iData('REQUISITE_IS_REQUIRED', '1A', ''))
@@ -372,8 +372,8 @@ def get_ptf_info(imodule, ptf_id, product_id, release_level):
                          .addData(iData('REQUISITE_PRODUCT_ID', '7A', ''))
                          .addData(iData('REQUISITE_PTF_ID', '7A', ''))
                          .addData(iData('RELEASE_OF_REQUISITE', '6A', ''))
-                         .addData(iData('REQUISITE_MIN_LEVLE', '2A', ''))
-                         .addData(iData('REQUISITE_MAX_LEVLE', '2A', ''))
+                         .addData(iData('REQUISITE_MIN_LEVEL', '2A', ''))
+                         .addData(iData('REQUISITE_MAX_LEVEL', '2A', ''))
                          .addData(iData('TYPE_OF_REQUISITE', '1A', ''))
                          .addData(iData('REQUISITE_IS_CONDITIONAL', '1A', ''))
                          .addData(iData('REQUISITE_IS_REQUIRED', '1A', ''))

@@ -35,7 +35,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
 - set_fact:
     ansible_ssh_user: '{{ansible_ssh_user_org}}'
     ansible_ssh_pass: '{{ansible_ssh_pass_org}}'
-  no_log: True
+  no_log: true
 
 - name: search the python3 job
   ibmi_cl_command:
@@ -58,4 +58,4 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
 - set_fact:
     ansible_ssh_user: '{{nopwd_user}}'
     ansible_ssh_pass: '{{becomepwd}}'
-  no_log: True
+  no_log: true

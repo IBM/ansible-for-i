@@ -34,7 +34,7 @@ options:
     required: yes
   joblog:
     description:
-      - If set to C(true), output the avaiable job log even the rc is 0(success).
+      - If set to C(true), output the available job log even the rc is 0(success).
     type: bool
     default: False
   become_user:
@@ -60,7 +60,7 @@ EXAMPLES = r'''
     become_user: 'USER1'
     become_user_password: 'yourpassword'
 
-- name: Compare the returned system valus as list
+- name: Compare the returned system values as list
   ibmi_ibm.power_ibmi.ibmi_sysval:
     sysvalue:
       - {'name':'QATNPGM', 'expect':'QEZMAIN   QSYS'}
@@ -156,7 +156,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 sysval_array = [

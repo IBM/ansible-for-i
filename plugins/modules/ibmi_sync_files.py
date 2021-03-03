@@ -17,10 +17,10 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sync_files
 short_description: Synchronize a list of files from current IBM i node A to another IBM i node B.
-version_added: '1.0.0'
+version_added: '1.0.2'
 description:
      - The C(ibmi_sync_files) module synchronize a list of files from current IBM i node to another IBM i node.
-     - Only supports SAVF(.file) format synchronize between QSYS and QSYS.
+     - Only supports SAVF(.file) and MBR(.mbr) format synchronize between QSYS and QSYS.
 options:
   src_list:
     description:
@@ -75,10 +75,11 @@ EXAMPLES = r'''
 - name: Synchronize a list of different types of files to host.com.
   ibmi_ibm.power_ibmi.ibmi_sync_files:
     src_list:
-      - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/fish.lib/'}
-      - {'src': '/qsys.lib/fish.lib/test.file', 'dest': '/qsys.lib/fish.lib'}
-      - {'src': '/tmp/c2.SAVF', 'dest': '/qsys.lib/fish.lib/'}
+      - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/test.lib/'}
+      - {'src': '/qsys.lib/test.lib/test.file', 'dest': '/qsys.lib/test.lib'}
+      - {'src': '/tmp/c2.SAVF', 'dest': '/qsys.lib/test.lib/'}
       - {'src': '/tmp/c3.bin', 'dest': '/test/dir'}
+      - {'src': '/qsys.lib/c4.file/test.mbr', 'dest': '/qsys.lib/test.lib/c5.file'}
     remote_host: 'host.com'
     remote_user: 'user'
     private_key: '/home/test/id_rsa'
@@ -160,7 +161,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 HAS_PARAMIKO = True
 
 try:
@@ -218,14 +219,20 @@ def main():
         if rc != 0 and 'File exists' not in err:
             return_error(module, "mkdir on current host failed. dir = {p_ifs_dir}. {p_err}".format(p_ifs_dir=ifs_dir, p_err=err), result)
 
-        private_key = to_bytes(private_key, errors='surrogate_or_strict')
-        p_key = paramiko.RSAKey.from_private_key_file(private_key)
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=remote_host, port=22, username=remote_user, pkey=p_key)
-        transport = paramiko.Transport((remote_host, 22))
-        transport.connect(username=remote_user, pkey=p_key)
-        sftp = paramiko.SFTPClient.from_transport(transport)
+        try:
+            private_key = to_bytes(private_key, errors='surrogate_or_strict')
+            p_key = paramiko.RSAKey.from_private_key_file(private_key)
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(hostname=remote_host, port=22, username=remote_user, pkey=p_key)
+            transport = paramiko.Transport((remote_host, 22))
+            transport.connect(username=remote_user, pkey=p_key)
+            sftp = paramiko.SFTPClient.from_transport(transport)
+        except Exception as e:
+            for i in range(len(src_list)):
+                src_list[i]['fail_reason'] = "{p_to_text}. ".format(p_to_text=to_text(e))
+            result.update({'fail_list': src_list})
+            return_error(module, "Exception. {p_to_text}. Use -vvv for more information.".format(p_to_text=to_text(e)), result)
 
         if dest:
             try:
@@ -249,12 +256,15 @@ def main():
             if final_dest == '':
                 final_dest = os.path.dirname(os.path.realpath(src_list[i]['src']))
 
-            if final_dest[0:9].upper() == '/QSYS.LIB':
-                final_dest = (final_dest + '/' + os.path.splitext(src_basename)[0] + '.FILE').replace("//", "/")
+            if final_dest[0:9].upper() == '/QSYS.LIB' and not os.path.isdir(src_list[i]['src']):
+                if os.path.splitext(src_basename)[-1].upper() == '.MBR':
+                    final_dest = (final_dest + '/' + src_basename).replace("//", "/")
+                else:
+                    final_dest = (final_dest + '/' + os.path.splitext(src_basename)[0] + '.FILE').replace("//", "/")
             else:
                 final_dest = (final_dest + '/' + src_basename).replace("//", "/")
 
-            if src_list[i]['src'][0:9].upper() == '/QSYS.LIB':
+            if src_list[i]['src'][0:9].upper() == '/QSYS.LIB' and os.path.splitext(src_basename)[-1].upper() != '.MBR':
                 ibmi_util.log_debug("cp " + src_list[i]['src'] + " " + ifs_dir, module._name)
                 rc, out, err = module.run_command(['cp', src_list[i]['src'], ifs_dir], use_unsafe_shell=False)
                 if rc == 0:

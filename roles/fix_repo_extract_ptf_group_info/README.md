@@ -1,6 +1,6 @@
 fix_repo_extract_ptf_group_info
 =========
-Call ibmi_fix_repo module to get the order information in download_status table, then call ibmi_fix_repo module again to extract
+Call ibmi_fix_repo module to get the order information in the download_status table, then call ibmi_fix_repo module again to extract
 and update ptf group's information into ptf_group_image_info table in catalog.
 
 Role Variables

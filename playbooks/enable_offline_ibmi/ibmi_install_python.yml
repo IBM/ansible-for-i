@@ -8,7 +8,7 @@
   args:
     executable: /qopensys/usr/bin/qsh
   register: default_python_existance
-  ignore_errors: True
+  ignore_errors: true
 
 - block: 
     - fail: 

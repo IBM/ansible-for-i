@@ -160,23 +160,16 @@ import sys
 import os
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
 
 try:
     from itoolkit import iToolKit
     from itoolkit import iSrvPgm
     from itoolkit import iPgm
-    from itoolkit import iCmd
     from itoolkit import iData
     from itoolkit import iDS
     from itoolkit.transport import DatabaseTransport
 except ImportError:
     HAS_ITOOLKIT = False
-
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
 
 # The mirror state
 MRDB_NOT_MIRRORED = 0
@@ -194,7 +187,7 @@ ERROR = -1
 
 CLOUDINIT_METADATA_DIR = '/QOpenSys/pkgs/lib/cloudinit/cloud/seed/config_drive/openstack/latest'
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def get_mirror_state_text(state):
@@ -525,8 +518,6 @@ def main():
 
     if not HAS_ITOOLKIT:
         module.fail_json(rc=999, msg="itoolkit package is required.")
-    if not HAS_IBM_DB:
-        module.fail_json(rc=999, msg="ibm_db package is required.")
 
     try:
         ibmi_module = imodule.IBMiModule(
