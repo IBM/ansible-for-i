@@ -1,6 +1,6 @@
 deploy_vm_via_powervc
 =========
-The ansible role is to create a VM via PowerVC.
+The ansible role for creating a VM via PowerVC.
 
 Role Variables
 --------------

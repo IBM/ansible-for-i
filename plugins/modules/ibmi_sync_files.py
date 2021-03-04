@@ -20,7 +20,7 @@ short_description: Synchronize a list of files from current IBM i node A to anot
 version_added: '1.0.2'
 description:
      - The C(ibmi_sync_files) module synchronize a list of files from current IBM i node to another IBM i node.
-     - Only supports SAVF(.file) and MBR(.mbr) format synchronize between QSYS and QSYS.
+     - Only supports SAVF(.file) and MBR(only supports "database" subtype Physical files(PF-DTA attribute)) format synchronize between QSYS and QSYS.
 options:
   src_list:
     description:
