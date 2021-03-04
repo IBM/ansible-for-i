@@ -124,7 +124,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.2.2"
 
 
 def _is_ipv4_addr(ip):
