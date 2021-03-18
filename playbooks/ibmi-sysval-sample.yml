@@ -12,7 +12,7 @@
   # sysvalue --  The list containing the system values to be checked
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
    - ibm.power_ibmi
 

@@ -2,7 +2,7 @@ fix_repo_download_apply_individual_ptfs
 =========
 
 Check if requested individual PTFs are already in catalog. If not, will download non-existent PTFs and write information into catalog.
-After that, will transfer savfs to target server, then load and apply PTFs.
+After that, will transfer savfs to the target server, then load and apply PTFs.
 
 Role Variables
 --------------

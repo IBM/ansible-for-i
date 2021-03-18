@@ -5,7 +5,7 @@
 #The sample file is to provide an example about how to manipulate the PTF database
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
    - ibm.power_ibmi
 
@@ -40,13 +40,3 @@
     - name: display_a_group_and_a_cum
       debug:
         msg: "{{ a_group_and_a_cum }}"
-
-    # THIS IS UNBELIEVABLE SLOW!!!
-    # - name: query_all_groups
-    #   ibmi_fix_group_check:
-    #     groups:
-    #       - "*ALL"
-    #   register: all_groups
-    # - name: display_all_groups
-    #   debug: 
-    #     msg: "{{ all_groups }}"

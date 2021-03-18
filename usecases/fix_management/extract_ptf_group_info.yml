@@ -4,7 +4,7 @@
 
 # Command example: ansible-playbook ./extract_ptf_group_info.yml -e "{'order_id': '2025910369'}"
   hosts: reposerver
-  gather_facts: No
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 

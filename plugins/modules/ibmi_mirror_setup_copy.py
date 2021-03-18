@@ -105,7 +105,6 @@ import os
 import sys
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
 
 try:
     from itoolkit import iToolKit
@@ -116,11 +115,6 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-try:
-    import ibm_db_dbi as dbi
-except ImportError:
-    HAS_IBM_DB = False
-
 CLOUDINIT_METADATA_DIR = '/QOpenSys/pkgs/lib/cloudinit/cloud/seed/config_drive/openstack/latest'
 DB2MTOOL_METADATA_DIR = '/QIBM/UserData/QDB2MIR/MRDB/TOOLS'
 
@@ -130,7 +124,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "1.2.2"
 
 
 def _is_ipv4_addr(ip):
@@ -388,8 +382,6 @@ def main():
 
     if not HAS_ITOOLKIT:
         module.fail_json(rc=999, msg="itoolkit package is required.")
-    if not HAS_IBM_DB:
-        module.fail_json(rc=999, msg="ibm_db package is required.")
 
     try:
         ibmi_module = imodule.IBMiModule(
@@ -554,7 +546,7 @@ def main():
             rc=255, msg="Error occurred when enable Activation Engine: stdout={0}, stderr={1}".format(out, err))
 
     module.exit_json(
-        rc=SUCCESS, msg="Success to confiure Db2Mirror copy node, reboot to make the nodes synchronized")
+        rc=SUCCESS, msg="Success to configure Db2Mirror copy node, reboot to make the nodes synchronized")
 
 
 if __name__ == '__main__':

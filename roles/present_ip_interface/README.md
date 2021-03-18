@@ -1,6 +1,6 @@
 present_ip_interface
 =========
-The role is to present an ip interface and make it active. The workflow is that:
+The role is to present an IP interface and make it active. The workflow is:
 1. If the internet_address does exist, make it active.
 2. If the internet_address doesn't exist, create it based on the given line_description. 
 3. If the given line_description doesn't exist, create it
@@ -20,11 +20,11 @@ Role Variables
 | `maxTransmissionUnit` | str          | False | *LIND    | Specifies the maximum size (in bytes) of IP datagrams that can be transmitted through this interface. |
 | `autoStart`            | str          | False | *YES    | Specifies whether the interface is automatically started. Default                     |
 | `preferredInterface`   | str           | False |  *NONE   | A list of preferred IPv4 interfaces that are to be used with the IPv4 interface being added for proxy. |
-| `textDescription`            | False |     | *BLANK         | Specifies text that briefly describes the interface. |
+| `textDescription`            | False |     | *BLANK         | Specifies the text to briefly describe the interface. |
 | `secToWait`      | int          | False |  0   | The number of seconds that the module waits after executing the task before returning the information of the internet address..                      |
 | `extraParams`          | str           | False | ''  |  The extra parameters that the user wants to pass into ibmi_tcp_interface module. |
-| `location_code_of_ethernet_port`      | str          | False |  ''    |The location code of the ethernet port that will be used to find or create line description. |
-| `resource_name_of_ethernet_port`      | str          | False |  ''   |The resouce name of the ethernet port that will be used to find or create line description.                      |
+| `location_code_of_ethernet_port`      | str          | False |  ''    |The location code of the ethernet port that will be used to find or create a line description. |
+| `resource_name_of_ethernet_port`      | str          | False |  ''   |The resource name of the ethernet port that will be used to find or create a line description.                      |
 | `mac_address_of_ethernet_port`      | str          | False |  ''   |The mac address of the ethernet port that will be used to find or create line description.                      |
 | `addition_options_for_CRTLINETH`     | str          | False |  　''   |Addtion options for CRTLINETH. |
 | `route_destination`      | str          | False  |  *DFTROUTE   |Specifies the route destination being added. |

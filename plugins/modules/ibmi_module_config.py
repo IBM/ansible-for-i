@@ -65,7 +65,7 @@ options:
     default: '/var/log'
   max_log_size_mb:
     description:
-      - The maximum size of the modules log file, if the log file is larger that this value, an archieve(zip) will be occurred.
+      - The maximum size of the modules log file, if the log file is larger that this value, an archive(zip) will be occurred.
     type: int
     default: 5
 
@@ -123,7 +123,7 @@ import json
 import os
 import pwd
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "1.2.2"
 
 
 def main():

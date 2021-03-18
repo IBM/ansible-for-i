@@ -63,7 +63,7 @@
     - name: run sql execute module
       ibmi_sql_execute:
         sql: "create table {{schema_long_name}}.{{table_long_name}}(id INT not null, name varchar(8), gender varchar(8))" 
-      ignore_errors: True
+      ignore_errors: true
 
     - name: find the created object in the library
       ibmi_object_find:
@@ -81,17 +81,17 @@
     - name: drop the table
       ibmi_sql_execute:
         sql: "drop table {{schema_long_name}}.{{table_long_name}}"
-      ignore_errors: True
+      ignore_errors: true
 
     - name: delete journal
       ibmi_cl_command: 
         cmd: QSYS/DLTJRN JRN({{library_name}}/ANSIJSNJRN) 
-      ignore_errors: True
+      ignore_errors: true
 
     - name: delete journal receiver
       ibmi_cl_command: 
         cmd: QSYS/DLTOBJ OBJ({{library_name}}/ANSIJSNRCV) OBJTYPE(*JRNRCV)
-      ignore_errors: True
+      ignore_errors: true
     
     - name: rmvlib
       ibmi_cl_command:

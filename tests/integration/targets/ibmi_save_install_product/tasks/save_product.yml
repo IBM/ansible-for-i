@@ -1,6 +1,6 @@
 - ibmi_cl_command:
     cmd: DLTLIB SAVJV1
-  ignore_errors: True
+  ignore_errors: true
 
 - name: save the product in an not exsing library with all supported options
   ibmi_save_product_to_savf:

@@ -6,7 +6,7 @@
   args:
     executable: /qopensys/usr/bin/qsh
   register: default_yum_existance
-  ignore_errors: True
+  ignore_errors: true
   
 - block: 
     - fail: 

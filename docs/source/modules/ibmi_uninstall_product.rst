@@ -48,7 +48,7 @@ become_user_password
 
      
 joblog
-  If set to ``true``, output the avaiable JOBLOG even the rc is 0(success).
+  If set to ``true``, output the available JOBLOG even the rc is 0(success).
 
 
   | **required**: false

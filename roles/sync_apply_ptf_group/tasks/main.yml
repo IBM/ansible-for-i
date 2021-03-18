@@ -5,7 +5,7 @@
 - name: Initialize sync_list and sync_apply_fail
   set_fact:
     sync_list: []
-    sync_apply_fail: False
+    sync_apply_fail: false
 
 - name: Compose target tmp dir str
   set_fact:
@@ -17,7 +17,7 @@
     state: directory
     mode: 0755
   register: file_result
-  ignore_errors: True
+  ignore_errors: true
 
 - block:
     - name: Skip when make receive dir fail
@@ -26,7 +26,7 @@
 
     - name: Initialize sync_apply_fail
       set_fact:
-        sync_apply_fail: True
+        sync_apply_fail: true
   when: file_result.failed == 1
 
 - block:
@@ -55,7 +55,7 @@
             msg: "One or more ptf group file transfer failed, quit apply ptf group action."
 
         - set_fact:
-            sync_apply_fail: True
+            sync_apply_fail: true
       when: sync_result.fail_list != []
 
     - block:

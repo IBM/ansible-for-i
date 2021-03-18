@@ -24,7 +24,7 @@ description:
 options:
   operation:
     description:
-      - The operation of the messgae.
+      - The operation of the message.
     type: str
     required: yes
     choices: ["find"]
@@ -209,7 +209,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "1.2.2"
 
 
 def handle_list_to_sql(sql, item_list, param_name):

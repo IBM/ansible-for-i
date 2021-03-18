@@ -20,7 +20,6 @@
 - block:
   - set_fact:
       superuser: "{{ansible_ssh_user}}"
-      linestoappend: '\ \ \ \ ibmi_util.log_error("version: " + __ibmi_module_version__, module._name)\n    ibmi_util.log_warning("version: " + __ibmi_module_version__, module._name)\n    ibmi_util.log_debug("version: " + __ibmi_module_version__, module._name)\n    ibmi_util.log_critical("version: " + __ibmi_module_version__, module._name)'
   # when first run, the server has no cfg file, check if it's can be generated as expected.
 
   - name: TC00 - set ibmi_pass for *USER to be created
@@ -269,11 +268,18 @@
       force: true
 
   - name: TC08 - test each log_level to print corresponding logs - change module to print logs, prepare for TC09 as well
-    local_action: command sed -i '/\ \ \ \ ibmi_util.log_info/a {{linestoappend}}' ~/.ansible/collections/ansible_collections/ibm/power_ibmi/plugins/modules/ibmi_message.py
-    register: sedappend
-    failed_when: sedappend.rc != 0
+    lineinfile:
+      path: ~/.ansible/collections/ansible_collections/ibm/power_ibmi/plugins/modules/ibmi_message.py
+      insertafter: "ibmi_util.log_info"
+      state: present
+      line: "{{item}}"
+    with_items:
+      - '    ibmi_util.log_error("version: " + __ibmi_module_version__, module._name)'  
+      - '    ibmi_util.log_warning("version: " + __ibmi_module_version__, module._name)'
+      - '    ibmi_util.log_debug("version: " + __ibmi_module_version__, module._name)'
+      - '    ibmi_util.log_critical("version: " + __ibmi_module_version__, module._name)'
+    delegate_to: localhost
   #   # this must be done before the 1st run of ibmi_message, otherwise it'll not be effective.
-  #   failed_when: false
 
   - name: TC08 - need write log, so change it back to no_log false
     ibmi_module_config:
@@ -628,11 +634,18 @@
       register: rmdftf_result
       failed_when: rmdftf_result.rc != 0
 
-    - name: TC - remove the line just append
-      local_action: command sed -i '/\ \ \ \ ibmi_util.log_error/,+3 d' ~/.ansible/collections/ansible_collections/ibm/power_ibmi/plugins/modules/ibmi_message.py
-      register: sedremove
-      failed_when: sedremove.rc != 0
-    
+    - name: remove the line just append
+      lineinfile:
+        path: ~/.ansible/collections/ansible_collections/ibm/power_ibmi/plugins/modules/ibmi_message.py
+        state: absent
+        line: "{{item}}"
+      with_items:
+        - '    ibmi_util.log_error("version: " + __ibmi_module_version__, module._name)'  
+        - '    ibmi_util.log_warning("version: " + __ibmi_module_version__, module._name)'
+        - '    ibmi_util.log_debug("version: " + __ibmi_module_version__, module._name)'
+        - '    ibmi_util.log_critical("version: " + __ibmi_module_version__, module._name)'
+      delegate_to: localhost
+
     - name: remove *USER profile created
       ibmi_cl_command:
         cmd:  'DLTUSRPRF USRPRF({{ibmi_user}}) OWNOBJOPT(*DLT)'

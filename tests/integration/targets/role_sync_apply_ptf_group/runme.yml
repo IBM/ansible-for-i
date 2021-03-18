@@ -1,6 +1,6 @@
 - name: testcase for role sync_apply_ptf_group
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 

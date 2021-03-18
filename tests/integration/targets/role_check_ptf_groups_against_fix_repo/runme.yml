@@ -1,6 +1,6 @@
 - name: IBM i check a set of PTFs
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
@@ -89,7 +89,7 @@
 
 - name: IBM i check a set of PTFs
   hosts: "repo_server_name"
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
@@ -204,7 +204,7 @@
       ibmi_fix_repo:
         type: "ptf_group"
         action: "add"
-        checksum: False
+        checksum: false
         parameters:
           - "{{ {
           'ptf_group_number': fix_group_check_result.group_info[0].ptf_group_number,
@@ -216,7 +216,7 @@
 
 - name: IBM i check a set of PTFs
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
   tasks:
@@ -378,7 +378,7 @@
 
 - name: negative test cases
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
   tasks:    

@@ -62,7 +62,7 @@ become_user_password
 
      
 disks
-  The list of the unconfigure disks.
+  The list of the un-configure disks.
 
 
   | **required**: false

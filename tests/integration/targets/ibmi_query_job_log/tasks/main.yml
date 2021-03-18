@@ -41,7 +41,7 @@
   failed_when:
     - neg_result.rc == 0
     - '"SQLSTATE=42704 SQLCODE=-443" not in neg_result.stderr'
-  #ignore_errors: True
+  #ignore_errors: true
 
 - name: TC02 assert returned parameters with joblog = True
   assert:

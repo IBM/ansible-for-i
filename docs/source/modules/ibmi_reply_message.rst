@@ -49,7 +49,7 @@ become_user_password
 
      
 ccsid
-  Coded character set ID, Vaild value are "1-65535", ``*HEX``, ``*JOB``.
+  Coded character set ID, Valid value are "1-65535", ``*HEX``, ``*JOB``.
 
 
   | **required**: false

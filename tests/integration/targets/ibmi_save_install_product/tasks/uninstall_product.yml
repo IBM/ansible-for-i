@@ -114,7 +114,7 @@
 - name: Provide invalid option
   ibmi_uninstall_product:
     product: 5770JV1    
-    abc: True
+    abc: true
   register: neg_result
   failed_when: "'Unsupported parameters' not in neg_result.msg" 
 

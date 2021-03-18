@@ -56,7 +56,7 @@ options:
     default: "*NOALWRJT"
   ccsid:
     description:
-      - Coded character set ID, Vaild value are "1-65535", C(*HEX), C(*JOB).
+      - Coded character set ID, Valid value are "1-65535", C(*HEX), C(*JOB).
     type: str
     default: "*JOB"
   joblog:
@@ -172,7 +172,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "1.2.2"
 
 
 def main():

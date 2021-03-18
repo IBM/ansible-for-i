@@ -5,7 +5,7 @@
 #The sample file is to provide an example about how to manipulate the PTF database
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
    - ibm.power_ibmi
 
@@ -72,18 +72,6 @@
       - name: display_updated_group_info_records
         debug:
           msg: '{{ query_updated_group_info_records }}'
-
-      # - name: delete some PTFs records
-      #   ibmi_fix_repo:
-      #     action: "delete"
-      #     type: 'ptf_group'
-      #     parameters: 
-      #       - {'ptf_group_number':'SF99738', 'ptf_group_level':'10'}
-      #   register: dsps_param_result_3
-
-      # - name: Display the returned parameters 3
-      #   debug: 
-      #     msg: '{{ dsps_param_result_3 }}'
 
       always:
       - name: drop_the_table

@@ -9,7 +9,7 @@
     list: "{{ list|default([]) + [{'ptf_id': ptfs_list_parm_var }] }}"
   loop: "{{ ptfs_list_parm }}"
   loop_control:
-        loop_var: ptfs_list_parm_var
+    loop_var: ptfs_list_parm_var
 
 - name: initialize rc, check_fail_list, RecordNotFound_list, download_fail_list and download_success_list
   set_fact:
@@ -24,7 +24,7 @@
     type: "single_ptf"
     action: "find"
     parameters: "{{ list }}"
-    checksum: True
+    checksum: true
   register: fix_repo_find_result
   delegate_to: "{{ repo_server }}"
 
@@ -51,7 +51,7 @@
       vars:
         to_be_downloaded_list: "{{ RecordNotFound_list }}"
         download_server: "{{ repo_server }}"
-      ignore_errors: True
+      ignore_errors: true
       when: RecordNotFound_list != []
 
     - block:
@@ -59,7 +59,7 @@
           ibm.power_ibmi.ibmi_fix_repo:
             type: "single_ptf"
             action: "add"
-            checksum: True
+            checksum: true
             parameters: "{{ download_success_list }}"
           register: fix_repo_add_result
           when: download_success_list != []
@@ -102,7 +102,7 @@
     type: "single_ptf"
     action: "find"
     parameters: "{{ list }}"
-    checksum: True
+    checksum: true
   register: final_find_result
   delegate_to: "{{ repo_server }}"
 

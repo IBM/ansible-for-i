@@ -126,7 +126,7 @@ message_type
 
      
 operation
-  The operation of the messgae.
+  The operation of the message.
 
 
   | **required**: True

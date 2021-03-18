@@ -4,8 +4,8 @@
 .. _ibmi_query_job_log_module:
 
 
-ibmi_query_job_log -- Query the specfic job log.
-================================================
+ibmi_query_job_log -- Query the specific job log.
+=================================================
 
 
 
@@ -16,7 +16,7 @@ ibmi_query_job_log -- Query the specfic job log.
 
 Synopsis
 --------
-- Query the specfic job log.
+- Query the specific job log.
 
 
 

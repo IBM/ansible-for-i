@@ -16,4 +16,5 @@
     nics: '{{ nic_list }}'
     timeout: '{{ deploy_timeout }}'
     userdata: '{{ deploy_userdata }}'
+    availability_zone: '{{ availability_zone_name }}'
   register: server_info

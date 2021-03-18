@@ -20,7 +20,7 @@
       file:
         path: /var/log/ibmi_ansible_modules.log
         state: absent
-      ignore_errors: True
+      ignore_errors: true
 
     ### Setup the user profiles and authority list
     - name: create a user profile with required options
@@ -158,9 +158,9 @@
         cmd: dltlib lib(ansible1)
         become_user: '{{becomeuser.upper()}}'
         become_user_password: '{{becomepwd}}'
-        joblog: True
+        joblog: true
       register: dltlib_result_2
-      ignore_errors: True
+      ignore_errors: true
 
     - name: TC09 assert returned parameters with joblog = True
       assert:
@@ -180,12 +180,12 @@
     - set_fact:
         ansible_ssh_user_org: '{{ansible_ssh_user}}'
         ansible_ssh_pass_org: '{{ansible_ssh_pass}}'
-      no_log: True
+      no_log: true
 
     - set_fact:
         ansible_ssh_user: '{{nopwd_user}}'
         ansible_ssh_pass: '{{becomepwd}}'
-      no_log: True
+      no_log: true
 
     - include: QSQSRVR_abnormal.yml
 
@@ -444,7 +444,7 @@
     - set_fact:
         ansible_ssh_user: '{{ansible_ssh_user_org}}'
         ansible_ssh_pass: '{{ansible_ssh_pass_org}}'
-      #no_log: True
+      #no_log: true
       ignore_errors: true
 
     - name: delete the user profile

@@ -183,7 +183,7 @@ Return Values
       
                               
        sql
-        | The formated sql statement executed by the task.
+        | The formatted sql statement executed by the task.
       
         | **returned**: always
         | **type**: str

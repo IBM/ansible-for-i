@@ -40,7 +40,7 @@ options:
     default: '*LAST'
   spooled_data_filter:
     description:
-      - A character string containing the substring in the spooled file lines.
+      - If supplied, only return lines that match this shell-style (fnmatch) wildcard.
         If this parameter is omitted, all the spooled file content is returned.
     type: str
     default: '*'
@@ -131,8 +131,9 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
+import fnmatch
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "1.2.2"
 
 
 def main():
@@ -204,7 +205,7 @@ def main():
             if spooled_data_filter != '*':
                 spooled_data_temp = []
                 for line in spooled_data:
-                    if (spooled_data_filter.upper() in line) or (spooled_data_filter.lower() in line):
+                    if (fnmatch.fnmatch(line, spooled_data_filter)) or (spooled_data_filter in line):
                         spooled_data_temp.append(line)
                 spooled_data = spooled_data_temp
         else:

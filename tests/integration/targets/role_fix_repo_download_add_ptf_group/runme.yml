@@ -1,6 +1,6 @@
 - name: download and add ptf group into fix repo on IBM i
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 

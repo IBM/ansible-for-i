@@ -6,22 +6,22 @@
 - name: create test data
   ibmi_cl_command:
     cmd: CRTUSRPRF USRPRF(USER1) PASSWORD(passw0rd) PWDEXP(*YES)  
-  ignore_errors: True
+  ignore_errors: true
 
 - name: create test data1
   ibmi_cl_command:
     cmd: CRTUSRPRF USRPRF(USER2) PASSWORD(passw0rd) PWDEXP(*YES) USROPT(*CLKWD *STSMSG)
-  ignore_errors: True
+  ignore_errors: true
 
 - name: create test data2
   ibmi_cl_command:
     cmd: CRTUSRPRF USRPRF(USER3) PASSWORD(passw0rd) STATUS(*DISABLED) TEXT('test account!@#$%') SPCAUT(*ALLOBJ *AUDIT *SECADM)
-  ignore_errors: True
+  ignore_errors: true
 
 - name: create test data4
   ibmi_cl_command:
     cmd: CRTUSRPRF USRPRF(TEST1) PASSWORD(passw0rd) USRCLS(*SECOFR) 
-  ignore_errors: True
+  ignore_errors: true
 
 - name: get test data
   ibmi_user_compliance_check:
@@ -52,4 +52,4 @@
 - name: clean envrironmet4
   ibmi_cl_command: 
     cmd: DLTUSRPRF USRPRF(TEST1) 
-  ignore_errors: True
+  ignore_errors: true

@@ -5,7 +5,7 @@
 #The sample file is to provide an example about how to manipulate the PTF database
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
    - ibm.power_ibmi
 
@@ -26,18 +26,6 @@
       - name: display_add_single_ptf_records_result
         debug:
           msg: "{{ add_single_ptf_records_result }}"
-
-      # - name: delete_single_ptf_records
-      #   ibmi_fix_repo:
-      #     action: "delete"
-      #     type: 'single_ptf'
-      #     parameters: 
-      #       - {'ptf_id':'MF65472'}
-      #   register: delete_single_ptf_records_result
-
-      # - name: display_delete_single_ptf_records_result
-      #   debug: 
-      #     msg: "{{ delete_single_ptf_records_result }}"
 
       - name: query_single_ptf_records_2
         ibmi_fix_repo:

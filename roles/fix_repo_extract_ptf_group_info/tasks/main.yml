@@ -5,7 +5,7 @@
 - name: Find the order information in download_status table
   ibm.power_ibmi.ibmi_fix_repo:
     type: "download_status"
-    checksum: True
+    checksum: true
     action: "find"
     parameters:
       - "{{ {'order_id': order_id } }}"
@@ -19,7 +19,7 @@
   ibm.power_ibmi.ibmi_fix_repo:
     type: "ptf_group"
     action: "update"
-    checksum: True
+    checksum: true
     parameters:
       - "{{ {'order_id': fix_repo_find_result.success_list[0].order_id,
       'file_path': fix_repo_find_result.success_list[0].file_path,

@@ -4,7 +4,7 @@
 # setup offline ibmi
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   vars:
     package_path: ""
     ibmi_host: "{{ ansible_ssh_host }}"

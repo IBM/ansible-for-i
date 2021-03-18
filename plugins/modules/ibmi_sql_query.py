@@ -180,7 +180,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "1.2.2"
 
 
 def main():
@@ -199,7 +199,7 @@ def main():
 
     ibmi_util.log_info("version: " + __ibmi_module_version__, module._name)
 
-    sql = module.params['sql'].strip().upper()
+    sql = module.params['sql'].strip()
     database = module.params['database'].strip().upper()
     check_row_count = False
     expected_row_count = module.params['expected_row_count']

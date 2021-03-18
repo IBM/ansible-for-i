@@ -19,7 +19,7 @@
     fields:
       - {'name':'status', 'expect':['*disabled']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TB02 result check
   assert:
@@ -36,7 +36,7 @@
     fields:
       - {'name':'status', 'expect':['*disabled']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 
 - name: TB03 result check
@@ -54,7 +54,7 @@
       - {'name':'status', 'expect':['*enabled']}
       - {'name':'status', 'expect':['*disabled']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
   
 - name: TB04 result check
   assert:
@@ -80,7 +80,7 @@
     fields:
       - {'name':'NO_PASSWORD_INDICATOR', 'expect':['*no']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TB06 result assert
   assert: 
@@ -108,7 +108,7 @@
       - {'name':'PASSWORD_EXPIRATION_INTERVAL', 'expect':['@Y']}
     joblog: true
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TB08 result assert
   assert: 
@@ -125,7 +125,7 @@
     fields:
       - {'name':'DAYS_UNTIL_PASSWORD_EXPIRES', 'expect':['0']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TA9 result assert
   assert: 
@@ -142,7 +142,7 @@
       - {'name':'INITIAL_PROGRAM_LIBRARY_NAME', 'expect':['str']}
     joblog: true
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TB10 result assert
   assert: 
@@ -159,7 +159,7 @@
     fields:
       - {'name':'SET_PASSWORD_TO_EXPIRE', 'expect':['0', 'no']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TB11 result assert
   assert: 
@@ -175,7 +175,7 @@
     fields:
       - {'name':'USER_CLASS_NAME', 'expect':['*secofr']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TB12 result assert
   assert: 
@@ -227,7 +227,7 @@
     fields:
       - {'name':'OWNER', 'expect':['@USRPRF']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TB15 result assert
   assert: 
@@ -269,7 +269,7 @@
     fields:
       - {'name':'USER_ACTION_AUDIT_LEVEL', 'expect':['3', '4']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TB19 assert result
   assert:
@@ -285,7 +285,7 @@
     fields:
       - {'name':'USER_ACTION_AUDIT_LEVEL', 'expect':['']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TB20 assert result
   assert:
