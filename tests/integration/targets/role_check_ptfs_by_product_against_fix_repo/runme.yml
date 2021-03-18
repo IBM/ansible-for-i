@@ -1,6 +1,6 @@
 - name: IBM i check a set of PTFs
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
@@ -67,7 +67,7 @@
 
 - name: IBM i check a set of PTFs
   hosts: repo_server_name
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
   vars:
@@ -100,14 +100,14 @@
       ibmi_fix_repo:
         type: "single_ptf"
         action: "add"
-        checksum: True
+        checksum: true
         parameters: "{{ download_success_list }}"
       register: fix_repo_add_result
       when: download_success_list != []
 
 - name: IBM i check a set of PTFs
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
@@ -134,7 +134,7 @@
     - name: Get the individual ptfs' information in catalog
       ibmi_fix_repo:
         type: "single_ptf"
-        checksum: True
+        checksum: true
         action: "find"
         parameters: "{{ individual_ptfs }}"
       delegate_to: "repo_server_name"

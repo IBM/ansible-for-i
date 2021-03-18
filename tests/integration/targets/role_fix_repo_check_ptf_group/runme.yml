@@ -1,6 +1,6 @@
 - name: fix repo check ptf group
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 

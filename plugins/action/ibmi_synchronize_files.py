@@ -6,7 +6,7 @@ __metaclass__ = type
 from ansible import constants as C
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "1.2.2"
 display = Display()
 
 
@@ -85,7 +85,7 @@ class ActionModule(ActionBase):
 
         display.debug("ibm i debug: args for ibmi_sync {p_tmp_args}".format(p_tmp_args=_tmp_args))
         # run the module and store the result
-        result.update(self._execute_module('ibmi_sync_files', module_args=_tmp_args))
+        result.update(self._execute_module('ibmi_sync_files', module_args=_tmp_args, task_vars=task_vars))
         result['failed'] = result['rc']
 
         if 'SyntaxError' in result.get('exception', result.get('msg', '')):

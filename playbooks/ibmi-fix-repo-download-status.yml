@@ -5,7 +5,7 @@
 #The sample file is to provide an example about how to manipulate the PTF database
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
    - ibm.power_ibmi
 

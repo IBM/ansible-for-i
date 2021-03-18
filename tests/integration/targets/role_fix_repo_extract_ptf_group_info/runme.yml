@@ -1,6 +1,6 @@
 - name: role_fix_repo_extract_ptf_group_info
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 

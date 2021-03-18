@@ -32,7 +32,7 @@ asp_device
 
   The ASP group name is the name of the primary ASP device within the ASP group.
 
-  Valid for all the operations, but operations display will igonre this option.
+  Valid for all the operations, but operations display will ignore this option.
 
 
   | **required**: false
@@ -68,7 +68,7 @@ authority
 
      
 authorization_list
-  Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl.
+  Specifies the authorization list that is to grant or revoke on the object, only vaild for operation grant_autl or revoke_autl.
 
   Valid only for operations grant_autl and revoke_autl, you must specify a value other than ``''``.
 

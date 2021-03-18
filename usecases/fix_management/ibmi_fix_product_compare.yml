@@ -1,14 +1,14 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-#ibmi-fix-product-compare.yml 
-#The sample file is to provide an example about how to compare the single ptf by product between repo server and IBM i.
+# ibmi-fix-product-compare.yml
+# The sample file is to provide an example about how to compare the single ptf by product between repo server and IBM i.
 
 # Command example: ansible-playbook ./ibmi-fix-group-compare.yml -e "{'product': '5770SS1', 'repo_server': 'my.repo.server.com'}"
 
 ---
 - hosts: '{{ target_system }}'
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
@@ -17,10 +17,10 @@
     repo_server: "{{repo_server}}"
 
   tasks:
-  - name: compare the product ptfs
-    include_role:
-      name: check_ptfs_by_product
+    - name: compare the product ptfs
+      include_role:
+        name: check_ptfs_by_product_against_fix_repo
 
-  - name: print ptf status list
-    debug:
-      var: ptf_status
+    - name: print ptf status list
+      debug:
+        var: ptf_status

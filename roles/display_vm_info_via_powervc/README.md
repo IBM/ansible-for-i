@@ -1,6 +1,6 @@
 display_vm_info_via_powervc
 =========
-Ansible role for starting, stopping a VM via PowerVC.
+An Ansible role for displaying a VM via PowerVC.
 
 Role Variables
 --------------

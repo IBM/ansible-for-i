@@ -50,7 +50,7 @@
       message_lib: "{{returned_msg_lib}}"
       reply: OK
       remove_message: "*NO"
-      joblog: True
+      joblog: true
     register: rpl_result
   
   - name: TC01 - assert result
@@ -71,7 +71,7 @@
       message_queue: "{{returned_msg_queue}}"
       message_lib: "DUMMYLIB"
       reply: BAD_MSGLIB
-      joblog: True
+      joblog: true
     ignore_errors: true
     register: neg_result
 
@@ -88,7 +88,7 @@
       message_queue: "{{returned_msg_queue}}"
       message_lib: "{{returned_msg_lib}}"
       reply: BAD_MSGKEY
-      joblog: True
+      joblog: true
     ignore_errors: true
     register: neg_result
 
@@ -105,7 +105,7 @@
       message_queue: "NONEXISTQ"
       message_lib: "{{returned_msg_lib}}"
       reply: BAD_MSGQ
-      joblog: True
+      joblog: true
     ignore_errors: true
     register: neg_result
 

@@ -176,7 +176,7 @@
       - {'name':'SUPPLEMENTAL_GROUP_COUNT', 'expect':['0']}
       - {'name':'USER_EXPIRATION_INTERVAL', 'expect':['0']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TA08 result assert
   assert: 
@@ -201,7 +201,7 @@
       - {'name':'USER_ACTION_AUDIT_LEVEL', 'expect':['']}
       - {'name':'PASE_SHELL_PATH', 'expect':['']}
   register: user_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TA09 result assert
   assert: 

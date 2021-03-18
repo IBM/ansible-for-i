@@ -14,15 +14,15 @@
   set_fact:
     resource_name: ''
 - block:
-  - name: Set the resource name of ethernet port
-    set_fact:
-      resource_name: '{{ ethernet_port.RESOURCE_NAME }}'
-    when: ethernet_port.RESOURCE_NAME == resource_name_of_ethernet_port or
-          ethernet_port.LOCATION_CODE == location_code_of_ethernet_port or
-          ethernet_port.DEFAULT_MAC_ADDRESS == mac_address_of_ethernet_port
-    loop: '{{ all_ethernet_ports.ethernet_ports }}'
-    loop_control:
-      loop_var: ethernet_port
+    - name: Set the resource name of ethernet port
+      set_fact:
+        resource_name: '{{ ethernet_port.RESOURCE_NAME }}'
+      when: ethernet_port.RESOURCE_NAME == resource_name_of_ethernet_port or
+            ethernet_port.LOCATION_CODE == location_code_of_ethernet_port or
+            ethernet_port.DEFAULT_MAC_ADDRESS == mac_address_of_ethernet_port
+      loop: '{{ all_ethernet_ports.ethernet_ports }}'
+      loop_control:
+        loop_var: ethernet_port
   when: all_ethernet_ports.ethernet_ports|length != 0
 
 - name: Fail the task if the default name of resource_name was not set

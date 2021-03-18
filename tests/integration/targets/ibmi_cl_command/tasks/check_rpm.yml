@@ -15,9 +15,9 @@
 - name: run CL command module with joblog = True
   ibmi_cl_command:
     cmd: dltlib ansible1 
-    joblog: True
+    joblog: true
   register: dltlib_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert the previous task failed because the target ibm i lacks of {{item}}
   assert:
@@ -44,7 +44,7 @@
   ibmi_cl_command:
     cmd: dltlib lib(ansible1)
   register: dltlib_result_1
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert the previous task failed because the target ibm i lacks of {{item}}
   assert:

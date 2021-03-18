@@ -102,7 +102,7 @@ Return Values
    
                               
        msg
-        | The message that descript the error or success
+        | The message that describes the error or success
       
         | **returned**: always
         | **type**: str

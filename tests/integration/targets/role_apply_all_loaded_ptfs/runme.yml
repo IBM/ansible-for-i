@@ -1,6 +1,6 @@
 - name: IBM i check a set of PTFs
   hosts: testhost
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 

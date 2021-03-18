@@ -18,7 +18,7 @@ Synopsis
 --------
 - The ``ibmi_synchronize_files`` plugin synchronize a list of files from IBM i node A to another IBM i node B.
 - ``ibmi_synchronize_files`` plugin calls ibmi_sync_files module.
-- Only supports SAVF(.file) format synchronize between QSYS and QSYS.
+- Only supports SAVF(.file) and MBR(.mbr) format synchronize between QSYS and QSYS.
 
 
 
@@ -97,10 +97,11 @@ Examples
    - name: Synchronize a list of different types of files to host.com.
      ibmi_ibm.power_ibmi.ibmi_synchronize_files:
        src_list:
-         - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/fish.lib/'}
-         - {'src': '/qsys.lib/fish.lib/test.file', 'dest': '/qsys.lib/fish.lib'}
-         - {'src': '/tmp/c2.SAVF', 'dest': '/qsys.lib/fish.lib/'}
+         - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/test.lib/'}
+         - {'src': '/qsys.lib/test.lib/test.file', 'dest': '/qsys.lib/test.lib'}
+         - {'src': '/tmp/c2.SAVF', 'dest': '/qsys.lib/test.lib/'}
          - {'src': '/tmp/c3.bin', 'dest': '/test/dir'}
+         - {'src': '/qsys.lib/c4.file/test.mbr', 'dest': '/qsys.lib/test.lib/c5.file'}
        private_key: '/home/test/id_rsa'
 
 

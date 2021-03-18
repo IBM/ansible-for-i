@@ -5,10 +5,10 @@
 # the target system. Then load and apply.
 
 # Command example: ansible-playbook /sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
-#'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP',
-#'delayed_option': '*IMMDLY', 'auto_ipl': false}"
+# 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP',
+# 'delayed_option': '*IMMDLY', 'auto_ipl': false}"
   hosts: '{{ target_system }}'
-  gather_facts: No
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
@@ -17,20 +17,22 @@
     ptfs_list: "{{ ptfs_list }}"
 
   tasks:
-    - set_fact:
+    - name: set_fact
+      set_fact:
         list: "{{ list|default([]) + [{'ptf_id': item }] }}"
       loop: "{{ ptfs_list }}"
 
     - name: Get the individual ptfs' information in catalog
       ibmi_fix_repo:
         type: "single_ptf"
-        checksum: True
+        checksum: true
         action: "find"
         parameters: "{{ list }}"
       delegate_to: "{{ repo_server }}"
       register: fix_repo_find_result
 
-    - fail:
+    - name: fail condition
+      fail:
         msg: "No available individual ptf in catalog, quit."
       when: fix_repo_find_result.success_list is not defined
 

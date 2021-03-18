@@ -8,7 +8,7 @@
     delayed_option: '{{ delayed_option }}'
     temp_or_perm: '{{ temp_or_perm }}'
     operation: 'apply_only'
-  ignore_errors: True
+  ignore_errors: true
   register: apply_fix_result
 
 # - debug:

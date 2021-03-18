@@ -104,7 +104,7 @@
     operation: 'create'
     disks: '{{disk_list[3]}}'
   register: iasp_result
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert error
   assert:

@@ -57,7 +57,7 @@ job_name
 
      
 spooled_data_filter
-  A character string containing the substring in the spooled file lines. If this parameter is omitted, all the spooled file content is returned.
+  If supplied, only return lines that match this shell-style (fnmatch) wildcard. If this parameter is omitted, all the spooled file content is returned.
 
 
   | **required**: false

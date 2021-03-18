@@ -7,9 +7,7 @@ Role Variables
 
 | Variable              | Type          | Description                                                          |
 |-----------------------|---------------|----------------------------------------------------------------------|
-| `ptf_group_number`    | str           | The ptf group number will be download.                               |
-| `ptf_group_level`     | int           | The ptf group level of the ptf group.                                |
-| `release_date`        | str           | The release date of the ptf group.                                   |
+| `ptf_group_info`    | str           | The ptf group information. ptf_group_number, ptf_group_level, release, release_date, ptf_list and description are required.        |
 
 Return Variables
 --------------
@@ -26,9 +24,39 @@ Example Playbook
   hosts: testhost
 
   vars:
-    ptf_group_number: "SF99740"
-    ptf_group_level: 7
-    release_date: "5/14/20"
+    ptf_group_info: {
+        "description": "SF99704 740 DB2 for IBM i",
+        "ptf_group_level": 11,
+        "ptf_group_number": "SF99704",
+        "ptf_list": [
+                    {
+                        "apar": "SE71038",
+                        "date": "06/19/19",
+                        "product": "5770SS1",
+                        "ptf_id": "SI69673"
+                    },
+                    {
+                        "apar": "SE70956",
+                        "date": "06/19/19",
+                        "product": "5770SS1",
+                        "ptf_id": "SI69805"
+                    },
+                    {
+                        "apar": "SE71415",
+                        "date": "06/19/19",
+                        "product": "5770SS1",
+                        "ptf_id": "SI70136"
+                    },
+                    {
+                        "apar": "SE71420",
+                        "date": "06/19/19",
+                        "product": "5770SS1",
+                        "ptf_id": "SI70149"
+                    }
+                ],
+        "release": "R740",
+        "release_date": "01/26/2021",
+    }
 
     - name: Include fix_repo_download_add_ptf_group role to download the ptf group and add information into catalog download_status table
       include_role:

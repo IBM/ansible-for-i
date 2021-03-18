@@ -6,7 +6,7 @@
     save_file_object: "{{ (load_ptf.file_name | splitext)[0] }}"
     save_file_lib: '{{ remote_lib }}'
     operation: 'load_only'
-  ignore_errors: True
+  ignore_errors: true
   register: load_result
 
 # - debug:

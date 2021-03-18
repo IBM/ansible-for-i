@@ -12,7 +12,7 @@
   ibmi_copy:
     src: 'MYSAVF.FILE'
     lib_name: 'qgpl'
-    force: True
+    force: true
     backup: false
 
 - name: TC01 - Sync a SAVF from one os400 to another

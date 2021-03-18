@@ -1,6 +1,6 @@
 sync_apply_ptf_group
 =========
-Call ibmi_synchronize_files to tranfer the exists ptf group files to an ibm i system, then call ibmi_fix_imgclg to apply this
+Call ibmi_synchronize_files to transfer the exists ptf group files to an ibm i system, then call ibmi_fix_imgclg to apply this
 ptf group. And return the result.
 
 Role Variables
@@ -10,7 +10,7 @@ Role Variables
 |-----------------------|---------------|--------------------------------------------------------------------|
 | `ptf_group_info`      | dict          | The ptf group's information. file_path and file_name are required. file_path must be a folder, and all of this
 ptf group's files should be in this folder. |
-| `src_host`            | str           | The system that has the src ptf group's files, which will be transferred to target system.|
+| `src_host`            | str           | The system that has the src ptf group's files, which will be transferred to the target system.|
 | `dest`                | str           | The path that ptf group files would be transferred to. Default is "/ansible/image".  |
 
 Return Variables
@@ -20,7 +20,7 @@ Return Variables
 |-----------------------|---------------|-----------------------------------------------------------|
 | `sync_result`         | list          | ibmi_synchronize_files module returned result of transmission.               |
 | `apply_result`        | dict          | ibmi_fix_imgclg module returned result of apply ptf group.                 |
-| `sync_apply_fail`     | bool          | The flag indicates whether sync_apply_ptf_group role ended successfully or failed. |
+| `sync_apply_fail`     | bool          | The flag indicates whether the sync_apply_ptf_group role ended successfully or failed. |
 
 Example Playbook
 ----------------
@@ -38,7 +38,7 @@ Example Playbook
         name: sync_apply_ptf_group
 
 ```
-Return Value Example
+Example Returned Variables
 ----------------
 ```
 "sync_result": {

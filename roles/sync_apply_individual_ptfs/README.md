@@ -1,6 +1,6 @@
 sync_apply_individual_ptfs
 =========
-Call ibmi_synchronize_files modules to transfer a list of exists ptfs to an ibm i system, then call load_apply_ptfs role to load
+Call ibmi_synchronize_files modules to transfer a list of exists ptfs and their coverletters to an ibm i system, then call load_apply_ptfs role to load
 and apply ptfs. And return the status.
 
 Role Variables

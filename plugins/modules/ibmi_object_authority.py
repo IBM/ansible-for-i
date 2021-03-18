@@ -73,7 +73,7 @@ options:
     description:
       - Specifies the auxiliary storage pool (ASP) device name where the library that contains the object (OBJ parameter) is located.
       - The ASP group name is the name of the primary ASP device within the ASP group.
-      - Valid for all the operations, but operations display will igonre this option.
+      - Valid for all the operations, but operations display will ignore this option.
     type: str
     default: '*'
   user:
@@ -100,7 +100,7 @@ options:
     default: false
   authorization_list:
     description:
-      - Specifies the authorization list that is to grant or revok on the object, only vaild for operation grant_autl or revoke_autl.
+      - Specifies the authorization list that is to grant or revoke on the object, only vaild for operation grant_autl or revoke_autl.
       - Valid only for operations grant_autl and revoke_autl, you must specify a value other than C('').
     type: str
     default: ''
@@ -331,7 +331,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "1.2.2"
 
 
 def main():

@@ -5,4 +5,4 @@
 temp_or_perm: '*TEMP'
 delayed_option: '*IMMDLY'
 auto_ipl: false
-apply_all_loaded_ptfs: True
+apply_all_loaded_ptfs: true

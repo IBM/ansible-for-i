@@ -174,7 +174,7 @@
     - name: TC14 Provide invalid option
       ibmi_end_subsystem:
         subsystem: QBATCH    
-        abc: True
+        abc: true
       register: endsbs_result
       failed_when: "'Unsupported parameters' not in endsbs_result.msg" 
 

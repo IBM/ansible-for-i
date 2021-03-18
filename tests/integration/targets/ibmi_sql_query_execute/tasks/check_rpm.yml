@@ -16,7 +16,7 @@
   ibmi_sql_query:
     sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
   register: sql_query_result_1
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert the previous task failed because the target ibm i lacks of {{item}}
   assert:
@@ -27,7 +27,7 @@
   ibmi_sql_execute:
     sql: "create table ansible(id INT not null, name varchar(8), gender varchar(8))" 
   register: sql_execute_result_1
-  ignore_errors: True
+  ignore_errors: true
 
 - name: assert the previous task failed because the target ibm i lacks of {{item}}
   assert:

@@ -140,7 +140,7 @@ AS next_ipl_indicator FROM abnormal;"
     - name: TC11 run sql query module without sql option
       ibmi_sql_query:
       register: sql_query_result_5
-      ignore_errors: True
+      ignore_errors: true
 
     - name: TC11 assert the previous task failed because lacks of required parameter sql
       assert:
@@ -151,7 +151,7 @@ AS next_ipl_indicator FROM abnormal;"
       ibmi_sql_query:
         sql: abcdefg
       register: sql_query_result_6
-      ignore_errors: True
+      ignore_errors: true
 
     - name: TC12 assert the previous task failed because lacks of required parameter sql
       assert:
@@ -163,7 +163,7 @@ AS next_ipl_indicator FROM abnormal;"
         sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
         expected_row_count: abc
       register: sql_query_result_7
-      ignore_errors: True
+      ignore_errors: true
 
     - name: TC13 assert the previous task failed because of invalid value of expected_row_count
       assert:
@@ -175,7 +175,7 @@ AS next_ipl_indicator FROM abnormal;"
         sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
         expected_row_count: 10
       register: sql_query_result_4
-      ignore_errors: True
+      ignore_errors: true
 
     - name: TC14 assert the returned parameters
       assert:
@@ -188,7 +188,7 @@ AS next_ipl_indicator FROM abnormal;"
         expected_row_count: 1
         invalid_opt: 123
       register: sql_query_result_8
-      ignore_errors: True
+      ignore_errors: true
 
     - name: TC15 assert the previous task failed because lacks of required parameter cmd
       assert:
@@ -198,7 +198,7 @@ AS next_ipl_indicator FROM abnormal;"
     - name: TC16 run sql execute without sql option
       ibmi_sql_execute:
       register: ibmi_sql_execute_3
-      ignore_errors: True
+      ignore_errors: true
 
     - name: TC16 assert the previous task failed because lacks of required parameter sql
       assert:
@@ -209,7 +209,7 @@ AS next_ipl_indicator FROM abnormal;"
       ibmi_sql_execute:
         sql: abcdefg
       register: ibmi_sql_execute_4
-      ignore_errors: True
+      ignore_errors: true
 
     - name: TC17 assert the previous task failed because lacks of required parameter sql
       assert:
@@ -221,7 +221,7 @@ AS next_ipl_indicator FROM abnormal;"
         sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
         invalid_opt: 123
       register: ibmi_sql_execute_5
-      ignore_errors: True
+      ignore_errors: true
 
     - name: TC18 assert the previous task failed because an invalid option
       assert:
@@ -237,22 +237,22 @@ AS next_ipl_indicator FROM abnormal;"
     - name: create default reply list entry for CPA7025
       ibmi_cl_command: 
         cmd: ADDRPYLE SEQNBR(9999) MSGID(CPA7025) RPY(I)
-      ignore_errors: True
+      ignore_errors: true
 
     - name: end journal
       ibmi_cl_command: 
         cmd: QSYS/ENDJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN)
-      ignore_errors: True
+      ignore_errors: true
  
     - name: drop the table
       ibmi_sql_execute:
         sql: "drop table qgpl.ansible"
-      ignore_errors: True
+      ignore_errors: true
 
     - name: delete journal
       ibmi_cl_command: 
         cmd: QSYS/DLTJRN JRN(QGPL/ANSIJSNJRN) 
-      ignore_errors: True
+      ignore_errors: true
 
     - name: save object
       ibmi_object_save:
@@ -265,19 +265,19 @@ AS next_ipl_indicator FROM abnormal;"
         force_save: "true"
         target_release: "*CURRENT"
         joblog: 'false'
-      ignore_errors: True
+      ignore_errors: true
 
     - name: delete journal receiver
       ibmi_cl_command: 
         cmd: QSYS/DLTOBJ OBJ(QGPL/ANSIJSNRCV) OBJTYPE(*JRNRCV)
-      ignore_errors: True
+      ignore_errors: true
 
     - name: remove reply list entry
       ibmi_cl_command: 
         cmd: QSYS/RMVRPYLE SEQNBR(9999)
-      ignore_errors: True
+      ignore_errors: true
 
     - name: remove object
       ibmi_cl_command: 
         cmd: QSYS/DLTOBJ OBJ(QGPL/TESTANSI) OBJTYPE(*FILE)
-      ignore_errors: True
+      ignore_errors: true

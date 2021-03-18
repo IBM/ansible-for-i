@@ -56,7 +56,7 @@
 - name: Enable test1 for TC05
   ibmi_cl_command:
     cmd: CHGUSRPRF USRPRF(TEST1) STATUS(*ENABLED) 
-  ignore_errors: True
+  ignore_errors: true
 
 - name: TC05 compliance successfully
   ibmi_user_compliance_check:

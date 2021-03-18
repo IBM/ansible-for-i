@@ -5,7 +5,7 @@
 ##################################
 vlanid: '*NONE'
 associatedLocalInterface: '*NONE'
-#type_of_service: '*NORMAL' 
+# type_of_service: '*NORMAL'
 typeOfService: '*NORMAL'
 maxTransmissionUnit: '*LIND'
 autoStart: '*YES'
@@ -13,7 +13,7 @@ preferredInterface: '*NONE'
 textDescription: '*BLANK'
 secToWait: 0
 extraParams: ''
-#line_description: ''
+# line_description: ''
 
 ##################################
 ## Line description varaibles   ##
@@ -30,8 +30,8 @@ addition_options_for_CRTLINETH: ''
 ##################################
 route_destination: '*DFTROUTE'
 next_hop: ''
-# By default the command to add routes only has two options RTEDEST and NEXTHOP. 
+# By default the command to add routes only has two options RTEDEST and NEXTHOP.
 # For example, ADDTCPRTE RTEDEST(*DFTROUTE) NEXTHOP('9.123.97.1').
-# If addtions are required, define them in addition_options_for_CRTLINETH. 
-# For example addition_options_for_ADDTCPRTE: 'SUBNETMASK(*NONE) TOS(*MINCOST) MTU(*IFC)' 
+# If addtions are required, define them in addition_options_for_CRTLINETH.
+# For example addition_options_for_ADDTCPRTE: 'SUBNETMASK(*NONE) TOS(*MINCOST) MTU(*IFC)'
 addition_options_for_ADDTCPRTE: ' '

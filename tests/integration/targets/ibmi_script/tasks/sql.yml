@@ -73,22 +73,22 @@
     - name: end journal
       ibmi_cl_command: 
         cmd: QSYS/ENDJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN)
-      ignore_errors: True
+      ignore_errors: true
  
     - name: drop the table
       ibmi_sql_execute:
         sql: "drop table ansible"
-      ignore_errors: True
+      ignore_errors: true
 
     - name: delete journal
       ibmi_cl_command: 
         cmd: QSYS/DLTJRN JRN(QGPL/ANSIJSNJRN) 
-      ignore_errors: True
+      ignore_errors: true
 
     - name: create default reply list entry for CPA7025
       ibmi_cl_command: 
         cmd: ADDRPYLE SEQNBR(9999) MSGID(CPA7025) RPY(I)
-      ignore_errors: True
+      ignore_errors: true
 
     - ibmi_object_save:
         object_names: "ANSIJSNRCV"
@@ -100,19 +100,19 @@
         force_save: "true"
         target_release: "*CURRENT"
         joblog: 'false'
-      ignore_errors: True
+      ignore_errors: true
 
     - name: delete journal receiver
       ibmi_cl_command: 
         cmd: QSYS/DLTOBJ OBJ(QGPL/ANSIJSNRCV) OBJTYPE(*JRNRCV)
-      ignore_errors: True
+      ignore_errors: true
 
     - name: remove reply list entry
       ibmi_cl_command: 
         cmd: QSYS/RMVRPYLE SEQNBR(9999)
-      ignore_errors: True
+      ignore_errors: true
 
     - name: remove object
       ibmi_cl_command: 
         cmd: QSYS/DLTOBJ OBJ(QGPL/TESTANSI) OBJTYPE(*FILE)
-      ignore_errors: True
+      ignore_errors: true

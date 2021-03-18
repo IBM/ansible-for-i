@@ -61,7 +61,7 @@ html_theme = 'sphinx_rtd_theme'
 html_context = {
     "display_github": "True",
     "github_user": "IBM",
-    "github_repo": "ansible_for_i",
+    "github_repo": "ansible-for-i",
     "github_version": "devel",
     "conf_py_path": "/docs/source/",
 }

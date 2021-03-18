@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 
 display = Display()
 
-__ibmi_module_version__ = "1.2.1"
+__ibmi_module_version__ = "1.2.2"
 
 
 class TimedOutException(Exception):
@@ -86,7 +86,8 @@ class ActionModule(RebootActionModule, ActionBase):
         super().__init__(*args, **kwargs)
 
     def get_distribution(self, task_vars):
-        return {'name': 'ibmi', 'version': '', 'family': ''}
+        # Also return the task_vars so that _execute_module in get_system_boot_time can use it
+        return {'name': 'ibmi', 'version': '', 'family': '', 'task_vars': task_vars}
 
     def validate_int(self):
         for int_key in self._INT_ARGS:
@@ -117,7 +118,10 @@ class ActionModule(RebootActionModule, ActionBase):
                 (QSYS2.JOB_INFO(JOB_STATUS_FILTER => '*ACTIVE', JOB_USER_FILTER => 'QSYS')) \
                     X WHERE JOB_NAME = '000000/QSYS/SCPF'"
             sql = ' '.join(sql.split())  # keep only one space between adjacent strings
+            # A workaround to use task_vars. RebootActionModule get_system_boot_time doesn't make task_var as the input parm
+            task_vars = distribution['task_vars']
             command_result = self._execute_module(
+                task_vars=task_vars,
                 module_name='ibmi_sql_query',
                 module_args={
                     "sql": sql,
@@ -226,6 +230,7 @@ class ActionModule(RebootActionModule, ActionBase):
         display.vvv("{action}: send rebooting notice message to all users...".format(action=self._task.action))
         try:
             self._execute_module(
+                task_vars=task_vars,
                 module_name='ibmi_cl_command',
                 module_args={
                     "cmd": send_message_command,
@@ -242,6 +247,7 @@ class ActionModule(RebootActionModule, ActionBase):
         result['start'] = datetime.utcnow()
         try:
             module_output = self._execute_module(
+                task_vars=task_vars,
                 module_name='ibmi_cl_command',
                 module_args={
                     "cmd": reboot_command,

@@ -16,10 +16,10 @@
     args:
       executable: /qopensys/usr/bin/qsh
     register: default_yum_existance
-    ignore_errors: True
+    ignore_errors: true
 
   - include: ibmi-install-yum.yml
-    when: "'No such path or directory' in default_yum_existance.stdout"
+    when: "'No such' in default_yum_existance.stdout or '/QOpensys/pkgs/bin/yum: not found' in default_yum_existance.stdout"
 
   - block:
       - include: ibmi-install-rpm.yml 
