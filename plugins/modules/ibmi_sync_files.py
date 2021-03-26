@@ -162,7 +162,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.2.2"
+__ibmi_module_version__ = "1.3.0"
 HAS_PARAMIKO = True
 
 try:
