@@ -73,6 +73,7 @@ This Ansible collection is maintained by IBM i development team.
    :hidden:
 
    installation
+   getting_started
 
 .. toctree::
    :maxdepth: 3

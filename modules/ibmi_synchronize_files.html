@@ -87,6 +87,7 @@
               <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing IBM i collection to Ansible server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Running Ansible to manage IBM i systems</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Reference</span></p>
 <ul class="current">
@@ -103,8 +104,10 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_download_fix_status.html">ibmi_download_fix_status – Checking whether the fix downloading complete</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_end_subsystem.html">ibmi_end_subsystem – End an active subsystem.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_ethernet_port.html">ibmi_ethernet_port – Retrieves all the ethernet ports(both virtual and physical)information on the system.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_facts.html">ibmi_facts – Gathering ibmi facts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fetch.html">ibmi_fetch – Fetch objects or a library from a remote IBM i node and store on local</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix.html">ibmi_fix – Install, remove or query an individual fix or a set of fixes on to IBM i system.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_check.html">ibmi_fix_check – Retrieve the latest PTF group information from PSP server.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_compare.html">ibmi_fix_compare – Verify whether the PTFs are installed.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_group_check.html">ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
@@ -252,7 +255,7 @@
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_synchronize_files</span></code> plugin synchronize a list of files from IBM i node A to another IBM i node B.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ibmi_synchronize_files</span></code> plugin calls ibmi_sync_files module.</p></li>
-<li><p>Only supports SAVF(.file) and MBR(.mbr) format synchronize between QSYS and QSYS.</p></li>
+<li><p>Only supports SAVF(.file) and MBR(only supports “database” subtype Physical files(PF-DTA attribute)) format synchronize between QSYS and QSYS.</p></li>
 </ul>
 </div>
 <div class="section" id="parameters">
@@ -306,6 +309,7 @@
       <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/tmp/c2.SAVF&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/qsys.lib/test.lib/&#39;</span><span class="p p-Indicator">}</span>
       <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/tmp/c3.bin&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/test/dir&#39;</span><span class="p p-Indicator">}</span>
       <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/qsys.lib/c4.file/test.mbr&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;/qsys.lib/test.lib/c5.file&#39;</span><span class="p p-Indicator">}</span>
+      <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;~/c6.txt&#39;</span><span class="p p-Indicator">,</span> <span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span> <span class="s">&#39;~/testfolder&#39;</span><span class="p p-Indicator">}</span>
     <span class="nt">private_key</span><span class="p">:</span> <span class="s">&#39;/home/test/id_rsa&#39;</span>
 </pre></div>
 </div>
