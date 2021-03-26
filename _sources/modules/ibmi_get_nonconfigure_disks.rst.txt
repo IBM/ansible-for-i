@@ -4,7 +4,7 @@
 .. _ibmi_get_nonconfigure_disks_module:
 
 
-ibmi_get_nonconfigure_disks -- Get all nonconfigure disks
+ibmi_get_nonconfigure_disks -- Get all un-configure disks
 =========================================================
 
 
@@ -16,7 +16,7 @@ ibmi_get_nonconfigure_disks -- Get all nonconfigure disks
 
 Synopsis
 --------
-- Get all nonconfigure disks.
+- Get all un-configure disks.
 - For non-IBM i targets, no need.
 
 

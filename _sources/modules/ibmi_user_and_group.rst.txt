@@ -70,7 +70,7 @@ expire
 
      
 joblog
-  If set to ``true``, output the avaiable job log even the rc is 0(success).
+  If set to ``true``, output the available job log even the rc is 0(success).
 
 
   | **required**: false
@@ -85,7 +85,7 @@ operation
 
   Operation change to change user(group) profile.
 
-  Operation display to display user(group) profile inforamtion.
+  Operation display to display user(group) profile information.
 
   Operation display_group_menbers to display the members of a group profile.
 

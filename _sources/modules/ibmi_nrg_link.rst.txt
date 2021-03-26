@@ -165,7 +165,7 @@ Notes
 
    NRG_INFO and NRG_LINK_INFO view can be used to retrieve the NRG and NRG links information by using module ibmi_sql_query.
 
-   More information about NRG releated services refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/db2mi/db2mservicesnrg.htm
+   More information about NRG related services refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/db2mi/db2mservicesnrg.htm
 
 
 
@@ -186,7 +186,7 @@ Return Values
    
                               
        msg
-        | The message that descript the error or success
+        | The message that describes the error or success
       
         | **returned**: always
         | **type**: str
