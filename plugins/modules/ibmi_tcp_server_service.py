@@ -36,8 +36,6 @@ options:
     description:
       - C(started)/C(stopped) are idempotent actions that will not run
         commands unless necessary.
-      - C(restarted) will always bounce the service.
-      - B(At least one of state and enabled are required.)
     type: str
     choices: ["started", "stopped"]
     required: yes

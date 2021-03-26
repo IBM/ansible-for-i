@@ -177,7 +177,9 @@ class IBMiModule(object):
             if db_name != ibmi_util.SYSBAS:
                 exp_msg = exp_msg + " Check if IASP {0} is exist and varied on.".format(db_name)
             else:
-                exp_msg = exp_msg + " Check if *LOCAL Relational Database Directory Entry(RDBDIRE) is exist."
+                exp_msg = exp_msg + \
+                    "A possible reason is the *LOCAL Relational Database Directory Entry(RDBDIRE) does not exist." + \
+                    "If it exists, apply the latest Cumulative PTF packages and try again."
         if re_raise:
             raise Exception(exp_msg)
 

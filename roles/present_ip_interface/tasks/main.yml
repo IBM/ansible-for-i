@@ -27,7 +27,8 @@
 
 - name: Create a new IP interface when it doesn't exist
   block:
-    - debug:
+    - name: print msg
+      debug:
         msg: Start creating IP interface
 
     - name: Find the resource name of ethernet port when line description name is not provided
@@ -51,7 +52,8 @@
         loop_var: lind_line
       when: line_description == 'DEF{{ resource_name }}'
 
-    - debug: var=line_description
+    - name: debug line_description
+      debug: var=line_description
 
     - include: vary_on_line_description.yml
 

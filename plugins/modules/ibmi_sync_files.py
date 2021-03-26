@@ -80,6 +80,7 @@ EXAMPLES = r'''
       - {'src': '/tmp/c2.SAVF', 'dest': '/qsys.lib/test.lib/'}
       - {'src': '/tmp/c3.bin', 'dest': '/test/dir'}
       - {'src': '/qsys.lib/c4.file/test.mbr', 'dest': '/qsys.lib/test.lib/c5.file'}
+      - {'src': '~/c6.txt', 'dest': '~/testfolder'}
     remote_host: 'host.com'
     remote_user: 'user'
     private_key: '/home/test/id_rsa'
@@ -215,7 +216,7 @@ def main():
         delete = False
         startd = datetime.datetime.now()
         ibmi_util.log_debug("mkdir " + ifs_dir, module._name)
-        rc, out, err = module.run_command(['mkdir', ifs_dir], use_unsafe_shell=False)
+        rc, out, err = module.run_command(['mkdir', '-p', ifs_dir], use_unsafe_shell=False)
         if rc != 0 and 'File exists' not in err:
             return_error(module, "mkdir on current host failed. dir = {p_ifs_dir}. {p_err}".format(p_ifs_dir=ifs_dir, p_err=err), result)
 
@@ -235,6 +236,12 @@ def main():
             return_error(module, "Exception. {p_to_text}. Use -vvv for more information.".format(p_to_text=to_text(e)), result)
 
         if dest:
+            if dest.startswith('~'):
+                stdin1, stdout1, stderr1 = ssh.exec_command("echo $HOME")
+                dest_home_path = stdout1.read().decode('utf-8')
+                if dest_home_path is None:
+                    return_error(module, "Get the dest 'HOME' path failed. ", result)
+                dest = os.path.join(dest_home_path.strip(), os.path.relpath(dest, '~/'))
             try:
                 sftp.stat(dest)
             except Exception as e:
@@ -245,10 +252,6 @@ def main():
 
         for i in range(len(src_list)):
             final_dest = dest
-            if not os.path.isfile(src_list[i]['src']):
-                src_list[i]['fail_reason'] = "src {p_src} doesn't exist.".format(p_src=src_list[i]['src'])
-                fail_list.append(src_list[i])
-                continue
             src_basename = os.path.basename(src_list[i]['src'])
             if final_dest == '':
                 if 'dest' in src_list[i]:
@@ -264,6 +267,13 @@ def main():
             else:
                 final_dest = (final_dest + '/' + src_basename).replace("//", "/")
 
+            if final_dest.startswith('~'):
+                stdin1, stdout1, stderr1 = ssh.exec_command("echo $HOME")
+                dest_home_path = stdout1.read().decode('utf-8')
+                if dest_home_path is None:
+                    return_error(module, "Get the dest 'HOME' path failed. ", result)
+                final_dest = os.path.join(dest_home_path.strip(), os.path.relpath(final_dest, '~/'))
+
             if src_list[i]['src'][0:9].upper() == '/QSYS.LIB' and os.path.splitext(src_basename)[-1].upper() != '.MBR':
                 ibmi_util.log_debug("cp " + src_list[i]['src'] + " " + ifs_dir, module._name)
                 rc, out, err = module.run_command(['cp', src_list[i]['src'], ifs_dir], use_unsafe_shell=False)
@@ -276,6 +286,11 @@ def main():
                         p_src=src_list[i]['src'], p_ifs_dir=ifs_dir, p_err=err)
                     fail_list.append(src_list[i])
                     continue
+            elif src_list[i]['src'].startswith('~'):
+                src_home_path = os.getenv('HOME', None)
+                if src_home_path is None:
+                    return_error(module, "getenv 'HOME' failed. ", result)
+                final_src = os.path.join(src_home_path, os.path.relpath(src_list[i]['src'], '~/'))
             else:
                 final_src = src_list[i]['src']
 

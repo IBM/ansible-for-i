@@ -1,12 +1,14 @@
 ---
 # tasks file for log_apply_fail_info
-- debug:
-    var: job_log_var.MESSAGE_TEXT[12:19]
-  when: job_log_var.MESSAGE_ID == 'CPF3632'
+# - name: debug ptf_id
+#   debug:
+#     var: job_log_var.MESSAGE_TEXT[12:19]
+#   when: job_log_var.MESSAGE_ID == 'CPF3632'
 
-- debug:
-    var: job_log_var.MESSAGE_TEXT[53:60]
-  when: job_log_var.MESSAGE_ID == 'CPF3632'
+# - name: debug requisite
+#   debug:
+#     var: job_log_var.MESSAGE_TEXT[53:60]
+#   when: job_log_var.MESSAGE_ID == 'CPF3632'
 
 - block:
     - name: compose apply_fail_with_requisite_list

@@ -51,10 +51,12 @@
         check_ptf_list: "{{ fix_repo_find_result.success_list }}"
 
     - block:
-        - debug:
+        - name: Debug msg
+          debug:
             msg: "No individual ptf need to be applied, quit."
 
-        - meta: end_host
+        - name: end_host
+          meta: end_host
       when: not_loaded_ptfs_list == [] and loaded_ptfs_list == []
 
     - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply

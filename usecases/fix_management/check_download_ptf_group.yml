@@ -23,7 +23,8 @@
           debug:
             msg: "PTF group information is already in catalog or is already downloading, quit play"
 
-        - meta: end_host
+        - name: end_host
+          meta: end_host
       when: ptf_group_find_result.fail_list is not defined or download_status_find_result.fail_list is not defined
 
     - name: Include fix_repo_download_add_ptf_group role to download the ptf group and add information into catalog download_status table
@@ -32,5 +33,6 @@
       vars:
         ptf_group_info: "{{ fix_group_check_result.group_info[0] }}"
 
-    - debug:
+    - name: Print msg
+      debug:
         msg: "After order {{ download_fix_result.order_id }} is complete, call fix_repo_extract_ptf_group_info role to extract ptf group information into catalog."

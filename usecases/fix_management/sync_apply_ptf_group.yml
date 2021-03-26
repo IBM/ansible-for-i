@@ -12,7 +12,6 @@
   vars:
     repo_server: "{{ repo_server }}"
     ptf_group: "{{ ptf_group }}"
-    dest: "/ansible/image"
 
   tasks:
     - name: Get the PTF group information in catalog
@@ -30,9 +29,11 @@
         var: fix_repo_find_result
 
     - block:
-        - debug:
+        - name: Debug msg
+          debug:
             msg: "PTF group information is not in catalog, quit."
-        - meta: end_host
+        - name: end_host
+          meta: end_host
       when: fix_repo_find_result.success_list is not defined or fix_repo_find_result.success_list == []
 
     - name: Get the PTF group information in download_status table, in case the order is still dwonloading
@@ -41,7 +42,7 @@
         action: "find"
         parameters:
           - "{{ {'ptf_group_number': ptf_group.ptf_group_number, 'ptf_group_level': ptf_group.ptf_group_level | default(omit), 'release_date': ptf_group.release_date | default(omit), 'additional_param':'ORDER BY release_date DESC LIMIT 1'} }}"
-        delegate_to: "{{ repo_server }}"
+      delegate_to: "{{ repo_server }}"
       register: download_status_find_result
 
     - name: Print the download_status table information
@@ -49,9 +50,11 @@
         var: download_status_find_result
 
     - block:
-        - debug:
+        - name: Debug msg
+          debug:
             msg: "The newest PTF group is still downloading, quit."
-        - meta: end_host
+        - name: end_host
+          meta: end_host
       when: download_status_find_result.success_list[0].download_status == 'downloading'
 
     - name: Compose apply list

@@ -1,13 +1,53 @@
-- name: fix repo check ptf group
+- name: download and add ptf group into fix repo on IBM i
   hosts: testhost
   gather_facts: false
   collections:
     - ibm.power_ibmi
 
   tasks:
-    # positive cases is covered in role_check_ptf_group, only run negative testcase here. 
-    #negative cases
-    - name: install ca-certificates as needed
-      command: '/QOpensys/pkgs/bin/yum install ca-certificates* -y'
-            
-    - include: neg_case.yml
+    - name: Run module to check the latest level
+      ibmi_fix_group_check:
+        groups: 'SF99663'  # select a small ptf group to test
+      register: group_check_result
+
+    - name: Add VM to Ansible in-memory inventory
+      add_host:
+        name: "repo_server_name"
+        ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
+        ansible_user: tester
+        groups: ibmi
+        ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+
+    - name: Include fix_repo_download_add_ptf_group role to download the ptf group and add information into catalog download_status table
+      include_role:
+        name: fix_repo_download_add_ptf_group
+      vars:
+        ptf_group_info: "{{group_check_result.group_info[0]}}"
+
+    - name: use ibmi_download_fix_status to determine if the downloading is completed.
+      ibmi_download_fix_status:
+        order_list: "{{download_fix_result.order_id}}"
+      register: ds
+      failed_when: ds.rc != 0
+      until: ds.status[0]['download_status'] == "DOWNLOADED"
+      retries: 100
+      delay: 30
+
+    - name: assert values
+      assert:
+        that:
+          - download_fix_result.command.find("SF99663") != -1
+          - download_fix_result.command.find("SNDPTFORD") != -1
+          - download_fix_result.file_path != ""
+          - download_fix_result.msg == "SNDPTFORD successfully ended."
+          - download_fix_result.order_id != ""
+          - download_status_add_result.database is defined
+          - download_status_add_result.row_changed == 1
+          - download_status_add_result.sql is defined
+          - download_status_add_result.type == "download_status"
+          - download_status_add_result.parameters | selectattr('file_path','equalto', "{{ download_fix_result.file_path }}")
+          - download_status_add_result.parameters | selectattr('order_id','equalto', "{{ download_fix_result.order_id }}")
+          - download_status_add_result.parameters | selectattr('ptf_group_number','equalto', "{{ group_check_result.group_info[0]['ptf_group_number'] }}")
+          - download_status_add_result.parameters | selectattr('ptf_group_level','equalto', "{{group_check_result.group_info[0]['ptf_group_level']}}")
+          - download_status_add_result.parameters | selectattr('release_date','equalto', "{{ group_check_result.group_info[0]['release_date'] }}")

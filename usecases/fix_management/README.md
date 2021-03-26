@@ -1,10 +1,10 @@
 Overview for fix management use case
 ==============
 
-The playbooks in this directory provides you the samples that you could directly use or do your own modifications.
+The playbooks in this directory provide you the samples that you could directly use or do your own modifications.
 Contents will be continuously added and enhanced.
 
-Fix management system on IBM i can be used to manage PTFs on IBM i system, including individual PTFs and PTF groups.
+Fix management system on IBM i can be used to manage PTFs on the IBM i system, including individual PTFs and PTF groups.
 
 Introduction
 --------------
@@ -22,6 +22,14 @@ Fix management system provides an infrastructure to manage PTF repository
  - Compare and send fixes from the repository to target IBM i systems
  - Install PTF and Group to IBM i endpoint systems
  - Compare PTF difference between endpoint IBM i systems and repository
+
+Dependency
+--------------
+
+ - Python3 paramiko package must be installed on the repository server.
+ - Sqlite3 package must be installed on the repository server.
+ - Make sure ssh passwordless login works from the repository server to every target IBM i server.
+ - Make sure SNDPTFORD works on the repository server. Refer to <a href="https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/rzaji/rzaji_setup.htm" target="_blank">Setting up a connection to IBM</a>
 
 Playbook
 --------------
@@ -129,9 +137,9 @@ ansible-playbook ./sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA
 
 ## download_apply_individual_ptfs
 ```
-download_apply_individual_ptfs playbook playbook does the following:
-  1.  Check if requested individual PTFs are already in catalog. If not, will download non-existent PTFs and write information into catalog.
-  2.  Transfer savfs to target server.
+download_apply_individual_ptfs playbook does the following:
+  1.  Check if requested individual PTFs are already in the catalog. If not, will download non-existent PTFs and write information into the catalog.
+  2.  Transfer savfs to the target server.
   3.  Load and apply PTFs.
 ```
 #### Variables

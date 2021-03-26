@@ -31,4 +31,5 @@
   set_fact:
     openstack_image: '{{ image_info.openstack_image }}'
 
-- debug: var=openstack_image
+- name: openstack_image
+  debug: var=openstack_image

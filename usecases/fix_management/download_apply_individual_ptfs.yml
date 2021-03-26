@@ -17,9 +17,11 @@
 
   tasks:
    - block:
-      - debug:
+      - name: Print msg
+        debug:
          msg: "ptfs_list is []. quit."
-      - meta: end_host
+      - name: Quit when ptfs_list is []
+        meta: end_host
      when: ptfs_list_parm == []
 
    - name: Include fix_repo_download_apply_individual_ptfs role to download and apply a list of individual ptfs
@@ -29,6 +31,7 @@
      loop: "{{ query('sequence', 'start=1 end=5') }}"
      loop_control:
       loop_var: sequence_var
+
    - name: fail condition
      fail:
       msg: "Loop already 5 times. quit."

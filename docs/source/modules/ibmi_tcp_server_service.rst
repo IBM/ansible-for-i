@@ -80,10 +80,6 @@ name_list
 state
   ``started``/``stopped`` are idempotent actions that will not run commands unless necessary.
 
-  ``restarted`` will always bounce the service.
-
-  **At least one of state and enabled are required.**
-
 
   | **required**: True
   | **type**: str
