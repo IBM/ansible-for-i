@@ -62,7 +62,7 @@ documentation: https://ibm.github.io/ansible-for-i/index.html
 issues: https://github.com/IBM/ansible-for-i/issues
 
 # The URL to the homepage of the collection/project
-#homepage: https://ibm.github.io/ansible-for-i/index.html
+# Homepage: https://ibm.github.io/ansible-for-i/index.html
 
 # A list of file glob-like patterns used to filter any files or directories that should not be included in the build
 # artifact. A pattern is matched from the relative path of the file or directory of the collection directory. This
