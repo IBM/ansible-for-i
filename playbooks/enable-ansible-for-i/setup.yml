@@ -3,10 +3,10 @@
 ---
 
 - hosts: all 
-  gather_facts: no 
+  gather_facts: false 
   collections:
    - ibm.power_ibmi
-
+   
   tasks:
   - set_fact:
       yum_installed: false
@@ -29,7 +29,7 @@
       
     vars:
       required_rpms: [itoolkit, ibm_db]
-      python_version: "{{ ansible_python_interpreter.split('/')[-1] }}"
+      python_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
 
   - block:
     - name: find the home directory 

@@ -133,9 +133,7 @@
       include_role:
         name: fix_repo_download_add_ptf_group
       vars:
-        ptf_group_number: "{{group_name}}"
-        ptf_group_level: "{{fix_group_check_result.group_info[0]['ptf_group_level']}}"
-        release_date: "{{fix_group_check_result.group_info[0]['release_date']}}"
+        ptf_group_info: "{{fix_group_check_result.group_info[0]}}"
 
     - name: assert returned value of the above role
       assert:

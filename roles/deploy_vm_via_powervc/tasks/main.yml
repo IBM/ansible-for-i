@@ -17,4 +17,5 @@
     timeout: '{{ deploy_timeout }}'
     userdata: '{{ deploy_userdata }}'
     availability_zone: '{{ availability_zone_name }}'
+    key_name: '{{ key_name_shown_on_powervc }}'
   register: server_info

@@ -30,10 +30,12 @@
      register: result
 
    - block:
-      - debug:
+      - name: Print msg
+        debug:
          msg: "No downloading order found, quit play!"
 
-      - meta: end_play
+      - name: end_play
+        meta: end_play
      when: result.success_list is not defined
 
    - block:

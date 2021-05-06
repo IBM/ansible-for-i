@@ -77,7 +77,8 @@
         loop_var: load_fail_list_var
       when: load_fail_list | default([]) != []
 
-    # - debug:
+    # - name: print load_fail_simple_list
+    #   debug:
     #     var: load_fail_simple_list
 
     - name: compose next_not_loaded_ptfs_list
@@ -178,7 +179,8 @@
       loop_control:
         loop_var: all_requisite_ptfs_list_var
 
-    - debug:
+    - name: print load_fail_simple_list
+      debug:
         msg: "No more ptfs need to be applied. quit."
 
     - name: print final ptfs status
@@ -194,6 +196,7 @@
         var: requisite_ptfs_status
       when: requisite_ptfs_status is defined
 
-    - meta: end_host
+    - name: end_host
+      meta: end_host
 
   when: ( tmp_not_loaded_ptfs_list == [] and tmp_loaded_ptfs_list == [] ) or ptfs_list_parm == [] or requisite_list | default([]) == []

@@ -1,0 +1,19 @@
+- name: gather ibmi facts
+  ibmi_facts:
+
+- name: assert facts
+  assert:
+    that:
+      - "'{{ansible_system}}' == 'OS400'"
+      - "{{ansible_kernel_version}} != '' "
+      - "'{{ansible_python_version}}' != '' "
+      - "'{{system_name}}' is defined"
+      - version_release is defined
+      - system_info is defined and system_info != {}
+      - system_values is defined
+      - system_catalogs is defined
+      - system_status is defined
+      - tcpip_info is defined
+      - group_ptf_info is defined
+      - dns_info is defined
+      - route_info is defined

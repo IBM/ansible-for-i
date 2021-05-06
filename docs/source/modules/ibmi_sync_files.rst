@@ -110,6 +110,7 @@ Examples
          - {'src': '/tmp/c2.SAVF', 'dest': '/qsys.lib/test.lib/'}
          - {'src': '/tmp/c3.bin', 'dest': '/test/dir'}
          - {'src': '/qsys.lib/c4.file/test.mbr', 'dest': '/qsys.lib/test.lib/c5.file'}
+         - {'src': '~/c6.txt', 'dest': '~/testfolder'}
        remote_host: 'host.com'
        remote_user: 'user'
        private_key: '/home/test/id_rsa'

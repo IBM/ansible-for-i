@@ -11,7 +11,7 @@ Role Variables
 | `ptf_group_info`      | dict          | The ptf group's information. file_path and file_name are required. file_path must be a folder, and all of this
 ptf group's files should be in this folder. |
 | `src_host`            | str           | The system that has the src ptf group's files, which will be transferred to the target system.|
-| `dest`                | str           | The path that ptf group files would be transferred to. Default is "/ansible/image".  |
+| `dest`                | str           | The path that ptf group files would be transferred to. Default is "~".  |
 
 Return Variables
 --------------

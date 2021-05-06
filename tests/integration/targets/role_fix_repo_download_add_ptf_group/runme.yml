@@ -1,5 +1,5 @@
 - name: download and add ptf group into fix repo on IBM i
-  hosts: testhost
+  hosts: fixrepo
   gather_facts: false
   collections:
     - ibm.power_ibmi
@@ -10,22 +10,20 @@
         groups: 'SF99663'  # select a small ptf group to test
       register: group_check_result
 
-    - name: Add VM to Ansible in-memory inventory
-      add_host:
-        name: "repo_server_name"
-        ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
-        ansible_user: tester 
-        groups: ibmi
-        ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+      #- name: Add VM to Ansible in-memory inventory
+      #  add_host:
+      #    name: "repo_server_name"
+      #    ansible_ssh_host: ut51p43.rch.stglabs.ibm.com
+      #    ansible_user: tester 
+      #    groups: ibmi
+      #    ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+      #    ansible_python_interpreter: /QOpensys/pkgs/bin/python3
 
     - name: Include fix_repo_download_add_ptf_group role to download the ptf group and add information into catalog download_status table
       include_role:
         name: fix_repo_download_add_ptf_group
       vars: 
-        ptf_group_number: "{{group_check_result.group_info[0]['ptf_group_number']}}"
-        ptf_group_level: "{{group_check_result.group_info[0]['ptf_group_level']}}"
-        release_date: "{{group_check_result.group_info[0]['release_date']}}"
+        ptf_group_info: "{{group_check_result.group_info[0]}}"
 
     - name: use ibmi_download_fix_status to determine if the downloading is completed.
       ibmi_download_fix_status:

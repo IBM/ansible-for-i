@@ -42,7 +42,8 @@
         WHERE PTF_IPL_ACTION <> 'NONE'"
       register: query_ptf_result
 
-    - debug:
+    - name: Debug msg
+      debug:
         msg: 'No PTFs require an IPL.'
       when: query_ptf_result.row | length == 0
 
@@ -50,11 +51,13 @@
         - name: Display ptf list which require an IPL
           debug: var=query_ptf_result.row
 
-        - debug:
+        - name: Debug msg
+          debug:
             msg: 'At least one PTF requires an IPL, but auto_ipl is false. Please IPL the system manually.'
           when: not auto_ipl
 
-        - debug:
+        - name: Debug msg
+          debug:
             msg: 'At least one PTF requires an IPL and auto_ipl is true. The system is going to be IPLed soon.'
           when: auto_ipl | bool
 

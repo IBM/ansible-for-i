@@ -1,12 +1,10 @@
 #negative test of the role
 
-- name: invalid ptf_group_number       #SNDPTFORD can submit, no error, not ansible bug
+- name: invalid ptf_group_info       #SNDPTFORD can submit, no error, not ansible bug
   include_role:
     name: fix_repo_download_add_ptf_group
-  vars: 
-    ptf_group_number: "invalid"
-    ptf_group_level: "{{group_check_result.group_info[0]['ptf_group_level']}}"
-    release_date: "{{group_check_result.group_info[0]['release_date']}}"
+  vars:
+    ptf_group_info: ""
 
 - name: assert values
   assert:
@@ -25,19 +23,8 @@
       - download_status_add_result.parameters | selectattr('ptf_group_level','equalto', "{{group_check_result.group_info[0]['ptf_group_level']}}")
       - download_status_add_result.parameters | selectattr('release_date','equalto', "{{ group_check_result.group_info[0]['release_date'] }}")
 
-- name: invalid ptf_group_level SNDPTFORD can submit, check ptf group module reports error, int for level only, issue opened
+- name: no vars passed
   include_role:
     name: fix_repo_download_add_ptf_group
-  vars: 
-    ptf_group_number: "{{group_check_result.group_info[0]['ptf_group_number']}}"
-    ptf_group_level: "invalid"
-    release_date: "{{group_check_result.group_info[0]['release_date']}}"
-  ignore_errors: true  
+  ignore_errors: true
 
-# - name: invalid release_date
-#   include_role:
-#     name: fix_repo_download_add_ptf_group
-#   vars: 
-#     ptf_group_number: "{{group_check_result.group_info[0]['ptf_group_number']}}"
-#     ptf_group_level: "{{group_check_result.group_info[0]['ptf_group_level']}}"
-#     release_date: "invalid"

@@ -92,7 +92,8 @@
       loop_control:
         loop_var: group
 
-    - debug:
+    - name: debug group_status
+      debug:
         var: group_status
 
     - name: compose group check list of 'NOT INSTALLED' for compare
