@@ -44,6 +44,21 @@ def fmtTo10(str):
     return str.ljust(10) if len(str) <= 10 else str[0:10]
 
 
+def get_ssh_client_and_user_info():
+    ssh_client = 'UNKNOWN'
+    ssh_connection = 'UNKNOWN'
+    user = 'UNKNOWN'
+    login = 'UNKNOWN'
+    try:
+        ssh_client = os.getenv('SSH_CLIENT', 'UNKNOWN')
+        ssh_connection = os.getenv('SSH_CONNECTION', 'UNKNOWN')
+        user = os.getenv('USER', 'UNKNOWN')
+        login = os.getenv('LOGIN', 'UNKNOWN')
+    except Exception:
+        pass
+    return ssh_client, ssh_connection, user, login
+
+
 def get_host_and_ip():
     hostname = 'UNKNOWN_HOST'
     ip = 'UNKNOWN_IP'
@@ -56,13 +71,7 @@ def get_host_and_ip():
 
 
 def log_debug(s, module_name="ibmi_util"):
-    hostname = 'UNKNOWN_HOST'
-    ip = 'UNKNOWN_IP'
-    try:
-        hostname = socket.gethostname()
-        ip = socket.gethostbyname(hostname)
-    except Exception:
-        pass
+    hostname, ip = get_host_and_ip()
     try:
         get_logger("ibmi_util").debug("%s(%s) - %s: %s", hostname, ip, module_name, s)
     except Exception:
@@ -128,10 +137,9 @@ def archive_log(log_path, log_file, max_log_size):
             zip_log_file = log_file + '_' + str(datetime.datetime.now()).replace(' ', '_').replace(':', '.')
             zip_log_file_path = os.path.join(log_path, zip_log_file)
             os.rename(log_file_path, zip_log_file_path)
-            z = zipfile.ZipFile(zip_log_file_path + '.zip', 'w', zipfile.ZIP_DEFLATED)
-            z.write(zip_log_file_path)
-            z.close()
-            os.remove(zip_log_file_path)
+            with zipfile.ZipFile(zip_log_file_path + '.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+                z.write(zip_log_file_path)
+                os.remove(zip_log_file_path)
 
 
 def setup_logging(detault_log_level=logging.INFO):
@@ -177,11 +185,11 @@ def setup_logging(detault_log_level=logging.INFO):
         max_log_size = max_log_size * 1024 * 1024
         ensure_dir(log_path, mode=0o0777)
         log_file_path = os.path.join(log_path, log_file)
+        log_level = logging.getLevelName(log_level_str)
+        archive_log(log_path, log_file, max_log_size)
     except Exception:
         pass
 
-    log_level = logging.getLevelName(log_level_str)
-    archive_log(log_path, log_file, max_log_size)
     logging.basicConfig(filename=log_file_path, filemode="a", level=log_level,
                         format='%(asctime)s - %(levelname)s - %(message)s')
     try:

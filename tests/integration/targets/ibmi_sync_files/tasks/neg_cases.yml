@@ -7,8 +7,8 @@
       password: "{{ansible_ssh_pass}}"
       user_class: '*USER'
     register: crtusrprf
-    failed_when: crtusrprf.rc != 0  
-    
+    failed_when: crtusrprf.rc != 0
+
   - name: TC03 - Sync multiple unsupported files from one os400 to another, including IFS files and object-based members
     ibmi_sync_files:
       src_list:
@@ -21,7 +21,7 @@
       remote_user: '{{ansible_ssh_user}}'
       private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
     register: result_03
-    failed_when: result_03.rc != 255  
+    failed_when: result_03.rc != 255
 
   - name: TC03 - Assert return values
     assert:
@@ -66,7 +66,7 @@
         file:
           state: directory
           path: ~/.ssh
-          mode: 0700      
+          mode: 0700
       - name: generate a key pair
         command: ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C "" -N "" -m PEM
         args:
@@ -101,7 +101,7 @@
 
   - name: TC05 - assert fail reason
     assert:
-      that: 
+      that:
         - result_05.fail_list | selectattr('fail_reason', 'match', '^[Errno 13] Permission denied.$')
 
   - name: TC05 - switch back to super user
@@ -111,7 +111,7 @@
   - name: TC06 - Sync to a non-pingable remote host
     ibmi_sync_files:
       src_list:
-        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'} 
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
       remote_host: "not-pingable-host.com"
       remote_user: '{{ansible_ssh_user}}'
       private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
@@ -121,7 +121,7 @@
   - name: TC06 - Assert return values
     assert:
       that:
-        - '"[Errno 8] Hostname and service name not provided or found" in result_06.stderr'  
+        - '"[Errno 8] Hostname and service name not provided or found" in result_06.stderr'
 
   - name: TC07 - Sync with an non-existing private key
     ibmi_sync_files:
@@ -136,7 +136,7 @@
   - name: TC07 - Assert return values
     assert:
       that:
-        - '"[Errno 2] No such file or directory:" in result_07.stderr'  
+        - '"[Errno 2] No such file or directory:" in result_07.stderr'
         - result_07.fail_list == []
         - result_07.success_list == []
 

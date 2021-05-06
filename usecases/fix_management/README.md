@@ -26,6 +26,7 @@ Fix management system provides an infrastructure to manage PTF repository
 Dependency
 --------------
 
+ - Initialize Ansible dependencies on IBM i node. Refer to <a href="https://ibm.github.io/ansible-for-i/index.html" target="_blank">Power IBM i collection for Ansible</a>
  - Python3 paramiko package must be installed on the repository server.
  - Sqlite3 package must be installed on the repository server.
  - Make sure ssh passwordless login works from the repository server to every target IBM i server.

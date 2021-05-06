@@ -1,0 +1,19 @@
+powervc_host: "<your-powervc_host_ip>"
+powervc_admin: "<your-powervc-admin>"
+powervc_admin_password: "<your-powervc_admin_password>"
+project: <your-project-name>
+project_domain: <your-project-domain>
+user_domain: <your-user-domain>
+vm_name: "VM-{{ build_lib }}"
+verify_cert: false
+image_name_or_id: "<your-ibmi-image-name>"
+nic_list: [{'net-name': '<your-network-interface>'}]
+flavor_name_or_id: tiny
+deploy_timeout: 300
+deploy_userdata: |
+  {%- raw -%}#!/bin/sh
+  mkdir /home/BUILDER
+  system "CRTUSRPRF USRPRF(BUILDER) PASSWORD(PASSWORD) USRCLS(*SECOFR) ASTLVL(*SYSVAL) TEXT('Ansible CICD build') HOMEDIR('/home/BUILDER')"
+  system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"
+  system "strtcpsvr *sshd"
+  {% endraw %}

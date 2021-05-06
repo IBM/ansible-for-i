@@ -16,7 +16,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
-__ibmi_module_version__ = "1.3.1"
+__ibmi_module_version__ = "0.0.1"
 
 ifs_dir = '/tmp/.ansible'
 display = Display()
@@ -364,9 +364,8 @@ class ActionModule(ActionBase):
                     re_raise = False  # workaround to pass the raise-missing-from pylint issue
                     inst = None
                     try:
-                        f = open(to_bytes(dest, errors='surrogate_or_strict'), 'wb')
-                        f.write(remote_data)
-                        f.close()
+                        with open(to_bytes(dest, errors='surrogate_or_strict'), 'wb') as f:
+                            f.write(remote_data)
                     except (IOError, OSError) as e:
                         re_raise = True
                         inst = e
