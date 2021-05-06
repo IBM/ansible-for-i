@@ -1,184 +1,80 @@
-# test code for the ibmi_cl_command module
+# test code for the ibmi_copy module and action plugin
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-# Test dependent packages 
-- block: 
-    - include: install_rpm.yml 
-      vars: 
-        python: "{{python_version}}"
-      with_list: "{{required_rpms}}"     
-    
-    - include: check_rpm.yml
-      vars: 
-        python: "{{python_version}}"
-      with_list: "{{required_rpms}}"  
-     
-  vars:
-    required_rpms: [itoolkit, ibm_db]
-    python_version: "{{ansible_python_interpreter.split('/')[-1]}}"   
+######################################################
+# Savefile archlib.file ARCHLIB
+#  Opt  Object      Type      Library     Attribute  
+#       PF          *JRNRCV   ARCHLIB                
+#       PF1         *JRNRCV   ARCHLIB                
+#       PF1         *FILE     ARCHLIB     PF         
+#       PF2         *FILE     ARCHLIB     PF         
+#       PF3         *FILE     ARCHLIB     PF         
+#       PF4         *FILE     ARCHLIB     PF         
+#       PF5         *FILE     ARCHLIB     PF         
+#       PF6         *FILE     ARCHLIB     PF         
+#       PF7         *FILE     ARCHLIB     PF         
+#       PF8         *FILE     ARCHLIB     PF         
+#       PF9         *FILE     ARCHLIB     PF            
+#  Savefile savrst.file                                               
+#  Opt  Object      Type      Library     Attribute
+#       ANSIJSNRC1  *JRNRCV   SAVRST               
+#       ANSIJSNRC2  *JRNRCV   SAVRST               
+#       PF1         *FILE     SAVRST      PF       
+#       PF2         *FILE     SAVRST      PF       
+#       PGM1        *FILE     SAVRST      SAVF     
+#       SAVF1       *FILE     SAVRST      SAVF     
+###################################################
+- block:
 
-- name: cleanup environment
-  ibmi_cl_command:
-    cmd: dltlib lib(ansible1)
-    joblog: true
-  ignore_errors: true
+    - name: Create a local temporary directory
+      shell: mktemp -d /tmp/ansible_test.XXXXXXXXX
+      register: tempfile_result
+      delegate_to: localhost
 
-# Test when all dependent packages are in place  
-- name: TC01 run CL command module with joblog = False
-  ibmi_cl_command:
-    cmd: crtlib lib(ansible1)
-    joblog: false
-  register: crtlib_result
+    - set_fact:
+        local_temp_dir: '{{ tempfile_result.stdout }}'
+        remote_dir: '{{ remote_tmp_dir }}'
+        remote_temp_lib: 'ARCHLIB'
+        remote_restored_lib: 'SAVRST'
+        savf_name: 'SAVRST.FILE'
+        try_same_name_savf: 'ANSIJSNRC1.FILE'
+        try_backup_savf_name: 'PF.FILE'
+        archive_savf_name: 'ARCHLIB.FILE'
+        txt_name: 'foo.txt'
 
-- name: TC01 assert the returned parameters when joblog
-  assert:
-    that: 
-      - "'CPF2110' not in crtlib_result"
-      - crtlib_result.joblog == False
-      - crtlib_result.cmd != ""
-      - crtlib_result.stderr == ""
-      - crtlib_result.stderr_lines == []
-      - crtlib_result.rc == 0 
+    - name: copy the testing files to local tempoarary directory
+      copy: 
+        src: 'PF.FILE'
+        dest: '{{ local_temp_dir }}'
+      delegate_to: localhost 
 
-- name: TC02 run CL command module without joblog
-  ibmi_cl_command:
-    cmd: DSPLIB ansible1
-    joblog: true
-  register: dsplib_result_1
+    - name: copy the testing files to local tempoarary directory
+      shell: ls -l {{ local_temp_dir }}
+      delegate_to: localhost
 
-- name: TC02 assert returned parameters without joblog
-  assert:
-    that:
-      - dsplib_result_1.joblog == true 
-      - dsplib_result_1.cmd == "DSPLIB ANSIBLE1"
-      - dsplib_result_1.stderr == ""
-      - dsplib_result_1.stderr_lines == []
-      - dsplib_result_1.rc == 0
-      - dsplib_result_1.job_log == [] 
+    - name: create libraries 
+      ibmi_cl_command: 
+        cmd: "crtlib lib({{item}})"
+      with_items: 
+        - '{{ remote_temp_lib }}'
+        - '{{ remote_restored_lib }}'
 
-- name: TC03 run CL command module with joblog = true
-  ibmi_cl_command:
-    cmd: dltlib lib(ansible1)
-    joblog: true
-  register: dltlib_result_1
+    - include: ibmi_copy.yml
 
-# Test output parameters
-- name: TC03 assert returned parameters with joblog = true
-  assert:
-    that:
-      - dltlib_result_1.joblog == true
-      - dltlib_result_1.cmd == "DLTLIB LIB(ANSIBLE1)"
-      - dltlib_result_1.stderr == ""
-      - dltlib_result_1.stderr_lines == []
-      - dltlib_result_1.rc == 0
-      - dltlib_result_1.job_log != [] 
+  always:
+    - name: Cleaning
+      file:
+        path: '{{ local_temp_dir }}'
+        state: absent
+      delegate_to: localhost
 
-- name: TC04 run CL command module to delete an not existing module
-  ibmi_cl_command:
-    cmd: dltlib lib(ansible1)
-    joblog: true
-  register: dltlib_result_2
-  ignore_errors: true
-
-- name: TC04 assert returned parameters with joblog = True
-  assert:
-    that:
-      - dltlib_result_2.job_log != []
-      - dltlib_result_2.stderr != ""
-      - (dltlib_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length) >= 1
-      - dltlib_result_2.rc != 0
-
-- name: TC05 run CL command module without any options
-  ibmi_cl_command:
-  register: crtlib_result_2
-  ignore_errors: true
-
-- name: TC05 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - "'missing required arguments: cmd' in crtlib_result_2.msg"
-
-- name: TC06 run CL command with joblog but without cmd
-  ibmi_cl_command:
-    joblog: true
-  register: crtlib_result_3
-  ignore_errors: true
-
-- name: TC06 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - "'missing required arguments: cmd' in crtlib_result_2.msg"
-
-- name: TC07 run CL command module with an invalid command and joblog=False
-  ibmi_cl_command:
-    cmd: abcdefg
-    joblog: false
-  register: crtlib_result_4
-  ignore_errors: true
-
-- name: TC07 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - crtlib_result_4.stderr != ""
-      - (crtlib_result_4.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0030') | map(attribute='MESSAGE_ID') | list | length) >= 1
-
-- name: TC08 run CL command module with an invalid command and joblog = True
-  ibmi_cl_command:
-    cmd: abcdefg
-    joblog: true
-  register: crtlib_result_5
-  ignore_errors: true
-
-- name: TC08 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - crtlib_result_5.stderr != ""
-      - (crtlib_result_5.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0030') | map(attribute='MESSAGE_ID') | list | length) >= 1
-
-- name: TC09 run CL command module with a valid command and an invalid joblog value
-  ibmi_cl_command:
-    cmd: dsplib ansible1
-    joblog: abcdefg
-  register: dsplib_result_2
-  ignore_errors: true
-
-- name: TC09 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - "'is not a valid boolean' in dsplib_result_2.msg"
-
-- name: TC10 run CL command module with valid cmd, joblog=True and an invalid option abc
-  ibmi_cl_command:
-    cmd: dsplib ansible1
-    joblog: true
-    invalid_opt: 123
-  register: dsplib_result_3
-  ignore_errors: true
-
-- name: TC10 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - "'Unsupported parameters' in dsplib_result_3.msg"
-
-- name: TC11 Run CL command with OUTPUT parameter DSPLIBL OUTPUT(*)
-  ibmi_cl_command:
-    cmd: DSPLIBL
-  register: dsplibl_result_1
-
-- name: TC11 run CL command with OUTPUT parameter and joblog=True
-  ibmi_cl_command:
-    cmd: DSPLIBL OUTPUT(*)
-    joblog: true
-  register: dsplibl_result_2
-  ignore_errors: true
-
-- name: cleanup
-  ibmi_cl_command:
-    cmd: dltlib ansible1
-  register: dltlib_result_2
-  failed_when: "dltlib_result_2.rc != 0 and (dltlib_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length) == 0"
-
-- include: iasp.yml
-#- include: become.yml
+    - name: delete libraries 
+      ibmi_cl_command: 
+        cmd: "dltlib lib({{item}})"
+        joblog: 'true'
+      with_items: 
+        - '{{ remote_temp_lib }}'
+        - '{{ remote_restored_lib }}'
+      ignore_errors: true

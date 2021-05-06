@@ -209,7 +209,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.3.1"
+__ibmi_module_version__ = "0.0.1"
 
 
 def handle_list_to_sql(sql, item_list, param_name):
@@ -281,10 +281,8 @@ def main():
         sql = handle_list_to_sql(sql, message_queue, "MESSAGE_QUEUE_NAME")
         sql = handle_list_to_sql(sql, message_id, "MESSAGE_ID")
         if message_text:
-            sql = sql + "(MESSAGE_TEXT LIKE UPPER('%" + message_text + "%') " + \
-                "OR MESSAGE_TEXT LIKE LOWER('%" + message_text + "%') " + \
-                "OR MESSAGE_SECOND_LEVEL_TEXT LIKE UPPER('%" + message_text + "%') " + \
-                "OR MESSAGE_SECOND_LEVEL_TEXT LIKE LOWER('%" + message_text + "%')) AND "
+            sql = sql + "(UPPER(MESSAGE_TEXT) LIKE UPPER('%" + message_text + "%') " + \
+                "OR UPPER(MESSAGE_SECOND_LEVEL_TEXT) LIKE UPPER('%" + message_text + "%')) AND "
         if message_type == "NO_REPLY":
             sql = sql + "MESSAGE_TYPE = 'INQUIRY' AND MESSAGE_KEY NOT IN " + \
                         "(SELECT ASSOCIATED_MESSAGE_KEY FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_TYPE = 'REPLY' " + \

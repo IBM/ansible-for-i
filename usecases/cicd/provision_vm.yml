@@ -1,0 +1,31 @@
+# Add powervc host to in-memory inventory
+- name: Add PowerVC host {{ powervc_host }} to Ansible in-memory inventory
+  add_host:
+    name: 'powervc'
+    ansible_user: '{{ powervc_admin}}'
+    ansible_ssh_pass: '{{ powervc_admin_password }}'
+    ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_host: '{{ powervc_host }}'
+  no_log: true
+
+# New vm info from OpenStack
+- name: Deploy a new VM
+  os_server:
+    auth:
+      auth_url: https://{{ ansible_ssh_host }}:5000/v3
+      username: '{{ ansible_ssh_user }}'
+      password: '{{ ansible_ssh_pass }}'
+      project_name: '{{ project }}'
+      project_domain_name: '{{ project_domain }}'
+      user_domain_name: '{{ user_domain }}'
+    name: '{{ vm_name }}'
+    image: '{{ image_name_or_id }}'
+    flavor: '{{ flavor_name_or_id }}'
+    verify: '{{ verify_cert }}'
+    nics: '{{ nic_list }}'
+    timeout: '{{ deploy_timeout }}'
+    userdata: '{{ deploy_userdata }}'
+    #  availability_zone: '{{ availability_zone_name }}'
+  register: vm_info
+  delegate_to: 'powervc'

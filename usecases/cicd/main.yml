@@ -1,0 +1,49 @@
+- hosts: localhost
+
+  vars:
+    build_with_STMFs: false       # Build with STMFs or PF members
+    provision: true               # If you want provision a new VM for each build by leveraging PowerVC
+    git_repo_url: '<your-git-repo-url>'
+    git_branch: '<your-git-branch>'
+    cleanup: true                 # If clean up build env after build completes
+    build_number: "{{ 9999 | random }}"
+
+  collections:
+    - ibm.power_ibmi
+  tasks:
+    - set_fact:
+        build_lib: "BUILD_{{ build_number }}"
+
+    - set_fact:
+        build_path: "/tmp/{{ build_lib }}"
+        local_workspace: '~/workspace/{{ build_lib }}'
+
+    - block:
+        - name: Step 1 - clone source code from git
+          include: git_clone.yml
+
+        - block:
+            - name: include provision related vars if provision is true
+              include_vars: provision_vars.yml
+
+            - name: Step 2.1 - provision vm on demand
+              include: provision_vm.yml
+          when: provision
+
+        - name: Step 2.2 - add build system to in-memory inventory
+          include: add_build_system.yml
+
+        - name: Step 3 - put source code to build machine
+          include: put_code.yml
+
+        - name: Step 4 - build your app on build machine
+          include: build.yml
+
+        - name: Step 5 - run test and completes
+          include: post_build_actions.yml
+          delegate_to: "build_system"
+
+          always:
+            - name: Step 6 - cleanup on demand
+              include: cleanup.yml
+              when: cleanup

@@ -1,6 +1,7 @@
 ---
 # role for fix_repo_download_add_ptf_group
-# Call ibm.power_ibmi.ibmi_download_fix module to download ptf group, then call ibm.power_ibmi.ibmi_fix_repo module to add information into download_status table in catalog.
+# Call ibm.power_ibmi.ibmi_download_fix module to download ptf group,
+# then call ibm.power_ibmi.ibmi_fix_repo module to add information into download_status table in catalog.
 - name: Download PTF group
   ibm.power_ibmi.ibmi_download_fix:
     ptf_id: "{{ ptf_group_info.ptf_group_number }}"
