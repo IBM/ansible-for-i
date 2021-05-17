@@ -193,7 +193,7 @@ class IBMiModule(object):
                 self.conn, become_user_name, "*NOPWD" if (become_user_password is None) else become_user_password)
             become_result = self.ibmi_logon.switch()
             if not become_result:
-                exp_msg = "Failed to become user {0} to excute the task. Invaild user or password or user is disabled".format(become_user_name)
+                exp_msg = "Failed to become user {0} to excute the task. Invaild user or password or user is disabled.".format(become_user_name)
                 raise Exception(exp_msg)
 
     def __del__(self):
