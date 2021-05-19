@@ -42,7 +42,8 @@
 
     - name: got record failed from repository server
       set_fact:
-        group_status: "{{ group_status|default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'PTF_GROUP_STATUS': 'Record not found in repository DB'}] }}"
+        group_status: "{{ group_status|default([])\
+                       + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'PTF_GROUP_STATUS': 'Record not found in repository DB'}] }}"
       when: group_info.get('fail_list')
       with_list: "{{ group_info.fail_list }}"
       loop_control:
@@ -64,8 +65,10 @@
 
     - name: retrieve group information from target system
       ibm.power_ibmi.ibmi_sql_query:
-        sql: "SELECT PTF_GROUP_NAME, PTF_GROUP_DESCRIPTION, PTF_GROUP_LEVEL, PTF_GROUP_STATUS FROM QSYS2.GROUP_PTF_INFO
-        WHERE PTF_GROUP_LEVEL IN (SELECT MAX(PTF_GROUP_LEVEL) FROM QSYS2.GROUP_PTF_INFO WHERE PTF_GROUP_NAME IN ('{{ group_list_str }}') GROUP BY PTF_GROUP_NAME)"
+        sql: "SELECT PTF_GROUP_NAME, PTF_GROUP_DESCRIPTION, PTF_GROUP_LEVEL, PTF_GROUP_STATUS\
+              FROM QSYS2.GROUP_PTF_INFO
+        WHERE PTF_GROUP_LEVEL IN (SELECT MAX(PTF_GROUP_LEVEL)\
+        FROM QSYS2.GROUP_PTF_INFO WHERE PTF_GROUP_NAME IN ('{{ group_list_str }}') GROUP BY PTF_GROUP_NAME)"
       register: result
 
     - name: compose the group name list

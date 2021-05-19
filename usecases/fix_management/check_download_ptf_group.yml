@@ -35,4 +35,6 @@
 
     - name: Print msg
       debug:
-        msg: "After order {{ download_fix_result.order_id }} is complete, call fix_repo_extract_ptf_group_info role to extract ptf group information into catalog."
+        msg: |
+            "After order {{ download_fix_result.order_id }} is complete, \
+             call fix_repo_extract_ptf_group_info role to extract ptf group information into catalog."

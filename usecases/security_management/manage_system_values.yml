@@ -109,7 +109,9 @@
           - {'name':'QPWDEXPWRN', 'expect':'7', 'check': 'equal'}
           - {'name':'QPWDLVL', 'expect':'1', 'check': 'equal'}
           - {'name':'QPWDRQDDIF', 'expect':'8', 'check': 'equal'}
-          - {'name':'QPWDRULES', 'expect':'*ALLCRTCHG *DGTLMTAJC *DGTLMTFST *DGTLMTLST *DGTMIN1 *LMTPRFNAME *MAXLEN10 *MINLEN8 *REQANY3 *SPCCHRLMTAJC *SPCCHRLMTFST *SPCCHRLMTLST', 'check': 'equal_as_list'}
+          - {'name':'QPWDRULES', 'expect':'*ALLCRTCHG *DGTLMTAJC *DGTLMTFST \
+            *DGTLMTLST *DGTMIN1 *LMTPRFNAME *MAXLEN10 *MINLEN8 *REQANY3 *SPCCHRLMTAJC \
+            *SPCCHRLMTFST *SPCCHRLMTLST', 'check': 'equal_as_list'}
           - {'name':'QRETSVRSEC', 'expect':'1', 'check': 'equal'}
           - {'name':'QRMTIPL', 'expect':'0', 'check': 'equal'}
           - {'name':'QRMTSIGN', 'expect':'*VERIFY', 'check': 'equal'}

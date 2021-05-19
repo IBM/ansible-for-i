@@ -21,7 +21,7 @@
     validate_certs: false
     groups: '{{group_74}}'
   register: group_check_result
-  failed_when: group_check_result.failed == true 
+  failed_when: group_check_result.failed == true
 
 - name: TC00 assert the defined parameters are returned
   assert:
@@ -42,7 +42,7 @@
   ibmi_fix_group_check:
     groups: '{{group_74}}'
   register: group_check_result
-  failed_when: group_check_result.failed == true 
+  failed_when: group_check_result.failed == true
 
 - name: TC00 assert the defined parameters are returned
   assert:
@@ -61,16 +61,15 @@
       - group_check_result.rc == 0
       - group_check_result.count >= 18
       - group_check_result.group_info | length >= 18
-      - group_check_result.group_info[0]["PTF_GROUP_NUMBER"] is defined
-      - group_check_result.group_info[0]["RELEASE"] is defined
-      - group_check_result.group_info[0]["TITLE"] is defined
-      - group_check_result.group_info[0]["RELEASE_DATE"] is defined
-      - group_check_result.group_info[0]["PTF_GROUP_LEVEL"] is defined
+      - group_check_result.group_info[0]["ptf_group_number"] is defined
+      - group_check_result.group_info[0]["release"] is defined
+      - group_check_result.group_info[0]["release_date"] is defined
+      - group_check_result.group_info[0]["ptf_group_level"] is defined
 
 - name: assert all groups defined in group_74 can be found in the returned list
   assert:
     that:
-      - (group_check_result.group_info | selectattr('PTF_GROUP_NUMBER', 'equalto', '{{item}}') | map(attribute='PTF_GROUP_NUMBER') | list | length) == 1
+      - (group_check_result.group_info | selectattr('ptf_group_number', 'equalto', '{{item}}') | map(attribute='ptf_group_number') | list | length) == 1
   loop: '{{group_74}}'
 
 - name: TC02 run module with groups
@@ -85,11 +84,10 @@
       - group_check_result_local.rc == 0
       - group_check_result_local.count >= 18
       - group_check_result_local.group_info | length >= 18
-      - group_check_result_local.group_info[0]["PTF_GROUP_NUMBER"] is defined
-      - group_check_result_local.group_info[0]["RELEASE"] is defined
-      - group_check_result_local.group_info[0]["TITLE"] is defined
-      - group_check_result_local.group_info[0]["RELEASE_DATE"] is defined
-      - group_check_result_local.group_info[0]["PTF_GROUP_LEVEL"] is defined
+      - group_check_result_local.group_info[0]["ptf_group_number"] is defined
+      - group_check_result_local.group_info[0]["release"] is defined
+      - group_check_result_local.group_info[0]["release_date"] is defined
+      - group_check_result_local.group_info[0]["ptf_group_level"] is defined
       - group_check_result_local.group_info == group_check_result.group_info
 
 - name: TC03 run module with groups
@@ -113,7 +111,7 @@
     that:
       - group_check_result.count == 1
       - group_check_result.group_info | length == 1
-      - group_check_result.group_info[0]["PTF_GROUP_NUMBER"] == group_74[0] 
+      - group_check_result.group_info[0]["ptf_group_number"] == group_74[0]
 
 - name: TC06 run module with an invalid group name
   ibmi_fix_group_check:
@@ -124,7 +122,7 @@
   assert:
     that:
       - group_check_result.stderr is defined
-      - group_check_result.count == 0 
+      - group_check_result.count == 0
       - group_check_result.group_info == []
 
 - name: TC07 run module with an invalid group name
@@ -136,12 +134,12 @@
   assert:
     that:
       - group_check_result.stderr is defined
-      - group_check_result.count == 0 
+      - group_check_result.count == 0
       - group_check_result.group_info == []
 
 - name: TC08 run module with a single PTF group
   ibmi_fix_group_check:
-    groups: 
+    groups:
       - '{{group_74[0]}}'
       - '{{group_73[0]}}'
   register: group_check_result
@@ -154,7 +152,7 @@
 
 - name: TC09 run module with a single PTF group
   ibmi_fix_group_check:
-    groups: 
+    groups:
       - '{{group_74[0]}}'
       - 'abc'
   register: group_check_result
@@ -164,4 +162,4 @@
     that:
       - group_check_result.count == 1
       - group_check_result.group_info | length == 1
-      - group_check_result.group_info[0]["PTF_GROUP_NUMBER"] == group_74[0]
+      - group_check_result.group_info[0]["ptf_group_number"] == group_74[0]

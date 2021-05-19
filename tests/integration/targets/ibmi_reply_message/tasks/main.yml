@@ -10,7 +10,7 @@
 #3. negative test:
 #   3.1 wrong parameter specified
 #
-  
+
 - block:
   - set_fact:
       random_number: "{{ 10000 | random }}"
@@ -25,15 +25,15 @@
 
   - name: TC01 - Send an inquiry message to messsage queue
 
-    ibmi_cl_command: 
+    ibmi_cl_command:
       cmd: "QSYS/SNDMSG MSG('Ansible test for replying an inquiry message {{random_number}}') TOMSGQ(CITST{{random_number}}/CITESTMSGQ) MSGTYPE(*INQ) RPYMSGQ(CITST{{random_number}}/CITESTMSGQ)"
 
-  - name: TC01 - find the message sent just now      
+  - name: TC01 - find the message sent just now
     ibmi_message:
       operation: 'find'
       message_queue: 'CITESTMSGQ'
       message_lib: 'CITST{{random_number}}'
-      message_type: 'INQUIRY'  
+      message_type: 'INQUIRY'
       message_text: 'Ansible test for replying an inquiry message {{random_number}}'
     register: find_result
 
@@ -52,7 +52,7 @@
       remove_message: "*NO"
       joblog: true
     register: rpl_result
-  
+
   - name: TC01 - assert result
     assert:
       that:
@@ -116,7 +116,7 @@
         - neg_result.stderr != ""
         - neg_result.job_log[0].MESSAGE_ID == "CPF2403"
 
-  always:     
+  always:
     - name: clear test env
       ibmi_cl_command:
         cmd: 'DLTLIB CITST{{random_number}}'

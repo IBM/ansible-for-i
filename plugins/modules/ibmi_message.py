@@ -281,10 +281,8 @@ def main():
         sql = handle_list_to_sql(sql, message_queue, "MESSAGE_QUEUE_NAME")
         sql = handle_list_to_sql(sql, message_id, "MESSAGE_ID")
         if message_text:
-            sql = sql + "(MESSAGE_TEXT LIKE UPPER('%" + message_text + "%') " + \
-                "OR MESSAGE_TEXT LIKE LOWER('%" + message_text + "%') " + \
-                "OR MESSAGE_SECOND_LEVEL_TEXT LIKE UPPER('%" + message_text + "%') " + \
-                "OR MESSAGE_SECOND_LEVEL_TEXT LIKE LOWER('%" + message_text + "%')) AND "
+            sql = sql + "(UPPER(MESSAGE_TEXT) LIKE UPPER('%" + message_text + "%') " + \
+                "OR UPPER(MESSAGE_SECOND_LEVEL_TEXT) LIKE UPPER('%" + message_text + "%')) AND "
         if message_type == "NO_REPLY":
             sql = sql + "MESSAGE_TYPE = 'INQUIRY' AND MESSAGE_KEY NOT IN " + \
                         "(SELECT ASSOCIATED_MESSAGE_KEY FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_TYPE = 'REPLY' " + \

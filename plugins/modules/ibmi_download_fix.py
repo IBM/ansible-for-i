@@ -441,7 +441,7 @@ def main():
         p_image_directory=image_directory,
         p_parameters=parameters)
 
-    cl_sbmjob = "QSYS/SBMJOB CMD(" + ' '.join(command.split()) + ") " + 'LOG(4 *JOBD *SECLVL) ' + 'LOGOUTPUT(*PND) ' + parameters
+    cl_sbmjob = "QSYS/SBMJOB CMD(" + ' '.join(command.split()) + ") " + 'LOG(4 *JOBD *SECLVL) ' + 'LOGOUTPUT(*PND) '
     startd = datetime.datetime.now()
     message_description = ''
     rc, out, error = ibmi_module.itoolkit_run_command(cl_sbmjob)
