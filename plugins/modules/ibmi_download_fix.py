@@ -280,7 +280,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 HAS_ITOOLKIT = True
 
@@ -441,7 +441,7 @@ def main():
         p_image_directory=image_directory,
         p_parameters=parameters)
 
-    cl_sbmjob = "QSYS/SBMJOB CMD(" + ' '.join(command.split()) + ") " + 'LOG(4 *JOBD *SECLVL) ' + 'LOGOUTPUT(*PND) '
+    cl_sbmjob = "QSYS/SBMJOB CMD(" + ' '.join(command.split()) + ") " + 'LOG(4 *JOBD *SECLVL) ' + 'LOGOUTPUT(*PND) ' + parameters
     startd = datetime.datetime.now()
     message_description = ''
     rc, out, error = ibmi_module.itoolkit_run_command(cl_sbmjob)

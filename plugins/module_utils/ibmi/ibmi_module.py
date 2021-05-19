@@ -162,9 +162,6 @@ class IBMiModule(object):
         re_raise = False  # workaround to pass the raise-missing-from pylint issue
         exp_msg = ''
         try:
-            ssh_client, ssh_connection, user, login = ibmi_util.get_ssh_client_and_user_info()
-            ibmi_util.log_info(
-                "ssh client: {0}, ssh connection: {1}, login name: {2}, user: {3}".format(ssh_client, ssh_connection, user, login))
             if db_name != ibmi_util.SYSBAS:
                 self.conn = dbi.connect(database='{db_pattern}'.format(db_pattern=db_name))
             else:
@@ -181,10 +178,8 @@ class IBMiModule(object):
                 exp_msg = exp_msg + " Check if IASP {0} is exist and varied on.".format(db_name)
             else:
                 exp_msg = exp_msg + \
-                    "Possible reasons and solutions are:" + \
-                    "1. If the *LOCAL Relational Database Directory Entry(RDBDIRE) does not exist, create it. " + \
-                    "2. Apply the latest Cumulative PTF packages. " + \
-                    "3. Upgrade the Open Source package python3-ibm_db to latest version."
+                    "A possible reason is the *LOCAL Relational Database Directory Entry(RDBDIRE) does not exist." + \
+                    "If it exists, apply the latest Cumulative PTF packages and try again."
         if re_raise:
             raise Exception(exp_msg)
 
@@ -247,7 +242,6 @@ class IBMiModule(object):
         itool.add(iSqlFree('free'))
         itool.call(itransport)
         command_output = itool.dict_out('query')
-        ibmi_util.log_debug("sql to run: " + str(sql))
 
         out = ''
         err = ''
@@ -273,7 +267,6 @@ class IBMiModule(object):
         itool.add(iCmd('command', command))
         itool.call(itransport)
         command_output = itool.dict_out('command')
-        ibmi_util.log_debug("command to run: " + str(command))
 
         out = ''
         err = ''
@@ -298,7 +291,6 @@ class IBMiModule(object):
         itransport = DatabaseTransport(self.conn)
         if command:
             command = command.upper().replace('OUTPUT(*)', '')
-        ibmi_util.log_debug("command to run: " + str(command))
         itool.add(iCmd5250('command', command))
         itool.call(itransport)
         command_output = itool.dict_out('command')
@@ -334,7 +326,7 @@ class IBMiModule(object):
         itool.add(iCmd('rtv_command', command + args))
         itool.call(itransport)
         rtv_command = itool.dict_out('rtv_command')
-        ibmi_util.log_debug("rtv_command to run: " + str(rtv_command), sys._getframe().f_code.co_name)
+        ibmi_util.log_debug("rtv_command " + str(rtv_command), sys._getframe().f_code.co_name)
         if 'error' in rtv_command:
             rc = ibmi_util.IBMi_COMMAND_RC_ERROR
             out_dict = dict()
@@ -356,7 +348,6 @@ class IBMiModule(object):
     def db_get_result_list(self, sql, hex_convert_columns):
         '''returns the result list containing maps with column name as key, column value as value'''
         result_list = []
-        ibmi_util.log_debug("sql to run: " + str(sql))
         try:
             # Already known hex column names
             known_hex_convert_columns = ['MESSAGE_KEY', 'ASSOCIATED_MESSAGE_KEY', 'INTERNAL_JOB_ID']
@@ -418,7 +409,6 @@ class IBMiModule(object):
     def ibm_dbi_sql_query(self, sql):
         out = ''
         err = ''
-        ibmi_util.log_debug("sql to run: " + str(sql))
         try:
             cursor_id = self.conn.cursor()
 

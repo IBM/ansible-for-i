@@ -52,9 +52,7 @@
         ptf_list: "{{ ptf_list|default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id] }] }}"
       when:
         - ptf_on_system.get(ptf_info.ptf_id)
-        - ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or\
-          ptf_on_system[ptf_info.ptf_id] == 'PERMANENTLY APPLIED' or\
-          ptf_on_system[ptf_info.ptf_id] == 'SUPERSEDED'
+        - ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or ptf_on_system[ptf_info.ptf_id] == 'PERMANENTLY APPLIED' or ptf_on_system[ptf_info.ptf_id] == 'SUPERSEDED'
       with_list: "{{ ptf_info_list }}"
       loop_control:
         loop_var: ptf_info

@@ -65,9 +65,6 @@ notes:
     - Need install paramiko package on target IBM i.
     - Make sure ssh passwordless login works from IBM i node A to IBM i node B.
     - private_key must be a rsa key in the legacy PEM private key format.
-    - Dependency PTFs
-      7.2 MF65149
-      7.3 MF65148
     - Doesn't support IASP by now.
 
 author:
@@ -165,7 +162,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 HAS_PARAMIKO = True
 
 try:

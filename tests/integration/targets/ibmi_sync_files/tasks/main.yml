@@ -37,9 +37,11 @@
 
   - name: TC00 - test preparation
     include: test.yml
-    vars:
+    vars: 
       target_system: "{{ item }}"
     with_items:
       - "{{nodeA}}"
       - "{{nodeB}}"
       - "{{nodeC}}"
+
+    

@@ -63,9 +63,6 @@ notes:
     - Need install paramiko package on target IBM i.
     - Make sure ssh passwordless login works from IBM i node A to IBM i node B.
     - private_key must be a rsa key in the legacy PEM private key format.
-    - Dependency PTFs
-      7.2 MF65149
-      7.3 MF65148
     - Doesn't support IASP by now.
 
 author:
