@@ -133,7 +133,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 import fnmatch
 
-__ibmi_module_version__ = "1.3.2"
+__ibmi_module_version__ = "0.0.1"
 
 
 def main():

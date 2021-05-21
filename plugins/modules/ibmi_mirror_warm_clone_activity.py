@@ -102,7 +102,7 @@ MrdbConfigComplete = 2
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "1.3.2"
+__ibmi_module_version__ = "BUILDDATE_REPLACE"
 
 
 def mrdb_retrieve_mirror_state(imodule):
