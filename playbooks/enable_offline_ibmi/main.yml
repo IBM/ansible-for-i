@@ -18,10 +18,7 @@
   tasks:
   - block:
       - name: Create a local temporary directory
-        file: 
-          path: '{{ remote_temp_dir }}'
-          state: directory
-          mode: 0755
+        raw: mkdir -p {{ remote_temp_dir }} 
         args:
           executable: /qopensys/usr/bin/qsh
         register: tempfile_result
