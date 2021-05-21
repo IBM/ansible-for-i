@@ -43,7 +43,7 @@
           include: post_build_actions.yml
           delegate_to: "build_system"
 
-          always:
-            - name: Step 6 - cleanup on demand
-              include: cleanup.yml
-              when: cleanup
+      always:
+        - name: Step 6 - cleanup on demand
+          include: cleanup.yml
+          when: cleanup
