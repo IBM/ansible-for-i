@@ -3,7 +3,8 @@
   # This playbook will check if requested individual PTFs are already in catalog, if not, will call download_individual_ptfs role
   # to download non-existent ptfs and write individual PTFs' information into catalog.
 
-  # Command example: ansible-playbook /check_download_individual_ptfs.yml -e "{'repo_server': 'reposerver'，'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
+  # Command example: ansible-playbook ./check_download_individual_ptfs.yml
+  # -e "{'repo_server': 'reposerver', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
   hosts: "{{ repo_server }}"
   gather_facts: false
   collections:

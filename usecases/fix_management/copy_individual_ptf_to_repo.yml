@@ -2,7 +2,7 @@
 - name: Copy individual ptf files from Ansible server to repo server
 # This playbook will copy individual ptf files on Ansible server to repo server, and create dir on repo server named after the ptf
 
-# Command example: ansible-playbook /copy_individual_ptf_to_repo.yml -e "{'repo_server': 'systemB', 'ptf_number': 'SI63556', 'file_path_dir': '/tmp/SI63556'"
+# Command example: ansible-playbook /copy_individual_ptf_to_repo.yml -e "{'repo_server': 'systemB', 'ptf_number': 'SI63556', 'file_path_dir': '/tmp/SI63556'}"
   hosts: '{{ repo_server }}'
   gather_facts: false
   collections:

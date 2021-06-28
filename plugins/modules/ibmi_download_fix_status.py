@@ -90,16 +90,10 @@ rc:
 import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 HAS_ITOOLKIT = True
-
-try:
-    from itoolkit import iToolKit
-except ImportError:
-    HAS_ITOOLKIT = False
 
 
 def main():

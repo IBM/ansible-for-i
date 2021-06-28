@@ -65,10 +65,9 @@
 
       - name: compose parameters to update order download status
         set_fact:
-         formatted_order_list: |
-             "{{ formatted_order_list|default([]) + \
-              [{ 'order_id': order_info.order_id, 'file_path': order_info.file_path, \
-              'download_status': 'DOWNLOADED' }] }}"
+         formatted_order_list:
+          "{{ formatted_order_list|default([]) +
+          [{ 'order_id': order_info.order_id, 'file_path': order_info.file_path, 'download_status': 'DOWNLOADED' }] }}"
         when: order_info.order_id in complete_order_id_list
         loop: '{{ downloading_order_info_list }}'
         loop_control:
