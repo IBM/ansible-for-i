@@ -103,7 +103,7 @@ import datetime
 import re
 
 
-__ibmi_module_version__ = "1.4.0"
+__ibmi_module_version__ = "9.9.9"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"
