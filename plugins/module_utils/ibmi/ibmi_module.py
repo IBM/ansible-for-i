@@ -231,6 +231,17 @@ class IBMiModule(object):
     def itoolkit_get_job_log(self, time):
         return self.get_job_log('*', str(time))
 
+    def itoolkit_get_job_log_NLS(self, time):
+        # retreive current job ccsid
+        rc, out, error = self.itoolkit_run_rtv_command('RTVJOBA', {'CCSID': 'number', 'DFTCCSID': 'number'})
+        if rc:
+            cast_ccsid = 37
+        else:
+            cast_ccsid = out['CCSID']
+            if cast_ccsid == 65535:
+                cast_ccsid = out['DFTCCSID']
+        return self.get_job_log_NLS('*', str(cast_ccsid), str(time))
+
     def itoolkit_run_sql(self, sql, hex_convert_columns=None):
         return self.db_get_result_list(sql, hex_convert_columns)
 
@@ -485,6 +496,34 @@ class IBMiModule(object):
                               "MESSAGE_SECOND_LEVEL_TEXT": result[20],
                               }
                 out.append(result_map)
+        return out
+
+    def get_job_log_NLS(self, job_name, cast_ccsid, time=None):
+        if time:
+            sql = "SELECT ORDINAL_POSITION, MESSAGE_ID, MESSAGE_TYPE, MESSAGE_SUBTYPE, SEVERITY, " + \
+                  "MESSAGE_TIMESTAMP, FROM_LIBRARY, FROM_PROGRAM, FROM_MODULE, FROM_PROCEDURE, FROM_INSTRUCTION, " + \
+                  "TO_LIBRARY, TO_PROGRAM, TO_MODULE, TO_PROCEDURE, TO_INSTRUCTION, FROM_USER, MESSAGE_FILE, " + \
+                  "MESSAGE_LIBRARY, MESSAGE_TOKEN_LENGTH, " + \
+                  "cast(MESSAGE_TOKENS as varchar(2048) CCSID " + str(cast_ccsid) + ") as MESSAGE_TOKENS, " + \
+                  "MESSAGE_TEXT, MESSAGE_SECOND_LEVEL_TEXT, MESSAGE_KEY " + \
+                  "FROM TABLE(QSYS2.JOBLOG_INFO('" + job_name + "')) A WHERE MESSAGE_TIMESTAMP >= '" + str(time) + "' " + \
+                  "ORDER BY ORDINAL_POSITION DESC"
+        else:
+            sql = "SELECT ORDINAL_POSITION, MESSAGE_ID, MESSAGE_TYPE, MESSAGE_SUBTYPE, SEVERITY, " + \
+                  "MESSAGE_TIMESTAMP, FROM_LIBRARY, FROM_PROGRAM, FROM_MODULE, FROM_PROCEDURE, FROM_INSTRUCTION, " + \
+                  "TO_LIBRARY, TO_PROGRAM, TO_MODULE, TO_PROCEDURE, TO_INSTRUCTION, FROM_USER, MESSAGE_FILE, " + \
+                  "MESSAGE_LIBRARY, MESSAGE_TOKEN_LENGTH, " + \
+                  "cast(MESSAGE_TOKENS as varchar(2048) CCSID " + str(cast_ccsid) + ")  as MESSAGE_TOKENS, " + \
+                  "MESSAGE_TEXT, MESSAGE_SECOND_LEVEL_TEXT, MESSAGE_KEY " + \
+                  "FROM TABLE(QSYS2.JOBLOG_INFO('" + job_name + \
+                  "')) A ORDER BY ORDINAL_POSITION DESC"
+        # MESSAGE_KEY: binary
+        hex_convert_columns = ['MESSAGE_KEY']
+        rc, out, error = self.itoolkit_run_sql(sql, hex_convert_columns)
+
+        if (not out) and (not error):
+            err = {"FATAL": "Job not found."}
+            out.append(err)
         return out
 
     def get_current_job_info(self):

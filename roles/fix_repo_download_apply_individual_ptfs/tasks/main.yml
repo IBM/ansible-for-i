@@ -19,7 +19,6 @@
 - name: Include fix_repo_check_download_individual_ptfs role to check and download a list of individual ptfs
   include_role:
     name: fix_repo_check_download_individual_ptfs
-  ignore_errors: true
 
 - name: compose final_ptfs_status add find fail list
   set_fact:

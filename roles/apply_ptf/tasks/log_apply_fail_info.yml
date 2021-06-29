@@ -11,14 +11,10 @@
 #   when: job_log_var.MESSAGE_ID == 'CPF3632'
 
 - block:
-    - name: compose apply_fail_with_requisite_list
-      set_fact:
-        apply_fail_with_requisite_list: "{{ apply_fail_with_requisite_list | default([]) +
-        [{ 'ptf_id': job_log_var.MESSAGE_TEXT[12:19], 'requisite': job_log_var.MESSAGE_TEXT[53:60]}] }}"
     - name: compose apply_fail_dict
       set_fact:
-        apply_fail_dict: "{{ apply_fail_dict | default({}) | combine({ job_log_var.MESSAGE_TEXT[12:19]: 'APPLY_FAIL' }) }}"
-    - name: compose apply_fail_with_requisite_list
+        apply_fail_dict: "{{ apply_fail_dict | default({}) | combine({ job_log_var.MESSAGE_TOKENS[21:28]: 'APPLY_FAIL' }) }}"
+    - name: compose requisite_list
       set_fact:
-        requisite_list: "{{ requisite_list + [job_log_var.MESSAGE_TEXT[53:60]] }}"
-  when: job_log_var.MESSAGE_ID == 'CPF3632'
+        requisite_list: "{{ requisite_list + [job_log_var.MESSAGE_TOKENS[7:14]] }}"
+  when: job_log_var.MESSAGE_ID == 'CPF3632' or job_log_var.MESSAGE_ID == 'CPD35B1'

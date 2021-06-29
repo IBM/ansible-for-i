@@ -16,9 +16,9 @@
   no_log: true
   shell: 'sshpass -p "{{ ibmi_pass }}" {{ transfer_command }}'
   delegate_to: localhost
-  when: ibmi_pass
+  when: ibmi_pass != ""
 
 - name: transfer installation package to remote IBM i and the target directory is {{ target_path }}
   shell: '{{ transfer_command }}'
   delegate_to: localhost
-  when: not ibmi_pass
+  when: ibmi_pass == ""

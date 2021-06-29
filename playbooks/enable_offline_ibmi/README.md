@@ -12,7 +12,7 @@ https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.sh
 <br> bootstrap.tar.Z
 https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.tar.Z
 </br>
-<br> python, libutil, libncurses6, python-itoolkit, python-ibm_db
+<br> python, libutil2, libncurses6, python-itoolkit, python-ibm_db, update-alternatives, libreadline8
 https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/ppc64/
 </br>
 <br> python-six

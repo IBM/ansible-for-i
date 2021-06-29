@@ -239,6 +239,28 @@ ptf_list:
         }
     ]
     returned: When use option query.
+requisite_ptf_list:
+    description: The PTF list contains the requiste PTF of the PTF being applied.
+    type: list
+    sample: [
+        {
+            "ptf_id": "SI76012",
+            "requisite": "SI76014"
+        },
+        {
+            "ptf_id": "SI76012",
+            "requisite": "SI76013"
+        }
+    ]
+    returned: When use option apply_only.
+load_fail_dict:
+    description: The PTF list contains the PTFs which failed to be loaded and the reason.
+                 When PTF list which should be loaded is *ALL, the result is empty.
+    type: list
+    sample: [
+        {"SI73543": "OPTION_NOT_INSTALLED"}
+    ]
+    returned: When use option apply_only or load_and_apply.
 '''
 
 HAS_ITOOLKIT = True
@@ -464,8 +486,34 @@ def main():
         else:
             rc = IBMi_COMMAND_RC_SUCCESS
 
+    requisite_ptf_list = []
+    load_fail_dict = []
     if joblog or (rc != IBMi_COMMAND_RC_SUCCESS):
-        job_log = ibmi_module.itoolkit_get_job_log(startd)
+        # get message_token for 'apply_only'
+        if operation == 'apply_only':
+            job_log = ibmi_module.itoolkit_get_job_log_NLS(startd)
+            # if message CPF3632 or CPD35B1, construct requisite_ptf_list dict
+            for joblog_var in job_log:
+                if joblog_var.get('MESSAGE_ID') in ['CPF3632', 'CPD35B1']:
+                    message_token = joblog_var.get('MESSAGE_TOKENS')
+                    requisite_ptf = {"ptf_id": message_token[21:28],
+                                     "requiste": message_token[7:14]
+                                     }
+                    requisite_ptf_list.append(requisite_ptf)
+        elif (operation == 'load_only' or operation == 'load_and_apply') and ptf_list_to_select[0] != '*ALL':
+            job_log = ibmi_module.itoolkit_get_job_log_NLS(startd)
+            for joblog_var in job_log:
+                if joblog_var.get('MESSAGE_ID') in ['CPF3606']:
+                    load_fail = {ptf_list_to_select[0]: "PRODUCT_NOT_INSTALLED"}
+                    load_fail_dict.append(load_fail)
+                if joblog_var.get('MESSAGE_ID') in ['CPF3616']:
+                    load_fail = {ptf_list_to_select[0]: "OPTION_NOT_INSTALLED"}
+                    load_fail_dict.append(load_fail)
+                if joblog_var.get('MESSAGE_ID') in ['CPF3619']:
+                    load_fail = {ptf_list_to_select[0]: "RELEASE_NOT_MATCH"}
+                    load_fail_dict.append(load_fail)
+        else:
+            job_log = ibmi_module.itoolkit_get_job_log(startd)
     else:
         job_log = []
 
@@ -473,16 +521,41 @@ def main():
     delta = endd - startd
 
     if rc > 0:
-        result_failed = dict(
-            start=str(startd),
-            end=str(endd),
-            delta=str(delta),
-            stdout=out,
-            stderr=err,
-            rc=rc,
-            job_log=job_log,
-            # changed=True,
-        )
+        if operation == 'apply_only':
+            result_failed = dict(
+                start=str(startd),
+                end=str(endd),
+                delta=str(delta),
+                stdout=out,
+                stderr=err,
+                rc=rc,
+                job_log=job_log,
+                requisite_ptf_list=requisite_ptf_list,
+                # changed=True,
+            )
+        elif operation == 'load_only' or operation == 'load_and_apply':
+            result_failed = dict(
+                start=str(startd),
+                end=str(endd),
+                delta=str(delta),
+                stdout=out,
+                stderr=err,
+                rc=rc,
+                job_log=job_log,
+                load_fail_dict=load_fail_dict,
+                # changed=True,
+            )
+        else:
+            result_failed = dict(
+                start=str(startd),
+                end=str(endd),
+                delta=str(delta),
+                stdout=out,
+                stderr=err,
+                rc=rc,
+                job_log=job_log,
+            )
+
         module.fail_json(msg='non-zero return code', **result_failed)
     else:
         result_success = dict(

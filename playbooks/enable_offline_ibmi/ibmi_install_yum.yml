@@ -26,11 +26,9 @@
         executable: /qopensys/usr/bin/qsh
 
     - name: Clear old package
-      file:
-        path: '/QOpenSys/var/lib/rpm' 
-        state: absent
+      raw: "rm -rf /QOpenSys/var/lib/rpm"
       args:
-        executable: /qopensys/usr/bin/qsh
+        executable: /qopensys/usr/bin/qsh 
 
     - name: Write the content to the installation script on IBM i
       raw: "echo \"

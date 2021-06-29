@@ -51,7 +51,6 @@
       vars:
         to_be_downloaded_list: "{{ RecordNotFound_list }}"
         download_server: "{{ repo_server }}"
-      ignore_errors: true
       when: RecordNotFound_list != []
 
     - block:
