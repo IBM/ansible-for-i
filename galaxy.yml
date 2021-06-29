@@ -9,7 +9,7 @@ namespace: ibm
 name: power_ibmi
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.4.0
+version: 9.9.9
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -53,7 +53,7 @@ tags: [infrastructure, ibmi, power, ibm]
 dependencies: {}
 
 # The URL of the originating SCM repository
-repository: https://github.com/IBM/ansible-for-i/tree/1.4.0
+repository: https://github.com/IBM/ansible-for-i/tree/9.9.9
 
 # The URL to any online docs
 documentation: https://ibm.github.io/ansible-for-i/index.html
