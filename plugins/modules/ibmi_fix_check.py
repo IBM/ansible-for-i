@@ -124,7 +124,7 @@ ptf_info:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-import ansible.module_utils.urls as urls
+from ansible.module_utils import urls
 import datetime
 import time
 import re
