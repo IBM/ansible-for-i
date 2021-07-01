@@ -124,13 +124,13 @@ ptf_info:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-import ansible.module_utils.urls as urls
+from ansible.module_utils import urls
 import datetime
 import time
 import re
 
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.4.0"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"
