@@ -1,5 +1,0 @@
----
-# defaults value for load_apply_ptfs
-remote_lib: 'QGPL'
-loaded_list: []
-load_success_list: []

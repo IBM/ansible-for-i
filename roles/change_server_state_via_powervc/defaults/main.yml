@@ -1,9 +1,0 @@
-# Copyright (c) IBM Corporation 2019, 2020
-# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
----
-# defaults value for change_server_state_via_powervc
-project: ibm-default
-project_domain: Default
-user_domain: Default
-verify_cert: true
-change_state_timeout: 1800
