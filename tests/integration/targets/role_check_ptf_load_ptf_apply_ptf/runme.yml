@@ -1,0 +1,349 @@
+- name: IBM i check a set of PTFs
+  hosts: testhost
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    test_positive_ptf_list_1:
+      - {'ptf_id':'SI73751', 'product':'5733SC1', 'file_name':'QSI73751.FILE', 'release':'V7R2M0'}
+      
+    temp_lib: testlib
+
+    test_positive_ptf_list_2_72:
+      - {'ptf_id':'MF59687', 'product':'5770999', 'file_name':'QMF59687', 'release':'V7R2M0'} # It is a requisite ptf of SI71691
+      - {'ptf_id':'MF65827', 'product':'5770999', 'file_name':'QMF65827', 'release':'V7R2M0'}
+      - {'ptf_id':'MF68066', 'product':'5770999', 'file_name':'QMF68066.FILE', 'release':'V7R2M0'} # It is a deployed ptf
+
+    test_positive_ptf_list_2_73:
+      - {'ptf_id':'SI74102', 'product':'5770SS1', 'file_name':'QSI74102', 'release':'V7R3M0'} # It is a requisite ptf of SI71691
+      - {'ptf_id':'SI74136', 'product':'5770ST1', 'file_name':'QSI74136', 'release':'V7R3M0'}
+      - {'ptf_id':'SI75058', 'product':'5770SS1', 'file_name':'QSI75058.FILE', 'release':'V7R3M0'} # It is a deployed ptf
+
+    test_positive_ptf_list_2_74:
+      - {'ptf_id':'SI70931', 'product':'5770SS1', 'file_name':'QSI70931', 'release':'V7R4M0'} # It is a requisite ptf of SI71691
+      - {'ptf_id':'SI71691', 'product':'5770SS1', 'file_name':'QSI71691', 'release':'V7R4M0'}
+      - {'ptf_id':'SI70544', 'product':'5770SS1', 'file_name':'QSI70544.FILE', 'release':'V7R4M0'} # It is a deployed ptf
+
+  tasks:
+      - block:
+        - name: query the os version of target IBM i
+          ibmi_sql_query:
+            sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+          register: sql_query
+
+        - name: set the ptf group to be used
+          set_fact:
+            test_positive_ptf_list_2: "{{ lookup('vars', 'test_positive_ptf_list_2_' + sql_query['row'][0]['OS_VERSION'] + sql_query['row'][0]['OS_RELEASE']) }}"        
+
+        - include: query_remove_ptf.yml
+          loop: '{{test_positive_ptf_list_1}}'
+
+        - include_role:
+            name: check_ptf
+          vars: 
+            check_ptf_list: '{{test_positive_ptf_list_1}}'
+
+        - name: assert the returned parameters
+          assert:
+            that:
+              - ptfs_info | length == 1
+              - ptfs_info[0].PTF_LOADED_STATUS == 'NON-EXISTENT' or ptfs_info[0].PTF_LOADED_STATUS == 'PERMANENTLY REMOVED' 
+              - ptfs_info[0].PTF_IDENTIFIER == test_positive_ptf_list_1[0].ptf_id 
+ 
+        - name: assert ptf_status
+          assert:
+            that:
+              - ptfs_status['{{test_positive_ptf_list_1[0].ptf_id}}'] == 'NON-EXISTENT' or ptfs_status['{{test_positive_ptf_list_1[0].ptf_id}}'] == 'PERMANENTLY REMOVED'  
+
+        - name: assert the returned parameters
+          assert:
+            that:
+              - not_loaded_ptfs_list == test_positive_ptf_list_1 
+              - loaded_ptfs_list is defined and loaded_ptfs_list == []
+
+        - name: create temporary remotelib
+          ibmi_cl_command: 
+            cmd: CRTLIB LIB({{temp_lib}})
+
+        - name: copy save files to remote library
+          ibmi_copy:
+            src: "files/{{(target_ptf_info['file_name']| splitext)[0]}}.FILE"
+            lib_name: '{{temp_lib}}'
+          loop: '{{test_positive_ptf_list_1}}' 
+          loop_control:
+            loop_var: target_ptf_info
+
+        - include_role:
+            name: load_ptf
+          vars: 
+            to_be_loaded_list: '{{test_positive_ptf_list_1}}'
+            remote_lib: '{{temp_lib}}'
+
+        - name: assert the returned list correct
+          assert:
+            that:
+              - load_success_list == test_positive_ptf_list_1
+              - load_fail_list == [] 
+
+        - include_role:
+            name: check_ptf
+          vars: 
+            check_ptf_list: '{{test_positive_ptf_list_1}}'
+
+        - name: assert the returned parameters
+          assert:
+            that:
+              - ptfs_info | length == 1 
+              - ptfs_info[0].PTF_LOADED_STATUS == 'LOADED'
+              - ptfs_info[0].PTF_IDENTIFIER == test_positive_ptf_list_1[0].ptf_id
+              
+        - name: assert ptf_status
+          assert:
+            that:
+              - ptfs_status['{{test_positive_ptf_list_1[0].ptf_id}}'] == 'LOADED' 
+
+        - name: assert the returned parameters
+          assert:
+            that:
+              - not_loaded_ptfs_list is defined and not_loaded_ptfs_list ==  []
+              - loaded_ptfs_list == test_positive_ptf_list_1
+
+        - include_role:
+            name: apply_ptf
+          vars: 
+            to_be_applied_list: '{{test_positive_ptf_list_1}}'
+            apply_all_loaded_ptfs: false
+
+        - name: assert the returned list correct
+          assert:
+            that:
+              - apply_success_list == test_positive_ptf_list_1
+              - apply_fail_list == [] 
+
+        - include_role:
+            name: check_ptf
+          vars: 
+            check_ptf_list: '{{test_positive_ptf_list_1}}'
+
+        - name: assert the returned parameters
+          assert:
+            that:
+              - ptfs_info | length == 1
+              - ptfs_info[0].PTF_LOADED_STATUS == 'APPLIED'
+              - ptfs_info[0].PTF_IDENTIFIER == test_positive_ptf_list_1[0].ptf_id 
+
+        - name: assert ptf_status
+          assert:
+            that:
+              - ptfs_status['{{test_positive_ptf_list_1[0].ptf_id}}'] == 'APPLIED' 
+
+        - name: assert the returned parameters
+          assert:
+            that:
+              - not_loaded_ptfs_list ==  []
+
+        ## Load PTFs again.
+        - include_role:
+            name: load_ptf
+          vars: 
+            to_be_loaded_list: '{{test_positive_ptf_list_1}}'
+            remote_lib: '{{temp_lib}}'
+
+        - name: assert no PTF can be loaded now.
+          assert:
+            that:
+              - load_success_list == []
+              - load_fail_list == test_positive_ptf_list_1
+
+        always:
+          - name: delete_lib
+            ibmi_cl_command:
+              cmd: QSYS/DLTLIB {{temp_lib}}
+            ignore_errors: true
+
+      - name: query the os version of target IBM i
+        ibmi_sql_query:
+          sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+        register: sql_query
+
+      - name: set the ptf group to be used
+        set_fact:
+          os_version: "{{sql_query['row'][0]['OS_VERSION'] + sql_query['row'][0]['OS_RELEASE']}}"
+          
+      - block:
+      
+        - name: query the os version of target IBM i
+          ibmi_sql_query:
+            sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+          register: sql_query
+
+        - name: set the ptf group to be used
+          set_fact:
+            test_positive_ptf_list_2: "{{ lookup('vars', 'test_positive_ptf_list_2_' + sql_query['row'][0]['OS_VERSION'] + sql_query['row'][0]['OS_RELEASE']) }}"        
+
+        - include: query_remove_ptf.yml
+          loop: '{{[]+ [test_positive_ptf_list_2[1]]}}'
+
+        - include: query_remove_ptf.yml
+          loop: '{{[]+ [test_positive_ptf_list_2[0]]}}'
+
+        - include: query_remove_ptf.yml
+          loop: '{{[]+ [test_positive_ptf_list_2[-1]]}}'
+
+        - include_role:
+            name: check_ptf
+          vars: 
+            check_ptf_list: '{{test_positive_ptf_list_2 + test_positive_ptf_list_1}}'
+
+        - name: assert the returned parameters
+          assert:
+            that:
+              - ptfs_info | length == test_positive_ptf_list_2 | length + test_positive_ptf_list_1 | length 
+              - ptfs_status | dict2items | length == ptfs_info | length
+              - not_loaded_ptfs_list | length == test_positive_ptf_list_2 | length
+
+        - name: verify each ptf is correct
+          assert:
+            that:
+              - single_ptf.0.PTF_LOADED_STATUS == 'PERMANENTLY REMOVED'
+          when: single_ptf.0.PTF_IDENTIFIER == single_ptf.1.ptf_id 
+          loop: '{{ptfs_info | product(test_positive_ptf_list_2) | list}}'
+          loop_control:
+            loop_var: single_ptf
+
+        - name: verify each ptf is correct
+          assert:
+            that:
+              - single_ptf.0.value == 'PERMANENTLY REMOVED'
+          when: single_ptf.0.key == single_ptf.1.ptf_id 
+          loop: '{{ptfs_status | dict2items | product(test_positive_ptf_list_2) | list}}'
+          loop_control:
+            loop_var: single_ptf
+
+        - name: verify each ptf is correct
+          assert:
+            that:
+              - single_ptf.0.PTF_LOADED_STATUS == 'APPLIED'
+          when: single_ptf.0.PTF_IDENTIFIER == single_ptf.1.ptf_id 
+          loop: '{{ptfs_info | product(test_positive_ptf_list_1) | list}}'
+          loop_control:
+            loop_var: single_ptf
+
+        - name: verify each ptf is correct
+          assert:
+            that:
+              - single_ptf.0.value == 'APPLIED'
+          when: single_ptf.0.key == single_ptf.1.ptf_id 
+          loop: '{{ptfs_status | dict2items | product(test_positive_ptf_list_1) | list}}'
+          loop_control:
+            loop_var: single_ptf
+
+        - name: assert the returned parameters
+          assert:
+            that:
+              - not_loaded_ptfs_list == test_positive_ptf_list_2
+
+        - name: copy save files to remote library
+          ibmi_copy:
+            src: "files/{{(target_ptf_info['file_name']| splitext)[0]}}.FILE"
+            lib_name: 'QGPL'
+          loop: '{{test_positive_ptf_list_2}}' 
+          loop_control:
+            loop_var: target_ptf_info
+
+        - include_role:
+            name: load_ptf
+          vars: 
+            to_be_loaded_list: '{{test_positive_ptf_list_2}}'
+
+        - name: assert the returned list correct
+          assert:
+            that:
+              - load_success_list == test_positive_ptf_list_2
+              - load_fail_list == []
+
+        - include_role:
+            name: load_ptf
+          vars: 
+            to_be_loaded_list: '{{test_positive_ptf_list_2}}'
+
+        - name: assert the returned list correct
+          assert:
+            that:
+              - load_fail_list == test_positive_ptf_list_2
+              - load_success_list == []
+
+        - include_role:
+            name: apply_ptf
+          vars: 
+            to_be_applied_list: '{{[]+ [test_positive_ptf_list_2[1]]}}'
+            apply_all_loaded_ptfs: false
+
+        - name: assert the returned list correct
+          assert:
+            that:
+              - apply_success_list == [] 
+              - apply_fail_list == []+[test_positive_ptf_list_2[1]]
+
+        - include_role:
+            name: apply_ptf
+          vars: 
+            to_be_applied_list: '{{test_positive_ptf_list_2[:2]}}'
+            apply_all_loaded_ptfs: false
+            temp_or_perm: '*TEMP'
+            delayed_option: '*NO'
+            auto_ipl: false
+
+        - name: assert the returned list correct
+          assert:
+            that:
+              - apply_success_list == test_positive_ptf_list_2[:2] 
+              - apply_fail_list == []
+
+        - include_role:
+            name: apply_ptf
+          vars: 
+            to_be_applied_list: '{{[] + [test_positive_ptf_list_2[-1]]}}'
+            apply_all_loaded_ptfs: false
+            temp_or_perm: '*TEMP'
+            delayed_option: '*NO'
+            auto_ipl: false
+
+        - name: assert the returned list correct
+          assert:
+            that:
+              - apply_success_list == []
+              - apply_fail_list == []+[test_positive_ptf_list_2[-1]]
+
+        - include_role:
+            name: apply_ptf
+          vars: 
+            to_be_applied_list: '{{[] + [test_positive_ptf_list_2[-1]] }}'
+            apply_all_loaded_ptfs: false
+            temp_or_perm: '*TEMP'
+            delayed_option: '*YES'
+            auto_ipl: true
+
+        - name: assert the returned list correct
+          assert:
+            that:
+              - apply_success_list == []+[test_positive_ptf_list_2[-1]]
+              - apply_fail_list == []
+
+        - include_role:
+            name: check_ptf
+          vars: 
+            check_ptf_list: '{{test_positive_ptf_list_2}}'
+
+        - name: negative testing
+          include: neg_case.yml
+          
+        always:
+          - name: cleanup SAVF file from QGPL
+            ibmi_cl_command:
+              cmd: QSYS/DLTOBJ OBJ(QGPL/{{(target_ptf_info['file_name']| splitext)[0]}}) OBJTYPE(*FILE)
+            ignore_errors: true
+            loop: '{{test_positive_ptf_list_2}}' 
+            loop_control:
+              loop_var: target_ptf_info 

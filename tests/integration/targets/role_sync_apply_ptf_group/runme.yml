@@ -1,0 +1,87 @@
+- name: testcase for role sync_apply_ptf_group
+  hosts: testhost
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  tasks:
+    - set_fact: # performance PTF group is small and good for test
+        group_73: 'SF99723'
+        group_72: 'SF99714'
+        group_74: 'SF99663'
+
+    - name: query the os version of target IBM i
+      ibmi_sql_query:
+        sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+      register: sql_query
+
+    - name: set the ptf group to be used
+      set_fact:
+        group_name: "{{ lookup('vars', 'group_' + sql_query['row'][0]['OS_VERSION'] + sql_query['row'][0]['OS_RELEASE']) }}"        
+
+    - name: Add VM to Ansible in-memory inventory for host - the target of sync
+      add_host:
+        name: "fix_repo"
+        ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
+        ansible_user: zhaoyao 
+        groups: ibmi
+        ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3  
+
+    - name: check and download the latest level of PTF group on repo, get ready for sync
+      delegate_to: "fix_repo"   
+      import_role:
+        name: fix_repo_check_ptf_group
+      vars: 
+        ptf_group: '{{group_name}}' 
+
+    - block:
+      - name: sync when already exist 
+        include_role:
+          name: sync_apply_ptf_group
+        vars:
+          ptf_group_info: "{{ ptf_group_find_result.success_list[0] }}"
+          src_host: "fix_repo"  
+      ignore_errors: true         
+      when: ptf_group_find_result.success_list is defined      
+       
+
+    - block:
+      - name: download ptf group to fix repo and add part of group information into fix repo catalog
+        delegate_to: "fix_repo"
+        import_role:
+          name: fix_repo_download_add_ptf_group
+        vars:
+          ptf_group_number: "{{group_name}}"
+          ptf_group_level: "{{fix_group_check_result.group_info[0]['ptf_group_level']}}"
+          release_date: "{{fix_group_check_result.group_info[0]['release_date']}}"
+
+      - name: use ibmi_download_fix_status to determine if the downloading is completed.
+        ibmi_download_fix_status:
+          order_list: "{{download_fix_result.order_id}}"
+        register: ds     
+        failed_when: ds.rc != 0
+        until: ds.status[0]['download_status'] == "DOWNLOADED"
+        retries: 100
+        delay: 30          
+        delegate_to: "fix_repo"
+
+      - name: get file_path
+        delegate_to: "fix_repo"
+        import_role:
+          name: fix_repo_extract_ptf_group_info
+        vars:
+          order_id: "{{download_fix_result.order_id}}"
+      - block:
+        - name: sync
+          include_role:
+            name: sync_apply_ptf_group
+          vars:
+            ptf_group_info: "{{ ptf_group_find_result.success_list[0] }}"
+            src_host: "fix_repo"   
+      ignore_errors: true       
+      when: ptf_group_find_result.fail_list is defined
+        
+
+    - name: negative case
+      include: neg_case.yml

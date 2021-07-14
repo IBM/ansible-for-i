@@ -1,0 +1,68 @@
+# test code for the ibmi_fix_imgclg module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# Need put the a fix on remote IBM i before the testing.
+## S0240V01.BIN - MF66738 (immed ptf) and its dependent ptf (MF66667, MF66739 are delayed PTF)
+## SI71746_1.BIN -  5733SC1 SI71746, which is a hiper PTF.
+## Use 5733SC1 SISI71746 to do the testing, if the PTF is superseded or permanently applied, the testing fails.
+## If it is in superseded, replace the bin file with one containing the latest 5733SC1 PTF.
+
+- set_fact:
+    remote_dir: '{{ remote_tmp_dir }}'
+    base_image_list: ['SI71746_1.bin']
+    # If there are more than one PTF of one product, using space to separate them
+    # For example, base_ptf_info: {'5733SC1': 'SI71746 SI11111', '5770999': 'MF11111 MF22222'} 
+    hiper_ptf_info: {'5733SC1': 'SI71746'} 
+    base_ptf_info: {'5733SC1': 'SI71746'}
+    os_version: '{{ansible_distribution_version}}{{ansible_distribution_release}}'
+
+- block:
+    - set_fact:
+        base_image_list: ['SI71746_1.bin', 'S0240V01.BIN']
+        base_ptf_info: {'5733SC1': 'SI71746', '5770999': ' MF66738 MF66739 MF66740 MF66667'}
+        delay_ptf_info: {'5770999': 'MF66739 MF66667'} 
+        immed_ptf_info: {'5733SC1': 'SI71746', '5770999': ' MF66738 MF66740'}
+        # ptf in hiper_ptf_info should not in omit_list
+        omit_list: [{'5770999': 'MF66738'}, {'5770999': 'MF66739'}, {'5770999': 'MF66740'}, {'5770999': 'MF66667'}]
+  when: os_version == '74'
+
+- set_fact:
+    product_id_list: "{{base_ptf_info.keys() | list}}"
+    has_5770SS1_ptf: false
+    has_5770999_ptf: false
+    require_IPL: false 
+
+- set_fact:
+    has_5770SS1_ptf: true
+    dict_5770SS1: {'5770SS1': "{{base_ptf_info['5770SS1']}}"}
+  when: "'5770SS1' in base_ptf_info.keys() | list | join(' ')"
+
+- set_fact:
+    has_5770999_ptf: true
+    dict_5770999: {'5770999': "{{base_ptf_info['5770999']}}"}
+  when: "'5770999' in base_ptf_info.keys() | list | join(' ')"
+
+- name: fail the testing if PTFs in base_ptf_info have been superseded or permanent applied. 
+  ibmi_sql_query:
+    sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_LOADED_STATUS, A.*
+    FROM QSYS2.PTF_INFO A
+    WHERE PTF_IDENTIFIER = '{{item}}';"
+  register: ptf_result
+  failed_when: "ptf_result.row | length != 0 and (ptf_result.row[0]['PTF_LOADED_STATUS'] == 'PERMANENTLY APPLIED' or ptf_result.row[0]['PTF_LOADED_STATUS'] == 'SUPERCEDED'  or ptf_result.row[0]['PTF_LOADED_STATUS'] == 'SUPERSEDED')"
+  loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
+
+- name: copy image files to remote IBM i
+  copy: 
+    src: '{{item}}'
+    dest: '{{remote_dir}}'
+  loop: '{{base_image_list}}'
+
+- include: ibmi_fix_imgclg.yml
+  when: "os_version != '74'"
+
+- include: ibmi_fix_imgclg_74.yml 
+  when: "os_version == '74'"
+  
+- include: negative_case.yml

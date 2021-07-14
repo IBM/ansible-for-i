@@ -1,0 +1,49 @@
+# test code for the ibmi_iasp module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+## The test system must have at least four non-configured disks
+- name: query non-configured disks
+  ibmi_get_nonconfigure_disks:
+  register: disk_result
+
+- name: assert the returned parameters
+  assert:
+    that: 
+      - disk_result.disks is defined
+      - disk_result.rc is defined
+      - disk_result.start is defined
+      - disk_result.end is defined
+      - disk_result.delta is defined
+      - disk_result.job_log is defined
+
+- set_fact: 
+    new_iasp: ['ANSIIASP1', 'ANSIIASP2']
+    disk_list: "{{disk_result['disks'].split(' ')}}"
+
+- block:  
+    - name: assert the returned parameters
+      assert:
+        that: 
+          - "{{disk_result['disks'].split(' ') | length }} >= 4" 
+        fail_msg: "The IBM i doesn't have enough non-configured disks. It doesn't qualify for the testing."
+
+    - include: primary.yml
+    - include: secondary.yml
+    - include: udfs.yml
+    - include: negative_case.yml
+
+  always:
+
+    - name: vary off the iasp
+      ibmi_device_vary:
+        device_list: '{{new_iasp}}'
+        status: '*OFF'
+      ignore_errors: true
+
+    - name: cleanup iasp
+      ibmi_cl_command:
+        cmd: CFGDEVASP ASPDEV({{item}}) ACTION(*DELETE) CONFIRM(*NO)
+      ignore_errors: true
+      loop: '{{new_iasp}}'

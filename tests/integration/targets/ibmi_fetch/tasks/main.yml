@@ -1,0 +1,82 @@
+# test code for the ibmi_fetch module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+######################################################
+# The content of the fetch74.FILE
+# Opt  Object      Type      Library     Attribute   Text                       
+#      PGM1        *DTAARA      SAVRST      CPPLE                                  
+#      PGM2        *DTAARA      SAVRST      CPPLE                                  
+#      ANSIJSNRC1  *JRNRCV   SAVRST                  JOURNAL RECEIVER FOR ANSIBL
+#      ANSIJSNRC2  *JRNRCV   SAVRST                  JOURNAL RECEIVER FOR ANSIBL
+#      PF1         *FILE     SAVRST      PF          LICKEYFILE to install from 
+#      PF2         *FILE     SAVRST      PF          PTF Cover Letter File      
+#      PGM1        *FILE     SAVRST      SAVF                                   
+#      SAVF1       *FILE     SAVRST      SAVF                                   
+#######################################################
+- block: 
+    ## Setup - Create libraries and objects on test systems
+    - name: put a SAVF containing 6 objects to remote node 
+      copy: src="FETCH.FILE" dest={{ remote_tmp_dir }}/
+
+    - set_fact:
+        output_dir: "/tmp/ibmi_fetch/files/test"
+        savf_name: 'FETCH.FILE'
+
+    - name: create libraries 
+      ibmi_cl_command: 
+        cmd: "crtlib lib({{item}})"
+      with_items: 
+        - SAVRST
+        - ARCHLIB
+
+    - name: copy file to library
+      command: 'mv {{ remote_tmp_dir }}/{{savf_name}} /QSYS.LIB/ARCHLIB.LIB/'
+
+    - name: restore objects to library
+      ibmi_object_restore:
+        object_lib: 'SAVRST'
+        savefile_name: 'FETCH'
+        savefile_lib: 'ARCHLIB'
+      register: original_result
+      ignore_errors: true
+
+    - name: assert the copied savf can be restored
+      assert:
+        that:
+          # The restore may reported user change error CPF3848 and some objects in the SAVF may not be restored CPF3773
+          #- "'CPF3848' in original_result.stderr or 'CPF3773' in original_result.stderr"
+          - "original_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length >= 1 or original_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3773') | map(attribute='MESSAGE_ID') | list | length >= 1"
+      when: "original_result.rc != 0"
+
+    - include: negative_case.yml
+    - include: ibmi_fetch.yml
+    
+  always:
+    - name: remove copied file
+      command: 'rm -rf {{ remote_tmp_dir }}'
+
+    - name: delete libraries 
+      ibmi_cl_command: 
+        cmd: "dltlib lib({{item}})"
+        joblog: 'true'
+      with_items: 
+        - SAVRST
+        - ARCHLIB
+      ignore_errors: true
+    
+    - name: Remove a local temporary directory
+      shell: rm -rf {{ output_dir }}
+      delegate_to: localhost
+      ignore_errors: true 
+
+    - name: Remove a local temporary directory
+      shell: rm -rf ~/test
+      delegate_to: localhost
+      ignore_errors: true 
+
+    - name: Remove a local temporary directory
+      shell: rm -rf testhost 
+      delegate_to: localhost
+      ignore_errors: true 

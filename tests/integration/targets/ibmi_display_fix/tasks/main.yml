@@ -1,0 +1,39 @@
+# test code for the ibmi_fix module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# Need put the a fix on remote IBM i before the testing.
+#SI72305 - Immediate apply
+#MF67068 - Immediate apply
+#SI71691 - require SI70931
+#SI67856 - UME PTF
+#SI70544 - delay PTF
+#SI71746 - Immediate apply
+- block:
+    - set_fact:
+        dist_ptf: {'SI73430':'5733SC1'}
+        pre_ptf_74: {'SI71619':'5770DG1'}
+        pre_ptf_73: {'SI71962':'5770DG1'}
+        pre_ptf_72: {'SI71969':'5770DG1'}
+        remote_lib: 'FIXLIB'
+
+    - set_fact:
+        pre_ptf: "{{ lookup('vars', 'pre_ptf_' + ansible_distribution_version + ansible_distribution_release) }}"
+
+    - ibmi_cl_command:
+        cmd: 'CRTLIB LIB({{remote_lib}})'
+
+    - name: transfer save files to remote, load fix and display fix
+      include: display_fix_with_pre.yml
+      with_items: 
+        - '{{pre_ptf.keys() | list}}'      
+
+    - name: transfer save files to remote, load fix and display fix
+      include: display_fix_with_dist.yml
+      with_items: 
+        - '{{dist_ptf.keys() | list}}'    
+
+  always:
+      - ibmi_cl_command:
+          cmd: 'DLTLIB LIB({{remote_lib}})'

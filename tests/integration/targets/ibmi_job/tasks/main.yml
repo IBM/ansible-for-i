@@ -1,0 +1,189 @@
+# test code for the ibmi_job module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block: 
+    - copy: src="sbmjob_script.sh" dest="/tmp/" mode="755"
+
+    - name: List jobs with default options
+      ibmi_job: 
+      register: job_result
+
+    - name: assert the returned options 
+      assert:
+        that:
+          - job_result.rc == 0 
+          - job_result.job_info[0].CCSID is defined
+          - job_result.job_info[0].COMPLETION_STATUS is defined
+          - job_result.job_info[0].JOB_ACCOUNTING_CODE is defined
+          - job_result.job_info[0].JOB_ACTIVE_TIME is defined
+          - job_result.job_info[0].JOB_DATE is defined
+          - job_result.job_info[0].JOB_DESCRIPTION is defined
+          - job_result.job_info[0].JOB_DESCRIPTION_LIBRARY is defined
+          - job_result.job_info[0].JOB_END_REASON is defined
+          - job_result.job_info[0].JOB_END_SEVERITY is defined
+          - job_result.job_info[0].JOB_END_TIME is defined
+          - job_result.job_info[0].JOB_ENTERED_SYSTEM_TIME is defined
+          - job_result.job_info[0].JOB_INFORMATION is defined
+          - job_result.job_info[0].JOB_NAME is defined
+          - job_result.job_info[0].JOB_QUEUE_LIBRARY is defined
+          - job_result.job_info[0].JOB_QUEUE_NAME is defined
+          - job_result.job_info[0].JOB_QUEUE_PRIORITY is defined
+          - job_result.job_info[0].JOB_QUEUE_STATUS is defined
+          - job_result.job_info[0].JOB_SCHEDULED_TIME is defined
+          - job_result.job_info[0].JOB_STATUS is defined
+          - job_result.job_info[0].JOB_SUBSYSTEM is defined
+          - job_result.job_info[0].JOB_TYPE is defined
+          - job_result.job_info[0].JOB_TYPE_ENHANCED is defined
+          - job_result.job_info[0].SUBMITTER_JOB_NAME is defined
+          - job_result.job_info[0].SUBMITTER_MESSAGE_QUEUE is defined
+          - job_result.job_info[0].SUBMITTER_MESSAGE_QUEUE_LIBRARY is defined
+          - job_result.stderr_lines is not defined
+          - job_result.stdout_lines is not defined
+          - job_result.stderr is not defined
+          - job_result.stdout is not defined 
+
+
+    - name: list job with all options other than default values
+      ibmi_job: 
+        status: "*ACTIVE"
+        type: '*BATCH'
+        #subsystem: "QSYSWRK"
+        #user: "QSYS"
+        submitter: "*USER"
+      register: job_result
+
+    - name: list job with all options other than default values
+      ibmi_job: 
+        status: "*ACTIVE"
+        type: '*BATCH'
+        subsystem: "QSYSWRK"
+        user: "QSYS"
+        #submitter: "*WRKSTN"
+      register: job_result
+
+    - name: list job with all options other than default values
+      ibmi_job: 
+        submitter: "*JOB"
+      register: job_result
+
+    - name: list job with all options other than default values
+      ibmi_job: 
+        status: "*ACTIVE"
+        type: '*BATCH'
+        subsystem: "QSYSWRK"
+        user: "QSYS"
+        submitter: "*ALL"
+      register: job_result
+
+    - name: assert the returned options 
+      assert:
+        that:
+          - job_result.job_info[0].JOB_NAME is defined
+          - job_result.job_info[0].JOB_STATUS == 'ACTIVE'
+          - job_result.job_info[0].JOB_SUBSYSTEM == 'QSYSWRK'
+
+    - name: list the detailed info of one job
+      ibmi_job: 
+        name: "{{ job_result.job_info[0].JOB_NAME }}"
+      register: job_result  
+      failed_when: "job_result.job_info | length != 1"     
+
+
+    - name: Submit a job with only required options
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
+        status: ['*COMPLETE', '*OUTQ']
+      register: sbmjob_result
+
+    - name: list job with check_interval
+      ibmi_job: 
+        name: "{{ sbmjob_result.job_submitted }}"
+
+    - name: list job with all options other than default values
+      ibmi_job: 
+        status: "*OUTQ"
+        type: '*ALL'
+        subsystem: "*ALL"
+        user: "{{ansible_ssh_user}}"
+        #submitter: "{{ansible_ssh_user}}"
+      register: job_result
+      failed_when: "job_result.job_info | length == 0"
+
+    - name: query job detailed info
+      ibmi_job: 
+        name: "{{ job_result.job_info[0].JOB_NAME }}"
+
+    - name: validate that other options are ignored when name is specified
+      ibmi_job: 
+        name: "{{ job_result.job_info[0].JOB_NAME }}"
+        status: "*OUTQ"
+        type: '*ALL'
+        subsystem: "QSYSWRK"
+        user: "*ALL"
+        submitter: "*ALL"
+      register: job_detailed_result
+      failed_when: "job_detailed_result.job_info == {}"
+
+    # test negative test cases
+    - name: list job with unsupported option 
+      ibmi_job: 
+        abc: "abcd"
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')" 
+      register: neg_result
+      failed_when: "'Unsupported parameters' not in neg_result.msg"
+
+    - name: list job with invalid status
+      ibmi_job: 
+        name: ""
+        status: "ABC"
+        type: '*ALL'
+        subsystem: "QSYSWRK"
+      register: neg_result
+      failed_when: "'value of status must be one of' not in neg_result.msg"
+
+    - name: list job with invalid type
+      ibmi_job: 
+        type: 'ABC'
+        subsystem: "QSYSWRK"
+      register: neg_result
+      failed_when: "'value of type must be one of' not in neg_result.msg"
+
+    - name: list job with invalid submitter
+      ibmi_job: 
+        submitter: "abc"
+      register: neg_result
+      failed_when: "'value of submitter must be one of' not in neg_result.msg"
+
+    - name: list job info with not existing user
+      ibmi_job: 
+        status: "*OUTQ"
+        type: '*ALL'
+        subsystem: "QSYSWRK"
+        user: "ABC"
+      register: neg_result
+      #failed_when: "job_result.job_info | length == 0"
+
+    - name: list job info with not existing subsystem
+      ibmi_job: 
+        status: "*OUTQ"
+        type: '*ALL'
+        subsystem: "ABC"
+      register: neg_result
+      failed_when: "job_result.rc != 0"
+
+    - name: query job info with invalid name
+      ibmi_job: 
+        name: "111111/WANGYUN/TEST"
+        status: "*OUTQ"
+        type: '*ALL'
+        subsystem: "QSYSWRK"
+      #register: neg_result
+      #failed_when: "job_result.job_info | length == 0"
+    
+  always:
+    - name: delete script file
+      command: "rm -rf /tmp/sbmjob_script.sh"
+
+ 

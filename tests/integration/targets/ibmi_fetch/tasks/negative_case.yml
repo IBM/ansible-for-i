@@ -1,0 +1,181 @@
+#Test missing required options 
+- name: TC24 Miss dest
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+  register: fetch_result
+  failed_when: "'lib_name and dest are required' not in fetch_result.msg"
+
+# Test missing required options 
+- name: TC25 Miss lib_name
+  ibmi_fetch:
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  failed_when: "'lib_name and dest are required' not in fetch_result.msg"
+
+# Test with an invalid option
+- name: TC26 Fetch objects with an invalid option
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: '{{ output_dir }}/fetched'
+    abc: 'abc'
+  register: fetch_result
+  ignore_errors: true
+
+- assert:
+    that:
+      - "'Invalid options for ibmi_fetch: abc' in fetch_result.msg"
+
+# Test with an invalid object_names
+- name: TC27 Fetch objects with invalid object_names
+  ibmi_fetch:
+    object_names: 'ABC'
+    lib_name: 'SAVRST'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  failed_when: "'Create SAVF failed' not in fetch_result.msg"
+
+- name: TC28 Fetch objects with invalid object_names 
+  ibmi_fetch:
+    object_names: 'ABC'
+    lib_name: 'SAVRST'
+    object_types: '*DTAARA'
+    savefile_name: 'ifetch2'
+    is_lib: false
+    dest: '{{ output_dir }}/fetched'
+    force_save: false
+    backup: false
+    format: '*SAVF'
+    target_release: '*CURRENT'
+    validate_checksum: true
+    flat: false
+  register: fetch_result
+  failed_when: "'Create SAVF failed' not in fetch_result.msg"
+
+- name: TC29 Fetch objects with duplicated object names
+  ibmi_fetch:
+    object_names: 'PGM1 PGM1'
+    lib_name: 'SAVRST'
+    object_types: '*DTAARA'
+    savefile_name: 'ifetch1'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+
+- include: setup_lib.yml
+
+# Test object_type doesn't match
+- name: TC30 Fetch objects with object_type doesn't match
+  ibmi_fetch:
+    object_names: 'PGM1'
+    lib_name: 'SAVRST'
+    object_types: '*JRNRCV'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  #failed_when: "'No objects saved or restored for library SAVRST' not in ''.join(fetch_result.stderr)"
+  # JRNRCV PGM1 in SAVRST not found
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3764') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+# Test with not existing lib_name
+- name: TC31 Fetch objects with not existing lib_name
+  ibmi_fetch:
+    lib_name: 'ABC'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  #failed_when: "'ABC not found' not in ''.join(fetch_result.stderr)"
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF7302') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+# Test with invalid object_types
+- name: TC32 Fetch objects with invalid object_types
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    object_types: 'ABC'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  #failed_when: "'CPD0084' not in ''.join(fetch_result.stderr)"
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+
+# Test with invalid savefile_name
+- name: TC33 Fetch objects with invalid savefile_name
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    savefile_name: 'abc*123'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  #failed_when: "'CPD0012' not in ''.join(fetch_result.stderr)"
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0012') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+# Test with savefile_name more than 10 characters
+- name: TC34 Fetch objects with savefile_name more than 10 characters
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    savefile_name: 'abc123456789'
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  #failed_when: "'CPD0074' not in ''.join(fetch_result.stderr)"
+  failed_when: "fetch_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0074') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+# Test with invalid is_lib
+- name: TC35 Fetch objects with invalid is_lib 
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    is_lib: abc
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  failed_when: "'is not a valid boolean' not in fetch_result.msg"
+
+# Test with invalid backup
+- name: TC36 Fetch objects with invalid backup
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    backup: abc
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  failed_when: "'is not a valid boolean' not in fetch_result.msg"
+
+# Test with invalid force_save
+- name: TC37 Fetch objects with invalid force_save
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    force_save: abc
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  failed_when: "'is not a valid boolean' not in fetch_result.msg"
+
+# Test with invalid flat
+- name: TC38 Fetch objects with invalid flat
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    flat: abc
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  failed_when: "'is not a valid boolean' not in fetch_result.msg"
+
+# Test with invalid validate_checksum
+- name: TC39 Fetch objects with invalid validate_checksum
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    validate_checksum: abc
+    dest: '{{ output_dir }}/fetched'
+  register: fetch_result
+  failed_when: "'is not a valid boolean' not in fetch_result.msg"
+
+# Test with invalid format
+- name: TC40 Fetch objects with invalid format 
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: '{{ output_dir }}/fetched'
+    format: 'abc'
+  register: fetch_result
+  failed_when: "'format can only be *SAVF' not in fetch_result.msg"
+
+# Test not existing dest
+- name: TC41 Fetch objects with not existing dest 
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: '{{ output_dir }}/abcdefg'
+  
+- name: TC42 dest is an existing directory name without trailing slash and flat=yes
+  ibmi_fetch:
+    lib_name: 'SAVRST'
+    dest: '{{ output_dir }}/fetched'
+    flat: yes

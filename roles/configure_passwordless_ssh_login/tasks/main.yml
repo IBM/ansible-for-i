@@ -1,0 +1,38 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+# tasks file for configure_passwordless_ssh_login
+- name: install ssh key
+  authorized_key: user={{ target_user }}
+                  key="{{  public_key }}"
+                  state=present
+
+- name: find the home directory
+  ibm.power_ibmi.ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ target_user }}'
+  register: user_result
+
+- name: compose home_dir
+  set_fact:
+    home_dir: "{{ user_result['result_set'][0]['HOME_DIRECTORY'] }}"
+
+- name: the authority of home directory has to be 0700
+  file:
+    path: '{{ home_dir }}'
+    state: directory
+    mode: '0700'
+    owner: '{{ target_user }}'
+
+- name: the authority of .ssh directory has to be 0700
+  file:
+    path: '{{ home_dir }}/.ssh'
+    state: directory
+    mode: '0700'
+    owner: '{{ target_user }}'
+
+- name: the authority of authorized_keys has to be 0600
+  file:
+    path: '{{ home_dir }}/.ssh/authorized_keys'
+    state: file
+    mode: '0600'
+    owner: '{{ target_user }}'

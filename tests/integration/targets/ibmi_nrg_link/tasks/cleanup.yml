@@ -1,0 +1,10 @@
+- set_fact:
+    ip_info: "{{item['INTERNET_ADDRESS']}}"
+
+- ibmi_cl_command:
+    cmd: ENDTCPIFC INTNETADR('{{ip_info}}')
+  when: item['INTERFACE_STATUS'] != 'INACTIVE'
+
+- name: remove the exising ifc
+  ibmi_cl_command:
+    cmd: RMVTCPIFC INTNETADR('{{ip_info}}')

@@ -1,0 +1,46 @@
+- name: copy /sendMsg.c if not exist
+  copy:
+    src: ../files/sendMsg.c
+    dest: /home/{{ansible_ssh_user}}/sendMsg.c
+    force: yes
+
+- set_fact:
+    key_path: '~/.ssh/id_rsa'
+
+- name: check key pair state
+  stat:
+    path: '{{key_path}}'
+  register: key_state
+  run_once: true
+#  delegate_to: '{{target_system}}'
+
+- name: generate a key if the key doesn't exist
+  block:
+    - name: present the home directory
+      file:
+        state: directory
+        path: ~/.ssh
+        mode: 0700
+
+    - name: generate a key pair
+      command: ssh-keygen -q -t rsa -f {{key_path}} -C "" -N "" -m PEM
+      args:
+        creates: '{{key_path}}'
+  when: key_state.stat.exists == false
+  run_once: true
+
+- name: copy public key to fact
+  command: cat  {{key_path}}.pub
+  register: cat_result
+
+- name: copy public key to fact
+  set_fact:
+    public_key_content: "{{cat_result.stdout}}"
+
+- name: add public key to remote IBM i endpoints
+  delegate_to: '{{target_system}}'
+  import_role:
+    name: configure_passwordless_ssh_login
+  vars:
+    target_user: '{{ansible_ssh_user}}'
+    public_key: '{{public_key_content}}'

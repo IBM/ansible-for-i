@@ -1,0 +1,206 @@
+# test code for the ibmi_script module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+
+- name: send an info message to the message queue
+  ibmi_cl_command:
+    cmd: "QSYS/SNDMSG MSG('{{item[1]}}') TOMSGQ({{msgq_lib}}/{{item[0]}})"
+  with_nested: 
+    - "{{msgq}}"
+    - "{{info_msg_text}}"
+
+- name: TC15 find message with all supported options
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_queue: '{{msgq[0]}}'
+    message_lib: '{{msgq_lib}}'
+    message_id: ''
+    message_text: 'TRY FRIST ANSIBLE INFORMATION MESSAGE'
+  register: find_result
+
+- name: TC15 assert returned option
+  assert:
+    that:
+      - find_result.start is defined
+      - find_result.end is defined
+      - find_result.delta is defined
+      - find_result.stderr is defined
+      - find_result.message_info | length == 1
+      - find_result.message_info[0]['MESSAGE_TEXT'] == "{{info_msg_text[0]}}"
+      - find_result.message_info[0]['MESSAGE_TYPE'] == 'INFORMATIONAL'
+
+# Low priority issue, may enhance in future
+- name: TC16 find message with lowercase message_lib
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_queue: '{{msgq[0]}}'
+    message_lib: '{{msgq_lib.lower()}}'
+    #message_id: ''
+  register: find_result
+
+- name: TC16 assert returned option
+  assert:
+    that:
+      - find_result.message_info | length == 2
+
+- name: TC17 find message with lowercase message_queue
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_queue: '{{msgq[0].lower()}}'
+    message_lib: '{{msgq_lib}}'
+    #message_id: ''
+    message_text: 'TRY FRIST ANSIBLE'
+  register: find_result
+
+- name: TC17 assert returned option
+  assert:
+    that:
+      - find_result.message_info | length == 1
+
+- name: TC18 find message with only required options
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_lib: '{{msgq_lib}}'
+  register: find_result
+
+- name: TC18 assert returned option
+  assert:
+    that:
+      - find_result.start is defined
+      - find_result.end is defined
+      - find_result.delta is defined
+      - find_result.stderr is defined
+      - find_result.message_info | length == 4
+
+- name: TC19 find message in two message queue
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_lib: '{{msgq_lib}}'
+    message_queue: '{{msgq}}'
+    message_text: 'TRY FRIST ANSIBLE INFORMATION MESSAGE'
+  register: find_result
+
+- name: TC20 assert returned option
+  assert:
+    that:
+      - find_result.start is defined
+      - find_result.end is defined
+      - find_result.delta is defined
+      - find_result.stderr is defined
+      - find_result.message_info | length == 2
+
+- name: TC21 find msg with invalid operation
+  ibmi_message:
+    operation: 'abc'
+    message_type: 'INQUIRY'
+    message_queue: '{{msgq[0]}}'
+    message_lib: '{{msgq_lib}}'
+    message_text: 'TRY FRIST ANSIBLE INFORMATION MESSAGE'
+  register: neg_result
+  failed_when: "'value of operation must be one of' not in neg_result.msg"
+
+- name: TC22 find msg with invalid messae type
+  ibmi_message:
+    operation: 'find'
+    message_type: 'abc'
+    message_queue: '{{msgq[0]}}'
+    message_lib: '{{msgq_lib}}'
+    message_text: 'TRY FRIST ANSIBLE INQUIRY MESSAGE'
+  register: neg_result
+  failed_when: "'value of message_type must be one of' not in neg_result.msg"
+
+- name: TC23 find msg with not existing message queue
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INQUIRY'
+    message_queue: 'abc'
+    message_lib: '{{msgq_lib}}'
+  register: neg_result
+  ignore_errors: true
+
+- name: TC23 assert returned option
+  assert:
+    that:
+      - neg_result.start is defined
+      - neg_result.end is defined
+      - neg_result.delta is defined
+      - neg_result.stderr is defined
+      - neg_result.message_info | length == 0 
+
+- name: TC24 find msg job with not existing library
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_queue: '{{msgq[0]}}'
+    message_lib: 'abcedfeg'
+  register: neg_result
+  ignore_errors: true
+
+- name: TC24 assert returned option
+  assert:
+    that:
+      #- "'Row not found' in neg_result.stderr"
+      - neg_result.message_info | length == 0
+
+- name: TC25 find msg job with not existing message text
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_queue: '{{msgq[0]}}'
+    message_lib: '{{msgq_lib}}'
+    message_id: ''
+    message_text: 'INVALID TEXT MESSAGE'
+  register: neg_result
+  ignore_errors: true
+
+- name: TC25 assert returned option
+  assert:
+    that:
+      - neg_result.message_info | length == 0
+      #- "'Row not found' in neg_result.stderr"
+
+- name: TC26 find msg job with not-existing parameters
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_queue: '{{msgq[0]}}'
+    message_lib: '{{msgq_lib}}'
+    abc: abc
+  register: neg_result
+  failed_when: "'Unsupported parameters' not in neg_result.msg"
+
+- name: TC27 find msg job missing required parameters
+  ibmi_message:
+    operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_queue: '{{msgq[0]}}'
+    #message_lib: '{{msgq_lib}}'       
+  register: neg_result
+  failed_when: "'missing required arguments: message_lib' not in neg_result.msg"
+
+- name: TC28 find msg job missing required parameters
+  ibmi_message:
+    operation: 'find'
+    #message_type: 'INFORMATIONAL'
+    message_queue: '{{msgq[0]}}'
+    message_lib: '{{msgq_lib}}'       
+  register: neg_result
+  failed_when: "'missing required arguments: message_type' not in neg_result.msg"
+
+- name: TC29 find msg job missing required parameters
+  ibmi_message:
+    #operation: 'find'
+    message_type: 'INFORMATIONAL'
+    message_queue: '{{msgq[0]}}'
+    message_lib: '{{msgq_lib}}'       
+  register: neg_result
+  failed_when: "'missing required arguments: operation' not in neg_result.msg"
+
+
+ 

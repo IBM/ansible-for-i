@@ -1,0 +1,9 @@
+---
+# tasks file for find_ptfinfo
+- name: compose compose_list
+  set_fact:
+    compose_list: "{{ compose_list|default([]) + [ptf_info] }}"
+  when: ptf_info.ptf_id == ptf_id
+  with_list: "{{ check_ptf_list }}"
+  loop_control:
+    loop_var: ptf_info

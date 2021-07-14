@@ -1,0 +1,197 @@
+# Test when all dependent packages are in place  
+- name: Query the iASP existing
+  ibmi_sql_query:
+    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+  register: iasp_list
+
+- block:
+  
+  - name: run CL command module with asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB(FINDLIB) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: true
+    
+  - name: restore object to library
+    ibmi_cl_command: 
+      cmd: "QSYS/RSTOBJ OBJ(*ALL) SAVLIB(FINDLIB) DEV(*SAVF) SAVF(QGPL/FINDOBJ) RSTASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})"
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    ignore_errors: true
+
+  # Run positive test cases
+
+  - name: find objects with object_type_list 
+    ibmi_object_find: 
+      object_type_list: " *DTAARA"
+      object_name: "OBJECT1"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: find_result
+
+  - name: assert the returned objects 
+    assert:
+      that:
+        - find_result.rc == 0
+        - find_result.start != ""
+        - find_result.end != ""   
+        - find_result.delta != ""
+        - "'stdout' not in find_result"
+        - "'stderr' not in find_result"
+        - "'stdout_lines' not in find_result"
+        - "'stderr_lines' not in find_result"  
+        - find_result.object_list[0].OBJNAME is defined
+        - find_result.object_list[0].OBJTYPE is defined
+        - find_result.object_list[0].OBJOWNER is defined
+        - find_result.object_list[0].TEXT is defined
+        - find_result.object_list[0].OBJCREATED is defined
+        - find_result.object_list[0].OBJDEFINER is defined
+        - find_result.object_list[0].OBJLIB is defined
+        - find_result.object_list[0].LAST_RESET_TIMESTAMP is defined
+        - find_result.object_list[0].LAST_USED_TIMESTAMP is defined
+        - find_result.object_list[0].OBJSIZE is defined
+
+  - name: find objects with object_type_list 
+    ibmi_object_find: 
+      object_type_list: " *DTAARA"
+      object_name: "OBJECT1"
+      lib_name: "FINDLIB"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: find_result
+
+  - name: find objects with age=1s size=1k
+    ibmi_object_find: 
+      age: "1s"
+      age_stamp: "ctime"
+      object_type_list: "*ALL"
+      lib_name: "FINDLIB"
+      object_name: "*ALL"
+      size: "1k"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      use_regex: false
+    register: find_result
+
+  - name: assert the returned objects 
+    assert:
+      that:
+        - find_result.rc == 0
+        - find_result.start != ""
+        - find_result.end != ""   
+        - find_result.delta != ""
+        - "'stdout' not in find_result"
+        - "'stderr' not in find_result"
+        - "'stdout_lines' not in find_result"
+        - "'stderr_lines' not in find_result"  
+        - find_result.object_list | length == 10
+        - find_result.object_list[0].OBJNAME is defined
+        - find_result.object_list[0].OBJTYPE is defined
+        - find_result.object_list[0].OBJOWNER is defined
+        - find_result.object_list[0].TEXT is defined
+        - find_result.object_list[0].OBJCREATED is defined
+        - find_result.object_list[0].OBJDEFINER is defined
+        - find_result.object_list[0].IASP_NUMBER is defined 
+        - find_result.object_list[0].OBJLIB is defined
+
+  - name: find objects with size=1k
+    ibmi_object_find: 
+      #age: "1s"
+      age_stamp: "ctime"
+      object_type_list: "*ALL"
+      lib_name: "FINDLIB"
+      object_name: "*ALL"
+      size: "1k"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      use_regex: false
+    register: find_result
+
+  - name: assert the returned objects 
+    assert:
+      that:  
+        - find_result.object_list | length == 10
+
+  - name: find objects with lib_name
+    ibmi_object_find: 
+      object_type_list: "*ALL"
+      lib_name: "FINDLIB"
+      object_name: "*ALL"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: find_result
+
+  - name: assert the returned objects 
+    assert:
+      that:  
+        - find_result.object_list | length == 10
+
+  - name: find objects with size=0 
+    ibmi_object_find: 
+      size: "0"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: find_result
+
+  - name: find objects with age=1s lib_name but without other options
+    ibmi_object_find: 
+      age: "1s"
+      lib_name: "FINDLIB"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: find_result
+
+  - name: assert the returned objects 
+    assert:
+      that:
+        - find_result.object_list | length == 10
+
+  - name: find objects with age=50w
+    ibmi_object_find: 
+      age: "50w"
+      lib_name: "FINDLIB"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: find_result
+
+  - name: assert the returned objects 
+    assert:
+      that:
+        - find_result.object_list | length == 0
+
+  - name: find objects with object_type_list lib_name
+    ibmi_object_find: 
+      object_type_list: " *DTAARA"
+      lib_name: "FINDLIB"
+      object_name: "OBJECT1"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: find_result
+
+  - name: assert the returned objects 
+    assert:
+      that:
+        - find_result.object_list | length == 1
+
+  - name: find objects with multiple object_type_list
+    ibmi_object_find: 
+      object_type_list: " *DTAARA *JRN *FILE"
+      lib_name: "FINDLIB"
+      object_name: "OBJECT1"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: find_result
+
+  - name: assert the returned objects 
+    assert:
+      that:
+        - find_result.object_list | length == 2
+
+  - name: find objects with multiple library_list
+    ibmi_object_find: 
+      object_type_list: " *DTAARA"
+      lib_name: "FINDLIB FINDLIB1"
+      object_name: "OBJECT1"
+      iasp_name: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: find_result
+
+  - name: assert the returned objects 
+    assert:
+      that:
+        - find_result.object_list | length == 0
+  when: iasp_list.row_count != 0
+
+  always:
+    - name: delete library
+      ibmi_cl_command: 
+        cmd: dltlib lib(FINDLIB)
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"

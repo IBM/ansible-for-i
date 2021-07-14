@@ -1,0 +1,6 @@
+- name: Get current boot time
+  ibmi_sql_query:
+    sql: "SELECT job_entered_system_time FROM TABLE(qsys2.job_info(job_status_filter => '*ACTIVE', job_user_filter => 'QSYS')) x
+         WHERE job_name = '000000/QSYS/SCPF'"
+    expected_row_count: 1
+  register: before_boot_time

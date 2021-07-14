@@ -1,0 +1,40 @@
+---
+- name: Get the latest PTF group information from PSP website, and download ptf group
+# This playbook will get the latest PTF group information from IBM PSP website, and check if the latest PTF group already in repo
+# server. If not, download the latest PTF group, add download record to download_status table and add PTF group information to ptf_group_image_info table.
+
+# Command example: ansible-playbook ./check_download_ptf_group.yml -e "{'repo_server': 'reposerver', 'ptf_group': 'SF99663'}"
+
+  hosts: "{{ repo_server }}"
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    ptf_group: "{{ ptf_group }}"
+
+  tasks:
+    - name: Include fix_repo_check_ptf_group role to check if the latest ptf group is already in catalog
+      include_role:
+        name: fix_repo_check_ptf_group
+
+    - block:
+        - name: End play when no ptf group need to be downloaded
+          debug:
+            msg: "PTF group information is already in catalog or is already downloading, quit play"
+
+        - name: end_host
+          meta: end_host
+      when: ptf_group_find_result.fail_list is not defined or download_status_find_result.fail_list is not defined
+
+    - name: Include fix_repo_download_add_ptf_group role to download the ptf group and add information into catalog download_status table
+      include_role:
+        name: fix_repo_download_add_ptf_group
+      vars:
+        ptf_group_info: "{{ fix_group_check_result.group_info[0] }}"
+
+    - name: Print msg
+      debug:
+        msg: |
+            "After order {{ download_fix_result.order_id }} is complete, \
+             call fix_repo_extract_ptf_group_info role to extract ptf group information into catalog."

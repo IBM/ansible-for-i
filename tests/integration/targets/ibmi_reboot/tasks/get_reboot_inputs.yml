@@ -1,0 +1,26 @@
+- name: Get current boot time
+  ibmi_sql_query:
+    sql: "SELECT job_entered_system_time FROM TABLE(qsys2.job_info(job_status_filter => '*ACTIVE', job_user_filter => 'QSYS')) x
+         WHERE job_name = '000000/QSYS/SCPF'"
+    expected_row_count: 1
+  register: after_boot_time
+
+- name: Ensure system was actually rebooted
+  assert:
+    that:
+      - reboot_result is changed
+      - reboot_result.elapsed > 10
+      - before_boot_time.row[0].JOB_ENTERED_SYSTEM_TIME != after_boot_time.row[0].JOB_ENTERED_SYSTEM_TIME 
+
+- set_fact: last_boot={{ before_boot_time.row[0]['JOB_ENTERED_SYSTEM_TIME'] }}
+
+- name: Get the input of PWRDWNSYS
+  ibmi_sql_query:
+    sql: "select message_second_level_text  FROM 
+TABLE(qsys2.history_log_info('{{ last_boot }}', (SELECT job_entered_system_time
+  FROM TABLE(qsys2.job_info(job_status_filter => '*ACTIVE', job_user_filter
+  => 'QSYS')) x
+  WHERE job_name = '000000/QSYS/SCPF'))) x
+     WHERE message_id = 'CPI0995'"
+    expected_row_count: 1
+  register: pwr_cmd_input

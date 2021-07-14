@@ -1,0 +1,130 @@
+- set_fact:
+    single_immed_ptf_number: "{{(immed_ptf | dict2items)[0]['key']}}"
+    single_immed_ptf_product: "{{(immed_ptf | dict2items)[0]['value']}}"
+
+- name: run module without options
+  ibmi_fix:
+  register: fix_result
+  failed_when: "'operation is load_and_apply but all of the following are missing: product_id, save_file_object' not in fix_result.msg"
+
+- name: load_and_apply fixes with missing product_id
+  ibmi_fix:
+    save_file_object: "Q{{single_immed_ptf_number}}" 
+    save_file_lib: '{{ remote_lib }}'
+  register: fix_result
+  failed_when: "'operation is load_and_apply but all of the following are missing: product_id' not in fix_result.msg"
+
+- name: load_and_apply fixes with missing save_file_object
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product}}"
+    #save_file_object: "Q{{single_immed_ptf_number}}" 
+    save_file_lib: '{{ remote_lib }}'
+  register: fix_result
+  failed_when: "'operation is load_and_apply but all of the following are missing: save_file_object' not in fix_result.msg"
+
+- name: load_only fixes with missing product_id
+  ibmi_fix:
+    save_file_object: "Q{{single_immed_ptf_number}}" 
+    save_file_lib: '{{ remote_lib }}'
+    operation: 'load_only'
+  register: fix_result
+  failed_when: "'operation is load_only but all of the following are missing: product_id' not in fix_result.msg"
+
+- name: load_only fixes with missing save_file_object
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product}}"
+    save_file_lib: '{{ remote_lib }}'
+    operation: 'load_only'
+  register: fix_result
+  failed_when: "'operation is load_only but all of the following are missing: save_file_object' not in fix_result.msg"
+
+- name: load_only fixes with an wrong product_id
+  ibmi_fix:
+    product_id: "5770ABC"
+    save_file_object: "Q{{single_immed_ptf_number}}" 
+    save_file_lib: '{{remote_lib}}'
+    operation: 'load_only'
+  register: fix_result
+  ignore_errors: true
+  #failed_when: "'Product 5770ABC *ONLY not installed' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3606') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+- name: load_only fixes with an wrong save_file_lib
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product}}"
+    save_file_object: "Q{{single_immed_ptf_number}}" 
+    save_file_lib: 'ABC'
+    operation: 'load_only'
+  register: fix_result
+  #failed_when: "'Cannot resolve to object ABC' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF381A') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: load_only fixes with an wrong save_file_object
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product}}"
+    save_file_object: "ABC" 
+    save_file_lib: '{{remote_lib}}'
+    operation: 'load_only'
+  register: fix_result
+  #failed_when: "'Cannot resolve to object ABC' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF381A') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: apply_only fixes with missing product_id 
+  ibmi_fix:
+    #product_id: "{{ single_immed_ptf_product}}"
+    fix_list: "Q{{single_immed_ptf_number}}"
+    operation: 'apply_only'
+  register: fix_result
+  failed_when: "'operation is apply_only but all of the following are missing: product_id' not in fix_result.msg"
+
+- name: remove fixes with missing product_id 
+  ibmi_fix:
+    #product_id: "{{ single_immed_ptf_product}}"
+    fix_list: "{{single_immed_ptf_number}}"
+    operation: 'remove'
+  register: fix_result
+  failed_when: "'operation is remove but all of the following are missing: product_id' not in fix_result.msg"
+
+- name: query fixes without other options, no error is returned. That is work as designed. 
+  ibmi_fix:
+    operation: 'query'
+  register: fix_result
+
+- name: query immed ptf with invalid prodct_id
+  ibmi_fix: 
+    product_id: '5770ABC'
+    fix_list: '{{ single_immed_ptf_number }}'
+    operation: 'query'
+
+- name: fix with invalid operation
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product}}"
+    fix_list: "Q{{single_immed_ptf_number}}"
+    operation: "abc" 
+  register: fix_result
+  failed_when: "'value of operation must be one of:' not in fix_result.msg"
+
+- name: fix with invalid operation
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product}}"
+    fix_list: "Q{{single_immed_ptf_number}}"
+    temp_or_perm: "abc" 
+  register: fix_result
+  failed_when: "'value of temp_or_perm must be one of' not in fix_result.msg"
+
+- name: install fix with all options
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product}}"
+    save_file_object: "Q{{single_immed_ptf_number}}"
+    save_file_lib: '{{remote_lib}}'
+    delayed_option: "abc"
+  register: fix_result
+  failed_when: "'value of delayed_option must be one of' not in fix_result.msg"
+
+- name: fix with invalid operation
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product}}"
+    fix_list: "Q{{single_immed_ptf_number}}"
+    abc: "abc" 
+  register: fix_result
+  failed_when: "'Unsupported parameters' not in fix_result.msg"

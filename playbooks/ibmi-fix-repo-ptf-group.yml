@@ -1,0 +1,80 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+#ibmi-fix-repo-sample.yml 
+#The sample file is to provide an example about how to manipulate the PTF database
+---
+- hosts: all
+  gather_facts: false
+  collections:
+   - ibm.power_ibmi
+
+  tasks:
+    - block:
+      - name: fetch_some_group_info_from_web
+        ibmi_fix_group_check:
+          groups:
+            - "SF99738"
+        register: group_info
+
+      - name: display_group_info
+        debug:
+          msg: '{{ group_info.count }} group info returned'
+
+      - name: add_group_info_records
+        ibmi_fix_repo:
+          action: 'add'
+          type: 'ptf_group'
+          checksum: false
+          parameters:
+            - { 'ptf_group_number': '{{ group_info.group_info[0].ptf_group_number }}',
+               'ptf_group_level': '{{ group_info.group_info[0].ptf_group_level }}',
+               'ptf_list': '{{ group_info.group_info[0].ptf_list }}',
+               'release_date': '{{ group_info.group_info[0].release_date }}' }
+        register: add_group_info_records
+
+      - name: query_group_info_records
+        ibmi_fix_repo:
+          action: 'find'
+          type: 'ptf_group'
+          parameters:
+            - {'ptf_group_number':'SF99738'}
+        register: group_info_records
+
+      - name: display_query_group_info_records
+        debug:
+          msg: '{{ group_info_records.success_list | length }} records returned'
+
+      - name: change_group_info_records
+        ibmi_fix_repo:
+          action: 'update'
+          type: 'ptf_group'
+          checksum: true
+          parameters:
+            - {'order_id': '2020579181', 'file_path':'/QIBM/UserData/OS/Service/ECS/PTF/2020579181',
+              'ptf_group_number': '{{ group_info.group_info[0].ptf_group_number }}',
+              'ptf_group_level': '{{ group_info.group_info[0].ptf_group_level }}',
+              'release_date': '{{ group_info.group_info[0].release_date }}'}
+        register: change_group_info_records
+
+      - name: display_change_group_info_records
+        debug:
+          msg: '{{ change_group_info_records }}'
+
+      - name: query_updated_group_info_records
+        ibmi_fix_repo:
+          action: 'find'
+          type: 'ptf_group'
+          parameters:
+            - {'ptf_group_number':'SF99738'}
+        register: query_updated_group_info_records
+
+      - name: display_updated_group_info_records
+        debug:
+          msg: '{{ query_updated_group_info_records }}'
+
+      always:
+      - name: drop_the_table
+        ibmi_fix_repo:
+          action: "clear"
+          type: 'ptf_group'

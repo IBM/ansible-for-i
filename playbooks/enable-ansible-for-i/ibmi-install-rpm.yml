@@ -1,0 +1,15 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- set_fact:
+    package_name: "{{ python }}-{{ item }}"
+
+- name: Verify {{ item }} installed
+  raw: /QOpensys/pkgs/bin/yum list installed | grep {{ package_name }}
+  register: package_query_result
+  ignore_errors: true
+
+- name: Install {{ item }} if it is not installed
+  raw: /QOpensys/pkgs/bin/yum install {{ python }}-{{ item }} -y
+  #when: '"{{ python }}-{{ item }}" not in package_query_result.stdout'
+  when: package_name not in package_query_result.stdout

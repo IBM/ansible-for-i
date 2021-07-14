@@ -1,0 +1,238 @@
+# test code for the ibmi_tcp_server_service module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block: 
+    - name: check whether the QDIRSRV is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+            JOB_NAME_FILTER => 'QUSRDIR',
+            CURRENT_USER_LIST_FILTER => 'QDIRSRV',
+            SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
+      register: sql_result
+
+    - name: end it if it is running
+      ibmi_cl_command:
+        cmd: 'ENDTCPSVR SERVER(*DIRSRV) INSTANCE(*all)'
+      when: sql_result.row | length != 0 
+
+    - name: TC01 start tcp server with all parameters
+      ibmi_tcp_server_service:
+        name_list: ['*DIRSRV']
+        state: 'started'
+        extra_parameters: ''
+        joblog: false
+      register: start_result
+    
+    - name: TC01 assert the defined parameters are returned
+      assert:
+        that:
+          - start_result.job_log is defined
+          - start_result.start is defined
+          - start_result.end is defined
+          - start_result.delta is defined
+          - start_result.stdout is defined
+          - start_result.stderr is defined
+          - "'QSYS/STRTCPSVR SERVER(*DIRSRV)' in start_result.cmd"
+          - start_result.rc == 0
+          - start_result.stdout_lines is defined
+          - start_result.stderr_lines is defined
+
+    - name: TC01 assert the host server is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+            JOB_NAME_FILTER => 'QUSRDIR',
+            CURRENT_USER_LIST_FILTER => 'QDIRSRV',
+            SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
+      register: sql_result  
+      until: sql_result.row | length == 1
+      retries: 5
+      delay: 300    
+
+    - name: TC02 start host server when the host server is running
+      ibmi_tcp_server_service:
+        name_list: ['*DIRSRV']
+        state: 'started'
+        extra_parameters: ''
+        joblog: false
+      register: start_result
+
+    - name: TC02 assert the host server is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+            JOB_NAME_FILTER => 'QUSRDIR',
+            CURRENT_USER_LIST_FILTER => 'QDIRSRV',
+            SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
+        expected_row_count: 1  
+
+    - name: TC03 end host server with all parameters
+      ibmi_tcp_server_service:
+        name_list: ['*DIRSRV']
+        state: 'stopped'
+        extra_parameters: ''
+        joblog: true
+      register: end_result
+
+    - name: TC03 assert the definedd parameters are returned
+      assert:
+        that:
+          - end_result.job_log is defined
+          - end_result.start is defined
+          - end_result.end is defined
+          - end_result.delta is defined
+          - end_result.stdout is defined
+          - end_result.stderr is defined
+          - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV) '
+          - end_result.rc == 0
+          - end_result.stdout_lines is defined
+          - end_result.stderr_lines is defined
+
+    - name: TC03 pause a few seconds to wait for the tcp service stopped
+      pause:
+        seconds: 20
+
+    - name: TC03 assert the host server is not running
+      ibmi_sql_query:
+        sql: "SELECT * 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+            JOB_NAME_FILTER => 'QUSRDIR',
+            CURRENT_USER_LIST_FILTER => 'QDIRSRV',
+            SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
+        expected_row_count: 0
+
+    - name: TC04 state==stopped when the host server is not running
+      ibmi_tcp_server_service:
+        name_list: ['*DIRSRV']
+        state: 'stopped'
+        extra_parameters: ''
+        joblog: true
+      register: end_result
+
+    - name: TC04 assert the host server is not running
+      ibmi_sql_query:
+        sql: "SELECT * 
+FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+            JOB_NAME_FILTER => 'QUSRDIR',
+            CURRENT_USER_LIST_FILTER => 'QDIRSRV',
+            SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
+        expected_row_count: 0
+
+    - name: TC05 start host server with extra_parameters
+      ibmi_tcp_server_service:
+        name_list: ['*DIRSRV']
+        state: 'started'
+        extra_parameters: 'INSTANCE(*ALL)'
+        joblog: false
+      register: start_result
+
+    - name: TC05 assert the definedd parameters are returned
+      assert:
+        that:
+          - start_result.cmd == 'QSYS/STRTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
+
+    - name: TC06 end host server with extra_parameters
+      ibmi_tcp_server_service:
+        name_list: ['*DIRSRV']
+        state: 'stopped'
+        extra_parameters: 'INSTANCE(*ALL)'
+        joblog: true
+      register: end_result
+
+    - name: TC06 assert the definedd parameters are returned
+      assert:
+        that:
+          - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
+
+    - name: TC07 start host server with multiple host servers
+      ibmi_tcp_server_service:
+        name_list: ["*DIRSRV", "*HTTP"]
+        state: 'started'
+        joblog: true
+      register: start_result
+
+    - name: TC07 assert the definedd parameters are returned
+      assert:
+        that:
+          - start_result.cmd == 'QSYS/STRTCPSVR SERVER(*DIRSRV *HTTP)  '
+
+    - name: TC08 end host server with multiple host servers
+      ibmi_tcp_server_service:
+        name_list: ["*DIRSRV", "*HTTP"]
+        state: 'stopped'
+        joblog: true
+      register: end_result
+
+    - name: TC08 assert the defined parameters are returned
+      assert:
+        that:
+          - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV *HTTP)  '
+
+    # Test negative path
+    - name: TC09 start host server only required parameters
+      ibmi_tcp_server_service:
+        state: started
+      register: neg_result
+      failed_when: "'missing required argument' not in neg_result.msg"
+
+    - name: TC10 end host server with default values
+      ibmi_tcp_server_service:
+        state: stopped
+      register: neg_result
+      failed_when: "'missing required argument' not in neg_result.msg"
+
+    - name: TC11 start host server only required parameters
+      ibmi_tcp_server_service:
+        name_list: ["*DIRSRV", "*HTTP"]
+      register: neg_result
+      failed_when: "'missing required argument' not in neg_result.msg"
+
+    - name: TC12 host server with missing required options
+      ibmi_tcp_server_service:
+      register: neg_result
+      failed_when: "'missing required argument' not in neg_result.msg"
+
+    - name: TC13 with invalid option
+      ibmi_tcp_server_service:
+        name_list: ["*DIRSRV", "*HTTP"]
+        state: 'stopped'
+        abc: true
+      register: neg_result
+      failed_when: "'Unsupported parameters' not in neg_result.msg"
+
+    - name: TC14 with invalid server type
+      ibmi_tcp_server_service:
+        name_list: ["abc"]
+        state: 'stopped'
+      register: neg_result
+      failed_when: "'Value specified for name_list is not valid' not in neg_result.msg"
+
+    - name: TC15 with invalid extra_parameters
+      ibmi_tcp_server_service:
+        name_list: ["*ALL"]
+        state: 'stopped'
+        extra_parameters: 'abc abc'
+        joblog: true
+      register: neg_result
+      #failed_when: "'CPD0044' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+    - name: TC16 with invalid joblog
+      ibmi_tcp_server_service:
+        name_list: ["ALL"]
+        state: 'stopped'
+        joblog: 'abcabc'
+      register: neg_result
+      failed_when: "'we were unable to convert to bool' not in neg_result.msg"
+
+    - name: TC17 start host server with multiple host servers
+      ibmi_tcp_server_service:
+        name_list: ["*HTTP", "*AUTOSTART"]
+        state: 'started'
+        joblog: true
+      register: neg_result
+      #failed_when: "'CPD0094' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0094') | map(attribute='MESSAGE_ID') | list | length ==0"

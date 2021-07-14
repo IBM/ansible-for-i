@@ -1,0 +1,297 @@
+# test code for the ibmi_copy module and action plugin
+# (c) 2020, Li Jun Zhu <zhuljbj@126.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+
+- set_fact:
+    single_immed_ptf_number: "{{(immed_ptf | dict2items)[0]['key']}}"
+    single_immed_ptf_product: "{{(immed_ptf | dict2items)[0]['value']}}"
+
+- include: query_remove_ptf.yml
+  with_dict: '{{immed_ptf}}'
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: '{{ immed_ptf.keys() |list}}'
+    operation: 'query'
+  register: fix_result
+
+- assert: 
+    that: 
+      - item['PTF_LOADED_STATUS'] != 'NOT LOADED' or item['PTF_LOADED_STATUS'] != 'PERMANENTLY REMOVED'
+    fail_msg: "{{item['PTF_IDENTIFIER']}} is not removed, its PTF_LOADED_STATUS is {{item['PTF_LOADED_STATUS'] }}"
+  loop: "{{fix_result.ptf_list}}" 
+  when: "fix_result.ptf_list | length != 0" 
+
+- name: install fixes
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product}}"
+    save_file_object: "{{ single_immed_ptf_number }}"
+    save_file_lib: '{{remote_lib}}'
+    operation: 'load_only'
+  register: fix_result
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_immed_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'LOADED'
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+# github issue is reported
+- name: allow apply without identifying fix
+  ibmi_fix:
+    product_id: "{{ single_immed_ptf_product }}"
+    fix_list: "{{ single_immed_ptf_number }}"
+    operation: 'apply_only'
+  register: fix_result 
+
+- assert:
+    that:
+      - "fix_result.ptf_list[0]['PTF_PRODUCT_ID'] == '{{ single_immed_ptf_product }}'"
+      - "fix_result.ptf_list[0]['PTF_IDENTIFIER'] == '{{ single_immed_ptf_number }}'"
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'APPLIED'
+      - fix_result.ptf_list[0]['PTF_SAVE_FILE'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_ACTION'] is defined
+      - fix_result.ptf_list[0]['PTF_ACTION_REQUIRED'] is defined
+      - fix_result.ptf_list[0]['PTF_STATUS_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_CREATION_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_ACTION_PENDING'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_REQUIRED'] is defined
+      - fix_result.ptf_list[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_immed_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.ptf_list[0]['PTF_PRODUCT_ID'] is defined
+      - fix_result.ptf_list[0]['PTF_IDENTIFIER'] is defined
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'APPLIED'
+      - fix_result.ptf_list[0]['PTF_SAVE_FILE'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_ACTION'] is defined
+      - fix_result.ptf_list[0]['PTF_ACTION_REQUIRED'] is defined
+      - fix_result.ptf_list[0]['PTF_STATUS_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_CREATION_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_ACTION_PENDING'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_REQUIRED'] is defined
+      - fix_result.ptf_list[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+- name: remove the ptfs temp if they have been installed
+  ibmi_fix:
+    fix_list: '{{ single_immed_ptf_number }}'
+    product_id: "{{ single_immed_ptf_product }}"
+    operation: 'remove'
+  register: fix_result
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'LOADED'
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_immed_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'LOADED'
+
+- name: remove the ptfs perm if they have been installed
+  ibmi_fix:
+    fix_list: '{{ single_immed_ptf_number }}'
+    product_id: "{{ single_immed_ptf_product }}"
+    operation: 'remove'
+    temp_or_perm: "*PERM"
+  register: fix_result
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_immed_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 0 or (fix_result.ptf_list | length == 1 and (fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'NOT LOADED' or fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'PERMANENTLY REMOVED')) 
+
+- name: install fixes
+  ibmi_fix:
+    product_id: '{{single_immed_ptf_product}}' 
+    save_file_object: '{{ single_immed_ptf_number }}'
+    fix_list: "{{ single_immed_ptf_number }}" 
+    save_file_lib: '{{remote_lib}}'
+    operation: 'load_and_apply'
+  register: fix_result 
+
+- assert:
+    that:
+      - "fix_result.ptf_list[0]['PTF_PRODUCT_ID'] == '{{ single_immed_ptf_product }}'"
+      - "fix_result.ptf_list[0]['PTF_IDENTIFIER'] == '{{ single_immed_ptf_number }}'"
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'APPLIED'
+      - fix_result.ptf_list[0]['PTF_SAVE_FILE'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_ACTION'] == 'NONE'
+      - fix_result.ptf_list[0]['PTF_ACTION_REQUIRED'] == 'NONE'
+      - fix_result.ptf_list[0]['PTF_STATUS_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_CREATION_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_ACTION_PENDING'] == 'NO'
+      - fix_result.ptf_list[0]['PTF_IPL_REQUIRED'] == 'IMMEDIATE'
+      - fix_result.ptf_list[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_immed_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - "fix_result.ptf_list[0]['PTF_PRODUCT_ID'] == '{{ single_immed_ptf_product }}'"
+      - "fix_result.ptf_list[0]['PTF_IDENTIFIER'] == '{{ single_immed_ptf_number }}'"
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'APPLIED'
+      - fix_result.ptf_list[0]['PTF_SAVE_FILE'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_ACTION'] == 'NONE'
+      - fix_result.ptf_list[0]['PTF_ACTION_REQUIRED'] == 'NONE'
+      - fix_result.ptf_list[0]['PTF_STATUS_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_CREATION_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_ACTION_PENDING'] == 'NO'
+      - fix_result.ptf_list[0]['PTF_IPL_REQUIRED'] == 'IMMEDIATE'
+      - fix_result.ptf_list[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+- name: remove the ptfs perm if they have been installed
+  ibmi_fix:
+    fix_list: '{{ single_immed_ptf_number }}'
+    product_id: "{{ single_immed_ptf_product }}"
+    operation: 'remove'
+    temp_or_perm: "*PERM"
+
+- name: install fixes with default operation
+  ibmi_fix:
+    product_id: '{{single_immed_ptf_product}}' 
+    save_file_object: '{{ single_immed_ptf_number }}'
+    save_file_lib: '{{remote_lib}}'
+  register: fix_result
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_immed_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - "fix_result.ptf_list[0]['PTF_PRODUCT_ID'] == '{{ single_immed_ptf_product }}'"
+      - "fix_result.ptf_list[0]['PTF_IDENTIFIER'] == '{{ single_immed_ptf_number }}'"
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'APPLIED'
+      - fix_result.ptf_list[0]['PTF_SAVE_FILE'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_ACTION'] == 'NONE'
+      - fix_result.ptf_list[0]['PTF_ACTION_REQUIRED'] == 'NONE'
+      - fix_result.ptf_list[0]['PTF_STATUS_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_CREATION_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_ACTION_PENDING'] == 'NO'
+      - fix_result.ptf_list[0]['PTF_IPL_REQUIRED'] == 'IMMEDIATE'
+      - fix_result.ptf_list[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+      - fix_result.ptf_list | length == 1
+
+- name: remove the ptfs temp if they have been installed
+  ibmi_fix:
+    fix_list: '{{ single_immed_ptf_number }}'
+    product_id: "{{ single_immed_ptf_product }}"
+    operation: 'remove'
+  register: fix_result
+
+- name: remove the ptfs perm if they have been installed
+  ibmi_fix:
+    fix_list: '{{ single_immed_ptf_number }}'
+    product_id: "{{ single_immed_ptf_product }}"
+    operation: 'remove'
+    temp_or_perm: "*PERM"

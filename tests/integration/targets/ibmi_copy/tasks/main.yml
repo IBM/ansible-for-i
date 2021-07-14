@@ -1,0 +1,80 @@
+# test code for the ibmi_copy module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+######################################################
+# Savefile archlib.file ARCHLIB
+#  Opt  Object      Type      Library     Attribute  
+#       PF          *JRNRCV   ARCHLIB                
+#       PF1         *JRNRCV   ARCHLIB                
+#       PF1         *FILE     ARCHLIB     PF         
+#       PF2         *FILE     ARCHLIB     PF         
+#       PF3         *FILE     ARCHLIB     PF         
+#       PF4         *FILE     ARCHLIB     PF         
+#       PF5         *FILE     ARCHLIB     PF         
+#       PF6         *FILE     ARCHLIB     PF         
+#       PF7         *FILE     ARCHLIB     PF         
+#       PF8         *FILE     ARCHLIB     PF         
+#       PF9         *FILE     ARCHLIB     PF            
+#  Savefile savrst.file                                               
+#  Opt  Object      Type      Library     Attribute
+#       ANSIJSNRC1  *JRNRCV   SAVRST               
+#       ANSIJSNRC2  *JRNRCV   SAVRST               
+#       PF1         *FILE     SAVRST      PF       
+#       PF2         *FILE     SAVRST      PF       
+#       PGM1        *FILE     SAVRST      SAVF     
+#       SAVF1       *FILE     SAVRST      SAVF     
+###################################################
+- block:
+
+    - name: Create a local temporary directory
+      shell: mktemp -d /tmp/ansible_test.XXXXXXXXX
+      register: tempfile_result
+      delegate_to: localhost
+
+    - set_fact:
+        local_temp_dir: '{{ tempfile_result.stdout }}'
+        remote_dir: '{{ remote_tmp_dir }}'
+        remote_temp_lib: 'ARCHLIB'
+        remote_restored_lib: 'SAVRST'
+        savf_name: 'SAVRST.FILE'
+        try_same_name_savf: 'ANSIJSNRC1.FILE'
+        try_backup_savf_name: 'PF.FILE'
+        archive_savf_name: 'ARCHLIB.FILE'
+        txt_name: 'foo.txt'
+
+    - name: copy the testing files to local tempoarary directory
+      copy: 
+        src: 'PF.FILE'
+        dest: '{{ local_temp_dir }}'
+      delegate_to: localhost 
+
+    - name: copy the testing files to local tempoarary directory
+      shell: ls -l {{ local_temp_dir }}
+      delegate_to: localhost
+
+    - name: create libraries 
+      ibmi_cl_command: 
+        cmd: "crtlib lib({{item}})"
+      with_items: 
+        - '{{ remote_temp_lib }}'
+        - '{{ remote_restored_lib }}'
+
+    - include: ibmi_copy.yml
+
+  always:
+    - name: Cleaning
+      file:
+        path: '{{ local_temp_dir }}'
+        state: absent
+      delegate_to: localhost
+
+    - name: delete libraries 
+      ibmi_cl_command: 
+        cmd: "dltlib lib({{item}})"
+        joblog: 'true'
+      with_items: 
+        - '{{ remote_temp_lib }}'
+        - '{{ remote_restored_lib }}'
+      ignore_errors: true

@@ -1,0 +1,189 @@
+- block: 
+    # The script is going to create a SAVF TEMPLIB/ANSIOBJ1, a dataarea TEMPLIB/ANSIOBJ1 and a SAVF QGPL/ANSIOBJ1 
+
+    - name: create library
+      ibmi_cl_command:
+        cmd: CRTLIB LIB({{item}})
+      with_items:
+        - TEMPLIB
+        - REFLIB
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF TEMPLIB/ANSIOBJ1
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF REFLIB/REFOBJ1
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF QGPL/ANSIOBJ1
+
+    - name: create dataarea for testing
+      ibmi_cl_command: 
+        cmd: CRTDTAARA DTAARA(TEMPLIB/ANSIOBJ1) TYPE(*DEC)
+
+    - name: create dataarea for testing
+      ibmi_cl_command: 
+        cmd: CRTDTAARA DTAARA(REFLIB/REFOBJ1) TYPE(*DEC)
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: dsp_result
+
+    - name: TC43 grant 1 users 1 AUL to a single object
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'REFOBJ1'
+        object_library: 'REFLIB'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+
+    - name: TC44 grant 1 users 1 AUL to a single object
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'REFOBJ1'
+        object_library: 'REFLIB'
+        object_type: '*DTAARA'
+        authorization_list: "{{au_list[1]}}"
+
+    - name: TC45 grant refaut to a single object
+      ibmi_object_authority:
+        operation: 'grant_ref'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        ref_object_name: REFOBJ1
+        ref_object_library: REFLIB
+        ref_object_type: '*DTAARA'
+      register: authority_result
+
+    - name: TC46 assert the returned options of display
+      assert:
+        that:
+          - authority_result.rc == 0
+          - authority_result.stdout is defined
+          - authority_result.stdout_lines is defined
+          - authority_result.stderr is not defined
+          - authority_result.stderr_lines is not defined
+          - authority_result.object_authority_list is not defined 
+
+    - name: TC47 display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['AUTHORIZATION_LIST'] == '{{au_list[1].upper()}}'
+      loop: "{{authority_result.object_authority_list }}"
+      when: os_version | int >= 74
+
+    - name: grant grant refaut to 2 objects
+      ibmi_object_authority:
+        operation: 'grant_ref'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+        ref_object_name: REFOBJ1
+        ref_object_library: REFLIB
+        ref_object_type: '*FILE'
+
+    - name: display AUL 2 objects
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
+      loop: "{{authority_result.object_authority_list }}"
+      when: os_version | int >= 74
+
+    - name: grant_ref with an not existing object
+      ibmi_object_authority:
+        operation: 'grant_ref'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        ref_object_name: ABC
+        ref_object_library: REFLIB
+        ref_object_type: '*FILE'
+      register: neg_result
+      #failed_when: "'Object ABC in library REFLIB type *FILE not found' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: grant_ref with an not existing lib
+      ibmi_object_authority:
+        operation: 'grant_ref'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        ref_object_name: REFOBJ1
+        ref_object_library: ABC
+        ref_object_type: '*FILE'
+      register: neg_result
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+
+    - name: grant_autl without required options
+      ibmi_object_authority:
+        operation: 'grant_ref'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        #object_type: '*FILE'
+        ref_object_name: REFOBJ1
+        ref_object_library: ABC
+        ref_object_type: '*FILE'
+      register: neg_result
+      failed_when: "'missing required arguments: object_type' not in neg_result.msg"
+
+    - name: grant_autl without required options
+      ibmi_object_authority:
+        operation: 'grant_ref'
+        #object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        ref_object_name: REFOBJ1
+        ref_object_library: REFLIB 
+        ref_object_type: '*FILE'
+      register: neg_result
+      failed_when: "'missing required arguments: object_name' not in neg_result.msg"
+
+    - name: grant_autl without required options
+      ibmi_object_authority:
+        operation: 'grant_ref'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        #ref_object_name: REFOBJ1
+        ref_object_library: REFLIB
+        ref_object_type: '*FILE'
+      register: neg_result
+      failed_when: "'Specify ref_object_name when the operation is grant_ref' not in neg_result.msg"
+
+  always:
+    - name: remove library
+      ibmi_cl_command: 
+        cmd: "dltlib {{item}}"
+      with_items:
+        - templib
+        - reflib
+
+    - name: delete object
+      ibmi_cl_command:
+         cmd: DLTOBJ OBJ(QGPL/ANSIOBJ1) OBJTYPE(*FILE)

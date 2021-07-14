@@ -1,0 +1,17 @@
+- name: remove if {{ local_workspace }} exists
+  file:
+    path: '{{ local_workspace }}'
+    state: 'absent'
+
+- name: create {{ local_workspace }}
+  file:
+    path: '{{ local_workspace }}'
+    state: 'directory'
+    mode: '0755'
+
+- name: git clone from source repository
+  git:
+    repo: '{{ git_repo_url }}'
+    dest: '{{ local_workspace }}'
+    version: '{{ git_branch }}'
+    key_file: ~/.ssh/id_rsa

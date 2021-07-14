@@ -1,0 +1,55 @@
+# test code for the ibmi_fix module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# Need put the a fix on remote IBM i before the testing.
+#SI72305 - Immediate apply
+#MF67068 - Immediate apply
+#SI71691 - require SI70931
+#SI67856 - UME PTF
+#SI70544 - delay PTF
+#SI71746 - Immediate apply
+- block:
+    - set_fact:
+        remote_dir: '{{ remote_tmp_dir }}'
+        immed_ptf: {'SI71746':'5733SC1'}
+        remote_lib: 'FIXLIB'
+
+    - ibmi_cl_command:
+        cmd: 'CRTLIB LIB({{remote_lib}})'
+
+    - block: 
+        - set_fact:
+            immed_ptf_with_requisite:  {'SI71691':'5770SS1'}
+            requisite_ptf: {'SI70931':'5770SS1'}
+            ptf_for_product_not_installed: {'SI67856':'5770UME'}
+            delay_ptf: {'SI70544': '5770SS1'}
+
+        - name: copy save file to remote node
+          ibmi_copy:
+            src: 'Q{{item}}.FILE'
+            lib_name: '{{remote_lib}}'
+          with_items: 
+            - '{{immed_ptf_with_requisite.keys() | list}}'
+            - '{{requisite_ptf.keys() | list}}'
+            - '{{ptf_for_product_not_installed.keys() | list}}'
+            - '{{delay_ptf.keys() | list}}'  
+
+        - include: ibmi_fix_delayed.yml
+        - include: ibmi_fix has_requisites.yml
+      when: "ansible_distribution_version == '7' and ansible_distribution_release == '4'"
+    
+
+    - name: copy save file to remote node
+      ibmi_copy:
+        src: '{{item}}.savf' 
+        lib_name: '{{remote_lib}}'
+      loop: '{{immed_ptf.keys() | list}}'
+
+    - include: ibmi_fix.yml
+    - include: negative_case.yml
+
+  always:
+      - ibmi_cl_command:
+          cmd: 'DLTLIB LIB({{remote_lib}})'

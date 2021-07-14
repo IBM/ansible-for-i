@@ -1,0 +1,16 @@
+# test code for the ibmi_object_save module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block: 
+    ## Setup - Create libraries and objects on test systems
+    - copy: src="IBMISAVF.FILE" dest="/tmp/"
+    
+    - include: save_object.yml
+
+    - include: iasp.yml
+
+  always:
+    - name: remove copied file
+      command: 'rm -rf /tmp/IBMISAVF.FILE'

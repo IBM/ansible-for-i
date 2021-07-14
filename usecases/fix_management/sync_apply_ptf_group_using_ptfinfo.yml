@@ -1,0 +1,145 @@
+---
+- name: Sync and apply ptf group files
+# This playbook will transfer the ptf group files to the target system. Then apply ptf group.
+# Only supports bin format ptf group files.
+# Before use this playbook, make sure you have used the copy_ptf_group_to_repo.yml to transfer files to repo server, then the ptf group dir
+# on repo server should be formatted as ptf_group_number_ptf_group_level under ~/PTF folder.
+
+# Command example: ansible-playbook /sync_apply_ptf_group_using_ptfinfo.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
+# 'ptf_group_number': 'SF99729', 'ptf_group_level': '125'}"
+  hosts: '{{ target_system }}'
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    repo_server: "{{ repo_server }}"
+    ptf_group_number: "{{ ptf_group_number }}"
+    ptf_group_level: "{{ ptf_group_level }}"
+
+  tasks:
+    - name: set_fact
+      set_fact:
+        repo_dir: "~/PTF/{{ ptf_group_number }}_{{ ptf_group_level }}"
+
+    - name: Print repo_dir
+      debug:
+        var: repo_dir
+
+    - name: Recursively find ptf group files
+      find:
+        paths: "{{ repo_dir }}"
+        recurse: true
+      delegate_to: "{{ repo_server }}"
+      register: find_result
+
+    - name: Print find_result
+      debug:
+        var: find_result
+
+    - name: quit
+      fail:
+        msg: "The repo dir: {{ repo_dir }} is not valid or doesn't contain any file, quit."
+      when: find_result.matched == 0
+
+    - name: Compose target tmp dir str
+      set_fact:
+        path: "{{ repo_dir }}"
+
+    - name: Clear receive dir
+      file:
+        path: "{{ path }}"
+        state: absent
+      register: clear_result
+      ignore_errors: true
+
+    - name: Make receive dir
+      file:
+        path: "{{ path }}"
+        state: directory
+        mode: 0755
+      register: file_result
+      ignore_errors: true
+
+    - block:
+        - name: Skip when make receive dir fail
+          debug:
+            msg: "{{ 'Make receive dir ' + path + ' fail, end host.' }}"
+
+        - name: end_host
+          meta: end_host
+      when: file_result.failed == 1
+
+    - block:
+        - name: compose src_list
+          set_fact:
+            src_list: "{{ src_list | default([]) + [{ 'src': find_result_files_var.path }] }}"
+          loop: "{{ find_result.files }}"
+          loop_control:
+            loop_var: find_result_files_var
+
+        - name: debug src_list
+          debug:
+            var: src_list
+
+        - name: Print path
+          debug:
+            var: path
+
+        - name: Transfer image to target_system
+          ibm.power_ibmi.ibmi_synchronize_files:
+            dest: "{{ path }}"
+            src_list: "{{ src_list }}"
+          delegate_to: "{{ repo_server }}"
+          register: sync_result
+
+        - name: Print transfer
+          debug:
+            var: sync_result
+
+        - block:
+            - name: skip when transfer failed
+              debug:
+                msg: "One or more ptf group file transfer failed, quit apply ptf group action."
+
+            - name: end_host
+              meta: end_host
+          when: sync_result.fail_list != []
+
+        - name: Get the home dir on target server
+          shell: 'echo $HOME'
+          register: home_dir
+
+        - name: Compose path
+          set_fact:
+            path: "{{ path | regex_replace('~', home_dir.stdout) }}"
+          when: path | regex_search("^~")
+
+        - name: debug path
+          debug:
+            var: path
+
+        - block:
+            - name: Apply PTF group
+              ibm.power_ibmi.ibmi_fix_imgclg:
+                src: '{{ path }}'
+              register: apply_result
+              ignore_errors: true
+
+            - name: Print apply result
+              debug:
+                var: apply_result
+
+            - name: Print apply result
+              debug:
+                msg: "PTF Group applied fail. Please see above job log"
+              when: apply_result.rc != 0
+
+            - name: Print apply result
+              debug:
+                msg: "PTF Group applied succesfully."
+              when: apply_result.rc == 0
+
+          when: sync_result.fail_list == []
+
+      when: file_result.failed == 0

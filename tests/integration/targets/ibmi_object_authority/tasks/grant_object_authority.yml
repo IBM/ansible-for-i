@@ -1,0 +1,642 @@
+- block: 
+    # The script is going to create a SAVF TEMPLIB/ANSIOBJ1, a dataarea TEMPLIB/ANSIOBJ1 and a SAVF QGPL/ANSIOBJ1 
+
+    - name: create library
+      ibmi_cl_command:
+        cmd: CRTLIB LIB({{item}})
+      with_items:
+        - TEMPLIB
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF TEMPLIB/ANSIOBJ1
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF QGPL/ANSIOBJ1
+
+    - name: create dataarea for testing
+      ibmi_cl_command: 
+        cmd: CRTDTAARA DTAARA(TEMPLIB/ANSIOBJ1) TYPE(*DEC)
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: dsp_result
+
+    - name: TC13 grant 1 users 1 authority to a single object
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user: "{{new_user[0]}}"
+        authority:
+          - "*OBJEXIST"
+      register: authority_result
+
+    - name: TC13 assert the returned options of display
+      assert:
+        that:
+          - authority_result.rc == 0
+          - authority_result.stdout is defined
+          - authority_result.stdout_lines is defined
+          - authority_result.stderr is not defined
+          - authority_result.stderr_lines is not defined
+          - authority_result.object_authority_list is not defined 
+
+    - name: TC13 display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: authority_result
+
+    - assert: 
+        that:
+          - authority_result.object_authority_list | length == (dsp_result.object_authority_list | length +1) 
+
+    - name: TC13 assert the returned object is correct
+      assert:
+        that:
+          - item['OBJECT_AUTHORITY'] == 'USER DEFINED'
+          - item['DATA_ADD'] == 'NO'
+          - item['DATA_DELETE'] == 'NO'
+          - item['DATA_EXECUTE']== 'NO'
+          - item['DATA_READ'] == 'NO'
+          - item['DATA_UPDATE'] == 'NO'
+          - item['OBJECT_ALTER'] == 'NO'
+          - item['OBJECT_EXISTENCE'] == 'YES'
+          - item['OBJECT_MANAGEMENT'] == 'NO'
+          - item['OBJECT_OPERATIONAL'] == 'NO'
+          - item['OBJECT_REFERENCE'] == 'NO'
+      when: item['AUTHORIZATION_NAME'] == new_user[0]
+      loop: "{{authority_result.object_authority_list }}"
+
+    - name: TC14 grant 2 user 2 authority to 2 objects
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+        user: "{{new_user}}"
+        authority:
+          - "*OBJMGT"
+          - "*OBJREF"
+
+    - name: TC14 Display the authority of DTAARA to validate its authority has been changed
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*DTAARA'
+      register: dta_result
+
+    - name: TC14 assert the returned object is correct
+      assert:
+        that:
+          - obj_aut.0['OBJECT_AUTHORITY'] == 'USER DEFINED'
+          - obj_aut.0['DATA_ADD'] == 'NO'
+          - obj_aut.0['DATA_DELETE'] == 'NO'
+          - obj_aut.0['DATA_EXECUTE']== 'NO'
+          - obj_aut.0['DATA_READ'] == 'NO'
+          - obj_aut.0['DATA_UPDATE'] == 'NO'
+          - obj_aut.0['OBJECT_ALTER'] == 'NO'
+          - obj_aut.0['OBJECT_EXISTENCE'] == 'NO'
+          - obj_aut.0['OBJECT_MANAGEMENT'] == 'YES'
+          - obj_aut.0['OBJECT_OPERATIONAL'] == 'NO'
+          - obj_aut.0['OBJECT_REFERENCE'] == 'YES'
+      when: obj_aut.0['AUTHORIZATION_NAME'] == obj_aut.1
+      loop: "{{ dta_result.object_authority_list | product(new_user) | list}}"
+      loop_control:
+        loop_var: obj_aut
+
+    - name: TC14 Display the authority of FILE to validate its authority has been changed
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: file_result
+
+    - name: TC14 assert the returned object is correct
+      assert:
+        that:
+          - item['OBJECT_AUTHORITY'] == 'USER DEFINED'
+          - item['DATA_ADD'] == 'NO'
+          - item['DATA_DELETE'] == 'NO'
+          - item['DATA_EXECUTE']== 'NO'
+          - item['DATA_READ'] == 'NO'
+          - item['DATA_UPDATE'] == 'NO'
+          - item['OBJECT_ALTER'] == 'NO'
+          - item['OBJECT_EXISTENCE'] == 'YES'
+          - item['OBJECT_MANAGEMENT'] == 'YES'
+          - item['OBJECT_OPERATIONAL'] == 'NO'
+          - item['OBJECT_REFERENCE'] == 'YES'
+      when: item['AUTHORIZATION_NAME'] == new_user[0]
+      loop: "{{ file_result.object_authority_list}}"
+
+    - name: TC15 grant user 2 authorities with *LIBL
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[1]}}"
+        authority:
+          - "*ALL"
+
+    - name: TC15 display authority to assert the authority of *DTAARA not changed 
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*DTAARA'
+      register: dta_result_new
+
+    - name: TC15 assert the authority of *DTAARA not changed
+      assert: 
+        that: 
+          - dta_result_new.object_authority_list == dta_result.object_authority_list
+
+    - name: TC16 display authority to assert the authority of FILE in TEMPLIB not changed
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: file_new_result
+
+    - name: TC16 assert the authority of FILE in TEMPLIB not changed
+      assert: 
+        that: 
+          - file_new_result.object_authority_list == file_result.object_authority_list
+
+    - name: TC17 display authority to assert the authority of FILE in QGPL changed
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'QGPL'
+        object_type: '*FILE'
+      register: authority_result
+
+    - name: TC17 assert the authority of FILE in QGPL changed
+      assert: 
+        that: 
+          - "'{{new_user[1]}}' in (authority_result.object_authority_list | map(attribute = 'AUTHORIZATION_NAME') | join(', '))"
+
+    - name: TC18 grant user 2 authority with replace_authority=true
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+        user:
+          - "{{new_user[1]}}"
+        authority:
+           - "*OBJEXIST"
+        replace_authority: true
+
+    - name: TC18 display authority of DTAARA and FILE in TEMPLIB
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+      register: authority_result
+
+    - name: TC18 assert the authority has been replaced
+      assert:
+        that:
+          - item['OBJECT_AUTHORITY'] == 'USER DEFINED'
+          - item['DATA_ADD'] == 'NO'
+          - item['DATA_DELETE'] == 'NO'
+          - item['DATA_EXECUTE']== 'NO'
+          - item['DATA_READ'] == 'NO'
+          - item['DATA_UPDATE'] == 'NO'
+          - item['OBJECT_ALTER'] == 'NO'
+          - item['OBJECT_EXISTENCE'] == 'YES'
+          - item['OBJECT_MANAGEMENT'] == 'NO'
+          - item['OBJECT_OPERATIONAL'] == 'NO'
+          - item['OBJECT_REFERENCE'] == 'NO'
+      when: item['AUTHORIZATION_NAME'] == new_user[1]
+      loop: "{{authority_result.object_authority_list}}"
+
+    # Start revoke testing here
+    - name: TC19 grant 2 authorities to user
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+        replace_authority: true
+
+    - name: TC20 revoke single value to user
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*DLT"
+      register: authority_result 
+
+    - name: TC20 assert the returned options of display
+      assert:
+        that:
+          - authority_result.rc == 0
+          - authority_result.stdout is defined
+          - authority_result.stdout_lines is defined
+          - authority_result.stderr is not defined
+          - authority_result.stderr_lines is not defined
+          - authority_result.object_authority_list is not defined
+
+    - name: TC20 display authority to assert the authority has been revoked
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: authority_result
+
+    - name: TC20 assert the authority has been revoked
+      assert:
+        that:
+          - item['OBJECT_AUTHORITY'] == 'USER DEFINED'
+          - item['DATA_ADD'] == 'NO'
+          - item['DATA_DELETE'] == 'NO'
+          - item['DATA_EXECUTE']== 'NO'
+          - item['DATA_READ'] == 'YES'
+          - item['DATA_UPDATE'] == 'NO'
+          - item['OBJECT_ALTER'] == 'NO'
+          - item['OBJECT_EXISTENCE'] == 'NO'
+          - item['OBJECT_MANAGEMENT'] == 'NO'
+          - item['OBJECT_OPERATIONAL'] == 'NO'
+          - item['OBJECT_REFERENCE'] == 'NO'
+      when: item['AUTHORIZATION_NAME'] == new_user[0]
+      loop: "{{authority_result.object_authority_list }}"
+
+    - name: TC21 grant 2 user 2 authorities to 2 objects
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+        user: "{{new_user}}"
+        authority:
+          - "*OBJMGT"
+          - "*OBJREF"
+    
+    - name: TC22 revoke 2 user 2 authorities to 2 objects
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+        user: "{{new_user}}"
+        authority:
+          - "*OBJMGT"
+
+    - name: TC22 display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+      register: changed_result
+
+    - name: TC22 assert the authority has been revoked
+      assert:
+        that:
+          - item.0['OBJECT_MANAGEMENT'] == 'NO'
+          - item.0['OBJECT_REFERENCE'] == 'YES'
+      when: item.0['AUTHORIZATION_NAME'] == item.1
+      loop: "{{ changed_result.object_authority_list | product(new_user) | list}}"
+
+    - name: TC23 grant user 2 authorities with *LIBL
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[1]}}"
+        authority:
+          - "*CHANGE"
+
+    - name: TC23 revoke user 2 authorities with *LIBL
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[1]}}"
+        authority:
+          - "*CHANGE"
+
+    - name: TC24 revoke user 2 authorities with *LIBL
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "*ALL"
+        authority:
+          - "*ALL"
+
+    - name: TC25 grant single value with *ALL
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "*ALL"
+        authority:
+          - "*READ"
+          - "*DLT"
+      register: neg_result
+      #failed_when: "'Value \\'*ALL      \\' for parameter USER not a valid name' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0078') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC25 grant single value with an not existing object
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ABC'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+      register: neg_result
+      #failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC26 grant single value with an not existing lib
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'ABC'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+      register: neg_result
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC27 grant single value with an not existing user
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "ABC"
+        authority:
+          - "*READ"
+          - "*DLT"
+      register: neg_result
+      #failed_when: "'User profile ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2204') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC27 grant single value with an invalid authority
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "ABC"
+      register: neg_result
+      failed_when: "'value of authority must be one or more of' not in neg_result.msg"
+
+    - name: TC28 grant without required options
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        #object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*ALL"
+      register: neg_result
+      failed_when: "'missing required arguments: object_type' not in neg_result.msg"
+
+    - name: TC29 grant without required options
+      ibmi_object_authority:
+        operation: 'grant'
+        #object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*ALL"
+      register: neg_result
+      failed_when: "'missing required arguments: object_name' not in neg_result.msg"
+
+    - name: TC30 grant without required options
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        #user: "*ALL"
+        authority:
+          - "*ALL"
+      register: neg_result
+      failed_when: "'Specify user when the operation is grant or revoke' not in neg_result.msg"
+
+    - name: TC31 grant without required options
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user: "{{new_user[0]}}"
+        authority: "*ALL"
+        replace_authority: "abc"
+      register: neg_result
+      failed_when: "'is not a valid boolean' not in neg_result.msg"
+
+    - name: TC32 grant authority with other not relevant options
+      ibmi_object_authority:
+        operation: 'grant'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+        replace_authority: true
+        authorization_list: "{{au_list[0]}}"
+        ref_object_name: ansible
+        ref_object_library: changle
+        ref_object_type: '*DTAARA'
+      register: authority_result 
+
+    - name: TC33 revoke single value with an not existing object
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ABC'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+      register: neg_result
+      #failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC34 revoke single value with an not existing lib
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'ABC'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+      register: neg_result
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC35 revoke single value with an not existing user
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "ABC"
+        authority:
+          - "*READ"
+          - "*DLT"
+      register: neg_result
+      #failed_when: "'User profile ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2204') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC36 revoke single value with an invalid authority
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "ABC"
+      register: authority_result
+      failed_when: "'value of authority must be one or more of' not in authority_result.msg"
+
+    - name: TC37 revoke without required options
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        #object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*ALL"
+      register: neg_result
+      failed_when: "'missing required arguments: object_type' not in neg_result.msg"
+
+    - name: TC38 revoke without required options
+      ibmi_object_authority:
+        operation: 'revoke'
+        #object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*ALL"
+      register: neg_result
+      failed_when: "'missing required arguments: object_name' not in neg_result.msg"
+
+    - name: TC39 revoke without required options
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        #user: "*ALL"
+        authority:
+          - "*ALL"
+      register: neg_result
+      failed_when: "'Specify user when the operation is grant or revoke' not in neg_result.msg"
+
+    - name: TC40 revoke without required options
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user: "{{new_user[0]}}"
+        #authority: "*ALL"
+      register: neg_result
+      #failed_when: "'Specific authority when the operation is grant or revoke' not in neg_result.msg"
+      ignore_errors: true
+
+    - name: TC41 revoke without required options
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user: "{{new_user[0]}}"
+        authority: "*ALL"
+        replace_authority: "abc"
+      register: neg_result
+      failed_when: "'is not a valid boolean' not in neg_result.msg"
+
+    - name: TC42 revoke authority with other not relevant options
+      ibmi_object_authority:
+        operation: 'revoke'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+        replace_authority: true
+        authorization_list: "{{au_list[0]}}"
+        ref_object_name: ansible
+        ref_object_library: changle
+        ref_object_type: '*DTAARA'
+  always:
+    - name: remove library
+      ibmi_cl_command: 
+        cmd: dltlib templib
+
+    - name: delete object
+      ibmi_cl_command:
+         cmd: DLTOBJ OBJ(QGPL/ANSIOBJ1) OBJTYPE(*FILE)

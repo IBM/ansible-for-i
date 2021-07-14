@@ -1,0 +1,47 @@
+- name: TC01 - Sync an IFS file from one os400 to another
+  ibmi_sync_files:
+    src_list:
+      - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
+    remote_host: "{{target_system}}"
+    remote_user: '{{ansible_ssh_user}}'
+    private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+  register: result_01
+  failed_when: result_01.rc != 0
+
+- name: TC01 - Sync a SAVF from one os400 to another -  transfer prepared SAVF from local to source os400
+  ibmi_copy:
+    src: 'MYSAVF.FILE'
+    lib_name: 'qgpl'
+    force: true
+    backup: false
+
+- name: TC01 - Sync a SAVF from one os400 to another
+  ibmi_sync_files:
+    src_list:
+      - {'src': '/qsys.lib/qgpl.lib/MYSAVF.FILE', 'dest': '/qsys.lib/qgpl.lib/'}
+    remote_host: "{{target_system}}"
+    remote_user: '{{ansible_ssh_user}}'
+    private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+  register: result_01A
+  failed_when: result_01A.rc != 0
+
+- name: TC02 - Sync multiple supported files from one os400 to another.
+  ibmi_sync_files:
+    src_list:
+      - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
+      - {'src': '/qsys.lib/qgpl.lib/MYSAVF.FILE', 'dest': '/qsys.lib/qgpl.lib/'}
+
+    remote_host: "{{target_system}}"
+    remote_user: '{{ansible_ssh_user}}'
+    private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+  register: result_02a
+  failed_when: result_02a.rc != 0  
+
+- name: TC02 - Assert return values
+  assert:
+    that:
+      - result_02a.fail_list == []
+      - result_02a.success_list | length == 2
+
+- name: negative test
+  include: neg_cases.yml

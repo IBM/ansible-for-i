@@ -1,0 +1,68 @@
+# test code for the ibmi_install_product_from_savf, ibmi_uninstall_product and ibmi_save_product_to_savf module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# The test case is use 5770JV1 for the testing and only valid for V7R4M0
+#  Opt  Object      Type      Library     Attribute   Tex
+#       BASE2962    *FILE     JV1         SAVF           
+#       BASE2989    *FILE     JV1         SAVF           
+#       OPTBASE     *FILE     JV1         SAVF           
+#       OPT16       *FILE     JV1         SAVF           
+#       OPT17       *FILE     JV1         SAVF   
+- include: simple_save_install_uninstall.yml
+  when: "ansible_distribution_version != '7' or ansible_distribution_release != '4'"
+
+- block:
+    
+    - name: create libraries 
+      ibmi_cl_command: 
+        cmd: "crtlib lib(JV1)"
+
+    - name: copy a SAVF to remote i with all options
+      ibmi_copy: 
+        src: '{{ item }}'
+        lib_name: 'JV1'
+        force: true
+        backup: false
+      with_items:
+        - BASE2962.FILE
+        - BASE2989.FILE
+        - OPTBASE.FILE
+        - OPT16.FILE
+        - OPT17.FILE
+
+    - name: Verify product installed or not
+      command: system "DSPSFWRSC"
+      register: installed_native_products
+    
+    - name: uninstall the product with default values
+      ibmi_uninstall_product:
+        product: '5770JV1'
+      when: "'5770JV1' in installed_native_products.stdout"
+
+    - name: accept license
+      ibmi_cl_command:
+        cmd: "CALL PGM(QLPACAGR) PARM('5770JV1' 'V7r4m0' '0000' '*')"
+
+    - include: install_negative_case.yml
+
+    - include: install_product.yml
+
+    - include: save_negative_case.yml
+
+    - include: save_product.yml
+
+    - include: uninstall_product.yml
+  when: "ansible_distribution_version == '7' and ansible_distribution_release == '4'"
+
+  always:
+    - name: delete libraries 
+      ibmi_cl_command: 
+        cmd: "dltlib lib({{item}})"
+        joblog: 'true'
+      with_items: 
+        - JV1
+        - SAVJV1
+        - SAVJV11
+      ignore_errors: true

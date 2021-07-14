@@ -1,0 +1,209 @@
+# test code for the ibmi_copy module and action plugin
+# (c) 2020, Li Jun Zhu <zhuljbj@126.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+- set_fact:
+    immed_ptf_with_requisite_number: "{{(immed_ptf_with_requisite | dict2items)[0]['key']}}"
+    immed_ptf_with_requisite_product: "{{(immed_ptf_with_requisite | dict2items)[0]['value']}}"
+    requiste_ptf_number: "{{(requisite_ptf | dict2items)[0]['key']}}"
+    requiste_ptf_product: "{{(requisite_ptf | dict2items)[0]['value']}}"  
+
+- include: query_remove_ptf.yml
+  with_dict: '{{immed_ptf_with_requisite}}'
+
+- include: query_remove_ptf.yml
+  with_dict: '{{requisite_ptf}}'
+  
+- name: install fixes
+  ibmi_fix:
+    product_id: "{{ requiste_ptf_product}}"
+    save_file_object: "Q{{ requiste_ptf_number}}"
+    save_file_lib: '{{remote_lib}}'
+    operation: 'load_only'
+
+- name: install fixes
+  ibmi_fix:
+    product_id: "{{ immed_ptf_with_requisite_product}}"
+    save_file_object: "Q{{ immed_ptf_with_requisite_number}}"
+    save_file_lib: '{{remote_lib}}'
+    operation: 'load_only'
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: ['{{ immed_ptf_with_requisite_number }}']
+    operation: 'query'
+  register: fix_result_1
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: ['{{requiste_ptf_number}}']
+    operation: 'query'
+  register: fix_result_2
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: ['{{ immed_ptf_with_requisite_number }}', '{{requiste_ptf_number}}']
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - (fix_result.ptf_list | length) == ((fix_result_1.ptf_list | length ) + (fix_result_2.ptf_list | length )) 
+
+- name: allow apply without multiple fix in the list
+  ibmi_fix:
+    product_id: "*ALL"
+    #fix_list: ['{{ immed_ptf_with_requisite_number }}', '{{requiste_ptf_number}}']
+    operation: 'apply_only'
+  register: fix_result 
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: ['{{ immed_ptf_with_requisite_number }}']
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'APPLIED'
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: ['{{ requiste_ptf_number }}']
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'APPLIED'
+
+- name: remove the ptfs temp if they have been installed
+  ibmi_fix:
+    fix_list: '{{ immed_ptf_with_requisite_number }}'
+    product_id: "{{ immed_ptf_with_requisite_product }}"
+    operation: 'remove'
+  register: fix_result
+  failed_when: "fix_result.ptf_list[0]['PTF_LOADED_STATUS'] != 'LOADED'"
+
+- name: remove the ptfs perm if they have been installed
+  ibmi_fix:
+    fix_list: ['{{ immed_ptf_with_requisite_number }}', '{{requiste_ptf_number}}']
+    product_id: "{{ immed_ptf_with_requisite_product }}"
+    operation: 'remove'
+    temp_or_perm: "*PERM"
+  register: fix_result
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: ['{{ immed_ptf_with_requisite_number }}', '{{requiste_ptf_number}}']
+    operation: 'query'
+  register: fix_result
+
+- assert:
+    that:
+      - fix_result.ptf_list | length == 0
+
+- name: install fixes missing required PTF
+  ibmi_fix:
+    product_id: '{{immed_ptf_with_requisite_product}}' 
+    fix_list: ['{{immed_ptf_with_requisite_number}}', '{{requiste_ptf_number}}'] 
+    save_file_object: 'Q{{ immed_ptf_with_requisite_number }}'
+    save_file_lib: '{{remote_lib}}'
+    #operation: 'load_and_apply'
+  register: fix_result 
+  # PTF 5770SS1-SI70931 *ONLY not found on specified device
+  #failed_when: "'CPF3921' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3921') | map(attribute='MESSAGE_ID') | list | length == 0"  
+
+- name: install fix with all options
+  ibmi_fix:
+    product_id: "{{ requiste_ptf_product}}"
+    save_file_object: "Q{{requiste_ptf_number}}"
+    save_file_lib: '{{remote_lib}}'
+    fix_list: ['{{immed_ptf_with_requisite_number}}', '{{requiste_ptf_number}}']
+    fix_omit_list: "{{immed_ptf_with_requisite_number}}"
+    delayed_option: "*NO"
+    operation: 'load_only'
+    temp_or_perm: '*TEMP'
+  register: fix_result
+  #failed_when: "'OMIT and SELECT parameters cannot be used together' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3529') | map(attribute='MESSAGE_ID') | list | length == 0"  
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: '{{item}}'
+    operation: 'query'
+  register: fix_result
+  failed_when: fix_result.ptf_list | length != 0 and fix_result.ptf_list[0]['PTF_LOADED_STATUS'] != 'NOT LOADED' 
+  with_items:
+    - '{{requiste_ptf_number}}'
+
+- name: install fix with all options
+  ibmi_fix:
+    product_id: "{{ requiste_ptf_product}}"
+    save_file_object: "Q{{requiste_ptf_number}}"
+    save_file_lib: '{{remote_lib}}'
+    fix_list: ['{{requiste_ptf_number}}']
+    fix_omit_list: ""
+    delayed_option: "*NO"
+    operation: 'load_only'
+    temp_or_perm: '*TEMP'
+  register: fix_result
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: '{{item}}'
+    operation: 'query'
+  register: fix_result
+  failed_when: "fix_result.ptf_list[0]['PTF_LOADED_STATUS'] != 'LOADED' "
+  with_items:
+    - '{{requiste_ptf_number}}'
+
+- name: install fix with all options
+  ibmi_fix:
+    product_id: "{{ immed_ptf_with_requisite_product}}"
+    save_file_object: "Q{{immed_ptf_with_requisite_number}}"
+    save_file_lib: '{{remote_lib}}'
+    fix_list: ['{{immed_ptf_with_requisite_number}}']
+    delayed_option: "*NO"
+    operation: 'load_only'
+    temp_or_perm: '*TEMP'
+  register: fix_result
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: '{{item}}'
+    operation: 'query'
+  register: fix_result
+  failed_when: "fix_result.ptf_list[0]['PTF_LOADED_STATUS'] != 'LOADED' "
+  with_items:
+    - '{{immed_ptf_with_requisite_number}}'
+
+- name: install fix with all options
+  ibmi_fix:
+    product_id: "{{ immed_ptf_with_requisite_product}}"
+    save_file_object: "Q{{immed_ptf_with_requisite_number}}"
+    save_file_lib: '{{remote_lib}}'
+    fix_omit_list: "{{immed_ptf_with_requisite_number}}"
+    delayed_option: "*NO"
+    operation: 'apply_only'
+    temp_or_perm: '*TEMP'
+  register: fix_result
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: '{{item}}'
+    operation: 'query'
+  register: fix_result
+  failed_when: fix_result.ptf_list[0]['PTF_LOADED_STATUS'] != 'APPLIED' 
+  with_items:
+    - '{{requiste_ptf_number}}'
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: '{{item}}'
+    operation: 'query'
+  register: fix_result
+  failed_when: fix_result.ptf_list[0]['PTF_LOADED_STATUS'] != 'LOADED' 
+  with_items:
+    - '{{immed_ptf_with_requisite_number}}'

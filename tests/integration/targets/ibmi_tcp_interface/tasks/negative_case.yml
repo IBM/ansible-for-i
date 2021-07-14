@@ -1,0 +1,213 @@
+- name: TC17 run without options
+  ibmi_tcp_interface:
+  register: tcp_result
+  failed_when: "'one of the following is required: internet_address, alias_name' not in tcp_result.msg"
+
+- name: TC18 create a new IFC 
+  ibmi_tcp_interface: 
+    line_description: '{{lind_name}}'
+    subnet_mask: '{{subnet}}'
+    alias_name: '{{ifc_name}}'
+    internet_address: '{{ifc_ip}}'
+
+- name: TC19 create a new IFC without internet_address 
+  ibmi_tcp_interface: 
+    line_description: '{{lind_name}}'
+    subnet_mask: '{{subnet}}'
+    alias_name: '{{ifc_name}}'
+  register: tcp_result
+  ignore_errors: true
+
+- name: TC19 
+  assert:
+    that:
+      - "'Parameter internet_address is not specified' in tcp_result.msg"
+
+- name: TC20 create a new IFC again
+  ibmi_tcp_interface: 
+    line_description: '{{lind_name}}'
+    subnet_mask: '{{subnet}}'
+    alias_name: '{{ifc_name}}'
+    internet_address: '{{ifc_ip}}'
+  ignore_errors: true
+
+- name: TC21 change IFS with unmatch alias_name and internet_address
+  ibmi_tcp_interface: 
+    line_description: '{{lind_name}}'
+    subnet_mask: '{{subnet}}' 
+    alias_name: '{{ifc_name}}'
+    internet_address: '12.12.12.2'
+  ignore_errors: true
+
+- name: TC22 query IFS with invalid alias_name
+  ibmi_tcp_interface: 
+    alias_name: 'abc'
+
+- name: TC23 query IFS with invalid internet_address
+  ibmi_tcp_interface: 
+    internet_address: '12.12.12.2'
+
+- name: TC24 change a not existing IFC 
+  ibmi_tcp_interface: 
+    line_description: '{{lind_name}}'
+    subnet_mask: '{{subnet}}'
+    alias_name: 'abc'
+    #internet_address: '{{ifc_ip}}'
+    max_transmission_unit: '1024'
+  register: tcp_result
+  failed_when: "'Parameter internet_address is not specified' not in tcp_result.msg"
+
+- name: TC25 start IFC with unmatch alias_name and internet_address
+  ibmi_tcp_interface: 
+    alias_name: '{{ifc_name}}'
+    internet_address: '12.12.12.2'
+    state: 'active'
+  register: tcp_result
+  ignore_errors: true
+
+- name: TC25 
+  assert:
+    that: 
+      #- "'12.12.12.2 interface not started' in tcp_result.stderr"
+      - tcp_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'TCP1B13') | map(attribute='MESSAGE_ID') | list | length >=1
+      - tcp_result.job_log | length > 0
+      - tcp_result.job_log[0]['FROM_INSTRUCTION'] is defined
+      - tcp_result.job_log[0]['FROM_LIBRARY'] is defined
+      - tcp_result.job_log[0]['FROM_MODULE'] is defined
+      - tcp_result.job_log[0]['FROM_PROCEDURE'] is defined
+      - tcp_result.job_log[0]['FROM_PROGRAM'] is defined
+      - tcp_result.job_log[0]['FROM_USER'] is defined
+      - tcp_result.job_log[0]['MESSAGE_FILE'] is defined
+      - tcp_result.job_log[0]['MESSAGE_ID'] is defined
+      - tcp_result.job_log[0]['MESSAGE_LIBRARY'] is defined
+      - tcp_result.job_log[0]['MESSAGE_SECOND_LEVEL_TEXT'] is defined
+      - tcp_result.job_log[0]['MESSAGE_SUBTYPE'] is defined
+      - tcp_result.job_log[0]['MESSAGE_TEXT'] is defined
+      - tcp_result.job_log[0]['MESSAGE_TIMESTAMP'] is defined
+      - tcp_result.job_log[0]['MESSAGE_TYPE'] is defined
+      - tcp_result.job_log[0]['ORDINAL_POSITION'] is defined
+      - tcp_result.job_log[0]['SEVERITY'] is defined
+      - tcp_result.job_log[0]['TO_INSTRUCTION'] is defined
+      - tcp_result.job_log[0]['TO_LIBRARY'] is defined
+      - tcp_result.job_log[0]['TO_MODULE'] is defined
+      - tcp_result.job_log[0]['TO_PROCEDURE'] is defined
+      - tcp_result.job_log[0]['TO_PROGRAM'] is defined
+
+- name: TC26 start IFC with unmatch alias_name and internet_address
+  ibmi_tcp_interface: 
+    alias_name: 'abc'
+    internet_address: '{{ifc_ip}}'
+    state: 'active'
+
+- name: TC27 start IFC with invalid alias_name
+  ibmi_tcp_interface: 
+    alias_name: 'abc'
+    state: 'active'
+    joblog: true
+  register: tcp_result
+  ignore_errors: true
+
+- name: TC27
+  assert:
+    that: 
+      #- "'TCP/IP interface not found' in tcp_result.stderr"
+      - tcp_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'TCP1B26') | map(attribute='MESSAGE_ID') | list | length >=1
+      - tcp_result.job_log | length > 0
+      - tcp_result.job_log[0]['FROM_INSTRUCTION'] is defined
+      - tcp_result.job_log[0]['FROM_LIBRARY'] is defined
+      - tcp_result.job_log[0]['FROM_MODULE'] is defined
+      - tcp_result.job_log[0]['FROM_PROCEDURE'] is defined
+      - tcp_result.job_log[0]['FROM_PROGRAM'] is defined
+      - tcp_result.job_log[0]['FROM_USER'] is defined
+      - tcp_result.job_log[0]['MESSAGE_FILE'] is defined
+      - tcp_result.job_log[0]['MESSAGE_ID'] is defined
+      - tcp_result.job_log[0]['MESSAGE_LIBRARY'] is defined
+      - tcp_result.job_log[0]['MESSAGE_SECOND_LEVEL_TEXT'] is defined
+      - tcp_result.job_log[0]['MESSAGE_SUBTYPE'] is defined
+      - tcp_result.job_log[0]['MESSAGE_TEXT'] is defined
+      - tcp_result.job_log[0]['MESSAGE_TIMESTAMP'] is defined
+      - tcp_result.job_log[0]['MESSAGE_TYPE'] is defined
+      - tcp_result.job_log[0]['ORDINAL_POSITION'] is defined
+      - tcp_result.job_log[0]['SEVERITY'] is defined
+      - tcp_result.job_log[0]['TO_INSTRUCTION'] is defined
+      - tcp_result.job_log[0]['TO_LIBRARY'] is defined
+      - tcp_result.job_log[0]['TO_MODULE'] is defined
+      - tcp_result.job_log[0]['TO_PROCEDURE'] is defined
+      - tcp_result.job_log[0]['TO_PROGRAM'] is defined
+      
+- name: TC28 start IFC with invalid internet_address
+  ibmi_tcp_interface: 
+    internet_address: '12.12.12.2'
+    state: 'active'
+  register: tcp_result
+  ignore_errors: true
+
+- name: TC28 
+  assert:
+    that: 
+      #- "'12.12.12.2 interface not started' in tcp_result.stderr"
+      - tcp_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'TCP1B13') | map(attribute='MESSAGE_ID') | list | length >=1
+
+- name: TC29 end IFC with unmatch alias_name and internet_address
+  ibmi_tcp_interface: 
+    alias_name: '{{ifc_name}}'
+    internet_address: '12.12.12.2'
+    state: 'inactive'
+  ignore_errors: true
+
+- name: TC29 end IFC with unmatch alias_name and internet_address
+  ibmi_tcp_interface: 
+    alias_name: 'abc'
+    internet_address: '{{ifc_ip}}'
+    state: 'inactive'
+  ignore_errors: true
+
+- name: TC30 end IFC with invalid alias_name
+  ibmi_tcp_interface: 
+    alias_name: 'abc'
+    state: 'inactive'
+  register: tcp_result
+  ignore_errors: true
+
+- name: TC30 
+  assert:
+    that: 
+      #- "'TCP/IP interface not found' in tcp_result.stderr" 
+      - tcp_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'TCP2686') | map(attribute='MESSAGE_ID') | list | length >=1
+
+- name: TC31 end IFC with invalid internet_address
+  ibmi_tcp_interface: 
+    internet_address: '12.12.12.2'
+    state: 'inactive'
+  ignore_errors: true
+
+- name: TC32 remove IFC with unmatch alias_name and internet_address
+  ibmi_tcp_interface: 
+    alias_name: '{{ifc_name}}'
+    internet_address: '12.12.12.2'
+    state: 'absent'
+  register: tcp_result
+
+- name: TC32
+  assert:
+    that: 
+      - tcp_result.interface_info | length == 0
+
+- name: TC33 remove IFC with unmatch alias_name and internet_address
+  ibmi_tcp_interface: 
+    alias_name: 'abc'
+    internet_address: '{{ifc_ip}}'
+    state: 'absent'
+  register: tcp_result
+
+- name: TC34 remove IFC with invalid internet_address
+  ibmi_tcp_interface: 
+    internet_address: '12.12.12.2'
+    state: 'absent'
+  register: tcp_result
+  ignore_errors: true
+
+- name: TC35
+  assert:
+    that: 
+      - tcp_result.interface_info | length == 0

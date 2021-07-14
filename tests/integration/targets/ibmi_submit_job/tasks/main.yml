@@ -1,0 +1,95 @@
+# test code for the ibmi_submit_job module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block: 
+    - copy: src="sbmjob_script.sh" dest="/tmp/" mode="755"
+  
+    - name: TC01 submit job with all options
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
+        time_out: "1m"
+        status: ['*NONE']
+        check_interval: "1m"
+        parameters: ""
+
+    - name: TC02 submit job with only required options
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
+
+    - name: TC03 submit job with timeout_setting and status
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1m')"
+        time_out: "180s"
+        status: ['*OUTQ']
+
+    - name: TC04 submit job with check_interval
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 2m')"
+        time_out: "6m"
+        status: ['*COMPLETE', '*OUTQ']
+        check_interval: "10s"
+      register: sbmjob_result
+  
+    - name: TC04 assert the returned options 
+      assert:
+        that:
+          - sbmjob_result.rc == 0 
+
+    - name: TC05 submit job with check_interval
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 10m')"
+        time_out: "6m"
+        status: ['*OUTQ', '*ACTIVE', '*JOBQ']
+        check_interval: "9s"
+        parameters: "JOB(ANSIBLE)"
+      register: sbmjob_result
+
+    # test negative test cases
+    - name: TC06 submit job with time_out reported
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 5m')"
+        status: ['*COMPLETE']
+        time_out: "1s"
+      register: neg_result
+      failed_when: "'non-zero return code: The returned status of the submitted job is not expected' not in neg_result.msg"
+
+    - name: TC07 submit job with invalid status
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
+        status: ['abc']
+      register: neg_result
+      failed_when: "'Value specified for status option is not valid' not in neg_result.msg"
+
+    - name: TC08 submit job with invalid check_interval
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
+        time_out: "abc"
+
+    - name: TC09 submit job with invalid parameters 
+      ibmi_submit_job: 
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
+        parameters: "abc"
+      register: neg_result
+      failed_when: neg_result.failed != true
+      #failed_when: "'CPD0044' not in neg_result.stderr"
+      #failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+    - name: TC10 submit job with unsupported option 
+      ibmi_submit_job: 
+        abc: "abcd"
+        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')" 
+      register: neg_result
+      failed_when: "'Unsupported parameters' not in neg_result.msg"
+
+    - name: TC11 submit job without required options
+      ibmi_submit_job:
+      register: neg_result
+      failed_when: "'missing required arguments: cmd' not in neg_result.msg"
+
+  always:
+    - name: delete script file
+      command: "rm -rf /tmp/sbmjob_script.sh"
+
+ 

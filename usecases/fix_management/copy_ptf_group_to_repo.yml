@@ -1,0 +1,68 @@
+---
+- name: Copy ptf group files from Ansible server to repo server
+# This playbook will copy ptf group files on Ansible server to repo server, and create dir on repo server named after the ptf group
+
+# Command example: ansible-playbook /copy_ptf_group_to_repo.yml -e "{'repo_server': 'systemB', 'ptf_group_number': 'SF99740', 'ptf_group_level': '12',
+# 'file_path_dir': '/tmp/2343456'"
+  hosts: '{{ repo_server }}'
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    repo_server: "{{ repo_server }}"
+    ptf_group_number: "{{ ptf_group_number }}"
+    ptf_group_level: "{{ ptf_group_level }}"
+    file_path_dir: "{{ file_path_dir }}"
+
+  tasks:
+    - name: Compose repo dir
+      set_fact:
+        repo_dir: "~/PTF/{{ ptf_group_number }}_{{ ptf_group_level }}"
+
+    - name: debug repo_dir
+      debug:
+        var: repo_dir
+
+    - name: Clear receive dir
+      file:
+        path: "{{ repo_dir }}"
+        state: absent
+      register: clear_result
+      ignore_errors: true
+
+    - name: debug clear_result
+      debug:
+        var: clear_result
+
+    - name: Make receive dir
+      file:
+        path: "{{ repo_dir }}"
+        state: directory
+        mode: 0755
+      register: file_result
+      ignore_errors: true
+
+    - name: debug file_result
+      debug:
+        var: file_result
+
+    - block:
+        - name: Skip when make receive dir fail
+          debug:
+            msg: "{{ 'Make receive dir ' + repo_dir + ' fail, end host.' }}"
+
+        - name: end_host
+          meta: end_host
+      when: file_result.failed == 1
+
+    - name: Copy files to repo
+      copy:
+        src: "{{ file_path_dir }}//"
+        dest: "{{ repo_dir }}"
+        force: true
+      register: copy_result
+
+    - name: print out successful msg
+      debug:
+        msg: "Files under {{ file_path_dir }} are successfully copied to {{ repo_dir }}"

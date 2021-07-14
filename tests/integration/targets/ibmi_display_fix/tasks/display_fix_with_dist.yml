@@ -1,0 +1,75 @@
+- name: query PTF status to confirm whether it has been applied.
+  ibmi_fix:
+    product_id: "{{ dist_ptf[item] }}"
+    fix_list: ['{{item}}']
+    operation: 'query'
+  register: ptf_orgi_status
+
+- block:
+    - name: copy save file of {{item}} to remote node
+      ibmi_copy:
+        src: '{{item}}.FILE'
+        lib_name: '{{remote_lib}}'
+
+    - name: load_fix of {{item}} 
+      ibmi_fix:
+        product_id: "{{ dist_ptf[item] }}"
+        save_file_object: "{{item}}"
+        save_file_lib: '{{ remote_lib }}'
+        operation: 'load_only'
+
+    - name: TC02 Get PTF information
+      ibmi_display_fix:
+        ptf: '{{item}}'
+        #release: 'V7R4M0'
+      register: display_fix_info
+
+    - name: TC02 assert the returned parameters of ibmi_display_fix 
+      assert:
+        that:
+          - display_fix_info.job_log is defined 
+          - display_fix_info.ptf_info | length == 1
+          - display_fix_info.ptf_info[0]['PTF_ACTION_PENDING'] is defined
+          - display_fix_info.ptf_info[0]['PTF_ACTION_REQUIRED'] is defined
+          - display_fix_info.ptf_info[0]['PTF_COVER_LETTER'] is defined
+          - display_fix_info.ptf_info[0]['PTF_CREATION_TIMESTAMP'] is defined
+          - display_fix_info.ptf_info[0]['PTF_IDENTIFIER'] is defined
+          - display_fix_info.ptf_info[0]['PTF_IPL_ACTION'] is defined
+          - display_fix_info.ptf_info[0]['PTF_IPL_REQUIRED'] is defined
+          - display_fix_info.ptf_info[0]['PTF_IS_RELEASED'] is defined
+          - display_fix_info.ptf_info[0]['PTF_LOADED_STATUS'] is defined
+          - display_fix_info.ptf_info[0]['PTF_MAXIMUM_LEVEL'] is defined
+          - display_fix_info.ptf_info[0]['PTF_MINIMUM_LEVEL'] is defined
+          - display_fix_info.ptf_info[0]['PTF_ON_ORDER'] is defined
+          - display_fix_info.ptf_info[0]['PTF_PRODUCT_DESCRIPTION'] is defined
+          - display_fix_info.ptf_info[0]['PTF_PRODUCT_ID'] is defined
+          - display_fix_info.ptf_info[0]['PTF_PRODUCT_LOAD'] is defined
+          - display_fix_info.ptf_info[0]['PTF_PRODUCT_OPTION'] is defined
+          - display_fix_info.ptf_info[0]['PTF_PRODUCT_RELEASE_LEVEL'] is defined
+          - display_fix_info.ptf_info[0]['PTF_RELEASE_LEVEL'] is defined
+          - display_fix_info.ptf_info[0]['PTF_SAVE_FILE'] is defined
+          - display_fix_info.ptf_info[0]['PTF_STATUS_TIMESTAMP'] is defined
+          - display_fix_info.ptf_info[0]['PTF_TECHNOLOGY_REFRESH_PTF'] is defined
+          - display_fix_info.ptf_info[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+          - display_fix_info.requisite_ptf_info | length >= 1
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_IS_CONDITIONAL'] is defined
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_IS_REQUIRED'] is defined
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_LOAD_ID'] is defined 
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_MAX_LEVLE'] is defined
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_MIN_LEVLE'] is defined
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_OPTION'] is defined
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_PRODUCT_ID'] is defined 
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_PTF_ID'] != ''
+          - display_fix_info.requisite_ptf_info | selectattr('TYPE_OF_REQUISITE', 'equalto', '9') | map(attribute='REQUISITE_PTF_ID') | list | length >= 1
+
+  always:
+    - name: remove loaded fix
+      ibmi_fix:
+        product_id: "{{ dist_ptf[item] }}"
+        delayed_option: "*NO"
+        temp_or_perm: "*PERM"
+        operation: 'remove'
+        fix_list:
+          - "{{item}}"
+      ignore_errors: true
+  when: ptf_orgi_status.ptf_list | length == 0 or (ptf_orgi_status.ptf_list | length != 0 and (ptf_orgi_status.ptf_list[0]['PTF_LOADED_STATUS']== 'NOT LOADED' or ptf_orgi_status.ptf_list[0]['PTF_LOADED_STATUS'] == 'PERMANENTLY REMOVED')) 

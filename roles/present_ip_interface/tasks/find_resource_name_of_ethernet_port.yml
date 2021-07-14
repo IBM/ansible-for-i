@@ -1,0 +1,33 @@
+- name: Fail the task if neither ethernet_port nor location port is provided
+  fail:
+    msg: "To create a line description please input a valid value of resource_name_of_ethernet_port or location_code_of_ethernet_port"
+  when:
+    - resource_name_of_ethernet_port is undefined
+    - location_code_of_ethernet_port is undefined
+    - mac_address_of_ethernet_port is undefined
+
+- name: List all the ethernet port information
+  ibm.power_ibmi.ibmi_ethernet_port:
+  register: all_ethernet_ports
+
+- name: Initial a flag
+  set_fact:
+    resource_name: ''
+- block:
+    - name: Set the resource name of ethernet port
+      set_fact:
+        resource_name: '{{ ethernet_port.RESOURCE_NAME }}'
+      when: ethernet_port.RESOURCE_NAME == resource_name_of_ethernet_port or
+            ethernet_port.LOCATION_CODE == location_code_of_ethernet_port or
+            ethernet_port.DEFAULT_MAC_ADDRESS == mac_address_of_ethernet_port
+      loop: '{{ all_ethernet_ports.ethernet_ports }}'
+      loop_control:
+        loop_var: ethernet_port
+  when: all_ethernet_ports.ethernet_ports|length != 0
+
+- name: Fail the task if the default name of resource_name was not set
+  fail:
+    msg: 'The designated ethernet port is not found. Please check if a valid
+    resource_name_of_ethernet_port or mac_address_of_ethernet_port or
+    location_code_of_ethernet_port is provided'
+  when: not resource_name

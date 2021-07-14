@@ -1,0 +1,211 @@
+- block:
+    - name: create libraries 
+      ibmi_cl_command: 
+        cmd: "crtlib lib({{item}})"
+      with_items: 
+        - SAVRST
+        - ARCHLIB
+    - copy: src="IBMISAVF.FILE" dest="/tmp/"
+    - name: copy file to library
+      command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB'
+
+    - name: restore objects to library
+      ibmi_object_restore:
+        object_lib: 'SAVRST'
+        savefile_name: 'IBMISAVF'
+        savefile_lib: 'ARCHLIB'
+      register: rstobj_result
+      #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+      failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC01 Save lib with only required options
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        joblog: true
+      register: savlib_result
+
+    - name: TC01 assert the returned value of ibmi_lib_save
+      assert:
+        that:
+          - savlib_result.start != ''
+          - savlib_result.end != ''
+          - savlib_result.delta != ''
+          - savlib_result.rc == 0
+          - savlib_result.stdout != ''
+          - savlib_result.stdout_lines != ''
+          - savlib_result.lib_name == 'SAVRST'
+          - savlib_result.savefile_name == 'SAVTEST'
+          - savlib_result.savefile_lib == 'ARCHLIB'
+          - savlib_result.format == '*SAVF'
+          - savlib_result.force_save == false
+          - savlib_result.target_release == '*CURRENT'
+
+    - name: TC01 verify the library can be restored
+      ibmi_lib_restore:
+        saved_lib: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+
+    - name: TC02 save library with all supported options
+      ibmi_lib_save:
+        lib_name: "SAVRST"
+        savefile_name: 'SAVRST7'
+        savefile_lib: 'ARCHLIB'
+        format: "*SAVF"
+        force_save: "true"
+        target_release: "*CURRENT"
+        joblog: 'false'
+        parameters: ''
+
+    - name: TC03 save library with parameters
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        force_save: "true"
+        parameters: 'PRECHK(*YES) SAVACT(*NO)'
+
+    - name: TC04 save library with joblog
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        force_save: "true"
+        joblog: 'true'
+
+    - name: TC05 Save lib with target_relese
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        force_save: "true"
+        target_release: "*PRV"
+      register: savlib_result
+
+    # Test negative test cases
+
+    #  Known issue, deffered to next release
+    # - name: Save lib with conflicting parameters
+    #   ibmi_lib_save:
+    #     lib_name: 'SAVRST'
+    #     savefile_name: 'SAVTEST'
+    #     savefile_lib: 'ARCHLIB'
+    #     force_save: "true"
+    #     parameters: 'TGTRLS(*PRV)'
+    #   register: savlib_result
+    #   failed_when: "'CPD0042' not in savlib_result.stderr"
+
+    - name: TC06 Save lib with save file exists
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+      register: savlib_result
+      #failed_when: "'CPF5813' not in savlib_result.stderr"
+      failed_when: "savlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF5813') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC08 save lib with wrong library name
+      ibmi_lib_save:
+        lib_name: 'ABC'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        force_save: 'true'
+      register: savlib_result
+      #failed_when: "'ABC not found' not in savlib_result.stderr"
+      failed_when: "savlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3781') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC09 save lib with wrong format
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        format: '*MEDDFN'
+        joblog: 'true'
+        force_save: 'true'
+      register: savlib_result
+      failed_when: "'value of format must be one of: *SAVF' not in savlib_result.msg"
+
+    - name: TC10 save lib with wrong joblog
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        joblog: 'abc'
+        force_save: 'true'
+      register: savlib_result
+      failed_when: "'is not a valid boolean' not in savlib_result.msg"
+
+    - name: TC11 save lib with wrong force_save
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        force_save: 'abc'
+      register: savlib_result
+      failed_when: "'is not a valid boolean' not in savlib_result.msg"
+
+    - name: TC12 save lib with wrong target_release
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        target_release: 'abc'
+        joblog: 'true'
+        force_save: 'true'
+      register: savlib_result
+      #failed_when: "'not valid for parameter TGTRLS' not in savlib_result.stderr"
+      failed_when: "savlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC13 save lib with an invalid parameters
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        parameters: 'abc'
+        joblog: 'true'
+        force_save: 'true'
+      register: savlib_result
+      #failed_when: "'CPF0001' not in savlib_result.stderr"
+      failed_when: "savlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0001') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC14 save lib with an invalid option
+      ibmi_lib_save:
+        abc: '==-91'
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+      register: savlib_result
+      failed_when: "'Unsupported parameters' not in savlib_result.msg"
+
+    - name: TC15 save lib without required options
+      ibmi_lib_save:
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+      register: savlib_result
+      failed_when: "'missing required arguments: lib_name' not in savlib_result.msg"
+
+    - name: TC16 save lib without required options
+      ibmi_lib_save:
+        lib_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+      register: savlib_result
+      failed_when: "'missing required arguments: savefile_name' not in savlib_result.msg"
+
+    - name: TC17 save lib without required options
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+      register: savlib_result
+      failed_when: "'missing required arguments: savefile_lib' not in savlib_result.msg"
+
+  always:
+    - name: delete libraries 
+      ibmi_cl_command: 
+        cmd: "dltlib lib({{item}})"
+      with_items: 
+        - SAVRST
+        - ARCHLIB
+      ignore_errors: true
+  

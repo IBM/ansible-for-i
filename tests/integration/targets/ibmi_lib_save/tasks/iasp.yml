@@ -1,0 +1,128 @@
+# Test when all dependent packages are in place  
+- name: Query the iASP existing
+  ibmi_sql_query:
+    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+  register: iasp_list
+
+- block:
+  
+  - name: run CL command module with asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB({{item}}) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: true
+    with_items:
+      - SAVRST
+      - TEMPLIB 
+
+  - name: run CL command module with asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB({{item}})
+      joblog: true
+    with_items:
+      - ARCHLIB
+      - SAVRST1
+      
+  - copy: src="IBMISAVF.FILE" dest="/tmp/"
+  - name: copy file to library
+    command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB'
+
+  - name: TC18 restore objects to from sysbase lib to iasp library
+    ibmi_object_restore:
+      object_lib: 'SAVRST'
+      savefile_name: 'IBMISAVF'
+      savefile_lib: 'ARCHLIB'
+      parameters: "RSTASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})"
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      #joblog: true
+    register: rstobj_result
+    #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+    failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+  - name: TC19 save library with all supported options from iasp to sys
+    ibmi_lib_save:
+      lib_name: "SAVRST"
+      savefile_name: 'SAVTEST1'
+      savefile_lib: 'SAVRST1'
+      format: "*SAVF"
+      force_save: "true"
+      target_release: "*CURRENT"
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: 'true'
+      parameters: ''
+    ignore_errors: true
+
+  - name: TC20 restore lib with all supported options from sys to iasp
+    ibmi_lib_restore:
+      saved_lib: 'SAVRST'
+      savefile_name: 'SAVTEST1'
+      savefile_lib: 'SAVRST1'
+      format: '*SAVF'
+      joblog: 'false'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      parameters: ''
+    register: rstlib_result
+
+  - name: TC21 save library with all supported options from iasp to iasp
+    ibmi_lib_save:
+      lib_name: "SAVRST"
+      savefile_name: 'SAVTEST2'
+      savefile_lib: 'TEMPLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+
+  - name: TC22 restore lib with all supported options from iasp to iasp
+    ibmi_lib_restore:
+      saved_lib: 'SAVRST'
+      savefile_name: 'SAVTEST2'
+      savefile_lib: 'TEMPLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: rstlib_result
+
+  - name: TC23 save library with all supported options from sys to iasp
+    ibmi_lib_save:
+      lib_name: "SAVRST1"
+      savefile_name: 'SAVTEST3'
+      savefile_lib: 'SAVRST'
+      format: "*SAVF"
+      force_save: "true"
+      target_release: "*CURRENT"
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: 'false'
+      parameters: ''
+
+  - name: TC24 restore lib with all supported options from iasp to sys
+    ibmi_lib_restore:
+      saved_lib: 'SAVRST1'
+      savefile_name: 'SAVTEST3'
+      savefile_lib: 'SAVRST'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: rstlib_result
+
+  - name: TC25 save library with all supported options from sys to sys
+    ibmi_lib_save:
+      lib_name: "SAVRST1"
+      savefile_name: 'SAVTEST4'
+      savefile_lib: 'ARCHLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+
+  - name: TC26 restore lib with all supported options from sys to sys
+    ibmi_lib_restore:
+      saved_lib: 'SAVRST1'
+      savefile_name: 'SAVTEST4'
+      savefile_lib: 'ARCHLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+    register: rstlib_result
+  when: iasp_list.row_count != 0
+
+  always:
+    - name: delete libraries 
+      ibmi_cl_command: 
+        cmd: "dltlib lib({{item}})"
+        joblog: 'true'
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      with_items: 
+        - SAVRST
+        - SAVRST1 
+        - ARCHLIB
+        - TEMPLIB
+      ignore_errors: true

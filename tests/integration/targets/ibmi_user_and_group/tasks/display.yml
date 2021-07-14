@@ -1,0 +1,40 @@
+- name: TC01 display a user profile 
+  ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ansible_ssh_user}}'
+  register: user_result
+
+- name: TC01 assert return options
+  assert: 
+    that:
+      - user_result.stdout is not defined
+      - user_result.stderr is not defined
+      - user_result.stdout_lines is not defined
+      - user_result.stderr_lines is not defined 
+      - user_result.result_set | length == 1
+      - user_result.result_set[0]['AUTHORIZATION_NAME'] == '{{ansible_ssh_user.upper()}}'
+
+- name: TC02 display with other options to ensure other options are ignored
+  ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ansible_ssh_user}}'
+    password: '{{pwd}}'
+    expire: '*YES'
+    status: '*DISABLED'
+    user_class: '*SYSOPR'
+    special_authority: ['*ALLOBJ', '*AUDIT']
+    user_group: ''
+    owner: '*USRPRF'
+    text: 'Created by ansible'
+    parameters: ''
+  register: user_result
+
+- name: TC02 assert return options
+  assert: 
+    that:
+      - user_result.stdout is not defined
+      - user_result.stderr is not defined
+      - user_result.stdout_lines is not defined
+      - user_result.stderr_lines is not defined 
+      - user_result.result_set | length == 1
+      - user_result.result_set[0]['AUTHORIZATION_NAME'] == '{{ansible_ssh_user.upper()}}'

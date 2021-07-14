@@ -1,0 +1,459 @@
+# test code for the ibmi_object_find module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+
+- include: long_name.yml
+
+# test negative test cases
+- name: Verify 5770SS1 Option 39
+  command: system "DSPSFWRSC"
+  register: installed_native_products
+
+- set_fact:
+    Option39_installed: false
+#
+- name: Promote message if 5770SS1 Option 39 is not installed
+  set_fact:
+    Option39_installed: true
+  when: '"5770SS1     39         5050" in installed_native_products.stdout'
+#
+- name: TC01 find objects with invalid age
+  ibmi_object_find:
+    age: "*1*#"
+  register: neg_result
+  ignore_errors: true
+
+- name: TC01 assert the returned objects with invalid age
+  assert:
+    that:
+      - "'failed to process age' in neg_result.msg"
+
+- name: TC02 find objects with invalid age_stamp
+  ibmi_object_find:
+    age_stamp: "atime"
+  register: neg_result
+  ignore_errors: true
+
+- name: TC02 assert the returned objects with invalid age_stamp
+  assert:
+    that:
+      - "'value of age_stamp must be one of: ctime, got: atime' in neg_result.msg"
+
+- name: TC03 find objects with invalid object_type_list
+  ibmi_object_find:
+     object_type_list: "abcedfg"
+  register: find_result
+  ignore_errors: true
+
+- name: TC03 assert failure result with invalid object_type_list
+  assert:
+    that:
+      - find_result.rc != 0
+      - "'stdout' not in find_result"
+      - "'stderr' in find_result"
+      - "'stderr_lines' in find_result"
+
+- name: TC04 find objects with invalid lib_name
+  ibmi_object_find:
+    lib_name: "\\*ab***fe"
+    joblog: true
+  register: neg_result
+  ignore_errors: true
+
+- name: TC04 assert failure result with invalid lib_name
+  assert:
+    that:
+      - neg_result.rc == 0
+      - neg_result.object_list | length == 0
+      - neg_result.job_log | length > 0
+      - neg_result.job_log[0]['FROM_INSTRUCTION'] is defined
+      - neg_result.job_log[0]['FROM_LIBRARY'] is defined
+      - neg_result.job_log[0]['FROM_MODULE'] is defined
+      - neg_result.job_log[0]['FROM_PROCEDURE'] is defined
+      - neg_result.job_log[0]['FROM_PROGRAM'] is defined
+      - neg_result.job_log[0]['FROM_USER'] is defined
+      - neg_result.job_log[0]['MESSAGE_FILE'] is defined
+      - neg_result.job_log[0]['MESSAGE_ID'] is defined
+      - neg_result.job_log[0]['MESSAGE_LIBRARY'] is defined
+      - neg_result.job_log[0]['MESSAGE_SECOND_LEVEL_TEXT'] is defined
+      - neg_result.job_log[0]['MESSAGE_SUBTYPE'] is defined
+      - neg_result.job_log[0]['MESSAGE_TEXT'] is defined
+      - neg_result.job_log[0]['MESSAGE_TIMESTAMP'] is defined
+      - neg_result.job_log[0]['MESSAGE_TYPE'] is defined
+      - neg_result.job_log[0]['ORDINAL_POSITION'] is defined
+      - neg_result.job_log[0]['SEVERITY'] is defined
+      - neg_result.job_log[0]['TO_INSTRUCTION'] is defined
+      - neg_result.job_log[0]['TO_LIBRARY'] is defined
+      - neg_result.job_log[0]['TO_MODULE'] is defined
+      - neg_result.job_log[0]['TO_PROCEDURE'] is defined
+      - neg_result.job_log[0]['TO_PROGRAM'] is defined
+
+- name: TC05 find objects with invalid object_name
+  ibmi_object_find:
+    object_name: "''-+__"
+  register: neg_result
+  ignore_errors: true
+
+- name: TC05 assert failure result with invalid object_name
+  assert:
+    that:
+      - neg_result.rc == 0
+      - neg_result.object_list | length == 0
+
+- name: TC06 find objects with invalid size
+  ibmi_object_find:
+    size: "abcedge"
+  register: neg_result
+  ignore_errors: true
+
+- name: TC06 assert failure result with invalid size
+  assert:
+    that:
+      - "'failed to process size' in neg_result.msg"
+
+# - name: TC07 find objects with invalid iasp_name
+#   ibmi_object_find:
+#      iasp_name: "IASP1"
+#   register: neg_result
+#   failed_when: "'Exception when trying to use IASP.' not in neg_result.msg"
+
+- name: TC08 find objects with invalid use_regex
+  ibmi_object_find:
+    use_regex: "abcd"
+  register: neg_result
+  ignore_errors: true
+
+- name: TC08 assert failure result invalid use_regex
+  assert:
+    that:
+      - "'is not a valid boolean' in neg_result.msg"
+
+- name: TC09 find objects with unsupported option
+  ibmi_object_find:
+    abc: "abcd"
+  register: neg_result
+  ignore_errors: true
+
+- name: TC09 assert failure result with unsupported option
+  assert:
+    that:
+      - "'Unsupported parameters' in neg_result.msg"
+
+- name: TC10 find objects with object_name with a *
+  ibmi_object_find:
+    lib_name: "FINDLIB"
+    object_name: "OBJECT*"
+    joblog: false
+  register: find_result
+  ignore_errors: true
+
+- name: TC10 assert returned parameters
+  assert:
+    that:
+      #- "'ERROR: Input parameters are not valid.' in find_result.stderr"
+      - find_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF503E') | map(attribute='MESSAGE_ID') | list | length >= 1
+
+
+- name: TC11 use_regex can't work with that object_name is *ALL
+  ibmi_object_find:
+    use_regex: true
+  register: find_result
+  ignore_errors: true
+
+- name: TC11 assert the error msg with use_regex=true and object_name is *ALL
+  assert:
+    that:
+      - "'ERROR: Regular expression specified is not valid' in find_result.stderr"
+      #failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length == 0"
+      - find_result.job_log | length > 0
+      - find_result.job_log[0]['FROM_INSTRUCTION'] is defined
+      - find_result.job_log[0]['FROM_LIBRARY'] is defined
+      - find_result.job_log[0]['FROM_MODULE'] is defined
+      - find_result.job_log[0]['FROM_PROCEDURE'] is defined
+      - find_result.job_log[0]['FROM_PROGRAM'] is defined
+      - find_result.job_log[0]['FROM_USER'] is defined
+      - find_result.job_log[0]['MESSAGE_FILE'] is defined
+      - find_result.job_log[0]['MESSAGE_ID'] is defined
+      - find_result.job_log[0]['MESSAGE_LIBRARY'] is defined
+      - find_result.job_log[0]['MESSAGE_SECOND_LEVEL_TEXT'] is defined
+      - find_result.job_log[0]['MESSAGE_SUBTYPE'] is defined
+      - find_result.job_log[0]['MESSAGE_TEXT'] is defined
+      - find_result.job_log[0]['MESSAGE_TIMESTAMP'] is defined
+      - find_result.job_log[0]['MESSAGE_TYPE'] is defined
+      - find_result.job_log[0]['ORDINAL_POSITION'] is defined
+      - find_result.job_log[0]['SEVERITY'] is defined
+      - find_result.job_log[0]['TO_INSTRUCTION'] is defined
+      - find_result.job_log[0]['TO_LIBRARY'] is defined
+      - find_result.job_log[0]['TO_MODULE'] is defined
+      - find_result.job_log[0]['TO_PROCEDURE'] is defined
+      - find_result.job_log[0]['TO_PROGRAM'] is defined
+  when: "Option39_installed == true "
+
+- name: TC11 assert the error msg with use_regex=true and object_name is *ALL
+  assert:
+    that:
+      - find_result.job_log | length > 0
+      - find_result.job_log[0]['FROM_INSTRUCTION'] is defined
+      - find_result.job_log[0]['FROM_LIBRARY'] is defined
+      - find_result.job_log[0]['FROM_MODULE'] is defined
+      - find_result.job_log[0]['FROM_PROCEDURE'] is defined
+      - find_result.job_log[0]['FROM_PROGRAM'] is defined
+      - find_result.job_log[0]['FROM_USER'] is defined
+      - find_result.job_log[0]['MESSAGE_FILE'] is defined
+      - find_result.job_log[0]['MESSAGE_ID'] is defined
+      - find_result.job_log[0]['MESSAGE_LIBRARY'] is defined
+      - find_result.job_log[0]['MESSAGE_SECOND_LEVEL_TEXT'] is defined
+      - find_result.job_log[0]['MESSAGE_SUBTYPE'] is defined
+      - find_result.job_log[0]['MESSAGE_TEXT'] is defined
+      - find_result.job_log[0]['MESSAGE_TIMESTAMP'] is defined
+      - find_result.job_log[0]['MESSAGE_TYPE'] is defined
+      - find_result.job_log[0]['ORDINAL_POSITION'] is defined
+      - find_result.job_log[0]['SEVERITY'] is defined
+      - find_result.job_log[0]['TO_INSTRUCTION'] is defined
+      - find_result.job_log[0]['TO_LIBRARY'] is defined
+      - find_result.job_log[0]['TO_MODULE'] is defined
+      - find_result.job_log[0]['TO_PROCEDURE'] is defined
+      - find_result.job_log[0]['TO_PROGRAM'] is defined
+      - "'ibm_db_dbi::ProgrammingError:' in find_result.stderr"
+     #failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+  when: "Option39_installed == false "
+#
+- copy: src="findobj.FILE" dest="/tmp/"
+#
+- name: copy file to library
+  command: 'mv /tmp/findobj.FILE /QSYS.LIB/QGPL.LIB/'
+
+  #- include: iasp.yml
+
+
+
+- block:
+    ## Setup - Create libraries and objects on test systems
+
+    - name: create libraries
+      ibmi_cl_command:
+        cmd: "crtlib lib(findlib)"
+
+    - name: restore object to library
+      ibmi_cl_command:
+        cmd: "QSYS/RSTOBJ OBJ(*ALL) SAVLIB(FINDLIB) DEV(*SAVF) SAVF(QGPL/FINDOBJ)"
+      register: rstobj_result
+      #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+      failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+   # Run positive test cases
+    - name: TC12 find library
+      ibmi_object_find:
+        lib_name: "QSYS"
+        object_name: "FINDLIB"
+      register: find_result
+
+    - name: TC12 assert the returned objects
+      assert:
+        that:
+          - find_result.rc == 0
+          - find_result.object_list | length == 1
+
+    - name: TC13 find objects with object_type_list
+      ibmi_object_find:
+        object_type_list: "*DTAARA"
+        object_name: "OBJECT1"
+      register: find_result
+
+    - name: TC13 assert the returned objects
+      assert:
+        that:
+          - find_result.rc == 0
+          - find_result.start != ""
+          - find_result.end != ""
+          - find_result.delta != ""
+          - "'stdout' not in find_result"
+          - "'stderr' not in find_result"
+          - "'stdout_lines' not in find_result"
+          - "'stderr_lines' not in find_result"
+          - find_result.object_list[0].OBJNAME is defined
+          - find_result.object_list[0].OBJTYPE is defined
+          - find_result.object_list[0].OBJOWNER is defined
+          - find_result.object_list[0].TEXT is defined
+          - find_result.object_list[0].OBJCREATED is defined
+          - find_result.object_list[0].OBJDEFINER is defined
+          - find_result.object_list[0].IASP_NUMBER is defined
+          - find_result.object_list[0].OBJLIB is defined
+          - find_result.object_list[0].LAST_RESET_TIMESTAMP is defined
+          - find_result.object_list[0].LAST_USED_TIMESTAMP is defined
+          - find_result.object_list[0].OBJSIZE is defined
+          - find_result.job_log == []
+
+    - name: TC14 find objects with age=1s size=1k
+      ibmi_object_find:
+        age: "1s"
+        age_stamp: "ctime"
+        object_type_list: "*ALL"
+        lib_name: "FINDLIB"
+        object_name: "*ALL"
+        size: "1k"
+        iasp_name: "*SYSBAS"
+        use_regex: false
+        joblog: true
+      register: find_result
+
+    - name: TC14 assert the returned objects
+      assert:
+        that:
+          - find_result.rc == 0
+          - find_result.start != ""
+          - find_result.end != ""
+          - find_result.delta != ""
+          - "'stdout' not in find_result"
+          - "'stderr' not in find_result"
+          - "'stdout_lines' not in find_result"
+          - "'stderr_lines' not in find_result"
+          - find_result.object_list | length == 10
+          - find_result.object_list[0].OBJNAME is defined
+          - find_result.object_list[0].OBJTYPE is defined
+          - find_result.object_list[0].OBJOWNER is defined
+          - find_result.object_list[0].TEXT is defined
+          - find_result.object_list[0].OBJCREATED is defined
+          - find_result.object_list[0].OBJDEFINER is defined
+          - find_result.object_list[0].IASP_NUMBER is defined
+          - find_result.object_list[0].OBJLIB is defined
+          - find_result.job_log | length > 0
+          - find_result.job_log[0]['FROM_INSTRUCTION'] is defined
+          - find_result.job_log[0]['FROM_LIBRARY'] is defined
+          - find_result.job_log[0]['FROM_MODULE'] is defined
+          - find_result.job_log[0]['FROM_PROCEDURE'] is defined
+          - find_result.job_log[0]['FROM_PROGRAM'] is defined
+          - find_result.job_log[0]['FROM_USER'] is defined
+          - find_result.job_log[0]['MESSAGE_FILE'] is defined
+          - find_result.job_log[0]['MESSAGE_ID'] is defined
+          - find_result.job_log[0]['MESSAGE_LIBRARY'] is defined
+          - find_result.job_log[0]['MESSAGE_SECOND_LEVEL_TEXT'] is defined
+          - find_result.job_log[0]['MESSAGE_SUBTYPE'] is defined
+          - find_result.job_log[0]['MESSAGE_TEXT'] is defined
+          - find_result.job_log[0]['MESSAGE_TIMESTAMP'] is defined
+          - find_result.job_log[0]['MESSAGE_TYPE'] is defined
+          - find_result.job_log[0]['ORDINAL_POSITION'] is defined
+          - find_result.job_log[0]['SEVERITY'] is defined
+          - find_result.job_log[0]['TO_INSTRUCTION'] is defined
+          - find_result.job_log[0]['TO_LIBRARY'] is defined
+          - find_result.job_log[0]['TO_MODULE'] is defined
+          - find_result.job_log[0]['TO_PROCEDURE'] is defined
+          - find_result.job_log[0]['TO_PROGRAM'] is defined
+
+    - name: TC15 find objects with size=0
+      ibmi_object_find:
+        size: "0"
+      register: find_result
+
+    - name: TC16 find objects with age=1s lib_name but without other options
+      ibmi_object_find:
+        age: "1s"
+        lib_name: "FINDLIB"
+        joblog: false
+      register: find_result
+
+    - name: TC16 assert the returned objects
+      assert:
+        that:
+          - find_result.object_list | length == 10
+          - find_result.job_log == []
+
+    - name: TC17 find objects with age=500w
+      ibmi_object_find:
+        age: "500w"
+        lib_name: "FINDLIB"
+      register: find_result
+
+    - name: TC17 assert the returned objects
+      assert:
+        that:
+          - find_result.object_list | length == 0
+
+    - name: TC18 find objects with object_type_list lib_name
+      ibmi_object_find:
+        object_type_list: "*DTAARA"
+        lib_name: "FINDLIB"
+        object_name: "OBJECT1"
+      register: find_result
+
+    - name: TC18 assert the returned objects
+      assert:
+        that:
+          - find_result.object_list | length == 1
+
+    - name: TC19 find objects with multiple object_type_list
+      ibmi_object_find:
+        object_type_list: "*DTAARA *JRN *FILE"
+        lib_name: "FINDLIB"
+        object_name: "OBJECT1"
+      register: find_result
+
+    - name: TC19 assert the returned objects
+      assert:
+        that:
+          - find_result.object_list | length == 2
+
+    - name: TC20 find objects with multiple library_list
+      ibmi_object_find:
+        object_type_list: "*DTAARA"
+        lib_name: "FINDLIB FINDLIB1"
+        object_name: "OBJECT1"
+      register: find_result
+
+    - name: TC20 assert the returned objects
+      assert:
+        that:
+          - find_result.object_list | length == 0
+
+    - name: TC21 find objects with size=80000b
+      ibmi_object_find:
+        lib_name: "FINDLIB"
+        size: "80000b"
+      register: find_result
+
+    - name: TC21 assert the returned objects
+      assert:
+        that:
+          - find_result.object_list | length >= 1
+
+    - name: TC22 find objects with use_regex
+      ibmi_object_find:
+        object_type_list: "*ALL"
+        lib_name: "FINDLIB"
+        object_name: "OBJ?ECT2"
+        use_regex: true
+      register: find_result
+      when: "Option39_installed == true "
+
+    - name: TC22 assert the returned objects
+      assert:
+        that:
+          - find_result.object_list | length == 2
+      when: "Option39_installed == true "
+
+    - name: TC23 find objects with use_regex
+      ibmi_object_find:
+        object_type_list: "*ALL"
+        lib_name: "FINDLIB"
+        object_name: "OBJC?ECT3"
+        use_regex: true
+      register: find_result
+      when: "Option39_installed == true "
+
+    - name: TC23 assert the returned objects
+      assert:
+        that:
+          - find_result.object_list | length == 1
+      when: "Option39_installed == true "
+
+  always:
+    - name: delete library
+      ibmi_cl_command:
+        cmd: dltlib lib(findlib)
+
+    - name: delete savf
+      ibmi_cl_command:
+        cmd: DLTOBJ OBJ(QGPL/FINDOBJ) OBJTYPE(*FILE)

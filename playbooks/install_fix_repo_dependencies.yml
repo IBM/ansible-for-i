@@ -1,0 +1,14 @@
+# Copyright (c) IBM Corporation 2019, 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Install dependencies if the repo system is an OS400 system
+      command: '/QOpensys/pkgs/bin/yum install sqlite3 python3-paramiko -y'
+      when: ansible_os_family.upper() == 'OS400'
+
+    - name: Install paramiko on other OS
+      command: pip3 install paramiko -y
+      when: ansible_os_family.upper() != 'OS400'

@@ -1,0 +1,28 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# ibmi_fix_group_compare.yml
+# The sample file is to provide an example about how to compare the ptf groups between repo server and IBM i.
+
+# Command example: ansible-playbook ./ibmi_fix_group_compare.yml -e
+# "{'group_list':['SF99xxx','SF99yyy'], 'target_system': 'target', 'repo_server': 'reposerver'}"
+
+---
+- hosts: '{{ target_system }}'
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    group_list: []
+    repo_server: "{{repo_server}}"
+    type: "latest"
+
+  tasks:
+    - name: compare the groups
+      include_role:
+        name: check_ptf_groups_against_fix_repo
+
+    - name: print group status
+      debug:
+        var: group_status

@@ -1,0 +1,314 @@
+# test code for the ibmi_copy module and action plugin
+# (c) 2020, Li Jun Zhu <zhuljbj@126.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+
+- set_fact:
+    single_delay_ptf_number: "{{(delay_ptf | dict2items)[0]['key']}}"
+    single_delay_ptf_product: "{{(delay_ptf | dict2items)[0]['value']}}"
+
+- include: query_remove_ptf.yml
+  with_dict: '{{delay_ptf}}'
+
+- name: query delay ptf with only requried options
+  ibmi_fix: 
+    fix_list: '{{ delay_ptf.keys() }}'
+    operation: 'query'
+  register: fix_result
+  failed_when: "fix_result.ptf_list | length != 0 and fix_result.ptf_list[0]['PTF_LOADED_STATUS'] != 'NOT LOADED'"
+
+- name: install fixes
+  ibmi_fix:
+    product_id: "{{ single_delay_ptf_product}}"
+    save_file_object: "Q{{ single_delay_ptf_number}}"
+    save_file_lib: '{{remote_lib}}'
+    operation: 'load_only'
+  register: fix_result
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_delay_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'LOADED'
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+- name: immed apply a delayed ptf
+  ibmi_fix:
+    product_id: "{{ single_delay_ptf_product }}"
+    save_file_object: 'Q{{ single_delay_ptf_number }}' 
+    save_file_lib: '{{remote_lib}}'
+    fix_list: "{{ single_delay_ptf_number }}"
+    operation: 'apply_only'
+  register: fix_result
+  #failed_when: "'cannot be applied or removed' not in fix_result.stderr"
+  failed_when: "fix_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3634') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- assert:
+    that:
+      - fix_result.ptf_list is not defined
+      - fix_result.stdout is defined
+      - fix_result.stderr is defined
+      - fix_result.rc != 0
+      - fix_result.stdout_lines is defined
+      - fix_result.stderr_lines is defined
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_delay_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'LOADED'
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+- name: allow apply without identifying fix
+  ibmi_fix:
+    product_id: "{{ single_delay_ptf_product }}"
+    save_file_object: 'Q{{ single_delay_ptf_number }}' 
+    save_file_lib: '{{remote_lib}}'
+    fix_list: "{{ single_delay_ptf_number }}"
+    operation: 'apply_only'
+    delayed_option: "*YES"
+  register: fix_result
+
+- assert:
+    that:
+      - fix_result.ptf_list[0]['PTF_PRODUCT_ID'] is defined
+      - fix_result.ptf_list[0]['PTF_IDENTIFIER'] is defined
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'LOADED'
+      - fix_result.ptf_list[0]['PTF_SAVE_FILE'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_ACTION'] == 'TEMPORARILY APPLIED'
+      - fix_result.ptf_list[0]['PTF_ACTION_REQUIRED'] is defined
+      - fix_result.ptf_list[0]['PTF_STATUS_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_CREATION_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_REQUIRED'] == 'DELAYED'
+      - fix_result.ptf_list[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_delay_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.ptf_list[0]['PTF_PRODUCT_ID'] is defined
+      - fix_result.ptf_list[0]['PTF_IDENTIFIER'] is defined
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'LOADED'
+      - fix_result.ptf_list[0]['PTF_SAVE_FILE'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_ACTION'] == 'TEMPORARILY APPLIED'
+      - fix_result.ptf_list[0]['PTF_ACTION_REQUIRED'] is defined
+      - fix_result.ptf_list[0]['PTF_STATUS_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_CREATION_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_REQUIRED'] == 'DELAYED'
+      - fix_result.ptf_list[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+- name: IPL the system to verify the PTF are applied.
+  ibmi_reboot:
+    how_to_end: '*IMMED'
+  when: "fix_result.ptf_list[0]['PTF_IPL_ACTION'] == 'TEMPORARILY APPLIED'"
+
+- name: remove the ptfs temp if they have been installed
+  ibmi_fix:
+    fix_list: '{{ single_delay_ptf_number }}'
+    product_id: "{{ single_delay_ptf_product }}"
+    operation: 'remove'
+  register: fix_result
+  failed_when: fix_result.rc == 0
+  #failed_when: "'CPF35C' not in fix_result.stderr"
+
+- name: remove the ptfs term
+  ibmi_fix:
+    fix_list: '{{ single_delay_ptf_number }}'
+    product_id: "{{ single_delay_ptf_product }}"
+    operation: 'remove'
+    delayed_option: "*YES" 
+    temp_or_perm: "*TEMP"
+  register: fix_result
+
+- name: IPL the system to verify the PTF are applied.
+  ibmi_reboot:
+    how_to_end: '*IMMED'
+
+- name: remove the ptfs perm
+  ibmi_fix:
+    fix_list: '{{ single_delay_ptf_number }}'
+    product_id: "{{ single_delay_ptf_product }}"
+    operation: 'remove'
+    temp_or_perm: "*PERM"
+  register: fix_result
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 0 or (fix_result.ptf_list | length == 1 and (fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'NOT LOADED' or fix_result.ptf_list[0]['PTF_IPL_ACTION'] == 'PERMANENTLY REMOVED')) 
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_delay_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+
+- name: install fixes failed because missing delayed_option=true
+  ibmi_fix:
+    product_id: '{{single_delay_ptf_product}}' 
+    save_file_object: 'Q{{ single_delay_ptf_number }}'
+    save_file_lib: '{{remote_lib}}'
+    operation: 'load_and_apply'
+  register: fix_result
+  failed_when: fix_result.rc == 0
+
+- name: remove the loaded ptfs
+  ibmi_fix:
+    fix_list: '{{ single_delay_ptf_number }}'
+    product_id: "{{ single_delay_ptf_product }}"
+    operation: 'remove'
+    temp_or_perm: "*PERM"
+  register: fix_result
+
+- name: install fixes with delayed_option=true
+  ibmi_fix:
+    product_id: '{{single_delay_ptf_product}}' 
+    save_file_object: 'Q{{ single_delay_ptf_number }}'
+    save_file_lib: '{{remote_lib}}'
+    operation: 'load_and_apply'
+    delayed_option: "*YES" 
+  register: fix_result
+
+- assert:
+    that:
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_delay_ptf_number }}"
+    operation: 'query'
+  register: fix_result 
+
+- assert:
+    that:
+      - "fix_result.ptf_list[0]['PTF_PRODUCT_ID'] == '{{ single_delay_ptf_product }}'"
+      - "fix_result.ptf_list[0]['PTF_IDENTIFIER'] == '{{ single_delay_ptf_number }}'"
+      - fix_result.ptf_list[0]['PTF_LOADED_STATUS'] == 'LOADED'
+      - fix_result.ptf_list[0]['PTF_SAVE_FILE'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_ACTION'] == 'TEMPORARILY APPLIED'
+      - fix_result.ptf_list[0]['PTF_ACTION_REQUIRED'] is defined
+      - fix_result.ptf_list[0]['PTF_STATUS_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_CREATION_TIMESTAMP'] is defined
+      - fix_result.ptf_list[0]['PTF_IPL_REQUIRED'] == 'DELAYED'
+      - fix_result.ptf_list[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+      - fix_result.start is defined
+      - fix_result.end is defined
+      - fix_result.delta is defined
+      - fix_result.stdout is not defined
+      - fix_result.stderr is not defined
+      - fix_result.rc == 0
+      - fix_result.stdout_lines is not defined
+      - fix_result.stderr_lines is not defined
+      - fix_result.ptf_list | length == 1
+
+- name: IPL the system to verify the PTF are applied.
+  ibmi_reboot:
+    how_to_end: '*IMMED'
+
+- name: remove the ptfs term
+  ibmi_fix:
+    fix_list: '{{ single_delay_ptf_number }}'
+    product_id: "{{ single_delay_ptf_product }}"
+    operation: 'remove'
+    delayed_option: "*YES" 
+    temp_or_perm: "*TEMP"
+  register: fix_result
+
+- name: IPL the system to verify the PTF are applied.
+  ibmi_reboot:
+    how_to_end: '*IMMED'
+
+- name: remove the ptfs perm if they have been installed
+  ibmi_fix:
+    fix_list: '{{ single_delay_ptf_number }}'
+    product_id: "{{ single_delay_ptf_product }}"
+    operation: 'remove'
+    temp_or_perm: "*PERM"
+
+- name: query immed ptf with only requried options
+  ibmi_fix: 
+    fix_list: "{{ single_delay_ptf_number }}"
+    operation: 'query'
+  register: fix_result 

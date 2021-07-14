@@ -1,0 +1,50 @@
+- hosts: localhost
+  collections:
+    - ibm.power_ibmi
+  tasks:
+    - block:
+        - name: remove build path
+          file:
+            path: '{{ build_path }}'
+            state: 'absent'
+          delegate_to: '{{ item }}'
+          with_items:
+            - "{{ host_names.split() }}"
+          ignore_errors: true
+          when: not provision|bool
+
+        - name: remove build lib
+          ibm.power_ibmi.ibmi_cl_command:
+            cmd: DLTLIB {{ build_lib }}
+          delegate_to: '{{ item }}'
+          with_items:
+            - "{{ host_names.split() }}"
+          ignore_errors: true
+          when: not provision|bool
+
+        - block:
+            - name: Add PowerVC host {{ powervc_host }} to Ansible in-memory inventory
+              add_host:
+                name: 'powervc'
+                ansible_user: '{{ powervc_admin }}'
+                ansible_ssh_pass: '{{ powervc_admin_password }}'
+                ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+                ansible_python_interpreter: /usr/bin/python3
+                ansible_ssh_host: '{{ powervc_host }}'
+              no_log: true
+
+            - name: Destroy VM when provision
+              os_server:
+                auth:
+                  auth_url: https://{{ powervc_host }}:5000/v3
+                  username: '{{ powervc_admin }}'
+                  password: '{{ powervc_admin_password }}'
+                  project_name: '{{ powervc_project }}'
+                  project_domain_name: '{{ project_domain }}'
+                  user_domain_name: '{{ user_domain }}'
+                name: '{{ vm_name }}'
+                verify: '{{ verify_cert }}'
+                state: 'absent'
+              delegate_to: 'powervc'
+          when: provision|bool
+      when: cleanup|bool

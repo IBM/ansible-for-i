@@ -1,0 +1,149 @@
+- block:
+    # - copy: src="cl1.cl" dest="/tmp/"
+
+    - name: TC01 run cl1.cl
+      ibmi_script: 
+        src: cl1.cl
+        type: 'CL'
+      register: cl_result
+
+    - name: TC01 assert returned options
+      assert:
+        that:
+          - cl_result.delta is defined
+          - cl_result.stdout is defined
+          - cl_result.stderr is defined
+          - cl_result.stdout_lines is defined 
+          - cl_result.stderr_lines is defined
+          - cl_result.rc is defined   
+
+    - name: TC01 query the data area has been created
+      ibmi_object_find:
+        object_name: 'CL1'
+        object_type_list: '*ALL'
+        lib_name: 'TESTSCRIPT'
+      register: find_result
+
+    - name: TC01 assert 1 object can be found
+      assert:
+        that:
+          - find_result.object_list | length == 1
+
+    - name: TC02 run CL script with as the separate character ":"
+      ibmi_script:
+        src: script/cl2.cl
+        type: 'CL'
+        severity_level: 20
+        parameters: 'DATFMT(*USA)'
+
+    - name: TC02 query the data area has been created
+      ibmi_object_find:
+        object_name: 'CL1'
+        object_type_list: '*ALL'
+        lib_name: 'TESTSCRIPT'
+      register: find_result
+
+    - name: TC02 assert 1 object can be found
+      assert:
+        that:
+          - find_result.object_list | length == 0
+
+    - name: TC03 run CL script with duplicated lib creation
+      ibmi_script:
+        src: "{{file_path}}/cl3.txt"
+        type: 'CL'
+      register: cl_result
+      ignore_errors: true
+
+    - name: TC03 assert returned options
+      assert:
+        that:
+          - cl_result.delta is defined
+          - cl_result.stdout is defined
+          #- "'Library TESTSCRIPT already exists' in cl_result.stderr"
+          - cl_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2111') | map(attribute='MESSAGE_ID') | list | length >=1
+          - cl_result.stdout_lines is defined 
+          - cl_result.stderr_lines is defined
+          - cl_result.rc is defined  
+
+    - name: TC03 query the library
+      ibmi_object_find:
+        object_name: 'TEST2'
+        object_type_list: '*LIB'
+        lib_name: 'QSYS'
+      register: find_result
+
+    - name: TC03 assert 0 object can be found
+      assert:
+        that:
+          - find_result.object_list | length == 0
+
+    - name: TC04 run CL script with invalid separate character
+      ibmi_script:
+        src: 'cl4.text'
+        type: 'CL'
+      register: cl_result
+      #failed_when: "'Errors occurred in command' not in cl_result.stderr"
+      failed_when: "cl_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0018') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+    - name: TC04 query the data area
+      ibmi_object_find:
+        object_name: 'CL1'
+        object_type_list: '*ALL'
+        lib_name: 'TESTSCRIPT'
+      register: find_result
+
+    - name: TC04 assert 0 object can be found
+      assert:
+        that:
+          - find_result.object_list | length == 0
+
+    - name: TC05 run CL script with an not existing script
+      ibmi_script:
+        src: 'abc.text'
+        type: 'CL'
+      register: cl_result
+      #ignore_errors: true
+      failed_when: "'Could not find or access \\'abc.text\\'' not in cl_result.stderr"
+      #failed_when: "cl_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3781') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+    - name: TC06 run script without required options
+      ibmi_script:
+        #src: 'abc.text'
+        type: 'CL'
+      register: cl_result
+      failed_when: "'src is required' not in cl_result.stderr"
+
+    - name: TC07 run script without required options
+      ibmi_script:
+        src: '{{file_path}}/script/cl2.cl'
+        #type: 'CL'
+      register: cl_result
+      failed_when: "'type is required' not in cl_result.stderr"
+
+    - name: TC08 run script without unsupported options
+      ibmi_script:
+        src: '{{file_path}}/script/cl2.cl'
+        type: 'CL'
+        abc: abc
+      register: cl_result
+      ignore_errors: true
+
+    - assert:
+        that:
+          - "'Invalid options for ibmi_script' in cl_result.msg"
+
+    - name: TC09 run script without unsupported type
+      ibmi_script:
+        src: '{{file_path}}/script/cl2.cl'
+        type: 'abc'
+      register: cl_result
+      failed_when: "'type must be \\'CL\\' or \\'SQL\\'' not in cl_result.stderr"
+  
+  always:
+    - ibmi_cl_command:
+        cmd: dltlib {{item}}
+      ignore_errors: true
+      with_items:
+        - TESTSCRIPT
+        - TEST2

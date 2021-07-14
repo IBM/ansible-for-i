@@ -1,0 +1,226 @@
+# test code for the ibmi_tcp_interface module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+## The test system must have at least one available CMN resource
+- block:
+    - name: Verify product installed or not
+      command: system "DSPSFWRSC"
+      register: installed_native_products
+
+    - name: assert the returned parameters
+      assert:
+        that: 
+          - "'5770SS1     48' in installed_native_products.stdout or '5770SS1    48' in installed_native_products.stdout"
+        fail_msg: "Required 5770SS1 option 48 is not installed"
+
+    - name: query ip interface from remote system
+      ibmi_sql_query:
+        sql: "SELECT INTERNET_ADDRESS,CONNECTION_TYPE,SUBNET_MASK,LINE_DESCRIPTION from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS  not in ('*IP6SAC', '*IP4DHCP') and LINE_DESCRIPTION not in ('*LOOPBACK')"
+      register: ip_interface_info
+
+    - set_fact:
+        lind_name: "{{ip_interface_info.row[0]['LINE_DESCRIPTION']}}"
+        subnet: "{{ip_interface_info.row[0]['SUBNET_MASK']}}"
+        ifc_name: "ANSI_IFC1"
+        ifc_ip_prefix: "192.168.0."
+        ip_postfix_list: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+        target_ip: "11.11.11.11"
+
+    - name: Random generate an IP
+      set_fact:
+        ifc_ip_postfix: "{{ ip_postfix_list | random }}"
+
+    - set_fact:
+        ifc_ip: "{{ifc_ip_prefix}}{{ifc_ip_postfix}}"
+
+    - name: query ip interface from remote system
+      ibmi_sql_query:
+        sql: "SELECT INTERNET_ADDRESS,INTERFACE_STATUS,ALIAS_NAME from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS='{{ifc_ip}}' or ALIAS_NAME='{{ifc_name}}'"
+      register: ifc_info
+
+    - include: cleanup.yml
+      loop: '{{ifc_info.row}}'
+      when: ifc_info.row | length > 0
+
+    - name: Setup source ip
+      ibmi_tcp_interface: 
+        line_description: '{{lind_name}}'
+        vlan_id: '2'
+        subnet_mask: '{{subnet}}'
+        alias_name: '{{ifc_name}}'
+        internet_address: '{{ifc_ip}}'
+        state: 'present'
+        associated_local_interface: '*NONE'
+        type_of_service: '*NORMAL'
+        max_transmission_unit: '1024'
+        auto_start: '*NO'
+        preferred_interface: '*NONE'
+        text_description: 'CREATED BY ANSIBLE'
+        sec_to_wait: 120
+        extra_params: 'DHCPDYNDNS(*NO)'
+        joblog: true
+      register: tcp_result
+
+    - name: TC01 add nrg link with only required options
+      ibmi_nrg_link:
+        operation: add
+        source_address: '{{ifc_ip}}'
+        target_address: 192.168.0.2
+        link_priority: 1
+      register: nrg_result
+
+    - name: TC01 query the nrg info to verify the link has been created
+      ibmi_sql_query:
+        sql: 'select * from qsys2.nrg_link_info'
+      register: sql_result
+
+    - name: TC01 assert the returned options
+      assert:
+        that:
+          - nrg_result.msg is defined  
+          - nrg_result.rc == 0 
+          #- sql_result.row | length == sql_org_result.row | length + 5
+          - sql_result.row | selectattr('SOURCE_ADDRESS', 'equalto', '{{ifc_ip}}') | map(attribute='SOURCE_ADDRESS') | list | length >= 1
+
+    - name: TC01 assert the nrg link properties
+      assert:
+        that:
+          - item['TARGET_ADDRESS'] == '192.168.0.2'
+          - item['LINK_PRIORITY'] == 1
+          - item['VIRTUAL_LAN_ID'] is defined
+          - item['LINE_DESCRIPTION'] is defined
+          - item['ADDRESS_SPACE_TYPE'] == 'IPV4'
+          - item['LINK_STATE'] == 'DOWN' 
+      when: item['SOURCE_ADDRESS'] == '{{ifc_ip}}'
+      loop: "{{sql_result['row']}}" 
+
+    - name: TC02 remove nrg link with only required options
+      ibmi_nrg_link:
+        operation: remove
+        source_address: '{{ifc_ip}}'
+        target_address: 192.168.0.2
+        link_priority: 1
+      register: nrg_result
+
+    - name: TC02 query the nrg info to verify the link has been created
+      ibmi_sql_query:
+        sql: 'select * from qsys2.nrg_link_info'
+      register: sql_result
+
+    - name: TC02 assert the returned options
+      assert:
+        that:
+          - nrg_result.msg is defined  
+          - nrg_result.rc == 0 
+          #- sql_result.row | length == sql_org_result.row | length
+          - sql_result.row | selectattr('SOURCE_ADDRESS', 'equalto', '{{ifc_ip}}') | map(attribute='SOURCE_ADDRESS') | list | length == 0
+
+    - name: TC03 query the nrg link info to verify the link has been created
+      ibmi_sql_query:
+        sql: 'select * from qsys2.nrg_info'
+      register: sql_org_result
+    
+    - name: TC03 add nrg link with all supported options
+      ibmi_nrg_link:
+        operation: add
+        nrg_name: MIRROR_DATABASE
+        source_address: '{{ifc_ip}}'
+        target_address: 192.168.0.4
+        change_load_balance_link_count: false
+        virtual_lan_id: 3
+        link_priority: 16
+        line_description: ABC
+      register: nrg_result
+
+    - name: TC03 query the nrg link info to verify the link has been created
+      ibmi_sql_query:
+        sql: 'select * from qsys2.nrg_info'
+      register: sql_result
+
+    - name: TC03 query the nrg info to verify change_load_balance_link_count
+      ibmi_sql_query:
+        sql: 'SELECT * FROM QSYS2.nrg_link_info;'
+      register: nrg_link_info_result  
+
+    - name: TC03 assert the returned options
+      assert:
+        that:
+          - nrg_result.msg is defined  
+          - nrg_result.rc == 0 
+          - (sql_org_result.row | length == 0 and sql_result.row[0]['LOAD_BALANCE_LINK_COUNT'] | int == 1) or sql_result.row[0]['LOAD_BALANCE_LINK_COUNT'] == sql_org_result.row[0]['LOAD_BALANCE_LINK_COUNT']
+          - nrg_link_info_result.row | selectattr('SOURCE_ADDRESS', 'equalto', '{{ifc_ip}}') | map(attribute='SOURCE_ADDRESS') | list | length >= 1
+
+    - name: TC03 assert the nrg link properties
+      assert:
+        that:
+          - item['TARGET_ADDRESS'] == '192.168.0.4'
+          - item['LINK_PRIORITY'] == 16
+          - item['ADDRESS_SPACE_TYPE'] == 'IPV4'
+          - item['LINK_STATE'] == 'DOWN'
+          - item['NRG_NAME'] == 'MIRROR_DATABASE'  
+      when: item['SOURCE_ADDRESS'] == '{{ifc_ip}}'
+      loop: "{{nrg_link_info_result['row']}}"
+
+    - name: TC04 remove nrg link with all supported options
+      ibmi_nrg_link:
+        operation: remove
+        nrg_name: MIRROR_DATABASE
+        source_address: '{{ifc_ip}}'
+        target_address: 192.168.0.4
+        change_load_balance_link_count: false
+        virtual_lan_id: 3
+        link_priority: 16
+        line_description: ABC1
+      register: nrg_result
+
+    - name: TC04 query the nrg info to verify the link has been created
+      ibmi_sql_query:
+        sql: 'select * from qsys2.nrg_link_info'
+      register: sql_result
+
+    - name: TC04 assert the returned options
+      assert:
+        that:
+          - nrg_result.msg is defined  
+          - nrg_result.rc == 0 
+          #- sql_result.row | length == sql_org_result.row | length
+          - sql_result.row | selectattr('SOURCE_ADDRESS', 'equalto', '{{ifc_ip}}') | map(attribute='SOURCE_ADDRESS') | list | length == 0
+
+    - name: TC05 add nrg link with all supported option
+      ibmi_nrg_link:
+        operation: add
+        source_address: '{{ifc_ip}}'
+        target_address: 192.168.0.4
+        change_load_balance_link_count: false
+        virtual_lan_id: 3
+        link_priority: 16
+        line_description: ABC     
+
+    - name: TC05 remove with *ALL
+      ibmi_nrg_link:
+        operation: remove
+        source_address: '*ALL'
+      register: nrg_result
+    
+    - include: negative_case.yml
+
+  when: "ansible_distribution_version == '7' and ansible_distribution_release == '4'"
+
+  always:
+    - name: query ip interface from remote system
+      ibmi_sql_query:
+        sql: "SELECT INTERNET_ADDRESS,INTERFACE_STATUS,ALIAS_NAME from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS='{{ifc_ip}}' or ALIAS_NAME='{{ifc_name}}'"
+      register: ifc_info
+
+    - include: cleanup.yml
+      loop: '{{ifc_info.row}}'
+      when: ifc_info.row | length > 0
+
+    - name: remove with *ALL
+      ibmi_nrg_link:
+        operation: remove
+        source_address: '*ALL'
+      register: nrg_result
+      ignore_errors: true

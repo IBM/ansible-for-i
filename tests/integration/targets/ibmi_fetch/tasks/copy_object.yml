@@ -1,0 +1,5 @@
+- name: copy the file to ibmi
+  copy: src="{{ output_dir }}/fetched/{{ inventory_hostname }}/QSYS.LIB/SAVRST.LIB/{{ savefile_name }}" dest={{ remote_tmp_dir }}
+
+- name: move the file to library
+  command: 'mv {{ remote_tmp_dir }}/{{ savefile_name }} /QSYS.LIB/ARCHLIB.LIB/'

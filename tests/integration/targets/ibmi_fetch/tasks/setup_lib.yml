@@ -1,0 +1,23 @@
+- name: dltlib
+  ibmi_cl_command:
+    cmd: dltlib SAVRST
+
+- name: crtlib
+  ibmi_cl_command:
+    cmd: crtlib SAVRST
+
+- name: restore objects to library
+  ibmi_object_restore:
+    object_lib: 'SAVRST'
+    savefile_name: "{{savf_name.split('.')[0]}}"
+    savefile_lib: 'ARCHLIB'
+  register: original_result
+  ignore_errors: true
+
+- name: assert the copied savf can be restored
+  assert:
+    that:
+      # The restore may reported user change error CPF3848 and some objects in the SAVF may not be restored CPF3773
+      #- "'CPF3848' in original_result.stderr or 'CPF3773' in original_result.stderr"
+      - "original_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length >= 1 or original_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3773') | map(attribute='MESSAGE_ID') | list | length >= 1"
+  when: "original_result.rc != 0"

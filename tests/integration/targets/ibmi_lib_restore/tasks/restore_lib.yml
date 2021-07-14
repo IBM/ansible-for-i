@@ -1,0 +1,145 @@
+- name: TC01 restore objects to library
+  ibmi_object_restore:
+    object_lib: 'SAVRST'
+    savefile_name: 'IBMISAVF'
+    savefile_lib: 'ARCHLIB'
+  register: rstobj_result
+  #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+  failed_when: "rstobj_result.rc != 0 and (rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length) == 0"
+
+- ibmi_lib_save:
+    lib_name: 'SAVRST'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+
+- include: dlt_crt_lib.yml
+
+- name: TC02 restore library with only required options
+  ibmi_lib_restore:
+    saved_lib: 'SAVRST'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+  register: rstlib_result
+
+- name: TC02 assert the returned parameters of ibmi_lib_restore
+  assert:
+    that:
+      - rstlib_result.start != ''
+      - rstlib_result.end != ''
+      - rstlib_result.delta != ''
+      - rstlib_result.rc == 0
+      - rstlib_result.stdout != ''
+      - rstlib_result.stdout_lines != ''
+      - rstlib_result.saved_lib == 'SAVRST'
+      - rstlib_result.savefile_name == 'SAVTEST'
+      - rstlib_result.savefile_lib == 'ARCHLIB'
+      - rstlib_result.format == '*SAVF'
+
+- include: dlt_crt_lib.yml
+
+- name: TC03 restore lib with all supported options
+  ibmi_lib_restore:
+    saved_lib: 'SAVRST'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+    format: '*SAVF'
+    joblog: 'false'
+    parameters: ''
+  register: rstlib_result
+
+- include: dlt_crt_lib.yml
+
+- name: TC04 restore library with parameters
+  ibmi_lib_restore:
+    saved_lib: 'SAVRST'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+    joblog: 'true'
+    parameters: 'OPTION(*NEW) STRJRN(*NO)'
+
+- name: TC04 verify all objects have been restored
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    expected_row_count: 6
+
+# Test negitive path
+- include: dlt_crt_lib.yml
+
+- name: TC05 restore lib with not existing library
+  ibmi_lib_restore:
+    saved_lib: 'ABC'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+  register: rstlib_result
+  #failed_when: "'ABC not found' not in rstlib_result.stderr"
+  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+- name: TC06 restore lib with wrong library name
+  ibmi_lib_restore:
+    saved_lib: 'DEF'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+  register: rstlib_result
+  #failed_when: "'CPF3780' not in rstlib_result.stderr"
+  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+- name: TC08 restore lib from wrong format
+  ibmi_lib_restore:
+    saved_lib: 'SAVRST'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+    format: '*MEDDFN'
+    joblog: 'true'
+  register: rstlib_result
+  failed_when: "'value of format must be one of: *SAVF' not in rstlib_result.msg"
+
+- name: TC09 restore lib with wrong joblog
+  ibmi_lib_restore:
+    saved_lib: 'SAVRST'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+    joblog: 'abc'
+  register: rstlib_result
+  failed_when: "'is not a valid boolean' not in rstlib_result.msg"
+
+- name: TC10 restore lib with an invalid parameters
+  ibmi_lib_restore:
+    saved_lib: 'SAVRST'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+    parameters: 'abc'
+    joblog: 'true'
+  register: rstlib_result
+  #failed_when: "'CPF0001' not in rstlib_result.stderr"
+  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0006') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+
+- name: TC11 restore lib with an invalid option
+  ibmi_lib_restore:
+    abc: '==-91'
+    saved_lib: 'SAVRST'
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+  register: rstlib_result
+  failed_when: "'Unsupported parameters' not in rstlib_result.msg"
+
+- name: TC12 restore lib without required options
+  ibmi_lib_restore:
+    savefile_name: 'SAVTEST'
+    savefile_lib: 'ARCHLIB'
+  register: rstlib_result
+  failed_when: "'missing required arguments: saved_lib' not in rstlib_result.msg"
+
+- name: TC13 restore lib without required options
+  ibmi_lib_restore:
+    saved_lib: 'SAVRST'
+    savefile_lib: 'ARCHLIB'
+  register: rstlib_result
+  failed_when: "'missing required arguments: savefile_name' not in rstlib_result.msg"
+
+- name: TC14 restore lib without required options
+  ibmi_lib_restore:
+    saved_lib: 'SAVRST'
+    savefile_name: 'SAVTEST'
+  register: rstlib_result
+  failed_when: "'missing required arguments: savefile_lib' not in rstlib_result.msg"

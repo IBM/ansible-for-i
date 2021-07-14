@@ -1,0 +1,17 @@
+---
+- name: Extract PTF group information and write into catalog
+# This playbook will call fix_repo_extract_ptf_group_info role to extract PTF group information and write into catalog
+
+# Command example: ansible-playbook ./extract_ptf_group_info.yml -e "{'order_id': '2025910369'}"
+  hosts: reposerver
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    order_id: "{{ order_id }}"
+
+  tasks:
+    - name: Include extract_ptf_group_info role to extract PTF group information and write into catalog
+      include_role:
+        name: fix_repo_extract_ptf_group_info

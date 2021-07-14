@@ -1,0 +1,129 @@
+# test code for the ibmi_start_subsystem module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block:
+    - name: check whether QBATCH is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result
+
+    - name: end the host server if it is running
+      ibmi_cl_command:
+        cmd: 'ENDSBS SBS(QBATCH) OPTION(*IMMED)'
+      when: sql_result.row | length == 1
+
+    - name: pause 1 minutes to wait for sbs end
+      pause: 
+        seconds: 20
+      when: sql_result.row | length == 1
+
+    - name: TC01 start subsystem with all supproted options
+      ibmi_start_subsystem:
+        subsystem: QBATCH
+        library: QSYS
+      register: strsbs_result
+
+    - name: TC01 assert the returned parameters when joblog
+      assert:
+        that: 
+          #- "'CPF0902' in strsbs_result.stdout"
+          #- strsbs_result.stderr is not defined
+          #- strsbs_result.stderr_lines is not defined 
+          - strsbs_result.stdout_lines is defined
+          - strsbs_result.rc == 0
+          - strsbs_result.job_log == []  
+
+    - name: TC01 check whether QBATCH is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+        expected_row_count: 1
+
+    - name: TC01 end the host server if it is running
+      ibmi_cl_command:
+        cmd: 'ENDSBS SBS(QBATCH) OPTION(*IMMED)'
+
+    - name: TC01 pause 1 minutes to wait for sbs end
+      pause: 
+        seconds: 20
+
+    - name: TC02 start subsystem with default options
+      ibmi_start_subsystem:
+        subsystem: QBATCH
+        joblog: true
+      register: strsbs_result
+
+    - name: TC02 assert the returned parameters when joblog
+      assert:
+        that: 
+          #- "'CPF0902' in strsbs_result.stdout"
+          #- strsbs_result.stderr is not defined
+          #- strsbs_result.stderr_lines is not defined 
+          - strsbs_result.stdout_lines is defined
+          - strsbs_result.rc == 0
+          - strsbs_result.job_log != [] 
+
+    - name: TC03 Start a running subsystem
+      ibmi_start_subsystem:
+        subsystem: QBATCH 
+      register: strsbs_result
+      ignore_errors: true
+
+    - name: TC03 assert the returned parameters
+      assert:
+        that: 
+          #- "'CPF1010' in strsbs_result.stderr"
+          - strsbs_result.stdout is defined
+          - strsbs_result.stderr_lines is defined 
+          - strsbs_result.stdout_lines is defined
+          - strsbs_result.rc != 0 
+
+    - name: TC04 Start a not-existing sbs
+      ibmi_start_subsystem:
+        subsystem: abc    
+      register: strsbs_result 
+      #failed_when: "'CPF1013' not in strsbs_result.stderr"
+      failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1013') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+    - name: TC04 assert the returned parameters when joblog
+      assert:
+        that: 
+          - strsbs_result.job_log != [] 
+
+    - name: TC04 Start with a wrong lib
+      ibmi_start_subsystem:
+        subsystem: QBATCH    
+        library: abc
+        joblog: true
+      register: strsbs_result 
+      #failed_when: "'CPF1080' not in strsbs_result.stderr"
+      failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1080') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+    - name: TC04 assert the returned parameters when joblog
+      assert:
+        that: 
+          - strsbs_result.job_log != [] 
+
+    - name: TC05 Missing required options
+      ibmi_start_subsystem:
+      register: strsbs_result
+      failed_when: "'missing required argument' not in strsbs_result.msg"
+
+    - name: TC06 Provide invalid option
+      ibmi_start_subsystem:
+        subsystem: QBATCH 
+        abc: abc   
+      register: strsbs_result
+      failed_when: "'Unsupported parameters' not in strsbs_result.msg" 
+
+  always:
+    - name: start the host server if it is running
+      ibmi_cl_command:
+        cmd: 'STRSBS SBSD(QBATCH)'
+      when: sql_result.row | length == 1
+      ignore_errors: true

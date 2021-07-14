@@ -1,0 +1,54 @@
+---
+- name: Install base with only required options
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+    language: '2924'
+    acceptance_cmd: "CALL PGM(QLPACAGR) PARM('5770JV1' 'V7r4m0' '0000' '*')"
+  register: install_result 
+
+- name: Verify product installed or not
+  ibmi_cl_command: 
+    cmd: DSPSFWRSC
+  register: verify_products
+
+- name: assert returned parameters
+  assert:
+    that:
+      - install_result.stdout is defined
+      - install_result.stdout_lines is defined
+      #- install_result.stderr is not defined
+      #- install_result.stderr_lines is not defined
+      - "'5770JV1     *BASE      5050' in verify_products.stdout" 
+      - "'5770JV1     *BASE      2924' in verify_products.stdout"
+      - "'5770JV1     16         5116' not in verify_products.stdout"
+
+- name: Install a *LNG
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    option: '*BASE'
+    object_type: '*LNG'
+    language: '2989'
+    release: 'V7R4M0'
+    savf_name: 'BASE2989'
+    savf_library: 'JV1'
+  register: install_result
+
+- name: Install option with *ALL
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    option: '16'
+    object_type: '*ALL'
+    savf_name: 'OPT16'
+    savf_library: 'JV1'
+  register: install_result
+
+- name: Install *PGM 
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    option: '17'
+    object_type: '*PGM'
+    savf_name: 'OPT17'
+    savf_library: 'JV1'
+  register: install_result

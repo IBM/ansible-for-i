@@ -1,0 +1,14 @@
+- name: Change VM state
+  os_server_action:
+    action: '{{ vm_action }}'
+    auth:
+      auth_url: https://{{ ansible_ssh_host }}:5000/v3
+      username: '{{ ansible_ssh_user }}'
+      password: '{{ ansible_ssh_pass }}'
+      project_name: '{{ project }}'
+      project_domain_name: '{{ project_domain }}'
+      user_domain_name: '{{ user_domain }}'
+    verify: '{{ verify_cert }}'
+    server: '{{ vm_name }}'
+    timeout: '{{ change_state_timeout }}'
+  register: os_server_result

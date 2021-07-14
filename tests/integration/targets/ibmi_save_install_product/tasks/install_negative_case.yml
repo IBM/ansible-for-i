@@ -1,0 +1,208 @@
+- name: Install option 16 
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    option: '16'
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+    acceptance_cmd: "CALL PGM(QLPACAGR) PARM('5770JV1' 'V7r4m0' '0000' '*')"
+  register: install_result
+  ##*PGM objects for product 5770JV1 option 16 release *FIRST not installed.                                                  
+  #failed_when: "'CPD3DE6' not in install_result.stderr"
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DE6') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: assert returned parameters
+  assert:
+    that:
+      - install_result.stdout is not defined
+      - install_result.stdout_lines is not defined
+      - install_result.stderr is defined
+      - install_result.stderr_lines is defined
+
+- name: Missing required option product
+  ibmi_install_product_from_savf:
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'  
+  register: install_result
+  failed_when: "'missing required argument' not in install_result.msg"
+
+- name: Missing required options
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_library: 'JV1'  
+  register: install_result
+  failed_when: "'missing required argument' not in install_result.msg"
+
+- name: Missing required options
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_name: 'OPTBASE'
+  register: install_result
+  failed_when: "'missing required argument' not in install_result.msg"
+
+- name: Provide invalid option
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+    abc: 'abc' 
+  register: install_result
+  failed_when: "'Unsupported parameters' not in install_result.msg" 
+
+- name: Install a product with invalid acceptance_cmd
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+    acceptance_cmd: "abc"
+  register: install_result
+  failed_when: "'The Accept Software Agreement command ABC failed' not in install_result.msg"
+
+- name: Install a product with invalid parameters
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+    parameters: 'ABC(ABC)'
+  register: install_result
+  #failed_when: "'Keyword ABC not valid for this command' not in install_result.stderr"
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0043') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a product with invalid library
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_name: 'OPTBASE'
+    savf_library: 'ABC'
+  register: install_result
+  failed_when: "'File OPTBASE in library ABC not found' not in install_result.msg" 
+  #failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF9810') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a product with invalid savf_name
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_name: 'ABC'
+    savf_library: 'JV1'
+  register: install_result
+  #failed_when: "'CPF9801: Object ABC in library JV1 not found' not in install_result.stderr"
+  failed_when: "'File ABC in library JV1 not found' not in install_result.msg" 
+  #failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF9801') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a product with invalid savf_name
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_name: 'OPT16'
+    savf_library: 'JV1'
+  register: install_result
+  ##Objects from save file OPT16 in JV1 not restored.
+  #failed_when: "'CPF3801' not in install_result.stderr" 
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3801') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a product with invalid replace_release
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    replace_release: 'ABC'
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+  register: install_result
+  ##Release ABC not valid for parameter REPLACERLS
+  #failed_when: "'CPD3DF5' not in install_result.stderr" 
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DF5') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a product with invalid release
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    release: 'ABC'
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+  register: install_result
+  ##Release ABC not valid for parameter RLS.
+  #failed_when: "'CPD3DF5' not in install_result.stderr" 
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DF5') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+
+- name: Install a product with invalid replace_release
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    replace_release: 'V7R3M0'
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+  register: install_result
+  ##*PGM objects for product 5770JV1 option *BASE release V7R3M0 not installed.                                                  
+  #failed_when: "'CPD3DD3' not in install_result.stderr"  
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DD3') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a product with invalid release
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    release: 'V7R3M0'
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+  register: install_result
+  ##*PGM objects for product 5770JV1 option *BASE release V7R3M0 not found on DEV(*SAVF).                                                                                           
+  #failed_when: "'CPD3DE6' not in install_result.stderr" 
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DE6') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a product with invalid language
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    language: 'abcd'
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+  register: install_result
+  ##NLV ABCD not valid for LNG parameter.                                                  
+  #failed_when: "'CPD3DF6' not in install_result.stderr"
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DF6') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a product with invalid language
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    language: '2989'
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+  register: install_result
+  ## *LNG objects for product 5770JV1 option *BASE release *FIRST not found on DEV(*SAVF).                                                                                          
+  #failed_when: "'CPD3DEE' not in install_result.stderr"
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DEE') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a product with invalid object_type
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    option: '*BASE'
+    object_type: 'abc'
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+  register: install_result
+  ## *LNG objects for product 5770JV1 option *BASE release *FIRST not found on DEV(*SAVF).                                                                                          
+  failed_when: "'value of object_type must be one of: *ALL, *PGM, *LNG' not in install_result.msg"
+  
+- name: Install a product with invalid option
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    option: '99'
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+  register: install_result
+  ## *PGM objects for product 5770JV1 option 99 release *FIRST not found                                                                                          
+  #failed_when: "'CPD3DE6' not in install_result.stderr"
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DE6') | map(attribute='MESSAGE_ID') | list | length ==0"
+  
+- name: Install a product with invalid product
+  ibmi_install_product_from_savf:
+    product: 5770ABC
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+  register: install_result
+  ##  *PGM objects for product 5770ABC option *BASE release *FIRST not found on DEV(*SAVF).                                                                                                                               
+  #failed_when: "'CPD3DE6' not in install_result.stderr"
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DE6') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+- name: Install a *LNG
+  ibmi_install_product_from_savf:
+    product: 5770JV1
+    savf_name: 'OPTBASE'
+    savf_library: 'JV1'
+    parameters: "LNGHOMEDIR('/home/zhulj')"
+  register: install_result
+  # Message . . . . :   Dynamic naming for product 5770JV1 option *BASE release
+  # *FIRST not supported.                                                    
+  #failed_when: "'CPD3DD6' not in install_result.stderr"
+  failed_when: "install_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD3DFE') | map(attribute='MESSAGE_ID') | list | length ==0"

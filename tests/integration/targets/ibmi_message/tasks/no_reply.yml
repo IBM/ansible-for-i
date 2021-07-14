@@ -1,0 +1,89 @@
+## Run QSYS/SNDMSG MSG('test inquery') TOMSGQ(ZHULJ/TRYMSG) MSGTYPE(*INQ) on the test system before do the testing following below steps    
+#  CRTLIB ANSI
+#  CRTMSGQ MSGQ(ANSI/TRYMSG1)                         
+#  CRTMSGQ MSGQ(ANSI/TRYMSG2)                         
+#  CRTMSGQ MSGQ(ANSI/TRYMSG3)                            
+#  QSYS/SNDMSG MSG('inquiry one') TOMSGQ(ANSI/TRYMSG1) MSGTYPE(*INQ)  
+#  QSYS/SNDMSG MSG('inquiry two') TOMSGQ(ANSI/TRYMSG1) MSGTYPE(*INQ)                       
+#  QSYS/SNDMSG MSG('inquiry two') TOMSGQ(ANSI/TRYMSG2) MSGTYPE(*INQ)  
+#  QSYS/SNDMSG MSG('inquiry three') TOMSGQ(ANSI/TRYMSG2) MSGTYPE(*INQ)    
+#  QSYS/SNDMSG MSG('inquiry two') TOMSGQ(ANSI/TRYMSG3) MSGTYPE(*INQ)  
+#  QSYS/SNDMSG MSG('inquiry three') TOMSGQ(ANSI/TRYMSG3) MSGTYPE(*INQ)
+#  QSYS/SNDMSG MSG('infor  one') TOMSGQ(ANSI/TRYMSG1) MSGTYPE(*INFO)
+#  QSYS/SNDMSG MSG('infor  one') TOMSGQ(ANSI/TRYMSG1) MSGTYPE(*INQ) Then "WRKMSGQ MSGQ(ANSI/TRYMSG1)" to find the message and reply it   
+
+- set_fact:
+    manual_lib: 'ANSI'
+    manual_msgq: ['TRYMSG1', 'TRYMSG2', 'TRYMSG3']
+
+- name: skip the no_reply testing if the defined manual_lib and manual_msgq don't exist 
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME FROM TABLE (QSYS2.OBJECT_STATISTICS('{{manual_lib}}', '*MSGQ') ) AS X;"
+  register: sql_result
+
+- set_fact:
+    is_msgq_ready: true
+    existing_queue_list: "{{sql_result.row | map(attribute='OBJNAME') | join(',')}}"
+
+- set_fact:
+    is_msgq_ready: false
+  when: item not in existing_queue_list 
+  loop: '{{manual_msgq}}'
+
+- block: 
+  - name: TC01 find NO_REPLY message with all supported options
+    ibmi_message:
+      operation: 'find'
+      message_type: "NO_REPLY"
+      message_queue: '{{manual_msgq[0]}}'
+      message_lib: '{{manual_lib}}'
+    register: find_result  
+
+  - name: TC01 assert returned option
+    assert:
+      that:
+        - find_result.message_info | length == 2
+
+  - name: TC02 find NO_REPLY message with all supported options
+    ibmi_message:
+      operation: 'find'
+      message_type: "NO_REPLY"
+      message_lib: '{{manual_lib}}'
+    register: find_result  
+
+  - name: TC02 assert returned option
+    assert:
+      that:
+        - find_result.message_info | length == 6
+
+  - name: TC03 find NO_REPLY message with all supported options
+    ibmi_message:
+      operation: 'find'
+      message_type: "NO_REPLY"
+      message_lib: '{{manual_lib}}'
+      message_text: 'two'
+    register: find_result  
+
+  - name: TC03 assert returned option
+    assert:
+      that:
+        - find_result.message_info | length == 3
+
+  - name: TC04 find NO_REPLY message with all supported options
+    ibmi_message:
+      operation: 'find'
+      message_type: "NO_REPLY"
+      message_queue: '{{manual_msgq[:2]}}'
+      message_lib: '{{manual_lib}}'
+      message_text: 'two'
+    register: find_result  
+
+  - name: TC04 assert returned option
+    assert:
+      that:
+        - find_result.message_info | length == 2
+  when: is_msgq_ready == true 
+
+- debug: 
+    msg: "'Created the message queues and send the requird messages to the message queues before run the testing'"
+  when: is_msgq_ready == false 

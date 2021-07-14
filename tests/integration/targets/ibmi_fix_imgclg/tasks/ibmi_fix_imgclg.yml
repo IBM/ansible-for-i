@@ -1,0 +1,127 @@
+# test code for the ibmi_copy module and action plugin
+# (c) 2020, Li Jun Zhu <zhuljbj@126.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+
+## S0240V01.BIN - MF66738 (immed ptf) and its dependent ptf (MF66667, MF66739 are delayed PTF)
+## S1422V01.BIN - 5770SS1 SI70892 5770SS1 SI71023 5733OMF SI70133 5770999 MF66177 5770ST1 SI70943 and their dependent PTFs.
+
+- block:
+
+  - include: remove_ptf.yml
+
+  - name: install fix with ptf in the image
+    ibmi_fix_imgclg:
+      src: '{{ remote_dir }}' 
+      virtual_image_name_list: '{{ base_image_list[0]}}'
+      product_id: '{{base_ptf_info.keys() | list }}'
+      fix_omit_list: [{}]
+      use_temp_path: false
+      apply_type: "*IMMDLY"
+      hiper_only: false
+      rollback: true
+    register: fix_result
+
+  - name: assert the returned parameters
+    assert:
+      that:
+        - fix_result.start is defined
+        - fix_result.end is defined
+        - fix_result.delta is defined
+        - fix_result.stdout is not defined
+        - fix_result.stderr is not defined
+        - fix_result.rc == 0
+        - fix_result.stdout_lines is not defined
+        - fix_result.stderr_lines is not defined
+
+  - name: verify the ptf has been installed
+    ibmi_sql_query:
+      sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
+      FROM QSYS2.PTF_INFO
+      WHERE PTF_IDENTIFIER = '{{item}}';"
+    register: ptf_status
+    failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'APPLIED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED')"
+    loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
+
+  - include: remove_ptf.yml
+
+  - name: install fix with ptf in the image
+    ibmi_fix_imgclg:
+      src: '{{ remote_dir }}' 
+      virtual_image_name_list: '{{ base_image_list[0]}}'
+      product_id: '{{base_ptf_info.keys() | list}}'
+      fix_omit_list: [{}]
+      use_temp_path: true
+      apply_type: "*IMMONLY"
+      hiper_only: true
+      rollback: true
+    register: fix_result
+
+  - name: verify the ptf has been installed
+    ibmi_sql_query:
+      sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
+      FROM QSYS2.PTF_INFO
+      WHERE PTF_IDENTIFIER = '{{item}}';"
+    register: ptf_status
+    failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'APPLIED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED')"
+    loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
+
+  - include: remove_ptf.yml
+
+  - name: Query the ptf status
+    ibmi_sql_query:
+      sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED 
+      FROM QSYS2.PTF_INFO
+      WHERE PTF_IDENTIFIER = '{{item}}';"
+    loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
+
+  - name: install fix with default options, supposed the default apply_type is DLYALL
+    ibmi_fix_imgclg:
+      src: '{{ remote_dir }}' 
+    register: fix_result
+
+  - name: assert the returned parameters
+    assert:
+      that:
+        - fix_result.start is defined
+        - fix_result.end is defined
+        - fix_result.delta is defined
+        - fix_result.stdout is not defined
+        - fix_result.stderr is not defined
+        - fix_result.rc == 0
+        - fix_result.need_action_ptf_list | length != 0
+        - fix_result.need_action_ptf_list[0]['PTF_ACTION_PENDING'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_ACTION_REQUIRED'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_CREATION_TIMESTAMP'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_IDENTIFIER'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_IPL_ACTION'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_IPL_REQUIRED'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_LOADED_STATUS'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_PRODUCT_ID'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_SAVE_FILE'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_STATUS_TIMESTAMP'] is defined
+        - fix_result.need_action_ptf_list[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
+        - fix_result.stdout_lines is not defined
+        - fix_result.stderr_lines is not defined
+
+  - name: Query the ptf status
+    ibmi_sql_query:
+      sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED 
+      FROM QSYS2.PTF_INFO
+      WHERE PTF_IDENTIFIER = '{{item}}';"
+    loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
+
+  - name: IPL the system to verify the PTF are applied.
+    ibmi_reboot:
+      how_to_end: '*IMMED'
+      
+  - name: verify the ptf has been installed
+    ibmi_sql_query:
+      sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
+      FROM QSYS2.PTF_INFO
+      WHERE PTF_IDENTIFIER = '{{item}}';"
+    register: ptf_status
+    failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0].PTF_LOADED_STATUS != 'APPLIED')"
+    loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
+  
+  - include: remove_ptf.yml

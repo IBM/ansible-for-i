@@ -1,0 +1,107 @@
+# Test become_user and become_user_password
+- set_fact:
+    becomeuser: 'anbecome'
+    becomepwd: 'password'
+    libname: 'becomelib'
+  no_log: true
+
+- block: 
+    - name: create a user profile with required options
+      ibmi_user_and_group:
+        operation: 'create'
+        user: '{{becomeuser}}'
+        password: '{{becomepwd}}'
+
+    - name: display a user profile with required options
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{becomeuser}}'
+      register: user_result
+
+    - name: TC01 check whether QBATCH is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result_orig
+
+    - name: TC01 start subsystem if it isnot running
+      ibmi_start_subsystem:
+        subsystem: QBATCH
+        library: QSYS
+      when: sql_result_orig.row | length == 0
+
+    - name: TC02 end the host server if it is running
+      ibmi_end_subsystem:
+        subsystem: QBATCH
+        how_to_end: '*IMMED'
+        controlled_end_delay_time: 60
+        end_subsystem_option: '*DFT'
+        parameters: ''
+        become_user: '{{becomeuser.upper()}}'
+        become_user_password: '{{becomepwd}}'
+      register: endsbs_result
+      failed_when: "endsbs_result.rc != 0 and (endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1038') | map(attribute='MESSAGE_ID') | list | length) == 0"
+
+    - name: backup original ansible_ssh_user
+      set_fact:
+        org_user: '{{ansible_ssh_user}}'
+
+    - name: backup original ansible_ssh_pass
+      no_log: true
+      set_fact: 
+        org_user_password: '{{ansible_ssh_pass}}'
+      when: ansible_ssh_pass is defined
+
+    - name: set ansible_ssh_user to *USRCLS
+      no_log: true
+      set_fact:
+        ansible_ssh_user: '{{becomeuser}}'
+        ansible_ssh_pass: '{{becomepwd}}'
+
+    - name: TC03 start subsystem if it isnot running
+      ibmi_start_subsystem:
+        subsystem: QBATCH
+        library: QSYS
+        become_user: '{{org_user}}'
+        become_user_password: '{{org_user_password}}'
+      when: sql_result_orig.row | length == 0
+
+    - name: TC04 end the host server if it is running
+      ibmi_end_subsystem:
+        subsystem: QBATCH
+        how_to_end: '*IMMED'
+        controlled_end_delay_time: 60
+        end_subsystem_option: '*DFT'
+        parameters: ''
+        become_user: '{{org_user}}'
+        become_user_password: '{{org_user_password}}'
+      register: endsbs_result
+
+    - name: TC05 pause 20 seconds to wait for sbs end
+      pause: 
+        seconds: 20
+
+    - name: TC05 check whether QBATCH is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result
+      failed_when: sql_result.row | length != 0 
+
+  always:
+    - name: set ansible_ssh_user to *USRCLS
+      no_log: true
+      set_fact:
+        ansible_ssh_user: '{{org_user.upper()}}'
+        ansible_ssh_pass: '{{org_user_password}}'
+      ignore_errors: true
+
+    - name: delete the user profile
+      ibmi_user_and_group:
+        operation: 'delete'
+        user: '{{becomeuser}}'
+        parameters: "OWNOBJOPT(*DLT)"
+      register: user_result
+      ignore_errors: true

@@ -1,0 +1,150 @@
+---
+- set_fact:
+    product_name: '5770UME'
+    rls_version: 'V1R4M0'
+    savf_lib: 'UME'
+    install_savf: 'UMEBASE'
+    lng: '2924'
+    tgt_rls: 'V6R1M0'
+    saved_savf: 'SAVED'
+
+- name: Verify product installed or not
+  ibmi_cl_command: 
+    cmd: DSPSFWRSC
+  register: installed_native_products
+
+- name: uninstall the product with default values
+  ibmi_uninstall_product:
+    product: '{{product_name}}'
+  when: "'{{product_name}}   ' in installed_native_products.stdout"
+
+- name: Install base with only required options
+  ibmi_install_product_from_savf:
+    product: '{{product_name}}'
+    savf_name: '{{install_savf}}'
+    savf_library: '{{savf_lib}}'
+    acceptance_cmd: "CALL PGM(QLPACAGR) PARM('{{product_name}}' '{{rls_version}}' '0000' '*')"
+  register: install_result 
+
+- name: Verify product installed or not
+  ibmi_cl_command: 
+    cmd: DSPSFWRSC
+  register: verify_products
+
+- name: assert returned parameters
+  assert:
+    that:
+      - install_result.stdout is defined
+      - install_result.stdout_lines is defined
+      #- install_result.stderr is not defined
+      #- install_result.stderr_lines is not defined
+      - "'{{product_name}}     *BASE' in verify_products.stdout" 
+
+- name: save the product in an not exsing library with all supported options
+  ibmi_save_product_to_savf:
+    product: '{{product_name}}'
+    option: '*BASE'
+    release: '{{rls_version}}'
+    language: '*ALL'
+    object_type: '*ALL'
+    target_release: '{{tgt_rls}}'
+    savf_name: '{{saved_savf}}'
+    savf_library: '{{savf_lib}}'
+    check_signature: '*ALL'
+    parameters: 'DTACPR(*LOW) LICACPRQD(*YES)'
+  register: save_result
+
+- name: assert the returned parameters
+  assert:
+    that: 
+      - save_result.stdout is defined
+      - save_result.stderr is defined
+      - save_result.stderr_lines is defined  
+      - save_result.stdout_lines is defined
+      - save_result.rc == 0
+
+- name: uninstall the product 
+  ibmi_uninstall_product:
+    product: '{{product_name}}'
+    option: '*ALL'
+    release: '{{rls_version}}'
+    language: '*ALL'
+  register: uninstall_result
+
+- name: Verify product installed or not
+  ibmi_cl_command: 
+    cmd: DSPSFWRSC
+  register: verify_products
+
+- name: assert returned parameters
+  assert:
+    that:
+      - uninstall_result.stdout is defined
+      - uninstall_result.job_log == [] 
+      - uninstall_result.stdout_lines is defined
+      #- install_result.stderr is not defined
+      #- install_result.stderr_lines is not defined
+      - "'{{product_name}}' not in verify_products.stdout" 
+
+- name: Install base with only required options
+  ibmi_install_product_from_savf:
+    product: '{{product_name}}'
+    savf_name: '{{saved_savf}}'
+    savf_library: '{{savf_lib}}'
+    acceptance_cmd: "CALL PGM(QLPACAGR) PARM('{{product_name}}' '{{rls_version}}' '0000' '*')"
+    joblog: true
+  register: install_result 
+
+- name: Verify product installed or not
+  ibmi_cl_command: 
+    cmd: DSPSFWRSC
+  register: verify_products
+
+- name: assert returned parameters
+  assert:
+    that:
+      - install_result.stdout is defined
+      - install_result.stdout_lines is defined
+      - install_result.job_log != []
+      #- install_result.stderr is not defined
+      #- install_result.stderr_lines is not defined
+      - "'{{product_name}}     *BASE' in verify_products.stdout" 
+
+- name: uninstall the product 
+  ibmi_uninstall_product:
+    product: '{{product_name}}'
+    option: '*ALL'
+    release: '{{rls_version}}'
+    language: '{{lng}}'
+  register: uninstall_result
+
+- name: Verify product installed or not
+  ibmi_cl_command: 
+    cmd: DSPSFWRSC
+  register: verify_products
+
+- name: assert returned parameters
+  assert:
+    that:
+      - uninstall_result.stdout is defined
+      - uninstall_result.job_log == [] 
+      - uninstall_result.stdout_lines is defined
+      #- install_result.stderr is not defined
+      #- install_result.stderr_lines is not defined
+      - "'{{product_name}}' in verify_products.stdout"
+
+- name: Install a *LNG
+  ibmi_install_product_from_savf:
+    product: '{{product_name}}'
+    option: '*BASE'
+    object_type: '*LNG'
+    language: '{{lng}}'
+    release: '{{rls_version}}'
+    savf_name: '{{install_savf}}'
+    savf_library: '{{savf_lib}}'
+  register: install_result
+
+- name: uninstall the product with default values
+  ibmi_uninstall_product:
+    product: '{{product_name}}'
+  when: "'{{product_name}}   ' not in installed_native_products.stdout"

@@ -1,0 +1,4 @@
+---
+# defaults value for sync_apply_individual_ptfs
+dest: "/qsys.lib/qgpl.lib"
+already_loaded_list: []

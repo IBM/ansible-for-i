@@ -1,0 +1,82 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+
+- hosts: all 
+  gather_facts: false 
+  collections:
+   - ibm.power_ibmi
+   
+  tasks:
+  - set_fact:
+      yum_installed: false
+
+  - name: Check whether yum has been installed. If not, install it in following tasks.
+    raw: ls -l /QOpensys/pkgs/bin/yum
+    args:
+      executable: /qopensys/usr/bin/qsh
+    register: default_yum_existance
+    ignore_errors: true
+
+  - include: ibmi-install-yum.yml
+    when: "'No such' in default_yum_existance.stdout or '/QOpensys/pkgs/bin/yum: not found' in default_yum_existance.stdout"
+
+  - block:
+      - include: ibmi-install-rpm.yml 
+        vars: 
+          python: "{{ python_version }}"
+        with_list: "{{ required_rpms }}"     
+      
+    vars:
+      required_rpms: [itoolkit, ibm_db]
+      python_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
+
+  - block:
+    - name: find the home directory 
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{ ansible_ssh_user }}'
+      register: user_result
+
+    - set_fact:
+        home_dir: "{{ user_result['result_set'][0]['HOME_DIRECTORY'] }}"
+
+    - name: ensure home directory exist
+      file:
+        path: '{{ home_dir }}'
+        state: directory
+        owner: '{{ ansible_ssh_user }}'
+
+    - name: ensure .profile exist
+      file:
+        path: '{{ home_dir }}/.profile'
+        state: touch
+        owner: '{{ ansible_ssh_user }}'
+
+    - name: export PATH to ssh user profile permanently
+      raw: echo 'PATH=/QOpenSys/pkgs/bin:$PATH' >> $HOME/.profile
+      args:
+        executable: /qopensys/usr/bin/qsh
+
+    - name: export PATH to ssh user profile permanently
+      raw: echo 'export PATH' >> $HOME/.profile
+      args:
+        executable: /qopensys/usr/bin/qsh
+    when: yum_installed == true
+
+  - name: change SSHD server auto-started
+    command: 'system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"'
+
+  - name: Verify 5770DG1
+    command: system "DSPSFWRSC"
+    register: installed_native_products
+
+  - name: Promote message if 5770DG1 is not installed
+    fail:
+      msg: 5770DG1 is not installed
+    when: '"5770DG1" not in installed_native_products.stdout'
+
+  - name: IBM i is now available for being managed by Ansible
+    debug:
+      msg: "The IBM i node is ready for Ansible."
+    when: '"5770DG1" in installed_native_products.stdout'

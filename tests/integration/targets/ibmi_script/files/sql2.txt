@@ -1,0 +1,2 @@
+create table qgpl.ansible(id INT not null, name varchar(8), gender varchar(8));
+INSERT INTO qgpl.ansible VALUES('2', 'User2', 'Male');

@@ -1,0 +1,13 @@
+# test code for the ibmi_user_and_group module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- set_fact:
+    new_user: [ansiuser1]
+    pwd: 'ansipwd'
+    new_group: [ANGRP1, angrp2]
+
+- include: display.yml
+- include: user_and_group.yml
+- include: negative_case.yml

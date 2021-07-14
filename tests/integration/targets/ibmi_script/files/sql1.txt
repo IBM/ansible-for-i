@@ -1,0 +1,3 @@
+create table qgpl.ansible(id INT not null, name varchar(8), gender varchar(8));
+CL: QSYS/STRJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN);
+INSERT INTO qgpl.ansible VALUES('1', 'User1', 'Female');

@@ -1,0 +1,42 @@
+- name: verify the ptf has been installed
+  ibmi_sql_query:
+    sql: "SELECT PTF_PRODUCT_ID, PTF_IPL_ACTION, PTF_IDENTIFIER, PTF_LOADED_STATUS, A.*
+    FROM QSYS2.PTF_INFO A
+    WHERE PTF_IDENTIFIER = '{{item.key}}';"
+  register: ptf_result
+
+- ibmi_cl_command:
+    cmd: "RMVPTF LICPGM({{item.value}}) SELECT({{item.key}}) RMV(*PERM)"
+    joblog: true
+  register: remove_result
+  ignore_errors: true
+
+- ibmi_cl_command:
+    cmd: "RMVPTF LICPGM({{item.value}}) SELECT({{item.key}}) RMV(*TEMP)  DELAYED(*YES)"
+    joblog: true      
+  when: "remove_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3634') | map(attribute='MESSAGE_ID') | list | length >=1"
+  ignore_errors: true
+
+- name: verify the ptf has been installed
+  ibmi_sql_query:
+    sql: "SELECT PTF_PRODUCT_ID, PTF_IPL_ACTION, PTF_IDENTIFIER, PTF_LOADED_STATUS, A.*
+    FROM QSYS2.PTF_INFO A
+    WHERE PTF_IDENTIFIER = '{{item.key}}';"
+  register: ptf_result
+
+- name: check any PTFs requires a IPL
+  ibmi_sql_query:
+      sql: "SELECT PTF_IDENTIFIER, PTF_IPL_ACTION, A.*
+FROM QSYS2.PTF_INFO A
+WHERE PTF_IPL_ACTION = 'TEMPORARILY REMOVED' or PTF_IPL_ACTION = 'PERMANENTLY REMOVED' and PTF_PRODUCT_ID = '{{item.value}}';"
+  register: sql_query
+
+- name: IPL the system to verify the PTF are applied.
+  ibmi_reboot:
+  when: sql_query.row | length != 0 
+
+- ibmi_cl_command:
+    cmd: "RMVPTF LICPGM({{item.value}}) SELECT({{item.key}}) RMV(*PERM)"
+    joblog: true
+  register: remove_result
+  ignore_errors: true

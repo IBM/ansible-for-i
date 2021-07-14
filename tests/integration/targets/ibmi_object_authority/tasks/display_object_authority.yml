@@ -1,0 +1,246 @@
+# The script is going to create a SAVF TEMPLIB/ANSIOBJ1, a dataarea TEMPLIB/ANSIOBJ1 and a SAVF QGPL/ANSIOBJ1 
+- block: 
+    - name: create library
+      ibmi_cl_command:
+        cmd: CRTLIB LIB(TEMPLIB)
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF TEMPLIB/ANSIOBJ1
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF QGPL/ANSIOBJ1
+
+    - name: create dataarea for testing
+      ibmi_cl_command: 
+        cmd: CRTDTAARA DTAARA(TEMPLIB/ANSIOBJ1) TYPE(*DEC)
+
+    - name: TC01 display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: authority_result
+
+    - name: TC01 assert the returned options of display
+      assert:
+        that:
+          - authority_result.rc == 0
+          #- authority_result.stdout is defined
+          #- authority_result.stdout_lines is defined
+          - authority_result.stderr is not defined
+          - authority_result.stderr_lines is not defined
+          - authority_result.object_authority_list | length != 0
+          - authority_result.object_authority_list[0].AUTHORIZATION_NAME is defined
+          - authority_result.object_authority_list[0].DATA_ADD is defined
+          - authority_result.object_authority_list[0].DATA_DELETE is defined 
+          - authority_result.object_authority_list[0].DATA_EXECUTE is defined
+          - authority_result.object_authority_list[0].DATA_READ is defined 
+          - authority_result.object_authority_list[0].DATA_UPDATE is defined
+          - authority_result.object_authority_list[0].OBJECT_ALTER is defined 
+          - authority_result.object_authority_list[0].OBJECT_AUTHORITY is defined
+          - authority_result.object_authority_list[0].OBJECT_EXISTENCE is defined 
+          - authority_result.object_authority_list[0].OBJECT_MANAGEMENT is defined
+          - authority_result.object_authority_list[0].OBJECT_NAME == 'ANSIOBJ1' 
+          - authority_result.object_authority_list[0].OBJECT_OPERATIONAL is defined
+          - authority_result.object_authority_list[0].OBJECT_REFERENCE is defined
+          - authority_result.object_authority_list[0].OBJECT_SCHEMA is defined 
+          - authority_result.object_authority_list[0].OBJECT_TYPE == "*FILE"
+          - authority_result.object_authority_list[0].OWNER == '{{ansible_ssh_user.upper()}}'
+          - authority_result.object_authority_list[0].SQL_OBJECT_TYPE is defined
+          - authority_result.object_authority_list[0].SYSTEM_OBJECT_NAME == 'ANSIOBJ1' 
+          - authority_result.object_authority_list[0].SYSTEM_OBJECT_SCHEMA == 'TEMPLIB' 
+          - authority_result.object_authority_list[0].TEXT_DESCRIPTION is defined   
+
+    - name: TC01 assert the returned object is correct
+      assert:
+        that:
+          - item['OBJECT_AUTHORITY'] == '*EXCLUDE'
+          - item['DATA_ADD'] == 'NO'
+          - item['DATA_DELETE'] == 'NO'
+          - item['DATA_EXECUTE']== 'NO'
+          - item['DATA_READ'] == 'NO'
+          - item['DATA_UPDATE'] == 'NO'
+          - item['OBJECT_ALTER'] == 'NO'
+          - item['OBJECT_EXISTENCE'] == 'NO'
+          - item['OBJECT_MANAGEMENT'] == 'NO'
+          - item['OBJECT_OPERATIONAL'] == 'NO'
+          - item['OBJECT_REFERENCE'] == 'NO'
+      when: item['AUTHORIZATION_NAME'] == '*PUBLIC'
+      loop: "{{authority_result.object_authority_list}}"
+      
+    - name: TC01 assert the returned object is correct
+      assert:
+        that:
+          - item['OBJECT_AUTHORITY'] == '*ALL'
+          - item['DATA_ADD'] == 'YES'
+          - item['DATA_DELETE'] == 'YES'
+          - item['DATA_EXECUTE']== 'YES'
+          - item['DATA_READ'] == 'YES'
+          - item['DATA_UPDATE'] == 'YES'
+          - item['OBJECT_ALTER'] == 'YES'
+          - item['OBJECT_EXISTENCE'] == 'YES'
+          - item['OBJECT_MANAGEMENT'] == 'YES'
+          - item['OBJECT_OPERATIONAL'] == 'YES'
+          - item['OBJECT_REFERENCE'] == 'YES'
+      when: item['AUTHORIZATION_NAME'] == "{{ansible_ssh_user.upper()}}"
+      loop: "{{authority_result.object_authority_list}}"
+
+    - name: TC02 display authority without library
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_type: '*FILE'
+      register: authority_result
+
+    - name: TC02 assert the returned options of display
+      assert:
+        that:
+          - "'TEMPLIB' in (authority_result.object_authority_list | map(attribute = 'SYSTEM_OBJECT_SCHEMA') | join(', '))"
+          - "'QGPL' in (authority_result.object_authority_list | map(attribute = 'SYSTEM_OBJECT_SCHEMA') | join(', '))"
+
+    - name: TC03 display authority without library
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_type: '*ALL'
+      register: authority_result
+
+    - name: TC03 assert the returned options of display
+      assert:
+        that:
+          - "'TEMPLIB' in (authority_result.object_authority_list | map(attribute = 'SYSTEM_OBJECT_SCHEMA') | join(', '))"
+          - "'QGPL' in (authority_result.object_authority_list | map(attribute = 'SYSTEM_OBJECT_SCHEMA') | join(', '))"
+
+    - name: TC04 Invalid operation 
+      ibmi_object_authority:
+        operation: 'ABC'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: authority_result
+      failed_when: "'value of operation must be one of:' not in authority_result.msg"
+
+    - name: TC05 Invalid operation 
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        abc: 'abc'
+      register: authority_result
+      failed_when: "'Unsupported parameters' not in authority_result.msg"
+
+    - name: TC06 display without required options
+      ibmi_object_authority:
+        #operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: neg_result
+      failed_when: "'missing required arguments: operation' not in neg_result.msg"
+
+    - name: TC07 display without required options
+      ibmi_object_authority:
+        operation: 'display'
+        #object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: neg_result
+      failed_when: "'missing required arguments: object_name' not in neg_result.msg"
+
+    - name: TC08 display without required options
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        #object_type: '*FILE'
+      register: neg_result
+      failed_when: "'missing required arguments: object_type' not in neg_result.msg"
+
+    - name: TC09 display authority of an not existing object
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ABC'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: org_result
+      failed_when: org_result.object_authority_list | length != 0 
+
+    - name: TC10 display authority of an not existing library
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'ABC'
+        object_type: '*FILE'
+      register: org_result
+      failed_when: org_result.object_authority_list | length != 0 
+
+    - name: TC11 display authority with an invalid authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ABC'
+      register: authority_result
+      failed_when: "'value of object_type must be one of:' not in authority_result.msg"
+
+    - name: TC12 display authority with other not relevant options
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "*ALL"
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+        replace_authority: true
+        authorization_list: "{{au_list[0]}}"
+        ref_object_name: ansible
+        ref_object_library: changle
+        ref_object_type: '*DTAARA'
+      register: authority_result
+
+    - name: TC12 assert the returned options of display
+      assert:
+        that:
+          - authority_result.rc == 0
+          #- authority_result.stdout is defined
+          #- authority_result.stdout_lines is defined
+          - authority_result.stderr is not defined
+          - authority_result.stderr_lines is not defined
+          - authority_result.object_authority_list | length != 0
+          - authority_result.object_authority_list[0].AUTHORIZATION_NAME is defined
+          - authority_result.object_authority_list[0].DATA_ADD is defined
+          - authority_result.object_authority_list[0].DATA_DELETE is defined 
+          - authority_result.object_authority_list[0].DATA_EXECUTE is defined
+          - authority_result.object_authority_list[0].DATA_READ is defined 
+          - authority_result.object_authority_list[0].DATA_UPDATE is defined
+          - authority_result.object_authority_list[0].OBJECT_ALTER is defined 
+          - authority_result.object_authority_list[0].OBJECT_AUTHORITY is defined
+          - authority_result.object_authority_list[0].OBJECT_EXISTENCE is defined 
+          - authority_result.object_authority_list[0].OBJECT_MANAGEMENT is defined
+          - authority_result.object_authority_list[0].OBJECT_NAME == 'ANSIOBJ1' 
+          - authority_result.object_authority_list[0].OBJECT_OPERATIONAL is defined
+          - authority_result.object_authority_list[0].OBJECT_REFERENCE is defined
+          - authority_result.object_authority_list[0].OBJECT_SCHEMA is defined 
+          - authority_result.object_authority_list[0].OBJECT_TYPE == "*FILE"
+          - authority_result.object_authority_list[0].OWNER == '{{ansible_ssh_user.upper()}}'
+          - authority_result.object_authority_list[0].SQL_OBJECT_TYPE is defined
+          - authority_result.object_authority_list[0].SYSTEM_OBJECT_NAME == 'ANSIOBJ1' 
+          - authority_result.object_authority_list[0].SYSTEM_OBJECT_SCHEMA == 'TEMPLIB' 
+          - authority_result.object_authority_list[0].TEXT_DESCRIPTION is defined 
+
+  always:
+    - name: remove library
+      ibmi_cl_command: 
+        cmd: dltlib templib
+
+    - name: delete object
+      ibmi_cl_command:
+         cmd: DLTOBJ OBJ(QGPL/ANSIOBJ1) OBJTYPE(*FILE)

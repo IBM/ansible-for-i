@@ -1,0 +1,134 @@
+- name: TC21 display a not existing user profile 
+  ibmi_user_and_group:
+    operation: 'display'
+    user: 'abc123456'
+  register: user_result
+  failed_when: "'User ABC123456 not found' not in user_result.msg"
+
+- name: TC22 run with invalid operation
+  ibmi_user_and_group:
+    operation: 'abc'
+    user: '{{ansible_ssh_user}}'
+  register: user_result
+  failed_when: "'value of operation must be one of:' not in user_result.msg"
+
+- name: TC23 run with invalid expire
+  ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ansible_ssh_user}}'
+    expire: 'ABC'
+    status: '*ENABLED'
+    user_class: '*SECOFR'
+    special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
+    user_group: 'new_group[1]'
+    owner: '*USRPRF'
+    text: 'ANSIBLE TESTING'
+    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+  register: user_result
+  failed_when: "'value of expire must be one of:' not in user_result.msg"
+
+- name: TC24 run with invalid status
+  ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ansible_ssh_user}}'
+    status: 'abc'
+    user_class: '*SECOFR'
+    special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
+    user_group: 'new_group[1]'
+    owner: '*USRPRF'
+    text: 'ANSIBLE TESTING'
+    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+  register: user_result
+  failed_when: "'value of status must be one of:' not in user_result.msg"
+
+- name: TC25 run with invalid user_class
+  ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ansible_ssh_user}}'
+    user_class: 'abc'
+    special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
+    user_group: 'new_group[1]'
+    owner: '*USRPRF'
+    text: 'ANSIBLE TESTING'
+    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+  register: user_result
+  failed_when: "'value of user_class must be one of:' not in user_result.msg"
+
+- name: TC26 run with invalid special_authority
+  ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ansible_ssh_user}}'
+    special_authority: ['abc']
+    user_group: 'new_group[1]'
+    owner: '*USRPRF'
+    text: 'ANSIBLE TESTING'
+    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+  register: user_result
+  failed_when: "'value of special_authority must be one or more of:' not in user_result.msg"
+
+- name: TC27 run with invalid owner
+  ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ansible_ssh_user}}'
+    owner: 'abc'
+    text: 'ANSIBLE TESTING'
+    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+  register: user_result
+  failed_when: "'value of owner must be one of:' not in user_result.msg"
+
+- name: TC28 run with invalid parameters
+  ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ansible_ssh_user}}'
+    text: 'ANSIBLE TESTING'
+    parameters: "ABC('abc')"
+  register: user_result
+  #failed_when: "'value of operation must be one of:' not in user_result.msg"
+
+- name: TC29 display with missing required option
+  ibmi_user_and_group:
+    operation: 'display'
+  register: user_result
+  failed_when: "'missing required arguments: user' not in user_result.msg"
+
+- name: TC30 display with missing required option
+  ibmi_user_and_group:
+    user: '{{ansible_ssh_user}}'
+  register: user_result
+  failed_when: "'missing required arguments: operation' not in user_result.msg"
+
+- name: TC31 display with unsupported option
+  ibmi_user_and_group:
+    operation: 'display'
+    user: '{{ansible_ssh_user}}'
+    abc: abc
+  register: user_result
+  failed_when: "'Unsupported parameters' not in user_result.msg"
+
+- name: TC32 create an existing user profile
+  ibmi_user_and_group:
+    operation: 'create'
+    user: '{{ansible_ssh_user}}'
+  register: user_result
+  failed_when: "'already exists' not in user_result.msg"
+
+- name: TC33 change an not existing user profile
+  ibmi_user_and_group:
+    operation: 'change'
+    user: 'abc'
+  register: user_result
+  failed_when: "'User profile ABC not found' not in user_result.msg"
+
+- name: TC34 delete an not existing user profile
+  ibmi_user_and_group:
+    operation: 'delete'
+    user: 'abc'
+  register: user_result
+  failed_when: "'User profile ABC not found' not in user_result.msg"
+
+- name: TC35 disply group member with an not exiting user group
+  ibmi_user_and_group:
+    operation: 'display_group_members'
+    user: 'abc'
+  register: user_result
+  failed_when: "'Group profile ABC not found' not in user_result.msg"

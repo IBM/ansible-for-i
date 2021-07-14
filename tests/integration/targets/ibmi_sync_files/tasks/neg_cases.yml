@@ -1,0 +1,148 @@
+- block:
+  - name: create a *USER profile to do authority test
+    ibmi_user_and_group:
+      operation: 'create'
+      user: "{{cuser}}"
+      special_authority: '*NONE'
+      password: "{{ansible_ssh_pass}}"
+      user_class: '*USER'
+    register: crtusrprf
+    failed_when: crtusrprf.rc != 0
+
+  - name: TC03 - Sync multiple unsupported files from one os400 to another, including IFS files and object-based members
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/bin', 'dest': '/home/{{ansible_ssh_user}}/'} #IFS dir - not supported for now
+        - {'src': '/home/{{ansible_ssh_user}}/bin/*', 'dest': '/home/{{ansible_ssh_user}}/'} #with wildcard - not supported for now
+        - {'src': '/QSYS.LIB/ZYLIB.LIB/QCLSRC.FILE/RMVPTF.MBR', 'dest': '/QSYS.LIB/ZYLIB.LIB/QCLSRC.FILE/'} #obj-based objects - mbr - not supported for now
+        - {'src': '/QSYS.LIB/ZYLIB.LIB/QCLSRC.FILE', 'dest': '/QSYS.LIB/ZYLIB.LIB'} #obj-based objects - PF - not supported for now
+
+      remote_host: "{{target_system}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_03
+    failed_when: result_03.rc != 255
+
+  - name: TC03 - Assert return values
+    assert:
+      that:
+        - result_03.success_list == []
+        - '"No files were successfully transferred." in result_03.msg'
+        - result_03.fail_list | length == 4
+
+  - name: TC04 - Sync a file which doesn't exist on local os400
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg1.c', 'dest': '/home/{{ansible_ssh_user}}/'} # non-existing
+      remote_host: "{{target_system}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_04
+    failed_when: result_04.rc != 255
+
+  - name: TC04 - Assert return values
+    assert:
+      that:
+        - result_04.success_list == []
+        - '"No files were successfully transferred." in result_04.msg'
+        - result_04.fail_list | length == 1
+        - result_04.fail_list[0]['src'] == "/home/{{ansible_ssh_user}}/sendMsg1.c"
+        - result_04.fail_list[0]['fail_reason'] == "src /home/{{ansible_ssh_user}}/sendMsg1.c doesn't exist."
+        - result_04.fail_list[0]['dest'] == "/home/{{ansible_ssh_user}}/"
+
+  - name: TC05 - switch to a common user to do sync
+    set_fact:
+      ansible_ssh_user: "{{cuser}}"
+
+  - name: check key pair state
+    stat:
+      path: '~/.ssh/id_rsa'
+    register: key_state
+    run_once: true
+
+  - name: generate a key if the key doesn't exist
+    block:
+      - name: present the home directory
+        file:
+          state: directory
+          path: ~/.ssh
+          mode: 0700
+      - name: generate a key pair
+        command: ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C "" -N "" -m PEM
+        args:
+          creates: '~/.ssh/id_rsa'
+      - name: copy public key to fact
+        command: cat ~/.ssh/id_rsa.pub
+        register: cat_result
+
+      - name: copy public key to fact
+        set_fact:
+          public_key_content: "{{cat_result.stdout}}"
+
+      - name: add public key to remote IBM i endpoints
+        delegate_to: "{{target_system}}"
+        import_role:
+          name: configure_passwordless_ssh_login
+        vars:
+          target_user: '{{cuser}}'
+          public_key: '{{public_key_content}}'
+    when: key_state.stat.exists == false
+    run_once: true
+
+  - name: TC05 - Sync a file to remote os400 which a *USER should has no access to src
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{superuser}}/sendMsg.c', 'dest': '/home/{{superuser}}/'} # no authority
+      remote_host: "{{target_system}}"
+      remote_user: '{{cuser}}'
+      private_key: '/home/{{cuser}}/.ssh/id_rsa'
+    register: result_05
+    failed_when: result_05.rc == 0
+
+  - name: TC05 - assert fail reason
+    assert:
+      that:
+        - result_05.fail_list | selectattr('fail_reason', 'match', '^[Errno 13] Permission denied.$')
+
+  - name: TC05 - switch back to super user
+    set_fact:
+      ansible_ssh_user: "{{superuser}}"
+
+  - name: TC06 - Sync to a non-pingable remote host
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
+      remote_host: "not-pingable-host.com"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
+    register: result_06
+    failed_when: result_06.rc != 255
+
+  - name: TC06 - Assert return values
+    assert:
+      that:
+        - '"[Errno 8] Hostname and service name not provided or found" in result_06.stderr'
+
+  - name: TC07 - Sync with an non-existing private key
+    ibmi_sync_files:
+      src_list:
+        - {'src': '/home/{{ansible_ssh_user}}/sendMsg.c', 'dest': '/home/{{ansible_ssh_user}}/'}
+      remote_host: "{{target_system}}"
+      remote_user: '{{ansible_ssh_user}}'
+      private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa_non-existing'
+    register: result_07
+    failed_when: result_07.rc != 255
+
+  - name: TC07 - Assert return values
+    assert:
+      that:
+        - '"[Errno 2] No such file or directory:" in result_07.stderr'
+        - result_07.fail_list == []
+        - result_07.success_list == []
+
+  always:
+    - name: remove CUSER profile
+      ibmi_cl_command:
+        cmd:  'DLTUSRPRF USRPRF({{cuser}}) OWNOBJOPT(*DLT)'
+      register: dltusrprf
+      failed_when: dltusrprf.rc != 0

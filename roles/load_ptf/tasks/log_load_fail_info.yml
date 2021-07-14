@@ -1,0 +1,6 @@
+---
+# tasks file for log_load_fail_info
+- name: Set load_fail_dict
+  set_fact:
+    load_fail_dict: "{{ load_fail_dict | default({}) | combine({ load_ptf.ptf_id: 'OPTION_NOT_INSTALLED' }) }}"
+  when: job_log_var.MESSAGE_ID == 'CPF3616'

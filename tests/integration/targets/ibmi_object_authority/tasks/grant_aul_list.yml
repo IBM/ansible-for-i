@@ -1,0 +1,325 @@
+- block: 
+    # The script is going to create a SAVF TEMPLIB/ANSIOBJ1, a dataarea TEMPLIB/ANSIOBJ1 and a SAVF QGPL/ANSIOBJ1 
+
+    - name: create library
+      ibmi_cl_command:
+        cmd: CRTLIB LIB({{item}})
+      with_items:
+        - TEMPLIB
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF TEMPLIB/ANSIOBJ1
+
+    - name: create savf
+      ibmi_cl_command:
+        cmd: CRTSAVF QGPL/ANSIOBJ1
+
+    - name: create dataarea for testing
+      ibmi_cl_command: 
+        cmd: CRTDTAARA DTAARA(TEMPLIB/ANSIOBJ1) TYPE(*DEC)
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: dsp_result
+
+    - name: grant 1 users 1 AUL to a single object
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+      register: authority_result
+
+    - name: assert the returned options of display
+      assert:
+        that:
+          - authority_result.rc == 0
+          - authority_result.stdout is defined
+          - authority_result.stdout_lines is defined
+          - authority_result.stderr is not defined
+          - authority_result.stderr_lines is not defined
+          - authority_result.object_authority_list is not defined 
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
+      loop: "{{authority_result.object_authority_list }}"
+      when: os_version | int >= 74
+
+    - name: grant AUL to 2 objects
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+        authorization_list: "{{au_list[1]}}"
+
+    - name: display AUL 2 objects
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['AUTHORIZATION_LIST'] == '{{au_list[1].upper()}}'
+      loop: "{{authority_result.object_authority_list }}"
+      when: os_version | int >= 74
+
+    # Start revoke testing here
+    - name: revoke 2 authorities to user
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[1]}}"
+      register: authority_result
+
+    - name: assert the returned options of display
+      assert:
+        that:
+          - authority_result.rc == 0
+          - authority_result.stdout is defined
+          - authority_result.stdout_lines is defined
+          - authority_result.stderr is not defined
+          - authority_result.stderr_lines is not defined
+          - authority_result.object_authority_list is not defined
+
+    - name: display authority
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+      register: authority_result
+
+    # - debug: msg= {{authority_result['object_authority_list'][0]['AUTHORIZATION_LIST']}}
+    # - set_fact:
+    #     aul_list: "{{authority_result['object_authority_list'][0]['AUTHORIZATION_LIST']}}"
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          #- item['AUTHORIZATION_LIST'] == "" or aul_list == "" 
+          - item['AUTHORIZATION_LIST'] == '' 
+      loop: "{{authority_result.object_authority_list }}"
+      when: os_version | int >= 74
+
+    - name: grant AUL to 2 objects
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+        authorization_list: "{{au_list[1]}}"
+
+    - name: revoke AUL to 2 objects
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+        authorization_list: "{{au_list[1]}}"
+
+    - name: display AUL 2 objects
+      ibmi_object_authority:
+        operation: 'display'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*ALL'
+      register: authority_result
+
+    - name: assert the returned object is correct
+      assert:
+        that:
+          - item['AUTHORIZATION_LIST'] == ''
+      loop: "{{authority_result.object_authority_list }}"
+      when: os_version | int >= 74
+
+    - name: grant_autl with an not existing object
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ABC'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      #failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: grant_autl with an not existing lib
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'ABC'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: grant_autl with an not existing auth_list
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        authorization_list: "ABC"
+      register: neg_result
+      #failed_when: "'Authorization list ABC does not exist' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2283') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: grant_autl without required options
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        #object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      failed_when: "'missing required arguments: object_type' not in neg_result.msg"
+
+    - name: grant_autl without required options
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        #object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      failed_when: "'missing required arguments: object_name' not in neg_result.msg"
+
+    - name: revoke authority with other not relevant options
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+        replace_authority: true
+        authorization_list: "{{au_list[0]}}"
+        ref_object_name: ansible
+        ref_object_library: changle
+        ref_object_type: '*DTAARA'
+
+    - name: revoke_autl with an not existing object
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        object_name: 'ABC'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      #failed_when: "'Object ABC in library TEMPLIB type *FILE not found' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2208') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: revoke_autl with an not existing lib
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'ABC'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      #failed_when: "'Library ABC not found' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2209') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: grant_autl with an not existing auth_list
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        authorization_list: "ABC"
+      register: neg_result
+      #failed_when: "'Authorization list ABC does not exist' not in neg_result.stderr" 
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2283') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: revoke_autl without required options
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        #object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      failed_when: "'missing required arguments: object_type' not in neg_result.msg"
+
+    - name: revoke_autl without required options
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        #object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      failed_when: "'missing required arguments: object_name' not in neg_result.msg"
+
+    - name: revoke_autl with other not relevant options
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        user:
+          - "{{new_user[0]}}"
+        authority:
+          - "*READ"
+          - "*DLT"
+        replace_authority: true
+        authorization_list: "{{au_list[0]}}"
+        ref_object_name: ansible
+        ref_object_library: changle
+        ref_object_type: '*DTAARA'
+
+    - name: revoke_autl without required options
+      ibmi_object_authority:
+        operation: 'revoke_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        #authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      failed_when: "'Specify authorization_list when the operation is grant_autl or revoke_autl' not in neg_result.msg"
+
+    - name: grant_autl without required options
+      ibmi_object_authority:
+        operation: 'grant_autl'
+        object_name: 'ANSIOBJ1'
+        object_library: 'TEMPLIB'
+        object_type: '*FILE'
+        #authorization_list: "{{au_list[0]}}"
+      register: neg_result
+      failed_when: "'Specify authorization_list when the operation is grant_autl or revoke_autl' not in neg_result.msg"
+
+  always:
+    - name: remove library
+      ibmi_cl_command: 
+        cmd: dltlib templib
+
+    - name: delete object
+      ibmi_cl_command:
+         cmd: DLTOBJ OBJ(QGPL/ANSIOBJ1) OBJTYPE(*FILE)

@@ -1,0 +1,169 @@
+# Test when all dependent packages are in place  
+- name: Query the iASP existing
+  ibmi_sql_query:
+    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+  register: iasp_list
+
+- block:
+  - copy: src="IBMISAVF.FILE" dest="/tmp/"
+
+  - name: run CL command module with asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB({{item}}) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: true
+    with_items:
+      - SAVRST
+      - TEMPLIB 
+
+  - name: run CL command module with asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB({{item}})
+      joblog: true
+    with_items:
+      - ARCHLIB
+      - SAVRST1
+
+  - name: copy file to library
+    command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB/'
+
+  - name: TC22 restore objects to from sysbase lib to iasp library
+    ibmi_object_restore:
+      object_lib: 'SAVRST'
+      savefile_name: 'IBMISAVF'
+      savefile_lib: 'ARCHLIB'
+      parameters: "RSTASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})"
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      #joblog: true
+    register: rstobj_result
+    #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+    failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+  - name: TC22 verify all objects have been restored
+    ibmi_sql_query:
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+      database: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+    register: sql_query_result
+
+  - name: TC23 Save objects with only required options
+    ibmi_object_save:
+      object_lib: 'SAVRST'
+      savefile_name: 'SAVTEST1'
+      savefile_lib: 'TEMPLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: true
+    register: savobj_result
+
+  - name: TC24 Save objects with only required options
+    ibmi_object_save:
+      object_lib: 'SAVRST'
+      savefile_name: 'SAVTEST'
+      savefile_lib: 'TEMPLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      #joblog: true
+    register: savobj_result
+
+  - name: TC24 assert the returned value of ibmi_object_save
+    assert:
+      that:
+        - savobj_result.start != ''
+        - savobj_result.end != ''
+        - savobj_result.delta != ''
+        - savobj_result.rc == 0
+        - savobj_result.stdout != ''
+        - savobj_result.stdout_lines != ''
+
+  - name: TC25 verify the objects can be restored
+    ibmi_object_restore:
+      object_lib: 'SAVRST'
+      savefile_name: 'SAVTEST1'
+      savefile_lib: 'TEMPLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      parameters: "RSTASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})" 
+      #joblog: true
+
+  - name: TC26 Save objects from iasp lib to sys lib
+    ibmi_object_save:
+      object_lib: 'SAVRST'
+      savefile_name: 'SAVTEST'
+      savefile_lib: 'SAVRST1'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: true
+    register: savobj_result
+
+  - name: delete libraries 
+    ibmi_cl_command: 
+      cmd: "dltlib lib(SAVRST)"
+      joblog: 'true'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+
+  - name: TC27 run CL command module with asp_group
+    ibmi_cl_command:
+      cmd: CRTLIB LIB(SAVRST) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+
+  - name: TC27 verify the objects can be restored from sysbas to iasp lib
+    ibmi_object_restore:
+      object_lib: 'SAVRST'
+      savefile_name: 'SAVTEST'
+      savefile_lib: 'SAVRST1'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      parameters: "RSTASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})" 
+      joblog: true
+
+  - name: TC27 verify all objects have been restored
+    ibmi_sql_query:
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+      database: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}" 
+      expected_row_count: 6
+    register: sql_query_result
+
+  - name: TC28 Save objects from sys lib to iasp lib
+    ibmi_object_save:
+      object_lib: 'SAVRST1'
+      savefile_name: 'SAVTEST2'
+      savefile_lib: 'TEMPLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      joblog: true
+    register: savobj_result
+
+  - name: TC29 verify the objects can be restored from iasp to sys lib
+    ibmi_object_restore:
+      object_lib: 'SAVRST1'
+      savefile_name: 'SAVTEST2'
+      savefile_lib: 'TEMPLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      #parameters: "RSTASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})" 
+      #joblog: true
+
+  - name: TC30 Save objects from sys lib to sys lib
+    ibmi_object_save:
+      object_lib: 'SAVRST1'
+      savefile_name: 'SAVTEST1'
+      savefile_lib: 'ARCHLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      #joblog: true
+    register: savobj_result
+
+  - name: TC31 verify the objects can be restored from iasp to sys lib
+    ibmi_object_restore:
+      object_lib: 'SAVRST1'
+      savefile_name: 'SAVTEST1'
+      savefile_lib: 'ARCHLIB'
+      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      #parameters: "RSTASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})" 
+      #joblog: true
+  when: iasp_list.row_count != 0
+
+  always:
+    - name: delete libraries 
+      ibmi_cl_command: 
+        cmd: "dltlib lib({{item}})"
+        joblog: 'true'
+        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      with_items: 
+        - SAVRST
+        - SAVRST1 
+        - ARCHLIB
+        - TEMPLIB
+      ignore_errors: true

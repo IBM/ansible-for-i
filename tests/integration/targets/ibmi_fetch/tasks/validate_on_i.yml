@@ -1,0 +1,48 @@
+- name: copy the file to ibmi
+  copy: src="{{ output_dir }}/fetched/{{ inventory_hostname }}/QSYS.LIB/SAVRST.LIB/{{ savefile_name }}" dest={{ remote_tmp_dir }}
+
+- name: move the file to library
+  command: 'mv {{ remote_tmp_dir }}/{{ savefile_name }} /QSYS.LIB/ARCHLIB.LIB/'
+
+- name: get the restored object info
+  ibmi_object_find:
+    object_name: "{{ object_name }}"
+    object_type_list: "{{ object_type }}"
+    lib_name: "SAVRST"
+  register: original_result
+
+- name: dltlib
+  ibmi_cl_command:
+    cmd: dltlib SAVRST
+
+- name: create lib
+  ibmi_cl_command:
+    cmd: crtlib SAVRST
+
+- name: restore the object
+  ibmi_object_restore:
+    object_lib: 'SAVRST'
+    savefile_name: "{{ savefile_name.split('.')[0] }}"
+    savefile_lib: 'ARCHLIB'
+  register: restore_result
+  ignore_errors: true
+
+- name: assert the copied savf can be restored
+  assert:
+    that:
+      # The restore may reported user change error CPF3848 and some objects in the SAVF may not be restored CPF3773
+      #- "'CPF3848' in restore_result.stderr or 'CPF3773' in restore_result.stderr"
+      - "original_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length >= 1 or original_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3773') | map(attribute='MESSAGE_ID') | list | length >= 1"
+  when: "restore_result.rc != 0"
+
+- name: get the restored object info
+  ibmi_object_find:
+    object_name: "{{ object_name }}"
+    object_type_list: "{{ object_type }}"
+    lib_name: "SAVRST"
+  register: restored_result
+
+- name: assert the size of the object is name as the original
+  assert:
+    that:
+      - "{{ restored_result.object_list[0]['OBJSIZE'] }} == {{ original_result.object_list[0]['OBJSIZE'] }}"

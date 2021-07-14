@@ -1,0 +1,97 @@
+# test code for the ibmi_script module and action plugin
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+#Test dependent packages 
+- block: 
+
+    - name: find a workable message id in qsysopr
+      ibmi_sql_query:
+        sql: "SELECT MESSAGE_ID, MESSAGE_TYPE FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_QUEUE_LIBRARY = 'QSYS' and MESSAGE_QUEUE_NAME = 'QSYSOPR' and MESSAGE_ID != '';"
+      register: sql_result
+
+    - set_fact:
+        msg_list: '{{sql_result.row | unique}}'
+        diag: ''
+        comp: ''
+        
+    - name: loop to set fact
+      include: find_msg_id.yml      
+      loop: "{{ msg_list}}"
+
+    - name: TC05 find message with message id
+      ibmi_message:
+        operation: 'find'
+        message_type: "DIAGNOSTIC"
+        message_queue: ['QSYSOPR', 'QCONSOLE']
+        message_lib: 'QSYS'
+        message_id: "{{diag.split(' ')[1:]}}"
+      register: find_result
+
+    - name: TC05 assert returned option
+      assert:
+        that:
+          - find_result.start is defined
+          - find_result.end is defined
+          - find_result.delta is defined
+          - find_result.stderr is defined
+          - find_result.message_info | length >= diag.split(' ')[1:] | length 
+
+    - name: TC06 find COMPLETION message with all supported options
+      ibmi_message:
+        operation: 'find'
+        message_type: "COMPLETION"
+        message_queue: 'QSYSOPR'
+        message_lib: 'QSYS'
+        message_id: "{{comp.split(' ').remove('')}}"
+      register: find_result
+
+    - name: TC06 assert returned option
+      assert:
+        that:
+          - find_result.message_info | length >= comp.split(' ') | length
+
+    - name: TC07 find REPLY message with all supported options
+      ibmi_message:
+        operation: 'find'
+        message_type: "REPLY"
+        message_queue: 'QSYSOPR'
+        message_lib: 'QSYS'
+
+    - name: TC08 find ESCAPE message with all supported options
+      ibmi_message:
+        operation: 'find'
+        message_type: "ESCAPE"
+        message_queue: 'QSYSOPR'
+        message_lib: 'QSYS'
+
+    - name: TC09 find NOTIFY message with all supported options
+      ibmi_message:
+        operation: 'find'
+        message_type: "NOTIFY"
+        message_queue: 'QSYSOPR'
+        message_lib: 'QSYS'
+
+    - name: TC10 find REQUEST message with all supported options
+      ibmi_message:
+        operation: 'find'
+        message_type: "REQUEST"
+        message_queue: 'QSYSOPR'
+        message_lib: 'QSYS'
+
+    - name: TC11 find SENDER message with all supported options
+      ibmi_message:
+        operation: 'find'
+        message_type: "SENDER"
+        message_queue: 'QSYSOPR'
+        message_lib: 'QSYS'
+
+    - name: TC12 find INQUIRY message with all supported options
+      ibmi_message:
+        operation: 'find'
+        message_type: "INQUIRY"
+        message_queue: 'QSYSOPR'
+        message_lib: 'QSYS'
+        message_id: "CPA7025"
+      register: org_result  

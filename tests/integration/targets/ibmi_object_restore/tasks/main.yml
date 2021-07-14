@@ -1,0 +1,35 @@
+# test code for the ibmi_object_restore module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block: 
+    ## Setup - Create libraries and objects on test systems
+    - copy: src="IBMISAVF.FILE" dest="/tmp/"
+    
+    - name: create libraries 
+      ibmi_cl_command: 
+        cmd: "crtlib lib({{item}})"
+      with_items: 
+        - SAVRST
+        - SAVRST1
+        - ARCHLIB
+
+    - name: copy file to library
+      command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB/'
+    
+    - include: restore_object.yml
+
+  always:
+    - name: remove copied file
+      command: 'rm -rf /tmp/IBMISAVF.FILE'
+
+    - name: delete libraries 
+      ibmi_cl_command: 
+        cmd: "QSYS/DLTLIB LIB({{item}})"
+        joblog: 'true'
+      with_items: 
+        - SAVRST
+        - SAVRST1
+        - ARCHLIB
+      ignore_errors: true

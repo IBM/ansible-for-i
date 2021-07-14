@@ -1,0 +1,48 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+#ibmi-fix-repo-sample.yml 
+#The sample file is to provide an example about how to manipulate the PTF database
+---
+- hosts: all
+  gather_facts: false
+  collections:
+   - ibm.power_ibmi
+
+  tasks:
+    - block:
+      - name: add_single_ptf_records
+        ibmi_fix_repo:
+          action: 'add'
+          type: 'single_ptf'
+          checksum: true
+          parameters:
+            - {'ptf_id':'SI67955', 'file_path':'/QSYS.LIB/QGPL.LIB/QSI67955.FILE', 'product':'5770SS1'}
+            - {'ptf_id':'MF65472', 'file_path':'/QSYS.LIB/QGPL.LIB/QMF65472.FILE', 'product':'5770SS1'}
+            - {'ptf_id':'SI71806', 'file_path':'/QSYS.LIB/QGPL.LIB/QSI71806.FILE', 'product':'5733OPS'}
+            - {'ptf_id':'SI00000', 'file_path':'/QSYS.LIB/QGPL.LIB/QSI00000.FILE', 'product':'5770SS1'}
+        register: add_single_ptf_records_result
+
+      - name: display_add_single_ptf_records_result
+        debug:
+          msg: "{{ add_single_ptf_records_result }}"
+
+      - name: query_single_ptf_records_2
+        ibmi_fix_repo:
+          action: "find"
+          type: 'single_ptf'
+          parameters:
+            - {'ptf_id':'SI67955'}
+            - {'ptf_id':'MF65472'}
+            - {'ptf_id':'SI71806'}
+        register: query_single_ptf_records_result_2
+
+      - name: display_query_single_ptf_records_result_2
+        debug:
+          msg: "{{ query_single_ptf_records_result_2 }}"
+
+      always:
+      - name: run_sql_to_drop_the_table
+        ibmi_fix_repo:
+          action: "clear"
+          type: 'single_ptf'

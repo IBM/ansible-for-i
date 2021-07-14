@@ -1,0 +1,280 @@
+# test code for the ibmi_copy module and action plugin
+# (c) 2020, Li Jun Zhu <zhuljbj@126.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+
+- name: TC01 copy a SAVF to remote i with all options
+  ibmi_copy: 
+    src: '{{ savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: true
+    backup: false
+  register: copy_result
+
+- name: TC01 assert the returned parameters
+  assert:
+    that:
+      - "copy_result.dest == '/QSYS.LIB/{{remote_temp_lib}}.LIB/{{ savf_name}}'"
+      - copy_result.msg is defined
+      - copy_result.stderr is defined
+      - copy_result.stdout is defined
+      - copy_result.delta is defined
+
+- name: TC01 confirm the object can be used
+  ibmi_object_restore:
+    object_lib: '{{ remote_restored_lib }}'
+    savefile_name: "{{ savf_name.split('.')[0] }}"
+    savefile_lib: '{{remote_temp_lib}}'
+  register: rstobj_result
+  #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0" 
+  failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+- name: TC01 confirm the object does exist on the remote lib
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_restored_lib }}', '*ALL' ))  AS X"
+    expected_row_count: 6
+
+- name: TC01 cleanup existing objects
+  ibmi_cl_command:
+    cmd: "DLTOBJ OBJ({{remote_temp_lib}}/{{ savf_name.split('.')[0] }}) OBJTYPE(*FILE)"
+
+- name: TC02 copy a SAVF with only required options and relative src path
+  ibmi_copy: 
+    src: '{{ savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+
+- name: TC02 assert the returned parameters
+  assert:
+    that:
+      - "copy_result.dest == '/QSYS.LIB/{{remote_temp_lib}}.LIB/{{ savf_name}}'"
+      - copy_result.msg is defined
+      - copy_result.stderr is defined
+      - copy_result.stdout is defined
+      - copy_result.delta is defined
+
+- name: TC02 get the restored object info
+  ibmi_object_find:
+    object_name: "{{ savf_name.split('.')[0] }}"
+    object_type_list: "*FILE"
+    lib_name: "{{remote_temp_lib}}"
+  register: original_result
+  ignore_errors: true
+  
+- name: TC02 assert the copied savf can be found in the library
+  assert:
+    that:
+      - 'original_result.object_list | length == 1'
+
+- name: TC03 copy a SAVF with force=true when the object does exist
+  ibmi_copy: 
+    src: '{{ savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: true
+    backup: false
+
+- name: TC03 get the restored object info
+  ibmi_object_find:
+    object_name: "{{ savf_name.split('.')[0] }}"
+    object_type_list: "*FILE"
+    lib_name: "{{remote_temp_lib}}"
+  register: forcesave_result
+
+- name: TC03 assert the object changed
+  assert:
+    that:
+      - forcesave_result.object_list[0]['OBJCREATED'] != original_result.object_list[0]['OBJCREATED']  
+
+- name: TC04 copy a SAVF with force=true backup=true
+  ibmi_copy: 
+    src: '{{ savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: true
+    backup: true
+
+- name: TC04 get the copy object info
+  ibmi_object_find:
+    object_name: "{{ savf_name.split('.')[0] }}"
+    object_type_list: "*FILE"
+    lib_name: "{{remote_temp_lib}}"
+  register: after_copy_result
+
+- name: TC04 get the backup object info
+  ibmi_object_find:
+    object_name: "{{ savf_name.split('.')[0] }}1"
+    object_type_list: "*FILE"
+    lib_name: "{{remote_temp_lib}}"
+  register: backup_result
+
+- name: TC04 assert the object is backed up
+  assert:
+    that:
+      - forcesave_result.object_list[0]['OBJSIZE'] == backup_result.object_list[0]['OBJSIZE']
+      - forcesave_result.object_list[0]['OBJCREATED'] == backup_result.object_list[0]['OBJCREATED'] 
+      - after_copy_result.object_list[0]['OBJCREATED'] != backup_result.object_list[0]['OBJCREATED'] 
+
+- name: TC04 cleanup existing objects
+  ibmi_cl_command:
+    cmd: "DLTOBJ OBJ({{remote_temp_lib}}/{{ savf_name.split('.')[0] }}1) OBJTYPE(*FILE)"
+
+- name: TC04 cleanup existing objects
+  ibmi_cl_command:
+    cmd: "DLTOBJ OBJ({{remote_temp_lib}}/{{ savf_name.split('.')[0] }}) OBJTYPE(*FILE)"
+
+- name: TC05 copy a SAVF with force=false backup=true
+  ibmi_copy: 
+    src: '{{ savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: false
+    backup: true
+
+- set_fact:
+    savf_name_without_postfix: "{{ savf_name.split('.')[0].upper() }}"
+    try_same_name_savf_without_postfix: "{{try_same_name_savf.split('.')[0].upper()}}"
+
+- name: TC05 confirm the object does exist on the remote lib
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_temp_lib }}', '*FILE', '{{ savf_name_without_postfix }}' ) ) AS X;"
+    expected_row_count: 1
+
+- name: TC05 get the backup object info
+  ibmi_object_find:
+    object_name: "{{ savf_name.split('.')[0] }}1"
+    object_type_list: "*FILE"
+    lib_name: "{{remote_temp_lib}}"
+  register: backup_result
+  failed_when: 'backup_result.object_list | length != 0'
+
+- name: TC06 copy a SAVF with force=false backup=true when the object exists
+  ibmi_copy: 
+    src: '{{ savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: false
+    backup: true
+  register: copy_result
+  failed_when: "'File with the Same name already exists on remote' not in copy_result.msg"
+
+- name: TC06 confirm the two objects with same name in the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_restored_lib }}', '*ALL') ) AS X;"
+
+- name: TC07 copy a SAVF whose name is same as one existing object but not *FILE in the library
+  ibmi_copy: 
+    src: '{{ try_same_name_savf }}'
+    lib_name: '{{remote_restored_lib}}'
+
+- name: TC07 confirm the two objects with same name in the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_restored_lib }}', '*ALL', '{{ try_same_name_savf_without_postfix }}' ) )  AS X;"
+    expected_row_count: 2
+
+- name: TC08 copy a SAVF to remote i with all options
+  ibmi_copy: 
+    src: '{{ archive_savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: true
+    backup: false
+
+- name: TC08 confirm the object can be used
+  ibmi_object_restore:
+    object_lib: '{{ remote_temp_lib }}'
+    savefile_name: "{{ archive_savf_name.split('.')[0] }}"
+    savefile_lib: '{{remote_temp_lib}}'
+    joblog: true
+  register: rstobj_result
+  ignore_errors: true
+  
+- name: TC08 assert the copied savf can be restored
+  assert:
+    that:
+      # The restore may reported user change error CPF3848 and some objects in the SAVF may not be restored CPF3773
+      #- "'CPF3848' in rstobj_result.stderr or 'CPF3773' in rstobj_result.stderr"
+      - "rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0 or
+      rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3773') | map(attribute='MESSAGE_ID') | list | length == 0"
+  when: "rstobj_result.rc != 0"
+
+- name: TC09 copy a SAVF
+  ibmi_copy: 
+    src: '{{ local_temp_dir }}/{{ try_backup_savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: true
+    backup: true
+
+- name: TC09 confirm the two objects with same name in the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_temp_lib }}', '*ALL') )  AS X;"
+
+- name: TC10 copy a SAVF again
+  ibmi_copy: 
+    src: '{{ local_temp_dir }}/{{ try_backup_savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: true 
+    backup: true
+  register: copy_result  
+  failed_when: "'Rename failure. SAVF names (/QSYS.LIB/ARCHLIB.LIB/PF9.FILE range(1,10)) are already exist on IBMi.' not in copy_result.msg"
+
+- name: TC10 confirm the two objects with same name in the library
+  ibmi_sql_query:
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_temp_lib }}', '*ALL') ) AS X;"
+
+- name: TC11 copy a SAVF with missing required options
+  ibmi_copy: 
+    src: '{{ savf_name }}'
+  register: neg_result 
+  failed_when: "'lib_name is required' not in neg_result.msg"
+
+- name: TC12 copy a SAVF with missing required options
+  ibmi_copy: 
+    lib_name: '{{remote_temp_lib}}'
+  register: neg_result 
+  failed_when: "'src is required' not in neg_result.msg"
+
+- name: TC13 Copy with an invalid option
+  ibmi_copy:
+    src: '{{ savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    abc: abc
+  register: neg_result
+  ignore_errors: true
+
+- assert:
+    that:
+      - "'Invalid options for ibmi_copy' in neg_result.msg"
+
+- name: TC14 Copy objects with invalid force 
+  ibmi_copy:
+    src: '{{ savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: abc
+    backup: true
+  register: neg_result
+  failed_when: "'is not a valid boolean' not in neg_result.msg"
+
+- name: TC15 Copy objects with invalid backup 
+  ibmi_copy:
+    src: '{{ savf_name }}'
+    lib_name: '{{remote_temp_lib}}'
+    force: true
+    backup: abc
+  register: neg_result
+  failed_when: "'is not a valid boolean' not in neg_result.msg"
+## An bug here
+# - name: TC16 Copy objects with a txt file
+#   ibmi_copy:
+#     src: '{{ txt_name }}'
+#     lib_name: '{{remote_temp_lib}}'
+#   register: neg_result
+#   #failed_when: 'txt file can not in lib'
+
+- name: TC17 Copy objects with not existing FILE
+  ibmi_copy:
+    src: '{{ local_temp_dir }}/abc.FILE'
+    lib_name: '{{remote_temp_lib}}'
+  register: neg_result
+  failed_when: "'Could not find or access' not in neg_result.msg"
+
+- name: TC18 Copy objects with a not existing lib
+  ibmi_copy:
+    src: '{{ savf_name }}'
+    lib_name: 'ABC'
+  register: neg_result
+  failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF7302') | map(attribute='MESSAGE_ID') | list | length == 0"

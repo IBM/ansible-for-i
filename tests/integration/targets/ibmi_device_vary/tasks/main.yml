@@ -1,0 +1,171 @@
+# test code for the ibmi_device_vary module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block:
+    - set_fact:
+        device_name: ["ANSIT1", "ANSIT2"]
+
+    - name: create a device description
+      ibmi_cl_command:
+        cmd: CRTDEVOPT DEVD({{item}}) RSRCNAME(*VRT) ONLINE(*YES)
+      loop: "{{device_name}}"
+
+    - name: query ip interface from remote system
+      ibmi_sql_query:
+        sql: "SELECT LINE_DESCRIPTION from QSYS2.NETSTAT_INTERFACE_INFO WHERE (INTERFACE_LINE_TYPE = 'ELAN' OR INTERFACE_LINE_TYPE = 'VETH') AND INTERNET_ADDRESS  not in ('*IP6SAC', '*IP4DHCP')"
+      register: ip_interface_info
+
+    - name: TC01 vry on device
+      ibmi_device_vary:
+        device_list: '{{device_name[0]}}'
+        status: '*ON'
+      register: vary_result
+
+    - name: TC01 assert the defined parameters are returned
+      assert:
+        that:
+          - vary_result.job_log is defined
+          - vary_result.start is defined
+          - vary_result.end is defined
+          - vary_result.delta is defined
+          - vary_result.stdout is defined
+          - "'VRYCFG CFGOBJ({{device_name[0]}}) CFGTYPE(*DEV) STATUS(*ON)' in vary_result.cmd"
+          - vary_result.rc == 0
+          - vary_result.stdout_lines is defined
+          - vary_result.stderr_lines is defined
+
+    # - name: TC02 display a device description
+    #   ibmi_cl_command:
+    #     cmd: QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD({{device_name[0]}})
+    #   register: cfg_result
+
+    # - name: TC02 assert the device has been varied on
+    #   assert:
+    #     that:
+    #       - "' {{device_name[0]}}               *DEV     ACTIVE' in cfg_result.stdout"
+
+    - name: TC02 display a device description
+      ibmi_cl_command:
+        cmd: QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD(*ALL) STATUS(*ACTIVE)
+      register: cfg_result
+
+    - name: TC02 assert the device has been varied on
+      assert:
+        that:
+          - "' {{device_name[0]}}               *DEV' in cfg_result.stdout"
+
+    - name: TC03 vry on device again
+      ibmi_device_vary:
+        device_list: '{{device_name[0]}}'
+        status: '*ON'
+      register: vary_result
+
+    - name: TC04 vry off two devices
+      ibmi_device_vary:
+        device_list: '{{device_name}}'
+        status: '*OFF'
+        extra_parameters: 'SBMMLTJOB(*YES)'
+        joblog: true
+
+    # Test negative path
+    - name: TC05 vry off the device without required parameters
+      ibmi_device_vary:
+        status: '*OFF'
+        joblog: true
+      register: neg_result
+      failed_when: "'missing required argument' not in neg_result.msg"
+
+    - name: TC06 vry on the device without required parameters
+      ibmi_device_vary:
+        device_list: '{{device_name}}'
+        extra_parameters: 'RANGE(*OBJ) SBMMLTJOB(*YES)'
+        joblog: true
+      register: neg_result
+      failed_when: "'missing required argument' not in neg_result.msg"
+
+    - name: TC07 with invalid option
+      ibmi_device_vary:
+        device_list: '{{device_name}}'
+        status: '*ON'
+        extra_parameters: 'RANGE(*OBJ) SBMMLTJOB(*YES)'
+        joblog: true
+        abc: abc
+      register: neg_result
+      failed_when: "'Unsupported parameters' not in neg_result.msg"
+
+    - name: TC08 with invalid extra_parameters
+      ibmi_device_vary:
+        device_list: '{{device_name}}'
+        status: '*ON'
+        extra_parameters: ' abc(*abc)'
+        joblog: true
+      register: neg_result
+      #failed_when: "'Keyword ABC not valid for this command' not in neg_result.stderr"
+      #failed_when: "'CPF0006' not in neg_result.stderr"
+      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0006') | map(attribute='MESSAGE_ID') | list | length == 0"      
+
+    - name: TC09 with invalid joblog
+      ibmi_device_vary:
+        device_list: '{{device_name}}'
+        status: '*ON'
+        extra_parameters: 'RANGE(*OBJ) SBMMLTJOB(*YES)'
+        joblog: 'abcabc'
+      register: neg_result
+      failed_when: "'we were unable to convert to bool' not in neg_result.msg"
+
+    - name: TC10 vry off the device
+      ibmi_device_vary:
+        device_list: ['abc']
+        status: '*OFF'
+        joblog: true
+      register: vary_result
+      ignore_errors: true
+
+    # - name: TC10 assert the defined parameters are returned
+    #   assert:
+    #     that:
+    #       - vary_result.start is defined
+    #       - vary_result.end is defined
+    #       - vary_result.delta is defined
+    #       - vary_result.stdout is defined
+    #       - "'Device description ABC not found' in vary_result.stderr"
+    #       - "'VRYCFG CFGOBJ(abc) CFGTYPE(*DEV) STATUS(*OFF) FRCVRYOFF(*YES)' in vary_result.cmd"
+    #       - vary_result.rc != 0
+    #       - vary_result.stdout_lines is defined
+    #       - vary_result.stderr_lines is defined
+
+    - name: TC11 vry off the device
+      ibmi_device_vary:
+        device_list: 
+          - '{{device_name}}'
+          - 'abc'
+        status: '*OFF'
+        joblog: true
+      register: vary_result
+      ignore_errors: true
+
+    - name: TC11 assert the defined parameters are returned
+      assert:
+        that:
+          - vary_result.start is defined
+          - vary_result.end is defined
+          - vary_result.delta is defined
+          - vary_result.stdout is defined
+          - vary_result.stderr is defined
+          - vary_result.rc != 0
+          - vary_result.stdout_lines is defined
+          - vary_result.stderr_lines is defined
+  
+  always:
+    - name: vary off the device description
+      ibmi_cl_command:
+        cmd: VRYCFG CFGOBJ({{item}}) CFGTYPE(*DEV) STATUS(*OFF) 
+      ignore_errors: true
+      loop: "{{device_name}}"
+
+    - name: delete a device description
+      ibmi_cl_command:
+        cmd: DLTDEVD DEVD({{item}})
+      loop: "{{device_name}}"

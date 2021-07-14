@@ -1,0 +1,10 @@
+- name: IBM i check a set of PTFs
+  hosts: testhost
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  tasks:
+    # positive cases is covered in role_check_ptf_group, only run negative testcase here. 
+    #negative cases      
+    - include: neg_case.yml
