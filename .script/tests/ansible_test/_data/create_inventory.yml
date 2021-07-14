@@ -1,0 +1,11 @@
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: create content in inventory
+      lineinfile:
+        path: inventory
+        state: present
+        create: yes
+        line: "ibmi ansible_ssh_host={{ibmi_ip}} ansible_ssh_user={{ibmi_user}} ansible_ssh_pass={{ibmi_pass}} ansible_python_interpreter={{ibmi_python}}"
+        regexp: '^ibmi'      

@@ -2,74 +2,74 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
   vars:
     become_user_name: null
     become_user_password: null
-  
+
   tasks:
-  - name: Review the connections that are transferring the most data, and the data is more than 1 G.
-    ibmi_sql_query:
-      sql: "SELECT * FROM QSYS2.NETSTAT_INFO WHERE BYTES_SENT_REMOTELY + BYTES_RECEIVED_LOCALLY > 1024 * 1024 * 1024
-           ORDER BY BYTES_SENT_REMOTELY + BYTES_RECEIVED_LOCALLY DESC LIMIT 10"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: net_stat_query_1
-    tags: review_most_data_transfer_connections
-    ignore_errors: True
+    - name: Review the connections that are transferring the most data, and the data is more than 1 G.
+      ibmi_sql_query:
+        sql: "SELECT * FROM QSYS2.NETSTAT_INFO WHERE BYTES_SENT_REMOTELY + BYTES_RECEIVED_LOCALLY > 1024 * 1024 * 1024
+            ORDER BY BYTES_SENT_REMOTELY + BYTES_RECEIVED_LOCALLY DESC LIMIT 10"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: net_stat_query_1
+      tags: review_most_data_transfer_connections
+      ignore_errors: true
 
-  - name: Get the connections that are transferring the most data
-    debug: msg={{net_stat_query_1.row}}
-    tags: review_most_data_transfer_connections
-    ignore_errors: True
+    - name: Get the connections that are transferring the most data
+      debug: msg={{ net_stat_query_1.row }}
+      tags: review_most_data_transfer_connections
+      ignore_errors: true
 
-  - name: Analyze remote IP address detail for password failures.
-    ibmi_sql_query:
-      sql: "WITH ip_addrs (rmt_addr, rmt_count) AS (
-                    SELECT remote_address,
-                           COUNT(*)
-                        FROM TABLE (
-                                qsys2.display_journal(
-                                    'QSYS', 'QAUDJRN', journal_entry_types => 'PW',
-                                    starting_timestamp => CURRENT TIMESTAMP - 24 HOURS)
-                            ) AS x
-                        GROUP BY remote_address
-                )
-                SELECT i.rmt_addr,
-                       i.rmt_count,
-                       user_name,
-                       rmt_port
-                    FROM ip_addrs i
-                         LEFT OUTER JOIN qsys2.netstat_job_info n
-                             ON i.rmt_addr = remote_address
-                    ORDER BY rmt_count DESC"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: rmt_ip_for_pwd_failures
-    tags: rmt_ip_for_pwd_failures
-    ignore_errors: True
+    - name: Analyze remote IP address detail for password failures.
+      ibmi_sql_query:
+        sql: "WITH ip_addrs (rmt_addr, rmt_count) AS (
+                      SELECT remote_address,
+                            COUNT(*)
+                          FROM TABLE (
+                                  qsys2.display_journal(
+                                      'QSYS', 'QAUDJRN', journal_entry_types => 'PW',
+                                      starting_timestamp => CURRENT TIMESTAMP - 24 HOURS)
+                              ) AS x
+                          GROUP BY remote_address
+                  )
+                  SELECT i.rmt_addr,
+                        i.rmt_count,
+                        user_name,
+                        rmt_port
+                      FROM ip_addrs i
+                          LEFT OUTER JOIN qsys2.netstat_job_info n
+                              ON i.rmt_addr = remote_address
+                      ORDER BY rmt_count DESC"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: rmt_ip_for_pwd_failures
+      tags: rmt_ip_for_pwd_failures
+      ignore_errors: true
 
-  - name: Get remote IP address detail for password failures.
-    debug: msg={{rmt_ip_for_pwd_failures.row}}
-    tags: rmt_ip_for_pwd_failures
-    ignore_errors: True
+    - name: Get remote IP address detail for password failures.
+      debug: msg={{ rmt_ip_for_pwd_failures.row }}
+      tags: rmt_ip_for_pwd_failures
+      ignore_errors: true
 
-  - name: Review Review the details of all TCP/IP routes and the local binding interface should be active.
-    ibmi_sql_query:
-      sql: "SELECT * FROM QSYS2.NETSTAT_ROUTE_INFO WHERE LOCAL_BINDING_INTERFACE_STATUS <> 'ACTIVE'"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: tcp_ip_routes
-    tags: tcp_ip_routes
-    ignore_errors: True
+    - name: Review Review the details of all TCP/IP routes and the local binding interface should be active.
+      ibmi_sql_query:
+        sql: "SELECT * FROM QSYS2.NETSTAT_ROUTE_INFO WHERE LOCAL_BINDING_INTERFACE_STATUS <> 'ACTIVE'"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: tcp_ip_routes
+      tags: tcp_ip_routes
+      ignore_errors: true
 
-  - name: Get the connections that are transferring the most data
-    debug: msg={{tcp_ip_routes.row}}
-    tags: tcp_ip_routes
-    ignore_errors: True
+    - name: Get the connections that are transferring the most data
+      debug: msg={{ tcp_ip_routes.row }}
+      tags: tcp_ip_routes
+      ignore_errors: true

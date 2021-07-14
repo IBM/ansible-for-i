@@ -6,3 +6,5 @@ This directory aims to provide solution level of examples for specific use cases
 fix_management directory provides different playbooks to manage IBM i PTF and PTF groups. 
 
 security_management directory provides different playbooks for security compliance checking examples.
+
+cicd directory provides an example of CICD process with ansible.

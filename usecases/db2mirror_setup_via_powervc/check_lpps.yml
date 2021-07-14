@@ -1,32 +1,39 @@
 - name: Query license info
   ibmi_sql_query:
-    sql: "SELECT * FROM QSYS2.LICENSE_INFO WHERE PRODUCT_ID = '{{lpp.product_id}}' and FEATURE_ID = {{lpp.feature_code}}"
+    sql: |
+        "SELECT * FROM QSYS2.LICENSE_INFO WHERE \
+         PRODUCT_ID = '{{ lpp.product_id }}' and \
+         FEATURE_ID = {{ lpp.feature_code }}"
   register: lpp_license_result
   delegate_to: source
 
 - name: Fail the precheck if license is not found
-  fail: 
-    msg: "A license of the required product {{lpp.product_id}} option {{lpp.product_option}} is not found on source node.
+  fail:
+    msg: "A license of the required product {{ lpp.product_id }} option {{ lpp.product_option }} is not found on source node.
           Please check if the license has been added."
   when: lpp_license_result.row | length == 0
 
 - name: Fail the precheck if required product is not installed
-  fail: 
-    msg: "The required product {{lpp.product_id}} option {{lpp.product_option}} is not installed."
+  fail:
+    msg: "The required product {{ lpp.product_id }} option {{ lpp.product_option }} is not installed."
   when: lpp_license_result.row[0]['INSTALLED'].upper() != 'YES'
 
 - name: Fail the precheck if required product is not installed
-  fail: 
-    msg: "The usage limit of required product {{lpp.product_id}} option {{lpp.product_option}} is 0 now."
-  when: lpp_license_result.row[0]['USAGE_LIMIT'].upper() == 0 or lpp_license_result.row[0]['USAGE_LIMIT'].upper() == '0' 
+  fail:
+    msg: "The usage limit of required product {{ lpp.product_id }} option {{ lpp.product_option }} is 0 now."
+  when: lpp_license_result.row[0]['USAGE_LIMIT'].upper() == 0 or lpp_license_result.row[0]['USAGE_LIMIT'].upper() == '0'
 
 - name: Query license info
   ibmi_sql_query:
-    sql: "SELECT * FROM QSYS2.LICENSE_INFO WHERE PRODUCT_ID = '{{lpp.product_id}}' AND FEATURE_ID = {{lpp.feature_code}} AND LICENSE_EXPIRATION <= CURRENT DATE"
+    sql: |
+        "SELECT * FROM QSYS2.LICENSE_INFO WHERE \
+         PRODUCT_ID = '{{ lpp.product_id }}' AND \
+         FEATURE_ID = {{ lpp.feature_code }} AND \
+         LICENSE_EXPIRATION <= CURRENT DATE"
   register: lpp_license_result
   delegate_to: source
 
 - name: Fail the precheck if the license of required product has been expired
-  fail: 
-    msg: "The license of required product {{lpp.product_id}} option {{lpp.product_option}} has expired."
-  when: lpp_license_result.row | length != 0 
+  fail:
+    msg: "The license of required product {{ lpp.product_id }} option {{ lpp.product_option }} has expired."
+  when: lpp_license_result.row | length != 0

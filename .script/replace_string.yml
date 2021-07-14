@@ -1,0 +1,5 @@
+- name: add build version
+  replace:
+    path: "{{item['path']}}"
+    regexp: '^__ibmi_module_version__ = .*$'   
+    replace: '__ibmi_module_version__ = "{{build_version}}"' 

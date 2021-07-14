@@ -1,0 +1,32 @@
+- hosts: localhost
+  collections:
+    - ibm.power_ibmi
+  tasks:
+    - name: add vm-{{ build_lib }} to ansible in-memory inventory
+      add_host:
+        name: build_system
+        ansible_ssh_host: '{{ build_system_ip }}'
+        ansible_user: '{{ build_system_user }}'
+        ansible_ssh_pass: '{{ build_system_pass }}'
+        groups: build_systems
+        ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+      when: provision | bool
+
+    - name: run PGM built with STMFs
+      ibm.power_ibmi.ibmi_cl_command:
+        cmd: CALL {{ build_lib }}/SENDMSG
+      register: callpgm
+      when: build_with_STMFs|bool
+      delegate_to: '{{ item }}'
+      with_items:
+        - "{{ host_names.split() }}"
+
+    - name: run PGM built from PF members
+      ibm.power_ibmi.ibmi_cl_command:
+        cmd: CALL {{ build_lib }}/SAMPLECL
+      register: callpgm
+      when: not build_with_STMFs|bool
+      delegate_to: '{{ item }}'
+      with_items:
+        - "{{ host_names.split() }}"

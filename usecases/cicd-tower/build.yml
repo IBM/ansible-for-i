@@ -1,0 +1,75 @@
+- hosts: localhost
+  collections:
+    - ibm.power_ibmi
+  tasks:
+    - name: add vm-{{ build_lib }} to ansible in-memory inventory
+      add_host:
+        name: build_system
+        ansible_ssh_host: '{{ build_system_ip }}'
+        ansible_user: '{{ build_system_user }}'
+        ansible_ssh_pass: '{{ build_system_pass }}'
+        groups: build_systems
+        ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+      when: provision | bool
+
+    - name: Delete {{ build_path }} if already exists
+      file:
+        state: absent
+        path: '{{ build_path }}'
+      delegate_to: '{{ item }}'
+      with_items:
+        - "{{ host_names.split() }}"
+
+    - name: create build lib
+      ibmi_cl_command:
+        cmd: CRTLIB {{ build_lib }}
+      delegate_to: '{{ item }}'
+      with_items:
+        - "{{ host_names.split() }}"
+      ignore_errors: true
+
+    - name: git clone from source repository
+      shell: /QOpenSys/pkgs/bin/git clone https://{{ github_access_token }}@{{ git_repo_url | regex_replace('[A-z]*://', '') }} {{ build_path }}
+      delegate_to: '{{ item }}'
+      with_items:
+        - "{{ host_names.split() }}"
+      when: github_access_token | length > 0
+
+    - name: git clone from source repository
+      shell: /QOpenSys/pkgs/bin/git clone https://{{ git_repo_url | regex_replace('[A-z]*://', '') }} {{ build_path }}
+      delegate_to: '{{ item }}'
+      with_items:
+        - "{{ host_names.split() }}"
+      when: github_access_token | length == 0
+
+    - name: call CL command to build application
+      ibmi_cl_command:
+        cmd: CRTBNDCPP PGM({{ build_lib }}/SENDMSG) SRCSTMF('{{ build_path }}/sendMsg.c')
+      when: build_with_STMFs|bool
+      delegate_to: '{{ item }}'
+      with_items:
+        - "{{ host_names.split() }}"
+
+    - block:
+        - name: CRTSRCPF on remote IBM i
+          ibmi_cl_command:
+            cmd: CRTSRCPF FILE({{ build_lib }}/QCLSRC)
+          delegate_to: '{{ item }}'
+          with_items:
+            - "{{ host_names.split() }}"
+
+        - name: Copy From Stream File
+          ibmi_cl_command:
+            cmd: CPYFRMSTMF FROMSTMF('{{ build_path }}/samplecl.txt') TOMBR('/QSYS.LIB/{{ build_lib }}.LIB/QCLSRC.FILE/SAMPLECL.MBR') MBROPT(*REPLACE)
+          delegate_to: '{{ item }}'
+          with_items:
+            - "{{ host_names.split() }}"
+
+        - name: build cl program
+          ibmi_cl_command:
+            cmd: CRTCLPGM PGM({{ build_lib }}/SAMPLECL) SRCFILE({{ build_lib }}/QCLSRC)
+          delegate_to: '{{ item }}'
+          with_items:
+            - "{{ host_names.split() }}"
+      when: not build_with_STMFs|bool

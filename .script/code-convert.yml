@@ -1,0 +1,40 @@
+- hosts: localhost
+  gather_facts: false
+
+  vars:
+    collection_name: ibm.power_ibmi
+
+  tasks:
+    - name: find all targets files
+      find:
+        path: ../plugins/modules
+        patterns: '*.py'
+        recurse: yes
+      register: find_result_1
+
+    - name: find all targets files
+      find:
+        path: ../plugins/action
+        patterns: '*.py'
+        recurse: yes
+      register: find_result_2
+
+    - name: find all targets files
+      find:
+        path: ../plugins/module_utils/ibmi/
+        patterns: '*.py'
+        recurse: yes
+      register: find_result_3
+
+    - name: read build version from galaxy.xml
+      shell: 'grep "version:" ../galaxy.yml'
+      register: shell_result
+
+    - set_fact:
+        build_version: "{{(shell_result.stdout.split(':')[-1]).split(' ')[-1]}}"
+        find_files: "{{find_result_2.files}} + {{find_result_1.files}} + {{find_result_3.files}}"
+    
+    - debug: var=find_files
+
+    - include: replace_string.yml 
+      loop: "{{find_files}}"

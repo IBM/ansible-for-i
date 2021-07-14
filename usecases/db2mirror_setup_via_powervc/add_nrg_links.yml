@@ -1,18 +1,18 @@
 - name: find line description
   ibmi_sql_query:
-    sql: "SELECT INTERNET_ADDRESS,CONNECTION_TYPE,SUBNET_MASK,PREFIX_LENGTH,LINE_DESCRIPTION,VIRTUAL_LAN_ID,PREFIX_LENGTH from 
-        QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS = '{{nrg_link.source_internet_address}}'"
+    sql: "SELECT INTERNET_ADDRESS,CONNECTION_TYPE,SUBNET_MASK,PREFIX_LENGTH,LINE_DESCRIPTION,VIRTUAL_LAN_ID,PREFIX_LENGTH from
+        QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS = '{{ nrg_link.source_internet_address }}'"
   register: existing_ip_interfaces_on_source_node
   delegate_to: source
 
 - name: Add NRG links into group
   ibmi_nrg_link:
     operation: add
-    nrg_name: '*MIRROR' 
-    source_address: '{{nrg_link.source_internet_address}}'
-    target_address: '{{nrg_link.copy_internet_address}}'
+    nrg_name: '*MIRROR'
+    source_address: '{{ nrg_link.source_internet_address }}'
+    target_address: '{{ nrg_link.copy_internet_address }}'
     change_load_balance_link_count: false
     # virtual_lan_id: 0
     link_priority: 1
-    line_description: '{{existing_ip_interfaces_on_source_node.row[0].LINE_DESCRIPTION}}'
+    line_description: '{{ existing_ip_interfaces_on_source_node.row[0].LINE_DESCRIPTION }}'
   delegate_to: source
