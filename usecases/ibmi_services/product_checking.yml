@@ -2,38 +2,38 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
   vars:
     become_user_name: null
     become_user_password: null
-  
-  tasks:
-  - name: Return information about all licensed products and features that will expire within the next 2 weeks.
-    ibmi_sql_query:
-      sql: "SELECT *
-                FROM QSYS2.LICENSE_INFO
-                WHERE LICENSE_EXPIRATION <= CURRENT DATE + 50 DAYS"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: expire_within_next_2_weeks
-    tags: expire_within_next_2_weeks
-    ignore_errors: True
 
-  - name: Return information about all licensed products and features that will expire within the next 2 weeks
-          for installed products only
-    ibmi_sql_query:
-      sql: "SELECT *
-                FROM QSYS2.LICENSE_INFO
-                WHERE INSTALLED = 'YES'
-                      AND LICENSE_EXPIRATION <= CURRENT DATE + 50 DAYS"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: expire_within_next_2_weeks
-    tags:
-      - expire_within_next_2_weeks
-    ignore_errors: True
+  tasks:
+    - name: Return information about all licensed products and features that will expire within the next 2 weeks.
+      ibmi_sql_query:
+        sql: "SELECT *
+                  FROM QSYS2.LICENSE_INFO
+                  WHERE LICENSE_EXPIRATION <= CURRENT DATE + 50 DAYS"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: expire_within_next_2_weeks
+      tags: expire_within_next_2_weeks
+      ignore_errors: true
+
+    - name: Return information about all licensed products and features that will expire within the next 2 weeks
+            for installed products only
+      ibmi_sql_query:
+        sql: "SELECT *
+                  FROM QSYS2.LICENSE_INFO
+                  WHERE INSTALLED = 'YES'
+                        AND LICENSE_EXPIRATION <= CURRENT DATE + 50 DAYS"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: expire_within_next_2_weeks
+      tags:
+        - expire_within_next_2_weeks
+      ignore_errors: true

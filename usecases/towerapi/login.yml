@@ -1,0 +1,21 @@
+- name: Get a Token
+  no_log: true
+  uri:
+    url: "{{ tower_api_url }}/users/1/personal_tokens/"
+    method: POST
+    status_code: [201]
+    body_format: json
+    user: "{{ tower_username }}"
+    password: "{{ tower_password }}"
+    force_basic_auth: true
+    body:
+      description: Personal Tower CLI token
+      application: null
+      scope: write
+    validate_certs: false
+    return_content: true
+  register: Token
+
+- set_fact:
+    token: "{{ Token.json.token }}"
+    token_id: "{{ Token.json.id }}"

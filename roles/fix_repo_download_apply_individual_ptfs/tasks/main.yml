@@ -115,9 +115,9 @@
         ptfs_list_parm: "{{ ( next_not_loaded_ptfs_list | default([]) + next_loaded_ptfs_list |
         default([]) + requisite_list | default([]) ) | difference( load_fail_simple_list | default([])) }}"
 
-    # - name: print ptfs_list
-    #   debug:
-    #     var: ptfs_list_parm
+  # - name: print ptfs_list
+  #   debug:
+  #     var: ptfs_list_parm
 
   when: tmp_not_loaded_ptfs_list != [] or tmp_loaded_ptfs_list != []
 

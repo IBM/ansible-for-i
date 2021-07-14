@@ -1,0 +1,79 @@
+- set_fact: template="{{ template_name }}-{{ playbook.split('.')[0] }}"
+
+- block:
+  - name: Check Job Template
+    uri:
+      url: "{{ tower_api_url }}/job_templates/?name={{ template }}"
+      headers:
+        Authorization: Bearer {{ token }}
+      validate_certs: false
+    register: check_job_templates
+
+  - block:
+      - name: Delete The Job Template
+        uri:
+          url: "{{ tower_api_url }}/job_templates/{{ check_job_templates.json.results[0].id }}/"
+          status_code: 204
+          method: DELETE
+          headers:
+            Authorization: Bearer {{ token }}
+          validate_certs: false
+        register: delete_job_templates
+    when: check_job_templates.json.count == 1
+  when: pre_cleanup|bool
+
+- name: Create A Job Template
+  uri:
+    url: "{{ tower_api_url }}/job_templates/"
+    status_code: 201
+    method: POST
+    headers:
+      Authorization: Bearer {{ token }}
+    body_format: json
+    body:
+      allow_callbacks: false
+      ask_credential_on_launch: false
+      ask_diff_mode_on_launch: false
+      ask_inventory_on_launch: false
+      ask_job_type_on_launch: false
+      ask_limit_on_launch: false
+      ask_scm_branch_on_launch: false
+      ask_skip_tags_on_launch: false
+      ask_tags_on_launch: false
+      ask_variables_on_launch: false
+      ask_verbosity_on_launch: false
+      custom_virtualenv: null
+      enable_webhook: false
+      extra_vars: ""
+      forks: 0
+      inventory: "{{ inventory.json.id }}"
+      job_slice_count: 1
+      job_tags: ""
+      job_type: "run"
+      name: "{{ template }}"
+      playbook: "{{ playbook }}"
+      project: "{{ project_id }}"
+      skip_tags: ""
+      survey_enabled: false
+      timeout: 0
+      verbosity: 0
+      webhook_credential: null
+    validate_certs: false
+  register: job_templates
+  failed_when: job_templates.json.id | int < 0
+
+- name: Add credentials to the job template
+  uri:
+    url: "{{ tower_api_url }}/job_templates/{{ job_templates.json.id }}/credentials/"
+    status_code: 204
+    method: POST
+    headers:
+      Authorization: Bearer {{ token }}
+    body_format: json
+    body: "{{ job_credential_body }}"
+    validate_certs: false
+  register: job_templates_add_credential
+  when: not provision|bool
+
+- name: Add the job template to the workflow
+  include: add_job_to_workflow.yml

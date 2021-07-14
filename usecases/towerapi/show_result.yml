@@ -1,0 +1,17 @@
+- name: Check A Job
+  uri:
+    url: "{{ tower_api_url }}/workflow_jobs/{{ workflow_job.json.id }}/"
+    status_code: 200
+    method: GET
+    headers:
+      Authorization: Bearer {{ token }}
+    validate_certs: false
+  register: workflow_job_info
+  until: workflow_job_info.json.status == "failed" or workflow_job_info.json.status == "successful"
+  retries: "{{ get_result_retry }}"
+  delay: "{{ get_result_retry_delay }}"
+  when: workflow_job.json.id | int >= 0
+
+- name: Display The Launch Result
+  debug:
+    msg: "Workflow Status: {{ workflow_job_info.json.status }}"

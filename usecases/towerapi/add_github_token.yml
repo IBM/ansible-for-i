@@ -1,0 +1,40 @@
+- block:
+  - name: Check Github Access Token
+    uri:
+      url: "{{ tower_api_url }}/credentials/?name={{ github_token_name }}"
+      headers:
+        Authorization: Bearer {{ token }}
+      validate_certs: false
+    register: check_github_token
+
+  - block:
+      - name: Delete The Github Access Token
+        uri:
+          url: "{{ tower_api_url }}/credentials/{{ check_github_token.json.results[0].id }}/"
+          status_code: 204
+          method: DELETE
+          headers:
+            Authorization: Bearer {{ token }}
+          validate_certs: false
+        register: delete_github_token
+    when: check_github_token.json.count == 1
+  when: pre_cleanup|bool
+
+- name: Add A Github Access Token
+  no_log: true
+  uri:
+    url: "{{ tower_api_url }}/credentials/"
+    status_code: 201
+    method: POST
+    headers:
+      Authorization: Bearer {{ token }}
+    body_format: json
+    body:
+      credential_type: 2
+      name: "{{ github_token_name }}"
+      user: 1
+      inputs:
+        password: "{{ github_access_token }}"
+        username: "{{ github_user_name }}"
+    validate_certs: false
+  register: add_github_access_token

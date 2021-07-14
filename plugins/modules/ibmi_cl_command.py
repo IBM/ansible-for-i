@@ -190,16 +190,17 @@ def main():
 
     startd = datetime.datetime.now()
 
+    command_upper = command.upper()
     is_cmd5250 = False
-    if command.startswith('DSP'):
+    if command_upper.startswith('DSP'):
         is_cmd5250 = True
-    if command.startswith('QSYS/DSP'):
+    if command_upper.startswith('QSYS/DSP'):
         is_cmd5250 = True
-    if command.startswith('WRK'):
+    if command_upper.startswith('WRK'):
         is_cmd5250 = True
-    if command.startswith('QSYS/WRK'):
+    if command_upper.startswith('QSYS/WRK'):
         is_cmd5250 = True
-    if 'OUTPUT(*)' in command:
+    if 'OUTPUT(*)' in command_upper:
         is_cmd5250 = True
 
     if is_cmd5250:

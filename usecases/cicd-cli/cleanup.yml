@@ -1,0 +1,39 @@
+- name: remove "{{ local_workspace }}"
+  file:
+    path: '{{ local_workspace }}'
+    state: 'absent'
+  ignore_errors: true
+
+- name: remove build path
+  file:
+    path: '{{ build_path }}'
+    state: 'absent'
+  delegate_to: "build_system"
+  ignore_errors: true
+  when: not provision
+
+- name: remove build lib
+  ibm.power_ibmi.ibmi_cl_command:
+    cmd: DLTLIB {{ build_lib }}
+  delegate_to: "build_system"
+  ignore_errors: true
+  when: not provision
+
+- name: Destroy VM when provision
+  os_server:
+    auth:
+      auth_url: https://{{ ansible_ssh_host }}:5000/v3
+      username: '{{ ansible_ssh_user }}'
+      password: '{{ ansible_ssh_pass }}'
+      project_name: '{{ project }}'
+      project_domain_name: '{{ project_domain }}'
+      user_domain_name: '{{ user_domain }}'
+    name: '{{ vm_name }}'
+    # image: '{{ image_name_or_id }}'
+    # flavor: '{{ flavor_name_or_id }}'
+    verify: '{{ verify_cert }}'
+    # nics: '{{ nic_list }}'
+    # timeout: '{{ deploy_timeout }}'
+    state: 'absent'
+  delegate_to: 'powervc'
+  when: provision

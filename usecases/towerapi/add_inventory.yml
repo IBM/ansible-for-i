@@ -1,0 +1,47 @@
+- block:
+  - name: Check Inventory
+    uri:
+      url: "{{ tower_api_url }}/inventories/?name={{ inventory_name }}"
+      headers:
+        Authorization: Bearer {{ token }}
+      validate_certs: false
+    register: check_inventory
+
+  - block:
+      - name: Delete The Inventory
+        uri:
+          url: "{{ tower_api_url }}/inventories/{{ check_inventory.json.results[0].id }}/"
+          status_code: 204, 202
+          method: DELETE
+          headers:
+            Authorization: Bearer {{ token }}
+          validate_certs: false
+        register: delete_inventory
+
+      - name: Check Inventory Again
+        uri:
+          url: "{{ tower_api_url }}/inventories/?name={{ inventory_name }}"
+          headers:
+            Authorization: Bearer {{ token }}
+          validate_certs: false
+        register: check_inventory_again
+        until: check_inventory_again.json.count == 0
+        retries: 3
+        delay: 10
+    when: check_inventory.json.count == 1
+  when: pre_cleanup|bool
+
+- name: Create A Inventory
+  uri:
+    url: "{{ tower_api_url }}/inventories/"
+    status_code: 201
+    method: POST
+    headers:
+      Authorization: Bearer {{ token }}
+    body_format: json
+    body:
+      organization: 1
+      name: "{{ inventory_name }}"
+    validate_certs: false
+  register: inventory
+  failed_when: inventory.json.id | int < 0

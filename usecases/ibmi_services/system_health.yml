@@ -2,56 +2,56 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
   vars:
     become_user_name: null
     become_user_password: null
-  
-  tasks:
-  - name: What unofficial IBM i code exists in QSYS
-    ibmi_sql_query:
-      sql: "SELECT *
-                FROM TABLE (
-                        QSYS2.OBJECT_STATISTICS('QSYS', '*PGM *SRVPGM')
-                    ) X
-                WHERE OBJECT_DOMAIN = '*SYSTEM'
-                      AND OBJECT_SIGNED = 'NO'
-                ORDER BY LAST_USED_TIMESTAMP DESC"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: unofficial_code_check
-    tags: unofficial_code_check
-    ignore_errors: True
 
-  - name: Find tables in System Limits with current_value over 10000000
-    ibmi_sql_query:
-      sql: "WITH X AS (
-                    SELECT ROW_NUMBER() OVER (
-                               PARTITION BY SYSTEM_SCHEMA_NAME,
-                                            SYSTEM_OBJECT_NAME,
-                                            SYSTEM_TABLE_MEMBER
-                               ORDER BY CURRENT_VALUE DESC NULLS LAST
-                           ) AS R,
-                           U.*
-                        FROM QSYS2.SYSLIMITS U
-                        WHERE LIMIT_ID = 15000
-                )
-                SELECT LAST_CHANGE_TIMESTAMP,
-                       SYSTEM_SCHEMA_NAME,
-                       SYSTEM_OBJECT_NAME,
-                       SYSTEM_TABLE_MEMBER,
-                       CURRENT_VALUE
-                    FROM X
-                    WHERE R = 1 AND CURRENT_VALUE > 10000000
-                    ORDER BY CURRENT_VALUE DESC"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: large_table
-    tags:
-      - large_table
-    ignore_errors: True
+  tasks:
+    - name: What unofficial IBM i code exists in QSYS
+      ibmi_sql_query:
+        sql: "SELECT *
+                  FROM TABLE (
+                          QSYS2.OBJECT_STATISTICS('QSYS', '*PGM *SRVPGM')
+                      ) X
+                  WHERE OBJECT_DOMAIN = '*SYSTEM'
+                        AND OBJECT_SIGNED = 'NO'
+                  ORDER BY LAST_USED_TIMESTAMP DESC"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: unofficial_code_check
+      tags: unofficial_code_check
+      ignore_errors: true
+
+    - name: Find tables in System Limits with current_value over 10000000
+      ibmi_sql_query:
+        sql: "WITH X AS (
+                      SELECT ROW_NUMBER() OVER (
+                                PARTITION BY SYSTEM_SCHEMA_NAME,
+                                              SYSTEM_OBJECT_NAME,
+                                              SYSTEM_TABLE_MEMBER
+                                ORDER BY CURRENT_VALUE DESC NULLS LAST
+                            ) AS R,
+                            U.*
+                          FROM QSYS2.SYSLIMITS U
+                          WHERE LIMIT_ID = 15000
+                  )
+                  SELECT LAST_CHANGE_TIMESTAMP,
+                        SYSTEM_SCHEMA_NAME,
+                        SYSTEM_OBJECT_NAME,
+                        SYSTEM_TABLE_MEMBER,
+                        CURRENT_VALUE
+                      FROM X
+                      WHERE R = 1 AND CURRENT_VALUE > 10000000
+                      ORDER BY CURRENT_VALUE DESC"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: large_table
+      tags:
+        - large_table
+      ignore_errors: true

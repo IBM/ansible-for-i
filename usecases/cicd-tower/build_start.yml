@@ -1,0 +1,19 @@
+- hosts: localhost
+  collections:
+    - ibm.power_ibmi
+  tasks:
+    - set_fact:
+        build_number: "{{ 9999 | random }}"
+
+    - set_stats:
+        data:
+          build_lib: "BUILD_{{ build_number }}"
+          build_path: "/tmp/BUILD_{{ build_number }}"
+
+    - set_stats:
+        data:
+          vm_name: "VM-BUILD_{{ build_number }}"
+      when: provision|bool
+
+    - debug:
+        msg: "Build number {{ build_number }} starts!"

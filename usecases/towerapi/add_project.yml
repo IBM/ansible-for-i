@@ -1,0 +1,80 @@
+- block:
+  - name: Check Project
+    uri:
+      url: "{{ tower_api_url }}/projects/?name={{ project_name }}"
+      headers:
+        Authorization: Bearer {{ token }}
+      validate_certs: false
+    register: check_project
+
+  - block:
+      - name: Delete The Project
+        uri:
+          url: "{{ tower_api_url }}/projects/{{ check_project.json.results[0].id }}/"
+          status_code: 204
+          method: DELETE
+          headers:
+            Authorization: Bearer {{ token }}
+          validate_certs: false
+        register: delete_project
+    when: check_project.json.count == 1
+  when: pre_cleanup|bool
+
+- block:
+    - name: Create A Project
+      uri:
+        url: "{{ tower_api_url }}/projects/"
+        status_code: 201
+        method: POST
+        headers:
+          Authorization: Bearer {{ token }}
+        body_format: json
+        body:
+          name: "{{ project_name }}"
+          scm_type: "git"
+          scm_url: "{{ git_url }}"
+          organization: 1
+          allow_override: true
+          base_dir: "/var/lib/awx/projects"
+          credential: "{{ add_github_access_token.json.id }}"
+          custom_virtualenv: null
+          scm_clean: true
+          scm_delete_on_update: true
+          scm_update_cache_timeout: "0"
+          scm_update_on_launch: true
+        validate_certs: false
+      register: project
+      failed_when: project.json.id | int < 0
+
+    - set_fact: project_id="{{ project.json.id }}"
+
+  when: github_access_token | length > 0
+
+- block:
+    - name: Create A Project without github token
+      uri:
+        url: "{{ tower_api_url }}/projects/"
+        status_code: 201
+        method: POST
+        headers:
+          Authorization: Bearer {{ token }}
+        body_format: json
+        body:
+          name: "{{ project_name }}"
+          scm_type: "git"
+          scm_url: "{{ git_url }}"
+          organization: 1
+          allow_override: true
+          base_dir: "/var/lib/awx/projects"
+          custom_virtualenv: null
+          scm_clean: true
+          scm_delete_on_update: true
+          scm_update_cache_timeout: "0"
+          scm_update_on_launch: true
+        validate_certs: false
+      register: project
+      failed_when: project.json.id | int < 0
+
+    - set_fact: project_id="{{ project.json.id }}"
+
+  when: github_access_token | length == 0

@@ -79,9 +79,9 @@
             src: '{{ path }}'
           register: apply_result
 
-        # - name: Print apply result
-        #   debug:
-        #     var: apply_result
+      # - name: Print apply result
+      #   debug:
+      #     var: apply_result
       when: sync_result.fail_list == []
 
   when: file_result.failed == 0
