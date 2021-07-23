@@ -1,22 +1,22 @@
 - debug: var=network
 
-- include_role: 
+- include_role:
     name: display_network_info_via_powervc
     apply:
       delegate_to: powervc
-  vars: 
-    mac_addr: "{{network['OS-EXT-IPS-MAC:mac_addr']}}"
+  vars:
+    mac_addr: "{{ network['OS-EXT-IPS-MAC:mac_addr'] }}"
 
 - include_role:
     name: present_ip_interface
     apply:
       delegate_to: source
   vars:
-    mac_address_of_ethernet_port: '{{interface_info.mac_addr.upper().split(":") |join()}}'
-    ip_address: '{{ip_info.1.ip_address}}'
-    next_hop: '{{ip_info.0.gateway_ip}}'
-    netmask: "{{ip_info.0.cidr | ipaddr('netmask') }}"
-  when: ip_info.0.id == ip_info.1.subnet_id and ip_info.0.ip_version == 4 
-  loop: "{{interface_info.subnet | product(interface_info.fixed_ips) |list}}"
+    mac_address_of_ethernet_port: '{{ interface_info.mac_addr.upper().split(":") |join() }}'
+    ip_address: '{{ ip_info.1.ip_address }}'
+    next_hop: '{{ ip_info.0.gateway_ip }}'
+    netmask: "{{ ip_info.0.cidr | ipaddr('netmask') }}"
+  when: ip_info.0.id == ip_info.1.subnet_id and ip_info.0.ip_version == 4
+  loop: "{{ interface_info.subnet | product(interface_info.fixed_ips) |list }}"
   loop_control:
     loop_var: ip_info

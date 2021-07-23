@@ -1,0 +1,65 @@
+- hosts: localhost
+  collections:
+    - ibm.power_ibmi
+  tasks:
+    - block:
+        - name: Add build server to Ansible in-memory inventory
+          add_host:
+            name: build_system
+            ansible_ssh_host: '{{ item }}'
+            ansible_user: '{{ build_system_user }}'
+            ansible_ssh_pass: '{{ build_system_pass }}'
+            groups: build_systems
+            ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+            ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+          with_items:
+            - "{{ host_names.split() }}"
+
+        - name: install dependencies as needed
+          include: ibmi_install_dependencies.yml
+          with_items:
+            - "{{ host_names.split() }}"
+      when: not provision|bool
+
+    - block:
+        - name: debug
+          debug:
+            var: build_system_ip
+
+        - name: set_fact for non-fixed build environment
+          set_fact:
+            build_system_ip: '{{ build_system_ip }}'
+            build_system_user: '{{ build_system_user }}'
+            build_system_pass: '{{ build_system_pass }}'
+
+        - name: remove existing entry for vm in case ssh header change occurs.
+          known_hosts:
+            name: "{{ build_system_ip }}"
+            path: ~/.ssh/known_hosts
+            state: absent
+
+        - name: add vm-{{ build_lib }} to ansible in-memory inventory
+          add_host:
+            name: build_system
+            ansible_ssh_host: '{{ build_system_ip }}'
+            ansible_user: '{{ build_system_user }}'
+            ansible_ssh_pass: '{{ build_system_pass }}'
+            groups: build_systems
+            ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+            ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+
+        - name: wait until vm-{{ build_lib }} is up and ssh ready
+          wait_for_connection:
+            sleep: 10
+            timeout: 1800
+          delegate_to: 'build_system'
+
+        - name: install dependencies as needed
+          include: ibmi_install_dependencies.yml
+          delegate_to: 'build_system'
+
+        - name: set build system to host_names
+          set_stats:
+            data:
+              host_names: 'build_system'
+      when: provision|bool

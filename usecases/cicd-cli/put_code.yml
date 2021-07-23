@@ -1,0 +1,42 @@
+- name: Create {{ build_lib }} on {{ build_system_ip }}
+  ibmi_cl_command:
+    cmd: CRTLIB {{ build_lib }}
+  delegate_to: "build_system"
+
+- name: "check if ~/.netrc contains ibm i target login"
+  lineinfile:
+    name: ~/.netrc
+    line: "machine {{build_system_ip}} login {{build_system_user}} password {{build_system_pass}}"
+    state: present
+  check_mode: false
+
+- block:
+    - name: Create {{ build_path }} on remote IBM i
+      ansible.builtin.file:
+        path: "{{ build_path }}"
+        state: "directory"
+      delegate_to: "build_system"
+
+    - name: combine transfer_command
+      set_fact:
+        transfer_command: "scp {{ local_workspace }}/sendMsg.c {{build_system_user}}@{{build_system_ip}}:{{ build_path }}/sendMsg.c"
+
+    - name: put STMFs to remote IBM i
+      shell:
+        cmd: 'sshpass -p "{{ build_system_pass }}" {{ transfer_command }}'
+  when: build_with_STMFs
+
+- block:
+    - name: CRTSRCPF on remote IBM i
+      ibm.power_ibmi.ibmi_cl_command:
+        cmd: CRTSRCPF FILE({{ build_lib }}/QCLSRC)
+      delegate_to: "build_system"
+
+    - name: put PF source member to remote IBM i via ftp
+      shell: |
+        ftp {{ build_system_ip }} <<EOF
+        cd {{ build_lib }}
+        put {{ local_workspace }}/samplecl.txt QCLSRC.SAMPLECL
+        bye
+        EOF
+  when: not build_with_STMFs

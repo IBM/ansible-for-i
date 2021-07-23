@@ -1,0 +1,42 @@
+- name: Add A Job Template to the Workflow
+  uri:
+    url: "{{ tower_api_url }}/workflow_job_templates/{{ workflow_job_templates.json.id }}/workflow_nodes/"
+    status_code: 201
+    method: POST
+    headers:
+      Authorization: Bearer {{ token }}
+    body_format: json
+    body:
+      all_parents_must_converge: false
+      credential: null
+      diff_mode: null
+      extra_data: {}
+      inventory: null
+      job_tags: null
+      job_type: null
+      limit: null
+      skip_tags: null
+      unified_job_template: "{{ job_templates.json.id }}"
+      verbosity: null
+    validate_certs: false
+  register: workflow_job_template_nodes
+  failed_when: workflow_job_template_nodes.json.id | int < 0
+
+- set_fact:
+    workflow_node_body: '{ "id": {{ workflow_job_template_nodes.json.id | int }} }'
+
+- name: Put The Job Template into the Workflow Queue
+  uri:
+    url: "{{ tower_api_url }}/workflow_job_template_nodes/{{ previous_node_id }}/success_nodes/"
+    status_code: 204
+    method: POST
+    headers:
+      Authorization: Bearer {{ token }}
+    body_format: json
+    body: "{{ workflow_node_body }}"
+    validate_certs: false
+  register: new_node
+  when: previous_node_id is defined and previous_node_id != workflow_job_template_nodes.json.id
+
+- set_fact:
+    previous_node_id: "{{ workflow_job_template_nodes.json.id }}"

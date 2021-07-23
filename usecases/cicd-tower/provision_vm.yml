@@ -1,0 +1,41 @@
+# New vm info from OpenStack
+- hosts: localhost
+  collections:
+    - ibm.power_ibmi
+  tasks:
+    - block:
+        - name: Step 1.1 - Add PowerVC host {{ powervc_host }} to Ansible in-memory inventory
+          add_host:
+            name: 'powervc'
+            ansible_user: '{{ powervc_admin }}'
+            ansible_ssh_pass: '{{ powervc_admin_password }}'
+            ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+            ansible_python_interpreter: /usr/bin/python3
+            ansible_ssh_host: '{{ powervc_host }}'
+          no_log: true
+
+        - name: Deploy a new VM
+          os_server:
+            auth:
+              auth_url: https://{{ powervc_host }}:5000/v3
+              username: '{{ powervc_admin }}'
+              password: '{{ powervc_admin_password }}'
+              project_name: '{{ powervc_project }}'
+              project_domain_name: '{{ project_domain }}'
+              user_domain_name: '{{ user_domain }}'
+            name: '{{ vm_name }}'
+            image: '{{ image_name_or_id }}'
+            flavor: '{{ flavor_name_or_id }}'
+            verify: '{{ verify_cert | bool}}'
+            network: '{{ network }}'
+            timeout: '{{ deploy_timeout }}'
+            userdata: '{{ deploy_userdata }}'
+          register: vm_info
+          delegate_to: 'powervc'
+
+        - name: set_fact for following job use
+          set_stats:
+            data:
+              build_system_ip: "{{ vm_info.server.accessIPv4 }}"
+
+      when: provision|bool

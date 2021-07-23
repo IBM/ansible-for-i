@@ -2,162 +2,162 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   collections:
     - ibm.power_ibmi
 
   vars:
     become_user_name: null
     become_user_password: null
-  
+
   tasks:
-  - name: Review the job scheduled entries which are no longer in effect, either because they
-          were explicitly held or because they were scheduled to run a single time and the date has passed.
-    ibmi_sql_query:
-      sql: "SELECT *
-                FROM QSYS2.SCHEDULED_JOB_INFO
-                WHERE STATUS IN (
-                        'HELD',
-                        'SAVED'
-                    )
-                ORDER BY SCHEDULED_BY"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: job_schedule_status
-    tags: job_schedule_status
-    ignore_errors: True
+    - name: Review the job scheduled entries which are no longer in effect, either because they
+            were explicitly held or because they were scheduled to run a single time and the date has passed.
+      ibmi_sql_query:
+        sql: "SELECT *
+                  FROM QSYS2.SCHEDULED_JOB_INFO
+                  WHERE STATUS IN (
+                          'HELD',
+                          'SAVED'
+                      )
+                  ORDER BY SCHEDULED_BY"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: job_schedule_status
+      tags: job_schedule_status
+      ignore_errors: true
 
-  - name: Find jobs sitting on a job queue, waiting to run
-    ibmi_sql_query:
-      sql: "SELECT *
-                FROM TABLE (
-                        QSYS2.JOB_INFO(JOB_STATUS_FILTER => '*JOBQ')
-                    ) X"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: job_in_queue
-    tags:
-      - job_in_queue
-    ignore_errors: True
+    - name: Find jobs sitting on a job queue, waiting to run
+      ibmi_sql_query:
+        sql: "SELECT *
+                  FROM TABLE (
+                          QSYS2.JOB_INFO(JOB_STATUS_FILTER => '*JOBQ')
+                      ) X"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: job_in_queue
+      tags:
+        - job_in_queue
+      ignore_errors: true
 
-  - name: Find the top 4 consumers of temporary storage, by memory pool, if temporary storage is over 1G
-    ibmi_sql_query:
-      sql: "WITH TOP_CONSUMERS (JOB_NAME, MEMORY_POOL, AUTHORIZATION_NAME, FUNCTION_TYPE, FUNCTION,
-                        TEMPORARY_STORAGE, RANK) AS (
-                    SELECT JOB_NAME,
-                           MEMORY_POOL,
-                           AUTHORIZATION_NAME,
-                           FUNCTION_TYPE,
-                           FUNCTION,
-                           TEMPORARY_STORAGE,
-                           RANK() OVER (
-                               PARTITION BY MEMORY_POOL
-                               ORDER BY TEMPORARY_STORAGE DESC
-                           )
-                        FROM TABLE (
-                                ACTIVE_JOB_INFO()
-                            ) x
-                        WHERE JOB_TYPE <> 'SYS'
-                )
-                SELECT JOB_NAME,
-                       MEMORY_POOL,
-                       AUTHORIZATION_NAME,
-                       FUNCTION_TYPE CONCAT '-' CONCAT FUNCTION AS FUNCTION,
-                       TEMPORARY_STORAGE
-                    FROM TOP_CONSUMERS
-                    WHERE RANK IN (
-                            1,
-                            2,
-                            3,
-                            4
-                        ) AND TEMPORARY_STORAGE > 1024
-                    ORDER BY MEMORY_POOL DESC"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: temp_storage_by_memory_pool
-    tags: temp_storage_by_memory_pool
-    ignore_errors: True
+    - name: Find the top 4 consumers of temporary storage, by memory pool, if temporary storage is over 1G
+      ibmi_sql_query:
+        sql: "WITH TOP_CONSUMERS (JOB_NAME, MEMORY_POOL, AUTHORIZATION_NAME, FUNCTION_TYPE, FUNCTION,
+                          TEMPORARY_STORAGE, RANK) AS (
+                      SELECT JOB_NAME,
+                            MEMORY_POOL,
+                            AUTHORIZATION_NAME,
+                            FUNCTION_TYPE,
+                            FUNCTION,
+                            TEMPORARY_STORAGE,
+                            RANK() OVER (
+                                PARTITION BY MEMORY_POOL
+                                ORDER BY TEMPORARY_STORAGE DESC
+                            )
+                          FROM TABLE (
+                                  ACTIVE_JOB_INFO()
+                              ) x
+                          WHERE JOB_TYPE <> 'SYS'
+                  )
+                  SELECT JOB_NAME,
+                        MEMORY_POOL,
+                        AUTHORIZATION_NAME,
+                        FUNCTION_TYPE CONCAT '-' CONCAT FUNCTION AS FUNCTION,
+                        TEMPORARY_STORAGE
+                      FROM TOP_CONSUMERS
+                      WHERE RANK IN (
+                              1,
+                              2,
+                              3,
+                              4
+                          ) AND TEMPORARY_STORAGE > 1024
+                      ORDER BY MEMORY_POOL DESC"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: temp_storage_by_memory_pool
+      tags: temp_storage_by_memory_pool
+      ignore_errors: true
 
-  - name: Find active jobs that use the temporary storage over 1G
-    ibmi_sql_query:
-      sql: "SELECT JOB_NAME,
-                   AUTHORIZATION_NAME,
-                   TEMPORARY_STORAGE,
-                   SQL_STATEMENT_TEXT,
-                   J.*
-                FROM TABLE (
-                        QSYS2.ACTIVE_JOB_INFO(DETAILED_INFO => 'ALL')
-                    ) J
-                WHERE JOB_TYPE <> 'SYS' AND TEMPORARY_STORAGE > 1024
-                ORDER BY TEMPORARY_STORAGE DESC"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: temp_storage_by_job
-    tags: temp_storage_by_job
-    ignore_errors: True
-
-
-  - name: Find the jobs that are encountering more than 2000 lock contention
-    ibmi_sql_query:
-      sql: "SELECT JOB_NAME, DATABASE_LOCK_WAITS,
-            NON_DATABASE_LOCK_WAITS,
-            DATABASE_LOCK_WAITS + NON_DATABASE_LOCK_WAITS AS Total_Lock_Waits, J.*
-                            FROM TABLE (
-                                    QSYS2.ACTIVE_JOB_INFO(DETAILED_INFO => 'ALL')
-                                ) J
-                            WHERE DATABASE_LOCK_WAITS + NON_DATABASE_LOCK_WAITS > 2000
-                            ORDER BY 4 DESC
-                            LIMIT 20"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: lock_waits
-    tags: lock_waits
-    ignore_errors: True
+    - name: Find active jobs that use the temporary storage over 1G
+      ibmi_sql_query:
+        sql: "SELECT JOB_NAME,
+                    AUTHORIZATION_NAME,
+                    TEMPORARY_STORAGE,
+                    SQL_STATEMENT_TEXT,
+                    J.*
+                  FROM TABLE (
+                          QSYS2.ACTIVE_JOB_INFO(DETAILED_INFO => 'ALL')
+                      ) J
+                  WHERE JOB_TYPE <> 'SYS' AND TEMPORARY_STORAGE > 1024
+                  ORDER BY TEMPORARY_STORAGE DESC"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: temp_storage_by_job
+      tags: temp_storage_by_job
+      ignore_errors: true
 
 
-  - name: Identify Host Server jobs currently using >10 Meg of QTEMP
-    ibmi_sql_query:
-      sql: "SELECT qtemp_size,
-                   job_name,
-                   internal_job_id,
-                   subsystem,
-                   subsystem_library_name,
-                   authorization_name,
-                   job_type,
-                   function_type,
-                   'FUNCTION',
-             job_status,
-             memory_pool,
-             run_priority,
-             thread_count,
-             temporary_storage,
-             cpu_time,
-             total_disk_io_count,
-             elapsed_interaction_count,
-             elapsed_total_response_time,
-             elapsed_total_disk_io_count,
-             elapsed_async_disk_io_count,
-             elapsed_sync_disk_io_count,
-             elapsed_cpu_percentage,
-             elapsed_cpu_time,
-             elapsed_page_fault_count,
-             job_end_reason,
-             server_type,
-             elapsed_time
-             FROM TABLE (
-             qsys2.active_job_info(
-             subsystem_list_filter => 'QUSRWRK', job_name_filter => 'QZDASOINIT',
-             detailed_info => 'QTEMP')
-             )
-             WHERE qtemp_size > 10"
-      become_user: '{{ become_user_name }}'
-      become_user_password: '{{ become_user_password }}'
-      expected_row_count: 0
-    register: qtemp_usage
-    tags: qtemp_usage
-    ignore_errors: True
+    - name: Find the jobs that are encountering more than 2000 lock contention
+      ibmi_sql_query:
+        sql: "SELECT JOB_NAME, DATABASE_LOCK_WAITS,
+              NON_DATABASE_LOCK_WAITS,
+              DATABASE_LOCK_WAITS + NON_DATABASE_LOCK_WAITS AS Total_Lock_Waits, J.*
+                              FROM TABLE (
+                                      QSYS2.ACTIVE_JOB_INFO(DETAILED_INFO => 'ALL')
+                                  ) J
+                              WHERE DATABASE_LOCK_WAITS + NON_DATABASE_LOCK_WAITS > 2000
+                              ORDER BY 4 DESC
+                              LIMIT 20"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: lock_waits
+      tags: lock_waits
+      ignore_errors: true
+
+
+    - name: Identify Host Server jobs currently using >10 Meg of QTEMP
+      ibmi_sql_query:
+        sql: "SELECT qtemp_size,
+                    job_name,
+                    internal_job_id,
+                    subsystem,
+                    subsystem_library_name,
+                    authorization_name,
+                    job_type,
+                    function_type,
+                    'FUNCTION',
+              job_status,
+              memory_pool,
+              run_priority,
+              thread_count,
+              temporary_storage,
+              cpu_time,
+              total_disk_io_count,
+              elapsed_interaction_count,
+              elapsed_total_response_time,
+              elapsed_total_disk_io_count,
+              elapsed_async_disk_io_count,
+              elapsed_sync_disk_io_count,
+              elapsed_cpu_percentage,
+              elapsed_cpu_time,
+              elapsed_page_fault_count,
+              job_end_reason,
+              server_type,
+              elapsed_time
+              FROM TABLE (
+              qsys2.active_job_info(
+              subsystem_list_filter => 'QUSRWRK', job_name_filter => 'QZDASOINIT',
+              detailed_info => 'QTEMP')
+              )
+              WHERE qtemp_size > 10"
+        become_user: '{{ become_user_name }}'
+        become_user_password: '{{ become_user_password }}'
+        expected_row_count: 0
+      register: qtemp_usage
+      tags: qtemp_usage
+      ignore_errors: true

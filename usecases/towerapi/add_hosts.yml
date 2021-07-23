@@ -1,0 +1,23 @@
+- block:
+  - name: print host_name
+    debug:
+      var: host_name
+    when: host_name is defined
+
+  - name: Create A Host
+    uri:
+      url: "{{ tower_api_url }}/hosts/"
+      status_code: 201
+      method: POST
+      headers:
+        Authorization: Bearer {{ token }}
+      body_format: json
+      body:
+        enabled: true
+        inventory: "{{ inventory.json.id }}"
+        name: "{{ item }}"
+      validate_certs: false
+    register: host
+    failed_when: host.json.id | int < 0
+    with_items: "{{ host_name.user_input.split() }}"
+    when: not provision|bool
