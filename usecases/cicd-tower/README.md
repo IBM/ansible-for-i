@@ -7,7 +7,7 @@ Overview for Ansible CI/CD integration with Ansible Tower use case
 The playbooks in this directory provides you the samples do your own modifications.
 
 This set of playbooks cannot be used directly since they are designed to be implemented to Ansible Tower automatically, some of the variables are inherited from
-https://github.com/IBM/ansible-for-i/tree/dev/usecases/towerapi
+[towerapi usecase](../towerapi/README.md).
 
 Contents may be continuously added and enhanced.
 
