@@ -9,7 +9,7 @@ namespace: ibm
 name: power_ibmi
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 9.9.9
+version: 1.5.0
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -21,11 +21,11 @@ authors:
   - Zhu Lijun <zhuljbj@@cn.ibm.com>
   - Peng Zengyu <pzypeng@cn.ibm.com>
   - Wang Yun <cdlwangy@cn.ibm.com>
-  - Jin Yifan <jinyifan@cn.ibm.com>
   - Zhao Yao <zhaoyao@cn.ibm.com>
   - Xu Meng <mengxumx@cn.ibm.com>
   - Zhang Yan <bjyanz@cn.ibm.com>
   - Zhou Yu <zhouyubj@cn.ibm.com>
+  - Wang Yuyu <wangyuyu@cn.ibm.com>
 
 ### OPTIONAL but strongly recommended
 
@@ -53,7 +53,7 @@ tags: [infrastructure, ibmi, power, ibm]
 dependencies: {}
 
 # The URL of the originating SCM repository
-repository: https://github.com/IBM/ansible-for-i/tree/1.4.0
+repository: https://github.com/IBM/ansible-for-i/tree/1.5.0
 
 # The URL to any online docs
 documentation: https://ibm.github.io/ansible-for-i/index.html

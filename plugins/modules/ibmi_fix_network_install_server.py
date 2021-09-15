@@ -267,7 +267,7 @@ except ImportError:
 HAS_IBM_DB = True
 
 
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.5.0"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
