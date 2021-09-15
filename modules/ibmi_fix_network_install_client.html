@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ibmi_object_save – Save one or more objects &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
+  <title>ibmi_fix_network_install_client – Install PTFs on the client via IBM i Network install &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -18,8 +18,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ibmi_query_job_log – Query the specific job log." href="ibmi_query_job_log.html" />
-    <link rel="prev" title="ibmi_object_restore – Restore one or more objects" href="ibmi_object_restore.html" /> 
+    <link rel="next" title="ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh." href="ibmi_fix_network_install_server.html" />
+    <link rel="prev" title="ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog." href="ibmi_fix_imgclg.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -64,7 +64,15 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_compare.html">ibmi_fix_compare – Verify whether the PTFs are installed.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_group_check.html">ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_network_install_client.html">ibmi_fix_network_install_client – Install PTFs on the client via IBM i Network install</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fix_network_install_client – Install PTFs on the client via IBM i Network install</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_network_install_server.html">ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_product_check.html">ibmi_fix_product_check – Check the software product installation status for a fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo.html">ibmi_fix_repo – Manipulate the PTF database via sqlite3</a></li>
@@ -85,13 +93,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_authority.html">ibmi_object_authority – Grant, revoke or display object authority</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_find.html">ibmi_object_find – Find specific IBM i object(s).</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_object_restore.html">ibmi_object_restore – Restore one or more objects</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_object_save – Save one or more objects</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_object_save.html">ibmi_object_save – Save one or more objects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_query_job_log.html">ibmi_query_job_log – Query the specific job log.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_reboot.html">ibmi_reboot – Reboot an IBM i machine</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_reply_message.html">ibmi_reply_message – Send a reply message to the sender of an inquiry message</a></li>
@@ -136,10 +138,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../modules.html">Modules</a> &raquo;</li>
-      <li>ibmi_object_save – Save one or more objects</li>
+      <li>ibmi_fix_network_install_client – Install PTFs on the client via IBM i Network install</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_object_save.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_network_install_client.py" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -147,33 +149,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="ibmi-object-save-save-one-or-more-objects">
-<span id="ibmi-object-save-module"></span><h1>ibmi_object_save – Save one or more objects<a class="headerlink" href="#ibmi-object-save-save-one-or-more-objects" title="Permalink to this headline"></a></h1>
+  <section id="ibmi-fix-network-install-client-install-ptfs-on-the-client-via-ibm-i-network-install">
+<span id="ibmi-fix-network-install-client-module"></span><h1>ibmi_fix_network_install_client – Install PTFs on the client via IBM i Network install<a class="headerlink" href="#ibmi-fix-network-install-client-install-ptfs-on-the-client-via-ibm-i-network-install" title="Permalink to this headline"></a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
 <li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
 <li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id4">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id4">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id5">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id6">Return Values</a></p></li>
 </ul>
 </div>
 <section id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline"></a></h2>
 <ul class="simple">
-<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_object_save</span></code> module create an save file on a remote IBM i nodes.</p></li>
-<li><p>The saved objects and save file are on the remote host, and the save file is not copied to the local host.</p></li>
-<li><p>Only support <code class="docutils literal notranslate"><span class="pre">*SAVF</span></code> as the save file’s format by now.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_fix</span></code> module installs PTFs on the client via IBM i Network install.</p></li>
+<li><p>Single PTF, PTF group and TR PTF are supported.</p></li>
 </ul>
 </section>
 <section id="parameters">
 <h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline"></a></h2>
 <dl>
-<dt>asp_group</dt><dd><p>Specifies the name of the auxiliary storage pool (ASP) group to set for the current thread.</p>
-<p>The ASP group name is the name of the primary ASP device within the ASP group.</p>
+<dt>apply_type</dt><dd><p>The fix apply type of the install to perform.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: *SYSBAS</div>
+<div class="line"><strong>default</strong>: *DLYALL</div>
+<div class="line"><strong>choices</strong>: *DLYALL, *IMMDLY, *IMMONLY</div>
 </div>
 </dd>
 <dt>become_user</dt><dd><p>The name of the user profile that the IBM i task will run under.</p>
@@ -189,235 +192,160 @@
 <div class="line"><strong>type</strong>: str</div>
 </div>
 </dd>
-<dt>force_save</dt><dd><p>If save file already exists or contains data, whether to clear data or not.</p>
+<dt>device_name</dt><dd><p>The virtual optical device name on the client</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: CLNTPTFOPT</div>
+</div>
+</dd>
+<dt>fix_omit_list</dt><dd><p>The list of PTFs which will be omitted.</p>
+<p>The key of the dict should be the product ID of the fix that is omitted.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: False</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: dict</div>
+</div>
+</dd>
+<dt>hiper_only</dt><dd><p>Whether or not only install the hiper fixes.</p>
+<p>Specify true if only need to install hiper fixes.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: bool</div>
 </div>
 </dd>
-<dt>format</dt><dd><p>The save file’s format. Only support <code class="docutils literal notranslate"><span class="pre">*SAVF</span></code> by now.</p>
+<dt>image_catalog_directory_name</dt><dd><p>The image catalog directory on the server</p>
+<p>The path is an IFS directory format.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: *SAVF</div>
-<div class="line"><strong>choices</strong>: *SAVF</div>
+<div class="line"><strong>default</strong>: /etc/ibmi_ansible/fix_management/network_install</div>
 </div>
 </dd>
-<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the avaiable JOBLOG even the rc is 0(success).</p>
+<dt>joblog</dt><dd><p>The job log of the job executing the task will be returned even rc is zero if it is set to True.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: bool</div>
 </div>
 </dd>
-<dt>object_lib</dt><dd><p>The library contains the objects.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: True</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>object_names</dt><dd><p>The objects need to be saved. One or more object names can be specified. Use space as separator.</p>
+<dt>operation</dt><dd><p>The operation on the client, the options are as follows</p>
+<p>setup_only will only setup the environment to install PTFs.</p>
+<p>setup_and_installPTF will setup the environment and install PTFs.</p>
+<p>installPTF_only will only install PTFs.</p>
+<p>reload will vary off and vary on the optical device when the image catalog files are updated on the server.</p>
+<p>uninstall will remove the environment on the client.</p>
+<p>setup_and_installPTF_and_uninstall will setup the environment, install PTFs and then remove the environment.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: setup_and_installPTF_and_uninstall</div>
+<div class="line"><strong>choices</strong>: setup_only, setup_and_installPTF, installPTF_only, reload, uninstall, setup_and_installPTF_and_uninstall</div>
+</div>
+</dd>
+<dt>product_id</dt><dd><p>The product ID of the fixes to be installed.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
 <div class="line"><strong>default</strong>: *ALL</div>
 </div>
 </dd>
-<dt>object_types</dt><dd><p>The object types. One or more object types can be specified. Use space as separator.</p>
+<dt>rollback</dt><dd><p>Whether or not rollback if there’s failure during the operation</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
+</div>
+</dd>
+<dt>server_address</dt><dd><p>The address of IBM i network install server</p>
+<p>It could be IP address or host name</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: *ALL</div>
-</div>
-</dd>
-<dt>parameters</dt><dd><p>The parameters that SAVOBJ command will take. Other than options above, all other parameters need to be specified here. The default values of parameters for SAVOBJ will be taken if not specified.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>:</div>
-</div>
-</dd>
-<dt>savefile_lib</dt><dd><p>The save file library.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: True</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>savefile_name</dt><dd><p>The save file name.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: True</div>
-<div class="line"><strong>type</strong>: str</div>
-</div>
-</dd>
-<dt>target_release</dt><dd><p>The release of the operating system on which you intend to restore and use the object.</p>
-<div class="line-block">
-<div class="line"><strong>required</strong>: false</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>default</strong>: *CURRENT</div>
 </div>
 </dd>
 </dl>
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Force to save test1.pgm and test2.srvpgm in objlib libary to archive.savf in archlib libary with become user.</span>
-  <span class="nt">ibm.power_ibmi.ibmi_object_save</span><span class="p">:</span>
-    <span class="nt">object_names</span><span class="p">:</span> <span class="s">&#39;test1</span><span class="nv"> </span><span class="s">test2&#39;</span>
-    <span class="nt">object_lib</span><span class="p">:</span> <span class="s">&#39;objlib&#39;</span>
-    <span class="nt">object_types</span><span class="p">:</span> <span class="s">&#39;*PGM</span><span class="nv"> </span><span class="s">*SRVPGM&#39;</span>
-    <span class="nt">savefile_name</span><span class="p">:</span> <span class="s">&#39;archive&#39;</span>
-    <span class="nt">savefile_lib</span><span class="p">:</span> <span class="s">&#39;archlib&#39;</span>
-    <span class="nt">force_save</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-    <span class="nt">target_release</span><span class="p">:</span> <span class="s">&#39;V7R2M0&#39;</span>
-    <span class="nt">become_user</span><span class="p">:</span> <span class="s">&#39;USER1&#39;</span>
-    <span class="nt">become_user_password</span><span class="p">:</span> <span class="s">&#39;yourpassword&#39;</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Setup the client</span>
+  <span class="nt">ibm.power_ibmi.ibmi_fix_network_install_client</span><span class="p">:</span>
+    <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;setup_only&#39;</span>
+    <span class="nt">server_address</span><span class="p">:</span> <span class="s">&#39;9.123.123.45&#39;</span>
+    <span class="nt">image_catalog_directory_name</span><span class="p">:</span> <span class="s">&#39;/tmp/PTFs&#39;</span>
+    <span class="nt">rollback</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+    <span class="nt">become_user</span><span class="p">:</span> <span class="s">&quot;QSECOFR&quot;</span>
+    <span class="nt">become_user_password</span><span class="p">:</span> <span class="s">&quot;yourpassword&quot;</span>
 </pre></div>
 </div>
 </section>
+<section id="notes">
+<h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+</div>
+</section>
+<section id="see-also">
+<h2><a class="toc-backref" href="#id5">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline"></a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">ibmi_fix, ibmi_fix_savf_module</span></p></li>
+</ul>
+</div>
+</section>
 <section id="return-values">
-<h2><a class="toc-backref" href="#id4">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id6">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
 <blockquote>
 <div><dl>
 <dt>start</dt><dd><div class="line-block">
-<div class="line">The save execution start time.</div>
+<div class="line">The task execution start time</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>returned</strong>: When rc is zero</div>
 <div class="line"><strong>type</strong>: str</div>
 <div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
 </div>
 </dd>
 <dt>end</dt><dd><div class="line-block">
-<div class="line">The save execution end time.</div>
+<div class="line">The task execution end time</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>returned</strong>: When rc is zero</div>
 <div class="line"><strong>type</strong>: str</div>
 <div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
 </div>
 </dd>
 <dt>delta</dt><dd><div class="line-block">
-<div class="line">The save execution delta time.</div>
+<div class="line">The task execution delta time</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>returned</strong>: When rc is zero</div>
 <div class="line"><strong>type</strong>: str</div>
 <div class="line"><strong>sample</strong>: 0:00:00.307534</div>
 </div>
 </dd>
 <dt>stdout</dt><dd><div class="line-block">
-<div class="line">The save standard output.</div>
+<div class="line">The task standard output</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>returned</strong>: When error occurs.</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: CPC3722: 2 objects saved from library objlib.</div>
+<div class="line"><strong>sample</strong>: CPC2102: Library TESTLIB created</div>
 </div>
 </dd>
 <dt>stderr</dt><dd><div class="line-block">
-<div class="line">The save standard error.</div>
+<div class="line">The task standard error</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>returned</strong>: When error occurs.</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: CPF5813: File archive in library archlib already exists.nCPF7302: File archive not created in library archlib.n</div>
-</div>
-</dd>
-<dt>object_names</dt><dd><div class="line-block">
-<div class="line">The objects need to be saved.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: test1 test2</div>
-</div>
-</dd>
-<dt>object_lib</dt><dd><div class="line-block">
-<div class="line">The library contains the object.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: objlib</div>
-</div>
-</dd>
-<dt>object_types</dt><dd><div class="line-block">
-<div class="line">The object types.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: *PGM *SRVPGM</div>
-</div>
-</dd>
-<dt>savefile_name</dt><dd><div class="line-block">
-<div class="line">The save file name.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: c1</div>
-</div>
-</dd>
-<dt>savefile_lib</dt><dd><div class="line-block">
-<div class="line">The save file library.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: c1lib</div>
-</div>
-</dd>
-<dt>format</dt><dd><div class="line-block">
-<div class="line">The save file’s format. Only support <code class="docutils literal notranslate"><span class="pre">*SAVF</span></code> by now.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: *SAVF</div>
-</div>
-</dd>
-<dt>force_save</dt><dd><div class="line-block">
-<div class="line">If save file already exists or contains data, whether to clear data or not.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: bool</div>
-<div class="line"><strong>sample</strong>:</div>
-</div>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">true</span>
-</pre></div>
-</div>
-</div></blockquote>
-</dd>
-<dt>target_release</dt><dd><div class="line-block">
-<div class="line">The release of the operating system on which you intend to restore and use the object.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: V7R1M0</div>
-</div>
-</dd>
-<dt>command</dt><dd><div class="line-block">
-<div class="line">The last excuted command.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: SAVOBJ OBJ(*ALL) LIB(TESTLIB) DEV(*SAVF) OBJTYPE(*ALL) SAVF(TEST/ARCHLIB) TGTRLS(V7R1M0)</div>
-</div>
-</dd>
-<dt>joblog</dt><dd><div class="line-block">
-<div class="line">Append JOBLOG to stderr/stderr_lines or not.</div>
-</div>
-<div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>sample</strong>: CPF2111:Library TESTLIB already exists</div>
 </div>
 </dd>
 <dt>rc</dt><dd><div class="line-block">
-<div class="line">The save action return code. 0 means success.</div>
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
@@ -426,35 +354,35 @@
 </div>
 </dd>
 <dt>stdout_lines</dt><dd><div class="line-block">
-<div class="line">The save standard output split in lines.</div>
+<div class="line">The task standard output split in lines</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>returned</strong>: When error occurs.</div>
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPC3722: 2 objects saved from library objlib.&quot;</span><span class="p">]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;+++ success CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;CRTIMGCLG IMGCLG(ANSIBCLG1) DIR(</span><span class="se">\u0027</span><span class="s2">/home/ansiblePTFInstallTemp/</span><span class="se">\u0027</span><span class="s2">) CRTDIR(*YES)&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div></blockquote>
 </dd>
 <dt>stderr_lines</dt><dd><div class="line-block">
-<div class="line">The save standard error split in lines.</div>
+<div class="line">The task standard error split in lines</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>returned</strong>: When error occurs.</div>
 <div class="line"><strong>type</strong>: list</div>
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF5813: File archive in library archlib already exists.&quot;</span><span class="p">,</span> <span class="s2">&quot;CPF7302: File archive not created in library archlib.&quot;</span><span class="p">]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div></blockquote>
 </dd>
 <dt>job_log</dt><dd><div class="line-block">
-<div class="line">The IBM i job log of the task executed.</div>
+<div class="line">The job log of the job executes the task.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
@@ -462,10 +390,56 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;FROM_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;149&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSHELL&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;QZSHRUNC&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;main&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QZSHRUNC&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_USER&quot;</span><span class="p">:</span> <span class="s2">&quot;TESTER&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;QZSHMSGF&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;QSH0005&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSHELL&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SECOND_LEVEL_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SUBTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Command ended normally with exit status 0.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-05-25-13.06.35.019371&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;COMPLETION&quot;</span><span class="p">,</span> <span class="s2">&quot;ORDINAL_POSITION&quot;</span><span class="p">:</span> <span class="s2">&quot;12&quot;</span><span class="p">,</span> <span class="s2">&quot;SEVERITY&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;5829&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QXMLSERV&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;PLUGILE&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;ILECMDEXC&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;XMLSTOREDP&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;FROM_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;318F&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QWTCHGJB&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_USER&quot;</span><span class="p">:</span> <span class="s2">&quot;CHANGLE&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;QCPFMSG&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;CPD0912&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SECOND_LEVEL_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Cause . . . . . :   This message is used by application programs as a general escape message.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SUBTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Printer device PRT01 not found.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-05-20-21.41.40.845897&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;DIAGNOSTIC&quot;</span><span class="p">,</span> <span class="s2">&quot;ORDINAL_POSITION&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;SEVERITY&quot;</span><span class="p">:</span> <span class="s2">&quot;20&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;9369&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
+</dd>
+<dt>device_name</dt><dd><div class="line-block">
+<div class="line">The virtual optical device name</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: REPOSVROPT</div>
+</div>
+</dd>
+<dt>need_action_ptf_list</dt><dd><div class="line-block">
+<div class="line">The list contains the information of the just installed PTFs that need further IPL actions.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When use operation ‘setup_and_installPTF’, ‘installPTF_only’ and ‘setup_and_installPTF_and_uninstall’</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;PTF_ACTION_PENDING&quot;</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_ACTION_REQUIRED&quot;</span><span class="p">:</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_CREATION_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2019-12-06T01:00:43&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IDENTIFIER&quot;</span><span class="p">:</span> <span class="s2">&quot;SI71746&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IPL_ACTION&quot;</span><span class="p">:</span> <span class="s2">&quot;TEMPORARILY APPLIED&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_IPL_REQUIRED&quot;</span><span class="p">:</span> <span class="s2">&quot;IMMEDIATE&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_LOADED_STATUS&quot;</span><span class="p">:</span> <span class="s2">&quot;LOADED&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_PRODUCT_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;5733SC1&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_SAVE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;NO&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_STATUS_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-03-24T09:03:55&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_TEMPORARY_APPLY_TIMESTAMP&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>requisite_ptf_list</dt><dd><div class="line-block">
+<div class="line">The PTF list contains the requiste PTF of the PTF being applied.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When use operation ‘setup_and_installPTF’, ‘installPTF_only’ and ‘setup_and_installPTF_and_uninstall’</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;ptf_id&quot;</span><span class="p">:</span> <span class="s2">&quot;SI76012&quot;</span><span class="p">,</span> <span class="s2">&quot;requisite&quot;</span><span class="p">:</span> <span class="s2">&quot;SI76014&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;ptf_id&quot;</span><span class="p">:</span> <span class="s2">&quot;SI76012&quot;</span><span class="p">,</span> <span class="s2">&quot;requisite&quot;</span><span class="p">:</span> <span class="s2">&quot;SI76013&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>ptf_install_fail_reason</dt><dd><div class="line-block">
+<div class="line">The failure reason if it fails to install PTFs. It is from the message content</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When use operation ‘setup_and_installPTF’, ‘installPTF_only’ and ‘setup_and_installPTF_and_uninstall’</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: Program temporary fixes (PTFs) can only be loaded, applied and removed for products which are installed.</div>
+</div>
 </dd>
 </dl>
 </div></blockquote>
@@ -476,8 +450,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="ibmi_object_restore.html" class="btn btn-neutral float-left" title="ibmi_object_restore – Restore one or more objects" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="ibmi_query_job_log.html" class="btn btn-neutral float-right" title="ibmi_query_job_log – Query the specific job log." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ibmi_fix_imgclg.html" class="btn btn-neutral float-left" title="ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog." accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ibmi_fix_network_install_server.html" class="btn btn-neutral float-right" title="ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

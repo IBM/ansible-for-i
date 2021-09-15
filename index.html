@@ -1,72 +1,33 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Power IBM i collection for Ansible &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installing IBM i collection to Ansible server" href="installation.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="#" class="icon icon-home"> IBM power_ibmi collection
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -74,107 +35,53 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installing IBM i collection to Ansible server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Running Ansible to manage IBM i systems</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="#">IBM power_ibmi collection</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Power IBM i collection for Ansible</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
-            
               <a href="https://github.com/IBM/ansible-for-i/blob/devel/docs/source/index.rst" class="fa fa-github"> Edit on GitHub</a>
-            
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="power-ibm-i-collection-for-ansible">
-<h1>Power IBM i collection for Ansible<a class="headerlink" href="#power-ibm-i-collection-for-ansible" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="power-ibm-i-collection-for-ansible">
+<h1>Power IBM i collection for Ansible<a class="headerlink" href="#power-ibm-i-collection-for-ansible" title="Permalink to this headline"></a></h1>
 <p>The IBM i collection includes modules. action plugins, sample playbooks to automate tasks on IBM i.</p>
 <p>Ansible is a radically simple IT automation system. It handles configuration management, application
 deployment, cloud provisioning, ad-hoc task execution, network automation, and multi-node orchestration.
 Ansible makes complex changes like zero-downtime rolling updates with load balancers easy.</p>
 <p>IBM i systems can be managed nodes of Ansible. This project is to enrich IBM i support on Ansible, like
 providing more IBM i modules and examples to manage IBM i nodes.</p>
-</div>
-<div class="section" id="getting-started-articles">
-<h1>Getting Started Articles<a class="headerlink" href="#getting-started-articles" title="Permalink to this headline">¶</a></h1>
+</section>
+<section id="getting-started-articles">
+<h1>Getting Started Articles<a class="headerlink" href="#getting-started-articles" title="Permalink to this headline"></a></h1>
 <p>You may want to check out below articles first if you are new to Ansible for IBM i support.</p>
 <p><a class="reference external" href="https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/">https://developer.ibm.com/linuxonpower/2020/05/01/ansible-automation-for-ibm-power-systems/</a></p>
 <p><a class="reference external" href="https://ibm.github.io/cloud-i-blog/archivers/2020_0602_automate_your_ibm_i_tasks_with_ansible">https://ibm.github.io/cloud-i-blog/archivers/2020_0602_automate_your_ibm_i_tasks_with_ansible</a></p>
@@ -189,69 +96,57 @@ providing more IBM i modules and examples to manage IBM i nodes.</p>
 </ul>
 </dd>
 </dl>
-</div>
-<div class="section" id="features">
-<h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+</section>
+<section id="features">
+<h1>Features<a class="headerlink" href="#features" title="Permalink to this headline"></a></h1>
 <p>The IBM i collection includes <a class="reference external" href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/action/">action plugins</a>, <a class="reference external" href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/">modules</a>, <a class="reference external" href="https://github.com/IBM/ansible-for-i/tree/devel/playbooks/">sample playbooks</a>, and
 <a class="reference external" href="https://github.com/IBM/ansible-for-i/tree/devel/docs/">ansible-doc</a> to automate tasks on IBM i.</p>
-</div>
-<div class="section" id="copyright">
-<h1>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h1>
+</section>
+<section id="copyright">
+<h1>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline"></a></h1>
 <p>© Copyright IBM Corporation 2020</p>
-</div>
-<div class="section" id="license">
-<h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
+</section>
+<section id="license">
+<h1>License<a class="headerlink" href="#license" title="Permalink to this headline"></a></h1>
 <p>Some portions of this collection are licensed under
 <a class="reference external" href="https://opensource.org/licenses/GPL-3.0">GNU General Public License, Version 3.0</a>, and other portions of this
 collection are licensed under <a class="reference external" href="https://opensource.org/licenses/Apache-2.0">Apache License, Version 2.0</a>.</p>
 <p>See individual files for applicable licenses.</p>
-</div>
-<div class="section" id="author-information">
-<h1>Author Information<a class="headerlink" href="#author-information" title="Permalink to this headline">¶</a></h1>
+</section>
+<section id="author-information">
+<h1>Author Information<a class="headerlink" href="#author-information" title="Permalink to this headline"></a></h1>
 <p>This Ansible collection is maintained by IBM i development team.</p>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">
 </div>
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="installation.html" class="btn btn-neutral float-right" title="Installing IBM i collection to Ansible server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2020, IBM.
+    <p>&#169; Copyright 2020, IBM.</p>
+  </div>
 
-    </p>
-  </div> 
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

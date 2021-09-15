@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ibmi_get_nonconfigure_disks – Get all un-configure disks &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
+  <title>ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -18,8 +18,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ibmi_host_server_service – Manage host server" href="ibmi_host_server_service.html" />
-    <link rel="prev" title="ibmi_fix_repo – Manipulate the PTF database via sqlite3" href="ibmi_fix_repo.html" /> 
+    <link rel="next" title="ibmi_fix_product_check – Check the software product installation status for a fix" href="ibmi_fix_product_check.html" />
+    <link rel="prev" title="ibmi_fix_network_install_client – Install PTFs on the client via IBM i Network install" href="ibmi_fix_network_install_client.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -65,16 +65,18 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_group_check.html">ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_imgclg.html">ibmi_fix_imgclg – Install fixes such as PTF, PTF Group, Technology refresh to the target IBM i system by image catalog.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_network_install_client.html">ibmi_fix_network_install_client – Install PTFs on the client via IBM i Network install</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_network_install_server.html">ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_product_check.html">ibmi_fix_product_check – Check the software product installation status for a fix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo.html">ibmi_fix_repo – Manipulate the PTF database via sqlite3</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_get_nonconfigure_disks – Get all un-configure disks</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notes">Notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#return-values">Return Values</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_product_check.html">ibmi_fix_product_check – Check the software product installation status for a fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo.html">ibmi_fix_repo – Manipulate the PTF database via sqlite3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all un-configure disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_install_product_from_savf.html">ibmi_install_product_from_savf – Install the licensed program(product) from a save file.</a></li>
@@ -136,10 +138,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../modules.html">Modules</a> &raquo;</li>
-      <li>ibmi_get_nonconfigure_disks – Get all un-configure disks</li>
+      <li>ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.</li>
       <li class="wy-breadcrumbs-aside">
               <!-- User defined GitHub URL -->
-              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_get_nonconfigure_disks.py" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_fix_network_install_server.py" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -147,21 +149,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="ibmi-get-nonconfigure-disks-get-all-un-configure-disks">
-<span id="ibmi-get-nonconfigure-disks-module"></span><h1>ibmi_get_nonconfigure_disks – Get all un-configure disks<a class="headerlink" href="#ibmi-get-nonconfigure-disks-get-all-un-configure-disks" title="Permalink to this headline"></a></h1>
+  <section id="ibmi-fix-network-install-server-setup-ibm-i-network-install-server-which-contains-image-files-of-ptfs-ptf-group-and-technology-refresh">
+<span id="ibmi-fix-network-install-server-module"></span><h1>ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.<a class="headerlink" href="#ibmi-fix-network-install-server-setup-ibm-i-network-install-server-which-contains-image-files-of-ptfs-ptf-group-and-technology-refresh" title="Permalink to this headline"></a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
 <li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
 <li><p><a class="reference internal" href="#examples" id="id3">Examples</a></p></li>
-<li><p><a class="reference internal" href="#return-values" id="id4">Return Values</a></p></li>
+<li><p><a class="reference internal" href="#notes" id="id4">Notes</a></p></li>
+<li><p><a class="reference internal" href="#see-also" id="id5">See Also</a></p></li>
+<li><p><a class="reference internal" href="#return-values" id="id6">Return Values</a></p></li>
 </ul>
 </div>
 <section id="synopsis">
 <h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline"></a></h2>
 <ul class="simple">
-<li><p>Get all un-configure disks.</p></li>
-<li><p>For non-IBM i targets, no need.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_fix</span></code> module setup IBM i Network install server which contains images files.</p></li>
+<li><p>Single PTF, PTF group and TR PTF are supported.</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -180,28 +184,208 @@
 <div class="line"><strong>type</strong>: str</div>
 </div>
 </dd>
-<dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, append JOBLOG to stderr/stderr_lines.</p>
+<dt>device_name</dt><dd><p>The virtual optical device name.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: REPOSVROPT</div>
+</div>
+</dd>
+<dt>image_catalog_directory_name</dt><dd><p>The image catalog directory on the IBM i Network install server.</p>
+<p>The path is an IFS directory format.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: /etc/ibmi_ansible/fix_management/network_install</div>
+</div>
+</dd>
+<dt>image_catalog_name</dt><dd><p>The name of image catalog that is created on the server.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: REPOSVRCLG</div>
+</div>
+</dd>
+<dt>joblog</dt><dd><p>The job log of the job executing the task will be returned even rc is zero if it is set to True.</p>
 <div class="line-block">
 <div class="line"><strong>required</strong>: false</div>
 <div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
+<dt>operation</dt><dd><p>The operation on the Network install server, the options are as follows</p>
+<p>setup_only will only setup the network install server, including configuring a virtual optical device and image catalog.</p>
+<p>setup_and_addimgclge will setup the network install server and add image catalog entries for PTF image files.</p>
+<p>addimgclge_only will only add image catalog entries for PTF image files.</p>
+<p>rmvimgclge_only will only remove all the image catalog entries for PTF image files.</p>
+<p>rmvimgclge_and_addimgclge will first remove all the image catalog entries for existing PTF image files, then add entries for new PTF image files.</p>
+<p>uninstall will remove the network install server configuration.</p>
+<p>retrieve_image_catalog_entries will retrieve the current image catalog entries.</p>
+<p>restart_NFS_server will restart NFS Server.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>default</strong>: setup_only</div>
+<div class="line"><strong>choices</strong>: setup_only, setup_and_addimgclge, addimgclge_only, rmvimgclge_only, rmvimgclge_and_addimgclge, uninstall, retrieve_image_catalog_entries, restart_NFS_server</div>
+</div>
+</dd>
+<dt>remove_image_files</dt><dd><p>Whether the PTF image files under image catalog directory will be removed when removing entries from image catalog.</p>
+<p>Whether the PTF image files under image catalog directory will be removed when removing the network install server configuration.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
+</div>
+</dd>
+<dt>rollback</dt><dd><p>Whether or not rollback if there’s failure during the operation.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+<div class="line"><strong>default</strong>: True</div>
+</div>
+</dd>
+<dt>virtual_image_name_list</dt><dd><p>The name list of the PTF image file and its directory, for example, <code class="docutils literal notranslate"><span class="pre">/tmp/5733WQXPTFs/SF99433_1.bin</span></code>.</p>
+<p>You can specify all the PTF image files under one directory, for example, <code class="docutils literal notranslate"><span class="pre">/tmp/PTFs/*ALL</span></code>.</p>
+<p>bin and iso image files are supported.</p>
+<p>default is <code class="docutils literal notranslate"><span class="pre">*ALL</span></code> for all the PTF image files under image catalog directory.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+<div class="line"><strong>default</strong>: *ALL</div>
+</div>
+</dd>
+<dt>virtual_image_name_remove_list</dt><dd><p>The name list of the PTF image file which will be moved from the image catalog, for example, <code class="docutils literal notranslate"><span class="pre">SF99433_1.bin</span></code>.</p>
+<p>default is <code class="docutils literal notranslate"><span class="pre">*ALL</span></code> for all the PTF image files under the image caltalog.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>elements</strong>: str</div>
+<div class="line"><strong>default</strong>: *ALL</div>
 </div>
 </dd>
 </dl>
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">get all nonconfigure disks</span>
-  <span class="nt">ibm.power_ibmi.ibmi_get_nonconfigure_disks</span><span class="p">:</span>
-    <span class="nt">joblog</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Setup IBM i Netwotk install server and add image files of group PTF for LPP 5733WQX</span>
+  <span class="nt">ibm.power_ibmi.ibmi_fix_network_install_server</span><span class="p">:</span>
+    <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;setup_and_addimgclge&#39;</span>
+    <span class="nt">rollback</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+    <span class="nt">virtual_image_name_list</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;/tmp/5733WQXPTFs/SF99433_1.bin&quot;</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;/tmp/5733WQXPTFs/SF99433_2.bin&quot;</span>
+    <span class="nt">become_user</span><span class="p">:</span> <span class="s">&quot;QSECOFR&quot;</span>
+    <span class="nt">become_user_password</span><span class="p">:</span> <span class="s">&quot;yourpassword&quot;</span>
 </pre></div>
 </div>
 </section>
+<section id="notes">
+<h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)</p>
+<p>If operation is setup_only or setup_and_addimgclge, the user who this task will run under, should be enrolled in system distribution directorty</p>
+<p>Issue ADDDIRE command to add the user to the system distribution directory entry</p>
+<p>Issue WRKDIRE command to check the current system distribution directory entries</p>
+</div>
+</section>
+<section id="see-also">
+<h2><a class="toc-backref" href="#id5">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline"></a></h2>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><span class="xref std std-ref">ibmi_fix, ibmi_fix_savf_module</span></p></li>
+</ul>
+</div>
+</section>
 <section id="return-values">
-<h2><a class="toc-backref" href="#id4">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id6">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
 <blockquote>
 <div><dl>
+<dt>start</dt><dd><div class="line-block">
+<div class="line">The task execution start time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
+</div>
+</dd>
+<dt>end</dt><dd><div class="line-block">
+<div class="line">The task execution end time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
+</div>
+</dd>
+<dt>delta</dt><dd><div class="line-block">
+<div class="line">The task execution delta time</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When rc is zero</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+</div>
+</dd>
+<dt>stdout</dt><dd><div class="line-block">
+<div class="line">The task standard output</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: CPC2102: Library TESTLIB created</div>
+</div>
+</dd>
+<dt>stderr</dt><dd><div class="line-block">
+<div class="line">The task standard error</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>type</strong>: str</div>
+<div class="line"><strong>sample</strong>: Same optical device with different configuration already exists</div>
+</div>
+</dd>
+<dt>rc</dt><dd><div class="line-block">
+<div class="line">The task return code (0 means success, non-zero means failure)</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: always</div>
+<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>sample</strong>: 255</div>
+</div>
+</dd>
+<dt>stdout_lines</dt><dd><div class="line-block">
+<div class="line">The task standard output split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;+++ success CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;CRTIMGCLG IMGCLG(ANSIBCLG1) DIR(</span><span class="se">\u0027</span><span class="s2">/home/ansiblePTFInstallTemp/</span><span class="se">\u0027</span><span class="s2">) CRTDIR(*YES)&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
+<dt>stderr_lines</dt><dd><div class="line-block">
+<div class="line">The task standard error split in lines</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>returned</strong>: When error occurs.</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
+</div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd>
 <dt>job_log</dt><dd><div class="line-block">
-<div class="line">The IBM i job log of the task executed.</div>
+<div class="line">The job log of the job executes the task.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
@@ -214,58 +398,74 @@
 </div>
 </div></blockquote>
 </dd>
-<dt>start</dt><dd><div class="line-block">
-<div class="line">The command execution start time.</div>
+<dt>image_catalog_name</dt><dd><div class="line-block">
+<div class="line">The name of image catalog on the server</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: 2019-12-02 11:07:53.757435</div>
+<div class="line"><strong>sample</strong>: REPOSVRCLG</div>
 </div>
 </dd>
-<dt>end</dt><dd><div class="line-block">
-<div class="line">The command execution end time.</div>
+<dt>device_name</dt><dd><div class="line-block">
+<div class="line">The virtual optical device name</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: 2019-12-02 11:07:54.064969</div>
+<div class="line"><strong>sample</strong>: REPOSVROPT</div>
 </div>
 </dd>
-<dt>delta</dt><dd><div class="line-block">
-<div class="line">The command execution delta time.</div>
+<dt>image_catalog_directory_name</dt><dd><div class="line-block">
+<div class="line">The path on the IBM i Network install server where the PTF image files are located.</div>
 </div>
 <div class="line-block">
 <div class="line"><strong>returned</strong>: always</div>
 <div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: 0:00:00.307534</div>
+<div class="line"><strong>sample</strong>: /etc/ibmi_ansible/fix_management/network_install</div>
 </div>
 </dd>
-<dt>disks</dt><dd><div class="line-block">
-<div class="line">all un-configure disks.</div>
+<dt>image_catalog_entries</dt><dd><div class="line-block">
+<div class="line">The image catalog entries (image file name and its index) in the image catalog after the operation</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: DMP002 DMP019 DMP005 DMP014 DMP031 DMP012</div>
+<div class="line"><strong>returned</strong>: When use operation setup_and_addmgclge, addimgclge_only, rmvimgclge_and_addimgclge, rmvimgclge_only or retrieve_image_catalog_entries</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
 </div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;SF99433_1.bin&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;SF99433_2.bin&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
 </dd>
-<dt>rc</dt><dd><div class="line-block">
-<div class="line">The command return code (0 means success, non-zero means failure).</div>
+<dt>success_list</dt><dd><div class="line-block">
+<div class="line">The image catalog entries (image file name) which are added or removed successfully</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: int</div>
+<div class="line"><strong>returned</strong>: When use operation setup_and_addmgclge, addimgclge_only, rmvimgclge_and_addimgclge, rmvimgclge_only</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
 </div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;add&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99433_1.bin&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;remove&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99433_2.bin&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
 </dd>
-<dt>rc_msg</dt><dd><div class="line-block">
-<div class="line">Meaning of the return code.</div>
+<dt>fail_list</dt><dd><div class="line-block">
+<div class="line">The image catalog entries (image file name) which are failed to be added or removed</div>
 </div>
 <div class="line-block">
-<div class="line"><strong>returned</strong>: always</div>
-<div class="line"><strong>type</strong>: str</div>
-<div class="line"><strong>sample</strong>: Success to get all un-configure disks.</div>
+<div class="line"><strong>returned</strong>: When use operation setup_and_addmgclge, addimgclge_only, rmvimgclge_and_addimgclge, rmvimgclge_only</div>
+<div class="line"><strong>type</strong>: list</div>
+<div class="line"><strong>sample</strong>:</div>
 </div>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;add&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99433_1.bin&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;remove&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99433_2.bin&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div></blockquote>
 </dd>
 </dl>
 </div></blockquote>
@@ -276,8 +476,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="ibmi_fix_repo.html" class="btn btn-neutral float-left" title="ibmi_fix_repo – Manipulate the PTF database via sqlite3" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="ibmi_host_server_service.html" class="btn btn-neutral float-right" title="ibmi_host_server_service – Manage host server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ibmi_fix_network_install_client.html" class="btn btn-neutral float-left" title="ibmi_fix_network_install_client – Install PTFs on the client via IBM i Network install" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ibmi_fix_product_check.html" class="btn btn-neutral float-right" title="ibmi_fix_product_check – Check the software product installation status for a fix" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
