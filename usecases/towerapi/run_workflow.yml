@@ -24,7 +24,7 @@
 
 - name: Display The Workflow's URL
   debug:
-    msg: "Workflow URL: {{ tower_url }}/#/workflows/{{ workflow_job.json.id }}"
+    msg: "Workflow URL: {{ tower_url | regex_replace('\\/$', '') }}/#/workflows/{{ workflow_job.json.id }}"
 
 - name: Display The Workflow's API URL
   debug:

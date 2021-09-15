@@ -3,7 +3,8 @@
 # This playbook will transfer the ptf group files to the target system according to the giving ptf group directory. Then apply the ptf group.
 
 # Command example: ansible-playbook /sync_apply_ptf_group_using_filedir.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
-# 'ptf_group_dir': '/tmp/SF99729_125'}"
+# 'ptf_group_dir': '/tmp/SF99729_125', 'delete': true}"
+# The 'delete' parameter specifies whether or not to delete the file install dir on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:
@@ -11,6 +12,7 @@
 
   vars:
     repo_server: "{{ repo_server }}"
+    deletefile: "{{ delete | default(true) }}"
 
   tasks:
     - name: Recursively find ptf group files
@@ -89,6 +91,13 @@
               debug:
                 msg: "One or more ptf group file transfer failed, quit apply ptf group action."
 
+            - name: delete the dest file dir
+              file:
+                path: "{{ path }}"
+                state: absent
+              ignore_errors: true
+              when: deletefile
+
             - name: end_host
               meta: end_host
           when: sync_result.fail_list != []
@@ -126,6 +135,13 @@
               debug:
                 msg: "PTF Group applied succesfully."
               when: apply_result.rc == 0
+
+            - name: delete the dest file dir
+              file:
+                path: "{{ path }}"
+                state: absent
+              ignore_errors: true
+              when: deletefile
 
           when: sync_result.fail_list == []
 

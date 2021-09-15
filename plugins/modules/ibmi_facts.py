@@ -315,7 +315,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 import fnmatch
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def run_module():
@@ -326,7 +326,7 @@ def run_module():
 
     result = dict(
         changed=False,
-        ansible_facts=dict()
+        ansible_facts={}
     )
 
     # supports check mode

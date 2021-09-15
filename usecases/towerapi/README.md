@@ -39,7 +39,7 @@ The implementation is still experimental and may be continuously updated.
 * **github_access_token**
   * **Type**: String
   * **Description**: The [access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) of your github repository with building playbooks.
-* **build_with_STMFs**
+* **build_with_stmfs**
   * **Type**: String
   * **Description**: Are you building your app with STMFs or PF members? Yes for SMTFs, No for PF members.
 * **cleanup**

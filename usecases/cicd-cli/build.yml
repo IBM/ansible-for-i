@@ -2,12 +2,12 @@
   - name: call CL command to build application
     ibm.power_ibmi.ibmi_cl_command:
       cmd: CRTBNDCPP PGM({{ build_lib }}/SENDMSG) SRCSTMF('{{ build_path }}/sendMsg.c')
-  when: build_with_STMFs
+  when: build_with_stmfs
   delegate_to: 'build_system'
 
 - block:
     - name: build cl program
       ibm.power_ibmi.ibmi_cl_command:
         cmd: CRTCLPGM PGM({{ build_lib }}/SAMPLECL) SRCFILE({{ build_lib }}/QCLSRC)
-  when: not build_with_STMFs
+  when: not build_with_stmfs
   delegate_to: 'build_system'

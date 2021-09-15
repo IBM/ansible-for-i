@@ -12,6 +12,7 @@ Role Variables
 ptf group's files should be in this folder. |
 | `src_host`            | str           | The system that has the src ptf group's files, which will be transferred to the target system.|
 | `dest`                | str           | The path that ptf group files would be transferred to. Default is "~".  |
+| `delete`              | bool          | Whether or not to delete the PTF group install dir after apply. The default is True.  |
 
 Return Variables
 --------------

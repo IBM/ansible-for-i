@@ -79,6 +79,8 @@
         - ptf.PTF_LOADED_STATUS != "APPLIED"
         - ptf.PTF_LOADED_STATUS != "PERMANENTLY APPLIED"
         - ptf.PTF_LOADED_STATUS != "SUPERSEDED"
+        # There is an bug in 7.3 and before, but sqlservice won't change this in the future.
+        - ptf.PTF_LOADED_STATUS != "SUPERCEDED"
       with_list: "{{ ptf_info.ptf_list }}"
       loop_control:
         loop_var: ptf

@@ -6,7 +6,8 @@
 
 # Command example: ansible-playbook /sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
 # 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP',
-# 'delayed_option': '*IMMDLY', 'auto_ipl': false}"
+# 'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
+# The 'delete' parameter specifies whether or not to delete the PTF install savf on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:
@@ -39,10 +40,12 @@
     - name: Print find success list in catalog
       debug:
         var: fix_repo_find_result.success_list
+      when: fix_repo_find_result.success_list is defined
 
     - name: Print find failed list in catalog
       debug:
         var: fix_repo_find_result.fail_list
+      when: fix_repo_find_result.fail_list is defined
 
     - name: Include check_ptf role to determine which ptfs need to apply
       include_role:

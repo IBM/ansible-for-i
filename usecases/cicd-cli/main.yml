@@ -1,7 +1,7 @@
 - hosts: localhost
 
   vars:
-    build_with_STMFs: false       # Build with STMFs or PF members
+    build_with_stmfs: false       # Build with STMFs or PF members
     provision: true               # If you want provision a new VM for each build by leveraging PowerVC
     git_repo_url: '<your-git-repo-url>'
     git_branch: '<your-git-branch>'

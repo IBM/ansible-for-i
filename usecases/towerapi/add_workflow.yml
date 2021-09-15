@@ -78,11 +78,11 @@
               required: false
               default: "{{ github_access_token }}"
             - type: text
-              question_name: build_with_STMFs?
-              question_description: build_with_STMFs?
-              variable: build_with_STMFs
+              question_name: build_with_stmfs?
+              question_description: build_with_stmfs?
+              variable: build_with_stmfs
               required: false
-              default: "{{ build_with_STMFs }}"
+              default: "{{ build_with_stmfs }}"
             - type: text
               question_name: cleanup?
               question_description: cleanup?
@@ -154,11 +154,11 @@
               required: false
               default: "{{ github_access_token }}"
             - type: text
-              question_name: build_with_STMFs?
-              question_description: build_with_STMFs?
-              variable: build_with_STMFs
+              question_name: build_with_stmfs?
+              question_description: build_with_stmfs?
+              variable: build_with_stmfs
               required: false
-              default: "{{ build_with_STMFs }}"
+              default: "{{ build_with_stmfs }}"
             - type: text
               question_name: cleanup?
               question_description: cleanup?

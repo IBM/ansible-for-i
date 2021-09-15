@@ -100,7 +100,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 def get_ptf_info(db_connection, ptf_list):
@@ -111,7 +111,7 @@ def get_ptf_info(db_connection, ptf_list):
           " PTF_STATUS_TIMESTAMP, PTF_CREATION_TIMESTAMP" \
           " FROM QSYS2.PTF_INFO WHERE UPPER(PTF_IDENTIFIER) IN ('" + str_ptf_list + "')"
     out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
-    out = dict()
+    out = {}
     if (out_result_set is not None):
         for result in out_result_set:
             result_map = {

@@ -3,9 +3,9 @@
 # This playbook will get the PTF group information in catalog. Then call sync_apply_ptf_group role to transfer the PTF group files
 # to the target system. Then apply.
 
-# Command example: ansible-playbook ./sync_apply_ptf_group.yml -e \
-# "{'target_system': 'systemA', 'repo_server': 'reposerver', \
-# 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
+# Command example: ansible-playbook ./sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group':
+# {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'delete': true}"
+# The 'delete' parameter specifies whether or not to delete the file install dir on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:
@@ -21,10 +21,11 @@
         type: "ptf_group"
         checksum: true
         action: "find"
-        parameters: |
+        parameters:
           - "{{ {'ptf_group_number': ptf_group.ptf_group_number, \
-             'ptf_group_level': ptf_group.ptf_group_level | default(omit), \
-             'release_date': ptf_group.release_date | default(omit), 'additional_param':'ORDER BY release_date DESC LIMIT 1'} }}"
+            'ptf_group_level': ptf_group.ptf_group_level | default(omit), \
+            'release_date': ptf_group.release_date | default(omit), \
+            'additional_param':'ORDER BY release_date DESC LIMIT 1'} }}"
       delegate_to: "{{ repo_server }}"
       register: fix_repo_find_result
 
@@ -44,11 +45,11 @@
       ibmi_fix_repo:
         type: "download_status"
         action: "find"
-        parameters: |
+        parameters:
           - "{{ {'ptf_group_number': ptf_group.ptf_group_number, \
-             'ptf_group_level': ptf_group.ptf_group_level | default(omit), \
-             'release_date': ptf_group.release_date | default(omit), \
-             'additional_param':'ORDER BY release_date DESC LIMIT 1'} }}"
+            'ptf_group_level': ptf_group.ptf_group_level | default(omit),\
+            'release_date': ptf_group.release_date | default(omit), \
+            'additional_param':'ORDER BY release_date DESC LIMIT 1'} }}"
       delegate_to: "{{ repo_server }}"
       register: download_status_find_result
 

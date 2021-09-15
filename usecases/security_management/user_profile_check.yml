@@ -1,0 +1,532 @@
+---
+- set_fact:
+    check_result_file: /tmp/security_management_userprofile_check_result-{{ inventory_hostname }}-{{ timestamp }}.json
+
+- name: 3.1 PUBLIC authority to all user profiles should be EXCLUDE
+        with the following exception QDBSHR QDBSHRDO QTMPLPD
+  ibmi_sql_query:
+    sql: "SELECT ALL
+    SYS_ONAME, OBJTYPE, USER_NAME, OBJ_AUTH
+    FROM QSYS2.OBJ_PRIV T01
+    WHERE OBJTYPE = '*USRPRF'
+    AND SYS_ONAME NOT IN ('QDBSHR', 'QDBSHRDO', 'QTMPLPD')
+    AND USER_NAME = '*PUBLIC'
+    AND OBJ_AUTH <> '*EXCLUDE'"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check31
+  ignore_errors: true
+
+- block:
+    - set_fact:
+        check31_failed_items: |
+          {{ check31.row | map(attribute='SYS_ONAME') | join(', ') }}
+    - set_fact:
+        check31_result: |
+          {{ check31_result | default({}) |
+          combine ({ item.key : item.value }) }}
+      with_items:
+        - {'key': 'id', 'value': '3.1'}
+        - {'key': 'desc', 'value': '3.1 PUBLIC authority to all user
+          profiles should be EXCLUDE with the following exceptions
+          QDBSHR QDBSHRDO QTMPLPD'}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': '{{ check31_failed_items }}'}
+        - {'key': 'remediation', 'value': 'GRTOBJAUT OBJ(SYSO_NAME_REPLACE)
+          OBJTYPE(*USRPRF) USER(*PUBLIC) AUT(*EXCLUDE) REPLACE(*YES)'}
+  when: check31.row_count != 0
+
+- set_fact:
+    check31_result: "{{ check31_result | default({}) |
+      combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.1'}
+    - {'key': 'desc', 'value': '3.1 PUBLIC authority to all user
+      profiles should be EXCLUDE with the following exceptions
+      QDBSHR QDBSHRDO QTMPLPD'}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check31.row_count == 0
+
+- name: 3.2 All Private authorities to all user profiles other than the
+        owner's and the profile itself should be removed.
+  ibmi_sql_query:
+    sql: "SELECT SYS_ONAME, OBJTYPE, USER_NAME, OBJ_AUTH FROM QSYS2.OBJ_PRIV
+          LEFT OUTER JOIN QSYS2.GROUPLIST
+          ON SYS_ONAME = GROUPNAME WHERE OBJTYPE = '*USRPRF' AND
+          SYS_ONAME <> USER_NAME AND USER_NAME <> OWNER
+          AND USER_NAME <> '*PUBLIC'
+          AND USERNAME IS NULL
+          AND SYS_ONAME CONCAT USER_NAME NOT IN
+          ('QGATEQSNADS', 'QMQMQMQMADM', 'QMSFQTCP',
+          'QSPLJOBQSPL', 'QTCPQMSF', 'QTMHHTTPQCLUSTER')"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check32
+  ignore_errors: true
+
+- block:
+    - set_fact:
+        check32_failed_items: |
+          {{ check32.row | map(attribute='SYS_ONAME') | join(', ') }}
+        check32_failed_by: |
+          {{ check32.row | map(attribute='USER_NAME') | join(', ') }}
+    - set_fact:
+        check32_result: |
+          {{ check32_result | default({}) |
+          combine ({ item.key : item.value }) }}
+
+      with_items:
+        - {'key': 'id', 'value': '3.2'}
+        - {'key': 'desc', 'value': "3.2 All Private authorities to all user
+            profiles other than the owner's and the profile itself
+            should be removed."}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': '{{ check32_failed_items }}'}
+        - {'key': 'failed_by', 'value': '{{ check32_failed_by }}'}
+        - {'key': 'remediation', 'value': 'RVKOBJAUT OBJ(SYSO_NAME_REPLACE)
+            OBJTYPE(*USRPRF) USER(USER_NAME_REPLACE) AUT(*ALL)'}
+  when: check32.row_count != 0
+
+- set_fact:
+    check32_result: "{{ check32_result | default({}) |
+      combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.2'}
+    - {'key': 'desc', 'value': "3.2 All Private authorities to all user
+        profiles other than the owner's and the profile itself should
+        be removed."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check32.row_count == 0
+
+- name: 3.3 All IBM Supplied Profiles shall be owned by QSYS with the
+        following exceptions
+        QFAXMSF shall be owned by QAUTPROF
+        QRDARS400xx shall be owned by QRDARS400
+        QTIVOLI, QTIVROOT and QTIVUSER shall be owned by QTIVOLI
+        Non-IBM (user created) profiles shall be owned by QSECOFR or QSYS
+  ibmi_sql_query:
+    sql: "SELECT ALL SYS_ONAME, OBJTYPE, OWNER FROM QSYS2.OBJ_PRIV
+          WHERE OBJTYPE = '*USRPRF' AND USER_NAME = '*PUBLIC'
+          AND OWNER NOT IN ('QSECOFR', 'QSYS')"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check33
+  ignore_errors: true
+
+- block:
+    - set_fact:
+        check33_failed_items: "{{ check33.row | map(attribute='SYS_ONAME') | join(', ') }}"
+    - set_fact:
+        check33_result: "{{ check33_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '3.3'}
+        - {'key': 'desc', 'value': "3.3 All IBM Supplied Profiles shall be owned by QSYS
+            with the following exceptions QFAXMSF shall be owned by QAUTPROF QRDARS400xx
+            shall be owned by QRDARS400 QTIVOLI, QTIVROOT and QTIVUSER shall be owned by QTIVOLI
+            Non-IBM (user created) profiles shall be owned by QSECOFR or QSYS."}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': '{{ check33_failed_items }}'}
+        - {'key': 'remediation', 'value': 'CHGOBJOWN OBJ(SYS_ONAME_REPLACE) OBJTYPE(*USRPRF)
+            NEWOWN(QSECOFR) CUROWNAUT(*REVOKE)'}
+  when: check33.row_count != 0
+
+- set_fact:
+    check33_result: "{{ check33_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.3'}
+    - {'key': 'desc', 'value': "3.3 All IBM Supplied Profiles shall be owned by QSYS with the
+        following exceptions
+        QFAXMSF shall be owned by QAUTPROF QRDARS400xx shall be owned by QRDARS400
+        QTIVOLI, QTIVROOT and QTIVUSER shall be owned by QTIVOLI
+        Non-IBM (user created) profiles shall be owned by QSECOFR or QSYS."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check33.row_count == 0
+
+- name: 3.6 Default passwords provide an opportunity for someone to enter your system,
+        if someone knows your policy for assigning profile names and knows that a new person is joining
+        your organization. Additionally, accounts with default passwords are often used
+        for shared (non-unique) accounts. Tell the new user the password confidentially, such as
+        in a "Welcome to the System" letter that outlines your security policies. Require the user to change
+        the password the first time that the user signs on by setting the user profile to PWDEXP(*YES)
+  ibmi_sql_query:
+    sql: "SELECT ALL
+          USER_NAME, STATUS, DFTPWD, PWDEXP
+          FROM QSYS2.USER_INFO T01
+          WHERE DFTPWD = 'YES' and PWDEXP != 'YES'"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check36
+  ignore_errors: true
+
+- block:
+    - set_fact:
+        check36_failed_items: "{{ check36.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+    - set_fact:
+        check36_result: "{{ check36_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '3.6'}
+        - {'key': 'desc', 'value': "3.6 Default passwords provide an opportunity for someone to enter your system,
+            if someone knows your policy for assigning profile names and knows that a new person is joining
+            your organization. Additionally, accounts with default passwords are often used
+            for shared (non-unique) accounts. Tell the new user the password confidentially, such as
+            in a 'Welcome to the System' letter that outlines your security policies. Require the user to change
+            the password the first time that the user signs on by setting the user profile to PWDEXP(*YES)."}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': '{{ check36_failed_items }}'}
+        - {'key': 'remediation', 'value': 'CHGUSRPRF USRPRF(USER_NAME_REPLACE) PWDEXP(*YES)'}
+  when: check36.row_count != 0
+
+- set_fact:
+    check36_result: "{{ check36_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.6'}
+    - {'key': 'desc', 'value': "3.6 Default passwords provide an opportunity for someone to enter your system,
+            if someone knows your policy for assigning profile names and knows that a new person is joining
+            your organization. Additionally, accounts with default passwords are often used
+            for shared (non-unique) accounts. Tell the new user the password confidentially, such as
+            in a 'Welcome to the System' letter that outlines your security policies. Require the user to change
+            the password the first time that the user signs on by setting the user profile to PWDEXP(*YES)."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check36.row_count == 0
+
+- name: 3.7 Disable inactive user profiles within 90 days.
+  ibmi_sql_query:
+    sql: "SELECT ALL
+                      USER_NAME, STATUS, LASTUSED
+                      FROM QSYS2.USER_INFO T01
+                      WHERE STATUS = '*ENABLED'
+                      AND LASTUSED <= CURRENT_TIMESTAMP - 90 DAYS
+                      OR STATUS = '*ENABLED'
+                      AND LASTUSED IS NULL"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check37
+
+- block:
+    - set_fact:
+        check37_failed_items: "{{ check37.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+    - set_fact:
+        check37_result: "{{ check37_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '3.7'}
+        - {'key': 'desc', 'value': "3.7 Disable inactive user profiles within 90 days."}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': '{{ check37_failed_items }}'}
+        - {'key': 'remediation', 'value': 'CHGUSRPRF USRPRF(USER_NAME_REPLACE) STATUS(*DISABLED)'}
+  when: check37.row_count != 0
+
+- set_fact:
+    check37_result: "{{ check37_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.7'}
+    - {'key': 'desc', 'value': "3.7 Disable inactive user profiles within 90 days."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check37.row_count == 0
+
+- name: 3.8 User Profiles with non-expiring passwords are never required to change their
+        Service accounts may be excluded from the audit and remediation.
+        A service account is a user account that is created explicitly to provide a security context
+        for automated system and application services running on the system.
+        Service accounts should be configured with a non-trivial, complex password that is used
+        in an automated service process and never used interactively.
+        Service accounts should be documented and their Password expiration interval should be set to *NOMAX.
+        A process should then be documented and executed to periodically change their passwords manually
+  ibmi_sql_query:
+    sql: "SELECT ALL
+          USER_NAME, STATUS, PWDEXPITV, LASTUSED
+          FROM QSYS2.USER_INFO T01
+          WHERE PWDEXPITV = -1"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check38
+
+- block:
+    - set_fact:
+        check38_failed_items: "{{ check38.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+    - set_fact:
+        check38_result: "{{ check38_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '3.8'}
+        - {'key': 'desc', 'value': "3.8 User Profiles with non-expiring passwords are never required to change their
+            Service accounts may be excluded from the audit and remediation.
+            A service account is a user account that is created explicitly to provide a security context
+            for automated system and application services running on the system.
+            Service accounts should be configured with a non-trivial, complex password that is used
+            in an automated service process and never used interactively.
+            Service accounts should be documented and their Password expiration interval should be set to *NOMAX.
+            A process should then be documented and executed to periodically change their passwords manually."}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': '{{ check38_failed_items }}'}
+        - {'key': 'remediation', 'value': 'CHGUSRPRF USRPRF(USER_NAME_REPLACE) PWDEXPITV(*SYSVAL)'}
+  when: check38.row_count != 0
+
+- set_fact:
+    check38_result: "{{ check38_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.8'}
+    - {'key': 'desc', 'value': "3.8 User Profiles with non-expiring passwords are never required to change their
+            Service accounts may be excluded from the audit and remediation.
+            A service account is a user account that is created explicitly to provide a security context
+            for automated system and application services running on the system.
+            Service accounts should be configured with a non-trivial, complex password that is used
+            in an automated service process and never used interactively.
+            Service accounts should be documented and their Password expiration interval should be set to *NOMAX.
+            A process should then be documented and executed to periodically change their passwords manually."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check38.row_count == 0
+
+- name: 3.9 User Profiles with command line access can run commands they are authorized to from a command line.
+  ibmi_sql_query:
+    sql: "SELECT ALL
+          USER_NAME, STATUS, LMTCPB, SPCAUT
+          FROM QSYS2.USER_INFO T01
+          WHERE LMTCPB <> '*YES'"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check39
+
+- block:
+    - set_fact:
+        check39_failed_items: "{{ check39.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+    - set_fact:
+        check39_result: "{{ check39_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '3.9'}
+        - {'key': 'desc', 'value': "3.9 User Profiles with command line access can run commands
+            they are authorized to from a command line."}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': '{{ check39_failed_items }}'}
+        - {'key': 'remediation', 'value': 'CHGUSRPRF USRPRF(USER_NAME_REPLACE) LMTCPB(*YES)'}
+  when: check39.row_count != 0
+
+- set_fact:
+    check39_result: "{{ check39_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.9'}
+    - {'key': 'desc', 'value': "3.9 User Profiles with command line access can run commands they are
+        authorized to from a command line."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check39.row_count == 0
+
+- name: 3.10A This section contains information about the IBM-Supplied user profiles that are shipped with
+        the system and Licensed Program Products. These profiles are used as object owners for various
+        system functions. Some system functions also run under specific IBM-supplied user profiles.
+  ibmi_sql_query:
+    sql: "SELECT AUTHORIZATION_NAME, NO_PASSWORD_INDICATOR, STATUS,
+          USER_CLASS_NAME, INITIAL_PROGRAM_NAME,
+          LIMIT_CAPABILITIES, SPECIAL_AUTHORITIES
+          FROM QSYS2.USER_INFO WHERE AUTHORIZATION_NAME LIKE 'Q%' AND
+          NO_PASSWORD_INDICATOR = 'NO' OR AUTHORIZATION_NAME LIKE 'Q%'
+          AND STATUS = '*DISABLED' OR AUTHORIZATION_NAME LIKE 'Q%'
+          AND USER_CLASS_NAME <> '*USER' OR AUTHORIZATION_NAME LIKE 'Q%' AND
+          INITIAL_PROGRAM_NAME <> '*NONE' OR AUTHORIZATION_NAME LIKE 'Q%' AND
+          LIMIT_CAPABILITIES <> '*NO' OR AUTHORIZATION_NAME LIKE 'Q%' AND SPECIAL_AUTHORITIES <> '*NONE'"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check310A
+
+- block:
+    - set_fact:
+        check310A_result: "{{ check310A_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '3.10A'}
+        - {'key': 'desc', 'value': "3.10A Check some parameters if they  match the
+           default values that are used for all IBM-supplied user profiles."}
+        - {'key': 'sql', 'value': "SELECT AUTHORIZATION_NAME, NO_PASSWORD_INDICATOR, STATUS,
+              USER_CLASS_NAME, INITIAL_PROGRAM_NAME,
+              LIMIT_CAPABILITIES, SPECIAL_AUTHORITIES
+              FROM QSYS2/USER_INFO WHERE AUTHORIZATION_NAME LIKE 'Q%' AND
+              NO_PASSWORD_INDICATOR = 'NO' OR AUTHORIZATION_NAME LIKE 'Q%' AND STATUS =
+              '*DISABLED' OR AUTHORIZATION_NAME LIKE 'Q%' AND USER_CLASS_NAME <> '*USER'
+              OR AUTHORIZATION_NAME LIKE 'Q%' AND INITIAL_PROGRAM_NAME <> '*NONE' OR
+              AUTHORIZATION_NAME LIKE 'Q%' AND LIMIT_CAPABILITIES <> '*NO' OR
+              AUTHORIZATION_NAME LIKE 'Q%' AND SPECIAL_AUTHORITIES <> '*NONE'"}
+        - {'key': 'remediation', 'value': "Review the results. This indicates that one or more of
+              the following parameters of the profiles
+              in the list does not match the default values that are used for all IBM-supplied user profiles.
+                  x NO_PASSWORD_INDICATOR (PASSWORD) = YES (Default)
+                  x STATUS (STATUS) = *ENABLED (Default)
+                  x USER_CLASS_NAME (USRCLS) = *USER (Default)
+                  x INITIAL_PROGRAM_NAME (INLPGM) = *NONE (Default)
+                  x LIMIT_CAPABILITIES (LMTCPB) = *NO (Default)
+                  x SPECIAL_AUTHORITIES (SPCAUT) = *NONE (Default)
+                  x Compare the results of the screen output to information about IBM-supplied
+              profiles, their purpose, and values for any IBM-supplied profiles that are different
+              from the defaults from the shipped defaults from the following link.
+              https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/rzarl/rzarlibmprfa.htm"}
+        - {'key': 'result', 'value': 'FAIL'}
+  when: check310A.row_count != 0
+
+- set_fact:
+    check310A_result: "{{ check310A_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.10A'}
+    - {'key': 'desc', 'value': "3.10A Check some parameters if they match the default values
+        that are used for all IBM-supplied user profiles."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check310A.row_count == 0
+
+- name: 3.10B To check if IBM Supplied Profiles are being used as Group Profiles.
+  ibmi_sql_query:
+    sql: "SELECT T01.GROUPNAME, T01.USERNAME FROM QSYS2.GROUPLIST T01 INNER JOIN
+          QSYS2.USER_INFO T02 ON T01.GROUPNAME = T02.USER_NAME WHERE
+          T02.USER_NAME LIKE 'Q%'
+          AND T02.USER_NAME NOT IN ('QBRMS', 'QMQMADM', 'QONDADM',
+          'QRDARS400', 'QRDARSADM', 'QWQADMIN')"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check310B
+
+- block:
+    - set_fact:
+        check310B_result: "{{ check310B_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '3.10B'}
+        - {'key': 'desc', 'value': "3.10B To check if IBM Supplied Profiles are being used as Group Profiles."}
+        - {'key': 'sql', 'value': "SELECT T01.GROUPNAME, T01.USERNAME FROM QSYS2.GROUPLIST T01 INNER JOIN
+              QSYS2.USER_INFO T02 ON T01.GROUPNAME = T02.USER_NAME WHERE
+              T02.USER_NAME LIKE 'Q%'
+              AND T02.USER_NAME NOT IN ('QBRMS', 'QMQMADM', 'QONDADM',
+              'QRDARS400', 'QRDARSADM', 'QWQADMIN')"}
+        - {'key': 'remediation', 'value': "Review the results of the screen output. The following are
+            valid exclusions from the audit.
+                x QBRMS
+                x QMQMADM
+                x QONDADM
+                x QRDARS400
+                x QRDARSADM
+                x QWQADMIN
+
+              Remediation:
+                x Change any IBM-Supplied user profile found in the audit that are different from the
+                defaults or values different from the list in the referenced table
+                https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/rzarl/rzarlibmsppl.htm
+                        CHGUSRPRF USRPRF(<xxxxxx>) <parameter>(<xxxxxx>)
+                x Change any User Profile that is a group member of an IBM-Supplied user profile
+                found in the audit to remove the IBM-Supplied user profile from its Group (GRPPRF)
+                and/or Supplemental Group (SUPGRPPRF) paramaters.
+                        CHGUSRPRF USRPRF(<xxxxxx>) GRPPRF(<xxxxxx>) SUPGRPPRF(<xxxxxx>)
+              Impact:
+                Functions using the authorities and parameters of any profile you change may fail. You may
+                want to contact IBM or your business partner for guidance prior to making any changes.
+
+              References:
+              1. https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/rzarl/rzarlibmprfa.htm
+
+              2. https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/rzarl/rzarldftusrprf.htm
+
+              3. https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/rzarl/rzarlibmsppl.htm"}
+        - {'key': 'result', 'value': 'FAIL'}
+  when: check310B.row_count != 0
+
+- set_fact:
+    check310B_result: "{{ check310B_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.10B'}
+    - {'key': 'desc', 'value': "3.10B To check if IBM Supplied Profiles are being used as Group Profiles."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check310B.row_count == 0
+
+- name: 3.11 Group profiles should not have a password as they are usually not associated with a unique account.
+  ibmi_sql_query:
+    sql: "SELECT All
+          T01.GROUPNAME, T02.NOPWD
+          FROM QSYS2.GROUPLIST T01 INNER JOIN
+          QSYS2.USER_INFO T02
+          ON T01.GROUPNAME = T02.USER_NAME
+          WHERE T02.NOPWD = 'NO'"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check311
+
+- block:
+    - set_fact:
+        check311_failed_items: "{{ check311.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+    - set_fact:
+        check311_result: "{{ check311_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '3.11'}
+        - {'key': 'desc', 'value': "Group profiles should not have a password as they are usually
+            not associated with a unique account."}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': '{{ check311_failed_items }}'}
+        - {'key': 'remediation', 'value': 'CHGUSRPRF USRPRF(USER_NAME_REPLACE) PASSWORD(*NONE)'}
+  when: check311.row_count != 0
+
+- set_fact:
+    check311_result: "{{ check311_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '3.11'}
+    - {'key': 'desc', 'value': "Group profiles should not have a password as they are usually
+        not associated with a unique account."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check311.row_count == 0
+
+- name: 5.1 QSECOFR Profile Shall Be DISABLED
+  ibmi_sql_query:
+    sql: "SELECT * FROM QSYS2.USER_INFO
+          WHERE USER_NAME = 'QSECOFR' AND STATUS = '*ENABLED'"
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check51
+
+- block:
+    - set_fact:
+        check51_result: "{{ check51_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '5.1'}
+        - {'key': 'desc', 'value': "QSECOFR Profile Shall Be DISABLED."}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': 'QSECOFR'}
+        - {'key': 'remediation', 'value': 'CHGUSRPRF USRPRF(QSECOFR) STATUS(*DISABLED)'}
+  when: check51.row_count == 1
+
+- set_fact:
+    check51_result: "{{ check51_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '5.1'}
+    - {'key': 'desc', 'value': "QSECOFR Profile Shall Be DISABLED."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: check51.row_count == 0
+
+- name: 5.2 QSECOFR Shall Not be Configured as a Group Profile
+  ibmi_cl_command:
+    cmd: DSPUSRPRF USRPRF(QSECOFR) TYPE(*GRPMBR)
+    joblog: true
+    become_user: '{{ become_user_name }}'
+    become_user_password: '{{ become_user_password }}'
+  register: check52
+  ignore_errors: true
+
+- block:
+    - set_fact:
+        check52_result: "{{ check52_result | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'key': 'id', 'value': '5.2'}
+        - {'key': 'desc', 'value': "QSECOFR Shall Not be Configured as a Group Profile."}
+        - {'key': 'result', 'value': 'FAIL'}
+        - {'key': 'vulnerables', 'value': 'QSECOFR'}
+        - {'key': 'remediation', 'value': 'CHGUSRPRF USRPRF(QSECOFR) GRPPRF(*NONE)'}
+  when: "'CPF2257: User profile QSECOFR not a group profile' not in check52.stderr"
+
+- set_fact:
+    check52_result: "{{ check52_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'id', 'value': '5.2'}
+    - {'key': 'desc', 'value': "QSECOFR Shall Not be Configured as a Group Profile."}
+    - {'key': 'result', 'value': 'PASS'}
+  when: "'CPF2257: User profile QSECOFR not a group profile' in check52.stderr"
+
+- set_fact:
+    report: "{{ [check31_result] + [check32_result] + [check33_result] + [check36_result]
+      + [check37_result]  + [check38_result]  + [check39_result] + [check310A_result]
+        + [check310B_result]  + [check311_result]  + [check51_result] + [check52_result]}}"
+
+- name: Generate report to file
+  copy:
+    content: "{{ report | to_nice_json(sort_keys=False) }}"
+    dest: '{{ check_result_file }}'
+
+- name: Check completes
+  debug:
+    msg: Security check report generated successfully, please review at {{ check_result_file }}

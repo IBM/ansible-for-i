@@ -156,7 +156,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 sysval_array = [
@@ -227,7 +227,7 @@ def chk_system_value(current, expect, check='equal'):
 
 
 def get_system_value(imodule, sysvaluename, expect=None, check='equal'):
-    sysvalue = dict()
+    sysvalue = {}
     sysvalue['rc'] = 0
     sysvalue['name'] = sysvaluename.strip().upper()
     for value in sysval_array:

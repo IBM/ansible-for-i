@@ -160,7 +160,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def return_error(module, ibmi_module, error, out, startd, result):
@@ -213,7 +213,7 @@ def main():
         if not os.path.isfile(src):
             return_error(module, ibmi_module, "src {p_src} doesn't exist.".format(p_src=src), '', startd, result)
 
-        with open(src, "r") as f:
+        with open(src, "r", encoding='utf-8') as f:
             ibmi_util.log_debug("open file: " + src, module._name)
 
             command = ''

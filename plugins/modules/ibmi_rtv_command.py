@@ -147,7 +147,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -167,7 +167,7 @@ def main():
 
     command = module.params['cmd'].strip().upper()
     char_vars = module.params['char_vars']
-    args_dict = dict()
+    args_dict = {}
     if char_vars:
         char_vars = [item.strip().upper() for item in char_vars]
         for item in char_vars:
@@ -181,7 +181,7 @@ def main():
     become_user = module.params['become_user']
     become_user_password = module.params['become_user_password']
 
-    out = dict()
+    out = {}
     if (not char_vars) and (not number_vars):
         module.fail_json(msg='At least one of the option char_vars or number_vars must contain value')
     try:

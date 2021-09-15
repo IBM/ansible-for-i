@@ -1,10 +1,11 @@
 ---
-- name: Sync and apply individual ptf files
-# This playbook will transfer the individual ptf file to the target system according to the giving directory. Then apply the ptf.
-# Only supports individual ptf downloaded as Binary file
+- name: Sync and apply ptf files
+# This playbook will transfer the ptf files to the target system. Then apply ptf.
+# Before use this playbook, make sure you have used the copy_individual_ptf_to_repo.yml to transfer files to repo server, then the ptf dir
+# on repo server should be formatted as ~/PTF/ptf_number.
 
-# Command example, type is 'bin': ansible-playbook /sync_apply_individual_ptf_using_filedir.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
-# 'ptf_dir': '/tmp/SI63556', 'delete': true}"
+# Command example: ansible-playbook /sync_apply_individual_ptf_using_ptfinfo.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
+# 'ptf_number': 'SI69385', 'delete': true}"
 # The 'delete' parameter specifies whether or not to delete the file install dir on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
@@ -13,12 +14,21 @@
 
   vars:
     repo_server: "{{ repo_server }}"
+    ptf_number: "{{ ptf_number }}"
     deletefile: "{{ delete | default(true) }}"
 
   tasks:
+    - name: set_fact
+      set_fact:
+        repo_dir: "~/PTF/{{ ptf_number }}"
+
+    - name: Print repo_dir
+      debug:
+        var: repo_dir
+
     - name: Recursively find ptf files
       find:
-        paths: "{{ ptf_dir }}"
+        paths: "{{ repo_dir }}"
         recurse: true
       delegate_to: "{{ repo_server }}"
       register: find_result
@@ -29,16 +39,12 @@
 
     - name: quit
       fail:
-        msg: "ptf_dir: {{ ptf_dir }} is not valid or doesn't contain any file, quit."
+        msg: "repo_dir: {{ repo_dir }} is not valid or doesn't contain any file, quit."
       when: find_result.matched == 0
 
     - name: Compose target tmp dir str
       set_fact:
-        path: "~/PTF/{{ ptf_dir | basename }}"
-
-    - name: Print path
-      debug:
-        var: path
+        path: "{{ repo_dir }}"
 
     - name: Clear receive dir
       file:
@@ -75,6 +81,10 @@
         - name: debug src_list
           debug:
             var: src_list
+
+        # - name: Print path
+        #   debug:
+        #     var: path
 
         - name: Transfer image to target_system
           ibm.power_ibmi.ibmi_synchronize_files:
@@ -117,7 +127,7 @@
             var: path
 
         - block:
-            - name: Apply PTF using bin file
+            - name: Apply PTF
               ibm.power_ibmi.ibmi_fix_imgclg:
                 src: '{{ path }}'
                 apply_type: "*IMMDLY"

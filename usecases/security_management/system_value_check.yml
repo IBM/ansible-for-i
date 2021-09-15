@@ -1,0 +1,32 @@
+---
+- name: Checking system value {{ sysval.name }}
+  ibmi_sysval:
+    sysvalue:
+      - "{{ sysval }}"
+    become_user: "{{ become_user_name }}"
+    become_user_password: "{{ become_user_password }}"
+  register: check
+  ignore_errors: true
+
+- set_fact:
+    itemized_result: "{{ itemized_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'name', 'value': "{{ check.fail_list[0]['name'] }}"}
+    - {'key': 'expect', 'value': "{{ check.fail_list[0]['expect'] }}"}
+    - {'key': 'actual', 'value': "{{ check.fail_list[0]['value'] }}"}
+    - {'key': 'check', 'value': "{{ check.fail_list[0]['check'] }}"}
+    - {'key': 'compliant', 'value': "{{ check.fail_list[0]['compliant'] }}"}
+  when: check.rc != 0
+
+- set_fact:
+    itemized_result: "{{ itemized_result | default({}) | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {'key': 'name', 'value': "{{ check.sysval[0]['name'] }}"}
+    - {'key': 'expect', 'value': "{{ check.sysval[0]['expect'] }}"}
+    - {'key': 'actual', 'value': "{{ check.sysval[0]['value'] }}"}
+    - {'key': 'check', 'value': "{{ check.sysval[0]['check'] }}"}
+    - {'key': 'compliant', 'value': "{{ check.sysval[0]['compliant'] }}"}
+  when: check.rc == 0
+
+- set_fact:
+    report: "{{ report|default([]) + [itemized_result] }}"

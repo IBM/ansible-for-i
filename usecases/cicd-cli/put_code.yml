@@ -24,7 +24,7 @@
     - name: put STMFs to remote IBM i
       shell:
         cmd: 'sshpass -p "{{ build_system_pass }}" {{ transfer_command }}'
-  when: build_with_STMFs
+  when: build_with_stmfs
 
 - block:
     - name: CRTSRCPF on remote IBM i
@@ -39,4 +39,4 @@
         put {{ local_workspace }}/samplecl.txt QCLSRC.SAMPLECL
         bye
         EOF
-  when: not build_with_STMFs
+  when: not build_with_stmfs

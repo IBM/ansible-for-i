@@ -2,219 +2,84 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 - hosts: all
-  gather_facts: false
+  gather_facts: true
   collections:
     - ibm.power_ibmi
 
   vars:
     become_user_name: null
     become_user_password: null
+    success_list: []
+    fail_list: []
+    skip_list: []
 
   tasks:
-    - name: 3.1 PUBLIC authority to all user profiles should be EXCLUDE with the following exceptions
-            QDBSHR QDBSHRDO QTMPLPD
-      ibmi_sql_query:
-        sql: "SELECT ALL
-        SYS_ONAME, OBJTYPE, USER_NAME, OBJ_AUTH
-        FROM QSYS2.OBJ_PRIV T01
-        WHERE OBJTYPE = '*USRPRF'
-        AND SYS_ONAME NOT IN ('QDBSHR', 'QDBSHRDO', 'QTMPLPD')
-        AND USER_NAME = '*PUBLIC'
-        AND OBJ_AUTH <> '*EXCLUDE'"
-        expected_row_count: 0
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      ignore_errors: true
+    - pause:
+        prompt: |
+          You're going to do user profile security compliance check on {{ ansible_ssh_host }}
+          Please input A,B or C for mode selection:
+          Check only(A) / Remediate only(B) / Check and Remediate(C)
+      register: mode
 
-    - name: 3.2 All Private authorities to all user profiles other than the owner's and the profile itself should be removed.
-      ibmi_sql_query:
-        sql: "SELECT SYS_ONAME, OBJTYPE, USER_NAME, OBJ_AUTH FROM QSYS2.OBJ_PRIV LEFT OUTER JOIN QSYS2.GROUPLIST
-        ON SYS_ONAME = GROUPNAME WHERE OBJTYPE = '*USRPRF' AND SYS_ONAME <> USER_NAME AND USER_NAME <> OWNER
-        AND USER_NAME <> '*PUBLIC'
-        AND USERNAME IS NULL
-        AND SYS_ONAME CONCAT USER_NAME NOT IN
-        ('QGATEQSNADS', 'QMQMQMQMADM', 'QMSFQTCP',
-        'QSPLJOBQSPL', 'QTCPQMSF', 'QTMHHTTPQCLUSTER')"
-        expected_row_count: 0
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      ignore_errors: true
+    - set_fact:
+        mode: "{{ mode.user_input | upper}}"
 
-    - name: 3.3 All IBM Supplied Profiles shall be owned by QSYS with the following exceptions
-            QFAXMSF shall be owned by QAUTPROF
-            QRDARS400xx shall be owned by QRDARS400
-            QTIVOLI, QTIVROOT and QTIVUSER shall be owned by QTIVOLI
-            Non-IBM (user created) profiles shall be owned by QSECOFR or QSYS
-      ibmi_sql_query:
-        sql: "SELECT ALL SYS_ONAME, OBJTYPE, OWNER FROM QSYS2.OBJ_PRIV
-              WHERE OBJTYPE = '*USRPRF' AND USER_NAME = '*PUBLIC'
-              AND OWNER NOT IN ('QSECOFR', 'QSYS')"
-        expected_row_count: 0
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      register: profile_ownership_check
-      ignore_errors: true
+    - fail:
+        msg: "only A/B/C is permitted in mode selection"
+      when: mode != 'A' and mode != 'B' and mode != 'C'
 
-    - name: Get the result of the checking for user profile ownership
-      debug: msg={{ profile_ownership_check.row }}
-      ignore_errors: true
+    - block:
+        - set_fact:
+            timestamp: '{{ ansible_date_time.iso8601_basic_short }}'
+        - include: user_profile_check.yml
+      when: mode != 'B'
 
+    - meta: end_play
+      when: mode == 'A'
 
-    - name: Default passwords provide an opportunity for someone to enter your system,
-            if someone knows your policy for assigning profile names and knows that a new person is joining
-            your organization. Additionally, accounts with default passwords are often used
-            for shared (non- unique) accounts. Tell the new user the password confidentially, such as
-            in a "Welcome to the System" letter that outlines your security policies. Require the user to change
-            the password the first time that the user signs on by setting the user profile to PWDEXP(*YES)
-      ibmi_sql_query:
-        sql: "SELECT ALL
-              USER_NAME, STATUS, DFTPWD, PWDEXP
-              FROM QSYS2.USER_INFO T01
-              WHERE DFTPWD = 'YES'"
-        expected_row_count: 0
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      ignore_errors: true
+    - block:
+        - block:
+            - pause:
+                prompt: |
+                  You're going to remediate the vulnerables base on the check.
+                  Please input the path to the security check result file.
+              register: report_file
 
+            - name:
+              stat:
+                path: '{{ report_file.user_input }}'
+              register: file
 
-    - name: 3.7 Remove/disable inactive user profiles within 90 days.
-      ibmi_sql_query:
-        sql: "SELECT ALL
-                          USER_NAME, STATUS, LASTUSED
-                          FROM QSYS2.USER_INFO T01
-                          WHERE STATUS = '*ENABLED'
-                          AND LASTUSED <= CURRENT_TIMESTAMP - 90 DAYS
-                          OR STATUS = '*ENABLED'
-                          AND LASTUSED IS NULL"
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-        expected_row_count: 0
-      register: profile_last_used_time
-      tags: inactive_profile
-      ignore_errors: true
+            - fail:
+                msg: Report file does not exist - {{ report_file.user_input }}
+              when: not file.stat.exists
 
-    - name: Get Remove/disable inactive user profiles within 90 days.
-      debug: msg={{ profile_last_used_time.row }}
-      tags: inactive_profile
-      ignore_errors: true
+            - name: Display the JSON file content
+              shell: cat {{ report_file.user_input }}
+              register: result
 
+            - name: save the Json data to a Variable as a Fact
+              set_fact:
+                report: "{{ result.stdout | from_json }}"
+          when: mode == 'B'
 
-    - name: 3.8 User Profiles with non-expiring passwords are never required to change their
-            Service accounts may be excluded from the audit and remediation.
-            A service account is a user account that is created explicitly to provide a security context
-            for automated system and application services running on the system.
-            Service accounts should be configured with a non-trivial, complex password that is used
-            in an automated service process and never used interactively.
-            Service accounts should be documented and their Password expiration interval should be set to *NOMAX.
-            A process should then be documented and executed to periodically change their passwords manually
-      ibmi_sql_query:
-        sql: "SELECT ALL
-              USER_NAME, STATUS, PWDEXPITV, LASTUSED
-              FROM QSYS2.USER_INFO T01
-              WHERE PWDEXPITV = -1"
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-        expected_row_count: 0
-      register: non_expiring_pwd
-      tags: non_expiring_pwd
-      ignore_errors: true
+        - include: user_profile_remediation.yml
+          loop: '{{ report }}'
+          loop_control:
+            loop_var: check_item
 
-    - name: Get User Profiles with non-expiring passwords are never required to change their password
-      debug: msg={{ non_expiring_pwd.row }}
-      tags: non_expiring_pwd
-      ignore_errors: true
-
-
-    - name: 3.9 User Profiles with command line access can run commands they are authorized to from a command line.
-      ibmi_sql_query:
-        sql: "SELECT ALL
-              USER_NAME, STATUS, LMTCPB, SPCAUT
-              FROM QSYS2.USER_INFO T01
-              WHERE LMTCPB <> '*YES'"
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-        expected_row_count: 0
-      register: run_cmd_via_cmd_line
-      tags: run_cmd_line
-      ignore_errors: true
-
-    - name: Get User Profiles with command line access can run commands they are authorized to from a command line.
-      debug: msg={{ run_cmd_via_cmd_line.row }}
-      tags: run_cmd_line
-      ignore_errors: true
-
-
-    - name: 3.10 This section contains information about the IBM-Supplied user profiles that are shipped with
-            the system and Licensed Program Products. These profiles are used as object owners for various
-            system functions. Some system functions also run under specific IBM-supplied user profiles.
-      ibmi_sql_query:
-        sql: "SELECT AUTHORIZATION_NAME, NO_PASSWORD_INDICATOR, STATUS,
-              USER_CLASS_NAME, INITIAL_PROGRAM_NAME,
-              LIMIT_CAPABILITIES, SPECIAL_AUTHORITIES
-              FROM QSYS2.USER_INFO WHERE AUTHORIZATION_NAME LIKE 'Q%' AND
-              NO_PASSWORD_INDICATOR = 'NO' OR AUTHORIZATION_NAME LIKE 'Q%'
-              AND STATUS = '*DISABLED' OR AUTHORIZATION_NAME LIKE 'Q%'
-              AND USER_CLASS_NAME <> '*USER' OR AUTHORIZATION_NAME LIKE 'Q%' AND
-              INITIAL_PROGRAM_NAME <> '*NONE' OR AUTHORIZATION_NAME LIKE 'Q%' AND
-              LIMIT_CAPABILITIES <> '*NO' OR AUTHORIZATION_NAME LIKE 'Q%' AND SPECIAL_AUTHORITIES <> '*NONE'"
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-        expected_row_count: 0
-      register: ibm_supplied_user
-      tags: check_ibm_supplied_user
-      ignore_errors: true
-
-    - name: Get User Profiles with command line access can run commands they are authorized to from a command line.
-      debug: msg={{ ibm_supplied_user.row }}
-      tags: check_ibm_supplied_user
-      ignore_errors: true
-
-    - name: 3.11 Group profiles should not have a password as they are usually not associated with a unique account.
-      ibmi_sql_query:
-        sql: "SELECT All
-              T01.GROUPNAME, T02.NOPWD
-              FROM QSYS2.GROUPLIST T01 INNER JOIN
-              QSYS2.USER_INFO T02
-              ON T01.GROUPNAME = T02.USER_NAME
-              WHERE T02.NOPWD = 'NO'"
-        expected_row_count: 0
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: check_group_profiles
-      ignore_errors: true
-
-
-    - name: 5.1 QSECOFR Profile Shall Be DISABLED
-      ibmi_sql_query:
-        sql: "SELECT * FROM QSYS2.USER_INFO
-              WHERE USER_NAME = 'QSECOFR' AND STATUS = '*ENABLED'"
-        expected_row_count: 0
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: disable_qsecofr
-      ignore_errors: true
-
-    #  - name: 5.1 QSECOFR Profile Shall Be DISABLED
-    #    ibmi_user_compliance_check:
-    #      users:
-    #        - 'QSECOFR'
-    #      fields:
-    #        - {'name':'status', 'expect':['*DISABLED']}
-    #      become_user: '{{ become_user_name }}'
-    #      become_user_password: '{{ become_user_password }}'
-    #    tags: disable_qsecofr
-
-    - name: 5.2 QSECOFR Shall Not be Configured as a Group Profile
-      ibmi_cl_command:
-        cmd: DSPUSRPRF USRPRF(QSECOFR) TYPE(*GRPMBR)
-        joblog: true
-      register: dspusrprf_group
-      tags: dspusrprf_group
-      ignore_errors: true
-
-    - name: QSECOFR Shall Not be Configured as a Group Profile
-      assert:
-        that:
-          - "'CPF2257: User profile QSECOFR not a group profile' in dspusrprf_group.stderr"
-      tags: dspusrprf_group
-      ignore_errors: true
+        - name: |
+            Remediation completes, please review remediation result.
+            Note:
+              1. You may re-run the playbook with check only mode to see the change.
+              2. We only provide suggestion for remediating item 3.10A and 3.10B because the scenarios
+                 on different machines may vary. You may need take action on your demand.
+          debug:
+            msg:
+              - "↓↓↓↓↓↓ Success list ↓↓↓↓↓↓"
+              - "{{ success_list }}"
+              - "↓↓↓↓↓↓ Fail list ↓↓↓↓↓↓"
+              - "{{ fail_list }}"
+              - "↓↓↓↓↓↓ Skip list ↓↓↓↓↓↓"
+              - "{{ skip_list }}"
+      when: mode != 'A'

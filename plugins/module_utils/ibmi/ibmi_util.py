@@ -175,7 +175,7 @@ def setup_logging(detault_log_level=logging.INFO):
         # Try again to read from default log config path
         if not os.path.exists(log_config_file_path):
             log_config_file_path = os.path.join(default_log_config_path, IBMi_ANSIBLE_CONFIG_FILE)
-        with open(log_config_file_path, 'r') as load_f:
+        with open(log_config_file_path, 'r', encoding='utf-8') as load_f:
             log_dict = json.load(load_f)
         no_log = log_dict['log_config']['no_log']
         log_path = log_dict['log_config']['log_dir']

@@ -6,7 +6,7 @@ __metaclass__ = type
 from ansible import constants as C
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 display = Display()
 
 
@@ -24,7 +24,7 @@ class ActionModule(ActionBase):
         display.debug("version: " + __ibmi_module_version__)
 
         if task_vars is None:
-            task_vars = dict()
+            task_vars = {}
 
         # _tmp_args is used for ibmi_sync module
         _tmp_args = self._task.args.copy()

@@ -1,0 +1,45 @@
+---
+- set_fact:
+    compliant: "{{ check_item.compliant }}"
+
+- block:
+    - pause:
+        prompt: |
+          Do you want to change system value {{ check_item.name }} on {{ ansible_ssh_host }} (Y/N)?
+          Expected value: {{ check_item.expect }} | Actual value: {{ check_item.actual }}
+      register: user_choice
+
+    - set_fact:
+        user_choice_mode: '{{ user_choice.user_input | upper | trim }}'
+
+    - block:
+        - name: Remediating {{ check_item.name }} on {{ ansible_ssh_host }}
+          ibmi_cl_command:
+            cmd: CHGSYSVAL SYSVAL({{ check_item.name }}) VALUE('{{ check_item.expect }}')
+            become_user: "{{ become_user_name }}"
+            become_user_password: "{{ become_user_password }}"
+          register: remediate
+          ignore_errors: true
+
+        - block:
+            - debug:
+                msg: |
+                  {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
+            - set_fact:
+                success_list: "{{ success_list + [ check_item.name ] }}"
+          when: remediate.rc == 0
+        - block:
+            - debug:
+                msg: |
+                  {{ check_item.name }} Remediation failed.
+            - set_fact:
+                fail_list: "{{ fail_list + [ check_item.name ] }}"
+          when: remediate.rc != 0
+      when: user_choice_mode == 'Y'
+    - block:
+        - debug:
+            msg: "User cancelled"
+        - set_fact:
+            skip_list: "{{ skip_list + [ check_item.name ] }}"
+      when: user_choice_mode != 'Y'
+  when: not compliant

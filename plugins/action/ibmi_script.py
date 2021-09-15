@@ -12,7 +12,7 @@ from ansible.module_utils.six import string_types
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 display = Display()
 
 
@@ -33,7 +33,7 @@ class ActionModule(ActionBase):
         display.debug("version: " + __ibmi_module_version__)
 
         if task_vars is None:
-            task_vars = dict()
+            task_vars = {}
 
         # _tmp_args is used for ibmi_sync module
         _tmp_args = self._task.args.copy()
@@ -109,10 +109,10 @@ class ActionModule(ActionBase):
 
             if result['rc']:
                 result['failed'] = True
-                result.update(dict(stderr=(u"Failed to execute script file {p_src}.".format(p_src=src)) + result['stderr'],
+                result.update(dict(stderr=("Failed to execute script file {p_src}.".format(p_src=src)) + result['stderr'],
                                    delta=str(delta)))
             else:
-                result.update(dict(stdout=u"Successfully execute script file {p_src}.".format(p_src=src), delta=str(delta)))
+                result.update(dict(stdout="Successfully execute script file {p_src}.".format(p_src=src), delta=str(delta)))
 
         except Exception as e:
             result['stderr'] += "{p_to_text}".format(p_to_text=to_text(e))

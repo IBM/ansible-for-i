@@ -2,10 +2,10 @@
   ibm.power_ibmi.ibmi_cl_command:
     cmd: CALL {{ build_lib }}/SENDMSG
   register: callpgm
-  when: build_with_STMFs
+  when: build_with_stmfs
 
 - name: run PGM built from PF members
   ibm.power_ibmi.ibmi_cl_command:
     cmd: CALL {{ build_lib }}/SAMPLECL
   register: callpgm
-  when: not build_with_STMFs
+  when: not build_with_stmfs

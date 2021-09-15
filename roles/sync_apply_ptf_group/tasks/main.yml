@@ -70,18 +70,28 @@
             path: "{{ path | regex_replace('~', home_dir.stdout) }}"
           when: path | regex_search("^~")
 
-        - name: debug path
-          debug:
-            var: path
+        # - name: debug path
+        #   debug:
+        #     var: path
 
         - name: Apply PTF group
           ibm.power_ibmi.ibmi_fix_imgclg:
             src: '{{ path }}'
           register: apply_result
 
-      # - name: Print apply result
-      #   debug:
-      #     var: apply_result
+        # - name: Print apply result
+        #   debug:
+        #     var: apply_result
       when: sync_result.fail_list == []
+
+    # - name: debug path
+    #   debug:
+    #     var: path
+
+    - name: delete the dest file dir
+      file:
+        path: "{{ path }}"
+        state: absent
+      when: delete
 
   when: file_result.failed == 0

@@ -169,7 +169,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 single_ptf_table = 'single_ptf_info'
 ptf_group_image_table = 'ptf_group_image_info'
@@ -295,7 +295,7 @@ def get_group_name_from_txt(file_path):
     ptf_list = []
     lines = []
 
-    with open(file_path, 'r') as f:
+    with open(file_path, 'r', encoding="utf-8") as f:
         lines += filter(None, (line.strip() for line in f))
 
     for idx, val in enumerate(lines):
@@ -383,7 +383,7 @@ def check_sum(module, parameters, _type):
                 group_item['rc'] = -1
                 fail_list.append(group_item)
                 continue
-            group_item = dict()
+            group_item = {}
             if parameter.get('order_id'):
                 group_item['order_id'] = parameter.get('order_id')
             path = parameter.get('file_path')

@@ -124,7 +124,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 def _is_ipv4_addr(ip):
@@ -166,13 +166,13 @@ def _is_ipv6_addr(addr):
 
 
 def load_meta_data(meta_data_file_path):
-    with open(meta_data_file_path, 'r') as load_f:
+    with open(meta_data_file_path, 'r', encoding='utf-8') as load_f:
         load_dict = json.load(load_f)
     return load_dict
 
 
 def save_meta_data(meta_data_file_path, json_dict):
-    with open(meta_data_file_path, 'w') as dump_f:
+    with open(meta_data_file_path, 'w', encoding='utf-8') as dump_f:
         json.dump(json_dict, dump_f)
 
 
