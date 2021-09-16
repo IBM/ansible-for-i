@@ -83,7 +83,7 @@ class ActionModule(ActionBase):
         display.debug("version: " + __ibmi_module_version__)
         ''' handler for fetch operations '''
         if task_vars is None:
-            task_vars = dict()
+            task_vars = {}
 
         result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect

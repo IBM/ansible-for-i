@@ -326,7 +326,7 @@ def run_module():
 
     result = dict(
         changed=False,
-        ansible_facts=dict()
+        ansible_facts={}
     )
 
     # supports check mode

@@ -227,7 +227,7 @@ def chk_system_value(current, expect, check='equal'):
 
 
 def get_system_value(imodule, sysvaluename, expect=None, check='equal'):
-    sysvalue = dict()
+    sysvalue = {}
     sysvalue['rc'] = 0
     sysvalue['name'] = sysvaluename.strip().upper()
     for value in sysval_array:

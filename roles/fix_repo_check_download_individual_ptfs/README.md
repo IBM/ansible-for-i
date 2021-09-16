@@ -19,7 +19,7 @@ Return Variables
 | Variable                | Type          | Description                                                       |
 |-------------------------|---------------|-------------------------------------------------------------------|
 | `check_fail_list` | list          | The list of ptfs which records are found in catalog with errors. |
-| `RecordNotFound_list` | list          | The list of ptfs which records are not found in the catalog.                                  |
+| `record_not_found_list` | list          | The list of ptfs which records are not found in the catalog.                                  |
 | `download_success_list` | list          | The list of successful download.                                  |
 | `download_fail_list`    | list          | The list of failed download.                                      |
 | `final_find_result` | list          | The final information records in the catalog of requested ptfs list.           |
@@ -80,7 +80,7 @@ Example Returned Variables
         }
 
 ]
-"RecordNotFound_list": [
+"record_not_found_list": [
         {
             "add_time": "2020-11-23 09:01:03",
             "checksum": "d7d8d4787e2a1d858f3523f2ec963f7dbc9f78ff",

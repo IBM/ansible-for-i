@@ -6,7 +6,8 @@
 # on repo server should be formatted as ptf_group_number_ptf_group_level under ~/PTF folder.
 
 # Command example: ansible-playbook /sync_apply_ptf_group_using_ptfinfo.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
-# 'ptf_group_number': 'SF99729', 'ptf_group_level': '125'}"
+# 'ptf_group_number': 'SF99729', 'ptf_group_level': '125', 'delete': true}"
+# The 'delete' parameter specifies whether or not to delete the file install dir on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:
@@ -16,6 +17,7 @@
     repo_server: "{{ repo_server }}"
     ptf_group_number: "{{ ptf_group_number }}"
     ptf_group_level: "{{ ptf_group_level }}"
+    deletefile: "{{ delete | default(true) }}"
 
   tasks:
     - name: set_fact
@@ -102,6 +104,13 @@
               debug:
                 msg: "One or more ptf group file transfer failed, quit apply ptf group action."
 
+            - name: delete the dest file dir
+              file:
+                path: "{{ path }}"
+                state: absent
+              ignore_errors: true
+              when: deletefile
+
             - name: end_host
               meta: end_host
           when: sync_result.fail_list != []
@@ -139,6 +148,13 @@
               debug:
                 msg: "PTF Group applied succesfully."
               when: apply_result.rc == 0
+
+            - name: delete the dest file dir
+              file:
+                path: "{{ path }}"
+                state: absent
+              ignore_errors: true
+              when: deletefile
 
           when: sync_result.fail_list == []
 

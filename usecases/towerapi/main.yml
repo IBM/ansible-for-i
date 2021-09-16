@@ -68,7 +68,7 @@
       private: true
       default: ""
 
-    - name: build_with_STMFs
+    - name: build_with_stmfs
       prompt: Are you building your app with STMFs or PF members? Yes for SMTFs, No for PF members. (Yes/No)
       default: "Yes"
       private: false
@@ -95,7 +95,7 @@
       default: ""
 
   vars:
-    tower_api_url: "{{ tower_url }}/api/v2"
+    tower_api_url: "{{ tower_url | regex_replace('\\/$', '') }}/api/v2"
     playbooks: "{{ playbook_names.split() }}"
 
   collections:

@@ -63,3 +63,25 @@
     remote_lib: "{{ (dest | basename | splitext)[0] }}"
     loaded_list: "{{ already_loaded_list }}"
   when: sync_success_list != [] or already_loaded_list != []
+
+- block:
+    - name: compose dest file path
+      set_fact:
+        dest_file_list: "{{ dest_file_list | default([]) + [ sync_success_list_var.file_path ] }}"
+      loop: "{{ sync_success_list }}"
+      loop_control:
+        loop_var: sync_success_list_var
+
+    - name: Print the list of dest file path
+      debug:
+        var: dest_file_list
+
+    - name: delete the dest file dir
+      file:
+        path: "{{ dest_file_list_var }}"
+        state: absent
+      loop: "{{ dest_file_list }}"
+      loop_control:
+        loop_var: dest_file_list_var
+
+  when: delete and sync_success_list != []

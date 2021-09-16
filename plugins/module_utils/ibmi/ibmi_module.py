@@ -348,7 +348,7 @@ class IBMiModule(object):
         ibmi_util.log_debug("rtv_command to run: " + str(rtv_command), sys._getframe().f_code.co_name)
         if 'error' in rtv_command:
             rc = ibmi_util.IBMi_COMMAND_RC_ERROR
-            out_dict = dict()
+            out_dict = {}
             error = str(rtv_command)
         else:
             # remove the key 'success' and its value, just left the result
@@ -379,7 +379,7 @@ class IBMiModule(object):
             field_map = self.db_get_fields_from_cursor(cur)
 
             for row in cur:
-                row_map = dict()
+                row_map = {}
                 for (k, v) in field_map.items():
                     col_num = v[0]
                     # wy: convert the db data type to python data type

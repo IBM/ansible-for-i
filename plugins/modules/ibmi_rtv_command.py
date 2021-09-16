@@ -167,7 +167,7 @@ def main():
 
     command = module.params['cmd'].strip().upper()
     char_vars = module.params['char_vars']
-    args_dict = dict()
+    args_dict = {}
     if char_vars:
         char_vars = [item.strip().upper() for item in char_vars]
         for item in char_vars:
@@ -181,7 +181,7 @@ def main():
     become_user = module.params['become_user']
     become_user_password = module.params['become_user_password']
 
-    out = dict()
+    out = {}
     if (not char_vars) and (not number_vars):
         module.fail_json(msg='At least one of the option char_vars or number_vars must contain value')
     try:

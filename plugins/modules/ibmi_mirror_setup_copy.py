@@ -166,13 +166,13 @@ def _is_ipv6_addr(addr):
 
 
 def load_meta_data(meta_data_file_path):
-    with open(meta_data_file_path, 'r') as load_f:
+    with open(meta_data_file_path, 'r', encoding='utf-8') as load_f:
         load_dict = json.load(load_f)
     return load_dict
 
 
 def save_meta_data(meta_data_file_path, json_dict):
-    with open(meta_data_file_path, 'w') as dump_f:
+    with open(meta_data_file_path, 'w', encoding='utf-8') as dump_f:
         json.dump(json_dict, dump_f)
 
 

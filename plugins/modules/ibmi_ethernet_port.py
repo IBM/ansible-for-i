@@ -175,7 +175,7 @@ def get_info_from_resource_name(imodule, resource_name):
         )
     )
 
-    resoure_info = dict()
+    resoure_info = {}
     itool.call(itransport)
     qgyrhr = itool.dict_out('qgyrhr')
     ibmi_util.log_debug("qgyrhr output: " + str(qgyrhr), sys._getframe().f_code.co_name)
@@ -249,7 +249,7 @@ def list_ethernet_ports_info(imodule):
         rhrl0100_t = qgyrhr['RHRL0100_t']
         if int(rhrl0100_t['rhrNbr']) > 0:
             res_t = rhrl0100_t['res_t']
-            res_info = dict()
+            res_info = {}
             for rec in res_t:
                 if rec['resKnd'] == kKindVirtEthernet or rec['resKnd'] == kKindPhysEthernet:
                     ibmi_util.log_debug(

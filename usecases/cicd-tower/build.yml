@@ -46,7 +46,7 @@
     - name: call CL command to build application
       ibmi_cl_command:
         cmd: CRTBNDCPP PGM({{ build_lib }}/SENDMSG) SRCSTMF('{{ build_path }}/sendMsg.c')
-      when: build_with_STMFs|bool
+      when: build_with_stmfs|bool
       delegate_to: '{{ item }}'
       with_items:
         - "{{ host_names.split() }}"
@@ -72,4 +72,4 @@
           delegate_to: '{{ item }}'
           with_items:
             - "{{ host_names.split() }}"
-      when: not build_with_STMFs|bool
+      when: not build_with_stmfs|bool

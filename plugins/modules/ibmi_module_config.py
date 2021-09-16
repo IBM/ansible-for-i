@@ -173,11 +173,11 @@ def main():
             etc_log_config_file_path = etc_log_config_dir + \
                 "/" + ibmi_util.IBMi_ANSIBLE_CONFIG_FILE
             if os.path.exists(home_log_config_file_path):
-                with open(home_log_config_file_path, 'r') as load_f:
+                with open(home_log_config_file_path, 'r', encoding='utf-8') as load_f:
                     load_dict = json.load(load_f)
                 config_path = home_log_config_file_path
             elif os.path.exists(etc_log_config_file_path):
-                with open(etc_log_config_file_path, 'r') as load_f:
+                with open(etc_log_config_file_path, 'r', encoding='utf-8') as load_f:
                     load_dict = json.load(load_f)
                 config_path = etc_log_config_file_path
             else:
@@ -250,7 +250,7 @@ def main():
     try:
         log_config_file_path = os.path.join(
             log_config_dir, ibmi_util.IBMi_ANSIBLE_CONFIG_FILE)
-        with open(log_config_file_path, 'w') as dump_f:
+        with open(log_config_file_path, 'w', encoding='utf-8') as dump_f:
             json.dump(config_dict, dump_f)
             mode = 0o0644
             os.chmod(log_config_file_path, mode)

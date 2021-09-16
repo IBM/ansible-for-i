@@ -111,7 +111,7 @@ def get_ptf_info(db_connection, ptf_list):
           " PTF_STATUS_TIMESTAMP, PTF_CREATION_TIMESTAMP" \
           " FROM QSYS2.PTF_INFO WHERE UPPER(PTF_IDENTIFIER) IN ('" + str_ptf_list + "')"
     out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
-    out = dict()
+    out = {}
     if (out_result_set is not None):
         for result in out_result_set:
             result_map = {

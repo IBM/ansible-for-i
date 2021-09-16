@@ -107,7 +107,7 @@ class ActionModule(ActionBase):
         display.debug("version: " + __ibmi_module_version__)
         ''' handler for fetch operations '''
         if task_vars is None:
-            task_vars = dict()
+            task_vars = {}
 
         result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
@@ -325,7 +325,7 @@ class ActionModule(ActionBase):
                     target_name = task_vars['inventory_hostname']
                 else:
                     target_name = self._play_context.remote_addr
-                dest = u"{p_self}/{p_target_name}/{p_source_local}".format(
+                dest = "{p_self}/{p_target_name}/{p_source_local}".format(
                     p_self=self._loader.path_dwim(dest),
                     p_target_name=target_name,
                     p_source_local=source_local)

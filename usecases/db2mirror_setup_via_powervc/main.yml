@@ -35,16 +35,16 @@
 
   vars:
     ## Required parameters
-    nrgLinkPairs: []
-    copyNodeTCPIP: {}
-    sourceVmNameOnPowerVC: ''
+    nrglinkpairs: []
+    copynodetcpip: {}
+    sourcevmnameonpowervc: ''
 
     ## Optional parameters
-    secondaryNode: 'db2mcopy'
-    cloneType: 'warm'
-    timeServer: 'TIME.COM'
-    defaultInclusionState: EXCLUDE
-    suspendTimeout: 300
+    secondarynode: 'db2mcopy'
+    clonetype: 'warm'
+    timeserver: 'TIME.COM'
+    defaultinclusionstate: EXCLUDE
+    suspendtimeout: 300
     verify_cert: false
     flavor: tiny
     availability_zone: 'Default Group'
@@ -57,7 +57,7 @@
   tasks:
     - name: set facts
       set_fact:
-        imageName: DB2Mirror
+        imagename: DB2Mirror
         terminationLevel: 'RECLONE'
         dependent_lpps:
           - {'product_id': '5770SS1', 'product_option': '41', 'feature_code': '5116', 'description': 'HA Switchable Resources'}

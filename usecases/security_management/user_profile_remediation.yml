@@ -1,0 +1,156 @@
+---
+- set_fact:
+    result: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).result }}"
+    id: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).id }}"
+
+- block:
+    - set_fact:
+        desc: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).desc }}"
+        vulnerables: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).vulnerables }}"
+        remediation: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).remediation }}"
+    - block:
+        - pause:
+            prompt: |
+              Start processing {{ desc }}.
+              Got vulnerables: {{ vulnerables }}.
+              How do you want to fix?
+                * Input A for all
+                * Input specific values for selective remediation, seperate multiple values with comma,
+                  e.g. USER1, USER2, USER3
+                * Leave blank and press Enter to skip
+          register: user_choice
+        - set_fact:
+            user_choice_mode: '{{ user_choice.user_input | upper | trim }}'
+      when: id != '3.2'
+
+    - block:
+        - set_fact:
+            failed_by: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).failed_by }}"
+        - pause:
+            prompt: |
+              Start processing {{ desc }}.
+              Got vulnerables: {{ vulnerables }}.
+              Failed by: {{ failed_by }}.
+              How do you want to fix?
+                * Input A for all
+                * Leave blank and press Enter to skip
+          register: user_choice
+        - set_fact:
+            user_choice_mode: '{{ user_choice.user_input | upper | trim }}'
+      when: id == '3.2'
+
+    - block:
+        - block:
+            - name: Start remediating {{ id }} base on user input
+              ibmi_cl_command:
+                cmd: "{{ remediation | replace('SYSO_NAME_REPLACE', item) }}"
+                become_user: '{{ become_user_name }}'
+                become_user_password: '{{ become_user_password }}'
+              with_items: "{{ user_choice_mode.split(',') }}"
+            - name: remediation successfully
+              set_fact:
+                success_list: "{{ success_list + [ id ] }}"
+          rescue:
+            - name: remediation failed
+              set_fact:
+                fail_list: "{{ fail_list + [ id ] }}"
+          when: user_choice_mode | length > 0 and user_choice_mode != 'A'
+        - block:
+            - name: Start remediating all vulnerables of {{ id }}
+              ibmi_cl_command:
+                cmd: "{{ remediation | replace('SYSO_NAME_REPLACE', item) }}"
+                become_user: '{{ become_user_name }}'
+                become_user_password: '{{ become_user_password }}'
+              with_items: "{{ vulnerables.split(',') }}"
+            - name: remediation successfully
+              set_fact:
+                success_list: "{{ success_list + [ id ] }}"
+          rescue:
+            - name: remediation failed
+              set_fact:
+                fail_list: "{{ fail_list + [ id ] }}"
+          when: user_choice_mode | length > 0 and user_choice_mode == 'A'
+      when: '"SYSO_NAME_REPLACE" in remediation and id != "3.2"'
+
+    - block:
+        - block:
+            - name: Start remediating {{ id }} base on user input
+              ibmi_cl_command:
+                cmd: "{{ remediation | replace('USER_NAME_REPLACE', item) }}"
+                become_user: '{{ become_user_name }}'
+                become_user_password: '{{ become_user_password }}'
+              with_items: "{{ user_choice_mode.split(',') }}"
+            - name: remediation successfully
+              set_fact:
+                success_list: "{{ success_list + [ id ] }}"
+          rescue:
+            - name: remediation failed
+              set_fact:
+                fail_list: "{{ fail_list + [ id ] }}"
+          when: user_choice_mode | length > 0 and user_choice_mode != 'A'
+
+        - block:
+            - name: Start remediating all vulnerables of {{ id }}
+              ibmi_cl_command:
+                cmd: "{{ remediation | replace('USER_NAME_REPLACE', item) }}"
+                become_user: '{{ become_user_name }}'
+                become_user_password: '{{ become_user_password }}'
+              with_items: "{{ vulnerables.split(',') }}"
+            - name: remediation successfully
+              set_fact:
+                success_list: "{{ success_list + [ id ] }}"
+          rescue:
+            - name: remediation failed
+              set_fact:
+                fail_list: "{{ fail_list + [ id ] }}"
+          when: user_choice_mode | length > 0 and user_choice_mode == 'A'
+      when: '"USER_NAME_REPLACE" in remediation and id != "3.2"'
+
+    - block:
+        - fail:
+            msg: "Invalid option, only A or Enter is accepted!"
+          when: user_choice_mode | length > 0 and user_choice_mode != 'A'
+
+        - block:
+            - name: Start remediating all vulnerables of {{ id }}
+              ibmi_cl_command:
+                cmd: "{{ remediation | replace('SYSO_NAME_REPLACE', item.0) | replace('USER_NAME_REPLACE', item.1) }}"
+                become_user: '{{ become_user_name }}'
+                become_user_password: '{{ become_user_password }}'
+              with_together:
+                - "{{ vulnerables.split(',') }}"
+                - "{{ failed_by.split(',') }}"
+            - name: remediation successfully
+              set_fact:
+                success_list: "{{ success_list + [ id ] }}"
+          rescue:
+            - name: remediation failed
+              set_fact:
+                fail_list: "{{ fail_list + [ id ] }}"
+          when: user_choice_mode | length > 0 and user_choice_mode == 'A'
+      when: id == '3.2'
+
+    - block:
+        - name: Start remediating {{ id }} base on user input
+          ibmi_cl_command:
+            cmd: "{{ remediation }}"
+            become_user: '{{ become_user_name }}'
+            become_user_password: '{{ become_user_password }}'
+        - name: remediation successfully
+          set_fact:
+            success_list: "{{ success_list + [ id ] }}"
+      rescue:
+        - name: remediation failed
+          set_fact:
+            fail_list: "{{ fail_list + [ id ] }}"
+      when: id == '5.1' or id == '5.2'
+
+    - block:
+        - name: User cancelled.
+          debug:
+            msg: User cancelled.
+        - name: write skip list
+          set_fact:
+            skip_list: "{{ skip_list + [ id ] }}"
+      when: user_choice_mode | length == 0
+  when: result == 'FAIL' and id != '3.10A' and id != '3.10B'

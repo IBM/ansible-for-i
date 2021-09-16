@@ -4,15 +4,15 @@
 ##     IP interface varaibles   ##
 ##################################
 vlanid: '*NONE'
-associatedLocalInterface: '*NONE'
+associatedlocalinterface: '*NONE'
 # type_of_service: '*NORMAL'
-typeOfService: '*NORMAL'
-maxTransmissionUnit: '*LIND'
-autoStart: '*YES'
-preferredInterface: '*NONE'
-textDescription: '*BLANK'
-secToWait: 0
-extraParams: ''
+typeofservice: '*NORMAL'
+maxtransmissionunit: '*LIND'
+autostart: '*YES'
+preferredinterface: '*NONE'
+textdescription: '*BLANK'
+sectowait: 0
+extraparams: ''
 # line_description: ''
 
 ##################################
@@ -23,7 +23,7 @@ resource_name_of_ethernet_port: ''
 mac_address_of_ethernet_port: ''
 # By default the command to create a line description only has two options LIND and RSRCNAME.
 # For example, CRTLINETH LIND(ETHLINE) RSRCNAME(CMN03)
-addition_options_for_CRTLINETH: ''
+addition_options_for_crtlineth: ''
 
 ##################################
 ##       Route varaibles        ##
@@ -34,4 +34,4 @@ next_hop: ''
 # For example, ADDTCPRTE RTEDEST(*DFTROUTE) NEXTHOP('9.123.97.1').
 # If addtions are required, define them in addition_options_for_CRTLINETH.
 # For example addition_options_for_ADDTCPRTE: 'SUBNETMASK(*NONE) TOS(*MINCOST) MTU(*IFC)'
-addition_options_for_ADDTCPRTE: ' '
+addition_options_for_addtcprte: ' '

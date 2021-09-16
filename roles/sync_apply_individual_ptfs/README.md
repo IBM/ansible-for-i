@@ -12,6 +12,7 @@ Role Variables
 | `already_loaded_list`    | list        | The already loaded ptfs' information list. ptf_id and product are required.  |
 | `src_host`            | str           | The system that has the src ptf savfs, which will be transferred to the target system.|
 | `dest`                | str           | The library that savfs would be transferred to. The default is "/qsys.lib/qgpl.lib".  |
+| `delete`              | bool          | Whether or not to delete the PTF install savf after apply. The default is True.  |
 | `apply_all_loaded_ptf`| bool          | Used by apply_ptf role. Used by apply_ptf role. Controls whether all loaded ptf will be applied. When the value is true, 'to_be_applied_list' will be ignored. The default value is True.    |
 | `temp_or_perm`        | str           | Used by apply_ptf role. Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.                     |
 | `delayed_option`      | str           | Used by apply_ptf role. Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.                      |

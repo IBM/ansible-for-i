@@ -2,127 +2,199 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 - hosts: all
-  gather_facts: false
+  gather_facts: true
   collections:
     - ibm.power_ibmi
 
   vars:
     become_user_name: null
     become_user_password: null
+    success_list: []
+    fail_list: []
+    skip_list: []
 
   tasks:
-    - name: 4.1.1.1 Allow Restoration of Security-Sensitive Objects
-            Determines if the system will allow authorized users to restore system-state objects
-            or programs that adopt authority to the system.
-            System administrators must use this privileged access to restore objects frequently
-            as a part of their routine IBM-supplied PTF OS maintenance as well as related to back-up
-            and recover processes for applications. The restore privileges will be limited to System administrator
-            and security personnel based on special authorities.
-      ibmi_sysval:
-        sysvalue:
-          - {'name':'QALWOBJRST', 'expect':'*ALWPTF', 'check': 'equal'}
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: QALWOBJRST
-      ignore_errors: true
+    - pause:
+        prompt: |
+          You're going to do system value compliance check on {{ ansible_ssh_host }}
+          Please input A,B or C for mode selection:
+          Check only(A) / Remediate only(B) / Check and Remediate(C)
+      register: mode
 
-    - name: 4.1.1.2 Set Attention Program
-            Determines what program is executed when the user presses the attention-key.
-      ibmi_sysval:
-        sysvalue:
-          - {'name':'QATNPGM', 'expect':'*NONE', 'check': 'equal'}
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: QATNPGM
-      ignore_errors: true
+    - set_fact:
+        mode: "{{ mode.user_input | upper}}"
 
-    - name: 4.1.1.3 Set Auditing Control
-            Serves as the on or off switch for security auditing.
-            AUDLVL activates event auditing at the system or user level.
-            OBJAUD activates object auditing.
-            NOQTEMP prevents extraneous auditing entries for objects in library QTEMP.
-      ibmi_sysval:
-        sysvalue:
-          - {'name':'QAUDCTL', 'expect':'*NOQTEMP *OBJAUD *AUDLVL', 'check': 'equal_as_list'}
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: QAUDCTL
-      ignore_errors: true
+    - fail:
+        msg: "Only A/B/C is permitted in mode selection"
+      when: mode != 'A' and mode != 'B' and mode != 'C'
 
-    - name: 4.1.1.4 Set Auditing End Action
-            Determines the action the system should take if it is unable to continue auditing
-            (e.g. the audit record is full)
-      ibmi_sysval:
-        sysvalue:
-          - {'name':'QAUDENDACN', 'expect':'*NOTIFY', 'check': 'equal'}
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: QAUDENDACN
-      ignore_errors: true
+    - block:
+        - pause:
+            prompt: |
+              Please read level definition and make selection:
+                * Level 1: Corporate/Enterprise Environment (general use)
+                  Items in this profile intend to:
+                    - be practical and prudent
+                    - provide a clear security benefit
+                    - not negatively inhibit the utility of the technology beyond acceptable means
+                * Level 2: High Security/Sensitive Data Environment (limited functionality)
+                  Items in this profile may have the following characteristic(s):
+                    - are intended for environments or use cases where security is paramount
+                    - acts as defense in depth measure
+                    - may negatively inhibit the utility or performance of the technology
+              Type 1 or 2 and press Enter
+          register: level
 
-    - name: 4.1.1.5 Set Auditing Force Level
-            Determines how many auditing journal entries records are cached in memory before
-            they are physically written to disk from memory.
-      ibmi_sysval:
-        sysvalue:
-          - {'name':'QAUDFRCLVL', 'expect':'*SYS', 'check': 'equal'}
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: QAUDFRCLVL
-      ignore_errors: true
+        - set_fact:
+            level_mode: "{{ level.user_input | trim }}"
 
-    - name: 4.1.1.6 Set Auditing Level
-            Determines the level of auditing on the system.
-      ibmi_sysval:
-        sysvalue:
-          - {'name':'QAUDLVL', 'expect':'*AUTFAIL *CREATE *DELETE *OBJMGT *PGMFAIL *SAVRST *SECURITY *SERVICE *SYSMGT', 'check': 'equal_as_list'}
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: QAUDLVL
-      ignore_errors: true
+        - fail:
+            msg: "Only 1/2 is permitted in level selection"
+          when: level_mode != '1' and level_mode != '2'
 
-    - name: 4.1.1.7 Set Security Auditing Level Extensions
-      ibmi_sysval:
-        sysvalue:
-          - {'name':'QAUDLVL2', 'expect':'*NONE', 'check': 'equal'}
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: QAUDLVL2
-      ignore_errors: true
+        - set_fact:
+            timestamp: '{{ ansible_date_time.iso8601_basic_short }}'
 
-    - name: Check system values whether they are compliant. Level 1
-      ibmi_sysval:
-        sysvalue:
-          - {'name':'QAUTOCFG', 'expect':'0', 'check': 'equal'}
-          - {'name':'QAUTORMT', 'expect':'0', 'check': 'equal'}
-          - {'name':'QCRTAUT', 'expect':'*USE', 'check': 'equal'}
-          - {'name':'QDSCJOBITV', 'expect':'30', 'check': 'equal'}
-          - {'name':'QDSPSGNINF', 'expect':'1', 'check': 'equal'}
-          - {'name':'QFRCCVNRST', 'expect':'3', 'check': 'equal'}
-          - {'name':'QINACTITV', 'expect':'30', 'check': 'equal'}
-          - {'name':'QINACTMSGQ', 'expect':'*DSCJOB', 'check': 'equal'}
-          - {'name':'QLMTSECOFR', 'expect':'0', 'check': 'equal'}
-          - {'name':'QMAXSGNACN', 'expect':'2', 'check': 'equal'}
-          - {'name':'QMAXSIGN', 'expect':'5', 'check': 'equal'}
-          - {'name':'QPWDCHGBLK', 'expect':'24', 'check': 'equal'}
-          - {'name':'QPWDEXPITV', 'expect':'90', 'check': 'equal'}
-          - {'name':'QPWDEXPWRN', 'expect':'7', 'check': 'equal'}
-          - {'name':'QPWDLVL', 'expect':'1', 'check': 'equal'}
-          - {'name':'QPWDRQDDIF', 'expect':'8', 'check': 'equal'}
-          - {'name':'QPWDRULES', 'expect':'*ALLCRTCHG *DGTLMTAJC *DGTLMTFST \
-            *DGTLMTLST *DGTMIN1 *LMTPRFNAME *MAXLEN10 *MINLEN8 *REQANY3 *SPCCHRLMTAJC \
-            *SPCCHRLMTFST *SPCCHRLMTLST', 'check': 'equal_as_list'}
-          - {'name':'QRETSVRSEC', 'expect':'1', 'check': 'equal'}
-          - {'name':'QRMTIPL', 'expect':'0', 'check': 'equal'}
-          - {'name':'QRMTSIGN', 'expect':'*VERIFY', 'check': 'equal'}
-          - {'name':'QSCANFS', 'expect':'*ROOTOPNUD', 'check': 'equal'}
-          - {'name':'QSCANFSCTL', 'expect':'*ERRFAIL *NOWRTUPG', 'check': 'equal'}
-          - {'name':'QSECURITY', 'expect':'40', 'check': 'equal'}
-          - {'name':'QSHRMEMCTL', 'expect':'1', 'check': 'equal'}
-          - {'name':'QSSLCSLCTL', 'expect':'*OPSYS', 'check': 'equal'}
-          - {'name':'QSSLPCL', 'expect':'*TLSV1.3 *TLSV1.2', 'check': 'equal'}
-          - {'name':'QVFYOBJRST', 'expect':'3', 'check': 'equal'}
-        become_user: '{{ become_user_name }}'
-        become_user_password: '{{ become_user_password }}'
-      tags: check_multiple_sysvals
-      ignore_errors: true
+        - set_fact:
+            check_result_file: /tmp/security_management_sysval_report-level{{ level_mode }}-{{ inventory_hostname }}-{{ timestamp }}.json
+
+        - set_fact:
+            level1:
+              - {'name':'QALWOBJRST', 'expect':'0', 'check': 'equal'}
+              - {'name':'QATNPGM', 'expect':'*NONE', 'check': 'equal'}
+              - {'name':'QAUDCTL', 'expect':'*NOQTEMP *OBJAUD *AUDLVL', 'check': 'equal_as_list'}
+              - {'name':'QAUDENDACN', 'expect':'*NOTIFY', 'check': 'equal'}
+              - {'name':'QAUDFRCLVL', 'expect':'*SYS', 'check': 'equal'}
+              - {'name':'QAUDLVL', 'expect':'*AUTFAIL *CREATE *DELETE *OBJMGT
+                  *PGMFAIL *SAVRST *SECURITY *SERVICE *SYSMGT', 'check': 'equal_as_list'}
+              - {'name':'QAUDLVL2', 'expect':'*NONE', 'check': 'equal'}
+              - {'name':'QAUTOCFG', 'expect':'0', 'check': 'equal'}
+              - {'name':'QAUTORMT', 'expect':'0', 'check': 'equal'}
+              - {'name':'QCRTAUT', 'expect':'*USE', 'check': 'equal'}
+              - {'name':'QDSCJOBITV', 'expect':'30', 'check': 'equal'}
+              - {'name':'QDSPSGNINF', 'expect':'1', 'check': 'equal'}
+              - {'name':'QFRCCVNRST', 'expect':'3', 'check': 'equal'}
+              - {'name':'QINACTITV', 'expect':'0000000030', 'check': 'equal'}
+              - {'name':'QINACTMSGQ', 'expect':'*DSCJOB', 'check': 'equal'}
+              - {'name':'QLMTSECOFR', 'expect':'0', 'check': 'equal'}
+              - {'name':'QMAXSGNACN', 'expect':'2', 'check': 'equal'}
+              - {'name':'QMAXSIGN', 'expect':'000005', 'check': 'equal'}
+              - {'name':'QPWDCHGBLK', 'expect':'24', 'check': 'equal'}
+              - {'name':'QPWDEXPITV', 'expect':'90', 'check': 'equal'}
+              - {'name':'QPWDEXPWRN', 'expect':'7', 'check': 'equal'}
+              - {'name':'QPWDLVL', 'expect':'1', 'check': 'equal'}
+              - {'name':'QPWDRQDDIF', 'expect':'8', 'check': 'equal'}
+              - {'name':'QPWDRULES', 'expect':'*ALLCRTCHG *DGTLMTAJC *DGTLMTFST
+                  *DGTLMTLST *DGTMIN1 *LMTPRFNAME *MAXLEN10 *MINLEN8 *REQANY3 *SPCCHRLMTAJC
+                  *SPCCHRLMTFST *SPCCHRLMTLST', 'check': 'equal_as_list'}
+              - {'name':'QRETSVRSEC', 'expect':'1', 'check': 'equal'}
+              - {'name':'QRMTIPL', 'expect':'0', 'check': 'equal'}
+              - {'name':'QRMTSIGN', 'expect':'*VERIFY', 'check': 'equal'}
+              - {'name':'QSCANFS', 'expect':'*ROOTOPNUD', 'check': 'equal'}
+              - {'name':'QSCANFSCTL', 'expect':'*ERRFAIL *NOWRTUPG', 'check': 'equal'}
+              - {'name':'QSECURITY', 'expect':'40', 'check': 'equal'}
+              - {'name':'QSHRMEMCTL', 'expect':'1', 'check': 'equal'}
+              - {'name':'QSSLCSLCTL', 'expect':'*OPSYS', 'check': 'equal'}
+              - {'name':'QSSLPCL', 'expect':'*TLSV1.3 *TLSV1.2', 'check': 'equal'}
+              - {'name':'QVFYOBJRST', 'expect':'3', 'check': 'equal'}
+          when: level_mode == '1'
+
+        - set_fact:
+            level2:
+              - {'name':'QALWOBJRST', 'expect':'*NONE', 'check': 'equal'}
+              - {'name':'QALWUSRDMN', 'expect':'QTEMP', 'check': 'equal'}
+              - {'name':'QAUDCTL', 'expect':'*OBJAUD *AUDLVL', 'check': 'equal_as_list'}
+              - {'name':'QAUDENDACN', 'expect':'*PWRDWNSYS', 'check': 'equal'}
+              - {'name':'QAUDFRCLVL', 'expect':'1', 'check': 'equal'}
+              - {'name':'QAUTOVRT', 'expect':'0', 'check': 'equal'}
+              - {'name':'QCRTAUT', 'expect':'*EXCLUDE', 'check': 'equal'}
+              - {'name':'QCRTOBJAUD', 'expect':'*ALL', 'check': 'equal'}
+              - {'name':'QDSCJOBITV', 'expect':'15', 'check': 'equal'}
+              - {'name':'QFRCCVNRST', 'expect':'7', 'check': 'equal'}
+              - {'name':'QINACTITV', 'expect':'0000000015', 'check': 'equal'}
+              - {'name':'QINACTMSGQ', 'expect':'*ENDJOB', 'check': 'equal'}
+              - {'name':'QLMTDEVSSN', 'expect':'1', 'check': 'equal'}
+              - {'name':'QMAXSGNACN', 'expect':'3', 'check': 'equal'}
+              - {'name':'QMAXSIGN', 'expect':'000003', 'check': 'equal'}
+              - {'name':'QPWDCHGBLK', 'expect':'99', 'check': 'equal'}
+              - {'name':'QPWDLVL', 'expect':'3', 'check': 'equal'}
+              - {'name':'QPWDRQDDIF', 'expect':'1', 'check': 'equal'}
+              - {'name':'QPWDRULES', 'expect':'*ALLCRTCHG *DGTLMTAJC *DGTLMTFST
+                  *DGTLMTLST *DGTMIN1 *LMTPRFNAME *MAXLEN128 *MINLEN14 *REQANY3
+                  *SPCCHRLMTAJC *SPCCHRLMTFST *SPCCHRLMTLST', 'check': 'equal_as_list'}
+              - {'name':'QPWDVLDPGM', 'expect':'*REGFAC', 'check': 'equal'}
+              - {'name':'QRMTSIGN', 'expect':'*FRCSIGNON', 'check': 'equal'}
+              - {'name':'QRETSVRSEC', 'expect':'0', 'check': 'equal'}
+              - {'name':'QSECURITY', 'expect':'50', 'check': 'equal'}
+              - {'name':'QSHRMEMCTL', 'expect':'0', 'check': 'equal'}
+              - {'name':'QVFYOBJRST', 'expect':'5', 'check': 'equal'}
+          when: level_mode == '2'
+
+        - name: check if system values compliant with expected
+          include: system_value_check.yml
+          loop: '{{ level1 }}'
+          loop_control:
+            loop_var: sysval
+          when: level_mode == '1'
+
+        - name: check if system values compliant with expected
+          include: system_value_check.yml
+          loop: '{{ level2 }}'
+          loop_control:
+            loop_var: sysval
+          when: level_mode == '2'
+
+        - name: Generate report to file
+          copy:
+            content: "{{ report | to_nice_json(sort_keys=False) }}"
+            dest: '{{ check_result_file }}'
+
+        - name: Check completes
+          debug:
+            msg: Security check report generated successfully, please review at {{ check_result_file }}
+      when: mode != 'B'
+
+    - meta: end_play
+      when: mode == 'A'
+
+    - block:
+        - block:
+            - pause:
+                prompt: |
+                  You're going to remediate the vulnerables base on the check.
+                  Please input the path to the system value check result file.
+              register: report_file
+
+            - name:
+              stat:
+                path: '{{ report_file.user_input }}'
+              register: file
+
+            - fail:
+                msg: Report file does not exist - {{ report_file.user_input }}
+              when: not file.stat.exists
+
+            - name: Display the JSON file content
+              shell: cat {{ report_file.user_input }}
+              register: result
+
+            - name: save the Json data to a Variable as a Fact
+              set_fact:
+                report: "{{ result.stdout | from_json }}"
+          when: mode == 'B'
+
+        - include: system_value_remediation.yml
+          loop: '{{ report }}'
+          loop_control:
+            loop_var: check_item
+
+        - name: Please review remediation result
+          debug:
+            msg:
+              - "↓↓↓↓↓↓ Success list ↓↓↓↓↓↓"
+              - "{{ success_list }}"
+              - "↓↓↓↓↓↓ Fail list ↓↓↓↓↓↓"
+              - "{{ fail_list }}"
+              - "↓↓↓↓↓↓ Skip list ↓↓↓↓↓↓"
+              - "{{ skip_list }}"
+      when: mode != 'A'
