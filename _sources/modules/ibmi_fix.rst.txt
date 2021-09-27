@@ -349,4 +349,32 @@ Return Values
                        [{"PTF_ACTION_PENDING": "NO", "PTF_ACTION_REQUIRED": "NONE", "PTF_CREATION_TIMESTAMP": null, "PTF_IDENTIFIER": "SI70819", "PTF_IPL_ACTION": "NONE", "PTF_IPL_REQUIRED": "UNKNOWN", "PTF_LOADED_STATUS": "SUPERSEDED", "PTF_PRODUCT_ID": "5733SC1", "PTF_SAVE_FILE": "NO", "PTF_STATUS_TIMESTAMP": "2020-09-01T01:15:42", "PTF_TEMPORARY_APPLY_TIMESTAMP": null}, {"PTF_ACTION_PENDING": "NO", "PTF_ACTION_REQUIRED": "NONE", "PTF_CREATION_TIMESTAMP": null, "PTF_IDENTIFIER": "SI72223", "PTF_IPL_ACTION": "NONE", "PTF_IPL_REQUIRED": "UNKNOWN", "PTF_LOADED_STATUS": "SUPERSEDED", "PTF_PRODUCT_ID": "5770DBM", "PTF_SAVE_FILE": "NO", "PTF_STATUS_TIMESTAMP": "2020-09-01T23:01:04", "PTF_TEMPORARY_APPLY_TIMESTAMP": null}]
             
       
+      
+                              
+       requisite_ptf_list
+        | The PTF list contains the requiste PTF of the PTF being applied.
+      
+        | **returned**: When use option apply_only.
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"ptf_id": "SI76012", "requisite": "SI76014"}, {"ptf_id": "SI76012", "requisite": "SI76013"}]
+            
+      
+      
+                              
+       load_fail_dict
+        | The PTF list contains the PTFs which failed to be loaded and the reason. When PTF list which should be loaded is *ALL, the result is empty.
+      
+        | **returned**: When use option apply_only or load_and_apply.
+        | **type**: list      
+        | **sample**:
+
+              .. code-block::
+
+                       [{"SI73543": "OPTION_NOT_INSTALLED"}]
+            
+      
         
