@@ -102,7 +102,7 @@ MrdbConfigComplete = 2
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 def mrdb_retrieve_mirror_state(imodule):
@@ -199,21 +199,21 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     # check special authority *IOSYSCFG
     # get current user's special authority
     command = 'RTVUSRPRF'
     if become_user:
-        command = command + ' USRPRF({0})'.format(become_user)
+        command = command + f' USRPRF({become_user})'
     rc, out, err, job_log = ibmi_module.itoolkit_run_rtv_command_once(
         command, {'SPCAUT': 'char'})
     if rc:
         module.fail_json(
-            rc=rc, msg="Error occurred when call RTVUSRPRF to special authority: {0}".format(str(err)))
+            rc=rc, msg=f"Error occurred when call RTVUSRPRF to special authority: {str(err)}")
     special_authority = out['SPCAUT']
-    ibmi_util.log_info("Special authority is {0}".format(special_authority), module._name)
+    ibmi_util.log_info(f"Special authority is {special_authority}", module._name)
 
     if '*IOSYSCFG' not in special_authority:
         module.fail_json(
@@ -230,13 +230,13 @@ def main():
             rc=state, msg="Error occurred when retrieving the system Db2 Mirror configuration state")
     elif config_state != MrdbConfigInitializing:
         module.fail_json(
-            rc=state, msg="Invalid Db2 Mirror configuration state: {0}".format(state))
+            rc=state, msg=f"Invalid Db2 Mirror configuration state: {state}")
 
     if operation == 'resume':
         # resume must run under tracking state
         if state != MRDB_TRACK_STATE:
             module.fail_json(
-                rc=state, msg="Invalid system mirror state: {0} for suspend activity".format(state))
+                rc=state, msg=f"Invalid system mirror state: {state} for suspend activity")
         result = mrdb_start_engine(ibmi_module)
         if result == ERROR:
             module.fail_json(
@@ -244,24 +244,23 @@ def main():
 
         command = "db2mtool action=_resume"
         rc, out, err = module.run_command(command, use_unsafe_shell=False)
-        ibmi_util.log_debug("Run command={0}, rc={1}, stdout={2}, stderr={3}".format(command, rc, out, err), module._name)
+        ibmi_util.log_debug(f"Run command={command}, rc={rc}, stdout={out}, stderr={err}", module._name)
         if 'Resume for ASP *SYSBAS was successful' not in out:
-            module.fail_json(rc=rc, msg="Error occurred when performing warm clone resume activity, stdout={0}, stderr={1}".format(out, err))
+            module.fail_json(rc=rc, msg=f"Error occurred when performing warm clone resume activity, stdout={out}, stderr={err}")
     else:
         # suspend must run under not mirrored state
         if state != MRDB_NOT_MIRRORED:
             module.fail_json(
-                rc=state, msg="Invalid system mirror state: {0} for suspend activity".format(state))
-        command = "db2mtool action=_suspend timeout={0}".format(
-            suspend_timeout)
+                rc=state, msg=f"Invalid system mirror state: {state} for suspend activity")
+        command = f"db2mtool action=_suspend timeout={suspend_timeout}"
         rc, out, err = module.run_command(command, use_unsafe_shell=False)
-        ibmi_util.log_debug("Run command={0}, rc={1}, stdout={2}, stderr={3}".format(command, rc, out, err), module._name)
+        ibmi_util.log_debug(f"Run command={command}, rc={rc}, stdout={out}, stderr={err}", module._name)
         if 'Suspend for ASP *SYSBAS was successful' not in out:
             module.fail_json(
-                rc=rc, msg="Error occurred when when performing warm clone suspend activity, stdout={0}, stderr={1}".format(out, err))
+                rc=rc, msg=f"Error occurred when when performing warm clone suspend activity, stdout={out}, stderr={err}")
 
     module.exit_json(
-        rc=SUCCESS, msg="Success to perform warm clone activity {0}.".format(operation))
+        rc=SUCCESS, msg=f"Success to perform warm clone activity {operation}.")
 
 
 if __name__ == '__main__':

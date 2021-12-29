@@ -1,0 +1,41 @@
+# test code for the ibmi_fix_network_install_client module
+# (c) 2020, zhaoyao <zhaoyao@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+#
+#Test procedure:
+# 1. setup with default parameters
+# 2. setup with customized parameters
+# 3.     choices: ['setup_only',
+#               'setup_and_addimgclge',
+#               'addimgclge_only',
+#               'rmvimgclge_only',
+#               'rmvimgclge_and_addimgclge',
+#               'uninstall',
+#               'retrieve_image_catalog_entries',
+#               'restart_NFS_server']
+# 4. negative testings
+
+- block:
+  - set_fact:
+      random_number: "{{ 100 | random }}"
+      become_user: null
+      become_user_password: null
+
+  - name: Add client to Ansible in-memory inventory
+    add_host:
+      name: 'cclient'
+      ansible_ssh_host: 'ut202p5.rch.stglabs.ibm.com'
+      ansible_user: 'zhaoyao'
+      ansible_ssh_pass: 'zy1982sj'
+      ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+
+  - name: run test
+    include: test.yml
+    delegate_to: 'cclient'  
+
+  - name: revert
+    debug:
+      msg: "Test completes" 

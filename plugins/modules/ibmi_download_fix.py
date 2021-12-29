@@ -280,7 +280,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 HAS_ITOOLKIT = True
 
@@ -421,25 +421,16 @@ def main():
     try:
         ibmi_module = imodule.IBMiModule(become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {str(inst)}'
         module.fail_json(rc=999, msg=message)
 
     conn = ibmi_module.get_connection()
 
     if image_directory != "*DFT":
-        image_directory = "'{p_image_directory}'".format(p_image_directory=image_directory)
+        image_directory = f"'{image_directory}'"
 
-    command = 'SNDPTFORD PTFID(({p_ptf_id} {p_product} {p_release})) DLVRYFMT({p_delivery_format}) ORDER({p_order}) \
-    REORDER({p_reorder}) CHKPTF({p_check_PTF}) IMGDIR({p_image_directory}) {p_parameters}'.format(
-        p_ptf_id=ptf_id,
-        p_product=product,
-        p_release=release,
-        p_delivery_format=delivery_format,
-        p_order=order,
-        p_reorder=reorder,
-        p_check_PTF=check_PTF,
-        p_image_directory=image_directory,
-        p_parameters=parameters)
+    command = f'SNDPTFORD PTFID(({ptf_id} {product} {release})) DLVRYFMT({delivery_format}) ORDER({order}) \
+    REORDER({reorder}) CHKPTF({check_PTF}) IMGDIR({image_directory}) {parameters}'
 
     cl_sbmjob = "QSYS/SBMJOB CMD(" + ' '.join(command.split()) + ") " + 'LOG(4 *JOBD *SECLVL) ' + 'LOGOUTPUT(*PND) '
     startd = datetime.datetime.now()

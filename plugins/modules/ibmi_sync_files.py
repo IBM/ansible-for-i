@@ -165,7 +165,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 HAS_PARAMIKO = True
 
 try:
@@ -221,7 +221,7 @@ def main():
         ibmi_util.log_debug("mkdir " + ifs_dir, module._name)
         rc, out, err = module.run_command(['mkdir', '-p', ifs_dir], use_unsafe_shell=False)
         if rc != 0 and 'File exists' not in err:
-            return_error(module, "mkdir on current host failed. dir = {p_ifs_dir}. {p_err}".format(p_ifs_dir=ifs_dir, p_err=err), result)
+            return_error(module, f"mkdir on current host failed. dir = {ifs_dir}. {err}", result)
 
         try:
             private_key = to_bytes(private_key, errors='surrogate_or_strict')
@@ -234,9 +234,9 @@ def main():
             sftp = paramiko.SFTPClient.from_transport(transport)
         except Exception as e:
             for i in range(len(src_list)):
-                src_list[i]['fail_reason'] = "{p_to_text}. ".format(p_to_text=to_text(e))
+                src_list[i]['fail_reason'] = f"{to_text(e)}. "
             result.update({'fail_list': src_list})
-            return_error(module, "Exception. {p_to_text}. Use -vvv for more information.".format(p_to_text=to_text(e)), result)
+            return_error(module, f"Exception. {to_text(e)}. Use -vvv for more information.", result)
 
         if dest:
             if dest.startswith('~'):
@@ -249,9 +249,8 @@ def main():
                 sftp.stat(dest)
             except Exception as e:
                 if 'No such file' in to_text(e):
-                    return_error(module, "dest: {p_dest} is not a directory.".format(p_dest=dest), result)
-                return_error(module, "Exception. {p_to_text}. Use -vvv for more information.".format(
-                    p_to_text=to_text(e)), result)
+                    return_error(module, f"dest: {dest} is not a directory.", result)
+                return_error(module, f"Exception. {to_text(e)}. Use -vvv for more information.", result)
 
         for i in range(len(src_list)):
             final_dest = dest
@@ -285,8 +284,7 @@ def main():
                     delete = True
                     delete_list.append(final_src)
                 else:
-                    src_list[i]['fail_reason'] = "Copy file to current host tmp dir failed. cp {p_src} {p_ifs_dir}. {p_err}".format(
-                        p_src=src_list[i]['src'], p_ifs_dir=ifs_dir, p_err=err)
+                    src_list[i]['fail_reason'] = f"Copy file to current host tmp dir failed. cp {src_list[i]['src']} {ifs_dir}. {err}"
                     fail_list.append(src_list[i])
                     continue
             elif src_list[i]['src'].startswith('~'):
@@ -303,17 +301,15 @@ def main():
                 success_list.append(src_list[i])
             except Exception as e:
                 if 'size mismatch' in to_text(e):
-                    src_list[i]['fail_reason'] = "Can't sync file to /QSYS.LIB. Put {p_final_src} to remote host fail.".format(
-                        p_final_src=final_src)
+                    src_list[i]['fail_reason'] = f"Can't sync file to /QSYS.LIB. Put {final_src} to remote host fail."
                 else:
-                    src_list[i]['fail_reason'] = "{p_to_text}. Put {p_final_src} to remote host exception.".format(
-                        p_to_text=to_text(e), p_final_src=final_src)
+                    src_list[i]['fail_reason'] = f"{to_text(e)}. Put {final_src} to remote host exception."
                 fail_list.append(src_list[i])
 
         endd = datetime.datetime.now()
         delta = endd - startd
-        if success_list != []:
-            result['msg'] = "Complete synchronize file list to remote host {p_remote_host}".format(p_remote_host=remote_host)
+        if success_list:
+            result['msg'] = f"Complete synchronize file list to remote host {remote_host}"
             result.update({'stderr': '', 'rc': 0, 'delta': str(delta), 'success_list': success_list, 'fail_list': fail_list})
             module.exit_json(**result)
         else:
@@ -322,8 +318,7 @@ def main():
             module.fail_json(**result)
 
     except Exception as e:
-        return_error(module, "Exception. {p_to_text}. Use -vvv for more information.".format(
-            p_to_text=to_text(e)), result)
+        return_error(module, f"Exception. {to_text(e)}. Use -vvv for more information.", result)
     finally:
         if 'ssh' in vars():
             ssh.close()

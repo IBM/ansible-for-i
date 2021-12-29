@@ -240,7 +240,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -284,55 +284,33 @@ def main():
             ibmi_module = imodule.IBMiModule(
                 db_name=asp_group, become_user_name=become_user, become_user_password=become_user_password)
         except Exception as inst:
-            message = 'Exception occurred: {0}'.format(str(inst))
+            message = f'Exception occurred: {str(inst)}'
             module.fail_json(rc=999, msg=message)
 
         # crtsavf
-        command = 'QSYS/CRTSAVF FILE({p_savefile_lib}/{p_savefile_name})'.format(
-            p_savefile_lib=savefile_lib,
-            p_savefile_name=savefile_name)
+        command = f'QSYS/CRTSAVF FILE({savefile_lib}/{savefile_name})'
         rc, out, error = ibmi_module.itoolkit_run_command(command)
         job_log = ibmi_module.itoolkit_get_job_log(startd)
         ibmi_util.log_debug("CRTSAVF: " + command, module._name)
         if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
             # SAVOBJ
-            command = 'QSYS/SAVOBJ OBJ({p_object_names}) LIB({p_object_lib}) DEV({p_format}) OBJTYPE({p_object_types}) \
-                SAVF({p_savefile_lib}/{p_savefile_name}) TGTRLS({p_target_release}) {p_parameters}'.format(
-                p_object_names=object_names,
-                p_object_lib=object_lib,
-                p_format=format,
-                p_object_types=object_types,
-                p_savefile_lib=savefile_lib,
-                p_savefile_name=savefile_name,
-                p_target_release=target_release,
-                p_parameters=parameters)
+            command = f'QSYS/SAVOBJ OBJ({object_names}) LIB({object_lib}) DEV({format}) OBJTYPE({object_types}) \
+                SAVF({savefile_lib}/{savefile_name}) TGTRLS({target_release}) {parameters}'
             rc, out, error = ibmi_module.itoolkit_run_command(' '.join(command.split()))
         else:
             if 'CPF5813' in str(job_log):
                 ibmi_util.log_debug("SAVF " + savefile_name + " already exists", module._name)
                 if force_save is True:
                     # CLRSAVF
-                    command = 'QSYS/CLRSAVF FILE({p_savefile_lib}/{p_savefile_name})'.format(
-                        p_savefile_lib=savefile_lib,
-                        p_savefile_name=savefile_name)
+                    command = f'QSYS/CLRSAVF FILE({savefile_lib}/{savefile_name})'
                     rc, out, error = ibmi_module.itoolkit_run_command(command)
                     ibmi_util.log_debug("CLRSAVF: " + command, module._name)
                     if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-                        command = 'QSYS/SAVOBJ OBJ({p_object_names}) LIB({p_object_lib}) DEV({p_format}) OBJTYPE({p_object_types}) \
-                            SAVF({p_savefile_lib}/{p_savefile_name}) TGTRLS({p_target_release}) {p_parameters}'.format(
-                            p_object_names=object_names,
-                            p_object_lib=object_lib,
-                            p_format=format,
-                            p_object_types=object_types,
-                            p_savefile_lib=savefile_lib,
-                            p_savefile_name=savefile_name,
-                            p_target_release=target_release,
-                            p_parameters=parameters)
+                        command = f'QSYS/SAVOBJ OBJ({object_names}) LIB({object_lib}) DEV({format}) OBJTYPE({object_types}) \
+                            SAVF({savefile_lib}/{savefile_name}) TGTRLS({target_release}) {parameters}'
                         rc, out, error = ibmi_module.itoolkit_run_command(' '.join(command.split()))
                 else:
-                    out = 'File {p_savefile_name} in library {p_savefile_lib} already exists. Set force_save to force save.'.format(
-                        p_savefile_name=savefile_name,
-                        p_savefile_lib=savefile_lib)
+                    out = f'File {savefile_name} in library {savefile_lib} already exists. Set force_save to force save.'
 
         endd = datetime.datetime.now()
         delta = endd - startd

@@ -14,7 +14,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 display = Display()
 
@@ -30,11 +30,9 @@ class ActionModule(ActionBase):
     def _calculate_savf_path(self, savefile_name, lib_name):
         # Calculate savf path when object is a *FILE
         if lib_name != 'QSYS':
-            savf_path = '/QSYS.LIB/{p_lib_name}.LIB/{p_savefile_name}.FILE'.format(
-                p_lib_name=lib_name,
-                p_savefile_name=savefile_name)
+            savf_path = f'/QSYS.LIB/{lib_name}.LIB/{savefile_name}.FILE'
         else:
-            savf_path = '/QSYS.LIB/{p_savefile_name}.FILE'.format(p_savefile_name=savefile_name)
+            savf_path = f'/QSYS.LIB/{savefile_name}.FILE'
 
         return savf_path
 
@@ -45,34 +43,24 @@ class ActionModule(ActionBase):
         msg = ''
 
         if lib_name != 'QSYS':
-            savf_path = '/QSYS.LIB/{p_lib_name}.LIB/{p_original_savf_name}.FILE'.format(
-                p_lib_name=lib_name,
-                p_original_savf_name=original_savf_name)
+            savf_path = f'/QSYS.LIB/{lib_name}.LIB/{original_savf_name}.FILE'
         else:
-            savf_path = '/QSYS.LIB/{p_original_savf_name}.FILE'.format(p_original_savf_name=original_savf_name)
+            savf_path = f'/QSYS.LIB/{original_savf_name}.FILE'
         i = 1
         while (self._execute_remote_stat(savf_path, all_vars=task_vars, follow=False))['exists']:
             if i > 9:
-                msg = 'Rename failure. SAVF names ({p_savf_path} range(1,{p_str})) are already exist on IBMi. Failed'.format(
-                    p_savf_path=savf_path,
-                    p_str=str(i))
+                msg = f'Rename failure. SAVF names ({savf_path} range(1,{str(i)})) are already exist on IBMi. Failed'
                 return savf_name, savf_path, msg
             if len(original_savf_name + str(i)) <= 10:
                 if lib_name != 'qsys':
-                    savf_path = '/QSYS.LIB/{p_lib_name}.LIB/{p_original_savf_name}.FILE'.format(
-                        p_lib_name=lib_name,
-                        p_original_savf_name=original_savf_name + str(i))
+                    savf_path = f'/QSYS.LIB/{lib_name}.LIB/{original_savf_name + str(i)}.FILE'
                 else:
-                    savf_path = '/QSYS.LIB/{p_original_savf_name}.FILE'.format(p_original_savf_name=original_savf_name + str(i))
-                savf_name = original_savf_name + str(i)
+                    savf_path = f'/QSYS.LIB/{original_savf_name + str(i)}.FILE'
             else:
                 if lib_name != 'qsys':
-                    savf_path = '/QSYS.LIB/{p_lib_name}.LIB/{p_original_savf_name}.FILE'.format(
-                        p_lib_name=lib_name,
-                        p_original_savf_name=original_savf_name[0:9] + str(i))
+                    savf_path = f'/QSYS.LIB/{lib_name}.LIB/{original_savf_name[0:9] + str(i)}.FILE'
                 else:
-                    savf_path = '/QSYS.LIB/{p_original_savf_name}.FILE'.format(
-                        p_original_savf_name=original_savf_name[0:9] + str(i))
+                    savf_path = f'/QSYS.LIB/{original_savf_name[0:9] + str(i)}.FILE'
                 savf_name = original_savf_name[0:9] + str(i)
             i += 1
 
@@ -154,9 +142,7 @@ class ActionModule(ActionBase):
                             result['failed'] = True
                             return result
                         else:
-                            cmd = "QSYS/REN OBJ('{p_savefile_path}') NEWOBJ({p_rename_savf_name}.file)".format(
-                                p_savefile_path=savefile_path,
-                                p_rename_savf_name=rename_savf_name)
+                            cmd = f"QSYS/REN OBJ('{savefile_path}') NEWOBJ({rename_savf_name}.file)"
                             module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd}, task_vars=task_vars)
                             save_result = module_output
                             rc = save_result['rc']
@@ -168,12 +154,9 @@ class ActionModule(ActionBase):
                                 result['rc'] = save_result['rc']
                                 result['failed'] = True
                                 return result
-                        display.debug("ibm i debug: The original save file is successfully renamed to {p_rename_savf_name}".format(
-                            p_rename_savf_name=rename_savf_name))
+                        display.debug(f"ibm i debug: The original save file is successfully renamed to {rename_savf_name}")
                     else:
-                        cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savefile_name}) OBJTYPE(*FILE)'.format(
-                            p_lib_name=lib_name,
-                            p_savefile_name=savefile_name)
+                        cmd = f'QSYS/DLTOBJ OBJ({lib_name}/{savefile_name}) OBJTYPE(*FILE)'
                         module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd}, task_vars=task_vars)
                         save_result = module_output
                         rc = save_result['rc']
@@ -192,21 +175,19 @@ class ActionModule(ActionBase):
                     return result
 
             # Create the save file
-            cmd = 'QSYS/CRTSAVF FILE({p_lib_name}/{p_savefile_name})'.format(
-                p_lib_name=lib_name,
-                p_savefile_name=savefile_name)
+            cmd = f'QSYS/CRTSAVF FILE({lib_name}/{savefile_name})'
             module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd}, task_vars=task_vars)
             save_result = module_output
             rc = save_result['rc']
             if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-                result['msg'] += "Failed to create SAVF: {p_savefile_path} on remote.".format(p_savefile_path=savefile_path)
+                result['msg'] += f"Failed to create SAVF: {savefile_path} on remote."
                 result['stderr'] = save_result['stderr_lines']
                 result['stdout'] = save_result['stdout_lines']
                 result['job_log'] = save_result['job_log']
                 result['rc'] = save_result['rc']
                 result['failed'] = True
                 return result
-            display.debug("ibm i debug: transfer {p_src} to {p_savefile_path}".format(p_src=src, p_savefile_path=savefile_path))
+            display.debug(f"ibm i debug: transfer {src} to {savefile_path}")
             self._transfer_file(src, savefile_path)
 
             local_checksum = checksum(src)
@@ -226,20 +207,17 @@ class ActionModule(ActionBase):
             result.update(dict(msg="File is successfully copied.", src=src, delta=str(delta), dest=savefile_path), rc=0)
 
         except Exception as e:
-            result['msg'] += "{p_to_text}".format(p_to_text=to_text(e))
+            result['msg'] += f"{to_text(e)}"
             result['failed'] = True
             return result
         finally:
             if created is True and result['failed'] is True:
-                cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savefile_name}) OBJTYPE(*FILE)'.format(
-                    p_lib_name=lib_name,
-                    p_savefile_name=savefile_name)
+                cmd = f'QSYS/DLTOBJ OBJ({lib_name}/{savefile_name}) OBJTYPE(*FILE)'
                 module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd}, task_vars=task_vars)
                 save_result = module_output
                 rc = save_result['rc']
                 if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS and ('CPF2105' not in save_result['stderr']):
-                    result['msg'] += "Failed to delete the new created save file {p_savefile_path} on remote. ".format(
-                        p_savefile_path=savefile_path)
+                    result['msg'] += f"Failed to delete the new created save file {savefile_path} on remote. "
                     result['job_log'] = save_result['job_log']
 
         return result

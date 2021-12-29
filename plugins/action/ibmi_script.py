@@ -12,7 +12,7 @@ from ansible.module_utils.six import string_types
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 display = Display()
 
 
@@ -26,6 +26,8 @@ class ActionModule(ActionBase):
         'type',
         'parameters',
         'severity_level',
+        'become_user',
+        'become_user_password',
     ))
 
     def run(self, tmp=None, task_vars=None):
@@ -87,7 +89,7 @@ class ActionModule(ActionBase):
                 raise AnsibleActionFail(to_native(inst))
 
             tmp_src = self._connection._shell.join_path(self._connection._shell.tmpdir, os.path.basename(src))
-            display.debug("ibm i debug: transfer script file {p_src} to {p_tmp_src}".format(p_src=src, p_tmp_src=tmp_src))
+            display.debug(f"ibm i debug: transfer script file {src} to {tmp_src}")
             self._transfer_file(src, tmp_src)
 
             local_checksum = checksum(src)
@@ -95,8 +97,7 @@ class ActionModule(ActionBase):
                 remote_checksum = self._remote_checksum(tmp_src, all_vars=task_vars, follow=True)
 
             if remote_checksum in ('1', '2', None):
-                result['stderr'] += "The permissions are lacking or privilege is needed. remote_checksum:{p_remote_checksum}".format(
-                    p_remote_checksum=remote_checksum)
+                result['stderr'] += f"The permissions are lacking or privilege is needed. remote_checksum:{remote_checksum}"
             elif local_checksum != remote_checksum:
                 result['stderr'] += "local_checksum doesn't match remote_checksum."
                 result['failed'] = True
@@ -109,13 +110,13 @@ class ActionModule(ActionBase):
 
             if result['rc']:
                 result['failed'] = True
-                result.update(dict(stderr=("Failed to execute script file {p_src}.".format(p_src=src)) + result['stderr'],
+                result.update(dict(stderr=(f"Failed to execute script file {src}.") + result['stderr'],
                                    delta=str(delta)))
             else:
-                result.update(dict(stdout="Successfully execute script file {p_src}.".format(p_src=src), delta=str(delta)))
+                result.update(dict(stdout=f"Successfully execute script file {src}.", delta=str(delta)))
 
         except Exception as e:
-            result['stderr'] += "{p_to_text}".format(p_to_text=to_text(e))
+            result['stderr'] += f"{to_text(e)}"
             result['failed'] = True
             return result
         finally:

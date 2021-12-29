@@ -159,7 +159,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -197,12 +197,13 @@ def main():
     check_command = "QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD(*ASP)"
     args = ['system', check_command]
     rc, out, error = module.run_command(args, use_unsafe_shell=False)
-    ibmi_util.log_info("Command {check_command} return: rc={rc}, stdout={out}, stderr={error}.".format(
-        check_command=check_command, rc=rc, out=out, error=error), module._name)
+    ibmi_util.log_info(
+        f"Command {check_command} return: rc={rc}, stdout={out}, stderr={error}.", module._name)
     if not rc:
         for device in device_list:
             if device.upper() in out:
-                ibmi_util.log_info("Device {0} is IASP device, does not support become user.".format(device), module._name)
+                ibmi_util.log_info(
+                    f"Device {device} is IASP device, does not support become user.", module._name)
                 is_iasp = True
     job_log = []
     if is_iasp:
@@ -213,7 +214,7 @@ def main():
             ibmi_module = imodule.IBMiModule(
                 become_user_name=become_user, become_user_password=become_user_password)
         except Exception as inst:
-            message = 'Exception occurred: {0}'.format(str(inst))
+            message = f'Exception occurred: {inst}'
             module.fail_json(rc=999, msg=message)
         rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
 

@@ -1,0 +1,322 @@
+# Copyright (c) IBM Corporation 2021, 2021
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+---
+- name: run ARE template on the clients
+  # This playbook will send ARE template from server to clients, run it and print the result summary.
+  # All the results files will be transferred back to the server
+
+  # Command example: ansible-playbook ./run_ARE_template.yml
+  # -e "{'ARE_clients': 'systemA', 'template_server': 'templateserver', 'template_name': '/tmp/PTF_SI71234.jar', 'ARE_results_dir_on_server': '/tmp/results'}"
+  hosts: "{{ ARE_clients }}"
+  gather_facts: true
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    template_server: "{{ template_server }}"
+    template_name: "{{ template_name }}"
+    template_dir_on_client: "{{ template_dir_client | default('/etc/ibmi_ansible/fix_management/ARE/templates') }}"
+    ARE_results_dir_on_client: "{{ ARE_results_dir_client | default('/etc/ibmi_ansible/fix_management/ARE/results') }}"
+    ARE_results_name_on_client: "{{ ARE_results_name_client | default(template_name | basename | splitext | first + '.out') }}"
+    ARE_results_dir_on_server: "{{ ARE_results_dir_server }}"
+    remove_ARE_template_on_client: "{{ remove_ARE_template_client | default(true) }}"
+
+  tasks:
+    - name: check if template file exists on the server
+      block:
+        - name: check if template file exists on the server
+          stat:
+            path: '{{ template_name }}'
+          register: src_template_status
+          delegate_to: "{{ template_server }}"
+          run_once: true
+
+        - block:
+            - name: skip when template file does not exist
+              debug:
+                msg: "{{ 'Template file ' + template_name + ' does not exist, end host.' }}"
+
+            - name: end_host
+              meta: end_host
+          when: src_template_status.stat.exists == false
+
+    - name: create subdirectory under ARE_results_dir_on_server to indicate which system the ARE result file is from
+      block:
+        - name: check if ARE results directory exists on the server
+          stat:
+            path: "{{ ARE_results_dir_on_server }}"
+          register: results_dir_server_status
+          delegate_to: "{{ template_server }}"
+          run_once: true
+
+        - name: create ARE results directory on the server if it does not exist
+          file:
+            path: "{{ ARE_results_dir_on_server }}"
+            state: directory
+            mode: 0755
+          register: results_dir_server_result
+          delegate_to: "{{ template_server }}"
+          ignore_errors: true
+          run_once: true
+          when: results_dir_server_status.stat.exists == false
+
+        - name: set subdirectory for each client under ARE results directory on the server
+          set_fact:
+            ARE_results_fulldir_server: "{{ ARE_results_dir_on_server }}/{{ ansible_hostname }}"
+
+        - name: check if subdirectory under ARE results directory exists on the server
+          stat:
+            path: "{{ ARE_results_fulldir_server | replace('//', '/') }}"
+          register: results_dir_server_fullpath_status
+          delegate_to: "{{ template_server }}"
+          run_once: true
+
+        - name: create subdirectory on the server if it does not exist
+          file:
+            path: "{{ ARE_results_fulldir_server | replace('//', '/') }}"
+            state: directory
+            mode: 0755
+          register: results_dir_server_fullpath_result
+          delegate_to: "{{ template_server }}"
+          ignore_errors: true
+          run_once: true
+          when: results_dir_server_fullpath_status.stat.exists == false
+
+    - name: transfer ARE template to the client
+      block:
+        - name: check if template directory specified exist on the client
+          stat:
+            path: "{{ template_dir_on_client }}"
+          register: dest_template_dir_status
+
+        - name: create template directory on the client if it does not exist
+          file:
+            path: "{{ template_dir_on_client }}"
+            state: directory
+            mode: 0755
+          register: dest_file_result
+          ignore_errors: true
+          when: dest_template_dir_status.stat.exists == false
+
+        - block:
+            - name: skip when creating template directory failed
+              debug:
+                msg: "{{ 'Make template dir ' + template_dir_on_client + ' fail, end host.' }}"
+
+            - name: end_host
+              meta: end_host
+          when: dest_template_dir_status.stat.exists == false and dest_file_result.failed == 1
+
+        - block:
+            - name: transfer ARE template to the client
+              ibm.power_ibmi.ibmi_synchronize_files:
+                src_list:
+                  - {'src': '{{ template_name }}', 'dest':'{{ template_dir_on_client }}'}
+              delegate_to: "{{ template_server }}"
+              ignore_errors: true
+              register: sync_result
+
+            - block:
+                - name: skip when transfer failed
+                  debug:
+                    msg: "template file transfer failed, quit ARE action."
+
+                - name: end_host
+                  meta: end_host
+              when: sync_result.rc != 0
+          when: template_name != "" and dest_template_dir_status.stat.exists == true
+      when: src_template_status.stat.exists == true
+
+    - name: run ARE on the client
+      block:
+        - name: check if ARE results directory exists on the client
+          stat:
+            path: '{{ ARE_results_dir_on_client }}'
+          register: results_dir_status
+
+        - name: create ARE results directory on the client if it does not exist
+          file:
+            path: "{{ ARE_results_dir_on_client }}"
+            state: directory
+            mode: 0755
+          register: ARE_results_dir_result
+          ignore_errors: true
+          when: results_dir_status.stat.exists == false
+
+        - block:
+            - name: skip when creating ARE results directory failed
+              debug:
+                msg: "{{ 'Make template dir ' + ARE_results_dir_on_client + ' fail, end host.' }}"
+
+            - name: end_host
+              meta: end_host
+          when: results_dir_status.stat.exists == false and ARE_results_dir_result.failed == 1
+
+        - name: set full name of ARE results files
+          set_fact:
+            ARE_results_client: "{{ ARE_results_dir_on_client }}/{{ ARE_results_name_on_client }}"
+
+        - name: run ARE script
+          shell:
+          args:
+            cmd: "/QIBM/ProdData/OS/OSGi/healthcheck/bin/runARE.sh -template {{ template_name | basename }} \
+                  -outFile {{ ARE_results_client | replace('//', '/') }} || /qopensys/usr/bin/true"
+            chdir: "{{ template_dir_on_client }}"
+            executable: /qopensys/usr/bin/qsh
+          register: template_results
+
+        - name: get current timestamp
+          set_fact:
+            ARE_results_name_timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+
+
+    - name: handle ARE results
+      block:
+        - name: check if ARE result file file_name.summary.txt, i.e PTF_SI71234.out.summary.txt, exists
+          stat:
+            path: "{{ ARE_results_client | replace('//', '/') }}.summary.txt"
+          register: ARE_result_summary_status
+
+        - name: check if ARE result file file_name, i.e PTF_SI71234.out, exists
+          stat:
+            path: "{{ ARE_results_client | replace('//', '/') }}"
+          register: ARE_result_out_status
+
+        - name: check if ARE result file file_name.xml, i.e PTF_SI71234.out.xml, exists
+          stat:
+            path: "{{ ARE_results_client | replace('//', '/') }}.xml"
+          register: ARE_result_xml_status
+
+
+        - name: trasnfer ARE result file file_name.summary.txt to server
+          block:
+            - name: transfer ARE result file file_name.summary.txt from client to server
+              ibm.power_ibmi.ibmi_sync_files:
+                src_list:
+                  - {'src': '{{ ARE_results_client | replace("//", "/") }}.summary.txt', 'dest': '{{ ARE_results_fulldir_server | replace("//", "/") }}'}
+                remote_host: '{{ hostvars[template_server]["ansible_ssh_host"] }}'
+                remote_user: '{{ hostvars[template_server]["ansible_ssh_user"] }}'
+                private_key: '/home/{{ ansible_ssh_user }}/.ssh/id_rsa'
+              ignore_errors: true
+              register: sync_ARE_result_summary_status
+
+            - name: skip when transfer ARE result file file_name.summary.txt failed
+              debug:
+                msg: "ARE result file \
+                     {{ ARE_results_client | basename }}.summary.txt \
+                     transfer failed."
+              when: sync_ARE_result_summary_status.rc != 0
+
+            - name: handle ARE result file *.summary.txt on the server
+              block:
+                - name: set the file name by adding timestamp
+                  set_fact:
+                    ARE_result_name_summary: "{{ ARE_results_client | replace('//', '/') | basename | splitext | \
+                                              first }}_{{ ARE_results_name_timestamp }}{{ ARE_results_client | \
+                                              replace('//', '/') | basename | splitext | last }}.summary.txt"
+                - name: add timestamp in the file name, i.e PTF_SI71234_20211111T035045.out.summary.txt
+                  shell: "mv {{ ARE_results_client | replace('//', '/') | basename }}.summary.txt {{ ARE_result_name_summary }}"
+                  args:
+                    chdir: "{{ ARE_results_fulldir_server | replace('//', '/') }}"
+                  delegate_to: "{{ template_server }}"
+
+                - name: print the result content
+                  block:
+                    - name: read ARE result content in the summary file
+                      command: "cat {{ ARE_result_name_summary }}"
+                      args:
+                        chdir: "{{ ARE_results_fulldir_server | replace('//', '/') }}"
+                      delegate_to: "{{ template_server }}"
+                      register: ARE_result_summary_content
+
+                    - name: print the ARE result content
+                      debug:
+                        msg:
+                          - '**************************************************'
+                          - '*                  ARE result                    *'
+                          - '**************************************************'
+                          - "{{ ARE_result_summary_content.stdout_lines }}"
+              when: sync_ARE_result_summary_status.rc == 0
+
+          when: ARE_result_summary_status.stat.exists == true
+
+
+        - name: trasnfer ARE result file to the server
+          block:
+            - name: transfer ARE result file file_name from client to server
+              ibm.power_ibmi.ibmi_sync_files:
+                src_list:
+                  - {'src': '{{ ARE_results_client | replace("//", "/") }}', 'dest': '{{ ARE_results_fulldir_server | replace("//", "/") }}'}
+                remote_host: '{{ hostvars[template_server]["ansible_ssh_host"] }}'
+                remote_user: '{{ hostvars[template_server]["ansible_ssh_user"] }}'
+                private_key: '/home/{{ ansible_ssh_user }}/.ssh/id_rsa'
+              ignore_errors: true
+              register: sync_ARE_result_out_status
+
+            - name: skip when transfer ARE result file file_name failed
+              debug:
+                msg: "ARE result file \
+                     {{ ARE_results_client | basename }} \
+                     transfer failed."
+              when: sync_ARE_result_out_status.rc != 0
+
+            - block:
+                - name: set the file name by adding timestamp
+                  set_fact:
+                    ARE_result_name_out: "{{ ARE_results_client | replace('//', '/') | basename | splitext | first \
+                                          }}_{{ ARE_results_name_timestamp }}{{ ARE_results_client | replace('//', '/') \
+                                          | basename | splitext | last }}"
+
+                - name: add timestamp in the file name, i.e PTF_SI71234_20211111T035045.out
+                  shell: mv "{{ ARE_results_client | replace('//', '/') | basename }}" "{{ ARE_result_name_out }}"
+                  args:
+                    chdir: "{{ ARE_results_fulldir_server | replace('//', '/') }}"
+                  delegate_to: "{{ template_server }}"
+              when: sync_ARE_result_out_status.rc == 0
+          when: ARE_result_out_status.stat.exists == true
+
+        - name: trasnfer ARE result file file_name.xml to server
+          block:
+            - name: transfer ARE result file file_name.xml from client to server
+              ibm.power_ibmi.ibmi_sync_files:
+                src_list:
+                  - {'src': '{{ ARE_results_client | replace("//", "/") }}.xml', 'dest': '{{ ARE_results_fulldir_server | replace("//", "/") }}'}
+                remote_host: '{{ hostvars[template_server]["ansible_ssh_host"] }}'
+                remote_user: '{{ hostvars[template_server]["ansible_ssh_user"] }}'
+                private_key: '/home/{{ ansible_ssh_user }}/.ssh/id_rsa'
+              ignore_errors: true
+              register: sync_ARE_result_xml_status
+
+            - name: skip when transfer ARE result file file_name.xml failed
+              debug:
+                msg: "ARE result file transfer \
+                     {{ ARE_results_client | basename }}.xml \
+                     transfer failed."
+              when: sync_ARE_result_xml_status.rc != 0
+
+            - block:
+                - name: set the file name by adding timestamp
+                  set_fact:
+                    ARE_result_name_xml: "{{ ARE_results_client | replace('//', '/') | basename | splitext | first \
+                                         }}_{{ ARE_results_name_timestamp }}{{ ARE_results_client | replace('//', '/') \
+                                         | basename | splitext | last }}.xml"
+
+                - name: add timestamp in the file name, i.e PTF_SI71234_20211111T035045.out.xml
+                  shell: "mv {{ ARE_results_client | replace('//', '/') | basename }}.xml {{ ARE_result_name_xml }}"
+                  args:
+                    chdir: "{{ ARE_results_fulldir_server | replace('//', '/') }}"
+                  delegate_to: "{{ template_server }}"
+              when: sync_ARE_result_xml_status.rc == 0
+          when: ARE_result_xml_status.stat.exists == true
+
+    - name: remove ARE template file on the client if needed
+      block:
+        - name: set ARE template file which will be removed on the client
+          set_fact:
+            template_to_remove: "{{ template_dir_on_client }}/{{ template_name | basename}}"
+
+        - name: remove ARE template file on the client if needed
+          file:
+            path: "{{template_to_remove | replace('//', '/')}}"
+            state: absent
+      when: remove_ARE_template_on_client == true

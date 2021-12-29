@@ -169,7 +169,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 single_ptf_table = 'single_ptf_info'
 ptf_group_image_table = 'ptf_group_image_info'
@@ -362,7 +362,7 @@ def check_param(module, parameters, _type, checksum):
             try:
                 group_item['ptf_group_level'] = int(group_level)
             except ValueError as ex:
-                group_item['msg'] = 'Group level [%s] cannot be converted to int. %s' % (group_level, ex)
+                group_item['msg'] = f'Group level [{group_level}] cannot be converted to int. {ex}'
                 group_item['rc'] = -5
                 fail_list.append(group_item)
                 continue
@@ -503,10 +503,9 @@ def select_table_dict(_type):
 def build_sql_init(_type):
     table, table_dict, constraints = select_table_dict(_type)
     fields = ''
-    for item in table_dict.items():
-        fields += '%s %s, ' % item
-    sql = 'CREATE TABLE IF NOT EXISTS {table} ({fields} {constraints})'.format(
-        table=table, fields=fields, constraints=constraints)
+    for k, v in table_dict.items():
+        fields += f'{k} {v}, '
+    sql = f'CREATE TABLE IF NOT EXISTS {table} ({fields} {constraints})'
     return sql
 
 
@@ -525,10 +524,11 @@ def build_sql_update(_type, parameters):
             if param_key not in constraints_list:
                 upserts += param_key + '=excluded.' + param_key + ', '
     if upserts != '':
-        conflictions = 'ON CONFLICT({constraints}) DO UPDATE SET {upserts}'.format(
-            constraints=constraints, upserts=upserts.rstrip(', '))
-    return 'INSERT INTO {table} ({name}) VALUES({value}) {conflictions}'.format(
-        table=table, name=names.rstrip(', '), value=values.rstrip(', '), conflictions=conflictions)
+        upserts = upserts.rstrip(', ')
+        conflictions = f'ON CONFLICT({constraints}) DO UPDATE SET {upserts}'
+    name = names.rstrip(', ')
+    value = values.rstrip(', ')
+    return f'INSERT INTO {table} ({name}) VALUES({value}) {conflictions}'
 
 
 def build_sql_delete(_type, parameters):
@@ -542,7 +542,7 @@ def build_sql_delete(_type, parameters):
         where += unique_key + '=:' + unique_key + ' AND '
     if where.endswith(' AND '):
         where = where[:-5]
-    return 'DELETE FROM {table} WHERE {where}'.format(table=table, where=where)
+    return f'DELETE FROM {table} WHERE {where}'
 
 
 def build_sql_find(_type, parameter):
@@ -559,9 +559,9 @@ def build_sql_find(_type, parameter):
         where += unique_key + '=:' + unique_key + ' AND '
     if where.endswith(' AND '):
         where = where[:-5]
-        return 'SELECT * FROM {table} WHERE {where} {additional_param}'.format(table=table, where=where, additional_param=additional_param)
+        return f'SELECT * FROM {table} WHERE {where} {additional_param}'
     else:
-        return 'SELECT * FROM {table} {additional_param}'.format(table=table, additional_param=additional_param)
+        return f'SELECT * FROM {table} {additional_param}'
 
 
 def dict_factory(cursor, row):

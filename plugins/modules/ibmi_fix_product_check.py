@@ -105,7 +105,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 def get_product_info(imodule, product_id, release_level, product_option, load_id):
@@ -186,7 +186,7 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     ptfs_with_product_installed = []
@@ -197,19 +197,19 @@ def main():
             release_level = ptf['release']
             ptf_id = ptf['ptf_id']
         except KeyError as ke:
-            message = 'KeyError: missing key {0} in the input PTFs dict list'.format(str(ke))
+            message = f'KeyError: missing key {ke} in the input PTFs dict list'
             module.fail_json(rc=999, msg=message)
-        ibmi_util.log_info('Checking PTF {0} {1} {2}'.format(ptf_id, product_id, release_level), sys._getframe().f_code.co_name)
+        ibmi_util.log_info(f'Checking PTF {ptf_id} {product_id} {release_level}', sys._getframe().f_code.co_name)
         rc, product_info, out = get_product_info(
             ibmi_module, product_id, release_level, '0000', '*CODE')
         if (rc == 0) and (product_info['Load_Error_Indicator'] == '*NONE') and (product_info['Symbolic_Load_State'] == '*INSTALLED'):
             ptfs_with_product_installed.append(ptf)
-            ibmi_util.log_info('Product for PTF {0} {1} {2} was installed'.format(
-                ptf_id, product_id, release_level), sys._getframe().f_code.co_name)
+            ibmi_util.log_info(
+                f'Product for PTF {ptf_id} {product_id} {release_level} was installed', sys._getframe().f_code.co_name)
         else:
             ptfs_without_product_installed.append(ptf)
-            ibmi_util.log_info('Product for PTF {0} {1} {2} was not installed or error occurred'.format(
-                ptf_id, product_id, release_level), sys._getframe().f_code.co_name)
+            ibmi_util.log_info(
+                f'Product for PTF {ptf_id} {product_id} {release_level} was not installed or error occurred', sys._getframe().f_code.co_name)
 
     result = dict(
         rc=0,

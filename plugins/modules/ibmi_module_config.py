@@ -123,7 +123,7 @@ import json
 import os
 import pwd
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -188,15 +188,13 @@ def main():
                 rc=0,
                 version=__ibmi_module_version__,
                 settings=load_dict,
-                msg="Success to dump IBMi Ansible module settings, config file = {0}".format(
-                    config_path)
+                msg=f"Success to dump IBMi Ansible module settings, config file = {config_path}"
             )
         except Exception as e:
             module.fail_json(
                 rc=255,
                 version=__ibmi_module_version__,
-                msg="Error occurred when dump IBMi Ansible module settings: {0}".format(
-                    str(e))
+                msg=f"Error occurred when dump IBMi Ansible module settings: {str(e)}"
             )
 
     try:
@@ -206,15 +204,13 @@ def main():
         module.fail_json(
             rc=255,
             version=__ibmi_module_version__,
-            msg="Error occurred when create IBMi Ansible log directory: {0}, {1}".format(
-                log_dir, str(e))
+            msg=f"Error occurred when create IBMi Ansible log directory: {log_dir}, {str(e)}"
         )
     if not os.access(log_dir, os.W_OK):
         module.fail_json(
             rc=255,
             version=__ibmi_module_version__,
-            msg="Current user write permission denied for IBMi Ansible log directory: {0}".format(
-                log_dir)
+            msg=f"Current user write permission denied for IBMi Ansible log directory: {log_dir}"
         )
 
     if config_dir == 'home':
@@ -228,16 +224,14 @@ def main():
         module.fail_json(
             rc=255,
             version=__ibmi_module_version__,
-            msg="Error occurred when create IBMi Ansible configuration directory: {0}, {1}".format(
-                log_config_dir, str(e))
+            msg=f"Error occurred when create IBMi Ansible configuration directory: {log_config_dir}, {str(e)}"
         )
 
     if not os.access(log_config_dir, os.W_OK):
         module.fail_json(
             rc=255,
             version=__ibmi_module_version__,
-            msg="Current user write permission denied for IBMi Ansible configuration directory: {0}".format(
-                log_config_dir)
+            msg=f"Current user write permission denied for IBMi Ansible configuration directory: {log_config_dir}"
         )
     config_dict = default_settings
     config_dict['time'] = str(datetime.datetime.now())
@@ -258,8 +252,7 @@ def main():
         module.fail_json(
             rc=255,
             version=__ibmi_module_version__,
-            msg="Error occurred when create IBMi Ansible configuration file: {0}, {1}".format(
-                log_config_file_path, str(e))
+            msg=f"Error occurred when create IBMi Ansible configuration file: {log_config_file_path}, {str(e)}"
         )
 
     if log_config_dir == ibmi_util.IBMi_DEFAULT_CONFIG_DIR:

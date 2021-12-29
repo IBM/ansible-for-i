@@ -359,7 +359,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_to
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -457,7 +457,7 @@ def main():
     if state == "present":
         # check options
         opt_vlan_id = "" if vlan_id is None else vlan_id
-        opt_line_description = "" if line_description is None else "LIND(" + line_description + " " + opt_vlan_id + ") "
+        opt_line_desc = "" if line_description is None else "LIND(" + line_description + " " + opt_vlan_id + ") "
         opt_subnet_mask = "" if subnet_mask is None else "SUBNETMASK('" + subnet_mask + "') "
         opt_alias_name = "" if alias_name is None else "ALIASNAME(" + alias_name + ") "
         opt_associate = "" if associated_local_interface is None else "LCLIFC(" + associated_local_interface + ") "
@@ -465,22 +465,19 @@ def main():
         opt_max_transmission_unit = "" if max_transmission_unit is None else "MTU(" + max_transmission_unit + ") "
         opt_auto_start = "" if auto_start is None else "AUTOSTART(" + auto_start + ") "
         opt_preferred_ifc = "" if preferred_interface is None else "PREFIFC('" + "' '".join(preferred_interface) + "') "
-        opt_text_desc = "" if text_description is None else "TEXT('" + text_description + "') "
+        opt_text = "" if text_description is None else "TEXT('" + text_description + "') "
 
-        # options_without_alias_name = opt_line_description + opt_subnet_mask + \
+        # x = opt_line_desc + opt_subnet_mask + \
         #                              opt_associate + opt_type_of_service + \
-        #                              opt_max_transmission_unit + opt_auto_start + opt_preferred_ifc + opt_text_desc
-        options_without_alias_name = "{0}{1}{2}{3}{4}{5}{6}{7}".format(opt_line_description, opt_subnet_mask,
-                                                                       opt_associate, opt_type_of_service,
-                                                                       opt_max_transmission_unit, opt_auto_start,
-                                                                       opt_preferred_ifc, opt_text_desc)
+        #                              opt_max_transmission_unit + opt_auto_start + opt_preferred_ifc + opt_text
+        x = f"{opt_line_desc}{opt_subnet_mask}{opt_associate}{opt_type_of_service}{opt_max_transmission_unit}{opt_auto_start}{opt_preferred_ifc}{opt_text}"
 
-        options = options_without_alias_name + opt_alias_name
+        options = x + opt_alias_name
 
         if (internet_address is not None) and (options == ""):
             # nothing to add or change means to query
             only_query = True
-        elif (opt_alias_name is not None) and (internet_address is None) and (options_without_alias_name == ""):
+        elif (opt_alias_name is not None) and (internet_address is None) and (x == ""):
             only_query = True
         else:
             if internet_address is None:
@@ -564,23 +561,23 @@ def main():
         current_interface_status = ''
         if len(rs) != 0:
             current_interface_status = rs[0]["INTERFACE_STATUS"]
-            ibmi_util.log_info("Interface status is {0} in first retrieving".format(
-                current_interface_status), module._name)
+            ibmi_util.log_info(
+                f"Interface status is {current_interface_status} in first retrieving", module._name)
             wait_for_starting_timeout = 120
             while((current_interface_status == 'STARTING') and (wait_for_starting_timeout > 0)):
-                ibmi_util.log_info("Interface status is {0}, timeout is {1}".format(
-                    current_interface_status, wait_for_starting_timeout), module._name)
+                ibmi_util.log_info(
+                    f"Interface status is {current_interface_status}, timeout is {wait_for_starting_timeout}", module._name)
                 time.sleep(5)
                 rs, query_err = return_interface_information(
                     connection_id, internet_address, alias_name)
                 current_interface_status = rs[0]["INTERFACE_STATUS"]
                 wait_for_starting_timeout = wait_for_starting_timeout - 5
-            ibmi_util.log_info("Interface status is {0}, timeout is {1}".format(
-                current_interface_status, wait_for_starting_timeout), module._name)
+            ibmi_util.log_info(
+                f"Interface status is {current_interface_status}, timeout is {wait_for_starting_timeout}", module._name)
 
         if current_interface_status == 'STARTING':  # Still STARTING status
-            ibmi_util.log_info("Interface status is still {0}".format(
-                current_interface_status), module._name)
+            ibmi_util.log_info(
+                f"Interface status is still {current_interface_status}", module._name)
             endd = datetime.datetime.now()
             delta = endd - startd
             result_success = dict(

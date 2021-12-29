@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 
 display = Display()
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 class TimedOutException(Exception):
@@ -96,20 +96,20 @@ class ActionModule(RebootActionModule, ActionBase):
             try:
                 validation.check_type_int(key_value)
                 if key_value < 0:
-                    raise AnsibleError('The value of %s must not be less than 0' % (int_key))
+                    raise AnsibleError(f'The value of {int_key} must not be less than 0')
             except (TypeError, ValueError):
                 re_raise = True  # workaround to pass the raise-missing-from pylint issue
             if re_raise:
-                raise AnsibleError("The value of argument %s is %s which can't be converted to int" % (int_key, key_value))
+                raise AnsibleError(f"The value of argument {int_key} is {key_value} which can't be converted to int")
         return None
 
     def get_shutdown_command(self, task_vars, distribution):
         return self.DEFAULT_SHUTDOWN_COMMAND
 
     def get_system_boot_time(self, distribution):
-        display.vvv('{action}: get_system_boot_time: version: {version}'.format(action=self._task.action, version=__ibmi_module_version__))
+        display.vvv(f'{self._task.action}: get_system_boot_time: version: {__ibmi_module_version__}')
         become_user = self._task.args.get('become_user')
-        display.vvv('{action}: get_system_boot_time: become to user: {user}'.format(action=self._task.action, user=become_user))
+        display.vvv(f'{self._task.action}: get_system_boot_time: become to user: {become_user}')
         become_user_password = self._task.args.get('become_user_password')
         re_raise = False  # workaround to pass the raise-missing-from pylint issue
         inst = None
@@ -134,10 +134,8 @@ class ActionModule(RebootActionModule, ActionBase):
             re_raise = True  # workaround to pass the raise-missing-from pylint issue
             inst = e
         if re_raise:
-            raise AnsibleError("{action}: failed to run module ibmi_sql_query to get boot time info: {exp}".format(
-                action=self._task.action,
-                exp=str(inst)))
-        display.vvv("{action}: command_output: {boot_time}".format(action=self._task.action, boot_time=str(command_result)))
+            raise AnsibleError(f"{self._task.action}: failed to run module ibmi_sql_query to get boot time info: {inst}")
+        display.vvv(f"{self._task.action}: command_output: {command_result}")
         if command_result['rc'] != 0:
             if 'msg' in command_result:
                 stderr = command_result['msg']
@@ -145,13 +143,9 @@ class ActionModule(RebootActionModule, ActionBase):
             else:
                 stderr = command_result['stderr']
                 stdout = command_result['job_log']
-            raise AnsibleError("{action}: failed to get host boot time info, rc: {rc}, stdout: {out}, stderr: {err}".format(
-                action=self._task.action,
-                rc=command_result['rc'],
-                out=stdout,
-                err=stderr))
+            raise AnsibleError(f"{self._task.action}: failed to get host boot time info, rc: {command_result['rc']}, stdout: {stdout}, stderr: {stderr}")
         last_boot_time = command_result['row'][0]['JOB_ENTERED_SYSTEM_TIME']
-        display.vvv("{action}: last boot time: {boot_time}".format(action=self._task.action, boot_time=last_boot_time))
+        display.vvv(f"{self._task.action}: last boot time: {last_boot_time}")
         return last_boot_time
 
     def get_shutdown_command_args(self, distribution):
@@ -191,7 +185,8 @@ class ActionModule(RebootActionModule, ActionBase):
         parameters = self._task.args.get('parameters', self.DEFAULT_PARAMETERS)
 
         if output.get('msg'):
-            raise AnsibleError('Invalid options for reboot_commad: {0}'.format(output['msg']).strip())
+            msg_string = output['msg'].strip()
+            raise AnsibleError(f'Invalid options for reboot_commad: {msg_string}')
 
         return args.format(
             how_to_end=how_to_end,
@@ -204,9 +199,9 @@ class ActionModule(RebootActionModule, ActionBase):
         )
 
     def perform_reboot(self, task_vars, distribution):
-        display.vvv('{action}: perform_reboot: version: {version}'.format(action=self._task.action, version=__ibmi_module_version__))
+        display.vvv(f'{self._task.action}: perform_reboot: version: {__ibmi_module_version__}')
         become_user = self._task.args.get('become_user')
-        display.vvv('{action}: perform_reboot: become to user: {user}'.format(action=self._task.action, user=become_user))
+        display.vvv(f'{self._task.action}: perform_reboot: become to user: {become_user}')
         become_user_password = self._task.args.get('become_user_password')
         result = {}
         result['start'] = datetime.utcnow()
@@ -219,15 +214,14 @@ class ActionModule(RebootActionModule, ActionBase):
             result['msg'] = to_text(e)
             return result
         shutdown_command = self.get_shutdown_command(task_vars, distribution)
-        reboot_command = "{0} {1}".format(shutdown_command, shutdown_command_args)
+        reboot_command = f"{shutdown_command} {shutdown_command_args}"
         reboot_command = ' '.join(reboot_command.split())  # keep only one space between adjacent strings
 
-        display.vvv("{action}: rebooting server...".format(action=self._task.action))
+        display.vvv(f"{self._task.action}: rebooting server...")
         delay_time = self._task.args.get('pre_reboot_delay', self.DEFAULT_PRE_REBOOT_DELAY)
         notify_message = self._task.args.get('msg', self.DEFAULT_MSG)
-        send_message_command = "QSYS/SNDBRKMSG MSG('{notify_message}, SYSTEM GOING DOWN IN {delay_time} SECONDS') TOMSGQ(*ALLWS)".format(
-            notify_message=notify_message, delay_time=delay_time)
-        display.vvv("{action}: send rebooting notice message to all users...".format(action=self._task.action))
+        send_message_command = f"QSYS/SNDBRKMSG MSG('{notify_message}, SYSTEM GOING DOWN IN {delay_time} SECONDS') TOMSGQ(*ALLWS)"
+        display.vvv(f"{self._task.action}: send rebooting notice message to all users...")
         try:
             self._execute_module(
                 task_vars=task_vars,
@@ -239,11 +233,11 @@ class ActionModule(RebootActionModule, ActionBase):
                 }
             )
         except Exception as inst:
-            display.vvv("{action}: send rebooting notice message failed: '{exp}'".format(action=self._task.action, exp=str(inst)))
+            display.vvv(f"{self._task.action}: send rebooting notice message failed: '{inst}'")
 
-        display.vvv("{action}: Waiting for {delay_time} seconds to reboot".format(action=self._task.action, delay_time=delay_time))
+        display.vvv(f"{self._task.action}: Waiting for {delay_time} seconds to reboot")
         time.sleep(int(delay_time))
-        display.vvv("{action}: rebooting server with command '{command}'".format(action=self._task.action, command=reboot_command))
+        display.vvv(f"{self._task.action}: rebooting server with command '{reboot_command}'")
         result['start'] = datetime.utcnow()
         try:
             module_output = self._execute_module(
@@ -263,16 +257,13 @@ class ActionModule(RebootActionModule, ActionBase):
                 job_log = reboot_result['job_log']
                 result['failed'] = True
                 result['rebooted'] = False
-                result['msg'] = "Reboot command failed, stdout: {stdout}, stderr: {stderr}, job_log: {job_log}".format(
-                    stdout=stdout.strip(),
-                    stderr=stderr.strip(),
-                    job_log=job_log)
+                result['msg'] = f"Reboot command failed, stdout: {stdout.strip()}, stderr: {stderr.strip()}, job_log: {job_log}"
             else:
                 result['failed'] = False
                 result['rc'] = 0
                 result['msg'] = reboot_result['stdout']
         except AnsibleConnectionFailure as e:
-            display.vvv('{action}: AnsibleConnectionFailure caught and handled: {error}'.format(action=self._task.action, error=to_text(e)))
+            display.vvv(f'{self._task.action}: AnsibleConnectionFailure caught and handled: {to_text(e)}')
             result['failed'] = False
             result['rc'] = 0
             result['msg'] = to_text(e)

@@ -217,7 +217,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "2.8.0"
+__ibmi_module_version__ = "9.9.9"
 
 parmname_array = [
     'SIGN_ON_ATTEMPTS_NOT_VALID',
@@ -460,24 +460,24 @@ def main():
                 field['name'].upper() == 'DAYS_USED_COUNT' or
                 field['name'].upper() == 'SIZE'):
             if len(field['expect']) > 1:
-                module.fail_json(rc=256, msg="Field {p_name} should be only one value".format(p_name=field['name'].upper()))
+                module.fail_json(rc=256, msg=f"Field {field['name'].upper()} should be only one value")
             if field['expect'][0].strip() != '' and not is_number(field['expect'][0]):
-                module.fail_json(rc=256, msg="Field {p_name} should be numerical".format(p_name=field['name'].upper()))
+                module.fail_json(rc=256, msg=f"Field {field['name'].upper()} should be numerical")
 
     try:
         ibmi_module = imodule.IBMiModule(become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     # Check to see if the user exists
-    User_not_existed = []
+    user_not_existed = []
     for user in users:
-        chkobj_cmd = 'QSYS/CHKOBJ OBJ(QSYS/{p_user}) OBJTYPE(*USRPRF)'.format(p_user=user)
+        chkobj_cmd = f'QSYS/CHKOBJ OBJ(QSYS/{user}) OBJTYPE(*USRPRF)'
         ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
         rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(chkobj_cmd)
         if rc != 0:
-            User_not_existed.append(user)
+            user_not_existed.append(user)
 
     sql1, sql2 = build_sql(fields, users)
     if sql1 != "":
@@ -496,7 +496,7 @@ def main():
                 rc=rc,
                 job_log=job_log,
             )
-            message = 'non-zero return code:{rc}'.format(rc=rc)
+            message = f'non-zero return code:{rc}'
             module.fail_json(msg=message, **result_failed)
 
     if sql2 != "":
@@ -516,7 +516,7 @@ def main():
                 rc=rc,
                 job_log=job_log,
             )
-            message = 'non-zero return code:{rc}'.format(rc=rc)
+            message = f'non-zero return code:{rc}'
             module.fail_json(msg=message, **result_failed)
 
         if out2:
@@ -627,7 +627,7 @@ def main():
     else:
         out = out1
 
-    if len(User_not_existed) == 0:
+    if len(user_not_existed) == 0:
         result_success = dict(
             result_set=out,
             sql1=sql1,
@@ -638,7 +638,7 @@ def main():
     else:
         result_success = dict(
             result_set=out,
-            user_not_existed=User_not_existed,
+            user_not_existed=user_not_existed,
             sql1=sql1,
             sql2=sql2,
             rc=rc,

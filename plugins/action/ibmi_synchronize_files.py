@@ -6,7 +6,7 @@ __metaclass__ = type
 from ansible import constants as C
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 display = Display()
 
 
@@ -83,7 +83,7 @@ class ActionModule(ActionBase):
                 remote_user = C.DEFAULT_REMOTE_USER
         _tmp_args['remote_user'] = remote_user
 
-        display.debug("ibm i debug: args for ibmi_sync {p_tmp_args}".format(p_tmp_args=_tmp_args))
+        display.debug(f"ibm i debug: args for ibmi_sync {_tmp_args}")
         # run the module and store the result
         result.update(self._execute_module('ibmi_sync_files', module_args=_tmp_args, task_vars=task_vars))
         result['failed'] = result['rc']

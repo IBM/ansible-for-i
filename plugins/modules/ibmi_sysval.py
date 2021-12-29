@@ -156,7 +156,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 sysval_array = [
@@ -336,7 +336,7 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        module.fail_json(rc=999, msg='Exception occurred: {0}'.format(str(inst)))
+        module.fail_json(rc=999, msg=f'Exception occurred: {inst}')
 
     for value in sysvalue:
         sysval = get_system_value(
@@ -349,7 +349,7 @@ def main():
 
     if rc:
         result.update({'rc': rc})
-        message = 'non-zero return code when get system value:{rc}'.format(rc=rc)
+        message = f'non-zero return code when get system value:{rc}'
         result.update({'stderr': message})
         module.fail_json(msg=message, **result)
 

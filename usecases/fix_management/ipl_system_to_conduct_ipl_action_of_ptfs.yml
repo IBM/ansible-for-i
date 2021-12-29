@@ -6,13 +6,14 @@
 
 # Parameters:
   # auto_ipl --  Specifies if an IPL is launched automatically when there is/are PTF(s) requiring IPL to be applied or removed.
+  # target_system -- Specifies the target IBM i system name which is defined in hosts.ini
   # All options supported by ibmi_reboot.
 
-# Command example: ansible-playbook ./ipl_system_to_conduct_ipl_action_of_ptfs.yml
+# Command example: ansible-playbook ./ipl_system_to_conduct_ipl_action_of_ptfs.yml -e "{'target_system': 'systemA'}"
 ---
 # tasks file for ipl_system_to_conduct_ipl_action_of_ptfs
 
-- hosts: testhost
+- hosts: '{{ target_system }}'
   gather_facts: false
   collections:
     - ibm.power_ibmi

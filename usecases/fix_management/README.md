@@ -157,6 +157,32 @@ download_apply_individual_ptfs playbook does the following:
 ansible-playbook /check_download_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
 ```
 
+## run_ARE_template
+```
+run_ARE_template playbook does the following:
+  1.  Send ARE template file to the clients.
+  2.  Run ARE template on the clients and print the content of the summary ARE result file. 5733ARE should be installed on the clients.
+  3.  Transfer all the ARE results files back to the server.
+```
+#### Variables
+
+| Variable              | Type          | Description                                                                    |
+|-----------------------|---------------|--------------------------------------------------------------------------------|
+| `ARE_clients`       | str             | The target IBM i clients that receive ARE template and run it.|
+| `template_server`       | str           | The target IBM i server that keep ARE template and receive ARE results from the clients.|
+| `template_name`| str          | The template name on the server, i.e /tmp/PTF_SI71234.jar     |
+| `template_dir_client`| str          | The directory on the client where ARE template will be located. The default value is '/etc/ibmi_ansible/fix_management/ARE/templates'.     |
+| `ARE_results_dir_client`| str          | The directory on the client where ARE results files will be located. The default value is '/etc/ibmi_ansible/fix_management/ARE/results'.     |
+| `ARE_results_name_client`| str          | The file name of ARE results on the client. The default value is the template name plus '.out'. For example, if the template name is 'SI71234.jar', the file name of ARE results will be 'SI71234.out'.    |
+| `ARE_results_dir_server`| str          | The directory on the server where ARE results files will be located.    |
+| `remove_ARE_template_client`| bool          | Whether ARE template file on the client will be removed after ARE results files are transferred to the server. The default value is true.   |
+
+### Example
+
+```
+ansible-playbook /run_ARE_template.yml -e "{'ARE_clients': 'systemA', 'template_server': 'templateserver', 'template_name': '/tmp/PTF_SI71234.jar', 'ARE_results_dir_on_server': '/tmp/results'}"
+```
+
 Reference
 -------
 For detail guides and reference, please visit the <a href="https://ibm.github.io/cloud-i-blog/archivers/2020-09-20-introduce_ansible_for_i_fix_management_function" target="_blank">Fix Management Documentation</a> site.

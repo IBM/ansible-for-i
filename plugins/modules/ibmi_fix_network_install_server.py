@@ -106,7 +106,7 @@ notes:
    - Issue ADDDIRE command to add the user to the system distribution directory entry
    - Issue WRKDIRE command to check the current system distribution directory entries
 seealso:
-- module: ibmi_fix, ibmi_fix_savf
+- module: ibmi_fix
 
 author:
     - Wang Yuyu (@wangyuyu)
@@ -242,13 +242,9 @@ fail_list:
 '''
 
 import datetime
-import re
 import os
-import time
-import shutil
 import sys
 import binascii
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi.temp_directory import TemporaryDirectory
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
@@ -267,7 +263,7 @@ except ImportError:
 HAS_IBM_DB = True
 
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -536,7 +532,7 @@ def setup_operation(ibmi_module, module, image_catalog_name, opt_device_name, di
     command_map["cl_start_NFS_service"] = "QSYS/STRNFSSVR *ALL"
     command_map["cl_export_catalog"] = "QSYS/CHGNFSEXP OPTIONS('-i -o ro') DIR('" + dir_target + "')"
     command_map["cl_vary_off_device"] = "QSYS/VRYCFG CFGOBJ(" + opt_device_name + ") CFGTYPE(*DEV) STATUS(*OFF) FRCVRYOFF(*YES)"
-    command_map["cl_delete_image_catalog"] = "QSYS/DLTIMGCLG IMGCLG(" + image_catalog_name + ") KEEP(*YES)"
+    command_map["cl_delete_image_catalog"] = "QSYS/DLTIMGCLG IMGCLG(" + image_catalog_name + ") KEEP(*NO)"
     command_map["unload_image_catalog"] = "QSYS/LODIMGCLG IMGCLG(" + image_catalog_name + ")  OPTION(*UNLOAD)"
     command_map["cl_dlt_device"] = "QSYS/DLTDEVD DEVD(" + opt_device_name + ")"
 
@@ -605,7 +601,7 @@ def setup_operation(ibmi_module, module, image_catalog_name, opt_device_name, di
     command_log = command_log + "\n" + out
     if rc > 0:
         if is_rollback:
-            run_a_list_of_commands(ibmi_module, ["cl_vary_off_device", "unload_image_catalog",
+            run_a_list_of_commands(ibmi_module, ["cl_vary_off_device",
                                                  "cl_delete_image_catalog", "cl_dlt_device"], command_map)
         return rc, out, err, command_log
 
@@ -630,8 +626,6 @@ def setup_operation(ibmi_module, module, image_catalog_name, opt_device_name, di
 
 
 def rollback_imgclg_entries(ibmi_module, module, image_catalog_name, rollback_entries, rollback_operation):
-    db_conn = ibmi_module.get_connection()
-    command_map = {}
     command_log = "Command log of rollback operation."
 
     if rollback_operation == "remove":
@@ -673,7 +667,6 @@ def rollback_imgclg_entries(ibmi_module, module, image_catalog_name, rollback_en
 
 
 def addimgclge_operation(ibmi_module, module, image_catalog_name, opt_device_name, dir_target, fix_file_name_list, is_rollback):
-    db_conn = ibmi_module.get_connection()
     image_catalog_entries = []
 
     command_map = {}
@@ -849,8 +842,6 @@ def addimgclge_operation(ibmi_module, module, image_catalog_name, opt_device_nam
 
 def rmvimgclge_operation(ibmi_module, module, image_catalog_name, opt_device_name, dir_target,
                          fix_file_name_remove_list, remove_image_files, is_rollback, PTF_sort):
-    db_conn = ibmi_module.get_connection()
-
     image_catalog_entries = []
     command_map = {}
     command_log = "Command log of rmvimgclge operation."
@@ -1076,7 +1067,6 @@ def uninstall_operation(ibmi_module, module, image_catalog_name, opt_device_name
 
 
 def retrieve_operation(ibmi_module, module, image_catalog_name, opt_device_name, image_catalog_directory, is_rollback):
-    db_conn = ibmi_module.get_connection()
     image_catalog_entries = []
 
     rc, info_return, err = get_image_catalog_info(ibmi_module, image_catalog_name)
@@ -1097,8 +1087,6 @@ def retrieve_operation(ibmi_module, module, image_catalog_name, opt_device_name,
 
 
 def NFSServer_operation(ibmi_module, module):
-    db_conn = ibmi_module.get_connection()
-
     command_map = {}
     command_log = "Command log of restart NFS server operation."
     command_map["cl_start_NFS_service"] = "QSYS/STRNFSSVR *ALL"

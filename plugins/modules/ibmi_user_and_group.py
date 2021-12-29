@@ -247,7 +247,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "9.9.9"
 
 
 def main():
@@ -305,7 +305,7 @@ def main():
         for item in single_value:
             if item in special_authority:
                 module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID,
-                                 msg="{p_item} must be only value for parameter special_authority".format(p_item=item))
+                                 msg=f"{item} must be only value for parameter special_authority")
 
     # handle parameter special_authority
     authorities = ''
@@ -336,11 +336,11 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     # Check to see if the group exists
-    chkobj_cmd = 'QSYS/CHKOBJ OBJ(QSYS/{p_group}) OBJTYPE(*USRPRF)'.format(p_group=user_group)
+    chkobj_cmd = f'QSYS/CHKOBJ OBJ(QSYS/{user_group}) OBJTYPE(*USRPRF)'
     ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(chkobj_cmd)
     if rc != 0:
@@ -349,7 +349,7 @@ def main():
         group_exist = True
 
     # Check to see if the user exists
-    chkobj_cmd = 'QSYS/CHKOBJ OBJ(QSYS/{p_user}) OBJTYPE(*USRPRF)'.format(p_user=user)
+    chkobj_cmd = f'QSYS/CHKOBJ OBJ(QSYS/{user}) OBJTYPE(*USRPRF)'
     ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(chkobj_cmd)
     if rc != 0:
@@ -359,41 +359,37 @@ def main():
 
     if operation == 'create':
         if user_exist:
-            module.fail_json(rc=256, msg="User profile {p_user} already exists".format(p_user=user))
+            module.fail_json(rc=256, msg=f"User profile {user} already exists")
         if (user_group != '*NONE') and (not group_exist):
-            module.fail_json(rc=256, msg="Group profile {p_group} not found".format(p_group=user_group))
+            module.fail_json(rc=256, msg=f"Group profile {user_group} not found")
 
-        command = "QSYS/CRTUSRPRF USRPRF({p_user}) PASSWORD({p_password}) PWDEXP({p_expire}) STATUS({p_status})\
-            USRCLS({p_class}) SPCAUT({p_special}) GRPPRF({p_group}) OWNER({p_owner}) TEXT('{p_text}') {parameters}".format(
-            p_user=user, p_password=password, p_expire=expire, p_status=status,
-            p_class=user_class, p_special=authorities, p_group=user_group, p_owner=owner, p_text=text, parameters=parameters)
+        command = f"QSYS/CRTUSRPRF USRPRF({user}) PASSWORD({password}) PWDEXP({expire}) STATUS({status})\
+            USRCLS({user_class}) SPCAUT({authorities}) GRPPRF({user_group}) OWNER({owner}) TEXT('{text}') {parameters}"
 
     elif operation == 'change':
         if not user_exist:
-            module.fail_json(rc=256, msg="User profile {p_user} not found".format(p_user=user))
+            module.fail_json(rc=256, msg=f"User profile {user} not found")
         if (user_group != '*NONE') and (user_group != '*SAME') and (not group_exist):
-            module.fail_json(rc=256, msg="Group profile {p_group} not found".format(p_group=user_group))
+            module.fail_json(rc=256, msg=f"Group profile {user_group} not found")
 
-        command = "QSYS/CHGUSRPRF USRPRF({p_user}) PASSWORD({p_password}) PWDEXP({p_expire}) STATUS({p_status})\
-            USRCLS({p_class}) SPCAUT({p_special}) GRPPRF({p_group}) OWNER({p_owner}) TEXT('{p_text}') {parameters}".format(
-            p_user=user, p_password=password, p_expire=expire, p_status=status,
-            p_class=user_class, p_special=authorities, p_group=user_group, p_owner=owner, p_text=text, parameters=parameters)
+        command = f"QSYS/CHGUSRPRF USRPRF({user}) PASSWORD({password}) PWDEXP({expire}) STATUS({status})\
+            USRCLS({user_class}) SPCAUT({authorities}) GRPPRF({user_group}) OWNER({owner}) TEXT('{text}') {parameters}"
 
     elif operation == 'delete':
         if not user_exist:
-            module.fail_json(rc=256, msg="User profile {p_user} not found".format(p_user=user))
-        command = 'QSYS/DLTUSRPRF USRPRF({p_user}) {parameters}'.format(p_user=user, parameters=parameters)
+            module.fail_json(rc=256, msg=f"User profile {user} not found")
+        command = f'QSYS/DLTUSRPRF USRPRF({user}) {parameters}'
 
     elif operation == 'display':
         if not user_exist:
-            module.fail_json(rc=256, msg="User {p_user} not found".format(p_user=user))
-        command = "SELECT * FROM QSYS2.USER_INFO WHERE AUTHORIZATION_NAME = '{p_user}'".format(p_user=user)
+            module.fail_json(rc=256, msg=f"User {user} not found")
+        command = f"SELECT * FROM QSYS2.USER_INFO WHERE AUTHORIZATION_NAME = '{user}'"
 
     else:
         # operation == 'display_group_members'
         if not user_exist:
-            module.fail_json(rc=256, msg="Group profile {p_user} not found".format(p_user=user))
-        command = "SELECT * FROM QSYS2.GROUP_PROFILE_ENTRIES WHERE GROUP_PROFILE_NAME = '{p_user}'".format(p_user=user)
+            module.fail_json(rc=256, msg=f"Group profile {user} not found")
+        command = f"SELECT * FROM QSYS2.GROUP_PROFILE_ENTRIES WHERE GROUP_PROFILE_NAME = '{user}'"
 
     if operation == 'display' or operation == 'display_group_members':
         rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(command)
@@ -410,7 +406,7 @@ def main():
                 job_log=job_log,
                 rc=rc,
             )
-            message = 'non-zero return code:{rc}'.format(rc=rc)
+            message = f'non-zero return code:{rc}'
             module.fail_json(msg=message, **result_failed)
         else:
             result_success = dict(
@@ -431,7 +427,7 @@ def main():
                 job_log=job_log,
                 rc=rc,
             )
-            message = 'non-zero return code:{rc}'.format(rc=rc)
+            message = f'non-zero return code:{rc}'
             module.fail_json(msg=message, **result_failed)
         else:
             result_success = dict(

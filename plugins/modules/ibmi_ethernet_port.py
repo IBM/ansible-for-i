@@ -134,7 +134,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 def get_info_from_resource_name(imodule, resource_name):
@@ -287,18 +287,18 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     rc, ethernet_ports, result = list_ethernet_ports_info(ibmi_module)
     ibmi_util.log_debug(
-        "list_ethernet_ports_info result is: {0}".format(result), module._name)
-    ibmi_util.log_debug("list_ethernet_ports_info resources information are: {0}".format(
-        ethernet_ports), module._name)
+        f"list_ethernet_ports_info result is: {result}", module._name)
+    ibmi_util.log_debug(
+        f"list_ethernet_ports_info resources information are: {ethernet_ports}", module._name)
 
     if rc:
         module.fail_json(
-            rc=rc, msg="Error when getting ethernet ports information: {0}".format(result))
+            rc=rc, msg=f"Error when getting ethernet ports information: {result}")
 
     module.exit_json(
         rc=SUCCESS, msg="Success to get ethernet ports information", ethernet_ports=ethernet_ports)

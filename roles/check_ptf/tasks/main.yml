@@ -11,6 +11,8 @@
     to_be_loadednumber: []
     loaded: []
     compose_list: []
+    temporarily_applied_list: []
+    temporarily_applied: []
 
 - name: compose ptf list and ptfs status dict
   set_fact:
@@ -19,6 +21,10 @@
   loop: '{{ check_ptf_list }}'
   loop_control:
     loop_var: check_ptf_list_var
+
+- name: print check_ptf_list
+  debug:
+    var: check_ptf_list
 
 - name: print ptf number list to-be-checked
   debug:
@@ -57,6 +63,14 @@
   set_fact:
     to_be_loadednumber: "{{ to_be_loadednumber|default([]) + [ptf_status.key] }}"
   when: ptf_status.value == 'NON-EXISTENT' or ptf_status.value == 'PERMANENTLY REMOVED' or ptf_status.value == 'NOT LOADED'
+  with_dict: "{{ ptfs_status }}"
+  loop_control:
+    loop_var: ptf_status
+
+- name: compose temporarily_applied_list
+  set_fact:
+    temporarily_applied: "{{ temporarily_applied_list|default([]) + [ptf_status.key] }}"
+  when: ptf_status.value == 'APPLIED'
   with_dict: "{{ ptfs_status }}"
   loop_control:
     loop_var: ptf_status
@@ -119,6 +133,17 @@
     loaded_ptfs_list: "{{ compose_list }}"
   when: loaded != []
 
+- name: compose temporarily_applied_list
+  include_tasks: find_ptfinfo.yml
+  with_list: "{{ temporarily_applied }}"
+  loop_control:
+    loop_var: ptf_id
+
+- name: compose temporarily_applied_list
+  set_fact:
+    temporarily_applied_list: "{{ compose_list }}"
+  when: temporarily_applied != []
+
 - name: compose ptfs_status
   set_fact:
     ptfs_status: "{{ ptfs_status | default({}) | combine({ ptf_status.ptf_id: 'PRODUCT_NOT_INSTALLED' }) }}"
@@ -154,3 +179,7 @@
 - name: print already loaded ptfs list
   debug:
     var: loaded_ptfs_list
+
+- name: print Temporarily applied ptfs list
+  debug:
+    var: temporarily_applied_list

@@ -124,7 +124,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "9.9.9"
 
 
 def _is_ipv4_addr(ip):
@@ -354,8 +354,8 @@ def list_rdma_location_code(imodule):
                         imodule, rec['resNam'])
                     ibmi_util.log_debug(
                         "location code is " + cur_loc, sys._getframe().f_code.co_name)
-                    ibmi_util.log_debug("get location code rc is {0}".format(
-                        rc), sys._getframe().f_code.co_name)
+                    ibmi_util.log_debug(
+                        f"get location code rc is {rc}", sys._getframe().f_code.co_name)
                     ibmi_util.log_debug(
                         "get location code result is " + result, sys._getframe().f_code.co_name)
                     location.append(cur_loc)
@@ -387,21 +387,21 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     # check special authority *IOSYSCFG
     # get current user's special authority
     command = 'RTVUSRPRF'
     if become_user:
-        command = command + ' USRPRF({0})'.format(become_user)
+        command = command + f' USRPRF({become_user})'
     rc, out, err, job_log = ibmi_module.itoolkit_run_rtv_command_once(
         command, {'SPCAUT': 'char'})
     if rc:
         module.fail_json(
-            rc=rc, msg="Error occurred when call RTVUSRPRF to special authority: {0}".format(str(err)))
+            rc=rc, msg=f"Error occurred when call RTVUSRPRF to special authority: {str(err)}")
     special_authority = out['SPCAUT']
-    ibmi_util.log_info("Special authority is {0}".format(special_authority), module._name)
+    ibmi_util.log_info(f"Special authority is {special_authority}", module._name)
 
     if '*IOSYSCFG' not in special_authority:
         module.fail_json(
@@ -410,11 +410,11 @@ def main():
     # Generate the meta_data base on the system snapshot
     command = "db2mtool action=snapshot"
     rc, out, err = module.run_command(command, use_unsafe_shell=False)
-    ibmi_util.log_debug("Run command={0}, rc={1}, stdout={2}, stderr={3}".format(
-        command, rc, out, err), module._name)
+    ibmi_util.log_debug(
+        f"Run command={command}, rc={rc}, stdout={out}, stderr={err}", module._name)
     if rc or ("INFO Save to file /QIBM/UserData/QDB2MIR/MRDB/TOOLS/meta_data" not in out):
         module.fail_json(
-            rc=rc, msg="Error occurred when generate system snapshot: stdout={0}, stderr={1}".format(out, err))
+            rc=rc, msg=f"Error occurred when generate system snapshot: stdout={out}, stderr={err}")
 
     json_file = None
     for line in out.splitlines():
@@ -428,12 +428,11 @@ def main():
 
     if (json_file is None) or (not os.path.exists(json_file)):
         module.fail_json(
-            rc=255, msg="Mirror configuration meta data not found, path={0}".format(json_file))
+            rc=255, msg=f"Mirror configuration meta data not found, path={json_file}")
 
     # Load the meta_data.json as dict
     json_dict = load_meta_data(json_file)
-    ibmi_util.log_debug("Current meta data: {0}".format(
-        str(json_dict)), module._name)
+    ibmi_util.log_debug(f"Current meta data: {str(json_dict)}", module._name)
 
     # Prepare the system name and hostname
     sql = "SELECT SECONDARY_NODE, SECONDARY_HOSTNAME FROM QSYS2.MIRROR_INFO"
@@ -447,8 +446,8 @@ def main():
         first_row = out[0]
         secondary_system_name = first_row['SECONDARY_NODE']
         sencodary_host_name = first_row['SECONDARY_HOSTNAME']
-    ibmi_util.log_debug("Secondary system name and hostname in QSYS2.MIRROR_INFO is: {0}, {1}".format(
-        secondary_system_name, sencodary_host_name), module._name)
+    ibmi_util.log_debug(
+        f"Secondary system name and hostname in QSYS2.MIRROR_INFO is: {secondary_system_name}, {sencodary_host_name}", module._name)
 
     # Prepare the RDMA address
     sql = "SELECT TARGET_ADDRESS FROM QSYS2.NRG_LINK_INFO WHERE NRG_NAME = 'MIRROR_DATABASE'"
@@ -461,19 +460,19 @@ def main():
         target_address.append(item['TARGET_ADDRESS'])
     # Remove the duplicate
     target_address = list(set(target_address))
-    ibmi_util.log_debug("Target address in QSYS2.NRG_LINK_INFO is: {0}".format(
-        target_address), module._name)
+    ibmi_util.log_debug(
+        f"Target address in QSYS2.NRG_LINK_INFO is: {target_address}", module._name)
 
     rc, location, result = list_rdma_location_code(ibmi_module)
     ibmi_util.log_debug(
-        "list_rdma_location_code result is: {0}".format(result), module._name)
+        f"list_rdma_location_code result is: {result}", module._name)
     if rc:
         module.fail_json(
-            rc=rc, msg="Error when list RDMA location code: {0}".format(result))
+            rc=rc, msg=f"Error when list RDMA location code: {result}")
     # Remove the duplicate
     location = list(set(location))
     ibmi_util.log_debug(
-        "RDMA resources location are: {0}".format(location), module._name)
+        f"RDMA resources location are: {location}", module._name)
 
     network_config_details_list = get_network_config_details(json_dict)
     already_configured_ip_list = []
@@ -483,33 +482,32 @@ def main():
         for ip in ip_address_list:
             already_configured_ip_list.append(ip)
         already_configured_cmn_list.append(item['cmnlocation'])
-    ibmi_util.log_debug("Already configured IP addresses are: {0}".format(
-        already_configured_ip_list), module._name)
-    ibmi_util.log_debug("Already configured cmnlocation are: {0}".format(
-        already_configured_cmn_list), module._name)
+    ibmi_util.log_debug(
+        f"Already configured IP addresses are: {already_configured_ip_list}", module._name)
+    ibmi_util.log_debug(
+        f"Already configured cmnlocation are: {already_configured_cmn_list}", module._name)
 
     for item in already_configured_ip_list:
         if item in target_address:
             target_address.remove(item)
     ibmi_util.log_debug(
-        "Non-configured IP addresses are: {0}".format(target_address), module._name)
+        f"Non-configured IP addresses are: {target_address}", module._name)
     for item in already_configured_cmn_list:
         if item in location:
             location.remove(item)
     ibmi_util.log_debug(
-        "Non-configured cmnlocation are: {0}".format(location), module._name)
+        f"Non-configured cmnlocation are: {location}", module._name)
 
     if len(location) < len(target_address):
-        module.fail_json(rc=255, msg="Not enough RDMA comunication resource ports({0}) for RDMA links({1})".format(
-            len(location), len(target_address)))
+        module.fail_json(
+            rc=255, msg=f"Not enough RDMA comunication resource ports({len(location)}) for RDMA links({len(target_address)})")
 
     if rdma_subnet_mask == '*SAME':
-        sql = "SELECT SUBNET_MASK from QSYS2.NETSTAT_INTERFACE_INFO \
+        sql = f"SELECT SUBNET_MASK from QSYS2.NETSTAT_INTERFACE_INFO \
             WHERE (INTERFACE_LINE_TYPE = 'ELAN' OR INTERFACE_LINE_TYPE = 'VETH') \
-            AND INTERNET_ADDRESS  NOT IN ('*IP6SAC', '*IP4DHCP') AND INTERNET_ADDRESS = '{0}'".format(
-            ip_address)
+            AND INTERNET_ADDRESS  NOT IN ('*IP6SAC', '*IP4DHCP') AND INTERNET_ADDRESS = '{ip_address}'"
         ibmi_util.log_debug(
-            "Retrieve RDMA subnet mask sql is: {0}".format(sql), module._name)
+            f"Retrieve RDMA subnet mask sql is: {sql}", module._name)
         rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(sql)
         if rc:
             module.fail_json(
@@ -519,9 +517,9 @@ def main():
                 rdma_subnet_mask = out[0]['SUBNET_MASK']
             else:
                 module.fail_json(
-                    rc=255, msg="Row incorrect when retrieving subnet mask information from QSYS2.NETSTAT_INTERFACE_INFO: row={0}".format(out))
-    ibmi_util.log_debug("RDMA subnet mask is: {0}".format(
-        rdma_subnet_mask), module._name)
+                    rc=255, msg=f"Row incorrect when retrieving subnet mask information from QSYS2.NETSTAT_INTERFACE_INFO: row={out}")
+    ibmi_util.log_debug(
+        f"RDMA subnet mask is: {rdma_subnet_mask}", module._name)
 
     i = 0
     for ip in target_address:
@@ -533,8 +531,8 @@ def main():
     reverse_nrg_ip_pairs(json_dict)
     if not os.path.exists(CLOUDINIT_METADATA_DIR):
         os.makedirs(CLOUDINIT_METADATA_DIR)
-    ibmi_util.log_debug("Write meta data to seed: {0}".format(
-        str(json_dict)), module._name)
+    ibmi_util.log_debug(
+        f"Write meta data to seed: {str(json_dict)}", module._name)
     save_meta_data(CLOUDINIT_METADATA_DIR + "/meta_data.json", json_dict)
     save_meta_data(DB2MTOOL_METADATA_DIR + "/meta_data_" +
                    secondary_system_name + "_ansible.json", json_dict)
@@ -543,7 +541,7 @@ def main():
     rc, out, err = module.run_command(args, use_unsafe_shell=False)
     if rc and ('ACTIVATION ENGINE OR CLOUD-INIT IS ALREADY ENABLED' not in err):
         module.fail_json(
-            rc=255, msg="Error occurred when enable Activation Engine: stdout={0}, stderr={1}".format(out, err))
+            rc=255, msg=f"Error occurred when enable Activation Engine: stdout={out}, stderr={err}")
 
     module.exit_json(
         rc=SUCCESS, msg="Success to configure Db2Mirror copy node, reboot to make the nodes synchronized")
