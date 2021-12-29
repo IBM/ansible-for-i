@@ -14,7 +14,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.6.0"
 
 display = Display()
 
