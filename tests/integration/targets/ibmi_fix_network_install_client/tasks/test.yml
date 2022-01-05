@@ -1,0 +1,193 @@
+- block:
+    - name: TC00 - Clean up default client configs before test starts
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'uninstall'
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        rollback: True
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: precleanup
+      failed_when:
+        - precleanup.rc != 0
+        - precleanup.rc is not defined
+
+    - name: TC01 - Setup IBM i Network install client with default parameters
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'setup_only'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc01
+      failed_when: tc01.rc != 0
+
+    - name: TC01 assertion
+      assert:
+        that:
+          - tc01.device_name == "CLNTPTFOPT"
+          - tc01.stderr_lines | length == 0
+          - "'success QSYS/VRYCFG CFGOBJ(CLNTPTFOPT) CFGTYPE(*DEV) STATUS(*ON)' in tc01.stdout"
+
+    - name: TC01 - uninstall this client since only one device for one server can be exist
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'uninstall'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc01_remove
+      failed_when: tc01_remove.rc != 0
+
+    - name: TC02 - Setup IBM i Network install client with customized parameters
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'setup_only'
+        device_name: 'VCLIENT{{random_number}}'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc02
+      failed_when: tc02.rc != 0
+
+    - name: TC03 - installPTF_only
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'installPTF_only'
+        device_name: 'VCLIENT{{random_number}}'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc03
+      failed_when: tc03.rc != 0
+
+    - name: TC04 - reload
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'reload'
+        device_name: 'VCLIENT{{random_number}}'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc04
+      failed_when: tc04.rc != 0
+
+    - name: TC05 - uninstall
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'uninstall'
+        device_name: 'VCLIENT{{random_number}}'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc05
+      failed_when: tc05.rc != 0
+
+    - name: TC06 - setup_and_installPTF
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'setup_and_installPTF'
+        device_name: 'VCLIENT{{random_number}}'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc06
+      failed_when: tc06.rc != 0
+
+    - name: TC07A - uninstall before setup_and_installPTF_and_uninstall
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'uninstall'
+        device_name: 'VCLIENT{{random_number}}'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc07a
+      failed_when: tc07a.rc != 0
+
+    - name: TC07B - setup_and_installPTF_and_uninstall
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'setup_and_installPTF_and_uninstall'
+        device_name: 'VCLIENT{{random_number}}'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc07b
+      failed_when: tc07b.rc != 0
+
+    - name: TC08 - setup_and_installPTF
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'setup_and_installPTF'
+        device_name: 'VCLIENT{{random_number}}'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc08
+      failed_when: tc08.rc != 0
+
+    - debug:
+        msg: "Start negative testing"
+
+    - name: TC09 - same server_address
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'setup_only'
+        device_name: 'TC09{{random_number}}'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc09
+      failed_when: tc09.rc == 0
+
+    - name: TC10 - no server on remote
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'setup_only'
+        device_name: 'TC10{{random_number}}'
+        rollback: True
+        server_address: 'gt73p1.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc10
+      failed_when: tc10.rc == 0
+
+    - name: TC11 - remote not pinging
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'setup_only'
+        device_name: 'TC11{{random_number}}'
+        rollback: True
+        server_address: '9.123.96.27'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc11
+      failed_when: tc11.rc == 0
+
+    - name: TC12A - setup a server on remote server B
+      ibm.power_ibmi.ibmi_fix_network_install_server:
+        operation: 'setup_only'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc12A
+      failed_when: tc12A.rc != 0
+      delegate_to: 'gt73p2.rch.stglabs.ibm.com'
+
+    - name: TC12B - duplicate device name
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'setup_only'
+        device_name: 'VCLIENT{{random_number}}'
+        rollback: True
+        server_address: 'gt73p2.rch.stglabs.ibm.com'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"
+      register: tc12b
+      failed_when: tc12b.rc == 0
+
+  always:
+    - name: clean up customized env after tests
+      ibm.power_ibmi.ibmi_fix_network_install_client:
+        operation: 'uninstall'
+        rollback: True
+        server_address: 'ut2026p8.rch.stglabs.ibm.com'
+        device_name: VCLIENT{{random_number}}
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"

@@ -39,110 +39,125 @@
       debug:
         var: path
 
-    - name: Clear receive dir
-      file:
+    - name: check if the folder is alrady exists
+      ansible.builtin.stat:
         path: "{{ path }}"
-        state: absent
-      register: clear_result
+      register: stat_result
       ignore_errors: true
 
-    - name: Make receive dir
-      file:
-        path: "{{ path }}"
-        state: directory
-        mode: 0755
-      register: file_result
-      ignore_errors: true
+    - name: Include check_file role to check if files are the same
+      include_role:
+        name: check_file
+      vars:
+        target_file_path: "{{ path }}"
+        repo_file_path: "{{ ptf_group_dir }}"
+      when: stat_result.stat.exists is true
 
     - block:
-        - name: Skip when make receive dir fail
-          debug:
-            msg: "{{ 'Make receive dir ' + path + ' fail, end host.' }}"
+        - name: Clear receive dir
+          file:
+            path: "{{ path }}"
+            state: absent
+          register: clear_result
+          ignore_errors: true
 
-        - name: end_host
-          meta: end_host
-      when: file_result.failed == 1
-
-    - block:
-        - name: compose src_list
-          set_fact:
-            src_list: "{{ src_list | default([]) + [{ 'src': find_result_files_var.path }] }}"
-          loop: "{{ find_result.files }}"
-          loop_control:
-            loop_var: find_result_files_var
-
-        - name: debug src_list
-          debug:
-            var: src_list
-
-        - name: Transfer image to target_system
-          ibm.power_ibmi.ibmi_synchronize_files:
-            dest: "{{ path }}"
-            src_list: "{{ src_list }}"
-          delegate_to: "{{ repo_server }}"
-          register: sync_result
-
-        - name: Print transfer
-          debug:
-            var: sync_result
+        - name: Make receive dir
+          file:
+            path: "{{ path }}"
+            state: directory
+            mode: 0755
+          register: file_result
+          ignore_errors: true
 
         - block:
-            - name: skip when transfer failed
+            - name: Skip when make receive dir fail
               debug:
-                msg: "One or more ptf group file transfer failed, quit apply ptf group action."
-
-            - name: delete the dest file dir
-              file:
-                path: "{{ path }}"
-                state: absent
-              ignore_errors: true
-              when: deletefile
+                msg: "{{ 'Make receive dir ' + path + ' fail, end host.' }}"
 
             - name: end_host
               meta: end_host
-          when: sync_result.fail_list != []
-
-        - name: Get the home dir on target server
-          shell: 'echo $HOME'
-          register: home_dir
-
-        - name: Compose path
-          set_fact:
-            path: "{{ path | regex_replace('~', home_dir.stdout) }}"
-          when: path | regex_search("^~")
-
-        - name: debug path
-          debug:
-            var: path
+          when: file_result.failed == 1
 
         - block:
-            - name: Apply PTF group
-              ibm.power_ibmi.ibmi_fix_imgclg:
-                src: '{{ path }}'
-              register: apply_result
-              ignore_errors: true
+            - name: compose src_list
+              set_fact:
+                src_list: "{{ src_list | default([]) + [{ 'src': find_result_files_var.path }] }}"
+              loop: "{{ find_result.files }}"
+              loop_control:
+                loop_var: find_result_files_var
 
-            - name: Print apply result
+            - name: debug src_list
               debug:
-                var: apply_result
+                var: src_list
 
-            - name: Print apply result
+            - name: Transfer image to target_system
+              ibm.power_ibmi.ibmi_synchronize_files:
+                dest: "{{ path }}"
+                src_list: "{{ src_list }}"
+              delegate_to: "{{ repo_server }}"
+              register: sync_result
+
+            - name: Print transfer
               debug:
-                msg: "PTF Group applied fail. Please see above job log"
-              when: apply_result.rc != 0
+                var: sync_result
 
-            - name: Print apply result
-              debug:
-                msg: "PTF Group applied succesfully."
-              when: apply_result.rc == 0
+            - block:
+                - name: skip when transfer failed
+                  debug:
+                    msg: "One or more ptf group file transfer failed, quit apply ptf group action."
 
-            - name: delete the dest file dir
-              file:
-                path: "{{ path }}"
-                state: absent
-              ignore_errors: true
-              when: deletefile
+                - name: delete the dest file dir
+                  file:
+                    path: "{{ path }}"
+                    state: absent
+                  ignore_errors: true
+                  when: deletefile
 
-          when: sync_result.fail_list == []
+                - name: end_host
+                  meta: end_host
+              when: sync_result.fail_list != []
+          when: file_result.failed == 0
 
-      when: file_result.failed == 0
+      when: same_files is false or stat_result.stat.exists is false
+
+    - name: Get the home dir on target server
+      shell: 'echo $HOME'
+      register: home_dir
+
+    - name: Compose path
+      set_fact:
+        path: "{{ path | regex_replace('~', home_dir.stdout) }}"
+      when: path | regex_search("^~")
+
+    - name: debug path
+      debug:
+        var: path
+
+    - block:
+        - name: Apply PTF group
+          ibm.power_ibmi.ibmi_fix_imgclg:
+            src: '{{ path }}'
+            rollback: true
+          register: apply_result
+          ignore_errors: true
+
+        - name: Print apply result
+          debug:
+            var: apply_result
+
+        - name: Print apply result
+          debug:
+            msg: "PTF Group applied fail. Please see above job log"
+          when: apply_result.rc != 0
+
+        - name: Print apply result
+          debug:
+            msg: "PTF Group applied succesfully."
+          when: apply_result.rc == 0
+
+    - name: delete the dest file dir
+      file:
+        path: "{{ path }}"
+        state: absent
+      ignore_errors: true
+      when: deletefile

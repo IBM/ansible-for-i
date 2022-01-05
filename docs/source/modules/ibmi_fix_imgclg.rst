@@ -193,7 +193,7 @@ See Also
 
 .. seealso::
 
-   - :ref:`ibmi_fix, ibmi_fix_savf_module`
+   - :ref:`ibmi_fix_module`
 
 
   

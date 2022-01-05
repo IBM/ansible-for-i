@@ -147,7 +147,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -188,7 +188,7 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     job_log = []
@@ -202,7 +202,7 @@ def main():
     )
 
     if rc:
-        message = 'non-zero return code:{rc}, error: {err}'.format(rc=rc, err=err)
+        message = f'non-zero return code:{rc}, error: {err}'
         module.fail_json(msg=message, **result)
 
     if not joblog:

@@ -179,7 +179,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -204,7 +204,7 @@ def main():
     if len(user) > 10:
         module.fail_json(rc=256, msg="Value of user exceeds 10 characters")
     if subsystem == '*JOBQ' or subsystem == '*OUTQ':
-        module.fail_json(rc=256, msg="Value of option subsystem can not be {subsystem_pattern}".format(subsystem_pattern=subsystem))
+        module.fail_json(rc=256, msg=f"Value of option subsystem can not be {subsystem}")
     become_user = module.params['become_user']
     become_user_password = module.params['become_user_password']
 
@@ -212,7 +212,7 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     job_log = []
@@ -227,8 +227,7 @@ def main():
                 job_log=job_log,
                 rc=rc,
             )
-            message = 'non-zero return code:{rc}'.format(
-                rc=rc)
+            message = f'non-zero return code:{rc}'
             module.fail_json(msg=message, **result_failed)
         else:
             result_success = dict(
@@ -252,8 +251,7 @@ def main():
                 job_log=job_log,
                 rc=rc,
             )
-            message = 'Failed to retrieve subsystem {subsystem_pattern} status, non-zero return code:{rc}'.format(
-                subsystem_pattern=subsystem, rc=rc)
+            message = f'Failed to retrieve subsystem {subsystem} status, non-zero return code:{rc}'
             module.fail_json(msg=message, **result_failed)
         else:
             is_active = False
@@ -261,16 +259,13 @@ def main():
                 if subsystem == items['SUBSYSTEM']:
                     is_active = True
             if not is_active:
-                module.fail_json(rc=ibmi_util.IBMi_SUBSYSTEM_NOT_ACTIVE, msg="Subsystem {0} is not active".format(subsystem))
+                module.fail_json(rc=ibmi_util.IBMi_SUBSYSTEM_NOT_ACTIVE, msg=f"Subsystem {subsystem} is not active")
 
             if user == '*ALL':
-                sql = "SELECT J.* FROM TABLE (QSYS2.ACTIVE_JOB_INFO(SUBSYSTEM_LIST_FILTER => '{subsystem_pattern}')) J \
-                  WHERE JOB_TYPE NOT IN ('SBS', 'SYS')".format(subsystem_pattern=subsystem)
+                sql = f"SELECT J.* FROM TABLE (QSYS2.ACTIVE_JOB_INFO(SUBSYSTEM_LIST_FILTER => '{subsystem}')) J WHERE JOB_TYPE NOT IN ('SBS', 'SYS')"
             else:
-                sql = "SELECT J.* FROM TABLE (QSYS2.ACTIVE_JOB_INFO(\
-                    SUBSYSTEM_LIST_FILTER => '{subsystem_pattern}', \
-                    CURRENT_USER_LIST_FILTER => '{user_pattern}')) J WHERE JOB_TYPE NOT IN ('SBS', 'SYS')".format(
-                    subsystem_pattern=subsystem, user_pattern=user)
+                sql = f"SELECT J.* FROM TABLE (QSYS2.ACTIVE_JOB_INFO(SUBSYSTEM_LIST_FILTER => '{subsystem}', \
+                    CURRENT_USER_LIST_FILTER => '{user}')) J WHERE JOB_TYPE NOT IN ('SBS', 'SYS')"
             ibmi_util.log_info("Command to run: " + sql, module._name)
             rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(sql)
             if rc:
@@ -280,8 +275,7 @@ def main():
                     job_log=job_log,
                     rc=rc,
                 )
-                message = 'non-zero return code:{rc}'.format(
-                    rc=rc)
+                message = f'non-zero return code:{rc}'
                 module.fail_json(msg=message, **result_failed)
             else:
                 result_success = dict(

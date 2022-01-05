@@ -111,7 +111,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 HAS_PARAMIKO = True
 
 try:
@@ -159,18 +159,18 @@ def main():
 
         startd = datetime.datetime.now()
         if os.path.splitext(os.path.basename(src))[-1].upper() != '.FILE':
-            return_error(module, "src {p_src} is not a save file. src must be end with '.FILE'.".format(p_src=src), result)
+            return_error(module, f"src {src} is not a save file. src must be end with '.FILE'.", result)
         if src[0:9].upper() != '/QSYS.LIB':
-            return_error(module, "src {p_src} path should be absolute, start with /QSYS.LIB.".format(p_src=src), result)
+            return_error(module, f"src {src} path should be absolute, start with /QSYS.LIB.", result)
 
         if dest == '':
             dest = src
         if dest[0:9].upper() != '/QSYS.LIB':
-            return_error(module, "dest {p_dest} path should be absolute, start with /QSYS.LIB.".format(p_dest=dest), result)
+            return_error(module, f"dest {dest} path should be absolute, start with /QSYS.LIB.", result)
 
         # Check if the savefile exists
         if not os.path.isfile(src):
-            return_error(module, "src doesn't exist. {p_src}".format(p_src=src), result)
+            return_error(module, f"src doesn't exist. {src}", result)
 
         ibmi_util.log_debug("mkdir " + ifs_dir, module._name)
         rc, out, err = module.run_command(['mkdir', ifs_dir], use_unsafe_shell=False)
@@ -189,43 +189,35 @@ def main():
                 transport = paramiko.Transport((remote_host, 22))
                 transport.connect(username=remote_user, pkey=p_key)
                 sftp = paramiko.SFTPClient.from_transport(transport)
-                stdin, stdout, stderr = ssh.exec_command('mkdir {p_ifs_dir}'.format(p_ifs_dir=ifs_dir))
+                stdin, stdout, stderr = ssh.exec_command(f'mkdir {ifs_dir}')
                 line = stderr.readlines()
                 if line != [] and 'File exists' not in "".join(line):
-                    return_error(module, "Failed to mkdir on remote host, dir = {p_ifs_dir}. {p_line}".format(
-                        p_ifs_dir=ifs_dir,
-                        p_line=line), result)
+                    return_error(module, f"Failed to mkdir on remote host, dir = {ifs_dir}. {line}", result)
                 try:
                     ibmi_util.log_debug("sftp: put " + ifs_name + " " + ifs_name, module._name)
                     sftp.put(ifs_name, ifs_name)
                 except Exception as e:
-                    return_error(module, "Put {p_to_text} to remote host exception. Use -vvv for more information.".format(
-                        p_to_text=to_text(e)), result)
+                    return_error(module, f"Put {to_text(e)} to remote host exception. Use -vvv for more information.", result)
 
                 ibmi_util.log_debug("mv " + ifs_name + " " + dest, module._name)
-                stdin, stdout, stderr = ssh.exec_command('mv {p_ifs_name} {p_dest}'.format(p_ifs_name=ifs_name, p_dest=dest))
+                stdin, stdout, stderr = ssh.exec_command(f'mv {ifs_name} {dest}')
                 line = stderr.readlines()
                 if line != []:
-                    return_error(module, "Failed to mv file to qsys. qsys dir = {p_dest}. {p_line}".format(
-                        p_dest=dest, p_line=line), result)
+                    return_error(module, f"Failed to mv file to qsys. qsys dir = {dest}. {line}", result)
             else:
                 return_error(module,
-                             "Copy file to current host tmp dir failed. cp {p_src} {p_ifs_dir}. {p_err}".format(
-                                 p_src=src, p_ifs_dir=ifs_dir, p_err=err), result)
+                             f"Copy file to current host tmp dir failed. cp {src} {ifs_dir}. {err}", result)
         else:
-            return_error(module, "mkdir on current host failed. dir = {p_ifs_dir}. {p_err}".format(
-                p_ifs_dir=ifs_dir, p_err=err), result)
+            return_error(module, f"mkdir on current host failed. dir = {ifs_dir}. {err}", result)
 
         endd = datetime.datetime.now()
         delta = endd - startd
-        result['stdout'] = "Successfully synchronize file {p_src} to remote host {p_remote_host}:{p_dest}".format(
-            p_src=src, p_remote_host=remote_host, p_dest=dest)
+        result['stdout'] = f"Successfully synchronize file {src} to remote host {remote_host}:{dest}"
         result.update({'stderr': err, 'rc': rc, 'delta': str(delta)})
         module.exit_json(**result)
 
     except Exception as e:
-        return_error(module, "Unexpected exception happens. error: {p_to_text}. Use -vvv for more information.".format(
-            p_to_text=to_text(e)), result)
+        return_error(module, f"Unexpected exception happens. error: {to_text(e)}. Use -vvv for more information.", result)
     finally:
         if 'ssh' in vars():
             ssh.close()

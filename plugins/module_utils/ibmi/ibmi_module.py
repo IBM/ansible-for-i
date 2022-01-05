@@ -164,21 +164,20 @@ class IBMiModule(object):
         try:
             ssh_client, ssh_connection, user, login = ibmi_util.get_ssh_client_and_user_info()
             ibmi_util.log_info(
-                "ssh client: {0}, ssh connection: {1}, login name: {2}, user: {3}".format(ssh_client, ssh_connection, user, login))
+                f"ssh client: {ssh_client}, ssh connection: {ssh_connection}, login name: {user}, user: {login}")
             if db_name != ibmi_util.SYSBAS:
-                self.conn = dbi.connect(database='{db_pattern}'.format(db_pattern=db_name))
+                self.conn = dbi.connect(database=f'{db_name}')
             else:
                 self.conn = dbi.connect()
             job_name_info = self.get_current_job_name()
-            ibmi_util.log_info("Job of the connection to execute the task: {0}".format(
-                job_name_info), "Connection Initialization")
+            ibmi_util.log_info(
+                f"Job of the connection to execute the task: {job_name_info}", "Connection Initialization")
         except Exception as inst:
             self.close_db_connection()
             re_raise = True
-            exp_msg = "Fail to connect to database {0}: {1}.".format(
-                db_name, str(inst))
+            exp_msg = f"Fail to connect to database {db_name}: {inst}."
             if db_name != ibmi_util.SYSBAS:
-                exp_msg = exp_msg + " Check if IASP {0} is exist and varied on.".format(db_name)
+                exp_msg = exp_msg + f" Check if IASP {db_name} is exist and varied on."
             else:
                 exp_msg = exp_msg + \
                     "Possible reasons and solutions are:" + \
@@ -193,7 +192,7 @@ class IBMiModule(object):
                 self.conn, become_user_name, "*NOPWD" if (become_user_password is None) else become_user_password)
             become_result = self.ibmi_logon.switch()
             if not become_result:
-                exp_msg = "Failed to become user {0} to excute the task. Invaild user or password or user is disabled".format(become_user_name)
+                exp_msg = f"Failed to become user {become_user_name} to excute the task. Invaild user or password or user is disabled"
                 raise Exception(exp_msg)
 
     def __del__(self):
@@ -217,8 +216,7 @@ class IBMiModule(object):
                 self.conn.close()
             except Exception as inst:
                 re_raise = True
-                exp_msg = "Failed to close connect from database: {0}".format(
-                    str(inst))
+                exp_msg = "Failed to close connect from database: {inst}"
             finally:
                 self.conn = None
                 if re_raise:

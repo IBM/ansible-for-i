@@ -160,7 +160,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def return_error(module, ibmi_module, error, out, startd, result):
@@ -206,12 +206,12 @@ def main():
             ibmi_module = imodule.IBMiModule(
                 db_name=asp_group, become_user_name=become_user, become_user_password=become_user_password)
         except Exception as inst:
-            message = 'Exception occurred: {0}'.format(str(inst))
+            message = f'Exception occurred: {str(inst)}'
             module.fail_json(rc=999, msg=message)
 
         src = os.path.realpath(src)
         if not os.path.isfile(src):
-            return_error(module, ibmi_module, "src {p_src} doesn't exist.".format(p_src=src), '', startd, result)
+            return_error(module, ibmi_module, f"src {src} doesn't exist.", '', startd, result)
 
         with open(src, "r", encoding='utf-8') as f:
             ibmi_util.log_debug("open file: " + src, module._name)
@@ -241,37 +241,29 @@ def main():
                     rc, out, error = ibmi_module.itoolkit_run_command(command)
                     ibmi_util.log_debug("run command: " + command, module._name)
             else:
-                command = "QSYS/RUNSQLSTM SRCSTMF('{p_src}') ERRLVL({p_severity_level}) {p_parameters}".format(
-                    p_src=src,
-                    p_severity_level=severity_level,
-                    p_parameters=parameters)
+                command = f"QSYS/RUNSQLSTM SRCSTMF('{src}') ERRLVL({severity_level}) {parameters}"
                 rc, out, error = ibmi_module.itoolkit_run_command(command)
                 ibmi_util.log_debug("RUNSQLSTM: " + command, module._name)
                 if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-                    return_error(module, ibmi_module, "Execute sql statement file {p_command} failed. err: \n {p_err}".format(
-                        p_command=command,
-                        p_err=error),
-                        out,
-                        startd,
-                        result)
+                    return_error(module, ibmi_module, f"Execute sql statement file {command} failed. err: \n {error}",
+                                 out,
+                                 startd,
+                                 result)
 
         endd = datetime.datetime.now()
         delta = endd - startd
         if rc != ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-            return_error(module, ibmi_module, "Execute command {p_command} failed. err: {p_err}".format(
-                p_command=command,
-                p_err=error),
-                out,
-                startd,
-                result)
+            return_error(module, ibmi_module, f"Execute command {command} failed. err: {error}",
+                         out,
+                         startd,
+                         result)
         result['stdout'] = "Successfully execute script file."
         result.update({'rc': rc, 'delta': str(delta)})
         module.exit_json(**result)
 
     except Exception as e:
         result.update({'rc': ibmi_util.IBMi_COMMAND_RC_ERROR,
-                      'msg': "Unexpected exception happens. error: {p_to_text}. Use -vvv for more information.".format(
-                          p_to_text=to_text(e))})
+                      'msg': f"Unexpected exception happens. error: {to_text(e)}. Use -vvv for more information."})
         module.fail_json(**result)
 
 

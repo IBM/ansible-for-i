@@ -63,6 +63,27 @@
         not_loaded_list: "{{ not_loaded_ptfs_list }}"
         src_host: "{{ repo_server }}"
         already_loaded_list: "{{ loaded_ptfs_list }}"
+      when: temp_or_perm != '*PERM'
+
+    - block:
+        - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply
+          include_role:
+            name: sync_apply_individual_ptfs
+          vars:
+            not_loaded_list: "{{ not_loaded_ptfs_list + temporarily_applied_list }}"
+            src_host: "{{ repo_server }}"
+            already_loaded_list: "{{ loaded_ptfs_list }}"
+            temp_or_perm: "{{ temp_or_perm }}"
+          when: not_loaded_ptfs_list != [] or loaded_ptfs_list != []
+
+        - name: call ibmi_cl_command to install the temporarily applied PTFs
+          ibm.power_ibmi.ibmi_cl_command:
+            cmd: "APYPTF LICPGM({{ temporarily_applied_list_parm.product }}) SELECT({{ temporarily_applied_list_parm.ptf_id }}) APY(*PERM)"
+          loop: "{{ temporarily_applied_list }}"
+          loop_control:
+            loop_var: temporarily_applied_list_parm
+          when: not_loaded_ptfs_list == [] and loaded_ptfs_list == [] and temporarily_applied_list != []
+      when: temp_or_perm == '*PERM'
 
     - name: compose final_ptfs_status load fail list
       set_fact:
@@ -115,11 +136,11 @@
         ptfs_list_parm: "{{ ( next_not_loaded_ptfs_list | default([]) + next_loaded_ptfs_list |
         default([]) + requisite_list | default([]) ) | difference( load_fail_simple_list | default([])) }}"
 
-  # - name: print ptfs_list
-  #   debug:
-  #     var: ptfs_list_parm
+    # - name: print ptfs_list_parm
+    #   debug:
+    #     var: ptfs_list_parm
 
-  when: tmp_not_loaded_ptfs_list != [] or tmp_loaded_ptfs_list != []
+  when: tmp_not_loaded_ptfs_list != [] or tmp_loaded_ptfs_list != [] or temporarily_applied_list != []
 
 # - name: print final ptfs status
 #   debug:

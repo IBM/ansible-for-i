@@ -172,7 +172,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -206,17 +206,10 @@ def main():
 
     # handle the message key which more than 4 characters
     if len(message_key) > 4:
-        message_key = "x'{0}'".format(message_key)
+        message_key = f"x'{message_key}'"
 
-    command = "QSYS/SNDRPY MSGKEY({p_message_key}) MSGQ({p_message_lib}/{p_message_queue}) \
-        RPY({p_reply}) RMV({p_remove_message}) RJTDFTRPY({p_reject_default_reply}) CCSID({p_ccsid})".format(
-        p_message_key=message_key,
-        p_message_queue=message_queue,
-        p_message_lib=message_lib,
-        p_reply=reply,
-        p_remove_message=remove_message,
-        p_reject_default_reply=reject_default_reply,
-        p_ccsid=ccsid)
+    command = f"QSYS/SNDRPY MSGKEY({message_key}) MSGQ({message_lib}/{message_queue}) \
+        RPY({reply}) RMV({remove_message}) RJTDFTRPY({reject_default_reply}) CCSID({ccsid})"
 
     startd = datetime.datetime.now()
 
@@ -224,7 +217,7 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     job_log = []

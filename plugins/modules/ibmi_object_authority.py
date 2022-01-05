@@ -331,7 +331,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -421,12 +421,12 @@ def main():
     user = [item.strip().upper() for item in user]
     for item in user:
         if len(item) > 10:
-            module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of {p_item} in option user exceeds 10 characters".format(p_item=item))
+            module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg=f"Value of {item} in option user exceeds 10 characters")
     authority = module.params['authority']
     authority = [item.strip().upper() for item in authority]
     for item in authority:
         if len(item) > 10:
-            module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Value of {p_item} in option authority exceeds 10 characters".format(p_item=item))
+            module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg=f"Value of {item} in option authority exceeds 10 characters")
     replace_authority = module.params['replace_authority']
     authorization_list = module.params['authorization_list'].strip().upper()
     if len(authorization_list) > 10:
@@ -458,7 +458,7 @@ def main():
             single_value = ['*CHANGE', '*ALL', '*USE', '*EXCLUDE', '*AUTL']
             for item in single_value:
                 if item in authority:
-                    module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="{p_item} must be only value for parameter authority".format(p_item=item))
+                    module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg=f"{item} must be only value for parameter authority")
 
         # handle the relateionship of *PUBLIC and *AUTL
         if isinstance(authority, list) and len(authority) == 1 and authority[0] == '*AUTL' and user[0] != '*PUBLIC':
@@ -491,70 +491,38 @@ def main():
         module.fail_json(rc=ibmi_util.IBMi_PARAM_NOT_VALID, msg="Specify authorization_list when the operation is grant_autl or revoke_autl")
 
     if operation == 'GRANT':
-        command = 'QSYS/GRTOBJAUT OBJ({p_lib}/{p_obj}) \
-            OBJTYPE({p_type}) ASPDEV({p_asp}) USER({p_user}) \
-            AUT({p_aut}) REPLACE({p_rep})'.format(
-            p_lib=object_library,
-            p_obj=object_name,
-            p_type=object_type,
-            p_asp=asp_device,
-            p_user=users,
-            p_aut=authorities,
-            p_rep=replace)
+        command = f'QSYS/GRTOBJAUT OBJ({object_library}/{object_name}) \
+            OBJTYPE({object_type}) ASPDEV({asp_device}) USER({users}) \
+            AUT({authorities}) REPLACE({replace})'
     elif operation == 'REVOKE':
-        command = 'QSYS/RVKOBJAUT OBJ({p_lib}/{p_obj}) \
-            OBJTYPE({p_type}) ASPDEV({p_asp}) USER({p_user}) \
-            AUT({p_aut})'.format(
-            p_lib=object_library,
-            p_obj=object_name,
-            p_type=object_type,
-            p_asp=asp_device,
-            p_user=users,
-            p_aut=authorities)
+        command = f'QSYS/RVKOBJAUT OBJ({object_library}/{object_name}) \
+            OBJTYPE({object_type}) ASPDEV({asp_device}) USER({users}) \
+            AUT({authorities})'
     elif operation == 'GRANT_AUTL':
-        command = 'QSYS/GRTOBJAUT OBJ({p_lib}/{p_obj}) \
-            OBJTYPE({p_type}) ASPDEV({p_asp}) \
-            AUTL({p_autl})'.format(
-            p_lib=object_library,
-            p_obj=object_name,
-            p_type=object_type,
-            p_asp=asp_device,
-            p_autl=authorization_list)
+        command = f'QSYS/GRTOBJAUT OBJ({object_library}/{object_name}) \
+            OBJTYPE({object_type}) ASPDEV({asp_device}) \
+            AUTL({authorization_list})'
     elif operation == 'REVOKE_AUTL':
-        command = 'QSYS/RVKOBJAUT OBJ({p_lib}/{p_obj}) \
-            OBJTYPE({p_type}) ASPDEV({p_asp}) \
-            AUTL({p_autl})'.format(
-            p_lib=object_library,
-            p_obj=object_name,
-            p_type=object_type,
-            p_asp=asp_device,
-            p_autl=authorization_list)
+        command = f'QSYS/RVKOBJAUT OBJ({object_library}/{object_name}) \
+            OBJTYPE({object_type}) ASPDEV({asp_device}) \
+            AUTL({authorization_list})'
     elif operation == 'GRANT_REF':
-        command = 'QSYS/GRTOBJAUT OBJ({p_lib}/{p_obj}) \
-            OBJTYPE({p_type}) ASPDEV({p_asp}) \
-            REFOBJ({p_ref_lib}/{p_ref_obj}) REFOBJTYPE({p_ref_type}) \
-            REFASPDEV({p_ref_asp})'.format(
-            p_lib=object_library,
-            p_obj=object_name,
-            p_type=object_type,
-            p_asp=asp_device,
-            p_ref_lib=ref_object_library,
-            p_ref_obj=ref_object_name,
-            p_ref_type=ref_object_type,
-            p_ref_asp=ref_asp_device)
+        command = f'QSYS/GRTOBJAUT OBJ({object_library}/{object_name}) \
+            OBJTYPE({object_type}) ASPDEV({asp_device}) \
+            REFOBJ({ref_object_library}/{ref_object_name}) REFOBJTYPE({ref_object_type}) \
+            REFASPDEV({ref_asp_device})'
     else:
-        command = "SELECT * FROM QSYS2.OBJECT_PRIVILEGES WHERE SYSTEM_OBJECT_NAME = '{p_obj}'".format(
-            p_obj=object_name)
+        command = f"SELECT * FROM QSYS2.OBJECT_PRIVILEGES WHERE SYSTEM_OBJECT_NAME = '{object_name}'"
         if (object_library != '') and (not object_library.startswith('*')):
-            command = command + ' ' + "AND SYSTEM_OBJECT_SCHEMA = '{p_lib}'".format(p_lib=object_library)
+            command = command + ' ' + f"AND SYSTEM_OBJECT_SCHEMA = '{object_library}'"
         if object_type != '*ALL':
-            command = command + ' ' + "AND OBJECT_TYPE = '{p_type}'".format(p_type=object_type)
+            command = command + ' ' + f"AND OBJECT_TYPE = '{object_type}'"
 
     try:
         ibmi_module = imodule.IBMiModule(
             db_name=asp_group, become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     if asp_group or operation == 'DISPLAY':
@@ -576,7 +544,7 @@ def main():
                 job_log=job_log,
                 rc=rc,
             )
-            message = 'non-zero return code:{rc}'.format(rc=rc)
+            message = f'non-zero return code:{rc}'
             module.fail_json(msg=message, **result_failed)
         else:
             result_success = dict(
@@ -597,7 +565,7 @@ def main():
                 job_log=job_log,
                 rc=rc,
             )
-            message = 'non-zero return code:{rc}'.format(rc=rc)
+            message = f'non-zero return code:{rc}'
             module.fail_json(msg=message, **result_failed)
         else:
             result_success = dict(

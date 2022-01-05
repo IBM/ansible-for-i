@@ -157,7 +157,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -202,7 +202,7 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     if operation == 'add':
@@ -210,43 +210,37 @@ def main():
             link_priority_int = int(link_priority)
             if link_priority_int < 1 or link_priority_int > 16:
                 module.fail_json(
-                    rc=255, msg="The value of argument link_priority is {0} which out of range from 1 to 16".format(link_priority_int))
+                    rc=255, msg=f"The value of argument link_priority is {link_priority_int} which out of range from 1 to 16")
         except (TypeError, ValueError):
             module.fail_json(
-                rc=255, msg="The value of argument link_priority is {0} which can't be converted to int".format(link_priority))
+                rc=255, msg=f"The value of argument link_priority is {link_priority} which can't be converted to int")
         if source_address == '*ALL':
             module.fail_json(
                 rc=255, msg="The value of argument source_address can not be '*ALL' when the operation is 'add'")
 
-        sql = "CALL QSYS2.ADD_NRG_LINK(NRG_NAME => '{p_name}', SOURCE_ADDRESS => '{s_addr}', TARGET_ADDRESS => '{t_addr}', \
-            LINK_PRIORITY => {p_linkp}, INCREMENT_LOAD_BALANCE_LINK_COUNT => '{p_load}'".format(
-            p_name=nrg_name, s_addr=source_address, t_addr=target_address,
-            p_linkp=link_priority_int, p_load=change_load_balance_link_count_str)
+        sql = f"CALL QSYS2.ADD_NRG_LINK(NRG_NAME => '{nrg_name}', SOURCE_ADDRESS => '{source_address}', TARGET_ADDRESS => '{target_address}', \
+            LINK_PRIORITY => {link_priority_int}, INCREMENT_LOAD_BALANCE_LINK_COUNT => '{change_load_balance_link_count_str}'"
         if line_description:
-            sql = sql + \
-                ", LINE_DESCRIPTION => '{p_lined}'".format(
-                    p_lined=line_description)
+            sql = sql + f", LINE_DESCRIPTION => '{line_description}'"
         if virtual_lan_id:
-            sql = sql + \
-                ", VIRTUAL_LAN_ID => '{p_vlan_id}'".format(
-                    p_vlan_id=virtual_lan_id)
+            sql = sql + f", VIRTUAL_LAN_ID => '{virtual_lan_id}'"
         sql = sql + ")"
 
         ibmi_util.log_info("Run sql statement: " + sql, module._name)
         rc, out, err, job_log = ibmi_module.itoolkit_sql_callproc_once(sql)
-        ibmi_util.log_debug("out={0}, err={1} ".format(str(out), str(err)), module._name)
+        ibmi_util.log_debug(f"out={out}, err={err} ", module._name)
         if rc:
             if (rc == ibmi_util.IBMi_PACKAGES_NOT_FOUND) or (rc == ibmi_util.IBMi_DB_CONNECTION_ERROR):
-                msg = "Error occurred when add NRG link: {0}".format(err)
+                msg = f"Error occurred when add NRG link: {err}"
             else:
                 msg = "Error occurred when add NRG link, see job log for detail"
             module.fail_json(
                 rc=rc, msg=msg, job_log=job_log)
 
-        sql = "CALL QSYS2.CHANGE_NRG(NRG_NAME => '{p_name}', NRG_DESCRIPTION => 'DB2MIRROR GROUP')".format(p_name=nrg_name)
+        sql = f"CALL QSYS2.CHANGE_NRG(NRG_NAME => '{nrg_name}', NRG_DESCRIPTION => 'DB2MIRROR GROUP')"
         ibmi_util.log_info("Run sql statement: " + sql, module._name)
         rc, out, err, job_log = ibmi_module.itoolkit_sql_callproc_once(sql)
-        ibmi_util.log_debug("out={0}, err={1} ".format(str(out), str(err)), module._name)
+        ibmi_util.log_debug(f"out={str(out)}, err={str(err)} ", module._name)
         if rc:
             module.fail_json(
                 rc=rc, msg="Error occurred when change NRG deescription, see job log for detail", job_log=job_log)
@@ -254,22 +248,17 @@ def main():
         module.exit_json(
             rc=0, msg="Success to add NRG link")
     else:
-        sql = "CALL QSYS2.REMOVE_NRG_LINK(NRG_NAME => '{p_name}', SOURCE_ADDRESS => '{s_addr}', \
-            DECREMENT_LOAD_BALANCE_LINK_COUNT => '{p_load}'".format(
-            p_name=nrg_name, s_addr=source_address, p_load=change_load_balance_link_count_str)
+        sql = f"CALL QSYS2.REMOVE_NRG_LINK(NRG_NAME => '{nrg_name}', SOURCE_ADDRESS => '{source_address}', \
+            DECREMENT_LOAD_BALANCE_LINK_COUNT => '{change_load_balance_link_count_str}'"
         if line_description:
-            sql = sql + \
-                ", LINE_DESCRIPTION => '{p_lined}'".format(
-                    p_lined=line_description)
+            sql = sql + f", LINE_DESCRIPTION => '{line_description}'"
         if virtual_lan_id:
-            sql = sql + \
-                ", VIRTUAL_LAN_ID => '{p_vlan_id}'".format(
-                    p_vlan_id=virtual_lan_id)
+            sql = sql + f", VIRTUAL_LAN_ID => '{virtual_lan_id}'"
         sql = sql + ")"
 
         ibmi_util.log_info("Run sql statement: " + sql, module._name)
         rc, out, err, job_log = ibmi_module.itoolkit_sql_callproc_once(sql)
-        ibmi_util.log_debug("out={0}, err={1} ".format(str(out), str(err)), module._name)
+        ibmi_util.log_debug(f"out={str(out)}, err={str(err)} ", module._name)
         if rc:
             module.fail_json(
                 rc=rc, msg="Error occurred when remove NRG link, see job log for detail", job_log=job_log)

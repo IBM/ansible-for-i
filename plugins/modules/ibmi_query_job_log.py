@@ -130,7 +130,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -151,21 +151,18 @@ def main():
     become_user = module.params['become_user']
     become_user_password = module.params['become_user_password']
 
-    sql = "SELECT ORDINAL_POSITION, MESSAGE_ID, MESSAGE_TYPE, MESSAGE_SUBTYPE, SEVERITY, \
+    sql = f"SELECT ORDINAL_POSITION, MESSAGE_ID, MESSAGE_TYPE, MESSAGE_SUBTYPE, SEVERITY, \
         MESSAGE_TIMESTAMP, FROM_LIBRARY, FROM_PROGRAM, FROM_MODULE, FROM_PROCEDURE, FROM_INSTRUCTION, \
         TO_LIBRARY, TO_PROGRAM, TO_MODULE, TO_PROCEDURE, TO_INSTRUCTION, FROM_USER, MESSAGE_FILE, \
         MESSAGE_LIBRARY, MESSAGE_TEXT, MESSAGE_SECOND_LEVEL_TEXT \
-        FROM TABLE(QSYS2.JOBLOG_INFO('{p_job_number}/{p_job_user}/{p_job_name}')) A".format(
-        p_job_number=job_number,
-        p_job_user=job_user,
-        p_job_name=job_name)
+        FROM TABLE(QSYS2.JOBLOG_INFO('{job_number}/{job_user}/{job_name}')) A"
 
     startd = datetime.datetime.now()
     try:
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
     job_log = []
     rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(sql)
@@ -183,7 +180,7 @@ def main():
             end=str(endd),
             delta=str(delta),
         )
-        message = 'non-zero return code {rc}'.format(rc=rc)
+        message = f'non-zero return code {rc}'
         module.fail_json(msg=message, **result_failed)
 
     result = dict(

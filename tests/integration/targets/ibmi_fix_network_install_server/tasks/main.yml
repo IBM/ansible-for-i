@@ -1,0 +1,231 @@
+# test code for the ibmi_fix_network_install_server module
+# (c) 2020, zhaoyao <zhaoyao@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+#
+#Test procedure:
+# 1. setup with default parameters
+# 2. setup with customized parameters
+# 3.     choices: ['setup_only',
+#               'setup_and_addimgclge',
+#               'addimgclge_only',
+#               'rmvimgclge_only',
+#               'rmvimgclge_and_addimgclge',
+#               'uninstall',
+#               'retrieve_image_catalog_entries',
+#               'restart_NFS_server']
+# 4. negative testings
+
+- block:
+  - set_fact:
+      random_number: "{{ 100 | random }}"
+      become_user: null
+      become_user_password: null
+
+  - name: TC00 - Clean up default server configs before test starts
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'uninstall'
+      rollback: True
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"  
+    register: precleanup
+    failed_when: 
+      - "'Failure in retrieving' not in precleanup.msg" 
+      - precleanup.rc is not defined
+
+  - name: TC01 - Setup IBM i Network install server with default parameters
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'setup_only'
+      rollback: True
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}" 
+    register: tc01  
+    failed_when: tc01.rc != 0
+
+  - name: TC01 assertion
+    assert:
+      that:
+        - tc01.image_catalog_directory_name == "/etc/ibmi_ansible/fix_management/network_install"  
+        - tc01.image_catalog_name == 'REPOSVRCLG'
+        - tc01.device_name == 'REPOSVROPT'
+        - tc01.stderr_lines | length == 0
+        - "'success QSYS/CHGNFSEXP' in tc01.stdout"
+
+  - name: TC02 - Setup IBM i Network install server with customized parameters
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'setup_only'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+      image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"
+    register: tc02
+    failed_when: tc02.rc != 0
+
+  - name: TC02 assertion
+    assert:
+      that:
+        - tc02.image_catalog_directory_name == '/tmp/imgclg_{{ random_number }}'
+        - tc02.image_catalog_name == 'imgclg_{{ random_number }}'
+        - tc02.device_name == 'vrtopt_{{ random_number }}'
+        - tc02.stderr_lines | length == 0
+        - "'success QSYS/CHGNFSEXP' in tc01.stdout"
+
+  - name: TC03A - Download a PTF with *IMAGE for testing
+    ibm.power_ibmi.ibmi_download_fix:
+      ptf_id: 'SI69940'
+      delivery_format: '*IMAGE'
+      become_user: "{{ become_user_password }}"
+      become_user_password: 'yourpassword'
+    register: fix_download
+    failed_when: fix_download.rc != 0
+
+  - name: TC03A - Pause for 5 minutes to wait for download completes
+    pause:
+      minutes: 5
+
+  - name: TC03A - get bin file name
+    find:
+      paths: '{{ fix_download.file_path }}'
+      file_type: file
+      use_regex: yes
+      patterns: ['*.BIN']
+    register: binfiles  
+
+  - name: TC03 - addimgclge
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'addimgclge_only'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+      image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+      virtual_image_name_list:
+        - "{{ binfiles.files }}"
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"
+    register: tc03
+    failed_when: tc03.rc != 0
+
+  - name: TC04 - rmvimgclge
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'rmvimgclge_only'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+      image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+      virtual_image_name_list:
+        - "{{ binfiles.files }}"
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"
+    register: tc04
+    failed_when: tc04.rc != 0
+
+  - name: TC05 - rmvimgclge_and_addimgclge
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'rmvimgclge_and_addimgclge'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+      image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+      virtual_image_name_list:
+        - "{{ binfiles.files }}"
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"
+    register: tc05
+    failed_when: tc05.rc != 0
+
+  - name: TC06 - retrieve_image_catalog_entries
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'retrieve_image_catalog_entries'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+    register: tc06
+    failed_when: tc06.rc != 0
+
+  - name: TC07 - restart_NFS_server
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'restart_NFS_server'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+    register: tc07
+    failed_when: tc07.rc != 0
+
+  - debug:
+      msg: "Start negative testing"
+
+  - name: TC09 - use existing device_name
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'setup_only'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+      image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"
+    register: tc08
+    failed_when: tc08.rc != 0
+
+  - name: TC10 - use existing image_catalog_name
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'setup_only'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+      image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"
+    register: tc08
+    failed_when: tc08.rc != 0
+
+  - name: TC11 - use existing image_catalog_directory_name
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'setup_only'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+      image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"
+    register: tc08
+    failed_when: tc08.rc != 0
+
+  - name: TC12 - use existing image_catalog_directory_name
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'setup_only'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+      image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"
+    register: tc08
+    failed_when: tc08.rc != 0
+
+  - name: TC12 - add non-existing images
+    ibm.power_ibmi.ibmi_fix_network_install_server:
+      operation: 'setup_and_addimgclge'
+      rollback: True
+      device_name: 'vrtopt_{{ random_number }}'
+      image_catalog_name: 'imgclg_{{ random_number }}'
+      image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+      virtual_image_name_list:
+        - "notexisting.BIN"      
+      become_user: "{{ become_user }}"
+      become_user_password: "{{ become_user_password }}"
+    register: tc08
+    failed_when: tc08.rc != 0
+
+  always: 
+    - name: clean up customized env after tests
+      ibm.power_ibmi.ibmi_fix_network_install_server:
+        operation: 'uninstall'
+        rollback: True
+        device_name: 'vrtopt_{{ random_number }}'
+        image_catalog_name: 'imgclg_{{ random_number }}'
+        image_catalog_directory_name: '/tmp/imgclg_{{ random_number }}'
+        become_user: "{{ become_user }}"
+        become_user_password: "{{ become_user_password }}"  

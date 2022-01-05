@@ -123,7 +123,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def getNonconfigureDisk(imodule, time):
@@ -200,7 +200,7 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     disk_list, job_log = getNonconfigureDisk(ibmi_module, startd)

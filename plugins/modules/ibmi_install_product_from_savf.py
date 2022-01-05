@@ -179,7 +179,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -237,12 +237,10 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
-    command = 'QSYS/CHKOBJ OBJ({pattern_savf_library}/{pattern_savf_name}) OBJTYPE(*FILE)'.format(
-        pattern_savf_name=savf_name.strip(),
-        pattern_savf_library=savf_library.strip())
+    command = f'QSYS/CHKOBJ OBJ({savf_library}/{savf_name}) OBJTYPE(*FILE)'
     # Check to see if the savf is existed
     ibmi_util.log_info("Command to run: " + command, module._name)
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
@@ -253,9 +251,7 @@ def main():
             rc=rc,
             job_log=job_log,
         )
-        module.fail_json(msg="File {pattern_savf_name} in library {pattern_savf_library} not found".format(
-            pattern_savf_name=savf_name.strip(),
-            pattern_savf_library=savf_library.strip()), **result)
+        module.fail_json(msg=f"File {savf_name} in library {savf_library} not found", **result)
 
     # Call the The Accept Software Agreement command
     if acceptance_cmd.strip():
@@ -269,22 +265,13 @@ def main():
                 rc=rc,
                 job_log=job_log,
             )
-            module.fail_json(msg="The Accept Software Agreement command {acceptance_cmd} failed".format(
-                acceptance_cmd=acceptance_cmd), **result)
+            module.fail_json(
+                msg=f"The Accept Software Agreement command {acceptance_cmd} failed", **result)
 
     # run the RSTLICPGM command to install the product
-    command = 'QSYS/RSTLICPGM LICPGM({pattern_product}) DEV(*SAVF) OPTION({pattern_option}) RSTOBJ({pattern_object_type}) \
-        LNG({pattern_language}) RLS({pattern_release}) REPLACERLS({pattern_replace_release}) \
-        SAVF({pattern_savf_library}/{pattern_savf_name}) {pattern_parameters}'.format(
-        pattern_product=product,
-        pattern_option=option,
-        pattern_object_type=object_type,
-        pattern_language=language,
-        pattern_release=release,
-        pattern_replace_release=replace_release,
-        pattern_savf_library=savf_library.strip(),
-        pattern_savf_name=savf_name.strip(),
-        pattern_parameters=parameters)
+    command = f'QSYS/RSTLICPGM LICPGM({product}) DEV(*SAVF) OPTION({option}) RSTOBJ({object_type}) \
+        LNG({language}) RLS({release}) REPLACERLS({replace_release}) \
+        SAVF({savf_library.strip()}/{savf_name.strip()}) {parameters}'
 
     command = ' '.join(command.split())  # keep only one space between adjacent strings
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
@@ -296,7 +283,7 @@ def main():
             rc=rc,
             job_log=job_log,
         )
-        message = 'non-zero return code:{rc}'.format(rc=rc)
+        message = f'non-zero return code:{rc}'
         module.fail_json(msg=message, **result)
 
     result = dict(

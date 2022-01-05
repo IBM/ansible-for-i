@@ -103,7 +103,7 @@ options:
 notes:
    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 seealso:
-- module: ibmi_fix, ibmi_fix_savf
+- module: ibmi_fix
 
 author:
     - Wang Yuyu (@wangyuyu)
@@ -243,12 +243,8 @@ ptf_install_fail_reason:
 
 import datetime
 import re
-import os
-import time
-import shutil
 import sys
 import socket
-from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi.temp_directory import TemporaryDirectory
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
@@ -267,7 +263,7 @@ except ImportError:
 HAS_IBM_DB = True
 
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -597,8 +593,6 @@ def get_optical_device_status(ibmi_module, module, opt_device_name):
 
 
 def INSPTF_operation(ibmi_module, module, product_id, device_name, fix_omit_list, is_rollback, apply_type, hiper_only, rollback_remove_devd):
-    db_conn = ibmi_module.get_connection()
-
     command_map = {}
     command_log = "Command log of INSPTF operation."
 
@@ -720,8 +714,6 @@ def uninstall_operation(ibmi_module, module, device_name, rollback):
 
 
 def reload_operation(ibmi_module, module, device_name, rollback):
-    db_conn = ibmi_module.get_connection()
-
     command_map = {}
     command_log = "Command log of setup operation."
     command_map["cl_vary_off_device"] = "QSYS/VRYCFG CFGOBJ(" + device_name + ") CFGTYPE(*DEV) STATUS(*OFF)"

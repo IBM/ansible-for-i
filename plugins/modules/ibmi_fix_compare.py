@@ -100,7 +100,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.6.0"
 
 
 def get_ptf_info(db_connection, ptf_list):
@@ -150,7 +150,7 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     db_conn = ibmi_module.get_connection()
