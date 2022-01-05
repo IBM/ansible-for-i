@@ -21,6 +21,7 @@ Return Variables
 | `not_loaded_ptfs_list` | list         | The sub-list of check_ptf_list. It includes PTFs don't exist and PTFs whose PTF_LOADED_STATUS is NOT_LOADED or PERMANENTLY REMOVED. |
 | `loaded_ptfs_list` | list             | The sub-list of check_ptf_list. It includes the already loaded PTFs list. |
 | `product_not_installed_ptfs` | list             | The sub-list of check_ptf_list. It includes the already loaded PTFs list. |
+| `temporarily_applied_list` | list             | The sub-list of check_ptf_list. It includes the temporarily applied PTFs list. |
 
 Example Playbook
 ----------------
@@ -118,6 +119,10 @@ Example Returned Variables
 
 "product_not_installed_ptfs": [
     {"ptf_id": "SI63489", "product": "5770UME", "release": "V1R4M0"}
+    ]
+
+"temporarily_applied_list": [
+    {'ptf_id": "SI73543", "product":'5770UME", "release": "V1R4M0"}
     ]
 ```
 

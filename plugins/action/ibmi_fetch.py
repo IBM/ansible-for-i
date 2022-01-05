@@ -16,7 +16,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 ifs_dir = '/tmp/.ansible'
 display = Display()
@@ -41,11 +41,9 @@ class ActionModule(ActionBase):
     def _calculate_savf_path(self, object_names, lib_name):
         # Calculate savf path when object is a *FILE
         if lib_name != 'QSYS':
-            savf_path = '/QSYS.LIB/{p_lib_name}.LIB/{p_object_names}.FILE'.format(
-                p_lib_name=lib_name,
-                p_object_names=object_names)
+            savf_path = f'/QSYS.LIB/{lib_name}.LIB/{object_names}.FILE'
         else:
-            savf_path = '/QSYS.LIB/{p_object_names}.FILE'.format(p_object_names=object_names)
+            savf_path = f'/QSYS.LIB/{object_names}.FILE'
 
         return savf_path
 
@@ -63,43 +61,34 @@ class ActionModule(ActionBase):
                 savf_name = original_savf_name
 
             if lib_name != 'QSYS':
-                savf_path = '/QSYS.LIB/{p_lib_name}.LIB/{p_original_savf_name}.FILE'.format(
-                    p_lib_name=lib_name,
-                    p_original_savf_name=original_savf_name)
+                savf_path = f'/QSYS.LIB/{lib_name}.LIB/{original_savf_name}.FILE'
             else:
-                savf_path = '/QSYS.LIB/{p_original_savf_name}.FILE'.format(p_original_savf_name=original_savf_name)
+                savf_path = f'/QSYS.LIB/{original_savf_name}.FILE'
             i = 1
             while (self._execute_remote_stat(savf_path, all_vars=task_vars, follow=False))['exists']:
                 if i > 9:
-                    result['msg'] = 'SAVF names ({p_savf_path} range(1,9)) are already exist on IBMi. Failed'.format(
-                        p_savf_path=savf_path)
+                    result['msg'] = f'SAVF names ({savf_path} range(1,9)) are already exist on IBMi. Failed'
                     result['failed'] = True
                     return result
                 if len(original_savf_name + str(i)) <= 10:
                     if lib_name != 'QSYS':
-                        savf_path = '/QSYS.LIB/{p_lib_name}.LIB/{p_orig}.FILE'.format(
-                            p_lib_name=lib_name,
-                            p_orig=(original_savf_name + str(i)))
+                        savf_path = f'/QSYS.LIB/{lib_name}.LIB/{original_savf_name + str(i)}.FILE'
                     else:
-                        savf_path = '/QSYS.LIB/{p_orig}.FILE'.format(p_orig=(original_savf_name + str(i)))
+                        savf_path = f'/QSYS.LIB/{original_savf_name + str(i)}.FILE'
                     savf_name = original_savf_name + str(i)
                 else:
                     if lib_name != 'QSYS':
-                        savf_path = '/QSYS.LIB/{p_lib_name}.LIB/{p_orig}.FILE'.format(
-                            p_lib_name=lib_name,
-                            p_orig=(original_savf_name[0:9] + str(i)))
+                        savf_path = f'/QSYS.LIB/{lib_name}.LIB/{original_savf_name[0:9] + str(i)}.FILE'
                     else:
-                        savf_path = '/QSYS.LIB/{p_orig}.FILE'.format(p_orig=original_savf_name[0:9] + str(i))
+                        savf_path = f'/QSYS.LIB/{original_savf_name[0:9] + str(i)}.FILE'
                     savf_name = original_savf_name[0:9] + str(i)
                 i += 1
         else:
             savf_name = savefile_name
             if lib_name != 'QSYS':
-                savf_path = '/QSYS.LIB/{p_lib_name}.LIB/{p_savefile_name}.FILE'.format(
-                    p_lib_name=lib_name,
-                    p_savefile_name=savefile_name)
+                savf_path = f'/QSYS.LIB/{lib_name}.LIB/{savefile_name}.FILE'
             else:
-                savf_path = '/QSYS.LIB/{p_savefile_name}.FILE'.format(p_savefile_name=savefile_name)
+                savf_path = f'/QSYS.LIB/{savefile_name}.FILE'
         return savf_name, savf_path
 
     def run(self, tmp=None, task_vars=None):
@@ -217,18 +206,18 @@ class ActionModule(ActionBase):
                 savf_name, savf_path = self._calculate_savf_name(object_names, lib_name, is_lib, savefile_name, task_vars,
                                                                  result)
                 if is_lib is True:
-                    omitfile = 'OMITOBJ(({p_lib_name}/{p_savf_name} *FILE))'.format(p_lib_name=lib_name, p_savf_name=savf_name)
+                    omitfile = f'OMITOBJ(({lib_name}/{savf_name} *FILE))'
                     module_args = {'lib_name': lib_name, 'savefile_name': savf_name, 'savefile_lib': lib_name,
                                    'target_release': target_release, 'force_save': force_save, 'joblog': True,
                                    'parameters': omitfile}
-                    display.debug("ibm i debug: call ibmi_lib_save {p_module_args}".format(p_module_args=module_args))
+                    display.debug(f"ibm i debug: call ibmi_lib_save {module_args}")
                     module_output = self._execute_module(module_name='ibmi_lib_save', module_args=module_args, task_vars=task_vars)
                 else:
-                    omitfile = 'OMITOBJ(({p_lib_name}/{p_savf_name} *FILE))'.format(p_lib_name=lib_name, p_savf_name=savf_name)
+                    omitfile = f'OMITOBJ(({lib_name}/{savf_name} *FILE))'
                     module_args = {'object_names': object_names, 'object_lib': lib_name, 'object_types': object_types,
                                    'savefile_name': savf_name, 'savefile_lib': lib_name, 'target_release': target_release,
                                    'force_save': force_save, 'joblog': True, 'parameters': omitfile}
-                    display.debug("ibm i debug: call ibmi_object_save {p_module_args}".format(p_module_args=module_args))
+                    display.debug(f"ibm i debug: call ibmi_object_save {module_args}")
                     module_output = self._execute_module(module_name='ibmi_object_save', module_args=module_args, task_vars=task_vars)
 
                 save_result = module_output
@@ -244,8 +233,8 @@ class ActionModule(ActionBase):
                 created = True
 
             source = savf_path
-            commandmk = 'mkdir {p_ifs_dir}'.format(p_ifs_dir=ifs_dir)
-            command = 'cp {p_savf_path} {p_ifs_dir}'.format(p_savf_path=savf_path, p_ifs_dir=ifs_dir)
+            commandmk = f'mkdir {ifs_dir}'
+            command = f'cp {savf_path} {ifs_dir}'
 
             module_output = self._execute_module(module_name='command', module_args={'_raw_params': commandmk}, task_vars=task_vars)
             save_result = module_output
@@ -268,7 +257,7 @@ class ActionModule(ActionBase):
                 return result
             ifs_created = True
 
-            source = '{p_ifs_dir}/{p_os}'.format(p_ifs_dir=ifs_dir, p_os=os.path.basename(savf_path))
+            source = f'{ifs_dir}/{os.path.basename(savf_path)}'
             if not isinstance(source, string_types):
                 result['msg'] = "Invalid type supplied for source option, it must be a string"
                 result['failed'] = True
@@ -325,10 +314,7 @@ class ActionModule(ActionBase):
                     target_name = task_vars['inventory_hostname']
                 else:
                     target_name = self._play_context.remote_addr
-                dest = "{p_self}/{p_target_name}/{p_source_local}".format(
-                    p_self=self._loader.path_dwim(dest),
-                    p_target_name=target_name,
-                    p_source_local=source_local)
+                dest = f"{self._loader.path_dwim(dest)}/{target_name}/{source_local}"
 
             dest = dest.replace("//", "/")
             if remote_checksum in ('0', '1', '2', '3', '4', '5'):
@@ -357,7 +343,7 @@ class ActionModule(ActionBase):
                 makedirs_safe(os.path.dirname(dest))
 
                 # fetch the file and check for changes
-                display.debug("ibm i debug: fetch {p_source} {p_dest}".format(p_source=source, p_dest=dest))
+                display.debug(f"ibm i debug: fetch {source} {dest}")
                 if remote_data is None:
                     self._connection.fetch_file(source, dest)
                 else:
@@ -370,7 +356,7 @@ class ActionModule(ActionBase):
                         re_raise = True
                         inst = e
                     if re_raise:
-                        raise AnsibleError("Failed to fetch the file: {p_e}".format(p_e=inst))
+                        raise AnsibleError(f"Failed to fetch the file: {inst}")
                 new_checksum = secure_hash(dest)
                 # For backwards compatibility. We'll return None on FIPS enabled systems
                 try:
@@ -405,21 +391,19 @@ class ActionModule(ActionBase):
                                    checksum=local_checksum, rc=0))
 
         except Exception as e:
-            result['msg'] += "{p_to_text}".format(p_to_text=to_text(e))
+            result['msg'] += f"{to_text(e)}"
             result['failed'] = True
             return result
         finally:
             if ((backup is False and is_savf is False) or result['failed'] is True) and created is True:
-                cmd = 'QSYS/DLTOBJ OBJ({p_lib_name}/{p_savf_name}) OBJTYPE(*FILE)'.format(
-                    p_lib_name=lib_name,
-                    p_savf_name=savf_name)
+                cmd = f'QSYS/DLTOBJ OBJ({lib_name}/{savf_name}) OBJTYPE(*FILE)'
                 module_output = self._execute_module(module_name='ibmi_cl_command', module_args={'cmd': cmd}, task_vars=task_vars)
                 save_result = module_output
                 rc = save_result['rc']
                 if rc != 0 and ('CPF2105' not in save_result['stderr']):
                     result['msg'] += "Failed to delete SAVF on remote when cleanup."
             if ifs_created is True:
-                cmd = 'rm {p_ifs_dir}/{p_os}'.format(p_ifs_dir=ifs_dir, p_os=os.path.basename(savf_path))
+                cmd = f'rm {ifs_dir}/{os.path.basename(savf_path)}'
                 try:
                     module_output = self._execute_module(module_name='command', module_args={'_raw_params': cmd}, task_vars=task_vars)
                     save_result = module_output
@@ -427,7 +411,7 @@ class ActionModule(ActionBase):
                     if rc != 0:
                         result['msg'] += "Failed to delete IFS on remote when cleanup."
                 except Exception as e:
-                    result['msg'] += "exception happens when delete IFS file. error: {p_to_text}".format(p_to_text=to_text(e))
+                    result['msg'] += f"exception happens when delete IFS file. error: {to_text(e)}"
 
             self._remove_tmp_path(self._connection._shell.tmpdir)
 

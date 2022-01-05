@@ -1,6 +1,6 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
-- import_playbook: manage_system_values_2.yml
-- import_playbook: manage_user_profiles_2.yml
+- import_playbook: manage_system_values.yml
+- import_playbook: manage_user_profiles.yml
 - import_playbook: manage_object_authorities.yml
 - import_playbook: manage_network_settings.yml

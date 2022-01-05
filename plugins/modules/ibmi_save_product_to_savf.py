@@ -176,7 +176,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -234,17 +234,15 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     # Check if the library of savf is existed
-    command = 'QSYS/CHKOBJ OBJ(QSYS/{pattern_savf_library}) OBJTYPE(*LIB)'.format(
-        pattern_savf_library=savf_library.strip())
+    command = f'QSYS/CHKOBJ OBJ(QSYS/{savf_library.strip()}) OBJTYPE(*LIB)'
     ibmi_util.log_info("Command to run: " + command, module._name)
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
     if rc != 0:  # library not exist, create it
-        command = "QSYS/CRTLIB LIB({pattern_savf_library}) TEXT('Create by Ansible')".format(
-            pattern_savf_library=savf_library.strip())
+        command = f"QSYS/CRTLIB LIB({savf_library.strip()}) TEXT('Create by Ansible')"
         ibmi_util.log_info("Command to run: " + command, module._name)
         rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
         if rc != 0:  # fail to create library
@@ -255,20 +253,15 @@ def main():
                 rc=rc,
                 job_log=job_log,
             )
-            module.fail_json(msg="Fail to create library: {pattern_savf_library}".format(
-                pattern_savf_library=savf_library.strip()), **result)
+            module.fail_json(msg=f"Fail to create library: {savf_library.strip()}")
 
     # library exist, now check if the savf is existed
-    command = 'QSYS/CHKOBJ OBJ({pattern_savf_library}/{pattern_savf_name}) OBJTYPE(*FILE)'.format(
-        pattern_savf_name=savf_name.strip(),
-        pattern_savf_library=savf_library.strip())
+    command = f'QSYS/CHKOBJ OBJ({savf_library.strip()}/{savf_name.strip()}) OBJTYPE(*FILE)'
     # Check if the savf is existed
     ibmi_util.log_info("Command to run: " + command, module._name)
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
     if rc != 0:  # savf not existed
-        command = "QSYS/CRTSAVF FILE({pattern_savf_library}/{pattern_savf_name}) TEXT('Create by Ansible')".format(
-            pattern_savf_name=savf_name.strip(),
-            pattern_savf_library=savf_library.strip())
+        command = f"QSYS/CRTSAVF FILE({savf_library.strip()}/{savf_name.strip()}) TEXT('Create by Ansible')"
         ibmi_util.log_info("Command to run: " + command, module._name)
         rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
         if rc != 0:  # fail to create savf
@@ -279,24 +272,13 @@ def main():
                 rc=rc,
                 job_log=job_log,
             )
-            module.fail_json(msg="Fail to create savf {pattern_savf_name} in library {pattern_savf_library}".format(
-                pattern_savf_name=savf_name.strip(),
-                pattern_savf_library=savf_library.strip()), **result)
+            module.fail_json(
+                msg=f"Fail to create savf {savf_name.strip()} in library {savf_library.strip()}", **result)
 
     # run the SAVLICPGM command to save the product objects to the savf
-    command = 'QSYS/SAVLICPGM LICPGM({pattern_product}) DEV(*SAVF) OPTION({pattern_option}) RLS({pattern_release}) \
-        LNG({pattern_language})  OBJTYPE({pattern_object_type}) SAVF({pattern_savf_library}/{pattern_savf_name}) \
-        TGTRLS({pattern_target_release}) CHKSIG({pattern_check_signature}) CLEAR(*ALL) {pattern_parameters}'.format(
-        pattern_product=product,
-        pattern_option=option,
-        pattern_release=release,
-        pattern_language=language,
-        pattern_object_type=object_type,
-        pattern_savf_library=savf_library.strip(),
-        pattern_savf_name=savf_name.strip(),
-        pattern_check_signature=check_signature,
-        pattern_target_release=target_release,
-        pattern_parameters=parameters)
+    command = f'QSYS/SAVLICPGM LICPGM({product}) DEV(*SAVF) OPTION({option}) RLS({release}) \
+        LNG({language})  OBJTYPE({object_type}) SAVF({savf_library.strip()}/{savf_name.strip()}) \
+        TGTRLS({target_release}) CHKSIG({check_signature}) CLEAR(*ALL) {parameters}'
 
     command = ' '.join(command.split())  # keep only one space between adjacent strings
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
@@ -317,7 +299,7 @@ def main():
             job_log=job_log,
             rc=rc,
         )
-        message = 'non-zero return code:{rc}'.format(rc=rc)
+        message = f'non-zero return code:{rc}'
         module.fail_json(msg=message, **result)
 
     if not joblog:

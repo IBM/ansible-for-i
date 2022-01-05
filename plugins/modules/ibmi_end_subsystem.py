@@ -152,7 +152,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -192,21 +192,14 @@ def main():
     become_user = module.params['become_user']
     become_user_password = module.params['become_user_password']
 
-    command = 'QSYS/ENDSBS SBS({subsystem}) \
-        OPTION({how_to_end}) DELAY({controlled_end_delay_time}) ENDSBSOPT({end_subsystem_option}) \
-        {parameters}'.format(
-        subsystem=subsystem,
-        how_to_end=how_to_end,
-        controlled_end_delay_time=controlled_end_delay_time,
-        end_subsystem_option=end_subsystem_option,
-        parameters=parameters)
+    command = f'QSYS/ENDSBS SBS({subsystem}) OPTION({how_to_end}) DELAY({controlled_end_delay_time}) ENDSBSOPT({end_subsystem_option}) {parameters}'
 
     command = ' '.join(command.split())  # keep only one space between adjacent strings
     try:
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = 'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
 
@@ -220,7 +213,7 @@ def main():
     )
 
     if rc != 0:
-        message = 'non-zero return code:{rc}'.format(rc=rc)
+        message = f'non-zero return code:{rc}'
         module.fail_json(msg=message, **result)
 
     if not joblog:

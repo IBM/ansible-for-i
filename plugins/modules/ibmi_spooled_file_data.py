@@ -133,7 +133,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 import fnmatch
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def main():
@@ -164,18 +164,17 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
-    ifs_spooled_file_path = '/TMP/ANSIBLE_{0}_{1}.TXT'.format(spooled_file_name, job_name.replace('/', '_'))
+    ifs_spooled_file_path = f"/TMP/ANSIBLE_{spooled_file_name}_{job_name.replace('/', '_')}.TXT"
     if os.path.exists(ifs_spooled_file_path):
         os.remove(ifs_spooled_file_path)
-    command = "QSYS/CPYSPLF FILE({0}) TOFILE(*TOSTMF) JOB({1}) SPLNBR({2}) TOSTMF('{3}') STMFOPT(*REPLACE)".format(
-        spooled_file_name, job_name, spooled_file_number, ifs_spooled_file_path)
+    command = f"QSYS/CPYSPLF FILE({spooled_file_name}) TOFILE(*TOSTMF) JOB({job_name}) \
+      SPLNBR({spooled_file_number}) TOSTMF('{ifs_spooled_file_path}') STMFOPT(*REPLACE)"
     rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
     if rc:
-        message = 'non-zero return code {0} when run command {1}, check if the job name and spooled file information are correct'.format(
-            rc, command)
+        message = f'non-zero return code {rc} when run command {command}, check if the job name and spooled file information are correct'
         result = dict(
             rc=rc,
             job_log=job_log,
@@ -185,21 +184,20 @@ def main():
     try:
         ccsid = 'IBM-037'  # default CCSID
         # get file CCSID
-        command = 'attr {0} CCSID'.format(ifs_spooled_file_path)
+        command = f'attr {ifs_spooled_file_path} CCSID'
         rc, out, err = module.run_command(command, use_unsafe_shell=False)
-        ibmi_util.log_info("run command: {0}, rc={1}, out={2}, err={3}".format(
-            command, rc, out, err), module._name)
+        ibmi_util.log_info(
+            f"run command: {command}, rc={rc}, out={out}, err={err}", module._name)
         if not rc:
             # convert to format like IBM-037, IBM-1399, IBM-500 etc....
             ccsid = 'IBM-' + out.strip().rjust(3, '0')
         rc, out, err = module.run_command(command, use_unsafe_shell=False)
 
         # convert file content to utf-8
-        command = 'iconv -f {0} -t UTF-8 {1}'.format(
-            ccsid, ifs_spooled_file_path)
+        command = f'iconv -f {ccsid} -t UTF-8 {ifs_spooled_file_path}'
         rc, out, err = module.run_command(command, use_unsafe_shell=False)
-        ibmi_util.log_info("run command: {0}, rc={1}, out={2}, err={3}".format(
-            command, rc, out, err), module._name)
+        ibmi_util.log_info(
+            f"run command: {command}, rc={rc}, out={out}, err={err}", module._name)
         if not rc:
             spooled_data = out.splitlines()
             if spooled_data_filter != '*':
@@ -209,12 +207,11 @@ def main():
                         spooled_data_temp.append(line)
                 spooled_data = spooled_data_temp
         else:
-            message = 'Error occurred when run command:{0}, error:{1}'.format(
-                command, str(err))
+            message = f'Error occurred when run command:{command}, error:{str(err)}'
             module.fail_json(rc=rc, msg=message)
         os.remove(ifs_spooled_file_path)
     except Exception as inst:
-        message = 'Exception occurred:{0}'.format(str(inst))
+        message = f'Exception occurred:{str(inst)}'
         module.fail_json(rc=999, msg=message)
 
     result = dict(

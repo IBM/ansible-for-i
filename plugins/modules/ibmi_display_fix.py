@@ -242,7 +242,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.6.0"
 
 
 def get_ptf_info(imodule, ptf_id, product_id, release_level):
@@ -464,15 +464,15 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
-    sql = "SELECT * FROM QSYS2.PTF_INFO WHERE PTF_IDENTIFIER = '{0}' ".format(ptf)
+    sql = f"SELECT * FROM QSYS2.PTF_INFO WHERE PTF_IDENTIFIER = '{ptf}' "
     if product != '*ONLY':
-        sql = sql + "and PTF_PRODUCT_ID = '{0}' ".format(product)
+        sql = sql + f"and PTF_PRODUCT_ID = '{product}' "
     if release != '*ALL':
-        sql = sql + "and PTF_PRODUCT_RELEASE_LEVEL = '{0}' ".format(release)
-    ibmi_util.log_debug("SQL to run: {0}".format(sql), module._name)
+        sql = sql + f"and PTF_PRODUCT_RELEASE_LEVEL = '{release}' "
+    ibmi_util.log_debug(f"SQL to run: {sql}", module._name)
 
     rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(sql)
 
@@ -481,8 +481,7 @@ def main():
     if rc:
         result.update({'rc': rc})
         result.update({'stderr': err})
-        message = 'non-zero return code when get PTF information:{rc}'.format(
-            rc=rc)
+        message = f'non-zero return code when get PTF information:{rc}'
         module.fail_json(msg=message, **result)
 
     result.update({'ptf_info': out})
@@ -492,16 +491,15 @@ def main():
             product = out[0]['PTF_PRODUCT_ID']
         if release == '*ALL':
             release = out[0]['PTF_RELEASE_LEVEL']
-        ibmi_util.log_debug("PTF release level: {0}, product id: {1}, ptf id: {2}".format(
-            release, product, ptf), module._name)
+        ibmi_util.log_debug(
+            f"PTF release level: {release}, product id: {product}, ptf id: {ptf}", module._name)
         rc, pre_req_list, api_result = get_ptf_info(ibmi_module, ptf, product, release)
         ibmi_util.log_debug("Requisite PTFs info: " +
                             str(pre_req_list), module._name)
         if rc:
             result.update({'rc': rc})
             result.update({'stderr': str(api_result)})
-            message = 'non-zero return code when get requisite PTFs infomation:{rc}'.format(
-                rc=rc)
+            message = f'non-zero return code when get requisite PTFs infomation:{rc}'
             module.fail_json(msg=message, **result)
         result.update({'requisite_ptf_info': pre_req_list})
     else:

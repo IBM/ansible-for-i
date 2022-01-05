@@ -20,6 +20,7 @@ Return Variables
 | `final_ptfs_status_with_requisite` | dict          | The dict of all the PTFs' status including requisite PTFs. |
 | `original_ptfs_status`          | dict          | The dict of the original requested PTFs' status.     |
 | `requisite_ptfs_status`         | dict          | The dict of the requisite PTFs' status.   |
+| `temp_or_perm`        | str           | Used by apply_ptf role. Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.                     |
 
 Example Playbook
 ----------------

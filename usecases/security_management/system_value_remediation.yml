@@ -1,45 +1,241 @@
 ---
 - set_fact:
     compliant: "{{ check_item.compliant }}"
-
 - block:
-    - pause:
-        prompt: |
-          Do you want to change system value {{ check_item.name }} on {{ ansible_ssh_host }} (Y/N)?
-          Expected value: {{ check_item.expect }} | Actual value: {{ check_item.actual }}
-      register: user_choice
-
-    - set_fact:
-        user_choice_mode: '{{ user_choice.user_input | upper | trim }}'
-
     - block:
-        - name: Remediating {{ check_item.name }} on {{ ansible_ssh_host }}
-          ibmi_cl_command:
-            cmd: CHGSYSVAL SYSVAL({{ check_item.name }}) VALUE('{{ check_item.expect }}')
-            become_user: "{{ become_user_name }}"
-            become_user_password: "{{ become_user_password }}"
-          register: remediate
-          ignore_errors: true
+        - pause:
+            prompt: |
+              Do you want to change system value {{ check_item.name }} on {{ ansible_ssh_host }} (Y/N)?
+              Expected value: {{ check_item.expect }} | Actual value: {{ check_item.actual }}
+          register: user_choice
 
-        - block:
-            - debug:
-                msg: |
-                  {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
-            - set_fact:
-                success_list: "{{ success_list + [ check_item.name ] }}"
-          when: remediate.rc == 0
-        - block:
-            - debug:
-                msg: |
-                  {{ check_item.name }} Remediation failed.
-            - set_fact:
-                fail_list: "{{ fail_list + [ check_item.name ] }}"
-          when: remediate.rc != 0
-      when: user_choice_mode == 'Y'
-    - block:
-        - debug:
-            msg: "User cancelled"
         - set_fact:
-            skip_list: "{{ skip_list + [ check_item.name ] }}"
-      when: user_choice_mode != 'Y'
+            user_choice_mode: '{{ user_choice.user_input | upper | trim }}'
+
+        - block:
+            - name: Remediating {{ check_item.name }} on {{ ansible_ssh_host }}
+              ibmi_cl_command:
+                cmd: CHGSYSVAL SYSVAL({{ check_item.name }}) VALUE('{{ check_item.expect }}')
+                become_user: "{{ become_user_name }}"
+                become_user_password: "{{ become_user_password }}"
+              register: remediate
+              ignore_errors: true
+
+            - block:
+                - debug:
+                    msg: |
+                      {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
+                - set_fact:
+                    success_list: "{{ success_list + [ check_item.name ] }}"
+              when: remediate.rc == 0
+            - block:
+                - debug:
+                    msg: |
+                      {{ check_item.name }} Remediation failed.
+                - set_fact:
+                    fail_list: "{{ fail_list + [ check_item.name ] }}"
+              when: remediate.rc != 0
+          when: user_choice_mode == 'Y'
+        - block:
+            - debug:
+                msg: "User cancelled"
+            - set_fact:
+                skip_list: "{{ skip_list + [ check_item.name ] }}"
+          when: user_choice_mode != 'Y'
+      when: check_item.name != "QLMTDEVSSN" and check_item.name != "QAUTOVRT" and check_item.name != "QSYSLIBL" and check_item.name != "QUSEADPAUT"
+
+    - block:
+        - pause:
+            prompt: |
+              Determines whether automatic device creation is allowed and if so, how many devices can
+              be configured automatically. Specify a value 1 through 32500 for this system value and is
+              both sufficient to support the needs of the business and not too large to represent a denial
+              of service exposure since it represents a finite limit. Setting the value to *NOMAX is a
+              security risk as an infinite number of virtual devices may lead to a denial of service if disk
+              capacity is reached. The value should be sufficient enough that enough devices are allocated to
+              support the business. Input a number between 1 and 32500. Leave blank and press Enter to skip.
+          register: QAUTOVRT_USER
+        - block:
+            - name: Changing QAUTOVRT to {{ QAUTOVRT_USER.user_input | int }}
+              ibmi_cl_command:
+                cmd: CHGSYSVAL SYSVAL(QAUTOVRT) VALUE({{ QAUTOVRT_USER.user_input | int }})
+                become_user: "{{ become_user_name }}"
+                become_user_password: "{{ become_user_password }}"
+              register: remediate
+              ignore_errors: true
+
+            - block:
+                - debug:
+                    msg: |
+                      QAUTOVRT Remediation completes, you can re-run check only mode to see the change.
+                - set_fact:
+                    success_list: "{{ success_list + [ 'QAUTOVRT' ] }}"
+              when: remediate.rc == 0
+
+            - block:
+                - debug:
+                    msg: |
+                      QAUTOVRT Remediation failed.
+                - set_fact:
+                    fail_list: "{{ fail_list + [ 'QAUTOVRT' ] }}"
+              when: remediate.rc != 0
+          when: QAUTOVRT_USER.user_input | length > 0
+
+        - block:
+            - debug:
+                msg: "User cancelled"
+            - set_fact:
+                skip_list: "{{ skip_list + [ 'QAUTOVRT' ] }}"
+          when: QAUTOVRT_USER.user_input | length == 0
+      when: check_item.name == "QAUTOVRT"
+
+    - block:
+        - pause:
+            prompt: |
+              QLMTDEVSSN specifies if users can have concurrent device sessions.
+              How many concurrent device sessions do you want to have in the system?
+              Input a number between 1-9. Leave blank and press Enter to skip.
+          register: QLMTDEVSSN_USER
+        - block:
+            - name: Changing QLMTDEVSSN to {{ QLMTDEVSSN_USER.user_input | trim | int }}
+              ibmi_cl_command:
+                cmd: CHGSYSVAL SYSVAL(QLMTDEVSSN) VALUE('{{ QLMTDEVSSN_USER.user_input | trim | int }}')
+                become_user: "{{ become_user_name }}"
+                become_user_password: "{{ become_user_password }}"
+              register: remediate
+              ignore_errors: true
+
+            - block:
+                - debug:
+                    msg: |
+                      QLMTDEVSSN Remediation completes, you can re-run check only mode to see the change.
+                - set_fact:
+                    success_list: "{{ success_list + [ 'QLMTDEVSSN' ] }}"
+              when: remediate.rc == 0
+
+            - block:
+                - debug:
+                    msg: |
+                      QLMTDEVSSN_USER Remediation failed.
+                - set_fact:
+                    fail_list: "{{ fail_list + [ 'QLMTDEVSSN' ] }}"
+              when: remediate.rc != 0
+          when: QLMTDEVSSN_USER.user_input | trim | length > 0
+
+        - block:
+            - debug:
+                msg: "User cancelled"
+            - set_fact:
+                skip_list: "{{ skip_list + [ 'QLMTDEVSSN' ] }}"
+          when: QLMTDEVSSN_USER.user_input | trim | length == 0
+      when: check_item.name == "QLMTDEVSSN"
+
+    - block:
+        - pause:
+            prompt: |
+              Controls those users allowed to create or change programs that use adopted authority from
+              other programs that call it. If an authorization list is specified, *PUBLIC(EXCLUDE) should
+              be used. Specific access granted for those users that are allowed to create or change
+              programs that adopt authority should be limited to system administrator personnel and
+              change control personnel responsible for disaster recovery and program change control
+              respectively. Do you want to remediate by creating an authorization list named QUSEADPAUT and
+              change the system value QUSEADPAUT to QUSEADPAUT? (Y/N)
+          register: QUSEADPAUT_USER
+        - set_fact:
+            QUSEADPAUT_USER_mode: '{{ QUSEADPAUT_USER.user_input | upper | trim }}'
+        - block:
+            - name: create a cl command file on {{ ansible_ssh_host }}
+              copy:
+                dest: "/tmp/create_QUSEADPAUT.cl"
+                content: |
+                  CRTAUTL AUTL(QUSEADPAUT) AUT(*EXCLUDE)
+
+                  CHGOBJOWN OBJ(QUSEADPAUT) OBJTYPE(*AUTL) NEWOWN(QSYS)
+
+                  CHGSYSVAL SYSVAL(QUSEADPAUT) VALUE(QUSEADPAUT)
+                force: true
+              ignore_errors: true
+
+            - name: execute the command file to remediate
+              ibmi_script_execute:
+                src: '/tmp/create_QUSEADPAUT.cl'
+                type: 'CL'
+                become_user: '{{ become_user_name }}'
+                become_user_password: '{{ become_user_password }}'
+              register: remediate
+              ignore_errors: true
+
+            - block:
+                - debug:
+                    msg: |
+                      QUSEADPAUT Remediation completes, you can re-run check only mode to see the change.
+                - set_fact:
+                    success_list: "{{ success_list + [ 'QUSEADPAUT' ] }}"
+              when: remediate.rc == 0
+
+            - block:
+                - debug:
+                    msg: |
+                      QUSEADPAUT Remediation failed.
+                - set_fact:
+                    fail_list: "{{ fail_list + [ 'QUSEADPAUT' ] }}"
+              when: remediate.rc != 0
+          when: QUSEADPAUT_USER_mode == 'Y'
+
+        - block:
+            - debug:
+                msg: "User cancelled"
+            - set_fact:
+                skip_list: "{{ skip_list + [ 'QUSEADPAUT' ] }}"
+          when: QUSEADPAUT_USER_mode == 'N'
+      when: check_item.name == "QUSEADPAUT"
+
+    - block:
+        - pause:
+            prompt: |
+              The security of the System Library List is a vital part of your overall system security. All
+              libraries in the System Library List should provide *PUBLIC *USE authority. Any authority
+              greater than *USE to any library in the System Library List can allow the introduction of
+              trojans and malicious code into your system that will be searched before any other
+              libraries in the library list of a job.
+
+              Do you want to remediate to ensure each library in the list grants *PUBLIC *USE Object Authority and that
+              any additional Users with an authority greater than *USE are properly authorized by
+              the business to introduce changes into the library? (Y/N)
+          register: QSYSLIBL_USER
+        - set_fact:
+            QSYSLIBL_USER_mode: '{{ QSYSLIBL_USER.user_input | upper | trim }}'
+        - block:
+            - name: Grant *PUBLIC *USE Object Authority to each library in QSYSLIBL
+              ibmi_cl_command:
+                cmd: GRTOBJAUT OBJ({{ item }}) OBJTYPE(*LIB) USER(*PUBLIC) AUT(*USE) REPLACE(*YES)
+                become_user: '{{ become_user_name }}'
+                become_user_password: '{{ become_user_password }}'
+              register: remediate
+              with_items:
+                - "{{ check_item.actual.split(' ') }}"
+              when: item != ""
+
+            - debug:
+                msg: |
+                  QSYSLIBL Remediation completes, you can re-run check only mode to see the change.
+
+            - set_fact:
+                success_list: "{{ success_list + [ 'QSYSLIBL' ] }}"
+
+          rescue:
+            - debug:
+                msg: |
+                  QSYSLIBL Remediation failed.
+            - set_fact:
+                fail_list: "{{ fail_list + [ 'QSYSLIBL' ] }}"
+          when: QSYSLIBL_USER_mode == 'Y'
+
+        - block:
+            - debug:
+                msg: "User cancelled"
+            - set_fact:
+                skip_list: "{{ skip_list + [ 'QSYSLIBL' ] }}"
+          when: QSYSLIBL_USER_mode == 'N'
+      when: check_item.name == "QSYSLIBL"
   when: not compliant

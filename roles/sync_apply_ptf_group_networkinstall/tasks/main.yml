@@ -1,0 +1,26 @@
+---
+# role for sync_apply_ptf_group_networkinstall
+# This role will setup network install env on repo server and use network install mechanism to install the PTF group on target system.
+- name: Setup network install repo server env
+  ibm.power_ibmi.ibmi_fix_network_install_server:
+    operation: 'setup_and_addimgclge'
+    rollback: true
+    virtual_image_name_list:
+      - "{{ ptf_group_info.file_path + '/*ALL' }}"
+  delegate_to: "{{ src_host }}"
+  register: network_install_server_result
+
+- name: Print network_install_server_result
+  debug:
+    var: network_install_server_result
+
+- name: Using network install mechanism to install the PTF group on target system
+  ibm.power_ibmi.ibmi_fix_network_install_client:
+    operation: 'setup_and_installPTF_and_uninstall'
+    server_address: "{{ hostvars[src_host]['ansible_ssh_host'] }}"
+    rollback: true
+  register: network_install_client_result
+
+- name: Print network_install_client_result
+  debug:
+    var: network_install_client_result

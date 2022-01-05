@@ -315,7 +315,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 import fnmatch
 
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 
 
 def run_module():
@@ -398,7 +398,7 @@ def run_module():
     except Exception as inst:
         virtual_facts = {}
         result['ansible_facts'] = virtual_facts
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(**result, rc=999, msg=message)
 
 

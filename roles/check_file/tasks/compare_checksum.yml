@@ -1,0 +1,18 @@
+---
+# tasks file for compare_checksum
+- name: Print find_result_target_var
+  debug:
+    var: find_result_target_var
+
+- name: Print find_result_repo_var
+  debug:
+    var: find_result_repo_var
+
+- name: Compose same_name
+  set_fact:
+    same_name: true
+
+- name: Set same_files to false when checksum are not the same
+  set_fact:
+    same_files: false
+  when: find_result_target_var.checksum != find_result_repo_var.checksum

@@ -177,7 +177,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.6.0"
 scdday_list = ['*NONE', '*ALL', '*MON', '*TUE', '*WED', '*THU', '*FRI', '*SAT', '*SUN']
 
 
@@ -214,11 +214,11 @@ def main():
     become_user_password = module.params['become_user_password']
 
     if scddate not in ["*CURRENT", "*MONTHSTR", "*MONTHEND", "*NONE"]:
-        scddate = "'{p_scddate}'".format(p_scddate=scddate)
+        scddate = f"'{scddate}'"
     if schtime != "*CURRENT":
-        schtime = "'{p_schtime}'".format(p_schtime=schtime)
+        schtime = f"'{schtime}'"
     if text != "*BLANK":
-        text = "'{p_text}'".format(p_text=text)
+        text = f"'{text}'"
     result = dict(
         command='',
         stdout='',
@@ -232,10 +232,9 @@ def main():
     if set(scdday) < set(scdday_list):
         pass
     else:
-        result.update({'msg': 'Value specified for scdday is not valid. Valid values are {p_scdday_list}'.format(
-            p_scdday_list=", ".join(scdday_list)),
-            'stderr': 'Parameter passed is not valid.',
-            'rc': ibmi_util.IBMi_PARAM_NOT_VALID})
+        result.update({'msg': f'Value specified for scdday is not valid. Valid values are {", ".join(scdday_list)}',
+                       'stderr': 'Parameter passed is not valid.',
+                       'rc': ibmi_util.IBMi_PARAM_NOT_VALID})
         module.fail_json(**result)
 
     scdday = " ".join(scdday)
@@ -249,21 +248,13 @@ def main():
         module.fail_json(**result)
 
     startd = datetime.datetime.now()
-    command = 'QSYS/ADDJOBSCDE JOB({p_job_name}) CMD({p_cmd}) FRQ({p_frequency}) SCDDATE({p_scddate}) SCDDAY({p_scdday}) \
-        SCDTIME({p_schtime}) TEXT({p_text}) {p_parameters}'.format(
-        p_job_name=job_name,
-        p_cmd=cmd,
-        p_frequency=frequency,
-        p_scddate=scddate,
-        p_scdday=scdday,
-        p_schtime=schtime,
-        p_text=text,
-        p_parameters=parameters)
+    command = f'QSYS/ADDJOBSCDE JOB({job_name}) CMD({cmd}) FRQ({frequency}) SCDDATE({scddate}) SCDDAY({scdday}) \
+        SCDTIME({schtime}) TEXT({text}) {parameters}'
 
     try:
         ibmi_module = imodule.IBMiModule(become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {str(inst)}'
         module.fail_json(rc=999, msg=message)
 
     rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
@@ -271,32 +262,29 @@ def main():
     delta = endd - startd
 
     if rc:
-        result.update({'msg': 'Failed to add Job schedule entry {p_job_name}. Please double check the input.'.format(
-            p_job_name=job_name),
-            'command': ' '.join(command.split()),
-            'stdout': out,
-            'stderr': error,
-            'rc': rc,
-            'delta': str(delta),
-            'job_log': job_log})
+        result.update({'msg': f'Failed to add Job schedule entry {job_name}. Please double check the input.',
+                       'command': ' '.join(command.split()),
+                       'stdout': out,
+                       'stderr': error,
+                       'rc': rc,
+                       'delta': str(delta),
+                       'job_log': job_log})
         module.fail_json(**result)
     elif joblog:
-        result.update({'msg': 'Job schedule entry {p_job_name} is successfully added.'.format(
-            p_job_name=job_name),
-            'command': ' '.join(command.split()),
-            'stdout': out,
-            'stderr': error,
-            'rc': rc,
-            'delta': str(delta),
-            'job_log': job_log})
+        result.update({'msg': f'Job schedule entry {job_name} is successfully added.',
+                       'command': ' '.join(command.split()),
+                       'stdout': out,
+                       'stderr': error,
+                       'rc': rc,
+                       'delta': str(delta),
+                       'job_log': job_log})
         module.exit_json(**result)
     else:
-        result.update({'msg': 'Job schedule entry {p_job_name} is successfully added.'.format(
-            p_job_name=job_name),
-            'command': ' '.join(command.split()),
-            'stdout': out, 'stderr': error,
-            'rc': rc,
-            'delta': str(delta)})
+        result.update({'msg': f'Job schedule entry {job_name} is successfully added.',
+                       'command': ' '.join(command.split()),
+                       'stdout': out, 'stderr': error,
+                       'rc': rc,
+                       'delta': str(delta)})
         module.exit_json(**result)
 
 

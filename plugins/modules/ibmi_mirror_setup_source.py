@@ -187,7 +187,7 @@ ERROR = -1
 
 CLOUDINIT_METADATA_DIR = '/QOpenSys/pkgs/lib/cloudinit/cloud/seed/config_drive/openstack/latest'
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.6.0"
 
 
 def get_mirror_state_text(state):
@@ -523,29 +523,29 @@ def main():
         ibmi_module = imodule.IBMiModule(
             become_user_name=become_user, become_user_password=become_user_password)
     except Exception as inst:
-        message = 'Exception occurred: {0}'.format(str(inst))
+        message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
 
     # check special authority *IOSYSCFG
     # get current user's special authority
     command = 'RTVUSRPRF'
     if become_user:
-        command = command + ' USRPRF({0})'.format(become_user)
+        command = command + f' USRPRF({become_user})'
     rc, out, err, job_log = ibmi_module.itoolkit_run_rtv_command_once(
         command, {'SPCAUT': 'char'})
     if rc:
         module.fail_json(
-            rc=rc, msg="Error occurred when call RTVUSRPRF to special authority: {0}".format(str(err)))
+            rc=rc, msg=f"Error occurred when call RTVUSRPRF to special authority: {str(err)}")
     special_authority = out['SPCAUT']
-    ibmi_util.log_info("Special authority is {0}".format(special_authority), module._name)
+    ibmi_util.log_info(f"Special authority is {special_authority}", module._name)
     if '*IOSYSCFG' not in special_authority:
         module.fail_json(
             rc=rc, msg="Special authority *IOSYSCFG is needed")
 
     # check system level is 7.4 or higher
     system_release_info, err = ibmi_module.get_ibmi_release()
-    ibmi_util.log_debug("get_ibmi_release() return release_info={0}, error={1} ".format(
-        str(system_release_info), str(err)), sys._getframe().f_code.co_name)
+    ibmi_util.log_debug(
+        f"get_ibmi_release() return release_info={str(system_release_info)}, error={str(err)} ", sys._getframe().f_code.co_name)
     # Example output for system_release_info: {'version': 7, 'release': 2, 'version_release': 7.2}
     # Note, version_release is float but not string
     if system_release_info['version_release'] < 7.4:
@@ -556,7 +556,7 @@ def main():
     not_installed_product_list = check_required_product(ibmi_module)
     if len(not_installed_product_list) > 0:
         module.fail_json(
-            rc=255, msg="Db2 Mirror required Products and Options are not installed: {0}".format(str(not_installed_product_list)))
+            rc=255, msg=f"Db2 Mirror required Products and Options are not installed: {str(not_installed_product_list)}")
 
     # check cloud-init
     '''
@@ -574,9 +574,9 @@ def main():
         'RTVNETA', {'SYSNAME': 'char'})
     if rc:
         module.fail_json(
-            rc=rc, msg="Error occurred when call RTVNETA to get system name: {0}".format(str(err)))
+            rc=rc, msg=f"Error occurred when call RTVNETA to get system name: {str(err)}")
     sys_name = out['SYSNAME']
-    ibmi_util.log_info("System name is {0}".format(sys_name), module._name)
+    ibmi_util.log_info(f"System name is {sys_name}", module._name)
 
     # get local RDBDIRE entry
     rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(
@@ -585,12 +585,12 @@ def main():
         module.fail_json(
             rc=rc, msg="Error occurred when get local RDB name", job_log=job_log)
     rdb_name = out[0]['RDB_NAME']
-    ibmi_util.log_info("Local RDB name is {0}".format(rdb_name), module._name)
+    ibmi_util.log_info(f"Local RDB name is {rdb_name}", module._name)
     # Activation Engine will change the local RDBDIRE name when it matches system name during openstack deployment,
     # which will cause the Db2 Mirror RCL error due to not same RDBDIRE entry between the pair nodes.
     if rdb_name.strip().upper() == sys_name.strip().upper():
         module.fail_json(
-            msg="System name:{0} is same as *LOCAL RDBDIRE name:{1}, which is not allowed in Db2 Mirror configuration.".format(sys_name, rdb_name))
+            msg=f"System name:{sys_name} is same as *LOCAL RDBDIRE name:{rdb_name}, which is not allowed in Db2 Mirror configuration.")
 
     # check nrg config is ready
     rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(
@@ -604,13 +604,13 @@ def main():
         state = mrdb_retrieve_mirror_state(ibmi_module)
         if state == ERROR:
             module.fail_json(
-                rc=state, msg="Error occurred when retrieving the system mirror state. {0}".format(terminate_msg))
+                rc=state, msg=f"Error occurred when retrieving the system mirror state. {terminate_msg}")
         elif state != MRDB_NOT_MIRRORED:
             module.fail_json(
-                rc=state, msg="Invalid system mirror state: {0}. {1}".format(get_mirror_state_text(state), terminate_msg))
+                rc=state, msg=f"Invalid system mirror state: {get_mirror_state_text(state)}. {terminate_msg}")
 
     rc, out, err, job_log = ibmi_module.itoolkit_sql_callproc_once(
-        "CALL QSYS2.TERMINATE_MIRROR('{0}')".format(termination_level))
+        f"CALL QSYS2.TERMINATE_MIRROR('{termination_level}')")
     if rc and 'ENGINE DATA DOES NOT EXIST' not in str(job_log):
         module.fail_json(
             rc=rc, msg="Error occurred when terminate mirror", job_log=job_log)
@@ -619,15 +619,11 @@ def main():
             rc=SUCCESS, msg="Success to terminate mirror with DESTORY Db2Mirror configuration on source node. Re-configuration NRG is required.")
 
     rc, out, err, job_log = ibmi_module.itoolkit_sql_callproc_once(
-        "CALL QSYS2.SETUP_MIRROR(\
-        PRIMARY_NODE => '{p_node}',\
-        SECONDARY_NODE => '{s_node}', \
-        PRIMARY_HOSTNAME => '{p_host}', \
-        SECONDARY_HOSTNAME => '{s_host}')".format(
-            p_node=primary_node,
-            s_node=secondary_node,
-            p_host=primary_hostname,
-            s_host=secondary_hostname))
+        f"CALL QSYS2.SETUP_MIRROR(\
+        PRIMARY_NODE => '{primary_node}',\
+        SECONDARY_NODE => '{secondary_node}', \
+        PRIMARY_HOSTNAME => '{primary_hostname}', \
+        SECONDARY_HOSTNAME => '{secondary_hostname}')")
     if rc:
         module.fail_json(
             rc=rc, msg="Error occurred when setting up mirror primary and secondary role", job_log=job_log)
@@ -638,7 +634,7 @@ def main():
         module.fail_json(
             rc=rc, msg="Error occurred when resetting default inclusion state", job_log=job_log)
     rc, out, err, job_log = ibmi_module.itoolkit_sql_callproc_once(
-        "CALL QSYS2.SET_DEFAULT_INCLUSION_STATE('{0}')".format(default_inclusion_state))
+        f"CALL QSYS2.SET_DEFAULT_INCLUSION_STATE('{default_inclusion_state}')")
     if rc and ("WARNING, FOUND AND REGISTERED AN EXISTING RCL OBJECT" not in str(job_log)):
         module.fail_json(
             rc=rc, msg="Error occurred when setting default inclusion state", job_log=job_log)
@@ -649,7 +645,7 @@ def main():
                        str(out) + ". stderr: " + str(err), module._name)
 
     rc, out, err, job_log = ibmi_module.itoolkit_sql_callproc_once(
-        "CALL QSYS2.ADD_TIME_SERVER(TIME_SERVER=>'{0}',PREFERRED_INDICATOR=>'YES')".format(time_server))
+        f"CALL QSYS2.ADD_TIME_SERVER(TIME_SERVER=>'{time_server}',PREFERRED_INDICATOR=>'YES')")
     if rc:
         module.fail_json(
             rc=rc, msg="Error occurred when adding time server", job_log=job_log)
