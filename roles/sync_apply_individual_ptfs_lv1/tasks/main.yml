@@ -1,0 +1,60 @@
+---
+# role for sync_apply_individual_ptfs_lv1
+- name: initialize sync_list
+  set_fact:
+    sync_list: []
+    sync_success_list: []
+    dest_file_path: []
+    apply_fail_list: []
+    apply_success_list: []
+    apply_loaded_fail_list: []
+    apply_loaded_success_list: []
+
+- name: Call copy.yml to copy ptf files to dest and get the result
+  include_tasks: transfer.yml
+  loop: "{{ not_loaded_list }}"
+  loop_control:
+    loop_var: not_loaded_list_var
+
+- name: Get the home dir on target server
+  shell: 'echo $HOME'
+  changed_when: false
+  register: home_dir
+
+- name: Call apply.yml to apply not loaded ptfs on target system
+  include_tasks: apply.yml
+  loop: "{{ not_loaded_list }}"
+  loop_control:
+    loop_var: not_loaded_list_var
+
+- name: Call apply_loaded.yml to apply already loaded ptfs
+  include_tasks: apply_loaded.yml
+  loop: "{{ already_loaded_list }}"
+  loop_control:
+    loop_var: already_loaded_list_var
+  when: already_loaded_list != []
+
+- name: initialize sync_list
+  set_fact:
+    apply_fail_list: "{{ apply_fail_list + apply_loaded_fail_list }}"
+
+- name: initialize sync_list
+  set_fact:
+    apply_success_list: "{{ apply_success_list + apply_loaded_success_list }}"
+
+- name: delete the dest file dir
+  file:
+    path: "{{ dest_file_path_var }}"
+    state: absent
+  loop: "{{ dest_file_path }}"
+  loop_control:
+    loop_var: dest_file_path_var
+  when: delete
+
+- name: Print apply_fail_list
+  debug:
+    var: apply_fail_list
+
+- name: Print apply_success_list
+  debug:
+    var: apply_success_list

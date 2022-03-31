@@ -1,0 +1,106 @@
+---
+- name: Sync and apply a list of individual ptfs
+# This playbook is used for 1st level solution. It will get the individual ptfs' information in catalog. Then call check_ptf role
+# to check which ptfs are not already applied or loaded on the target syste. Then call sync_apply_individual_ptfs_lv1 role to transfer
+# the unloaded or unapplied ptfs to the target system. Then load and apply.
+
+# Command example: ansible-playbook ./sync_apply_individual_ptfs_lv1.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
+# 'image_root': '/home/test/PTF', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': true, 'temp_or_perm': '*TEMP',
+# 'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
+# The 'delete' parameter specifies whether or not to delete the PTF install savf on target server after apply. The default value is true.
+# The 'image_root' parameter specifies the image files' dir on the repo_server.
+# The output final_result, which includes:
+# all_ptf_status: all input ptf's status,
+# apply_fail_list: apply failed ptf list
+# apply_success_list: apply successful ptf list
+# not_in_catalog: the list of ptfs which information are not in the catalog
+  hosts: '{{ target_system }}'
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    repo_server: "{{ repo_server }}"
+
+  tasks:
+    - name: init varibles
+      set_fact:
+        check_ptf_list: []
+
+    - name: Compose ptf id list
+      set_fact:
+        ptf_id_list: "{{ ptf_id_list | default([]) + [{'ptf_id': ptfs_list_var}] }}"
+      loop: "{{ ptfs_list }}"
+      loop_control:
+        loop_var: ptfs_list_var
+
+    - name: Refresh PTF DB information in catalog
+      ibmi_fix_repo_lv1:
+        image_root: "{{ image_root }}"
+        action: "refresh"
+      delegate_to: "{{ repo_server }}"
+      register: fix_repo_refresh_result
+
+    - name: Print the PTF group refresh result
+      debug:
+        var: fix_repo_refresh_result
+
+    - name: Include fix_repo_lv1_find_individual_ptf role to recursively find individual ptfs in catalog
+      include_role:
+        name: fix_repo_lv1_find_individual_ptf
+      vars:
+        ptfs_list: "{{ ptfs_list }}"
+        src_host: "{{ repo_server }}"
+        image_root: "{{ image_root }}"
+
+    - name: fail condition
+      fail:
+        msg: "No available individual ptf in catalog, quit."
+      when: ptf_find_result == []
+
+    - name: Call compose_check_ptf_list.yml to compose check_ptf_list
+      include_tasks: compose_check_ptf_list.yml
+      loop: "{{ ptf_find_result }}"
+      loop_control:
+        loop_var: ptf_find_result_var
+
+    - name: Print check_ptf_list
+      debug:
+        var: check_ptf_list
+
+    - name: Include check_ptf role to determine which ptfs need to apply
+      include_role:
+        name: check_ptf
+
+    - block:
+        - name: No individual ptf need to be applied msg
+          debug:
+            msg: "No individual ptf need to be applied, quit."
+
+        - name: end_host
+          meta: end_host
+      when: not_loaded_ptfs_list == [] and loaded_ptfs_list == []
+
+    - name: Include sync_apply_individual_ptfs_lv1 role to transfer a list of individual ptfs to target ibm i, then load and apply
+      include_role:
+        name: sync_apply_individual_ptfs_lv1
+      vars:
+        not_loaded_list: "{{ not_loaded_ptfs_list }}"
+        src_host: "{{ repo_server }}"
+        already_loaded_list: "{{ loaded_ptfs_list }}"
+
+    - name: Include check_ptf role again to get the final applied result
+      include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list: "{{ ptf_id_list }}"
+        check_product: false
+
+    - name: Compose final result
+      set_fact:
+        final_result: "{{ {'not_in_catalog': ptf_fail_list, 'apply_success_list': apply_success_list, 'apply_fail_list': apply_fail_list, \
+        'all_ptf_status': ptfs_status} }}"
+
+    - name: Print final ptfs status
+      debug:
+        var: final_result

@@ -1,0 +1,25 @@
+---
+# This playbook is used for sync_apply_individual_ptfs_lv1.yml only.
+- name: Print ordered_ptf_var
+  debug:
+    var: ordered_ptf_var
+  loop: "{{ ptf_find_result_var.query_result[0].ordered_ptf }}"
+  loop_control:
+    loop_var: ordered_ptf_var
+
+- name: Compose ptf_dict
+  set_fact:
+    ptf_dict: "{{ ptf_dict|default({}) | combine({'ptf_id': ptf_find_result_var.query_item.ptf, 'product': ordered_ptf_var.product, \
+    'release': ordered_ptf_var.vrm, 'file_path': ptf_find_result_var.query_result[0].image_path}) }}"
+  when: ordered_ptf_var.ptf == ptf_find_result_var.query_item.ptf
+  loop: "{{ ptf_find_result_var.query_result[0].ordered_ptf }}"
+  loop_control:
+    loop_var: ordered_ptf_var
+
+- name: Print ptf_dict
+  debug:
+    var: ptf_dict
+
+- name: Compose check_ptf_list
+  set_fact:
+    check_ptf_list: "{{ check_ptf_list|default([]) + [ptf_dict] }}"

@@ -97,6 +97,7 @@
     - name: Get the home dir on target server
       shell: 'echo $HOME'
       register: home_dir
+      changed_when: home_dir == ''
 
     - name: Compose path
       set_fact:
@@ -110,6 +111,7 @@
     - name: Apply PTF group
       ibm.power_ibmi.ibmi_fix_imgclg:
         src: '{{ path }}'
+        fix_omit_list: '{{ ptf_omit_list | default([]) }}'
         rollback: true
       register: apply_result
 
@@ -123,5 +125,4 @@
   file:
     path: "{{ path }}"
     state: absent
-  ignore_errors: true
   when: delete

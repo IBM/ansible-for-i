@@ -1,0 +1,58 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+#ibmi-fix-repo-sample.yml 
+#The sample file is to provide an example about how to manipulate the PTF database
+---
+- hosts: repo2
+  gather_facts: false
+  collections:
+   - ibm.power_ibmi
+
+  tasks:
+    - block:
+      - name: scan PTF info from image root
+        ibmi_fix_repo_lv1:
+          action: 'refresh'
+          image_root: '/home/pengzy/PTF'
+        register: scanning_info
+
+      - name: display_scanning_info
+        debug:
+          msg: '{{ scanning_info.row_changed }} records added'
+
+      - name: query all PTF info from database
+        ibmi_fix_repo_lv1:
+          action: 'list'
+          additional_sql: 'WHERE image_type IS NOT "cum" ORDER BY download_date DESC'
+        register: query_result
+
+      - name: display all PTF info from database
+        debug:
+          msg: '{{ query_result.success_list }}'
+
+      - name: find image info from database
+        ibmi_fix_repo_lv1:
+          action: 'find'
+          checksum: true
+          # additional_sql: 'WHERE image_type = "single_ptf" ORDER BY download_date DESC'
+          additional_sql: 'ORDER BY ordered_ptf_count'
+          fields:
+            - 'image_type'
+            - 'image_path'
+            - 'ordered_ptf_count'
+          parameters:
+            - {"group": "SF99704", "level":19}
+            - {"group": "SF99876"}
+            - {"shipped_ptf": "SI50077"}
+            - {"ptf": "SI77631"}
+        register: find_result
+
+      - name: display find result
+        debug:
+          msg: '{{ find_result }}'
+
+      always:
+      - name: drop_the_table
+        ibmi_fix_repo_lv1:
+          action: "clear"

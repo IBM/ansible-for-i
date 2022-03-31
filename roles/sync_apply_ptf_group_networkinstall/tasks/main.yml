@@ -3,24 +3,43 @@
 # This role will setup network install env on repo server and use network install mechanism to install the PTF group on target system.
 - name: Setup network install repo server env
   ibm.power_ibmi.ibmi_fix_network_install_server:
-    operation: 'setup_and_addimgclge'
+    operation: 'setup_only'
+    rollback: true
+  delegate_to: "{{ src_host }}"
+  register: network_install_server_setuponly_result
+
+- name: Print network_install_server_setuponly_result
+  debug:
+    var: network_install_server_setuponly_result
+
+- name: Add image files to network install env
+  ibm.power_ibmi.ibmi_fix_network_install_server:
+    operation: 'rmvimgclge_and_addimgclge'
     rollback: true
     virtual_image_name_list:
       - "{{ ptf_group_info.file_path + '/*ALL' }}"
   delegate_to: "{{ src_host }}"
-  register: network_install_server_result
+  register: network_install_server_rmadd_result
 
-- name: Print network_install_server_result
+- name: Print network_install_server_rmadd_result
   debug:
-    var: network_install_server_result
+    var: network_install_server_rmadd_result
 
 - name: Using network install mechanism to install the PTF group on target system
   ibm.power_ibmi.ibmi_fix_network_install_client:
     operation: 'setup_and_installPTF_and_uninstall'
     server_address: "{{ hostvars[src_host]['ansible_ssh_host'] }}"
+    fix_omit_list: '{{ ptf_omit_list | default([]) }}'
     rollback: true
   register: network_install_client_result
+  ignore_errors: true
 
 - name: Print network_install_client_result
   debug:
     var: network_install_client_result
+
+- block:
+    - name: Debug msg
+      fail:
+        msg: "Failed to insgtall PTF group, see previous joblog for details."
+  when: network_install_client_result.rc != 0
