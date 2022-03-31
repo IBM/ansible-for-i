@@ -68,6 +68,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_network_install_server.html">ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_product_check.html">ibmi_fix_product_check – Check the software product installation status for a fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo.html">ibmi_fix_repo – Manipulate the PTF database via sqlite3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo_lv1.html">ibmi_fix_repo_lv1 – Manipulate the PTF database via sqlite3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all un-configure disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP</a></li>
@@ -207,12 +208,12 @@
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Synchronize c1 save file from IBM i node A to another IBM i node B.</span>
-  <span class="nt">ibmi_ibm.power_ibmi.ibmi_synchronize</span><span class="p">:</span>
-    <span class="nt">src</span><span class="p">:</span> <span class="s">&#39;/qsys.lib/test.lib/c1.file&#39;</span>
-    <span class="nt">remote_user</span><span class="p">:</span> <span class="s">&#39;user&#39;</span>
-    <span class="nt">private_key</span><span class="p">:</span> <span class="s">&#39;/home/test/id_rsa&#39;</span>
-  <span class="nt">delegate_to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">nodeA</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Synchronize c1 save file from IBM i node A to another IBM i node B.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_synchronize</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;/qsys.lib/test.lib/c1.file&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">remote_user</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;user&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">private_key</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;/home/test/id_rsa&#39;</span><span class="w"></span>
+<span class="w">  </span><span class="nt">delegate_to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nodeA</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
