@@ -260,6 +260,7 @@ def main():
             stderr=err,
             rc=rc,
             sbmjob_cmd=cl_sbmjob,
+            out=current_job_log,
             # changed=True,
         )
         module.fail_json(msg='Submit job failed. ', **result_failed)

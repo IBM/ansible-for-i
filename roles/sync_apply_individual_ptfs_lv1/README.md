@@ -1,7 +1,6 @@
 sync_apply_individual_ptfs_lv1
 =========
-Call ibmi_synchronize_files modules to transfer a list of exists ptfs install files to an ibm i system(~/PTF/singleptf/), then call load_apply_ptfs role to load
-and apply ptfs. And return the status.
+Call ibmi_synchronize_files modules to transfer a list of exists ptfs install files to an ibm i system(~/PTF/singleptf/), then call ibmi_fix and ibmi_fix_imgclg module to load and apply ptfs. And return the status. This role is only used for LV1 solution.
 
 Role Variables
 --------------
@@ -10,7 +9,8 @@ Role Variables
 |-----------------------|---------------|----------------------------------------------------------------------------------|
 | `not_loaded_list`      | list          | The not loaded ptfs' information list. ptf_id, product, file_name and file_path are required.  |
 | `already_loaded_list`    | list        | The already loaded ptfs' information list. ptf_id and product are required.  |
-| `src_host`            | str           | The system that has the src ptf savfs, which will be transferred to the target system.|
+| `src_host`            | str           | The system that has the ptf install files, which will be transferred to the target system.|
+| `delete`              | bool          | Whether or not to delete the PTF install files after apply. The default is True.  |
 
 Return Variables
 --------------

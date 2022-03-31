@@ -34,7 +34,7 @@
   debug:
     var: path
 
-- name: check if the folder is alrady exists
+- name: check if the folder is already exists
   ansible.builtin.stat:
     path: "{{ path }}"
   register: stat_result

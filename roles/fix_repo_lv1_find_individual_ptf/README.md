@@ -8,8 +8,8 @@ Role Variables
 
 | Variable              | Type          | Description                                               |
 |-----------------------|---------------|-----------------------------------------------------------|
-| `ptfs_list`      | list         | PTFs list will be fined. |
-| `src_host`       | str          | The system that has the src ptf install files, which will be transferred to the target system.        |
+| `ptfs_list`      | list         | PTFs list will be found. |
+| `src_host`       | str          | The system that has the ptf install files, which will be transferred to the target system.        |
 | `image_root`     | str          | Specifies the image files' dir on the repo_server        |
 
 Return Variables

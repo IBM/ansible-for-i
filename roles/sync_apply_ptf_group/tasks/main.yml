@@ -11,7 +11,7 @@
   set_fact:
     path: "{{ dest }}/{{ ptf_group_info.file_path | basename }}"
 
-- name: check if the folder is alrady exists
+- name: check if the folder is already exists
   ansible.builtin.stat:
     path: "{{ path }}"
   register: stat_result
