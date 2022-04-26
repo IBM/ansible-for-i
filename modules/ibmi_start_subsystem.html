@@ -68,6 +68,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_network_install_server.html">ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_product_check.html">ibmi_fix_product_check – Check the software product installation status for a fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo.html">ibmi_fix_repo – Manipulate the PTF database via sqlite3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo_lv1.html">ibmi_fix_repo_lv1 – Manipulate the PTF database via sqlite3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all un-configure disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP</a></li>
@@ -204,16 +205,16 @@
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Start the subsystem QBATCH.</span>
-  <span class="nt">ibmi_ibm.power_ibmi.ibmi_start_subsystem</span><span class="p">:</span>
-    <span class="nt">subsystem</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">QBATCH</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Start the subsystem QBATCH.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_start_subsystem</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">subsystem</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QBATCH</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Start a user defined subsystem, which the subsystem description is MYSBS, located at library MYLIB.</span>
-  <span class="nt">ibmi_ibm.power_ibmi.ibmi_start_subsystem</span><span class="p">:</span>
-    <span class="nt">subsystem</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MYSBS</span>
-    <span class="nt">library</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MYLIB</span>
-    <span class="nt">become_user</span><span class="p">:</span> <span class="s">&#39;USER1&#39;</span>
-    <span class="nt">become_user_password</span><span class="p">:</span> <span class="s">&#39;yourpassword&#39;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Start a user defined subsystem, which the subsystem description is MYSBS, located at library MYLIB.</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_start_subsystem</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">subsystem</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MYSBS</span><span class="w"></span>
+<span class="w">    </span><span class="nt">library</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MYLIB</span><span class="w"></span>
+<span class="w">    </span><span class="nt">become_user</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;USER1&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">become_user_password</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;yourpassword&#39;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>

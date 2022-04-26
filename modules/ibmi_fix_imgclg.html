@@ -76,6 +76,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_network_install_server.html">ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_product_check.html">ibmi_fix_product_check – Check the software product installation status for a fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo.html">ibmi_fix_repo – Manipulate the PTF database via sqlite3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo_lv1.html">ibmi_fix_repo_lv1 – Manipulate the PTF database via sqlite3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all un-configure disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP</a></li>
@@ -259,21 +260,21 @@
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Install a list of PTFs of LPP 5733SC1 from image catalog</span>
-  <span class="nt">ibm.power_ibmi.ibmi_fix_imgclg</span><span class="p">:</span>
-    <span class="nt">product_id</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="s">&#39;5733SC1&#39;</span>
-    <span class="nt">src</span><span class="p">:</span> <span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">fix_install_path</span> <span class="cp">}}</span><span class="s">&#39;</span>
-    <span class="nt">apply_type</span><span class="p">:</span> <span class="s">&#39;*DLYALL&#39;</span>
-    <span class="nt">hiper_only</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
-    <span class="nt">use_temp_path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-    <span class="nt">rollback</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-    <span class="nt">virtual_image_name_list</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="s">&#39;S2018V01.BIN&#39;</span>
-    <span class="nt">fix_omit_list</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">5733SC1</span><span class="p">:</span> <span class="s">&quot;SI70819&quot;</span>
-    <span class="nt">become_user</span><span class="p">:</span> <span class="s">&quot;QSECOFR&quot;</span>
-    <span class="nt">become_user_password</span><span class="p">:</span> <span class="s">&quot;yourpassword&quot;</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install a list of PTFs of LPP 5733SC1 from image catalog</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_fix_imgclg</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">product_id</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;5733SC1&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;</span><span class="cp">{{</span> <span class="nv">fix_install_path</span> <span class="cp">}}</span><span class="s">&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">apply_type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*DLYALL&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">hiper_only</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="w">    </span><span class="nt">use_temp_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="w">    </span><span class="nt">rollback</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="w">    </span><span class="nt">virtual_image_name_list</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;S2018V01.BIN&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">fix_omit_list</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">5733SC1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;SI70819&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">become_user</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;QSECOFR&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">become_user_password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;yourpassword&quot;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>

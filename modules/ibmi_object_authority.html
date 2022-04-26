@@ -68,6 +68,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_network_install_server.html">ibmi_fix_network_install_server – Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_product_check.html">ibmi_fix_product_check – Check the software product installation status for a fix</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo.html">ibmi_fix_repo – Manipulate the PTF database via sqlite3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ibmi_fix_repo_lv1.html">ibmi_fix_repo_lv1 – Manipulate the PTF database via sqlite3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_get_nonconfigure_disks.html">ibmi_get_nonconfigure_disks – Get all un-configure disks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_host_server_service.html">ibmi_host_server_service – Manage host server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ibmi_iasp.html">ibmi_iasp – Control IASP</a></li>
@@ -315,63 +316,63 @@
 </section>
 <section id="examples">
 <h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
-<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Grant 1 user 1 authority on object</span>
-  <span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span>
-    <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">grant</span>
-    <span class="nt">object_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testobj</span>
-    <span class="nt">object_library</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testlib</span>
-    <span class="nt">object_type</span><span class="p">:</span> <span class="s">&#39;*DTAARA&#39;</span>
-    <span class="nt">user</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testuser</span>
-    <span class="nt">authority</span><span class="p">:</span> <span class="s">&#39;*ALL&#39;</span>
+<div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Grant 1 user 1 authority on object</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grant</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testobj</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_library</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testlib</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*DTAARA&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testuser</span><span class="w"></span>
+<span class="w">    </span><span class="nt">authority</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*ALL&#39;</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Revoke 1 user&#39;s 2 authorities on object</span>
-  <span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span>
-    <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;revoke&#39;</span>
-    <span class="nt">object_name</span><span class="p">:</span> <span class="s">&#39;ANSIBLE&#39;</span>
-    <span class="nt">object_library</span><span class="p">:</span> <span class="s">&#39;CHANGLE&#39;</span>
-    <span class="nt">user</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="s">&#39;CHANGLE&#39;</span>
-    <span class="nt">authority</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="s">&#39;*READ&#39;</span>
-      <span class="p p-Indicator">-</span> <span class="s">&#39;*DLT&#39;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Revoke 1 user&#39;s 2 authorities on object</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;revoke&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;ANSIBLE&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_library</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;CHANGLE&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">user</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;CHANGLE&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">authority</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;*READ&#39;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;*DLT&#39;</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Display the authority</span>
-  <span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span>
-    <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">display</span>
-    <span class="nt">object_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testobj</span>
-    <span class="nt">object_library</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testlib</span>
-    <span class="nt">object_type</span><span class="p">:</span> <span class="s">&#39;*DTAARA&#39;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Display the authority</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">display</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testobj</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_library</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testlib</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*DTAARA&#39;</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Grant the reference object authority</span>
-  <span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span>
-    <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">grant_ref</span>
-    <span class="nt">object_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testobj</span>
-    <span class="nt">object_library</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testlib</span>
-    <span class="nt">object_type</span><span class="p">:</span> <span class="s">&#39;*DTAARA&#39;</span>
-    <span class="nt">ref_object</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testrefobj</span>
-    <span class="nt">ref_object_library</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testreflib</span>
-    <span class="nt">ref_object_type</span><span class="p">:</span> <span class="s">&#39;*DTAARA&#39;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Grant the reference object authority</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grant_ref</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testobj</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_library</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testlib</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*DTAARA&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ref_object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testrefobj</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ref_object_library</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testreflib</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ref_object_type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*DTAARA&#39;</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Revoke the authority list on object</span>
-  <span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span>
-    <span class="nt">operation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">revoke_autl</span>
-    <span class="nt">object_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testobj</span>
-    <span class="nt">object_library</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">testlib</span>
-    <span class="nt">object_type</span><span class="p">:</span> <span class="s">&#39;*DTAARA&#39;</span>
-    <span class="nt">authorization_list</span><span class="p">:</span> <span class="s">&#39;MYAUTL&#39;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Revoke the authority list on object</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">revoke_autl</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testobj</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_library</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">testlib</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*DTAARA&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">authorization_list</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;MYAUTL&#39;</span><span class="w"></span>
 
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">grant user 2 authority on an iasp</span>
-  <span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span>
-    <span class="nt">operation</span><span class="p">:</span> <span class="s">&#39;grant&#39;</span>
-    <span class="nt">object_name</span><span class="p">:</span> <span class="s">&#39;iasp1&#39;</span>
-    <span class="nt">object_library</span><span class="p">:</span> <span class="s">&#39;CHANGLE2&#39;</span>
-    <span class="nt">object_type</span><span class="p">:</span> <span class="s">&#39;*DTAARA&#39;</span>
-    <span class="nt">asp_group</span><span class="p">:</span> <span class="s">&#39;IASP1&#39;</span>
-    <span class="nt">user</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="s">&#39;CHANGLE&#39;</span>
-    <span class="nt">authority</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="s">&#39;*READ&#39;</span>
-      <span class="p p-Indicator">-</span> <span class="s">&#39;*DLT&#39;</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grant user 2 authority on an iasp</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_object_authority</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;grant&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;iasp1&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_library</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;CHANGLE2&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">object_type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;*DTAARA&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">asp_group</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;IASP1&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">user</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;CHANGLE&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">authority</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;*READ&#39;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;*DLT&#39;</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
