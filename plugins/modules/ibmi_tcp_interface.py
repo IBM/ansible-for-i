@@ -359,7 +359,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_to
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "1.7.0"
+__ibmi_module_version__ = "1.7.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

@@ -249,7 +249,7 @@ except ImportError:
     HAS_ITOOLKIT = False
 
 
-__ibmi_module_version__ = "1.7.0"
+__ibmi_module_version__ = "1.7.1"
 
 
 def get_ptf_info(imodule, ptf_id, product_id, release_level):
