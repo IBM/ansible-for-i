@@ -6,7 +6,7 @@ __metaclass__ = type
 from ansible import constants as C
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.7.0"
 display = Display()
 
 

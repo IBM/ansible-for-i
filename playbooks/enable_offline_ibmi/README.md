@@ -24,11 +24,13 @@ Variables
 | Variable              | Type          | Description                                      |
 |-----------------------|---------------|--------------------------------------------------|
 | `package_path`      | str          | The directory you just created, for example,  /tmp/ibmi-packages                  |
+| `is_python39_to_be_installed`      | boolean          | Python 39 is going to be enabled by default. Specify it to false it you would like to enable python39.                |
 
 Example 
 ----------------
 ```
 ansible-playbook -i path/to/inventory main.yml -e 'package_path=/tmp/ibmi-packages'
+ansible-playbook -i path/to/inventory main.yml -e "{'package_path':'/tmp/ibmi-packages', 'is_python39_to_be_installed':false}
 ```
 
 License

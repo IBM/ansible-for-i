@@ -238,11 +238,18 @@ try:
     from itoolkit import iPgm
     from itoolkit import iData
     from itoolkit import iDS
-    from itoolkit.transport import DatabaseTransport
+    from itoolkit.transport import DatabaseTransport as BaseDatabaseTransport
+
+    class DatabaseTransport(BaseDatabaseTransport):
+        def _close(self):
+            """Don't close connection, we'll manage it ourselves"""
+            pass
+
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "9.9.9"
+
+__ibmi_module_version__ = "1.7.0"
 
 
 def get_ptf_info(imodule, ptf_id, product_id, release_level):

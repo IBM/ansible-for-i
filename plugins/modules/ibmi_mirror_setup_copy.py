@@ -111,9 +111,16 @@ try:
     from itoolkit import iSrvPgm
     from itoolkit import iData
     from itoolkit import iDS
-    from itoolkit.transport import DatabaseTransport
+    from itoolkit.transport import DatabaseTransport as BaseDatabaseTransport
+
+    class DatabaseTransport(BaseDatabaseTransport):
+        def _close(self):
+            """Don't close connection, we'll manage it ourselves"""
+            pass
+
 except ImportError:
     HAS_ITOOLKIT = False
+
 
 CLOUDINIT_METADATA_DIR = '/QOpenSys/pkgs/lib/cloudinit/cloud/seed/config_drive/openstack/latest'
 DB2MTOOL_METADATA_DIR = '/QIBM/UserData/QDB2MIR/MRDB/TOOLS'
@@ -124,7 +131,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.7.0"
 
 
 def _is_ipv4_addr(ip):

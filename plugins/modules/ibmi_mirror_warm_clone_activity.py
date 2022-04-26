@@ -84,9 +84,16 @@ try:
     from itoolkit import iSrvPgm
     from itoolkit import iData
     from itoolkit import iDS
-    from itoolkit.transport import DatabaseTransport
+    from itoolkit.transport import DatabaseTransport as BaseDatabaseTransport
+
+    class DatabaseTransport(BaseDatabaseTransport):
+        def _close(self):
+            """Don't close connection, we'll manage it ourselves"""
+            pass
+
 except ImportError:
     HAS_ITOOLKIT = False
+
 
 # The mirror state
 MRDB_NOT_MIRRORED = 0
@@ -102,7 +109,7 @@ MrdbConfigComplete = 2
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.7.0"
 
 
 def mrdb_retrieve_mirror_state(imodule):

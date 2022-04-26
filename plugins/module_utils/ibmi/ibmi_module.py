@@ -18,7 +18,13 @@ try:
     from itoolkit import iPgm
     from itoolkit import iData
     from itoolkit import iDS
-    from itoolkit.transport import DatabaseTransport
+    from itoolkit.transport import DatabaseTransport as BaseDatabaseTransport
+
+    class DatabaseTransport(BaseDatabaseTransport):
+        def _close(self):
+            """Don't close connection, we'll manage it ourselves"""
+            pass
+
 except ImportError:
     HAS_ITOOLKIT = False
 
@@ -173,6 +179,7 @@ class IBMiModule(object):
             ibmi_util.log_info(
                 f"Job of the connection to execute the task: {job_name_info}", "Connection Initialization")
         except Exception as inst:
+            ibmi_util.log_info("Exception occured during IBMiModule _init_: " + str(inst))
             self.close_db_connection()
             re_raise = True
             exp_msg = f"Fail to connect to database {db_name}: {inst}."
@@ -216,7 +223,7 @@ class IBMiModule(object):
                 self.conn.close()
             except Exception as inst:
                 re_raise = True
-                exp_msg = "Failed to close connect from database: {inst}"
+                exp_msg = f"Failed to close connect from database: {inst}"
             finally:
                 self.conn = None
                 if re_raise:
@@ -434,21 +441,25 @@ class IBMiModule(object):
             result_set = cursor_id.execute(sql)
             if not result_set:
                 err = "Failed to execute the SQL statement."
+                ibmi_util.log_debug("sql execute into error: " + str(err))
                 return out, err
 
             result_set = cursor_id.fetchall()
             if not result_set:
                 err = "Failed to fetch the result set."
+                ibmi_util.log_debug("sql fetch into error: " + str(err))
                 return out, err
 
             out = result_set
         except Exception as inst:
             err = str(inst)
+            ibmi_util.log_debug("sql run into exception " + str(err))
             return out, err
 
         return out, err
 
     def get_job_log(self, job_name, time=None):
+        ibmi_util.log_info("get_job_log: job_name is " + job_name + ", time is " + str(time))
         if time:
             sql = "SELECT ORDINAL_POSITION, MESSAGE_ID, MESSAGE_TYPE, MESSAGE_SUBTYPE, SEVERITY, " + \
                   "MESSAGE_TIMESTAMP, FROM_LIBRARY, FROM_PROGRAM, FROM_MODULE, FROM_PROCEDURE, FROM_INSTRUCTION, " + \

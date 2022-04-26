@@ -257,13 +257,18 @@ try:
     from itoolkit import iData
     from itoolkit import iDS
     from itoolkit import iCmd
-    from itoolkit.transport import DatabaseTransport
+    from itoolkit.transport import DatabaseTransport as BaseDatabaseTransport
+
+    class DatabaseTransport(BaseDatabaseTransport):
+        def _close(self):
+            """Don't close connection, we'll manage it ourselves"""
+            pass
+
 except ImportError:
     HAS_ITOOLKIT = False
 HAS_IBM_DB = True
 
-
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.7.0"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255

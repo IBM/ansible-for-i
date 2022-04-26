@@ -130,7 +130,7 @@ import time
 import re
 
 
-__ibmi_module_version__ = "9.9.9"
+__ibmi_module_version__ = "1.7.0"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"
