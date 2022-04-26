@@ -6,8 +6,18 @@
   gather_facts: false 
   collections:
    - ibm.power_ibmi
-   
+  vars:
+    is_python39_to_be_installed: true
+    python_interpreter_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
+    python_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
+
   tasks:
+  - name: Set python39
+    set_fact:
+      python_version: 'python39'
+      python_interpreter_version: 'python3.9' 
+    when: is_python39_to_be_installed
+
   - set_fact:
       yum_installed: false
 
@@ -29,7 +39,6 @@
       
     vars:
       required_rpms: [itoolkit, ibm_db]
-      python_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
 
   - block:
     - name: find the home directory 

@@ -6,7 +6,7 @@
 # on repo server should be formatted as ptf_group_number_ptf_group_level under ~/PTF folder.
 
 # Command example: ansible-playbook /sync_apply_ptf_group_using_ptfinfo.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
-# 'ptf_group_number': 'SF99729', 'ptf_group_level': '125', 'delete': true}"
+# 'ptf_group_number': 'SF99729', 'ptf_group_level': '125', 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
 # The 'delete' parameter specifies whether or not to delete the file install dir on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
@@ -48,7 +48,7 @@
       set_fact:
         path: "{{ repo_dir }}"
 
-    - name: check if the folder is alrady exists
+    - name: check if the folder is already exists
       ansible.builtin.stat:
         path: "{{ path }}"
       register: stat_result
@@ -149,6 +149,7 @@
         - name: Apply PTF group
           ibm.power_ibmi.ibmi_fix_imgclg:
             src: '{{ path }}'
+            fix_omit_list: '{{ ptf_omit_list | default([]) }}'
             rollback: true
           register: apply_result
           ignore_errors: true

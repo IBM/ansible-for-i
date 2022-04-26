@@ -124,7 +124,13 @@ try:
     from itoolkit import iSrvPgm
     from itoolkit import iData
     from itoolkit import iDS
-    from itoolkit.transport import DatabaseTransport
+    from itoolkit.transport import DatabaseTransport as BaseDatabaseTransport
+
+    class DatabaseTransport(BaseDatabaseTransport):
+        def _close(self):
+            """Don't close connection, we'll manage it ourselves"""
+            pass
+
 except ImportError:
     HAS_ITOOLKIT = False
 
@@ -134,7 +140,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "1.6.0"
+__ibmi_module_version__ = "1.7.1"
 
 
 def get_info_from_resource_name(imodule, resource_name):
@@ -184,7 +190,7 @@ def get_info_from_resource_name(imodule, resource_name):
         if int(rhri0100_t['rhrAvl']) > 0:
             resoure_info = {"RESOURCE_NAME": resource_name,
                             "SYSTEM_BUS_NUMBER": rhri0100_t['sysBusNum'],
-                            "SYSTEM_BOARD_NUMBER": rhri0100_t['sysCdNum'],
+                            "SYSTEM_BOARD_NUMBER": rhri0100_t['sysBdNum'],
                             "SYSTEM_CARD_NUMBER": rhri0100_t['sysCdNum'],
                             "IO_BUS_ADDRESS": rhri0100_t['IOBusAdd'],
                             "ADAPTER_ADDRESS": rhri0100_t['AdaptAdd'],

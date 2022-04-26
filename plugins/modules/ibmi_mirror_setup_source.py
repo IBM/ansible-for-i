@@ -167,9 +167,16 @@ try:
     from itoolkit import iPgm
     from itoolkit import iData
     from itoolkit import iDS
-    from itoolkit.transport import DatabaseTransport
+    from itoolkit.transport import DatabaseTransport as BaseDatabaseTransport
+
+    class DatabaseTransport(BaseDatabaseTransport):
+        def _close(self):
+            """Don't close connection, we'll manage it ourselves"""
+            pass
+
 except ImportError:
     HAS_ITOOLKIT = False
+
 
 # The mirror state
 MRDB_NOT_MIRRORED = 0
@@ -187,7 +194,7 @@ ERROR = -1
 
 CLOUDINIT_METADATA_DIR = '/QOpenSys/pkgs/lib/cloudinit/cloud/seed/config_drive/openstack/latest'
 
-__ibmi_module_version__ = "1.6.0"
+__ibmi_module_version__ = "1.7.1"
 
 
 def get_mirror_state_text(state):

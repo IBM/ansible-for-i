@@ -11,7 +11,7 @@
   set_fact:
     path: "{{ dest }}/{{ ptf_group_info.file_path | basename }}"
 
-- name: check if the folder is alrady exists
+- name: check if the folder is already exists
   ansible.builtin.stat:
     path: "{{ path }}"
   register: stat_result
@@ -97,6 +97,7 @@
     - name: Get the home dir on target server
       shell: 'echo $HOME'
       register: home_dir
+      changed_when: home_dir == ''
 
     - name: Compose path
       set_fact:
@@ -110,6 +111,7 @@
     - name: Apply PTF group
       ibm.power_ibmi.ibmi_fix_imgclg:
         src: '{{ path }}'
+        fix_omit_list: '{{ ptf_omit_list | default([]) }}'
         rollback: true
       register: apply_result
 
@@ -123,5 +125,4 @@
   file:
     path: "{{ path }}"
     state: absent
-  ignore_errors: true
   when: delete

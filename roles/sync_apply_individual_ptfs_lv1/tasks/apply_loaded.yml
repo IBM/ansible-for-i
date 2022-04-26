@@ -1,0 +1,25 @@
+---
+# task for apply_loaded.yml
+- name: Involve ibm.power_ibmi.ibmi_fix to apply already loaded ptfs
+  ibm.power_ibmi.ibmi_fix:
+    product_id: "{{ already_loaded_list_var.product }}"
+    fix_list: "{{ already_loaded_list_var.ptf_id }}"
+    operation: 'apply_only'
+    delayed_option: '{{ delayed_option }}'
+    temp_or_perm: '{{ temp_or_perm }}'
+  ignore_errors: true
+  register: ibmi_fix_result
+
+- name: Print ibmi_fix_result
+  debug:
+    var: ibmi_fix_result
+
+- name: Compose apply success list
+  set_fact:
+    apply_loaded_success_list: "{{ apply_loaded_success_list | default([]) + [ already_loaded_list_var.ptf_id ] }}"
+  when: ibmi_fix_result.rc == 0
+
+- name: Compose apply fail list
+  set_fact:
+    apply_loaded_fail_list: "{{ apply_loaded_fail_list | default([]) + [ already_loaded_list_var.ptf_id ] }}"
+  when: ibmi_fix_result.rc != 0

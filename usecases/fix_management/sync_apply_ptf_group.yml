@@ -4,7 +4,7 @@
 # to the target system. Then apply.
 
 # Command example: ansible-playbook ./sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group':
-# {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'delete': true}"
+# {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
 # The 'delete' parameter specifies whether or not to delete the file install dir on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
@@ -41,7 +41,7 @@
           meta: end_host
       when: fix_repo_find_result.success_list is not defined or fix_repo_find_result.success_list == []
 
-    - name: Get the PTF group information in download_status table, in case the order is still dwonloading
+    - name: Get the PTF group information in download_status table, in case the order is still downloading
       ibmi_fix_repo:
         type: "download_status"
         action: "find"

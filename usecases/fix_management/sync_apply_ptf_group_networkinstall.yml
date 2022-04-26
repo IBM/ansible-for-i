@@ -1,10 +1,11 @@
 ---
 - name: Using remote network install mechanism to install the PTF group on target system
-# This playbook will get the PTF group information in catalog. Then call sync_apply_ptf_group_networkinstall role to install PTF group
-# on the target system.
+# This playbook is used for 2nd level solution. It will get the PTF group information in catalog.
+# Then call sync_apply_ptf_group_networkinstall role to install PTF group on the target system.
 
 # Command example: ansible-playbook ./sync_apply_ptf_group_networkinstall.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group':
-# {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}}"
+# {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
+# The 'ptf_omit_list' parameter specifies the PTFs which need to be omitted, including product ID and PTF number.
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:
@@ -39,7 +40,7 @@
           meta: end_host
       when: fix_repo_find_result.success_list is not defined or fix_repo_find_result.success_list == []
 
-    - name: Get the PTF group information in download_status table, in case the order is still dwonloading
+    - name: Get the PTF group information in download_status table, in case the order is still downloading
       ibmi_fix_repo:
         type: "download_status"
         action: "find"

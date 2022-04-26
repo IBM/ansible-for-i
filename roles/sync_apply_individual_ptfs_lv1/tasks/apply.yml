@@ -1,0 +1,51 @@
+---
+# task for apply.yml
+- name: Initialize
+  set_fact:
+    path: "~/PTF/singleptf/{{ not_loaded_list_var.file_path | basename }}"
+
+- name: Compose path
+  set_fact:
+    path: "{{ path | regex_replace('~', home_dir.stdout) }}"
+  when: path | regex_search("^~")
+
+- name: debug path
+  debug:
+    var: path
+
+- block:
+    - name: Apply PTF using bin file
+      ibm.power_ibmi.ibmi_fix_imgclg:
+        src: '{{ path }}'
+        apply_type: "*IMMDLY"
+        rollback: true
+      register: apply_result
+      ignore_errors: true
+
+    - name: Print apply result
+      debug:
+        var: apply_result
+
+    - block:
+        - name: Print apply fail result
+          debug:
+            msg: "PTF {{ not_loaded_list_var.ptf_id }} applied fail. Please see above job log"
+
+        - name: Compose apply fail list
+          set_fact:
+            apply_fail_list: "{{ apply_fail_list | default([]) + [not_loaded_list_var.ptf_id] }}"
+      when: apply_result.rc != 0
+
+    - block:
+        - name: Print apply success result
+          debug:
+            msg: "PTF {{ not_loaded_list_var.ptf_id }} applied succesfully"
+
+        - name: debug not_loaded_list_var.ptf_id
+          debug:
+            var: not_loaded_list_var.ptf_id
+
+        - name: Compose apply success list
+          set_fact:
+            apply_success_list: "{{ apply_success_list | default([]) + [not_loaded_list_var.ptf_id] }}"
+      when: apply_result.rc == 0
