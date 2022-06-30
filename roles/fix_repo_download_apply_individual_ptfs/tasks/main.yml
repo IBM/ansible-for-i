@@ -73,7 +73,7 @@
             not_loaded_list: "{{ not_loaded_ptfs_list + temporarily_applied_list }}"
             src_host: "{{ repo_server }}"
             already_loaded_list: "{{ loaded_ptfs_list }}"
-            temp_or_perm: "{{ temp_or_perm }}"
+            # temp_or_perm: "{{ temp_or_perm }}"
           when: not_loaded_ptfs_list != [] or loaded_ptfs_list != []
 
         - name: call ibmi_cl_command to install the temporarily applied PTFs

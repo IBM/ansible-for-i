@@ -25,7 +25,7 @@
           - "{{ {'ptf_group_number': ptf_group.ptf_group_number, \
             'ptf_group_level': ptf_group.ptf_group_level | default(omit), \
             'release_date': ptf_group.release_date | default(omit), \
-            'additional_param':'ORDER BY release_date DESC LIMIT 1'} }}"
+            'additional_param':'ORDER BY release_date LIMIT 1'} }}"
       delegate_to: "{{ repo_server }}"
       register: fix_repo_find_result
 
@@ -49,7 +49,7 @@
           - "{{ {'ptf_group_number': ptf_group.ptf_group_number, \
             'ptf_group_level': ptf_group.ptf_group_level | default(omit),\
             'release_date': ptf_group.release_date | default(omit), \
-            'additional_param':'ORDER BY release_date DESC LIMIT 1'} }}"
+            'additional_param':'ORDER BY release_date LIMIT 1'} }}"
       delegate_to: "{{ repo_server }}"
       register: download_status_find_result
 

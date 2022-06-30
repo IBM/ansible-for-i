@@ -111,3 +111,7 @@ Below input parameters are only prompted when you're going to create a new compu
 10. run_workflow.yml - run the Ansible Tower workflow.
 11. show_result.yml - show the running result of the Ansible Tower workflow.
 12. cleanup.yml - revoke the Ansible Tower server access token.
+
+## License
+
+Apache-2.0

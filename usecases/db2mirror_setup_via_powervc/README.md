@@ -60,3 +60,9 @@ ansible-playbook -i hosts.ini main.yml -vvv --extra-vars "{
         'copyNodeTCPIP': {'copy_internet_address': '9.5.163.101', 'copy_network_name': 'net-163'},
         'sourceVmNameOnPowerVC': MIRRORS
         }"
+
+
+License
+-----------------------------------------
+
+Apache-2.0

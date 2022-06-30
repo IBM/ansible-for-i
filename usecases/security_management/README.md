@@ -67,3 +67,9 @@ ansible-playbook ./main.yml
 
 
 Note: to turn off displaying skipped task/host entries in a task in the default callback, you can run "ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ansible-playbook ./main.yml" instead.
+
+
+# License
+**---------------------**
+
+Apache-2.0

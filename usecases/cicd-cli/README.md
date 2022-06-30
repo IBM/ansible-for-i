@@ -48,3 +48,10 @@ ansible-playbook -i hosts.ini ./main.yml
 
 \```
 
+
+
+License
+
+**--------------**
+
+Apache-2.0

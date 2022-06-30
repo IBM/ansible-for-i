@@ -1,0 +1,72 @@
+---
+- name: Migrate repository server to another IBM i system 
+# The IBM i system where the repo server is located should be at the higest OS level. 
+# This playbook is used for 2st level solution. It will package the repo server DB and files, then tranfer them to another IBM i system. 
+# Then setup the new repository enviornment.
+
+# Command example: ansible-playbook ./migrate_repo_server.yml -e "{'target_system': 'systemA', 'original_system': 'systemB', 
+# 'repo_dir': '/etc/ibmi_ansible/fix_management', 'target_dir': '/etc/ibmi_ansible/fix_management'}"
+# The 'original_system' parameter specifies the original repo server.
+# The 'target_system' parameter specifies the new IBM i system which you want to migrate the repo server to.
+# The 'original_dir' parameter specifies the repo.sqlite3 DB dir on the original IBM i system, the default value is /etc/ibmi_ansible/fix_management.
+# The 'target_dir' parameter specifies the repo.sqlite3 DB dir on the target IBM i system, the default value is /etc/ibmi_ansible/fix_management.
+# Notes: The PTF Group image files dir on the target IBM i system must be the same as the original one, '/QIBM/UserData/OS/Service/ECS/PTF'. This playbook will not migrate the individual 
+# PTF savfs under QGPL libary, since such files will be auto downloaded again when you use it.
+  hosts: '{{ target_system }}'
+  gather_facts: false
+  collections:
+    - ibm.power_ibmi
+
+  vars:
+    original_system: "{{ original_system }}"
+    original_dir: "{{ repo_dir | default('/etc/ibmi_ansible/fix_management') }}"
+    target_dir: "{{ repo_dir | default('/etc/ibmi_ansible/fix_management') }}"
+
+  tasks:
+    - name: Recursively find PTF Group files on original repo server
+      find:
+        paths: "/QIBM/UserData/OS/Service/ECS/PTF"
+        recurse: true
+      delegate_to: "{{ original_system }}"
+      register: find_result
+
+    - name: debug original_dir
+      debug:
+        var: original_dir
+
+    - name: debug target_dir
+      debug:
+        var: target_dir
+
+    - name: compose src_list
+      set_fact:
+        image_src_list: "{{ image_src_list | default([]) + [{ 'src': find_result_var.path, 'dest': find_result_var.path | dirname }] }}"
+      loop: "{{ find_result.files }}"
+      loop_control:
+        loop_var: find_result_var
+
+    - name: debug image_src_list
+      debug:
+        var: image_src_list
+
+    - name: Transfer PTF Group image files to target_system
+      ibm.power_ibmi.ibmi_synchronize_files:
+        dest: "/QIBM/UserData/OS/Service/ECS/PTF"
+        src_list: "{{ image_src_list }}"
+      delegate_to: "{{ original_system }}"
+      register: image_sync_result
+
+    - name: debug image_sync_result
+      debug:
+        var: image_sync_result
+
+    - name: Transfer repo to target_system
+      ibm.power_ibmi.ibmi_synchronize_files:
+        dest: "{{ target_dir }}"
+        src_list: "[{'src': '{{ original_dir }}/repo.sqlite3'}]"
+      delegate_to: "{{ original_system }}"
+      register: repo_sync_result
+
+    - name: debug repo_sync_result
+      debug:
+        var: repo_sync_result
