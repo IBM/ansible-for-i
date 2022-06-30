@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -79,7 +80,7 @@
            <div itemprop="articleBody">
              
   <section id="installing-ibm-i-collection-to-ansible-server">
-<h1>Installing IBM i collection to Ansible server<a class="headerlink" href="#installing-ibm-i-collection-to-ansible-server" title="Permalink to this headline"></a></h1>
+<h1>Installing IBM i collection to Ansible server<a class="headerlink" href="#installing-ibm-i-collection-to-ansible-server" title="Permalink to this heading"></a></h1>
 <p>There are two options to install IBM i collection for Ansible:</p>
 <ul>
 <li><p>Installing from Ansible Galaxy</p>
@@ -100,7 +101,7 @@
 </li>
 </ul>
 <section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline"></a></h2>
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
 <p>In order to use this Ansible collection, you must have the following pre-requisite software installed and available on your Ansible server:</p>
 <p><strong>Python v3.6+</strong></p>
 <blockquote>
@@ -120,14 +121,14 @@ If you install Python from the package manager for your operating system, you mu
 </div></blockquote>
 </section>
 <section id="installing-using-ansible-galaxy">
-<h2>Installing using Ansible Galaxy<a class="headerlink" href="#installing-using-ansible-galaxy" title="Permalink to this headline"></a></h2>
+<h2>Installing using Ansible Galaxy<a class="headerlink" href="#installing-using-ansible-galaxy" title="Permalink to this heading"></a></h2>
 <p>You can use the <code class="docutils literal notranslate"><span class="pre">ansible-galaxy</span></code> command to install a collection from Ansible Galaxy, the package manager for Ansible:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">ibm</span><span class="o">.</span><span class="n">power_ibmi</span>
 </pre></div>
 </div>
 </section>
 <section id="installing-from-source">
-<h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline"></a></h2>
+<h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this heading"></a></h2>
 <p>You can use the <code class="docutils literal notranslate"><span class="pre">ansible-galaxy</span></code> command to install a collection built from source. To build your own collection, follow these steps:</p>
 <ol class="arabic simple">
 <li><p>Clone the repository:</p></li>
@@ -150,7 +151,7 @@ If you install Python from the package manager for your operating system, you mu
 </div>
 </section>
 <section id="enabling-ibm-i-nodes">
-<h2>Enabling IBM i nodes<a class="headerlink" href="#enabling-ibm-i-nodes" title="Permalink to this headline"></a></h2>
+<h2>Enabling IBM i nodes<a class="headerlink" href="#enabling-ibm-i-nodes" title="Permalink to this heading"></a></h2>
 <p>Before IBM i systems can be managed-nodes of Ansible, a few dependencies have to be installed on IBM i.</p>
 <blockquote>
 <div><ul class="simple">

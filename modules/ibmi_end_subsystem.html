@@ -14,6 +14,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -151,7 +152,7 @@
            <div itemprop="articleBody">
              
   <section id="ibmi-end-subsystem-end-an-active-subsystem">
-<span id="ibmi-end-subsystem-module"></span><h1>ibmi_end_subsystem – End an active subsystem.<a class="headerlink" href="#ibmi-end-subsystem-end-an-active-subsystem" title="Permalink to this headline"></a></h1>
+<span id="ibmi-end-subsystem-module"></span><h1>ibmi_end_subsystem – End an active subsystem.<a class="headerlink" href="#ibmi-end-subsystem-end-an-active-subsystem" title="Permalink to this heading"></a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
@@ -163,13 +164,13 @@
 </ul>
 </div>
 <section id="synopsis">
-<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_end_subsystem</span></code> module ends an active subsystem.</p></li>
 </ul>
 </section>
 <section id="parameters">
-<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
 <dl>
 <dt>become_user</dt><dd><p>The name of the user profile that the IBM i task will run under.</p>
 <p>Use this option to set a user with desired privileges to run the task.</p>
@@ -229,7 +230,7 @@
 </dl>
 </section>
 <section id="examples">
-<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">End the subsystem QBATCH with another user.</span><span class="w"></span>
 <span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_end_subsystem</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">subsystem</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QBATCH</span><span class="w"></span>
@@ -244,7 +245,7 @@
 </div>
 </section>
 <section id="notes">
-<h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This module is NOT ALLOWED to end ALL subsystems, use the <code class="docutils literal notranslate"><span class="pre">ibmi_cl_command</span></code> module instead.</p>
@@ -252,7 +253,7 @@
 </div>
 </section>
 <section id="see-also">
-<h2><a class="toc-backref" href="#id5">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id5">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this heading"></a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -261,7 +262,7 @@
 </div>
 </section>
 <section id="return-values">
-<h2><a class="toc-backref" href="#id6">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this headline"></a></h2>
+<h2><a class="toc-backref" href="#id6">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this heading"></a></h2>
 <blockquote>
 <div><dl>
 <dt>stdout</dt><dd><div class="line-block">
