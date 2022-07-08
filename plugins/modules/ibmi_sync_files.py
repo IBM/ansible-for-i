@@ -165,7 +165,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.7.1"
+__ibmi_module_version__ = "1.8.0"
 HAS_PARAMIKO = True
 
 try:
@@ -297,6 +297,11 @@ def main():
 
             try:
                 ibmi_util.log_debug("sftp: put " + final_src + " " + final_dest, module._name)
+                if final_dest[0:9].upper() != '/QSYS.LIB':
+                    try:
+                        sftp.mkdir(os.path.dirname(final_dest))
+                    except Exception as e:
+                        ibmi_util.log_debug(f"sftp: mkdir failed. Dir may be exist. Error: {to_text(e)}")
                 sftp.put(final_src, final_dest)
                 success_list.append(src_list[i])
             except Exception as e:

@@ -183,6 +183,12 @@ run_ARE_template playbook does the following:
 ansible-playbook /run_ARE_template.yml -e "{'ARE_clients': 'systemA', 'template_server': 'templateserver', 'template_name': '/tmp/PTF_SI71234.jar', 'ARE_results_dir_on_server': '/tmp/results'}"
 ```
 
+License
+-----------------------------------------
+
+Apache-2.0
+
+
 Reference
 -------
 For detail guides and reference, please visit the <a href="https://ibm.github.io/cloud-i-blog/archivers/2020-09-20-introduce_ansible_for_i_fix_management_function" target="_blank">Fix Management Documentation</a> site.

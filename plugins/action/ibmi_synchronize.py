@@ -6,7 +6,7 @@ __metaclass__ = type
 from ansible import constants as C
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
-__ibmi_module_version__ = "1.7.1"
+__ibmi_module_version__ = "1.8.0"
 display = Display()
 
 
@@ -71,11 +71,6 @@ class ActionModule(ActionBase):
                                                dest_host_inventory_vars.get('ansible_ssh_host'))
                          if hostid is not None]
         _tmp_args['remote_host'] = dest_host
-
-        # Don't support src and dest are the same.
-        if delegate_to in dest_host_ids:
-            result.update(dict(failed=True, stderr="The src host can't be the same as dest host. "))
-            return result
 
         if not remote_user:
             remote_user = task_vars.get('ansible_ssh_user') or self._play_context.remote_user

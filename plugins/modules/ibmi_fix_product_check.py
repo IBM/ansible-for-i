@@ -111,7 +111,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "1.7.1"
+__ibmi_module_version__ = "1.8.0"
 
 
 def get_product_info(imodule, product_id, release_level, product_option, load_id):

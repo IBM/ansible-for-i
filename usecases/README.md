@@ -8,3 +8,8 @@ fix_management directory provides different playbooks to manage IBM i PTF and PT
 security_management directory provides different playbooks for security compliance checking examples.
 
 cicd directory provides an example of CICD process with ansible.
+
+License
+-----------------------------------------
+
+Apache-2.0

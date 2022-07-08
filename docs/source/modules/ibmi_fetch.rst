@@ -92,7 +92,7 @@ is_lib
 
      
 lib_name
-  The library contains the objects. If is_lib is ``Ture``, lib_name means the library name.
+  The library contains the objects. If is_lib is ``True``, lib_name means the library name.
 
 
   | **required**: True

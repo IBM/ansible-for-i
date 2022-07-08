@@ -33,7 +33,7 @@ options:
   lib_name:
     description:
       - The library contains the objects.
-        If is_lib is C(Ture), lib_name means the library name.
+        If is_lib is C(True), lib_name means the library name.
     type: str
     required: yes
   object_types:

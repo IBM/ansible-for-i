@@ -35,3 +35,11 @@ Playbooks
 4. build.yml - invoke CL command or script to do build on build machine.
 5. post_build_actions.yml - actions you may want to do after building completes, like verification, UT, FVT, etc.
 6. cleanup.yml - cleanup local workspace, remote building directories, libraries, destroy compute instance on demand.
+
+
+
+License
+
+**--------------**
+
+Apache-2.0
