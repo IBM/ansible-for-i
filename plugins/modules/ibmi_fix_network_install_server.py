@@ -101,7 +101,7 @@ options:
     type: str
 
 notes:
-   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+   - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3
    - If operation is setup_only or setup_and_addimgclge, the user who this task will run under, should be enrolled in system distribution directorty
    - Issue ADDDIRE command to add the user to the system distribution directory entry
    - Issue WRKDIRE command to check the current system distribution directory entries
@@ -1216,13 +1216,13 @@ def main():
         catalog_directory_length = info_return['Catalog_Directory_Length']
         current_image_directory_hex = (info_return['Directory'])[0: int(catalog_directory_length) * 2]
         current_image_directory = binascii.a2b_hex(current_image_directory_hex).decode("utf-16")
-        if(current_image_directory.strip('/').upper() != image_catalog_directory.strip('/').upper()):
+        if (current_image_directory.strip('/').upper() != image_catalog_directory.strip('/').upper()):
             module.fail_json(msg="Incorrect image_catalog_directory_name input: " + image_catalog_directory)
 
         # do not check device name if the device name is blank
         # Because the device is not loaded to the image catalog
         current_device_name = (info_return['Virtual_Device_Name']).strip()
-        if((current_device_name != "") and (current_device_name.upper() != device_name.strip().upper())):
+        if ((current_device_name != "") and (current_device_name.upper() != device_name.strip().upper())):
             module.fail_json(msg="Incorrect device_name input: " + device_name)
 
     if operation == 'setup_only':

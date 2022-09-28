@@ -1,9 +1,19 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # This playbook will copy PTF Group files on Ansible server to repo server, and create dir on repo server named after the ptf group
+
+# Parameters:
+  # repo_system -- The IBM i/Linux server stores PTFs and PTF groups.   
+  # ptf_group_number -- Specifies the PTF Group number which needs to be copied to repo server.   
+  # ptf_group_level -- Specifies the PTF Group level.   
+  # file_path_dir -- The directory of PTF Group files on repo server.   
+
+# Command example: 
+  # ansible-playbook ./copy_ptf_group_to_repo.yml -e "{'repo_server': 'systemB', 'ptf_group_number': 'SF99740', 'ptf_group_level': '12', 'file_path_dir': '/tmp/2343456'"
 ---
 - name: Copy ptf group files from Ansible server to repo server
-# This playbook will copy ptf group files on Ansible server to repo server, and create dir on repo server named after the ptf group
-
-# Command example: ansible-playbook /copy_ptf_group_to_repo.yml -e "{'repo_server': 'systemB', 'ptf_group_number': 'SF99740', 'ptf_group_level': '12',
-# 'file_path_dir': '/tmp/2343456'"
   hosts: '{{ repo_server }}'
   gather_facts: false
   collections:

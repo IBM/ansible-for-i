@@ -1,8 +1,18 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # This playbook will copy individual ptf files on Ansible server to repo server, and create dir on repo server named after the ptf
+
+# Parameters:
+  # repo_server -- The IBM i/Linux server stores PTFs and PTF groups.
+  # ptf_number -- Specifies the PTF number which needs to be copied to repo server.
+  # file_path_dir -- The directory of PTF files on repo server.
+
+# Command example: 
+  # ansible-playbook /copy_individual_ptf_to_repo.yml -e "{'repo_server': 'systemB', 'ptf_number': 'SI63556', 'file_path_dir': '/tmp/SI63556'}"
 ---
 - name: Copy individual ptf files from Ansible server to repo server
-# This playbook will copy individual ptf files on Ansible server to repo server, and create dir on repo server named after the ptf
-
-# Command example: ansible-playbook /copy_individual_ptf_to_repo.yml -e "{'repo_server': 'systemB', 'ptf_number': 'SI63556', 'file_path_dir': '/tmp/SI63556'}"
   hosts: '{{ repo_server }}'
   gather_facts: false
   collections:

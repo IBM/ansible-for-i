@@ -1,19 +1,32 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # This playbook is used for 1st level solution. It will get the individual ptfs' information in catalog. Then call check_ptf role
+  # to check which ptfs are not already applied or loaded on the target syste. Then call sync_apply_individual_ptfs_lv1 role to transfer
+  # the unloaded or unapplied ptfs to the target system. Then load and apply.
+
+# Parameters:
+  # repo_server -- The IBM i/Linux server stores PTFs and PTF groups. 
+  # target_system -- The target IBM i server that receives and applies the PTFs.
+  # ptfs_list -- Specifies the PTFs' list.
+  # delete -- Specifies whether or not to delete the file install dir on target server after apply. The default value is true.
+  # image_root -- Specifies the image files' dir on the repo_server. This should be the root dir of all the image files.
+  # apply_all_loaded_ptfs -- Controls whether all loaded ptf will be applied. The default value is true.
+  # temp_or_perm -- Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.
+  # delayed_option -- Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'. 
+  # auto_ipl -- Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. The default value is false.
+
+# Output:
+  # all_ptf_status -- All input ptf's status
+  # apply_fail_list -- Apply failed ptf list
+  # apply_success_list -- Apply successful ptf list
+  # not_in_catalog -- The list of ptfs which information is not in the catalog
+
+# Command example: 
+  # ansible-playbook ./sync_apply_individual_ptfs_lv1.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB', 'image_root': '/home/test/PTF', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': true, 'temp_or_perm': '*TEMP', 'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
 ---
 - name: Sync and apply a list of individual ptfs
-# This playbook is used for 1st level solution. It will get the individual ptfs' information in catalog. Then call check_ptf role
-# to check which ptfs are not already applied or loaded on the target syste. Then call sync_apply_individual_ptfs_lv1 role to transfer
-# the unloaded or unapplied ptfs to the target system. Then load and apply.
-
-# Command example: ansible-playbook ./sync_apply_individual_ptfs_lv1.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
-# 'image_root': '/home/test/PTF', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': true, 'temp_or_perm': '*TEMP',
-# 'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
-# The 'delete' parameter specifies whether or not to delete the PTF install savf on target server after apply. The default value is true.
-# The 'image_root' parameter specifies the image files' dir on the repo_server.
-# The output final_result, which includes:
-# all_ptf_status: all input ptf's status,
-# apply_fail_list: apply failed ptf list
-# apply_success_list: apply successful ptf list
-# not_in_catalog: the list of ptfs which information are not in the catalog
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:

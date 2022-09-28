@@ -61,15 +61,18 @@ These playbooks focus on security compliance checks. Right now, they are just si
 # Usage
 
 **---------------------**
+For all the securoity check, you can use main.yml:
+ansible-playbook ./main.yml -e "{'target_system': 'IBMi_ToBe_checked'}"
 
-ansible-playbook ./main.yml
+For individual security check, you can directly run specific playbook, for example:
+ansible-playbook ./manage_system_values.yml -e "{'target_system': 'IBMi_ToBe_checked'}"
 
-
-
-Note: to turn off displaying skipped task/host entries in a task in the default callback, you can run "ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ansible-playbook ./main.yml" instead.
+Note: 
+- To turn off displaying skipped task/host entries in a task in the default callback, you can run "ANSIBLE_DISPLAY_SKIPPED_HOSTS=false ansible-playbook ./main.yml" instead.
+- If doesn't specify 'target_system', the default host value is 'all'.
 
 
 # License
-**---------------------**
 
+**---------------------**
 Apache-2.0

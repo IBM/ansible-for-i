@@ -1,11 +1,16 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-# ibmi_fix_product_compare.yml
-# The sample file is to provide an example about how to compare the single ptf by product between repo server and IBM i.
+# Description:
+  # The sample file is to provide an example about how to compare the single ptf by product between repo server and IBM i.
 
-# Command example: ansible-playbook ./ibmi_fix_group_compare.yml -e "{'product': '5770SS1', 'repo_server': 'reposerver', 'target_system':'target'}"
+# Parameters:
+  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
+  # target_system -- The target IBM i server which needs to be compared with repo server.
+  # product -- Specifies the PTFs' product which needs to be compared.
 
+# Command example: 
+  # ansible-playbook ./ibmi_fix_product_compare.yml -e "{'product': '5770SS1', 'repo_server': 'reposerver', 'target_system':'target'}"
 ---
 - hosts: '{{ target_system }}'
   gather_facts: false

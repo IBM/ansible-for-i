@@ -1,11 +1,16 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-# check_ptf_group_order_status.yml
-# The playbook is to provide an example about how to check PTF group order status since the downloading may take several minutes to hours depends on the
-# size of the package and the network condition. Waiting until the downloading completes may not always be a wise option. This playbook can be used as a
-# scheduler job in your system, check the downloading status and update them as needed.
-# command example: ansible-playbook ./check_ptf_group_order_status.yml -e "{'repo_server': 'reposerver'}"
+# Description:
+  # The playbook is to provide an example about how to check PTF group order status since the downloading may take several minutes to hours depends on the
+  # size of the package and the network condition. Waiting until the downloading completes may not always be a wise option. This playbook can be used as a
+  # scheduler job in your system, check the downloading status and update them as needed.
+
+# Parameters:
+  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
+  
+# Command example: 
+  # ansible-playbook ./check_ptf_group_order_status.yml -e "{'repo_server': 'reposerver'}"
 ---
 - hosts: "{{ repo_server }}"
   gather_facts: false

@@ -1,11 +1,22 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # This playbook will get the PTF group information in catalog. Then call sync_apply_ptf_group role to transfer the PTF group files
+  # to the target system, and apply.
+
+# Parameters:
+  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
+  # target_system -- The target IBM i server that receives and applies the PTF group.
+  # ptf_group -- The information of the PTF groups to be synced and applied on the target. ptf_group_number and ptf_group_level are required. 
+  # delete -- Specifies whether or not to delete the file install dir on target server after apply. The default value is true.
+  # ptf_omit_list -- The list of PTFs which will be omitted. The elements of the list are dict. The key of the dict should be the product ID of the fix that is omitted.
+
+# Command example: 
+  # ansible-playbook ./sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group':
+  # {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
 ---
 - name: Transfer a PTF group files from repo server to target system, and apply
-# This playbook will get the PTF group information in catalog. Then call sync_apply_ptf_group role to transfer the PTF group files
-# to the target system. Then apply.
-
-# Command example: ansible-playbook ./sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group':
-# {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
-# The 'delete' parameter specifies whether or not to delete the file install dir on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:

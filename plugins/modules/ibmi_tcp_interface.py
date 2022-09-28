@@ -564,7 +564,7 @@ def main():
             ibmi_util.log_info(
                 f"Interface status is {current_interface_status} in first retrieving", module._name)
             wait_for_starting_timeout = 120
-            while((current_interface_status == 'STARTING') and (wait_for_starting_timeout > 0)):
+            while ((current_interface_status == 'STARTING') and (wait_for_starting_timeout > 0)):
                 ibmi_util.log_info(
                     f"Interface status is {current_interface_status}, timeout is {wait_for_starting_timeout}", module._name)
                 time.sleep(5)

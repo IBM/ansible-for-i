@@ -1,8 +1,24 @@
 ---
+- set_fact:
+    sysval_vrm: {}
+
+- name: Compose sysval with VRM
+  set_fact:
+    sysval_vrm: "{{ { 'name': sysval.name, 'expect': sysval.get('expect_' + os400_ver), 'check': sysval.check } }}"
+  when: level_mode == '3' and sysval.name in ['QPWDRULES', 'QSSLCSL', 'QSSLCSLCTL', 'QSSLPCL']
+
+- set_fact:
+    sysvalreal: "{{ sysval_vrm }}"
+  when: sysval_vrm != {}
+
+- set_fact:
+    sysvalreal: "{{ sysval }}"
+  when: sysval_vrm == {}
+
 - name: Checking system value {{ sysval.name }}
   ibmi_sysval:
     sysvalue:
-      - "{{ sysval }}"
+      - "{{ sysvalreal }}"
     become_user: "{{ become_user_name }}"
     become_user_password: "{{ become_user_password }}"
   register: check
