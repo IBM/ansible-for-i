@@ -41,6 +41,18 @@
     name: check_ptf
   vars:
     check_ptf_list: "{{ final_find_result.success_list }}"
+  when: final_find_result.success_list is defined
+
+- block:
+    - name: Print final_ptfs_status
+      debug:
+        var: final_ptfs_status
+
+    - name: fail
+      fail:
+        msg: "repo server doesn't have the necessary PTF install files, see previous log. Quit."
+
+  when: final_find_result.success_list is not defined
 
 - name: compose final_ptfs_status download fail list
   set_fact:
@@ -66,14 +78,13 @@
       when: temp_or_perm != '*PERM'
 
     - block:
-        - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply
+        - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply when temp_or_perm == '*PERM'
           include_role:
             name: sync_apply_individual_ptfs
           vars:
             not_loaded_list: "{{ not_loaded_ptfs_list + temporarily_applied_list }}"
             src_host: "{{ repo_server }}"
             already_loaded_list: "{{ loaded_ptfs_list }}"
-            # temp_or_perm: "{{ temp_or_perm }}"
           when: not_loaded_ptfs_list != [] or loaded_ptfs_list != []
 
         - name: call ibmi_cl_command to install the temporarily applied PTFs

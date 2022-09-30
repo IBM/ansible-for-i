@@ -1,12 +1,16 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-# ibmi_fix_group_compare.yml
-# The sample file is to provide an example about how to compare the ptf groups between repo server and IBM i.
+# Description:
+  # The sample file is to provide an example about how to compare the ptf groups between repo server and IBM i.
 
-# Command example: ansible-playbook ./ibmi_fix_group_compare.yml -e
-# "{'group_list':['SF99xxx','SF99yyy'], 'target_system': 'target', 'repo_server': 'reposerver'}"
+# Parameters:
+  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
+  # target_system -- The target IBM i server which needs to be compared with repo server.
+  # group_list -- The PTF group list
 
+# Command example: 
+  # ansible-playbook ./ibmi_fix_group_compare.yml -e "{'group_list':['SF99xxx','SF99yyy'], 'target_system': 'target', 'repo_server': 'reposerver'}"
 ---
 - hosts: '{{ target_system }}'
   gather_facts: false

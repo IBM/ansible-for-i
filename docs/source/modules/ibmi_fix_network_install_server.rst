@@ -192,7 +192,7 @@ Notes
 -----
 
 .. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3
 
    If operation is setup_only or setup_and_addimgclge, the user who this task will run under, should be enrolled in system distribution directorty
 

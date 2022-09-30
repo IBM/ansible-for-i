@@ -42,7 +42,7 @@
             - set_fact:
                 skip_list: "{{ skip_list + [ check_item.name ] }}"
           when: user_choice_mode != 'Y'
-      when: check_item.name != "QLMTDEVSSN" and check_item.name != "QAUTOVRT" and check_item.name != "QSYSLIBL" and check_item.name != "QUSEADPAUT"
+      when: check_item.name != "QLMTDEVSSN" and check_item.name != "QAUTOVRT" and check_item.name != "QSYSLIBL" and check_item.name != "QUSEADPAUT" and check_item.name != "QAUTOCFG" and check_item.name != "QPWDRQDDIF"
 
     - block:
         - pause:
@@ -94,6 +94,10 @@
             prompt: |
               QLMTDEVSSN specifies if users can have concurrent device sessions.
               How many concurrent device sessions do you want to have in the system?
+              For Level 1, the suggestied value can be a non-zero number between 1-9.
+              For Level 2 and Level 3, the suggestied value is 1.
+              QLMTDEVSSN's current value: {{ check_item.actual }}
+              Do you want to change system value {{ check_item.name }} on {{ ansible_ssh_host }}?
               Input a number between 1-9. Leave blank and press Enter to skip.
           register: QLMTDEVSSN_USER
         - block:
@@ -187,7 +191,7 @@
                 msg: "User cancelled"
             - set_fact:
                 skip_list: "{{ skip_list + [ 'QUSEADPAUT' ] }}"
-          when: QUSEADPAUT_USER_mode == 'N'
+          when: QUSEADPAUT_USER_mode == 'N' or QUSEADPAUT_USER_mode | length == 0 
       when: check_item.name == "QUSEADPAUT"
 
     - block:
@@ -236,6 +240,95 @@
                 msg: "User cancelled"
             - set_fact:
                 skip_list: "{{ skip_list + [ 'QSYSLIBL' ] }}"
-          when: QSYSLIBL_USER_mode == 'N'
+          when: QSYSLIBL_USER_mode == 'N' or QSYSLIBL_USER_mode | length == 0
       when: check_item.name == "QSYSLIBL"
+
+    - block:
+        - pause:
+            prompt: |
+              In order to make sure that the IBM i stock images can be successfully deployed, QAUTOCFG could not be 
+              changed to the recommended value during the deployment. The customer can change it after deployment.
+              Do you still want to change system value QAUTOCFG on {{ ansible_ssh_host }} (Y/N)?
+              Expected value: {{ check_item.expect }} | Actual value: {{ check_item.actual }}
+          register: QAUTOCFG_choice
+
+        - set_fact:
+            QAUTOCFG_choice_mode: '{{ QAUTOCFG_choice.user_input | upper | trim }}'
+
+        - block:
+            - name: Remediating {{ check_item.name }} on {{ ansible_ssh_host }}
+              ibmi_cl_command:
+                cmd: CHGSYSVAL SYSVAL({{ check_item.name }}) VALUE('{{ check_item.expect }}')
+                become_user: "{{ become_user_name }}"
+                become_user_password: "{{ become_user_password }}"
+              register: remediate
+              ignore_errors: true
+
+            - block:
+                - debug:
+                    msg: |
+                      {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
+                - set_fact:
+                    success_list: "{{ success_list + [ check_item.name ] }}"
+              when: remediate.rc == 0
+            - block:
+                - debug:
+                    msg: |
+                      {{ check_item.name }} Remediation failed.
+                - set_fact:
+                    fail_list: "{{ fail_list + [ check_item.name ] }}"
+              when: remediate.rc != 0
+          when: QAUTOCFG_choice_mode == 'Y'
+        - block:
+            - debug:
+                msg: "User cancelled"
+            - set_fact:
+                skip_list: "{{ skip_list + [ check_item.name ] }}"
+          when: QAUTOCFG_choice_mode != 'N' or QAUTOCFG_choice_mode | length == 0
+      when: check_item.name == "QAUTOCFG"
+
+    - block:
+        - pause:
+            prompt: |
+              In order to make sure that the IBM i stock images can be successfully deployed, QPWDRQDDIF could not be 
+              changed to the recommended value during the deployment. The customer can change it after deployment.
+              Do you still want to change system value QPWDRQDDIF on {{ ansible_ssh_host }} (Y/N)?
+              Expected value: {{ check_item.expect }} | Actual value: {{ check_item.actual }}
+          register: QPWDRQDDIF_choice
+
+        - set_fact:
+            QPWDRQDDIF_choice_mode: '{{ QPWDRQDDIF_choice.user_input | upper | trim }}'
+
+        - block:
+            - name: Remediating {{ check_item.name }} on {{ ansible_ssh_host }}
+              ibmi_cl_command:
+                cmd: CHGSYSVAL SYSVAL({{ check_item.name }}) VALUE('{{ check_item.expect }}')
+                become_user: "{{ become_user_name }}"
+                become_user_password: "{{ become_user_password }}"
+              register: remediate
+              ignore_errors: true
+
+            - block:
+                - debug:
+                    msg: |
+                      {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
+                - set_fact:
+                    success_list: "{{ success_list + [ check_item.name ] }}"
+              when: remediate.rc == 0
+            - block:
+                - debug:
+                    msg: |
+                      {{ check_item.name }} Remediation failed.
+                - set_fact:
+                    fail_list: "{{ fail_list + [ check_item.name ] }}"
+              when: remediate.rc != 0
+          when: QPWDRQDDIF_choice_mode == 'Y'
+        - block:
+            - debug:
+                msg: "User cancelled"
+            - set_fact:
+                skip_list: "{{ skip_list + [ check_item.name ] }}"
+          when: QPWDRQDDIF_choice_mode != 'N' or QPWDRQDDIF_choice_mode | length == 0
+      when: check_item.name == "QPWDRQDDIF"
+
   when: not compliant

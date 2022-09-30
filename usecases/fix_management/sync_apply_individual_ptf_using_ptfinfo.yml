@@ -1,12 +1,20 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # This playbook will transfer the ptf files to the target system, and apply ptf.
+  # Before use this playbook, make sure you have used the copy_individual_ptf_to_repo.yml to transfer files to repo server, then the ptf dir on repo server should be formatted as ~/PTF/ptf_number.
+
+# Parameters:
+  # repo_server -- The IBM i/Linux server stores PTFs and PTF groups. 
+  # target_system -- The target IBM i server that receives and applies the PTFs.
+  # ptf_number -- Specifies the PTF number which needs to be applied on target IBM i system.
+  # delete -- Specifies whether or not to delete the file install dir on target server after apply. The default value is true.
+
+# Command example: 
+  # ansible-playbook ./sync_apply_individual_ptf_using_ptfinfo.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB','ptf_number': 'SI69385', 'delete': true}"
 ---
 - name: Sync and apply ptf files
-# This playbook will transfer the ptf files to the target system. Then apply ptf.
-# Before use this playbook, make sure you have used the copy_individual_ptf_to_repo.yml to transfer files to repo server, then the ptf dir
-# on repo server should be formatted as ~/PTF/ptf_number.
-
-# Command example: ansible-playbook /sync_apply_individual_ptf_using_ptfinfo.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
-# 'ptf_number': 'SI69385', 'delete': true}"
-# The 'delete' parameter specifies whether or not to delete the file install dir on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:

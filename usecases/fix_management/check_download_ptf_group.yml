@@ -1,10 +1,19 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # This playbook is used for 2st level solution. It will get the latest PTF group information from the IBM PSP website, 
+  # and check if the latest PTF group already in the repository server. If not, download the latest PTF group and write 
+  # download information into the download_status table and part of the PTF group information into the ptf_group_image_info table in the PTF database.
+
+# Parameters:
+  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.  
+  # ptf_group -- The PTF group number which will be checked and downloaded.
+
+# Command example: 
+  # ansible-playbook ./check_download_ptf_group.yml -e "{'repo_server': 'reposerver', 'ptf_group': 'SF99663'}"
 ---
 - name: Get the latest PTF group information from PSP website, and download ptf group
-# This playbook will get the latest PTF group information from IBM PSP website, and check if the latest PTF group already in repo
-# server. If not, download the latest PTF group, add download record to download_status table and add PTF group information to ptf_group_image_info table.
-
-# Command example: ansible-playbook ./check_download_ptf_group.yml -e "{'repo_server': 'reposerver', 'ptf_group': 'SF99663'}"
-
   hosts: "{{ repo_server }}"
   gather_facts: false
   collections:

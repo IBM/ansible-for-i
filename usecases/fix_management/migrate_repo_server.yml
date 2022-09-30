@@ -1,17 +1,25 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # The IBM i system where the repo server is located should be at the higest OS level. 
+  # This playbook is used for 2st level solution. It will package the repo server DB and files, then tranfer them to another IBM i system. 
+  # Then setup the new repository enviornment.
+
+# Parameters:
+  # original_system -- Specifies the original repo server.
+  # target_system -- Specifies the new IBM i system which you want to migrate the repo server to.
+  # original_dir -- Specifies the repo.sqlite3 DB dir on the original IBM i system, the default value is /etc/ibmi_ansible/fix_management.
+  # target_dir -- Specifies the repo.sqlite3 DB dir on the target IBM i system, the default value is /etc/ibmi_ansible/fix_management.
+
+# Notes:
+  # The PTF Group image files dir on the target IBM i system must be the same as the original one, '/QIBM/UserData/OS/Service/ECS/PTF'. This playbook will not migrate the individual 
+  # PTF savfs under QGPL libary, since such files will be auto downloaded again when you use it.
+
+# Command example: 
+  # ansible-playbook ./migrate_repo_server.yml -e "{'target_system': 'systemA', 'original_system': 'systemB', 'repo_dir': '/etc/ibmi_ansible/fix_management', 'target_dir': '/etc/ibmi_ansible/fix_management'}"
 ---
 - name: Migrate repository server to another IBM i system 
-# The IBM i system where the repo server is located should be at the higest OS level. 
-# This playbook is used for 2st level solution. It will package the repo server DB and files, then tranfer them to another IBM i system. 
-# Then setup the new repository enviornment.
-
-# Command example: ansible-playbook ./migrate_repo_server.yml -e "{'target_system': 'systemA', 'original_system': 'systemB', 
-# 'repo_dir': '/etc/ibmi_ansible/fix_management', 'target_dir': '/etc/ibmi_ansible/fix_management'}"
-# The 'original_system' parameter specifies the original repo server.
-# The 'target_system' parameter specifies the new IBM i system which you want to migrate the repo server to.
-# The 'original_dir' parameter specifies the repo.sqlite3 DB dir on the original IBM i system, the default value is /etc/ibmi_ansible/fix_management.
-# The 'target_dir' parameter specifies the repo.sqlite3 DB dir on the target IBM i system, the default value is /etc/ibmi_ansible/fix_management.
-# Notes: The PTF Group image files dir on the target IBM i system must be the same as the original one, '/QIBM/UserData/OS/Service/ECS/PTF'. This playbook will not migrate the individual 
-# PTF savfs under QGPL libary, since such files will be auto downloaded again when you use it.
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:

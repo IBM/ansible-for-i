@@ -1,13 +1,27 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # This playbook will get the individual ptfs' information in catalog. Then call check_ptf role to check which ptfs are not already
+  # applied or loaded on the target syste. Then call sync_apply_individual_ptfs role to transfer the unloaded or unapplied ptfs to
+  # the target system. Then load and apply.
+
+# Parameters:
+  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
+  # target_system -- The target IBM i server that receives and applies the PTFs.
+  # ptfs_list -- The list of PTFs to be processed.
+  # delete -- Specifies whether or not to delete the file install dir on target server after apply. The default value is true.
+  # apply_all_loaded_ptfs -- Used by apply_ptf role. Controls whether all loaded ptf will be applied. When the value is true, 'to_be_applied_list' will be ignored. The default value is True.
+  # temp_or_perm -- Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.
+  # delayed_option -- Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'. 
+  # auto_ipl -- Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. The default value is false.
+
+# Command example: 
+  # ansible-playbook ./sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB', 
+  #  'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP',
+  # 'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
 ---
 - name: Sync and apply a list of individual ptfs
-# This playbook will get the individual ptfs' information in catalog. Then call check_ptf role to check which ptfs are not already
-# applied or loaded on the target syste. Then call sync_apply_individual_ptfs role to transfer the unloaded or unapplied ptfs to
-# the target system. Then load and apply.
-
-# Command example: ansible-playbook /sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
-# 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP',
-# 'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
-# The 'delete' parameter specifies whether or not to delete the PTF install savf on target server after apply. The default value is true.
   hosts: '{{ target_system }}'
   gather_facts: false
   collections:

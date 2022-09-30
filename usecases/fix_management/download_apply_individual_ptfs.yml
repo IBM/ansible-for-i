@@ -1,10 +1,18 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # This playbook will Check if requested individual PTFs are already in catalog. If not, will download non-existent PTFs and write
+  # information into catalog. After that, will transfer savfs to target server, then load and apply PTFs.
+
+# Parameters:
+  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
+  # target_system -- The target IBM i server that receives and applies the PTFs.
+  # ptfs_list -- The PTF number list which needs to be applied. 
+  
+# Command example: ansible-playbook ./download_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
 ---
 - name: Download and apply a list of individual ptfs
-# This playbook will Check if requested individual PTFs are already in catalog. If not, will download non-existent PTFs and write
-# information into catalog. After that, will transfer savfs to target server, then load and apply PTFs.
-
-# Command example: ansible-playbook /download_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver',
-# 'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
   hosts: "{{ target_system }}"
   gather_facts: false
   collections:

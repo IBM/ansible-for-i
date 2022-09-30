@@ -1,9 +1,18 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+
+# Description:
+  # This playbook will call fix_repo_extract_ptf_group_info role to extract PTF group information and write into catalog
+
+# Parameters:
+  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
+  # order_id -- order_id returned from the ibmi_download_fix module.
+
+# Command example: 
+  # ansible-playbook ./extract_ptf_group_info.yml -e "{'repo_server': 'reposerver', 'order_id': '2025910369', 'database': '/ansible/repo.sqlite3'}"
 ---
 - name: Extract PTF group information and write into catalog
-# This playbook will call fix_repo_extract_ptf_group_info role to extract PTF group information and write into catalog
-
-# Command example: ansible-playbook ./extract_ptf_group_info.yml -e "{'order_id': '2025910369'}"
-  hosts: reposerver
+  hosts: "{{ repo_server }}"
   gather_facts: false
   collections:
     - ibm.power_ibmi
