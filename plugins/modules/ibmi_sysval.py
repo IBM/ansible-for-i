@@ -27,8 +27,8 @@ options:
     description:
       - Specifies the input system values. The detail explanations of the elements in the dict are as follows
       - C(name) is the name of the system value. (required)
-      - C(expect) is the expected returned value. (optional)
-      - C(check) is the comparison method, including C(equal) and C(equal_as_list). The default value is C(equal) (optional)
+      - C(expect) is the expected returned value. If it is a number, the system value will be converted to a number brfore comparison. (optional)
+      - C(check) is the comparison method, including C(equal), C(range) and C(equal_as_list). The default value is C(equal). (optional)
     type: list
     elements: dict
     required: yes
@@ -55,7 +55,8 @@ EXAMPLES = r'''
 - name: Get System Value information
   ibmi_ibm.power_ibmi.ibmi_sysval:
     sysvalue:
-      - {'name':'qmaxsgnacn', 'expect':'3'}
+      - {'name':'qmaxsgnacn', 'expect':3}
+      - {'name':'qmaxsgnacn', 'expect':'000003'}
       - {'name':'qccsid'}
     become_user: 'USER1'
     become_user_password: 'yourpassword'
@@ -67,6 +68,12 @@ EXAMPLES = r'''
       - {'name':'QATNPGM', 'expect':'QSYS  QEZMAIN'}
       - {'name':'QATNPGM', 'expect':'QEZMAIN  QSYS', 'check':'equal_as_list'}
       - {'name':'QATNPGM', 'expect':'QSYS QEZMAIN', 'check':'equal_as_list'}
+
+- name: Check if the returned system values are in a range
+  ibmi_ibm.power_ibmi.ibmi_sysval:
+    sysvalue:
+      - {'name':'qmaxsgnacn', 'expect':'[1,8)', 'check':'range'}
+      - {'name':'qccsid', 'expect':'[0,65535]', 'check':'range'}
 '''
 
 RETURN = r'''
@@ -222,14 +229,80 @@ sysval_array = [
 
 def chk_system_value(current, expect, check='equal'):
     if check == 'equal':
-        if current == expect:
+        if isinstance(expect, float):
+            try:
+                current_float = float(current)
+                if current_float == expect:
+                    return True
+            except ValueError:
+                return False
+        elif isinstance(expect, int):
+            try:
+                current_int = int(current)
+                if current_int == expect:
+                    return True
+            except ValueError:
+                return False
+        elif current == expect:
             return True
         return False
     elif check == 'equal_as_list':
         if [i for i in current.split() if i not in expect.split()] == []:
             return True
         return False
+    elif check == 'range':
+        result = False
+        current_float = None
+        try:
+            current_float = float(current)
+        except ValueError:
+            try:
+                current_float = float(int(current))
+            except ValueError:
+                return False
+            return False
+        inc_min, range_min, range_max, inc_max = get_range_value(expect)
+        if range_min is not None and isinstance(range_min, float):
+            if inc_min is True:
+                result = current_float >= range_min
+            else:
+                result = current_float > range_min
+        if result is True and range_max is not None and isinstance(range_max, float):
+            if inc_max is True:
+                result = current_float <= range_max
+            else:
+                result = current_float < range_max
+        return result
     return True
+
+
+def get_range_value(expect):
+    expect = expect.strip()
+    inc_min = False
+    range_min = None
+    range_max = None
+    inc_max = False
+    if expect.startswith('[') or expect.startswith('('):
+        if expect.startswith('['):
+            inc_min = True
+        if expect.endswith(']') or expect.endswith(')'):
+            if expect.endswith(']'):
+                inc_max = True
+            range = expect[1:-1].split(',', 2)
+            if isinstance(range, list) and len(range) == 2:
+                range_min = range[0].strip()
+                range_max = range[1].strip()
+                if range_min != '':
+                    try:
+                        range_min = float(range_min)
+                    except ValueError:
+                        range_min = None
+                if range_max != '':
+                    try:
+                        range_max = float(range_max)
+                    except ValueError:
+                        range_max = None
+    return inc_min, range_min, range_max, inc_max
 
 
 def get_system_value(imodule, sysvaluename, expect=None, check='equal'):

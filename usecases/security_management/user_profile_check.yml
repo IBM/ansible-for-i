@@ -32,7 +32,7 @@
           QDBSHR QDBSHRDO QTMPLPD'}
         - {'key': 'result', 'value': 'FAIL'}
         - {'key': 'vulnerables', 'value': '{{ check31_failed_items }}'}
-        - {'key': 'remediation', 'value': 'GRTOBJAUT OBJ(SYSO_NAME_REPLACE)
+        - {'key': 'remediation', 'value': 'GRTOBJAUT OBJ(SYS_ONAME_REPLACE)
           OBJTYPE(*USRPRF) USER(*PUBLIC) AUT(*EXCLUDE) REPLACE(*YES)'}
   when: check31.row_count != 0
 
@@ -83,7 +83,7 @@
         - {'key': 'result', 'value': 'FAIL'}
         - {'key': 'vulnerables', 'value': '{{ check32_failed_items }}'}
         - {'key': 'failed_by', 'value': '{{ check32_failed_by }}'}
-        - {'key': 'remediation', 'value': 'RVKOBJAUT OBJ(SYSO_NAME_REPLACE)
+        - {'key': 'remediation', 'value': 'RVKOBJAUT OBJ(SYS_ONAME_REPLACE)
             OBJTYPE(*USRPRF) USER(USER_NAME_REPLACE) AUT(*ALL)'}
   when: check32.row_count != 0
 

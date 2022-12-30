@@ -63,9 +63,9 @@ sysvalue
 
   ``name`` is the name of the system value. (required)
 
-  ``expect`` is the expected returned value. (optional)
+  ``expect`` is the expected returned value. If it is a number, the system value will be converted to a number brfore comparison. (optional)
 
-  ``check`` is the comparison method, including ``equal`` and ``equal_as_list``. The default value is ``equal`` (optional)
+  ``check`` is the comparison method, including ``equal``, ``range`` and ``equal_as_list``. The default value is ``equal``. (optional)
 
 
   | **required**: True
@@ -84,7 +84,8 @@ Examples
    - name: Get System Value information
      ibmi_ibm.power_ibmi.ibmi_sysval:
        sysvalue:
-         - {'name':'qmaxsgnacn', 'expect':'3'}
+         - {'name':'qmaxsgnacn', 'expect':3}
+         - {'name':'qmaxsgnacn', 'expect':'000003'}
          - {'name':'qccsid'}
        become_user: 'USER1'
        become_user_password: 'yourpassword'
@@ -96,6 +97,12 @@ Examples
          - {'name':'QATNPGM', 'expect':'QSYS  QEZMAIN'}
          - {'name':'QATNPGM', 'expect':'QEZMAIN  QSYS', 'check':'equal_as_list'}
          - {'name':'QATNPGM', 'expect':'QSYS QEZMAIN', 'check':'equal_as_list'}
+
+   - name: Check if the returned system values are in a range
+     ibmi_ibm.power_ibmi.ibmi_sysval:
+       sysvalue:
+         - {'name':'qmaxsgnacn', 'expect':'[1,8)', 'check':'range'}
+         - {'name':'qccsid', 'expect':'[0,65535]', 'check':'range'}
 
 
 
