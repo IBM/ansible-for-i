@@ -1,36 +1,73 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="ibmi_sqlite3 – Executes a SQL statement via sqlite3" href="ibmi_sqlite3.html" />
     <link rel="prev" title="ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement" href="ibmi_sql_execute.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../index.html" class="icon icon-home"> IBM power_ibmi collection
+          
+
+          
           </a>
+
+          
+            
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -38,7 +75,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing IBM i collection to Ansible server</a></li>
@@ -126,35 +174,81 @@
 </li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">IBM power_ibmi collection</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../modules.html">Modules</a> &raquo;</li>
+        
       <li>ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement.</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
+            
               <!-- User defined GitHub URL -->
               <a href="https://github.com/IBM/ansible-for-i/tree/devel/plugins/modules/ibmi_sql_query.py" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <section id="ibmi-sql-query-executes-a-sql-dql-data-query-language-statement">
-<span id="ibmi-sql-query-module"></span><h1>ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement.<a class="headerlink" href="#ibmi-sql-query-executes-a-sql-dql-data-query-language-statement" title="Permalink to this heading"></a></h1>
-<div class="contents local topic" id="contents">
+<span id="ibmi-sql-query-module"></span><h1>ibmi_sql_query – Executes a SQL DQL(Data Query Language) statement.<a class="headerlink" href="#ibmi-sql-query-executes-a-sql-dql-data-query-language-statement" title="Permalink to this heading">¶</a></h1>
+<nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
 <li><p><a class="reference internal" href="#parameters" id="id2">Parameters</a></p></li>
@@ -163,15 +257,15 @@
 <li><p><a class="reference internal" href="#see-also" id="id5">See Also</a></p></li>
 <li><p><a class="reference internal" href="#return-values" id="id6">Return Values</a></p></li>
 </ul>
-</div>
+</nav>
 <section id="synopsis">
-<h2><a class="toc-backref" href="#id1">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_sql_query</span></code> module takes the SQL DQL(Data Query Language) statement as argument.</p></li>
 </ul>
 </section>
 <section id="parameters">
-<h2><a class="toc-backref" href="#id2">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this heading">¶</a></h2>
 <dl>
 <dt>become_user</dt><dd><p>The name of the user profile that the IBM i task will run under.</p>
 <p>Use this option to set a user with desired privileges to run the task.</p>
@@ -225,7 +319,7 @@
 </dl>
 </section>
 <section id="examples">
-<h2><a class="toc-backref" href="#id3">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Query the data of table Persons.</span><span class="w"></span>
 <span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_sql_query</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">sql</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;select</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">Persons&#39;</span><span class="w"></span>
@@ -235,14 +329,14 @@
 </div>
 </section>
 <section id="notes">
-<h2><a class="toc-backref" href="#id4">Notes</a><a class="headerlink" href="#notes" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Notes</a><a class="headerlink" href="#notes" title="Permalink to this heading">¶</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This module can only run one statement at a time.</p>
 </div>
 </section>
 <section id="see-also">
-<h2><a class="toc-backref" href="#id5">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this heading">¶</a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -251,7 +345,7 @@
 </div>
 </section>
 <section id="return-values">
-<h2><a class="toc-backref" href="#id6">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this heading">¶</a></h2>
 <blockquote>
 <div><dl>
 <dt>start</dt><dd><div class="line-block">
@@ -386,30 +480,42 @@
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="ibmi_sql_execute.html" class="btn btn-neutral float-left" title="ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="ibmi_sqlite3.html" class="btn btn-neutral float-right" title="ibmi_sqlite3 – Executes a SQL statement via sqlite3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ibmi_sql_execute.html" class="btn btn-neutral float-left" title="ibmi_sql_execute – Executes a SQL non-DQL(Data Query Language) statement" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, IBM.</p>
-  </div>
+    <p>
+        &#169; Copyright 2020, IBM.
 
-   
+    </p>
+  </div> 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
