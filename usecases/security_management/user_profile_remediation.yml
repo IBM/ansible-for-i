@@ -43,7 +43,7 @@
         - block:
             - name: Start remediating {{ id }} base on user input
               ibmi_cl_command:
-                cmd: "{{ remediation | replace('SYSO_NAME_REPLACE', item) }}"
+                cmd: "{{ remediation | replace('SYS_ONAME_REPLACE', item) }}"
                 become_user: '{{ become_user_name }}'
                 become_user_password: '{{ become_user_password }}'
               with_items: "{{ user_choice_mode.split(',') }}"
@@ -58,7 +58,7 @@
         - block:
             - name: Start remediating all vulnerables of {{ id }}
               ibmi_cl_command:
-                cmd: "{{ remediation | replace('SYSO_NAME_REPLACE', item) }}"
+                cmd: "{{ remediation | replace('SYS_ONAME_REPLACE', item) }}"
                 become_user: '{{ become_user_name }}'
                 become_user_password: '{{ become_user_password }}'
               with_items: "{{ vulnerables.split(',') }}"
@@ -70,7 +70,7 @@
               set_fact:
                 fail_list: "{{ fail_list + [ id ] }}"
           when: user_choice_mode | length > 0 and user_choice_mode == 'A'
-      when: '"SYSO_NAME_REPLACE" in remediation and id != "3.2"'
+      when: '"SYS_ONAME_REPLACE" in remediation and id != "3.2"'
 
     - block:
         - block:
@@ -114,7 +114,7 @@
         - block:
             - name: Start remediating all vulnerables of {{ id }}
               ibmi_cl_command:
-                cmd: "{{ remediation | replace('SYSO_NAME_REPLACE', item.0) | replace('USER_NAME_REPLACE', item.1) }}"
+                cmd: "{{ remediation | replace('SYS_ONAME_REPLACE', item.0) | replace('USER_NAME_REPLACE', item.1) }}"
                 become_user: '{{ become_user_name }}'
                 become_user_password: '{{ become_user_password }}'
               with_together:

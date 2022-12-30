@@ -123,7 +123,7 @@ import json
 import os
 import pwd
 
-__ibmi_module_version__ = "BUILDDATE_REPLACE"
+__ibmi_module_version__ = "1.9.1"
 
 
 def main():
