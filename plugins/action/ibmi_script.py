@@ -12,7 +12,7 @@ from ansible.module_utils.six import string_types
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
-__ibmi_module_version__ = "0.0.1"
+__ibmi_module_version__ = "1.9.1"
 display = Display()
 
 
