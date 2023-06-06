@@ -107,6 +107,7 @@ __ibmi_module_version__ = "1.9.1"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"
+HTTP_AGENT = "ansible/ibm.power_ibmi"
 
 
 # url: https://www.ibm.com/support/pages/node/6211843
@@ -122,7 +123,7 @@ def get_group_info_from_web(groups, validate_certs, timeout):
     )
     response = ''
     try:
-        response = urls.open_url(ALL_GROUP_PAGE, validate_certs=validate_certs, timeout=timeout)
+        response = urls.open_url(ALL_GROUP_PAGE, validate_certs=validate_certs, timeout=timeout, http_agent=HTTP_AGENT)
     except Exception as e:
         return [dict(
                 url=ALL_GROUP_PAGE,
@@ -163,7 +164,7 @@ def get_ptf_list_from_web(url, validate_certs, timeout):
     pattern_packid = r'PACKAGE ID:.+?(?P<packid>[A-Z]\d{7})'
     response = ''
     try:
-        response = urls.open_url(url, validate_certs=validate_certs, timeout=timeout)
+        response = urls.open_url(url, validate_certs=validate_certs, timeout=timeout, http_agent=HTTP_AGENT)
     except Exception as e:
         return [dict(
                 url=url,
@@ -200,7 +201,7 @@ def get_cum_ptf_list_from_web(pack_id, validate_certs, timeout):
     response = ''
     url = 'https://www.ibm.com/support/pages/uid/nas4' + pack_id
     try:
-        response = urls.open_url(url, validate_certs=validate_certs, timeout=timeout)
+        response = urls.open_url(url, validate_certs=validate_certs, timeout=timeout, http_agent=HTTP_AGENT)
     except Exception as e:
         return [dict(
                 url=url,
@@ -251,6 +252,9 @@ def main():
     result.update({'start': str(startd)})
     result.update({'end': str(endd)})
     result.update({'elapsed_time': str(delta)})
+    result.update({'validate_certs': validate_certs})
+    result.update({'timeout': timeout})
+    result.update({'http_agent': HTTP_AGENT})
 
     module.exit_json(**result)
 
