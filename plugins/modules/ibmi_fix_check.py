@@ -133,10 +133,10 @@ import re
 __ibmi_module_version__ = "1.9.1"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
-ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"
+ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/ibm-i-group-ptfs-level"
 
 
-# url: https://www.ibm.com/support/pages/node/6211843
+# url: https://www.ibm.com/support/pages/ibm-i-group-ptfs-level
 # group: 'SF99738'
 def get_group_info_from_web(groups, certs, timeout):
     pattern_link = re.compile(

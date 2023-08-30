@@ -14,7 +14,7 @@
   - debug:
       msg: "{{os400_ver}}"  
   - set_fact:  # pre-define some ptfs/groups for each os version to test
-               # IBM i Group PTFs with level --> https://www.ibm.com/support/pages/node/6211843
+               # IBM i Group PTFs with level --> https://www.ibm.com/support/pages/ibm-i-group-ptfs-level
       ptfs: ['SI69340', 'SI71891', 'SI69764']
       ptf_grps: ['SF99667']  # group 1, group 2( with different levels) , group 3 - cum
     when: os400_ver == "V7R4M0"
