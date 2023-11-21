@@ -1,7 +1,7 @@
 ---
 # Retrive vm info from OpenStack
 - name: Retrive vm info
-  os_server_info:
+  openstack.cloud.server_info:
     auth:
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
       username: '{{ ansible_ssh_user }}'

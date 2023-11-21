@@ -130,7 +130,7 @@ except ImportError:
     HAS_ITOOLKIT = False
 
 
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = ""
 
 
 def getNonconfigureDisk(imodule, time):

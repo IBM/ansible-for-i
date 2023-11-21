@@ -135,7 +135,9 @@
   ibmi_module_authority_check:
     modulea:
   register: module_result
-  failed_when: "'Unsupported parameters' not in module_result.msg"
+  failed_when:
+    - "'Unsupported parameters' not in module_result.msg"
+    - "'missing required arguments' not in module_result.msg"
 
 - name: TB03 invalid module 
   ibmi_module_authority_check:

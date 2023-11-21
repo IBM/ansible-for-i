@@ -1,20 +1,20 @@
-- name: find the line description name
-  set_fact:
+- name: Find the line description name
+  ansible.builtin.set_fact:
     find_lind: false
 
-- name: find the line description name
-  set_fact:
+- name: Find the line description name
+  ansible.builtin.set_fact:
     lind: "{{ lind_line.split(' ')[1] }}"
     find_lind: true
   when: "'*LIN' in lind_line"
 
-- name: display line description
+- name: Display line description
   ibm.power_ibmi.ibmi_cl_command:
     cmd: dsplind {{ lind }}
   register: lind_details
   when: find_lind
 
-- name: check if resource name exists
-  set_fact:
+- name: Check if resource name exists
+  ansible.builtin.set_fact:
     line_description: '{{ lind }}'
   when: find_lind and resource_name in lind_details.stdout

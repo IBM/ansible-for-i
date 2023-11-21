@@ -248,5 +248,3 @@
     - name: delete script local
       command: "rm -rf /tmp/testhost/tmp/at.txt"
       delegate_to: localhost
-
-

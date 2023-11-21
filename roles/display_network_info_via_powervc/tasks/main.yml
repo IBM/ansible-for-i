@@ -1,5 +1,5 @@
 - name: Gather information about a previously created network by name
-  os_port_info:
+  openstack.cloud.port_info:
     auth:
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
       username: '{{ ansible_ssh_user }}'
@@ -13,7 +13,7 @@
   register: port_info
 
 - name: Gather information about a previously created subnet by name
-  os_subnets_info:
+  openstack.cloud.subnets_info:
     auth:
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
       username: '{{ ansible_ssh_user }}'
@@ -29,7 +29,7 @@
     loop_var: fixed_ip
 
 - name: Compose interface_info
-  set_fact:
+  ansible.builtin.set_fact:
     interface_info: >
       {'fixed_ips': '{{ port_info.openstack_ports[0].fixed_ips }}', \
       'mac_addr': "{{ mac_addr }}", \

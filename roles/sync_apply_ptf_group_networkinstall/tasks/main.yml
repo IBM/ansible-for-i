@@ -1,5 +1,5 @@
 ---
-# role for sync_apply_ptf_group_networkinstall
+# Role for sync_apply_ptf_group_networkinstall
 # This role will setup network install env on repo server and use network install mechanism to install the PTF group on target system.
 - name: Setup network install repo server env
   ibm.power_ibmi.ibmi_fix_network_install_server:
@@ -9,7 +9,7 @@
   register: network_install_server_setuponly_result
 
 - name: Print network_install_server_setuponly_result
-  debug:
+  ansible.builtin.debug:
     var: network_install_server_setuponly_result
 
 - name: Add image files to network install env
@@ -22,7 +22,7 @@
   register: network_install_server_rmadd_result
 
 - name: Print network_install_server_rmadd_result
-  debug:
+  ansible.builtin.debug:
     var: network_install_server_rmadd_result
 
 - name: Using network install mechanism to install the PTF group on target system
@@ -35,11 +35,12 @@
   ignore_errors: true
 
 - name: Print network_install_client_result
-  debug:
+  ansible.builtin.debug:
     var: network_install_client_result
 
-- block:
-    - name: Debug msg
-      fail:
-        msg: "Failed to insgtall PTF group, see previous joblog for details."
+- name: Failure handling
   when: network_install_client_result.rc != 0
+  block:
+    - name: Debug msg
+      ansible.builtin.fail:
+        msg: "Failed to insgtall PTF group, see previous joblog for details."

@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sysval
 short_description: Displays the specified system value
-version_added: '1.0.1'
+version_added: '1.1.0'
 description:
   - The C(ibmi_sysval) module displays the information of the specified system value.
   - Type of requisite values meaning refer to https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_74/apis/qwcrsval.htm
@@ -169,7 +169,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = ""
 
 
 sysval_array = [

@@ -11,7 +11,7 @@
 
 # New vm info from OpenStack
 - name: Deploy a new VM
-  os_server:
+  openstack.cloud.server:
     auth:
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
       username: '{{ ansible_ssh_user }}'

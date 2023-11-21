@@ -17,7 +17,7 @@ ibmi_host_server_service -- Manage host server
 Synopsis
 --------
 - Manage and query IBM i host server service.
-- For non-IBM i targets, use the \ :strong:`ERROR while parsing`\ : While parsing "M(service)" at index 32: Module name "service" is not a FQCN\  module instead.
+- For non-IBM i targets, use the \ :ref:`ansible.builtin.service <ansible_collections.ansible.builtin.service_module>`\  module instead.
 
 
 

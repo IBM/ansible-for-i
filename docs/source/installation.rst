@@ -28,9 +28,9 @@ There are two options to install IBM i collection for Ansible:
 Requirements
 ------------
 
-In order to use this Ansible collection, you must have the following pre-requisite software installed and available on your Ansible server:
+In order to use this Ansible collection at **release 2.0.0** and beyond, you must have the following pre-requisite software installed and available on your Ansible server:
 
-**Python v3.6+**
+**Python v3.9+**
 
     Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc).
     If you install Python from the package manager for your operating system, you must also install the development libraries (usually a package named ``python3-devel``), as these are required when installing modules through ``pip``.
@@ -38,13 +38,65 @@ In order to use this Ansible collection, you must have the following pre-requisi
     - The official Python website: https://www.python.org/downloads/
     - The unofficial Python version manager: https://github.com/pyenv/pyenv
 
-**Ansible v2.9+**
+**Ansible v2.14+**
 
     Ansible can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc). You can also install it using ``pip``, the package manager for Python:
 
     ::
 
         pip3 install ansible
+
+Requirements for IBM i Ansible Server
+-------------------------------------
+
+For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps can be used to install Ansible with pip.
+
+1. There are some necessary open source packages that must be installed with yum (if not already present):
+
+    ::
+
+        yum install git
+        yum install python39-cryptography
+        yum install python39-paramiko
+        yum install pase-utf8-locale
+        yum install sshpass   # allows specifying ssh password if desired
+
+2. Configure ~/.profile for language environment variables (verify with ''locale'' command) such as:
+
+    ::
+
+        export LANG=en_US.UTF-8
+        export LC_ALL=en_US.UTF-8
+
+3. Install Ansible. Either full ansible (a) or ansible-core (b).
+
+   a. Install Ansible at 7.X (v2.14 core) or 8.X level (v2.15 core) with pip (skip step 3b). For example, to install level 8.1 that includes v2.15.6 ansible-core use the following:
+
+      ::
+
+          python3 -m pip install --user ansible==8.1
+
+   b. Alternatively ansible-core may be installed instead of full ansible, but some additional ibmi dependent collections may need to be installed via ansible-galaxy. For example, to install ansible core v2.15.1 use the following command:
+
+      ::
+
+          python3 -m pip install --user ansible-core==2.15.1
+
+4. Add the following path to ~/.profile for the ansible executables:
+
+   ::
+
+       export PATH=~/.local/bin:$PATH
+
+5. Ensure dependent collections are installed if only using ansible-core. Perform the following collection install commands if ''ansible-galaxy collection list'' doesn't show these collections. 
+
+   ::
+
+       ansible-galaxy collection install community.general 
+
+       ansible-galaxy collection install openstack.cloud
+
+       ansible-galaxy collection install ansible.posix
 
 Installing using Ansible Galaxy
 -------------------------------

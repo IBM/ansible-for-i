@@ -20,7 +20,7 @@ short_description: Manage tcp server
 version_added: '1.0.0'
 description:
   - Manage and query IBMi tcp server service.
-  - For non-IBMi targets, use the M(service) module instead.
+  - For non-IBMi targets, use the M(ansible.builtin.service) module instead.
 options:
   name_list:
     description:
@@ -158,7 +158,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = ""
 IBMi_STRSVR = "QSYS/STRTCPSVR"
 IBMi_ENDSVR = "QSYS/ENDTCPSVR"
 IBMi_TCP_SERVER_LIST = ["*ALL", "*AUTOSTART", "*BOOTP", "*DBG", "*DDM", "*DHCP", "*DIRSRV", "*DLFM", "*DNS",

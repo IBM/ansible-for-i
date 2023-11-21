@@ -1,54 +1,53 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-#ibmi-fix-repo-sample.yml 
-#The sample file is to provide an example about how to manipulate the PTF database
+# ibmi-fix-check.yml
+# Provide examples on the use of ibmi_fix_check
 ---
-- hosts: all
+- name: Example playbook on the use of ibmi_fix_check
+  hosts: all
   gather_facts: false
-  collections:
-   - ibm.power_ibmi
 
   tasks:
-    - name: query_two_ptf
-      ibmi_fix_check:
+    - name: Task query_two_ptf
+      ibm.power_ibmi.ibmi_fix_check:
         ptfs:
           - "SI71691"
           - "SI74112"
       register: two_ptf
-      
-    - name: display_two_ptf
-      debug: 
+
+    - name: Task display_two_ptf
+      ansible.builtin.debug:
         msg: "{{ two_ptf }}"
 
-    - name: deep_search_ptf
-      ibmi_fix_check:
+    - name: Task deep_search_ptf
+      ibm.power_ibmi.ibmi_fix_check:
         ptfs:
           - "SI63115"
         expanded_requisites: true
       register: deep_search_ptf
-      
-    - name: display_deep_search_ptf
-      debug: 
+
+    - name: Task display_deep_search_ptf
+      ansible.builtin.debug:
         msg: "{{ deep_search_ptf }}"
 
-    - name: query_a_single_group
-      ibmi_fix_check:
+    - name: Task query_a_single_group
+      ibm.power_ibmi.ibmi_fix_check:
         groups:
           - "SF99713"
       register: single_group
 
-    - name: display_a_single_group
-      debug:
+    - name: Task display_a_single_group
+      ansible.builtin.debug:
         msg: "{{ single_group }}"
 
-    - name: query_a_group_and_a_cum
-      ibmi_fix_check:
+    - name: Task query_a_group_and_a_cum
+      ibm.power_ibmi.ibmi_fix_check:
         groups:
           - "SF99738"
           - "SF99740"
       register: a_group_and_a_cum
 
-    - name: display_a_group_and_a_cum
-      debug:
+    - name: Task display_a_group_and_a_cum
+      ansible.builtin.debug:
         msg: "{{ a_group_and_a_cum }}"

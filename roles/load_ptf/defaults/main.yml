@@ -1,3 +1,3 @@
 ---
-# defaults value for load_ptf
+# Default values for load_ptf
 remote_lib: 'QGPL'

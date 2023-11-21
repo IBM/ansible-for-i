@@ -1,5 +1,5 @@
 - name: Change VM state
-  os_server_action:
+  openstack.cloud.server_action:
     action: '{{ vm_action }}'
     auth:
       auth_url: https://{{ ansible_ssh_host }}:5000/v3

@@ -27,4 +27,3 @@
   include_role:
     name: fix_repo_download_add_ptf_group
   ignore_errors: true
-

@@ -1,29 +1,29 @@
 ---
-# tasks file for check_ptfs_by_product
-- name: fail the playbook if repo_server is invalid
-  fail:
+# Tasks file for check_ptfs_by_product
+- name: Fail the playbook if repo_server is invalid
+  ansible.builtin.fail:
     msg: "repository server is not provided, please provide the repository server."
   when: not repo_server or repo_server is undefined
 
-- name: fail the playbook if product is invalid
-  fail:
+- name: Fail the playbook if product is invalid
+  ansible.builtin.fail:
     msg: "product is not provided, please provide the product id."
   when: not product or product is undefined
 
-- name: initialize ptf_status
-  set_fact:
+- name: Initialize ptf_status
+  ansible.builtin.set_fact:
     ptf_status: []
 
-- name: query system release
+- name: Query system release
   ibm.power_ibmi.ibmi_sql_query:
     sql: "SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO"
   register: result
 
-- name: compose parameter release
-  set_fact:
+- name: Compose parameter release
+  ansible.builtin.set_fact:
     release: "{{ 'V' + result['row'][0]['OS_VERSION'] + 'R' + result['row'][0]['OS_RELEASE'] + 'M0' }}"
 
-- name: retrieve the PTF list by product from repository server
+- name: Retrieve the PTF list by product from repository server
   ibm.power_ibmi.ibmi_fix_repo:
     action: "find"
     type: "single_ptf"
@@ -32,14 +32,14 @@
   delegate_to: "{{ repo_server }}"
   register: product_info
 
-- name: got record failed from repository server
-  set_fact:
-    ptf_status: "{{ ptf_status|default([]) + [{ 'PRODUCT': prod.product, 'PRODUCT_STATUS': 'Record not found in repository DB' }] }}"
+- name: Got record failed from repository server
+  ansible.builtin.set_fact:
+    ptf_status: "{{ ptf_status | default([]) + [{ 'PRODUCT': prod.product, 'PRODUCT_STATUS': 'Record not found in repository DB' }] }}"
   when: product_info.get('fail_list')
   with_list: "{{ product_info.fail_list }}"
   loop_control:
     loop_var: prod
 
-- name: compare the ptfs on target system
-  include_tasks: compare_ptf.yml
+- name: Compare the ptfs on target system
+  ansible.builtin.include_tasks: compare_ptf.yml
   when: product_info.get('success_list')

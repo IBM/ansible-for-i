@@ -53,7 +53,7 @@
       operation: 'create'
       user: "{{ibmi_user}}"
       special_authority: '*NONE'
-      password: "{{ibmi_pass}}"
+      password: '"{{ibmi_pass}}"'
       user_class: '*USER'
     register: crtusrprf
     failed_when: crtusrprf.rc != 0
@@ -374,7 +374,7 @@
       release: "{{os400_ver}}"
       wait: true
       become_user: "{{superuser}}"
-      become_user_password: "{{ibmi_pass}}"
+      become_user_password: '"{{ibmi_pass}}"'
     register: dl_single_ptf_result
     failed_when: dl_single_ptf_result.rc != 0
 
@@ -384,7 +384,7 @@
       delivery_format: "*IMAGE"
       release: "*ONLYRLS"
       become_user: "{{superuser}}"
-      become_user_password: "{{ibmi_pass}}"
+      become_user_password: '"{{ibmi_pass}}"'
     register: dl_ptf_grp_result
     failed_when: dl_ptf_grp_result.rc != 0
 
@@ -517,7 +517,7 @@
       ptf_id: "{{ptfs[0]}}"
       release: "{{os400_ver}}"
       become_user: "{{ibmi_user}}"
-      become_user_password: "{{ibmi_pass}}"
+      become_user_password: '"{{ibmi_pass}}"'
     register: dl_single_ptf_result
     failed_when: dl_single_ptf_result.rc == 0
 
@@ -531,7 +531,7 @@
       ptf_id: "{{ptf_grps[0]}}"
       release: "{{os400_ver}}"
       become_user: "{{ibmi_user}}"
-      become_user_password: "{{ibmi_pass}}"
+      become_user_password: '"{{ibmi_pass}}"'
     register: dl_ptf_grp_result
     failed_when: dl_ptf_grp_result.rc == 0
 

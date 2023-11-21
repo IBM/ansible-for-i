@@ -16,7 +16,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = ""
 
 ifs_dir = '/tmp/.ansible'
 display = Display()
@@ -101,6 +101,7 @@ class ActionModule(ActionBase):
         result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
 
+        ifs_created = False
         try:
             result = dict(
                 msg="",
@@ -121,7 +122,6 @@ class ActionModule(ActionBase):
             created = False
             is_savf = False
             savf = ''
-            ifs_created = False
             backup = False
             is_lib = False
             force_save = False

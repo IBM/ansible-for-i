@@ -2,18 +2,23 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0
 ---
 - name: Check whether yum has been installed. If not, install it in following tasks.
-  raw: ls -l /QOpensys/pkgs/bin/yum
+  ansible.builtin.raw: ls -l /QOpensys/pkgs/bin/yum
   args:
     executable: /qopensys/usr/bin/qsh
   register: default_yum_existance
   ignore_errors: true
-  
-- block: 
-    - fail: 
+  changed_when: false
+
+- name: Create installation script
+  when: default_yum_existance.rc != 0
+  block:
+    - name: Need package path or fail
+      ansible.builtin.fail:
         msg: "package_path is not provided, please provide the directory path where the installation packages locate at"
       when: package_path == ""
 
-    - include: transfer_files.yml
+    - name: Transfer files
+      ansible.builtin.include_tasks: transfer_files.yml
       loop: '{{ yum_packages }}'
       loop_control:
         loop_var: package
@@ -21,31 +26,33 @@
         target_path: /tmp
 
     - name: Create the installation script on IBM i
-      raw: "rm -rf /tmp/bootstrap.sql && /usr/bin/touch -C 819 /tmp/bootstrap.sql"
+      ansible.builtin.raw: "rm -rf /tmp/bootstrap.sql && /usr/bin/touch -C 819 /tmp/bootstrap.sql"
       args:
         executable: /qopensys/usr/bin/qsh
+      changed_when: true
 
     - name: Clear old package
-      raw: "rm -rf /QOpenSys/var/lib/rpm"
+      ansible.builtin.raw: "rm -rf /QOpenSys/var/lib/rpm"
       args:
-        executable: /qopensys/usr/bin/qsh 
+        executable: /qopensys/usr/bin/qsh
+      changed_when: true
 
     - name: Write the content to the installation script on IBM i
-      raw: "echo \"
+      ansible.builtin.raw: "echo \"
     CL:QSH CMD('/usr/bin/touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstrap.sh > /tmp/bootstrap.log 2>&1');
     \" >> /tmp/bootstrap.sql"
       args:
         executable: /qopensys/usr/bin/qsh
+      changed_when: true
 
     - name: Run the installation script to install yum
-      raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
+      ansible.builtin.raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
       args:
         executable: /qopensys/usr/bin/qsh
       register: output_of_runsqlstm
       failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
+      changed_when: "'QSH0005' in output_of_runsqlstm.stdout"
 
-    - name: set yum_installed to true
-      set_fact:
+    - name: Set yum_installed to true
+      ansible.builtin.set_fact:
         yum_installed: true
-
-  when: default_yum_existance.rc != 0

@@ -47,7 +47,7 @@
         - '"No files were successfully transferred." in result_04.msg'
         - result_04.fail_list | length == 1
         - result_04.fail_list[0]['src'] == "/home/{{ansible_ssh_user}}/sendMsg1.c"
-        - result_04.fail_list[0]['fail_reason'] == "src /home/{{ansible_ssh_user}}/sendMsg1.c doesn't exist."
+        - "'[Errno 2] No such file or directory' in result_04.fail_list[0]['fail_reason']"
         - result_04.fail_list[0]['dest'] == "/home/{{ansible_ssh_user}}/"
 
   - name: TC05 - switch to a common user to do sync
@@ -102,7 +102,7 @@
   - name: TC05 - assert fail reason
     assert:
       that:
-        - result_05.fail_list | selectattr('fail_reason', 'match', '^[Errno 13] Permission denied.$')
+        - result_05.fail_list | selectattr('fail_reason', 'match', '^\[Errno 13\] Permission denied')
 
   - name: TC05 - switch back to super user
     set_fact:
@@ -136,8 +136,8 @@
   - name: TC07 - Assert return values
     assert:
       that:
-        - '"[Errno 2] No such file or directory:" in result_07.stderr'
-        - result_07.fail_list == []
+        - '"[Errno 2] No such file or directory" in result_07.stderr'
+        - '"[Errno 2] No such file or directory" in result_07.fail_list[0].fail_reason'
         - result_07.success_list == []
 
   always:

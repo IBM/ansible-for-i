@@ -1,5 +1,5 @@
 ---
-# tasks file for load_individual_ptf
+# Tasks file for load_individual_ptf
 - name: Involve ibm.power_ibmi.ibmi_fix to load ptfs
   ibm.power_ibmi.ibmi_fix:
     product_id: "{{ load_ptf.product }}"
@@ -10,23 +10,24 @@
   ignore_errors: true
   register: load_result
 
-# - debug:
+# - name:
+#   ansible.builtin.debug:
 #     var: load_result
 
-- name: log success in result
-  set_fact:
+- name: Log success in result
+  ansible.builtin.set_fact:
     load_success_list: "{{ load_success_list|default([]) + [ load_ptf ] }}"
   when: load_result.failed == 0
 
-- name: log load_fail_dict in load_fail_list
-  set_fact:
+- name: Log load_fail_dict in load_fail_list
+  ansible.builtin.set_fact:
     # load_fail_dict: "{{ load_fail_dict | default({}) | combine({ load_ptf.ptf_id: 'LOAD_FAIL' }) }}"
     load_fail_dict: "{{ load_fail_dict | default({}) | combine(load_result.load_fail_dict) }}"
     load_fail_list: "{{ load_fail_list | default([]) + [ load_ptf ] }}"
   when: load_result.failed != 0
 
-# - name: log fail dict in result
-#   include_tasks: log_load_fail_info.yml
+# - name: Log fail dict in result
+#   ansible.builtin.include_tasks: log_load_fail_info.yml
 #   loop: "{{ load_result.job_log }}"
 #   loop_control:
 #     loop_var: job_log_var

@@ -1,42 +1,41 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
-#ibmi-fix-repo-sample.yml 
-#The sample file is to provide an example about how to manipulate the PTF database
+# ibmi-fix-group-check.yml
+# Provide examples on how to use ibmi_fix_group_check
 ---
-- hosts: all
+- name: Example playbook on using ibmi_fix_group_check
+  hosts: all
   gather_facts: false
-  collections:
-   - ibm.power_ibmi
 
   tasks:
-    - name: query_invalid_groups
-      ibmi_fix_group_check:
+    - name: Task query_invalid_groups
+      ibm.power_ibmi.ibmi_fix_group_check:
         groups:
           - "ABC123456"
       register: invalid_groups
 
-    - name: display_invalid_groups
-      debug:
+    - name: Task display_invalid_groups
+      ansible.builtin.debug:
         msg: "{{ invalid_groups }}"
 
-    - name: query_a_single_group
-      ibmi_fix_group_check:
+    - name: Task query_a_single_group
+      ibm.power_ibmi.ibmi_fix_group_check:
         groups:
           - "SF99713"
       register: single_group
 
-    - name: display_a_single_group
-      debug:
+    - name: Task display_a_single_group
+      ansible.builtin.debug:
         msg: "{{ single_group }}"
 
-    - name: query_a_group_and_a_cum
-      ibmi_fix_group_check:
+    - name: Task query_a_group_and_a_cum
+      ibm.power_ibmi.ibmi_fix_group_check:
         groups:
           - "SF99738"
           - "SF99740"
       register: a_group_and_a_cum
 
-    - name: display_a_group_and_a_cum
-      debug:
+    - name: Task display_a_group_and_a_cum
+      ansible.builtin.debug:
         msg: "{{ a_group_and_a_cum }}"

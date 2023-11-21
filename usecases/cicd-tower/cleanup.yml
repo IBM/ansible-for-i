@@ -34,7 +34,7 @@
               no_log: true
 
             - name: Destroy VM when provision
-              os_server:
+              openstack.cloud.server:
                 auth:
                   auth_url: https://{{ powervc_host }}:5000/v3
                   username: '{{ powervc_admin }}'

@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 
 display = Display()
 
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = ""
 
 
 class TimedOutException(Exception):

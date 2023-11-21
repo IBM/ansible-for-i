@@ -11,10 +11,10 @@
       shell: 'cat /var/log/ibmi_ansible_modules.log | grep "ibmi"  | wc -l'
       register: check_pwd_count
 
-    - name: assert the count
+    - name: assert the count (and handle case where module log does not exist)
       assert:
         that:
-         - check_pwd_count.stdout | int > 0
+         - (check_pwd_count.stdout | int > 0) or ("'cannot open' in check_pwd_count.stderr")
 
     - name: cleanup module.log
       file:

@@ -16,7 +16,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_fix_network_install_server
 short_description: Setup IBM i Network install server which contains image files of PTFs, PTF Group and Technology refresh.
-version_added: '1.3.1'
+version_added: '1.4.0'
 description:
      - The C(ibmi_fix) module setup IBM i Network install server which contains images files.
      - Single PTF, PTF group and TR PTF are supported.
@@ -268,7 +268,7 @@ except ImportError:
     HAS_ITOOLKIT = False
 HAS_IBM_DB = True
 
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = ""
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255

@@ -9,7 +9,7 @@ namespace: ibm
 name: power_ibmi
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.9.2
+version: 9.9.9 
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -17,7 +17,8 @@ readme: README.md
 # A list of the collection's content authors. Can be just the name or in the format 'Full Name <email> (url)
 # @nicks:irc/im.site#channel'
 authors:
-  - Chang Le<changle@cn.ibm.com>
+  - Rob Gjertsen <gjertsen@us.ibm.com>
+  - Chang Le <changle@cn.ibm.com>
   - Zhu Lijun <zhuljbj@@cn.ibm.com>
   - Peng Zengyu <pzypeng@cn.ibm.com>
   - Wang Yun <cdlwangy@cn.ibm.com>
@@ -76,6 +77,7 @@ build_ignore:
   - .DS_Store
   - .gitkeep
   - .github
-  - tests
+  - tests/integration
+  - tests/sanity
   - plugins/modules/ibmi_powervc_os_server_capture.py
   - changelogs/.plugin-cache.yaml

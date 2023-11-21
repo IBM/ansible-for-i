@@ -17,7 +17,7 @@ ibmi_tcp_server_service -- Manage tcp server
 Synopsis
 --------
 - Manage and query IBMi tcp server service.
-- For non-IBMi targets, use the \ :strong:`ERROR while parsing`\ : While parsing "M(service)" at index 31: Module name "service" is not a FQCN\  module instead.
+- For non-IBMi targets, use the \ :ref:`ansible.builtin.service <ansible_collections.ansible.builtin.service_module>`\  module instead.
 
 
 

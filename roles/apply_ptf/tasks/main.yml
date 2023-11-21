@@ -1,23 +1,26 @@
 ---
-# tasks file for apply_ptfs
+# Tasks file for apply_ptfs
 - name: Initialize variables
-  set_fact:
+  ansible.builtin.set_fact:
     requisite_list: []
     apply_fail_dict: {}
     apply_fail_with_requisite_list: []
 
-- include: apply_all_loaded_ptfs.yml
+- name: Include tasks from apply_all_loaded_ptfs.yml
+  ansible.builtin.include_tasks: apply_all_loaded_ptfs.yml
   when: apply_all_loaded_ptfs
 
-- block:
+- name: Apply all loaded ptfs
+  when: not apply_all_loaded_ptfs
+  block:
     - name: Initialize variables
-      set_fact:
+      ansible.builtin.set_fact:
         apply_success_list: []
         apply_fail_list: []
         ipl_requested: false
 
     - name: Apply ptfs
-      include_tasks: apply_individual_ptf.yml
+      ansible.builtin.include_tasks: apply_individual_ptf.yml
       loop: "{{ to_be_applied_list }}"
       loop_control:
         loop_var: apply_ptf
@@ -28,22 +31,21 @@
       when: auto_ipl and ipl_requested
 
     - name: Print the successfully apply list
-      debug:
+      ansible.builtin.debug:
         var: apply_success_list
 
     - name: Print the fail apply list
-      debug:
+      ansible.builtin.debug:
         var: apply_fail_list
-  when: not apply_all_loaded_ptfs
 
-- name: print apply_fail_with_requisite_list
-  debug:
+- name: Print apply_fail_with_requisite_list
+  ansible.builtin.debug:
     var: apply_fail_with_requisite_list
 
-- name: print apply_fail_dict
-  debug:
+- name: Print apply_fail_dict
+  ansible.builtin.debug:
     var: apply_fail_dict
 
-- name: print requisite_list
-  debug:
+- name: Print requisite_list
+  ansible.builtin.debug:
     var: requisite_list
