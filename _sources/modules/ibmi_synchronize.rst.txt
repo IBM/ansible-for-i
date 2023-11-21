@@ -16,12 +16,12 @@ ibmi_synchronize -- Synchronize a save file from IBM i node A to another IBM i n
 
 Synopsis
 --------
-- The ``ibmi_synchronize`` plugin synchronize a save file from IBM i node A to another IBM i node B.
-- ``ibmi_synchronize`` plugin calls ibmi_sync module.
+- The \ :literal:`ibmi\_synchronize`\  plugin synchronize a save file from IBM i node A to another IBM i node B.
+- \ :literal:`ibmi\_synchronize`\  plugin calls ibmi\_sync module.
 - Only support to synchronize save file by now.
 - For non-IBMi native targets, use the synchronize module instead.
-- delegate_to must be set to IBM i node A, and set hosts to IBM i node B.
-- Be careful to set delegate_to or hosts to node groups. The synchronized data may be overridden.
+- delegate\_to must be set to IBM i node A, and set hosts to IBM i node B.
+- Be careful to set delegate\_to or hosts to node groups. The synchronized data may be overridden.
 
 
 
@@ -60,7 +60,7 @@ private_key
 remote_user
   The user name to connect to the remote IBM i node B.
 
-  If not specify, remote_user will be the ansible_ssh_user of IBM i node B, which stored in ansible inventory.
+  If not specify, remote\_user will be the ansible\_ssh\_user of IBM i node B, which stored in ansible inventory.
 
 
   | **required**: false
@@ -100,13 +100,13 @@ Notes
 -----
 
 .. note::
-   ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under [defaults] section.
+   ansible.cfg needs to specify interpreter\_python=/QOpenSys/pkgs/bin/python3 under [defaults] section.
 
-   delegate_to must be set to IBM i node A.
+   delegate\_to must be set to IBM i node A.
 
    Make sure ssh passwordless login works from IBM i node A to IBM i node B.
 
-   private_key must be a rsa key in the legacy PEM private key format.
+   private\_key must be a rsa key in the legacy PEM private key format.
 
    Doesn't support IASP by now.
 

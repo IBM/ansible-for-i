@@ -16,7 +16,7 @@ ibmi_ethernet_port -- Retrieves all the ethernet ports(both virtual and physical
 
 Synopsis
 --------
-- The ``ibmi_ethernet_port`` module lists the ethernet ports information of the system.
+- The \ :literal:`ibmi\_ethernet\_port`\  module lists the ethernet ports information of the system.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -77,7 +77,7 @@ Notes
 .. note::
    The following PTFs are required for getting the default MAC address of a port, V7R1M0 SI64305, MF63437, MF63430 V7R2M0 SI63691, MF99106 V7R3M0 SI63671, MF99202
 
-   Field Descriptions refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/apis/qgyrhri.htm
+   Field Descriptions refer to https://www.ibm.com/support/knowledgecenter/ssw\_ibm\_i\_74/apis/qgyrhri.htm
 
 
 

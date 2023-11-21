@@ -16,7 +16,7 @@ ibmi_fix -- Install, remove or query an individual fix or a set of fixes on to I
 
 Synopsis
 --------
-- The ``ibmi_fix`` module install fixes to target IBM i system.
+- The \ :literal:`ibmi\_fix`\  module install fixes to target IBM i system.
 - The installation file of the fixes should be in the format of save file.
 - The fixes are normally known as PTFs for IBM i users.
 
@@ -41,7 +41,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -95,11 +95,11 @@ joblog
 operation
   The operation for the fix, the options are as follows
 
-  load_and_apply will load the PTF and apply the PTF
+  load\_and\_apply will load the PTF and apply the PTF
 
-  apply_only will only apply the PTF
+  apply\_only will only apply the PTF
 
-  load_only will only load the PTF by LODPTF
+  load\_only will only load the PTF by LODPTF
 
   remove will remove the PTF
 
@@ -195,7 +195,7 @@ Notes
 -----
 
 .. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+   Ansible hosts file need to specify ansible\_python\_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 
@@ -366,7 +366,7 @@ Return Values
       
                               
        load_fail_dict
-        | The PTF list contains the PTFs which failed to be loaded and the reason. When PTF list which should be loaded is *ALL, the result is empty.
+        | The PTF list contains the PTFs which failed to be loaded and the reason. When PTF list which should be loaded is \*ALL, the result is empty.
       
         | **returned**: When use option apply_only or load_and_apply.
         | **type**: list      

@@ -16,7 +16,7 @@ ibmi_user_and_group -- Create, change or display a user(or group) profile
 
 Synopsis
 --------
-- The ``ibmi_user_and_group`` module can do the user(or group) profile management(create, change, delete and display).
+- The \ :literal:`ibmi\_user\_and\_group`\  module can do the user(or group) profile management(create, change, delete and display).
 - A user profile contain a user's passwords, the list of special authorities assigned to a user, and the objects the user owns.
 - A group profile is a special type of user profile that provides the same authority to a group of users.
 - You create group profiles in the same way that you create individual profiles.
@@ -44,7 +44,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -57,7 +57,7 @@ expire
 
   If the password is set to expired, the user is required to change the password to sign on the system.
 
-  If not specify, ``*NO`` will be used for operation create, ``*SAME`` will be used for operation change.
+  If not specify, \ :literal:`\*NO`\  will be used for operation create, \ :literal:`\*SAME`\  will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -70,7 +70,7 @@ expire
 
      
 joblog
-  If set to ``true``, output the available job log even the rc is 0(success).
+  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
 
 
   | **required**: false
@@ -87,7 +87,7 @@ operation
 
   Operation display to display user(group) profile information.
 
-  Operation display_group_menbers to display the members of a group profile.
+  Operation display\_group\_menbers to display the members of a group profile.
 
 
   | **required**: True
@@ -99,7 +99,7 @@ operation
 owner
   Specifies the user that is to be the owner of objects created by this user.
 
-  If not specify, ``*USRPRF`` will be used for operation create, ``*SAME`` will be used for operation change.
+  If not specify, \ :literal:`\*USRPRF`\  will be used for operation create, \ :literal:`\*SAME`\  will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -120,7 +120,7 @@ parameters
 
   Supported parameters contain ASTLVL, CURLIB, INLPGM, INLMNU, LMTCPB, TEXT, SPCENV, DSPSGNINF, PWDEXPITV, PWDCHGBLK, LCLPWDMGT, LMTDEVSSN, KBDBUF, MAXSTGLRG, MAXSTG, PTYLMT, GRPAUT, GRPAUTTYP, SUPGRPPRF, ACGCDE, DOCPWD, MSGQ, DLVRY, SEV, PRTDEV, OUTQ, ATNPGM, SRTSEQ, LANGID, CNTRYID, CCSID, CHRIDCTL, SETJOBATR, LOCALE, USROPT, UID, GID, HOMEDIR, EIMASSOC, USREXPDATE, USREXPITV, AUT, JOBD when the operation is create or change Or OWNOBJOPT, PGPOPT, EIMASSOC when the operation is delete.
 
-  Refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/crtusrprf.htm. and https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/cl/dltusrprf.htm for detail.
+  Refer to https://www.ibm.com/support/knowledgecenter/ssw\_ibm\_i\_74/cl/crtusrprf.htm. and https://www.ibm.com/support/knowledgecenter/ssw\_ibm\_i\_74/cl/dltusrprf.htm for detail.
 
 
   | **required**: false
@@ -146,7 +146,7 @@ password
 special_authority
   Specifies the special authorities given to a user.
 
-  If not specify, ``*USRCLS`` will be used for operation create, ``*SAME`` will be used for operation change.
+  If not specify, \ :literal:`\*USRCLS`\  will be used for operation create, \ :literal:`\*SAME`\  will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -162,7 +162,7 @@ special_authority
 status
   Specifies the status of the user profile.
 
-  If not specify, ``*ENABLED`` will be used for operation create, ``*SAME`` will be used for operation change.
+  If not specify, \ :literal:`\*ENABLED`\  will be used for operation create, \ :literal:`\*SAME`\  will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -177,7 +177,7 @@ status
 text
   Specifies the text that briefly describes the user or group profile.
 
-  If not specify, 'Create by Ansible' will be used for operation create, ``*SAME`` will be used for operation change.
+  If not specify, 'Create by Ansible' will be used for operation create, \ :literal:`\*SAME`\  will be used for operation change.
 
   Valid only for operation create and change.
 
@@ -204,7 +204,7 @@ user
 user_class
   Specifies the type of user associated with this user profile, security officer, security administrator, programmer, system operator, or user.
 
-  If not specify, ``*USER`` will be used for operation create, ``*SAME`` will be used for operation change.
+  If not specify, \ :literal:`\*USER`\  will be used for operation create, \ :literal:`\*SAME`\  will be used for operation change.
 
   Valid only for operation create and change.
 

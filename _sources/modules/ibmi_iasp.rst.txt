@@ -31,7 +31,7 @@ Parameters
 
      
 asp_type
-  The asp_type of new create iasp.
+  The asp\_type of new create iasp.
 
 
   | **required**: false
@@ -53,7 +53,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -82,7 +82,7 @@ extra_parameters
 
      
 joblog
-  If set to ``true``, append JOBLOG to stderr/stderr_lines.
+  If set to \ :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
 
 
   | **required**: false
@@ -100,11 +100,11 @@ name
 
      
 operation
-  ``create``/``delete``/``add_disks`` are idempotent actions that will not run commands unless necessary.
+  \ :literal:`create`\ /\ :literal:`delete`\ /\ :literal:`add\_disks`\  are idempotent actions that will not run commands unless necessary.
 
-  ``view`` will return the iasp state
+  \ :literal:`view`\  will return the iasp state
 
-  **At least one of operation are required.**
+  \ :strong:`At least one of operation are required.`\ 
 
 
   | **required**: True
@@ -114,7 +114,7 @@ operation
 
      
 primary_asp
-  The primary_asp of new create iasp.
+  The primary\_asp of new create iasp.
 
 
   | **required**: false
@@ -254,7 +254,7 @@ Return Values
       
                               
        asp_info
-        | The asp_info of the identify iasp.
+        | The asp\_info of the identify iasp.
       
         | **returned**: always
         | **type**: list      

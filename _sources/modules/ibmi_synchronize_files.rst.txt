@@ -16,8 +16,8 @@ ibmi_synchronize_files -- Synchronize a list of files from IBM i node A to anoth
 
 Synopsis
 --------
-- The ``ibmi_synchronize_files`` plugin synchronize a list of files from IBM i node A to another IBM i node B.
-- ``ibmi_synchronize_files`` plugin calls ibmi_sync_files module.
+- The \ :literal:`ibmi\_synchronize\_files`\  plugin synchronize a list of files from IBM i node A to another IBM i node B.
+- \ :literal:`ibmi\_synchronize\_files`\  plugin calls ibmi\_sync\_files module.
 - Only supports SAVF(.file) and MBR(only supports "database" subtype Physical files(PF-DTA attribute)) format synchronize between QSYS and QSYS.
 
 
@@ -34,11 +34,11 @@ dest
 
   The path must be absolute.
 
-  If specify, all the src files will be synchronized to the directory that dest speicified. Individual dest key in src_list will be ignored.
+  If specify, all the src files will be synchronized to the directory that dest speicified. Individual dest key in src\_list will be ignored.
 
-  If not specify, individual dest will be the dest value inputted in src_list.
+  If not specify, individual dest will be the dest value inputted in src\_list.
 
-  If both dest and dest key in src_list are not specify, individual dest will be equal to individual src in src_list.
+  If both dest and dest key in src\_list are not specify, individual dest will be equal to individual src in src\_list.
 
   Example '/test/dir/'
 
@@ -63,7 +63,7 @@ private_key
 remote_user
   The user name to connect to the remote IBM i node B.
 
-  If not specify, remote_user will be the ansible_ssh_user of IBM i node B, which stored in ansible inventory.
+  If not specify, remote\_user will be the ansible\_ssh\_user of IBM i node B, which stored in ansible inventory.
 
 
   | **required**: false
@@ -74,7 +74,7 @@ remote_user
 src_list
   src files information list on the source host.
 
-  Evey src_list element should be a dict. dict can contain 'src' and 'dest'. 'dest' is optional.
+  Evey src\_list element should be a dict. dict can contain 'src' and 'dest'. 'dest' is optional.
 
   The src key is the path to the src, and must be absolute.
 
@@ -112,15 +112,15 @@ Notes
 -----
 
 .. note::
-   ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under [defaults] section.
+   ansible.cfg needs to specify interpreter\_python=/QOpenSys/pkgs/bin/python3 under [defaults] section.
 
-   delegate_to must be set to IBM i node A.
+   delegate\_to must be set to IBM i node A.
 
    Need install paramiko package on target IBM i.
 
    Make sure ssh passwordless login works from IBM i node A to IBM i node B.
 
-   private_key must be a rsa key in the legacy PEM private key format.
+   private\_key must be a rsa key in the legacy PEM private key format.
 
    Dependency PTFs 7.2 MF65149 7.3 MF65148
 

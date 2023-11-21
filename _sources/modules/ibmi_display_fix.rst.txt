@@ -16,8 +16,8 @@ ibmi_display_fix -- Displays the PTF(Program Temporary Fix) information and also
 
 Synopsis
 --------
-- The ``ibmi_display_fix`` module displays the information of the PTF and also get the requisite PTFs.
-- Type of requisite values meaning refer to https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/apis/qpzrtvfx.htm#HDRPTFLLH2
+- The \ :literal:`ibmi\_display\_fix`\  module displays the information of the PTF and also get the requisite PTFs.
+- Type of requisite values meaning refer to https://www.ibm.com/support/knowledgecenter/ssw\_ibm\_i\_74/apis/qpzrtvfx.htm#HDRPTFLLH2
 
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -49,7 +49,7 @@ become_user_password
 
      
 joblog
-  If set to ``true``, output the available job log even the rc is 0(success).
+  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
 
 
   | **required**: false
@@ -60,7 +60,7 @@ joblog
 product
   Specifies the product ID for the PTF.
 
-  Value ``'*ONLY'`` means the product ID is not known, but only one PTF exists on the system by this PTF ID.
+  Value \ :literal:`'\*ONLY'`\  means the product ID is not known, but only one PTF exists on the system by this PTF ID.
 
 
   | **required**: false
@@ -81,7 +81,7 @@ ptf
 release
   Specifies the release level of the PTF in one of the following formats, VxRyMz, for example, V7R2M0 is version 7, release 2, modification 0, vvrrmm, this format must be used if the version or release of the product is greater than 9. For example, 110300 is version 11, release 3, modification 0.
 
-  This field is ignored if ``*ONLY`` is specified in the product ID field.
+  This field is ignored if \ :literal:`\*ONLY`\  is specified in the product ID field.
 
 
   | **required**: false

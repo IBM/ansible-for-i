@@ -16,7 +16,7 @@ ibmi_module_config -- Configures managed nodes settings
 
 Synopsis
 --------
-- The ``ibmi_module_config`` module configures the managed nodes settings, like module log settings.
+- The \ :literal:`ibmi\_module\_config`\  module configures the managed nodes settings, like module log settings.
 
 
 
@@ -30,9 +30,9 @@ Parameters
 config_dir
   The configuration file directory.
 
-  When set to ``home``, the configurations takes effect for the current user.
+  When set to \ :literal:`home`\ , the configurations takes effect for the current user.
 
-  When set to ``etc``, the configurations takes effect for all the users.
+  When set to \ :literal:`etc`\ , the configurations takes effect for all the users.
 
 
   | **required**: false
@@ -65,7 +65,7 @@ log_file
 log_level
   The log level setting.
 
-  critical > error > warning > info > debug
+  critical \> error \> warning \> info \> debug
 
   debug, print all the log
 
@@ -96,7 +96,7 @@ max_log_size_mb
 
      
 no_log
-  If set to ``true``, no module log will be written on managed nodes.
+  If set to \ :literal:`true`\ , no module log will be written on managed nodes.
 
 
   | **required**: false
@@ -107,7 +107,7 @@ no_log
 section
   The section to be configured.
 
-  When set to ``dump``, the current configuration will be displayed
+  When set to \ :literal:`dump`\ , the current configuration will be displayed
 
 
   | **required**: True

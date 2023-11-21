@@ -16,7 +16,7 @@ ibmi_sync -- Synchronize a save file from current IBM i node A to another IBM i 
 
 Synopsis
 --------
-- The ``ibmi_sync`` module synchronize a save file from current IBM i node to another IBM i node.
+- The \ :literal:`ibmi\_sync`\  module synchronize a save file from current IBM i node to another IBM i node.
 - Only support to synchronize save file by now.
 - For non-IBMi native targets, use the synchronize module instead.
 
@@ -110,7 +110,7 @@ Notes
 
    Make sure ssh passwordless login works from IBM i node A to IBM i node B.
 
-   private_key must be a rsa key in the legacy PEM private key format.
+   private\_key must be a rsa key in the legacy PEM private key format.
 
    Doesn't support IASP by now.
 
