@@ -16,9 +16,9 @@ ibmi_fix_repo_lv1 -- Manipulate the PTF database via sqlite3
 
 Synopsis
 --------
-- The ``ibmi_fix_repo_lv1`` module manipulate the PTF database via sqlite3.
-- Required dependency is ``SQLite3 >= 3.26``.
-- Install it using ``yum install libsqlite3``
+- The \ :literal:`ibmi\_fix\_repo\_lv1`\  module manipulate the PTF database via sqlite3.
+- Required dependency is \ :literal:`SQLite3 \>= 3.26`\ .
+- Install it using \ :literal:`yum install libsqlite3`\ 
 
 
 
@@ -30,9 +30,9 @@ Parameters
 
      
 action
-  The action the ``ibmi_fix_repo_lv1`` module takes towards the PTF database.
+  The action the \ :literal:`ibmi\_fix\_repo\_lv1`\  module takes towards the PTF database.
 
-  ``refresh``, ``list``, ``find`` or ``clear``.
+  \ :literal:`refresh`\ , \ :literal:`list`\ , \ :literal:`find`\  or \ :literal:`clear`\ .
 
 
   | **required**: True
@@ -79,7 +79,7 @@ fields
 
      
 image_root
-  The image_root of the image files.
+  The image\_root of the image files.
 
 
   | **required**: false

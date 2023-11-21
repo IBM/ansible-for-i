@@ -1,6 +1,7 @@
 sync_apply_ptf_group_networkinstall
 =========
 This role will setup network install env on repo server and use network install mechanism to install the PTF group on the target system.
+*SRVLAN must be configured before use. Please refer to <a href="https://www.ibm.com/docs/en/i/7.5?topic=server-configuring-service-tools-dst" target="_blank">Configuring the service tools server for DST</a>
 
 Role Variables
 --------------

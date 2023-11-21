@@ -68,7 +68,7 @@ Return Values
    
                               
        ansible_facts
-        | ibmi specific facts to add to ansible_facts.
+        | ibmi specific facts to add to ansible\_facts.
       
         | **returned**: always
         | **type**: dict

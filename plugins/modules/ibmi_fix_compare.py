@@ -100,7 +100,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.9.1"
+__ibmi_module_version__ = "1.9.2"
 
 
 def get_ptf_info(db_connection, ptf_list):

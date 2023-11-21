@@ -16,7 +16,7 @@ ibmi_fix_network_install_server -- Setup IBM i Network install server which cont
 
 Synopsis
 --------
-- The ``ibmi_fix`` module setup IBM i Network install server which contains images files.
+- The \ :literal:`ibmi\_fix`\  module setup IBM i Network install server which contains images files.
 - Single PTF, PTF group and TR PTF are supported.
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -92,21 +92,21 @@ joblog
 operation
   The operation on the Network install server, the options are as follows
 
-  setup_only will only setup the network install server, including configuring a virtual optical device and image catalog.
+  setup\_only will only setup the network install server, including configuring a virtual optical device and image catalog.
 
-  setup_and_addimgclge will setup the network install server and add image catalog entries for PTF image files.
+  setup\_and\_addimgclge will setup the network install server and add image catalog entries for PTF image files.
 
-  addimgclge_only will only add image catalog entries for PTF image files.
+  addimgclge\_only will only add image catalog entries for PTF image files.
 
-  rmvimgclge_only will only remove all the image catalog entries for PTF image files.
+  rmvimgclge\_only will only remove all the image catalog entries for PTF image files.
 
-  rmvimgclge_and_addimgclge will first remove all the image catalog entries for existing PTF image files, then add entries for new PTF image files.
+  rmvimgclge\_and\_addimgclge will first remove all the image catalog entries for existing PTF image files, then add entries for new PTF image files.
 
   uninstall will remove the network install server configuration.
 
-  retrieve_image_catalog_entries will retrieve the current image catalog entries.
+  retrieve\_image\_catalog\_entries will retrieve the current image catalog entries.
 
-  restart_NFS_server will restart NFS Server.
+  restart\_NFS\_server will restart NFS Server.
 
 
   | **required**: false
@@ -139,13 +139,13 @@ rollback
 
      
 virtual_image_name_list
-  The name list of the PTF image file and its directory, for example, ``/tmp/5733WQXPTFs/SF99433_1.bin``.
+  The name list of the PTF image file and its directory, for example, \ :literal:`/tmp/5733WQXPTFs/SF99433\_1.bin`\ .
 
-  You can specify all the PTF image files under one directory, for example, ``/tmp/PTFs/*ALL``.
+  You can specify all the PTF image files under one directory, for example, \ :literal:`/tmp/PTFs/\*ALL`\ .
 
   bin and iso image files are supported.
 
-  default is ``*ALL`` for all the PTF image files under image catalog directory.
+  default is \ :literal:`\*ALL`\  for all the PTF image files under image catalog directory.
 
 
   | **required**: false
@@ -156,9 +156,9 @@ virtual_image_name_list
 
      
 virtual_image_name_remove_list
-  The name list of the PTF image file which will be moved from the image catalog, for example, ``SF99433_1.bin``.
+  The name list of the PTF image file which will be moved from the image catalog, for example, \ :literal:`SF99433\_1.bin`\ .
 
-  default is ``*ALL`` for all the PTF image files under the image caltalog.
+  default is \ :literal:`\*ALL`\  for all the PTF image files under the image caltalog.
 
 
   | **required**: false
@@ -192,9 +192,9 @@ Notes
 -----
 
 .. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3
+   Ansible hosts file need to specify ansible\_python\_interpreter=/QOpenSys/pkgs/bin/python3
 
-   If operation is setup_only or setup_and_addimgclge, the user who this task will run under, should be enrolled in system distribution directorty
+   If operation is setup\_only or setup\_and\_addimgclge, the user who this task will run under, should be enrolled in system distribution directorty
 
    Issue ADDDIRE command to add the user to the system distribution directory entry
 

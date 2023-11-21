@@ -71,7 +71,7 @@ Example Returned Variables
         }
 ]
 "load_fail_dict": {
-        "SI73962": "OPTION_NOT_INSTALLED"
+        "SI73962": "OPTION_NOT_INSTALLED_OR_ALREADY_INSTALLED"
     }
 "apply_fail_with_requisite_list": [
         {

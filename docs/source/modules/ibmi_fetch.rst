@@ -16,7 +16,7 @@ ibmi_fetch -- Fetch objects or a library from a remote IBM i node and store on l
 
 Synopsis
 --------
-- The ``ibmi_feth`` is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in a file tree, organized by hostname.
+- The \ :literal:`ibmi\_feth`\  is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in a file tree, organized by hostname.
 - Save file that already exists at dest will be overwritten if it is different than the new one.
 - For non-IBMi native targets, use the fetch module instead.
 
@@ -63,7 +63,7 @@ flat
 
      
 force_save
-  If force to use savefile_name when savefile_name.file already exists on remote IBM i.
+  If force to use savefile\_name when savefile\_name.file already exists on remote IBM i.
 
 
   | **required**: false
@@ -72,7 +72,7 @@ force_save
 
      
 format
-  The save file's format. Only support ``*SAVF`` by now.
+  The save file's format. Only support \ :literal:`\*SAVF`\  by now.
 
 
   | **required**: false
@@ -92,7 +92,7 @@ is_lib
 
      
 lib_name
-  The library contains the objects. If is_lib is ``True``, lib_name means the library name.
+  The library contains the objects. If is\_lib is \ :literal:`True`\ , lib\_name means the library name.
 
 
   | **required**: True
@@ -105,7 +105,7 @@ object_names
 
   One or more object names can be specified. Use space as separator.
 
-  If object type is ``*FILE``, then fetch it directly. Only one ``*FILE`` object will fetch directly at one time.
+  If object type is \ :literal:`\*FILE`\ , then fetch it directly. Only one \ :literal:`\*FILE`\  object will fetch directly at one time.
 
 
   | **required**: false
@@ -129,7 +129,7 @@ object_types
 savefile_name
   The save file name can be specified.
 
-  If not specified savefile_name, the save file name will be the first object_name.file. If is_lib is True, the save file name will be lib_name.file. For example, if fetch obja.pgm and objb.srvpgm in objlib library, the save file name will be obja. If the obja already exists in objlib, then rename the save file name to (obja+number), number range from 1 to 9(obja1, obja2...obja9).
+  If not specified savefile\_name, the save file name will be the first object\_name.file. If is\_lib is True, the save file name will be lib\_name.file. For example, if fetch obja.pgm and objb.srvpgm in objlib library, the save file name will be obja. If the obja already exists in objlib, then rename the save file name to (obja+number), number range from 1 to 9(obja1, obja2...obja9).
 
 
   | **required**: false
@@ -188,7 +188,7 @@ Notes
 -----
 
 .. note::
-   ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
+   ansible.cfg needs to specify interpreter\_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
 
    Need install 5770SS1 option 39 on remote IBM i for regex usage
 

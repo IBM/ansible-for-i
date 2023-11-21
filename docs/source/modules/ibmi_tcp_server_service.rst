@@ -17,7 +17,7 @@ ibmi_tcp_server_service -- Manage tcp server
 Synopsis
 --------
 - Manage and query IBMi tcp server service.
-- For non-IBMi targets, use the :ref:`service <service_module>` module instead.
+- For non-IBMi targets, use the \ :strong:`ERROR while parsing`\ : While parsing "M(service)" at index 31: Module name "service" is not a FQCN\  module instead.
 
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -59,7 +59,7 @@ extra_parameters
 
      
 joblog
-  If set to ``true``, append JOBLOG to stderr/stderr_lines.
+  If set to \ :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
 
 
   | **required**: false
@@ -68,7 +68,7 @@ joblog
 
      
 name_list
-  The name of the tcp server service. The valid value are ``*ALL``, ``*AUTOSTART``, ``*BOOTP``, ``*DBG``, ``*DDM``, ``*DHCP``, ``*DIRSRV``, ``*DLFM``, ``*DNS``, ``*DOMINO``, ``*EDRSQL``, ``*FTP``, ``*HTTP``, ``*HOD``, ``*IAS``, ``*INETD``, ``*LPD``, ``*MGTC``, ``*NETSVR``, ``*NSLD``, ``*NTP``, ``*ODPA``, ``*OMPROUTED``, ``*ONDMD``, ``*POP``, ``*QOS``, ``*REXEC``, ``*ROUTED``, ``*SLP``, ``*SMTP``, ``*SNMP``, ``*SRVSPTPRX``, ``*SSHD``, ``*TCM``, ``*TELNET``, ``*TFTP``, ``*VPN``, ``*WEBFACING``.
+  The name of the tcp server service. The valid value are \ :literal:`\*ALL`\ , \ :literal:`\*AUTOSTART`\ , \ :literal:`\*BOOTP`\ , \ :literal:`\*DBG`\ , \ :literal:`\*DDM`\ , \ :literal:`\*DHCP`\ , \ :literal:`\*DIRSRV`\ , \ :literal:`\*DLFM`\ , \ :literal:`\*DNS`\ , \ :literal:`\*DOMINO`\ , \ :literal:`\*EDRSQL`\ , \ :literal:`\*FTP`\ , \ :literal:`\*HTTP`\ , \ :literal:`\*HOD`\ , \ :literal:`\*IAS`\ , \ :literal:`\*INETD`\ , \ :literal:`\*LPD`\ , \ :literal:`\*MGTC`\ , \ :literal:`\*NETSVR`\ , \ :literal:`\*NSLD`\ , \ :literal:`\*NTP`\ , \ :literal:`\*ODPA`\ , \ :literal:`\*OMPROUTED`\ , \ :literal:`\*ONDMD`\ , \ :literal:`\*POP`\ , \ :literal:`\*QOS`\ , \ :literal:`\*REXEC`\ , \ :literal:`\*ROUTED`\ , \ :literal:`\*SLP`\ , \ :literal:`\*SMTP`\ , \ :literal:`\*SNMP`\ , \ :literal:`\*SRVSPTPRX`\ , \ :literal:`\*SSHD`\ , \ :literal:`\*TCM`\ , \ :literal:`\*TELNET`\ , \ :literal:`\*TFTP`\ , \ :literal:`\*VPN`\ , \ :literal:`\*WEBFACING`\ .
 
 
   | **required**: True
@@ -78,7 +78,7 @@ name_list
 
      
 state
-  ``started``/``stopped`` are idempotent actions that will not run commands unless necessary.
+  \ :literal:`started`\ /\ :literal:`stopped`\  are idempotent actions that will not run commands unless necessary.
 
 
   | **required**: True

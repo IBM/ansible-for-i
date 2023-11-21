@@ -16,7 +16,7 @@ ibmi_script -- Execute a local cl/sql script file.
 
 Synopsis
 --------
-- The ``ibmi_script`` plugin transfer a local cl/sql script file to a remote ibm i node and execute.
+- The \ :literal:`ibmi\_script`\  plugin transfer a local cl/sql script file to a remote ibm i node and execute.
 - Only support cl/sql script file by now.
 - For sql script, use RUNSQLSTM to process.
 - For non-cl/sql script, use the script plugin instead.
@@ -53,7 +53,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -103,7 +103,7 @@ src
 type
   Specify the script file type.
 
-  Only support ``CL`` or ``SQL`` script by now.
+  Only support \ :literal:`CL`\  or \ :literal:`SQL`\  script by now.
 
 
   | **required**: True
@@ -140,7 +140,7 @@ Notes
 -----
 
 .. note::
-   ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
+   ansible.cfg needs to specify interpreter\_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
 
    For cl script, the command supports line breaks.
 

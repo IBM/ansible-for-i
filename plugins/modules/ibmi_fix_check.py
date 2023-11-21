@@ -130,13 +130,14 @@ import time
 import re
 
 
-__ibmi_module_version__ = "1.9.1"
+__ibmi_module_version__ = "1.9.2"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
-ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/node/6211843"
+ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/ibm-i-group-ptfs-level"
+HTTP_AGENT = "ansible/ibm.power_ibmi"
 
 
-# url: https://www.ibm.com/support/pages/node/6211843
+# url: https://www.ibm.com/support/pages/ibm-i-group-ptfs-level
 # group: 'SF99738'
 def get_group_info_from_web(groups, certs, timeout):
     pattern_link = re.compile(
@@ -149,7 +150,7 @@ def get_group_info_from_web(groups, certs, timeout):
     )
     response = ''
     try:
-        response = urls.open_url(ALL_GROUP_PAGE, validate_certs=certs, timeout=timeout)
+        response = urls.open_url(ALL_GROUP_PAGE, validate_certs=certs, timeout=timeout, http_agent=HTTP_AGENT)
     except Exception as e:
         return [dict(
                 url=ALL_GROUP_PAGE,
@@ -190,7 +191,7 @@ def get_ptf_list_from_web(url, certs, timeout):
     pattern_packid = r'PACKAGE ID:.+?(?P<packid>[A-Z]\d{7})'
     response = ''
     try:
-        response = urls.open_url(url, validate_certs=certs, timeout=timeout)
+        response = urls.open_url(url, validate_certs=certs, timeout=timeout, http_agent=HTTP_AGENT)
     except Exception as e:
         return [dict(
                 url=url,
@@ -227,7 +228,7 @@ def get_cum_ptf_list_from_web(pack_id, certs, timeout):
     response = ''
     url = 'https://www.ibm.com/support/pages/uid/nas4' + pack_id
     try:
-        response = urls.open_url(url, validate_certs=certs, timeout=timeout)
+        response = urls.open_url(url, validate_certs=certs, timeout=timeout, http_agent=HTTP_AGENT)
     except Exception as e:
         return [dict(
                 url=url,
@@ -270,7 +271,7 @@ def get_ptf_req_from_web(ptf, reqs, expanded_requisites, certs, timeout):
     url = 'https://www.ibm.com/support/pages/ptf/' + ptf
     time.sleep(1)
     try:
-        response = urls.open_url(url, validate_certs=certs, timeout=timeout)
+        response = urls.open_url(url, validate_certs=certs, timeout=timeout, http_agent=HTTP_AGENT)
     except Exception as e:
         return [dict(url=url, error=str(e))]
     r = response.read().decode("utf-8")
@@ -336,6 +337,7 @@ def main():
     result.update({'expanded_requisites': expanded_requisites})
     result.update({'certs': certs})
     result.update({'timeout': timeout})
+    result.update({'http_agent': HTTP_AGENT})
 
     module.exit_json(**result)
 

@@ -164,16 +164,15 @@ import os
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
+from tempfile import mkdtemp
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.9.1"
+__ibmi_module_version__ = "1.9.2"
 HAS_PARAMIKO = True
 
 try:
     import paramiko
 except ImportError:
     HAS_PARAMIKO = False
-
-ifs_dir = '/tmp/.ansible/'
 
 
 def return_error(module, error, result):
@@ -213,15 +212,14 @@ def main():
         remote_user = module.params['remote_user']
         remote_host = module.params['remote_host']
         private_key = module.params['private_key']
-        delete_list = []
         success_list = []
         fail_list = []
-        delete = False
         startd = datetime.datetime.now()
-        ibmi_util.log_debug("mkdir " + ifs_dir, module._name)
-        rc, out, err = module.run_command(['mkdir', '-p', ifs_dir], use_unsafe_shell=False)
-        if rc != 0 and 'File exists' not in err:
-            return_error(module, f"mkdir on current host failed. dir = {ifs_dir}. {err}", result)
+
+        ifs_dir = mkdtemp("", "ansible_for_i_temp", None)
+        ibmi_util.log_debug("mkdtemp " + ifs_dir, module._name)
+        if not os.path.isdir(ifs_dir):
+            return_error(module, f"mkdtemp on current host failed. dir = {ifs_dir}. {err}", result)
 
         try:
             private_key = to_bytes(private_key, errors='surrogate_or_strict')
@@ -280,9 +278,7 @@ def main():
                 ibmi_util.log_debug("cp " + src_list[i]['src'] + " " + ifs_dir, module._name)
                 rc, out, err = module.run_command(['cp', src_list[i]['src'], ifs_dir], use_unsafe_shell=False)
                 if rc == 0:
-                    final_src = ifs_dir + src_basename
-                    delete = True
-                    delete_list.append(final_src)
+                    final_src = ifs_dir + "/" + src_basename
                 else:
                     src_list[i]['fail_reason'] = f"Copy file to current host tmp dir failed. cp {src_list[i]['src']} {ifs_dir}. {err}"
                     fail_list.append(src_list[i])
@@ -306,7 +302,7 @@ def main():
                 success_list.append(src_list[i])
             except Exception as e:
                 if 'size mismatch' in to_text(e):
-                    src_list[i]['fail_reason'] = f"Can't sync file to /QSYS.LIB. Put {final_src} to remote host fail."
+                    src_list[i]['fail_reason'] = f"Can't sync file to /QSYS.LIB. Put {final_src} to remote host fail. Error message: {to_text(e)}"
                 else:
                     src_list[i]['fail_reason'] = f"{to_text(e)}. Put {final_src} to remote host exception."
                 fail_list.append(src_list[i])
@@ -329,9 +325,7 @@ def main():
             ssh.close()
         if 'sftp' in vars():
             sftp.close()
-        if delete is True:
-            for i in range(len(delete_list)):
-                rc, out, err = module.run_command(['rm', delete_list[i]], use_unsafe_shell=False)
+        rc, out, err = module.run_command(['rm', '-rf', ifs_dir], use_unsafe_shell=False)
 
 
 if __name__ == '__main__':

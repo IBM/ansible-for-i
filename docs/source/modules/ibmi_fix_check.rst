@@ -16,7 +16,7 @@ ibmi_fix_check -- Retrieve the latest PTF group information from PSP server.
 
 Synopsis
 --------
-- The ``ibmi_fix_check`` module retrieve latest PTF group information from PSP(Preventive Service Planning) server.
+- The \ :literal:`ibmi\_fix\_check`\  module retrieve latest PTF group information from PSP(Preventive Service Planning) server.
 - Refer to https://www.ibm.com/support/pages/node/667567 for more details of PSP.
 - ALL PTF groups or specific PTF groups are supported.
 
@@ -69,7 +69,7 @@ timeout
 
      
 validate_certs
-  If set to ``False``, the SSL certificate verification will be disabled. It's recommended for test scenario.
+  If set to \ :literal:`False`\ , the SSL certificate verification will be disabled. It's recommended for test scenario.
 
   It's recommended to enable the SSL certificate verification for security concern.
 
@@ -105,9 +105,9 @@ Notes
 -----
 
 .. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3.
+   Ansible hosts file need to specify ansible\_python\_interpreter=/QOpenSys/pkgs/bin/python3.
 
-   If the module is delegated to an IBM i server and SSL certificate verification is enabled, package ``ca-certificates-mozilla`` is required.
+   If the module is delegated to an IBM i server and SSL certificate verification is enabled, package \ :literal:`ca-certificates-mozilla`\  is required.
 
 
 

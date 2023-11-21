@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -51,7 +51,7 @@ become_user_password
 device_list
   The name of the device.
 
-  If the one of the device is IASP device, the become_user and become_user_password will be ignored.
+  If the one of the device is IASP device, the become\_user and become\_user\_password will be ignored.
 
 
   | **required**: True
@@ -71,7 +71,7 @@ extra_parameters
 
      
 joblog
-  If set to ``true``, append JOBLOG to stderr/stderr_lines.
+  If set to \ :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
 
 
   | **required**: false
@@ -80,11 +80,11 @@ joblog
 
      
 status
-  ``on``/``off`` are idempotent actions that will not run commands unless necessary.
+  \ :literal:`on`\ /\ :literal:`off`\  are idempotent actions that will not run commands unless necessary.
 
-  ``reset`` will always bounce the service.
+  \ :literal:`reset`\  will always bounce the service.
 
-  **At least one of status are required.**
+  \ :strong:`At least one of status are required.`\ 
 
 
   | **required**: True
