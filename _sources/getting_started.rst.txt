@@ -47,5 +47,5 @@ Refer to Ansible community doc to learn how to run Ansible command or playbook h
 Examples:
 ::
 
-    ansible -i inventory.ini -m ibm.power_ibmi.ibmi_cl_command -a "cmd='crtlib lib(demo111)'"
-    ansible -i inventory.ini db2mb1pa -m ibm.power_ibmi.ibmi_reboot
+    ansible -i inventory.ini ibmi -m ibm.power_ibmi.ibmi_cl_command -a "cmd='crtlib lib(demo111)'"
+    ansible -i inventory.ini ibmi -m ibm.power_ibmi.ibmi_reboot

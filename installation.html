@@ -13,9 +13,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,6 +46,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installing IBM i collection to Ansible server</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements-for-ibm-i-ansible-server">Requirements for IBM i Ansible Server</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-using-ansible-galaxy">Installing using Ansible Galaxy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#enabling-ibm-i-nodes">Enabling IBM i nodes</a></li>
@@ -84,7 +85,7 @@
            <div itemprop="articleBody">
              
   <section id="installing-ibm-i-collection-to-ansible-server">
-<h1>Installing IBM i collection to Ansible server<a class="headerlink" href="#installing-ibm-i-collection-to-ansible-server" title="Permalink to this heading"></a></h1>
+<h1>Installing IBM i collection to Ansible server<a class="headerlink" href="#installing-ibm-i-collection-to-ansible-server" title="Link to this heading"></a></h1>
 <p>There are two options to install IBM i collection for Ansible:</p>
 <ul>
 <li><p>Installing from Ansible Galaxy</p>
@@ -105,9 +106,9 @@
 </li>
 </ul>
 <section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
-<p>In order to use this Ansible collection, you must have the following pre-requisite software installed and available on your Ansible server:</p>
-<p><strong>Python v3.6+</strong></p>
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>In order to use this Ansible collection at <strong>release 2.0.0</strong> and beyond, you must have the following pre-requisite software installed and available on your Ansible server:</p>
+<p><strong>Python v3.9+</strong></p>
 <blockquote>
 <div><p>Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc).
 If you install Python from the package manager for your operating system, you must also install the development libraries (usually a package named <code class="docutils literal notranslate"><span class="pre">python3-devel</span></code>), as these are required when installing modules through <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
@@ -116,7 +117,7 @@ If you install Python from the package manager for your operating system, you mu
 <li><p>The unofficial Python version manager: <a class="reference external" href="https://github.com/pyenv/pyenv">https://github.com/pyenv/pyenv</a></p></li>
 </ul>
 </div></blockquote>
-<p><strong>Ansible v2.9+</strong></p>
+<p><strong>Ansible v2.14+</strong></p>
 <blockquote>
 <div><p>Ansible can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc). You can also install it using <code class="docutils literal notranslate"><span class="pre">pip</span></code>, the package manager for Python:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="n">ansible</span>
@@ -124,15 +125,68 @@ If you install Python from the package manager for your operating system, you mu
 </div>
 </div></blockquote>
 </section>
+<section id="requirements-for-ibm-i-ansible-server">
+<h2>Requirements for IBM i Ansible Server<a class="headerlink" href="#requirements-for-ibm-i-ansible-server" title="Link to this heading"></a></h2>
+<p>For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps can be used to install Ansible with pip.</p>
+<ol class="arabic">
+<li><p>There are some necessary open source packages that must be installed with yum (if not already present):</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">install</span> <span class="n">git</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">python39</span><span class="o">-</span><span class="n">cryptography</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">python39</span><span class="o">-</span><span class="n">paramiko</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">pase</span><span class="o">-</span><span class="n">utf8</span><span class="o">-</span><span class="n">locale</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">sshpass</span>   <span class="c1"># allows specifying ssh password if desired</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Configure ~/.profile for language environment variables (verify with ‘’locale’’ command) such as:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">LANG</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+<span class="n">export</span> <span class="n">LC_ALL</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Install Ansible. Either full ansible (a) or ansible-core (b).</p>
+<ol class="loweralpha">
+<li><p>Install Ansible at 7.X (v2.14 core) or 8.X level (v2.15 core) with pip (skip step 3b). For example, to install level 8.1 that includes v2.15.6 ansible-core use the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">ansible</span><span class="o">==</span><span class="mf">8.1</span>
+</pre></div>
+</div>
+</li>
+<li><p>Alternatively ansible-core may be installed instead of full ansible, but some additional ibmi dependent collections may need to be installed via ansible-galaxy. For example, to install ansible core v2.15.1 use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">ansible</span><span class="o">-</span><span class="n">core</span><span class="o">==</span><span class="mf">2.15.1</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+<li><p>Add the following path to ~/.profile for the ansible executables:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PATH=~/.local/bin:$PATH
+</pre></div>
+</div>
+</li>
+<li><p>Ensure dependent collections are installed if only using ansible-core. Perform the following collection install commands if ‘’ansible-galaxy collection list’’ doesn’t show these collections.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">community</span><span class="o">.</span><span class="n">general</span>
+
+<span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">openstack</span><span class="o">.</span><span class="n">cloud</span>
+
+<span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">ansible</span><span class="o">.</span><span class="n">posix</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
 <section id="installing-using-ansible-galaxy">
-<h2>Installing using Ansible Galaxy<a class="headerlink" href="#installing-using-ansible-galaxy" title="Permalink to this heading"></a></h2>
+<h2>Installing using Ansible Galaxy<a class="headerlink" href="#installing-using-ansible-galaxy" title="Link to this heading"></a></h2>
 <p>You can use the <code class="docutils literal notranslate"><span class="pre">ansible-galaxy</span></code> command to install a collection from Ansible Galaxy, the package manager for Ansible:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">ibm</span><span class="o">.</span><span class="n">power_ibmi</span>
 </pre></div>
 </div>
 </section>
 <section id="installing-from-source">
-<h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this heading"></a></h2>
+<h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Link to this heading"></a></h2>
 <p>You can use the <code class="docutils literal notranslate"><span class="pre">ansible-galaxy</span></code> command to install a collection built from source. To build your own collection, follow these steps:</p>
 <ol class="arabic simple">
 <li><p>Clone the repository:</p></li>
@@ -155,7 +209,7 @@ If you install Python from the package manager for your operating system, you mu
 </div>
 </section>
 <section id="enabling-ibm-i-nodes">
-<h2>Enabling IBM i nodes<a class="headerlink" href="#enabling-ibm-i-nodes" title="Permalink to this heading"></a></h2>
+<h2>Enabling IBM i nodes<a class="headerlink" href="#enabling-ibm-i-nodes" title="Link to this heading"></a></h2>
 <p>Before IBM i systems can be managed-nodes of Ansible, a few dependencies have to be installed on IBM i.</p>
 <blockquote>
 <div><ul class="simple">
