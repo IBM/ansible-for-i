@@ -16,7 +16,7 @@ ibmi_job -- Returns job information according to inputs.
 
 Synopsis
 --------
-- The ``ibmi_job`` module returns information associated with one or more jobs.
+- The \ :literal:`ibmi\_job`\  module returns information associated with one or more jobs.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -90,7 +90,7 @@ submitter
 
      
 subsystem
-  The job subsystem filter. A valid subsystem name can be specified. Valid values are ``*ALL`` or subsystem name.
+  The job subsystem filter. A valid subsystem name can be specified. Valid values are \ :literal:`\*ALL`\  or subsystem name.
 
 
   | **required**: false
@@ -113,7 +113,7 @@ type
 user
   The user profile name to use as the job user filtering criteria.
 
-  Valid values are user profile name, ``*USER`` or ``*ALL``.
+  Valid values are user profile name, \ :literal:`\*USER`\  or \ :literal:`\*ALL`\ .
 
 
   | **required**: false
@@ -145,7 +145,7 @@ Notes
 -----
 
 .. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+   Ansible hosts file need to specify ansible\_python\_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 

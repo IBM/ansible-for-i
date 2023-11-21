@@ -16,8 +16,8 @@ ibmi_cl_command -- Executes a CL(Control language) command
 
 Synopsis
 --------
-- The ``ibmi_cl_command`` module takes the CL command followed by a list of space-delimited arguments.
-- For PASE(Portable Application Solutions Environment for i) or QSHELL(Unix/Linux-liked) commands, like 'ls', 'chmod', use the ``command`` module instead.
+- The \ :literal:`ibmi\_cl\_command`\  module takes the CL command followed by a list of space-delimited arguments.
+- For PASE(Portable Application Solutions Environment for i) or QSHELL(Unix/Linux-liked) commands, like 'ls', 'chmod', use the \ :literal:`command`\  module instead.
 
 
 
@@ -54,7 +54,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -72,7 +72,7 @@ cmd
 
      
 joblog
-  If set to ``true``, output the available job log even the rc is 0(success).
+  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
 
   Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL, DSPHDWRSC.
 
@@ -104,9 +104,9 @@ Notes
 .. note::
    CL command with OUTPUT parameter like DSPLIBL, DSPHDWRSC does not have job log and does not support become user.
 
-   CL command can also be run by ``command`` module with simple stdout/stderr, put 'system' as the as first args in ``command`` module.
+   CL command can also be run by \ :literal:`command`\  module with simple stdout/stderr, put 'system' as the as first args in \ :literal:`command`\  module.
 
-   The ``ibmi_cl_command`` module can only run one CL command at a time.
+   The \ :literal:`ibmi\_cl\_command`\  module can only run one CL command at a time.
 
 
 

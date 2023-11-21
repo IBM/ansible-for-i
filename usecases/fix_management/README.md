@@ -106,7 +106,7 @@ The playbook file is to provide an example about how to configure passwordless s
 whose user which is authorized by target_system can log in target_system via ssh without providing password.   |
 | `target_system`           | str     | Specifies the system which performs as a server in futher ssh connection.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./configure_passwordless_ssh_login.yml -e  "{'source_system': 'reposerver', 'target_system': 'ibmi'}"
@@ -124,7 +124,7 @@ This playbook will copy individual ptf files on Ansible server to repository ser
 | `ptf_number`           | str     | Specifies the PTF number which needs to be copied to repository server.   |
 | `file_path_dir`         | str       | The directory of PTF files on repository server.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./copy_individual_ptf_to_repo.yml -e "{'repo_server': 'systemB', 'ptf_number': 'SI63556', 'file_path_dir': '/tmp/SI63556'}"
@@ -143,7 +143,7 @@ This playbook will copy PTF Group files on Ansible server to repository server, 
 | `ptf_group_level`           | str     | Specifies the PTF Group level.   |
 | `file_path_dir`         | str       | The directory of PTF Group files on repository server.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./copy_ptf_group_to_repo.yml -e "{'repo_server': 'systemB', 'ptf_group_number': 'SF99740', 'ptf_group_level': '12', 'file_path_dir': '/tmp/2343456'"
@@ -160,7 +160,7 @@ The playbook file is to provide an example about how to query all PTFs requring 
 | `auto_ipl`           | bool     | Specifies if an IPL is launched automatically when there is/are PTF(s) requiring IPL to be applied or removed.   |
 | `target_system`           | str     | Specifies the target IBM i system name which is defined in hosts.ini.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./ipl_system_to_conduct_ipl_action_of_ptfs.yml -e "{'target_system': 'systemA'}"
@@ -178,7 +178,7 @@ The playbook file is to provide an example about how to query all PTFs requring 
 | `target_system`           | str     | The target IBM i server that receives and applies the PTFs.   |
 | `delete`           | bool     | Specifies whether or not to delete the file install dir on target server after apply. The default value is true.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./sync_apply_individual_ptf_using_filedir.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB', 'ptf_dir': '/tmp/SI63556', 'delete': true}"
@@ -198,7 +198,7 @@ Before use this playbook, make sure you have used the copy_individual_ptf_to_rep
 | `ptf_number`           | str     | Specifies the PTF number which needs to be applied on target IBM i system.   |
 | `delete`           | bool     | Specifies whether or not to delete the file install dir on target server after apply. The default value is true.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./sync_apply_individual_ptf_using_ptfinfo.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB','ptf_number': 'SI69385', 'delete': true}"
@@ -218,7 +218,7 @@ This playbook will transfer the PTF Group files to the target system according t
 | `ptf_omit_list`           | list     | The list of PTFs which will be omitted. The elements of the list are dict. The key of the dict should be the product ID of the fix that is omitted.   |
 | `delete`           | bool     | Specifies whether or not to delete the file install dir on target server after apply. The default value is true.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook /sync_apply_ptf_group_using_filedir.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB', 'ptf_group_dir': '/tmp/SF99729_125', 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
@@ -241,7 +241,7 @@ Before use this playbook, make sure you have used the copy_ptf_group_to_repo.yml
 | `ptf_omit_list`           | list     | The list of PTFs which will be omitted. The elements of the list are dict. The key of the dict should be the product ID of the fix that is omitted.   |
 | `delete`           | bool     | Specifies whether or not to delete the file install dir on target server after apply. The default value is true.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./sync_apply_ptf_group_using_ptfinfo.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB', 'ptf_group_number': 'SF99729', 'ptf_group_level': '125', 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
@@ -265,7 +265,7 @@ This playbook is used for 1st level solution. It will get the individual ptfs' i
 | `delayed_option`       | str    | Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.    |
 | `auto_ipl`             | bool    | Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. The default value is false.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./sync_apply_individual_ptfs_lv1.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB', 'image_root': '/home/test/PTF', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': true, 'temp_or_perm': '*TEMP', 'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
@@ -286,7 +286,7 @@ This playbook is used for 1st level solution. It will get the PTF group informat
 | `image_root`          | str     | Specifies the image files' dir on the repo_server. This should be the root dir of all the image files.   |
 | `ptf_omit_list`           | list     | The list of PTFs which will be omitted. The elements of the list are dict. The key of the dict should be the product ID of the fix that is omitted.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./sync_apply_ptf_group_lv1.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group': {'group':'SF99876', 'level': 19}, 'image_root': '/home/test/PTF', 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
@@ -303,7 +303,7 @@ This playbook is used for 2st level solution. It will get the latest PTF group i
 | `repo_server`         | str           | The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.   |
 | `ptf_group`           | str           | The PTF group number which needs be checked and downloaded.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./check_download_ptf_group.yml -e "{'repo_server': 'reposerver', 'ptf_group': 'SF99704'}"
@@ -320,7 +320,7 @@ This playbook is used for 2st level solution. It will check if requested individ
 | `repo_server`         | str           | The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.  |
 | `ptfs_list`           | list          | The PTF number list which needs to be checked and downloaded.  |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./check_download_individual_ptfs.yml -e "{'repo_server': 'reposerver'，'ptfs_list':['SI67856', 'SI69375', 'SI73751']}"
@@ -336,7 +336,7 @@ The playbook is to provide an example about how to check PTF group order status 
 |-----------------------|---------------|--------------------------------------------------------------------------------|
 | `repo_server`         | str           | The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.  |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./check_ptf_group_order_status.yml -e "{'repo_server': 'reposerver'}"
@@ -354,7 +354,7 @@ Please call extract_ptf_group_info playbook after the order status becomes DOWNL
 | `repo_server`         | str           | The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.   |
 | `order_id`            | str           | order_id returned from the ibmi_download_fix module.  |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./extract_ptf_group_info.yml -e "{'repo_server': 'reposerver', 'order_id': '2025910369'}"
@@ -379,7 +379,7 @@ sync_apply_ptf_group playbook does the following things:
 | `delete`              | bool     | Specifies whether or not to delete the file install dir on target server after apply. The default value is true.  |
 | `ptf_omit_list`           | list     | The list of PTFs which will be omitted. The elements of the list are dict. The key of the dict should be the product ID of the fix that is omitted.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
@@ -405,7 +405,7 @@ sync_apply_individual_ptfs playbook does the following:
 | `delayed_option`      | str           | Used by apply_ptf role. Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.                      |
 | `auto_ipl`            | bool          | Used by apply_ptf role. Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. The default value is false. |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP', 'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
@@ -423,7 +423,7 @@ This playbook will Check if requested individual PTFs are already in catalog. If
 | `repo_server`| str          | The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.      |
 | `ptfs_list`| list          | The PTF number list which needs to be applied.     |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./download_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
@@ -441,7 +441,7 @@ The sample file is to provide an example about how to compare the ptf groups bet
 | `repo_server`| str          | The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.      |
 | `group_list`| list          | The PTF group list.     |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./ibmi_fix_group_compare.yml -e "{'group_list':['SF99xxx','SF99yyy'], 'target_system': 'target', 'repo_server': 'reposerver'}"
@@ -459,7 +459,7 @@ The sample file is to provide an example about how to compare the single ptf by 
 | `repo_server`| str          | The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.      |
 | `product`| str          | Specifies the PTFs' product which needs to be compared.     |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./ibmi_fix_product_compare.yml -e "{'product': '5770SS1', 'repo_server': 'reposerver', 'target_system':'target'}"
@@ -471,6 +471,10 @@ This playbook is used for 2nd level solution. It will get the PTF group informat
 sync_apply_ptf_group_networkinstall role will setup network install env on repository server and use network install mechanism to install the PTF group on the target system.
 ```
 
+#### Notes
+*SRVLAN must be configured before use. Please refer to <a href="https://www.ibm.com/docs/en/i/7.5?topic=server-configuring-service-tools-dst" target="_blank">Configuring the service tools server for DST</a>
+
+
 #### Variables
 
 | Variable              | Type          | Description                                                                    |
@@ -481,7 +485,7 @@ sync_apply_ptf_group_networkinstall role will setup network install env on repos
 | `delete`              | bool     | Specifies whether or not to delete the file install dir on target server after apply. The default value is true.  |
 | `ptf_omit_list`           | list     | The list of PTFs which will be omitted. The elements of the list are dict. The key of the dict should be the product ID of the fix that is omitted.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./sync_apply_ptf_group_networkinstall.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group': {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
@@ -507,7 +511,7 @@ run_ARE_template playbook does the following:
 | `ARE_results_dir_server`| str          | The directory on the server where ARE results files will be located.    |
 | `remove_ARE_template_client`| bool          | Whether ARE template file on the client will be removed after ARE results files are transferred to the server. The default value is true.   |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./run_ARE_template.yml -e "{'ARE_clients': 'systemA', 'template_server': 'templateserver', 'template_name': '/tmp/PTF_SI71234.jar', 'ARE_results_dir_on_server': '/tmp/results'}"
@@ -527,7 +531,7 @@ The IBM i system where the repository server is located should be at the higest 
 | `original_dir`           | str          | Specifies the repo.sqlite3 DB dir on the original IBM i system, the default value is /etc/ibmi_ansible/fix_management.  |
 | `target_dir`              | str     | Specifies the repo.sqlite3 DB dir on the target IBM i system, the default value is /etc/ibmi_ansible/fix_management.  |
 
-### Example
+#### Example
 
 ```
 ansible-playbook ./migrate_repo_server.yml -e "{'target_system': 'systemA', 'original_system': 'systemB', 'repo_dir': '/etc/ibmi_ansible/fix_management', 'target_dir': '/etc/ibmi_ansible/fix_management'}"

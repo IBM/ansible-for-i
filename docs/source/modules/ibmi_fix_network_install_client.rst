@@ -16,7 +16,7 @@ ibmi_fix_network_install_client -- Install PTFs on the client via IBM i Network 
 
 Synopsis
 --------
-- The ``ibmi_fix`` module installs PTFs on the client via IBM i Network install.
+- The \ :literal:`ibmi\_fix`\  module installs PTFs on the client via IBM i Network install.
 - Single PTF, PTF group and TR PTF are supported.
 
 
@@ -51,7 +51,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -116,17 +116,17 @@ joblog
 operation
   The operation on the client, the options are as follows
 
-  setup_only will only setup the environment to install PTFs.
+  setup\_only will only setup the environment to install PTFs.
 
-  setup_and_installPTF will setup the environment and install PTFs.
+  setup\_and\_installPTF will setup the environment and install PTFs.
 
-  installPTF_only will only install PTFs.
+  installPTF\_only will only install PTFs.
 
   reload will vary off and vary on the optical device when the image catalog files are updated on the server.
 
   uninstall will remove the environment on the client.
 
-  setup_and_installPTF_and_uninstall will setup the environment, install PTFs and then remove the environment.
+  setup\_and\_installPTF\_and\_uninstall will setup the environment, install PTFs and then remove the environment.
 
 
   | **required**: false
@@ -191,7 +191,7 @@ Notes
 -----
 
 .. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3
+   Ansible hosts file need to specify ansible\_python\_interpreter=/QOpenSys/pkgs/bin/python3
 
 
 

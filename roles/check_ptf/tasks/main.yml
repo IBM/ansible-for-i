@@ -67,9 +67,9 @@
   loop_control:
     loop_var: ptf_status
 
-- name: compose temporarily_applied_list
+- name: compose temporarily_applied
   set_fact:
-    temporarily_applied: "{{ temporarily_applied_list|default([]) + [ptf_status.key] }}"
+    temporarily_applied: "{{ temporarily_applied|default([]) + [ptf_status.key] }}"
   when: ptf_status.value == 'APPLIED'
   with_dict: "{{ ptfs_status }}"
   loop_control:
@@ -160,14 +160,6 @@
   loop_control:
     loop_var: ptf_status
 
-- name: print ptfs status
-  debug:
-    var: ptfs_status
-
-- name: print ptfs info
-  debug:
-    var: ptfs_info
-
 - name: print not loaded ptfs list
   debug:
     var: not_loaded_ptfs_list
@@ -183,3 +175,12 @@
 - name: print Temporarily applied ptfs list
   debug:
     var: temporarily_applied_list
+
+- name: print ptfs status
+  debug:
+    var: ptfs_status
+
+- name: print ptfs info
+  debug:
+    var: ptfs_info
+    

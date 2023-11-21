@@ -16,7 +16,7 @@ ibmi_sync_files -- Synchronize a list of files from current IBM i node A to anot
 
 Synopsis
 --------
-- The ``ibmi_sync_files`` module synchronize a list of files from current IBM i node to another IBM i node.
+- The \ :literal:`ibmi\_sync\_files`\  module synchronize a list of files from current IBM i node to another IBM i node.
 - Only supports SAVF(.file) and MBR(only supports "database" subtype Physical files(PF-DTA attribute)) format synchronize between QSYS and QSYS.
 
 
@@ -33,11 +33,11 @@ dest
 
   The path must be absolute.
 
-  If specify, all the src files will be synchronized to the directory that dest speicified. Individual dest key in src_list will be ignored.
+  If specify, all the src files will be synchronized to the directory that dest speicified. Individual dest key in src\_list will be ignored.
 
-  If not specify, individual dest will be the dest value inputted in src_list.
+  If not specify, individual dest will be the dest value inputted in src\_list.
 
-  If both dest and dest key in src_list are not specify, individual dest will be equal to individual src in src_list.
+  If both dest and dest key in src\_list are not specify, individual dest will be equal to individual src in src\_list.
 
   Example '/test/dir/'
 
@@ -82,7 +82,7 @@ remote_user
 src_list
   src files information list on the source host.
 
-  Evey src_list element should be a dict. dict can contain 'src' and 'dest'. 'dest' is optional.
+  Evey src\_list element should be a dict. dict can contain 'src' and 'dest'. 'dest' is optional.
 
   The src key is the path to the src, and must be absolute.
 
@@ -126,7 +126,7 @@ Notes
 
    Make sure ssh passwordless login works from IBM i node A to IBM i node B.
 
-   private_key must be a rsa key in the legacy PEM private key format.
+   private\_key must be a rsa key in the legacy PEM private key format.
 
    Dependency PTFs 7.2 MF65149 7.3 MF65148
 

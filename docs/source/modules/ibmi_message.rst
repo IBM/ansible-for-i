@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -49,7 +49,7 @@ become_user_password
 
      
 joblog
-  If set to ``true``, append JOBLOG to stderr/stderr_lines.
+  If set to \ :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
 
 
   | **required**: false
@@ -116,7 +116,7 @@ message_type
 
   SENDER, an inquiry or notify message that is kept by the sender.
 
-  NO_REPLY, a message that type is "INQUIRY" and has not been replied.
+  NO\_REPLY, a message that type is "INQUIRY" and has not been replied.
 
 
   | **required**: True
@@ -247,7 +247,7 @@ Return Values
       
                               
        message_info
-        | The message_info.
+        | The message\_info.
       
         | **returned**: always
         | **type**: list      

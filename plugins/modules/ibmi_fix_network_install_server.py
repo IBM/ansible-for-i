@@ -268,7 +268,7 @@ except ImportError:
     HAS_ITOOLKIT = False
 HAS_IBM_DB = True
 
-__ibmi_module_version__ = "1.9.1"
+__ibmi_module_version__ = "1.9.2"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
