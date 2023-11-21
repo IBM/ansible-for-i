@@ -16,10 +16,10 @@ ibmi_tcp_interface -- Add, change, remove or query a tcp/ip interface.
 
 Synopsis
 --------
-- The ``ibmi_tcp_interface`` module add, change, remove, start, end or query a tcp/ip interface.
+- The \ :literal:`ibmi\_tcp\_interface`\  module add, change, remove, start, end or query a tcp/ip interface.
 - This module provides the similar function of ADDTCPIFC, CHGTCPIFC, RMVTCPIFC, STRTCPIFC, ENDTCPIFC.
 - In addition, the module provides query function for a specific internet address basing on internet address
-- or alias_name.
+- or alias\_name.
 
 
 
@@ -33,7 +33,7 @@ Parameters
 alias_name
   A name that can be used in place of the internet address.
 
-  This alias_name can be used to change, remove, start, end and query a internet interface.
+  This alias\_name can be used to change, remove, start, end and query a internet interface.
 
 
   | **required**: False
@@ -74,7 +74,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -173,21 +173,21 @@ state
 
   When the internet address does not exist on the IBM i system, present option will create the interface.
 
-  When the internet address exists on the IBM i system, and only internet_address or alias_name is specified, present option will query the specific interface.
+  When the internet address exists on the IBM i system, and only internet\_address or alias\_name is specified, present option will query the specific interface.
 
-  When the internet address exists on the IBM i system, and internet_address option is used together with other options, present option will change the specific interface.
+  When the internet address exists on the IBM i system, and internet\_address option is used together with other options, present option will change the specific interface.
 
-  absent means to remove the internet interface. Either internet_address or alias_name can be used.
+  absent means to remove the internet interface. Either internet\_address or alias\_name can be used.
 
-  If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.
+  If both internet\_address and alias\_name are used for absent option, the alias\_name option will be ignored.
 
-  active means to start the internet interface. Either internet_address or alias_name can be used.
+  active means to start the internet interface. Either internet\_address or alias\_name can be used.
 
-  If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.
+  If both internet\_address and alias\_name are used for absent option, the alias\_name option will be ignored.
 
-  inactive means to end the internet interface. Either internet_address or alias_name can be used.
+  inactive means to end the internet interface. Either internet\_address or alias\_name can be used.
 
-  If both internet_address and alias_name are used for absent option, the alias_name option will be ignored.
+  If both internet\_address and alias\_name are used for absent option, the alias\_name option will be ignored.
 
 
   | **required**: false
@@ -236,7 +236,7 @@ vlan_id
 
   This parameter is only valid for interfaces defined for Ethernet adapters that support the 802.1Q standard.
 
-  This must be used together with line_description.
+  This must be used together with line\_description.
 
 
   | **required**: False
@@ -354,7 +354,7 @@ Notes
 -----
 
 .. note::
-   Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+   Ansible hosts file need to specify ansible\_python\_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 

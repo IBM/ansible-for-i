@@ -16,9 +16,9 @@ ibmi_fix_repo -- Manipulate the PTF database via sqlite3
 
 Synopsis
 --------
-- The ``ibmi_fix_repo`` module manipulate the PTF database via sqlite3.
-- Required dependencies are ``SQLite3 >= 3.26`` and python module ``requests``.
-- Install them using ``yum install libsqlite3`` and ``pip3 install requests``
+- The \ :literal:`ibmi\_fix\_repo`\  module manipulate the PTF database via sqlite3.
+- Required dependencies are \ :literal:`SQLite3 \>= 3.26`\  and python module \ :literal:`requests`\ .
+- Install them using \ :literal:`yum install libsqlite3`\  and \ :literal:`pip3 install requests`\ 
 
 
 
@@ -30,9 +30,9 @@ Parameters
 
      
 action
-  The action the ``ibmi_fix_repo`` module takes towards the PTF database.
+  The action the \ :literal:`ibmi\_fix\_repo`\  module takes towards the PTF database.
 
-  ``add``, ``update``, ``find``, ``delete`` or ``clear``.
+  \ :literal:`add`\ , \ :literal:`update`\ , \ :literal:`find`\ , \ :literal:`delete`\  or \ :literal:`clear`\ .
 
 
   | **required**: True
@@ -70,7 +70,7 @@ parameters
 
      
 type
-  The type of the target, ``single_ptf``, ``ptf_group`` or ``download_status``.
+  The type of the target, \ :literal:`single\_ptf`\ , \ :literal:`ptf\_group`\  or \ :literal:`download\_status`\ .
 
 
   | **required**: false

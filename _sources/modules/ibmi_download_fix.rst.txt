@@ -16,7 +16,7 @@ ibmi_download_fix -- Download fix through SNDPTFORD
 
 Synopsis
 --------
-- The ``ibmi_download_fix`` module download fix through SNDPTFORD.
+- The \ :literal:`ibmi\_download\_fix`\  module download fix through SNDPTFORD.
 - The supported fixs are individual PTFs, cumulative PTF package and PTF Groups.
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -81,7 +81,7 @@ image_directory
 
      
 joblog
-  If set to ``true``, output the available joblog even the rc is 0(success).
+  If set to \ :literal:`true`\ , output the available joblog even the rc is 0(success).
 
 
   | **required**: false
@@ -127,21 +127,21 @@ ptf_id
 
   For Cumulative PTF package and PTF group ID, please see
 
-  ``*CUMPKG`` Order the latest level of the Cumulative PTF package group (SF99vrm) for the operating system release that is installed on the system. The HIPER and DB2 for IBM i PTF groups are automatically included when the Cumulative PTF package PTF group is specified. This value cannot be specified with any other PTF identifier or special value.
+  \ :literal:`\*CUMPKG`\  Order the latest level of the Cumulative PTF package group (SF99vrm) for the operating system release that is installed on the system. The HIPER and DB2 for IBM i PTF groups are automatically included when the Cumulative PTF package PTF group is specified. This value cannot be specified with any other PTF identifier or special value.
 
-  ``*ALLGRP`` Order the latest level of all PTF groups for the installed operating system release, except the Cumulative PTF package group.
+  \ :literal:`\*ALLGRP`\  Order the latest level of all PTF groups for the installed operating system release, except the Cumulative PTF package group.
 
-  ``*HIPERGRP`` Order the latest level of the HIPER PTF group for the operating system release that is installed on the system.
+  \ :literal:`\*HIPERGRP`\  Order the latest level of the HIPER PTF group for the operating system release that is installed on the system.
 
-  ``*DB2GRP`` Order the latest level of the DB2 for IBM i PTF group for the operating system release that is installed on the system.
+  \ :literal:`\*DB2GRP`\  Order the latest level of the DB2 for IBM i PTF group for the operating system release that is installed on the system.
 
-  ``*BRSGRP`` Order the latest level of the Backup Recovery Solutions PTF group for the operating system release that is installed on the system.
+  \ :literal:`\*BRSGRP`\  Order the latest level of the Backup Recovery Solutions PTF group for the operating system release that is installed on the system.
 
-  ``*HTTPGRP`` Order the latest level of the IBM HTTP Server for i PTF group for the operating system release that is installed on the system.
+  \ :literal:`\*HTTPGRP`\  Order the latest level of the IBM HTTP Server for i PTF group for the operating system release that is installed on the system.
 
-  ``*JVAGRP`` Order the latest level of the Java PTF group for the operating system release that is installed on the system.
+  \ :literal:`\*JVAGRP`\  Order the latest level of the Java PTF group for the operating system release that is installed on the system.
 
-  ``*PFRGRP`` Order the latest level of the Performance Tools PTF group for the operating system release that is installed on the system.
+  \ :literal:`\*PFRGRP`\  Order the latest level of the Performance Tools PTF group for the operating system release that is installed on the system.
 
 
   | **required**: True
@@ -183,9 +183,9 @@ time_out
 
      
 wait
-  Only works when delivery_format is ``*SAVF``.
+  Only works when delivery\_format is \ :literal:`\*SAVF`\ .
 
-  If delivery_format is ``*SAVF``, and ``wait`` set to ``true``, module will wait until all PTF save files are delivered or time is up.
+  If delivery\_format is \ :literal:`\*SAVF`\ , and \ :literal:`wait`\  set to \ :literal:`true`\ , module will wait until all PTF save files are delivered or time is up.
 
 
   | **required**: false

@@ -16,7 +16,7 @@ ibmi_mirror_setup_source -- Configures the Db2 Mirror on the source node
 
 Synopsis
 --------
-- The ``ibmi_mirror_setup_source`` module configures the Db2 Mirror on the source node and sets the configuration state to initializing.
+- The \ :literal:`ibmi\_mirror\_setup\_source`\  module configures the Db2 Mirror on the source node and sets the configuration state to initializing.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -108,7 +108,7 @@ secondary_node
 terminate_confirmed
   A bool value to indicate the terminate mirror action is confirmed.
 
-  When set to False, only the replication state as NOT_MIRRORED is allowed to run this module.
+  When set to False, only the replication state as NOT\_MIRRORED is allowed to run this module.
 
   When set to True, this module will execute the terminate mirror without checking the replication state.
 
@@ -119,7 +119,7 @@ terminate_confirmed
 
      
 termination_level
-  The TERMINATE_MIRROR procedure ends all replication between the primary and secondary nodes and resets the replication state of both nodes to NOT MIRRORED. A clone operation is required to restart replication. When termination_level is RECLONE, all Db2 Mirror configuration information is retained. When termination_level is DESTROY, all Db2 Mirror configuration information is deleted.
+  The TERMINATE\_MIRROR procedure ends all replication between the primary and secondary nodes and resets the replication state of both nodes to NOT MIRRORED. A clone operation is required to restart replication. When termination\_level is RECLONE, all Db2 Mirror configuration information is retained. When termination\_level is DESTROY, all Db2 Mirror configuration information is deleted.
 
 
   | **required**: false
@@ -189,7 +189,7 @@ Return Values
       
                               
        job_log
-        | the job_log
+        | the job\_log
       
         | **returned**: always
         | **type**: str

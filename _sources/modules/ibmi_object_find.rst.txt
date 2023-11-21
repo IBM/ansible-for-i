@@ -28,7 +28,7 @@ Parameters
 
      
 age
-  Select objects whose age is equal to or greater than the specified time. Use a negative age to find objects equal to or less than the specified time. You can choose seconds, minutes, hours, days, or weeks by specifying the first letter of any of those \n words (e.g., "1w").
+  Select objects whose age is equal to or greater than the specified time. Use a negative age to find objects equal to or less than the specified time. You can choose seconds, minutes, hours, days, or weeks by specifying the first letter of any of those \\n words (e.g., "1w").
 
 
   | **required**: False
@@ -59,7 +59,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in ``become_user``.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -70,7 +70,7 @@ become_user_password
 iasp_name
   The auxiliary storage pool (ASP) where storage is allocated for the object.
 
-  The default value is ``*SYSBAS``.
+  The default value is \ :literal:`\*SYSBAS`\ .
 
   If an IASP name is specified, objects in this ASP group will be returned, including both SYSBAS and IASP.
 
@@ -101,7 +101,7 @@ lib_name
 
      
 object_name
-  The name of the object that will be returned. Whether regex can be used for object_name is controlled by ``use_regex`` option
+  The name of the object that will be returned. Whether regex can be used for object\_name is controlled by \ :literal:`use\_regex`\  option
 
 
   | **required**: false
@@ -130,7 +130,7 @@ size
 
      
 use_regex
-  Controls whether regex can be used for object_name option. The target IBM i system needs to have the International Components for Unicode (ICU) option installed. It takes time to return result if this option is turned on.
+  Controls whether regex can be used for object\_name option. The target IBM i system needs to have the International Components for Unicode (ICU) option installed. It takes time to return result if this option is turned on.
 
 
   | **required**: false
@@ -183,7 +183,7 @@ Notes
 -----
 
 .. note::
-   Hosts file needs to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
+   Hosts file needs to specify ansible\_python\_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 
 
 
