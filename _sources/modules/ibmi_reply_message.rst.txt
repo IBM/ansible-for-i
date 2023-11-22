@@ -17,7 +17,7 @@ ibmi_reply_message -- Send a reply message to the sender of an inquiry message
 Synopsis
 --------
 - Send a reply message to the sender of an inquiry message.
-- For non-IBM i targets, use the \ :strong:`ERROR while parsing`\ : While parsing "M(service)" at index 32: Module name "service" is not a FQCN\  module instead.
+- For non-IBM i targets, use the \ :ref:`ansible.builtin.service <ansible_collections.ansible.builtin.service_module>`\  module instead.
 
 
 

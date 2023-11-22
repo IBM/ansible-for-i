@@ -13,9 +13,9 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/documentation_options.js?v=8d563738"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -155,7 +155,7 @@
            <div itemprop="articleBody">
              
   <section id="ibmi-tcp-server-service-manage-tcp-server">
-<span id="ibmi-tcp-server-service-module"></span><h1>ibmi_tcp_server_service – Manage tcp server<a class="headerlink" href="#ibmi-tcp-server-service-manage-tcp-server" title="Permalink to this heading"></a></h1>
+<span id="ibmi-tcp-server-service-module"></span><h1>ibmi_tcp_server_service – Manage tcp server<a class="headerlink" href="#ibmi-tcp-server-service-manage-tcp-server" title="Link to this heading"></a></h1>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
@@ -166,14 +166,14 @@
 </ul>
 </nav>
 <section id="synopsis">
-<h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Manage and query IBMi tcp server service.</p></li>
-<li><p>For non-IBMi targets, use the <strong>ERROR while parsing</strong>: While parsing “M(service)” at index 31: Module name “service” is not a FQCN module instead.</p></li>
+<li><p>For non-IBMi targets, use the <span class="xref std std-ref">ansible.builtin.service</span> module instead.</p></li>
 </ul>
 </section>
 <section id="parameters">
-<h2><a class="toc-backref" href="#id2" role="doc-backlink">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Parameters</a><a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
 <dl>
 <dt>become_user</dt><dd><p>The name of the user profile that the IBM i task will run under.</p>
 <p>Use this option to set a user with desired privileges to run the task.</p>
@@ -218,7 +218,7 @@
 </dl>
 </section>
 <section id="examples">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">start tcp server service</span>
 <span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_tcp_server_service</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">name_list</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;*SSH&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;*HTTP&#39;</span><span class="p p-Indicator">]</span>
@@ -228,7 +228,7 @@
 </div>
 </section>
 <section id="see-also">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">See Also</a><a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -237,7 +237,7 @@
 </div>
 </section>
 <section id="return-values">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Link to this heading"></a></h2>
 <blockquote>
 <div><dl>
 <dt>job_log</dt><dd><div class="line-block">

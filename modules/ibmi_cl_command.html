@@ -13,9 +13,9 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+        <script src="../_static/documentation_options.js?v=8d563738"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -156,7 +156,7 @@
            <div itemprop="articleBody">
              
   <section id="ibmi-cl-command-executes-a-cl-control-language-command">
-<span id="ibmi-cl-command-module"></span><h1>ibmi_cl_command – Executes a CL(Control language) command<a class="headerlink" href="#ibmi-cl-command-executes-a-cl-control-language-command" title="Permalink to this heading"></a></h1>
+<span id="ibmi-cl-command-module"></span><h1>ibmi_cl_command – Executes a CL(Control language) command<a class="headerlink" href="#ibmi-cl-command-executes-a-cl-control-language-command" title="Link to this heading"></a></h1>
 <nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#synopsis" id="id1">Synopsis</a></p></li>
@@ -168,14 +168,14 @@
 </ul>
 </nav>
 <section id="synopsis">
-<h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Synopsis</a><a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_cl_command</span></code> module takes the CL command followed by a list of space-delimited arguments.</p></li>
 <li><p>For PASE(Portable Application Solutions Environment for i) or QSHELL(Unix/Linux-liked) commands, like ‘ls’, ‘chmod’, use the <code class="docutils literal notranslate"><span class="pre">command</span></code> module instead.</p></li>
 </ul>
 </section>
 <section id="parameters">
-<h2><a class="toc-backref" href="#id2" role="doc-backlink">Parameters</a><a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Parameters</a><a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
 <dl>
 <dt>asp_group</dt><dd><p>Specifies the name of the ASP(Auxiliary Storage Pool) group to set for the current thread.</p>
 <p>The ASP group name is the name of the primary ASP device within the ASP group.</p>
@@ -215,7 +215,7 @@
 </dl>
 </section>
 <section id="examples">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create a library by using CL command CRTLIB</span>
 <span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_cl_command</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">cmd</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;CRTLIB</span><span class="nv"> </span><span class="s">LIB(TESTLIB)&#39;</span>
@@ -225,7 +225,7 @@
 </div>
 </section>
 <section id="notes">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Notes</a><a class="headerlink" href="#notes" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Notes</a><a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>CL command with OUTPUT parameter like DSPLIBL, DSPHDWRSC does not have job log and does not support become user.</p>
@@ -234,7 +234,7 @@
 </div>
 </section>
 <section id="see-also">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">See Also</a><a class="headerlink" href="#see-also" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">See Also</a><a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
@@ -243,7 +243,7 @@
 </div>
 </section>
 <section id="return-values">
-<h2><a class="toc-backref" href="#id6" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Permalink to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Return Values</a><a class="headerlink" href="#return-values" title="Link to this heading"></a></h2>
 <blockquote>
 <div><dl>
 <dt>joblog</dt><dd><div class="line-block">
