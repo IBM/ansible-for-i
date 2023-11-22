@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sqlite3
 short_description: Executes a SQL statement via sqlite3
-version_added: '1.0.2'
+version_added: '1.1.0'
 description:
      - The C(ibmi_sqlite3) module takes the SQL statement as argument.
 options:
@@ -161,7 +161,7 @@ from ansible.module_utils.basic import AnsibleModule
 import sqlite3
 import datetime
 
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = "2.0.0"
 
 
 def main():

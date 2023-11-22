@@ -1,3 +1,3 @@
 ---
-# defaults value for fix_repo_download_apply_individual_ptfs
+# Default values for fix_repo_download_apply_individual_ptfs
 temp_or_perm: '*TEMP'

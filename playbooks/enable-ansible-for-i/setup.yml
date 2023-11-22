@@ -1,91 +1,101 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-
-- hosts: all 
-  gather_facts: false 
-  collections:
-   - ibm.power_ibmi
+- name: Playbook to set up IBM i for ansible collection
+  hosts: all
+  gather_facts: false
   vars:
     is_python39_to_be_installed: true
     python_interpreter_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
     python_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
 
   tasks:
-  - name: Set python39
-    set_fact:
-      python_version: 'python39'
-      python_interpreter_version: 'python3.9' 
-    when: is_python39_to_be_installed
+    - name: Set python39
+      ansible.builtin.set_fact:
+        python_version: "python39"
+        python_interpreter_version: "python3.9"
+      when: is_python39_to_be_installed
 
-  - set_fact:
-      yum_installed: false
+    - name: Initialize yum_installed
+      ansible.builtin.set_fact:
+        yum_installed: false
 
-  - name: Check whether yum has been installed. If not, install it in following tasks.
-    raw: ls -l /QOpensys/pkgs/bin/yum
-    args:
-      executable: /qopensys/usr/bin/qsh
-    register: default_yum_existance
-    ignore_errors: true
-
-  - include: ibmi-install-yum.yml
-    when: "'No such' in default_yum_existance.stdout or '/QOpensys/pkgs/bin/yum: not found' in default_yum_existance.stdout"
-
-  - block:
-      - include: ibmi-install-rpm.yml 
-        vars: 
-          python: "{{ python_version }}"
-        with_list: "{{ required_rpms }}"     
-      
-    vars:
-      required_rpms: [itoolkit, ibm_db]
-
-  - block:
-    - name: find the home directory 
-      ibmi_user_and_group:
-        operation: 'display'
-        user: '{{ ansible_ssh_user }}'
-      register: user_result
-
-    - set_fact:
-        home_dir: "{{ user_result['result_set'][0]['HOME_DIRECTORY'] }}"
-
-    - name: ensure home directory exist
-      file:
-        path: '{{ home_dir }}'
-        state: directory
-        owner: '{{ ansible_ssh_user }}'
-
-    - name: ensure .profile exist
-      file:
-        path: '{{ home_dir }}/.profile'
-        state: touch
-        owner: '{{ ansible_ssh_user }}'
-
-    - name: export PATH to ssh user profile permanently
-      raw: echo 'PATH=/QOpenSys/pkgs/bin:$PATH' >> $HOME/.profile
+    - name: Check whether yum has been installed. If not, install it in following tasks.
+      ansible.builtin.raw: ls -l /QOpensys/pkgs/bin/yum
       args:
         executable: /qopensys/usr/bin/qsh
+      changed_when: false
+      register: default_yum_existance
+      ignore_errors: true
 
-    - name: export PATH to ssh user profile permanently
-      raw: echo 'export PATH' >> $HOME/.profile
-      args:
-        executable: /qopensys/usr/bin/qsh
-    when: yum_installed == true
+    - name: Include task list from ibmi-install-yum.yml
+      ansible.builtin.include_tasks: ibmi-install-yum.yml
+      when: "'No such' in default_yum_existance.stdout or '/QOpensys/pkgs/bin/yum: not found' in default_yum_existance.stdout"
 
-  - name: change SSHD server auto-started
-    command: 'system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"'
+    - name: Include task list
+      vars:
+        required_rpms: [itoolkit, ibm_db]
+      block:
+        - name: Include task list from ibmi-install-rpm.yml
+          ansible.builtin.include_tasks: ibmi-install-rpm.yml
+          vars:
+            python: "{{ python_version }}"
+          with_list: "{{ required_rpms }}"
 
-  - name: Verify 5770DG1
-    command: system "DSPSFWRSC"
-    register: installed_native_products
+    - name: Final set up actions
+      when: yum_installed
+      block:
+        - name: Find the home directory
+          ibm.power_ibmi.ibmi_user_and_group:
+            operation: "display"
+            user: "{{ ansible_ssh_user }}"
+          register: user_result
 
-  - name: Promote message if 5770DG1 is not installed
-    fail:
-      msg: 5770DG1 is not installed
-    when: '"5770DG1" not in installed_native_products.stdout'
+        - name: Set home_dir
+          ansible.builtin.set_fact:
+            home_dir: "{{ user_result['result_set'][0]['HOME_DIRECTORY'] }}"
 
-  - name: IBM i is now available for being managed by Ansible
-    debug:
-      msg: "The IBM i node is ready for Ansible."
-    when: '"5770DG1" in installed_native_products.stdout'
+        - name: Ensure home directory exists
+          ansible.builtin.file:
+            path: "{{ home_dir }}"
+            state: directory
+            owner: "{{ ansible_ssh_user }}"
+            mode: "0700"
+
+        - name: Ensure .profile exist
+          ansible.builtin.file:
+            path: "{{ home_dir }}/.profile"
+            state: touch
+            owner: "{{ ansible_ssh_user }}"
+            mode: "0600"
+
+        - name: Export PATH to ssh user profile permanently
+          ansible.builtin.raw: echo 'PATH=/QOpenSys/pkgs/bin:$PATH' >> $HOME/.profile
+          args:
+            executable: /qopensys/usr/bin/qsh
+          changed_when: true
+
+        - name: Export PATH to ssh user profile permanently
+          ansible.builtin.raw: echo 'export PATH' >> $HOME/.profile
+          args:
+            executable: /qopensys/usr/bin/qsh
+          changed_when: true
+
+    - name: Change SSHD server auto-started
+      ansible.builtin.command: 'system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"'
+      changed_when: true
+
+    - name: Verify 5770DG1
+      ansible.builtin.command: system "DSPSFWRSC"
+      register: installed_native_products
+      changed_when: false
+
+    - name: Provide error message if 5770DG1 is not installed
+      ansible.builtin.fail:
+        msg: 5770DG1 is not installed
+      when: '"5770DG1" not in installed_native_products.stdout'
+
+    - name: IBM i is now available for being managed by Ansible
+      ansible.builtin.debug:
+        msg: "The IBM i node is ready for Ansible."
+      when: '"5770DG1" in installed_native_products.stdout'

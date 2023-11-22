@@ -1,9 +1,9 @@
 ---
-# role for fix_repo_check_ptf_group
+# Role for fix_repo_check_ptf_group
 # Get the latest PTF group information from PSP(Preventive Service Planning) server, and check if the latest PTF group is already
 # in ptf_group_image table or already downloading.
 - name: Initialize check_ptf_group_fail
-  set_fact:
+  ansible.builtin.set_fact:
     check_ptf_group_fail: false
 
 - name: Check and get the latest PTF group information on PSP
@@ -12,21 +12,24 @@
   register: fix_group_check_result
 
 - name: Print the latest PTF group information
-  debug:
+  ansible.builtin.debug:
     var: fix_group_check_result
 
-- block:
-    - name: If get the latest PTF group information fail
-      debug:
+- name: Check for failure
+  when: fix_group_check_result.group_info is not defined
+  block:
+    - name: If cannot get the latest PTF group information, then fail
+      ansible.builtin.debug:
         msg: "Get the latest PTF group information fail, skip the rest of this role"
 
     - name: Set check_ptf_group_fail to True
-      set_fact:
+      ansible.builtin.set_fact:
         check_ptf_group_fail: true
-  when: fix_group_check_result.group_info is not defined
 
-- block:
-    - name: Check if ptf group information is already in catalog's ptf group information table
+- name: Perform checking
+  when: fix_group_check_result.group_info is defined
+  block:
+    - name: Check if PTF group information is already in catalog's PTF group information table
       ibm.power_ibmi.ibmi_fix_repo:
         type: "ptf_group"
         action: "find"
@@ -38,11 +41,13 @@
       when: fix_group_check_result.group_info != []
 
     - name: Print find PTF group result
-      debug:
+      ansible.builtin.debug:
         var: ptf_group_find_result
 
-    - block:
-        - name: Check if ptf group information is already in catalog's download_status table, which means ptf group is downloading.
+    - name: Checking download status table
+      when: ptf_group_find_result.fail_list is defined
+      block:
+        - name: Check if PTF group information is already in catalog's download_status table, which means PTF group is downloading.
           ibm.power_ibmi.ibmi_fix_repo:
             type: "download_status"
             action: "find"
@@ -54,8 +59,5 @@
           when: fix_group_check_result.group_info != []
 
         - name: Print find download_status table result
-          debug:
+          ansible.builtin.debug:
             var: download_status_find_result
-      when: ptf_group_find_result.fail_list is defined
-
-  when: fix_group_check_result.group_info is defined

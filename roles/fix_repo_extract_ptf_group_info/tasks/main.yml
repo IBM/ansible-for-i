@@ -1,5 +1,5 @@
 ---
-# role for fix_repo_extract_ptf_group_info
+# Role for fix_repo_extract_ptf_group_info
 # Call ibm.power_ibmi.ibmi_fix_repo module to get the order information in download_status table, then call ibm.power_ibmi.ibmi_fix_repo module again to extract
 # and update ptf group's information into ptf_group_image_info table in catalog.
 - name: Find the order information in download_status table
@@ -12,7 +12,7 @@
   register: fix_repo_find_result
 
 - name: Print order information
-  debug:
+  ansible.builtin.debug:
     var: fix_repo_find_result
 
 - name: Update PTF group record into catalog
@@ -30,10 +30,10 @@
   when: fix_repo_find_result.success_list | default([]) != []
 
 - name: Print PTF group record information
-  debug:
+  ansible.builtin.debug:
     var: fix_repo_update_result
 
 - name: Print find error msg if any
-  debug:
+  ansible.builtin.debug:
     msg: Find order fail in download_status table
   when: fix_repo_find_result.fail_list | default([]) != []

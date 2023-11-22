@@ -20,7 +20,7 @@ short_description: Send a reply message to the sender of an inquiry message
 version_added: '1.0.0'
 description:
   - Send a reply message to the sender of an inquiry message.
-  - For non-IBM i targets, use the M(service) module instead.
+  - For non-IBM i targets, use the M(ansible.builtin.service) module instead.
 options:
   message_key:
     description:
@@ -172,13 +172,13 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = "2.0.0"
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            message_key=dict(type='str', required=True),
+            message_key=dict(type='str', required=True, no_log=False),
             message_queue=dict(type='str', required=True),
             message_lib=dict(type='str', default='*LIB'),
             reply=dict(type='str', default='*DFT'),

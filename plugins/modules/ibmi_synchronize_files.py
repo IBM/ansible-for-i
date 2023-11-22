@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_synchronize_files
 short_description: Synchronize a list of files from IBM i node A to another IBM i node B
-version_added: '1.0.2'
+version_added: '1.1.0'
 description:
      - The C(ibmi_synchronize_files) plugin synchronize a list of files from IBM i node A to another IBM i node B.
      - C(ibmi_synchronize_files) plugin calls ibmi_sync_files module.

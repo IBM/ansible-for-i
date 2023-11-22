@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
 ---
 module: ibmi_sync_files
 short_description: Synchronize a list of files from current IBM i node A to another IBM i node B.
-version_added: '1.0.2'
+version_added: '1.1.0'
 description:
      - The C(ibmi_sync_files) module synchronize a list of files from current IBM i node to another IBM i node.
      - Only supports SAVF(.file) and MBR(only supports "database" subtype Physical files(PF-DTA attribute)) format synchronize between QSYS and QSYS.
@@ -166,7 +166,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from tempfile import mkdtemp
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = "2.0.0"
 HAS_PARAMIKO = True
 
 try:
@@ -219,7 +219,7 @@ def main():
         ifs_dir = mkdtemp("", "ansible_for_i_temp", None)
         ibmi_util.log_debug("mkdtemp " + ifs_dir, module._name)
         if not os.path.isdir(ifs_dir):
-            return_error(module, f"mkdtemp on current host failed. dir = {ifs_dir}. {err}", result)
+            return_error(module, f"mkdtemp on current host failed. dir = {ifs_dir}.", result)
 
         try:
             private_key = to_bytes(private_key, errors='surrogate_or_strict')

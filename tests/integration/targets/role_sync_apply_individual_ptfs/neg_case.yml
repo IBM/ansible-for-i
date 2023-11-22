@@ -16,4 +16,4 @@
       that:
         - sync_fail_list | length == 1
         - sync_success_list | length == 0
-        - sync_fail_list[0]['fail_reason'] == "src {{sync_fail_list[0]['file_path']}} doesn't exist."
+        - "'No such file or directory' in sync_fail_list[0]['fail_reason']"

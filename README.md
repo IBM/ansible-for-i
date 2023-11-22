@@ -7,17 +7,17 @@ IBM Power Systems is a family of enterprise servers that helps transform your or
 Ansible Content for IBM Power Systems - IBM i, as part of the broader offering of <b>Ansible Content for IBM Power Systems</b>, is available from Ansible Galaxy and has community support.
 
 # Requirements
-In order to use this Ansible Content for IBM Power Systems, you must have the following pre-requisite software installed and available on your Ansible server and IBM i node:
+In order to use the Ansible collection for Power Systems on IBM i with <b>release 2.0.0</b> and beyond, you must have the following pre-requisite software installed and available on your Ansible server and IBM i node:
 
 - Dependencies on Ansible server
-  * Python v3.6+
+  * <b>Python v3.9+</b>
     Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc). If you install Python from the package manager for your operating system, you must also install the development libraries (usually a package named python3-devel), as these are required when installing modules through pip.
 
     The official Python website: <a href="https://www.python.org/downloads/" target="_blank">official Python website</a>
 
     The unofficial Python version manager: <a href="https://github.com/pyenv/pyenv" target="_blank">unofficial Python version manager</a>
 
-  * Ansible v2.9+
+  * <b>Ansible v2.14+</b>
 
     Ansible can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc). You can also install it using pip, the package manager for Python: pip3 install ansible
 
@@ -27,6 +27,9 @@ In order to use this Ansible Content for IBM Power Systems, you must have the fo
   * python3
   * python3-itoolkit
   * python3-ibm_db
+
+- Dependencies on IBM i Ansible server:
+  * Ansible v2.14+ is not available as a prepackaged rpm for IBM i, yet can be installed with python pip. In the documentation site noted below under "Resources" there are detailed instructions provided in the "Getting Started" section for setting up Ansible with pip.
 
 # Resources
 For detail guides and reference, please visit the <a href="https://ibm.github.io/ansible-for-i/index.html" target="_blank">Documentation</a> site.

@@ -1,85 +1,89 @@
 ---
-# task for transfer.yml
-- name: initialize sync_list
-  set_fact:
+# Task for transfer.yml
+- name: Initialize sync_list
+  ansible.builtin.set_fact:
     path: ''
     sync_list: []
     sync_success_list: []
 
 - name: Print not_loaded_list_var
-  debug:
+  ansible.builtin.debug:
     var: not_loaded_list_var
 
 - name: Recursively find ptf files
-  find:
+  ansible.builtin.find:
     paths: "{{ not_loaded_list_var.file_path }}"
     recurse: true
   delegate_to: "{{ src_host }}"
   register: find_result
 
 - name: Print find_result
-  debug:
+  ansible.builtin.debug:
     var: find_result
 
-- name: quit
-  fail:
+- name: Quit
+  ansible.builtin.fail:
     msg: "ptf_dir: {{ not_loaded_list_var.file_path }} is not valid or doesn't contain any file, quit."
   when: find_result.matched == 0
 
 - name: Compose target tmp dir str
-  set_fact:
+  ansible.builtin.set_fact:
     path: "~/PTF/singleptf/{{ not_loaded_list_var.file_path | basename }}"
 
 - name: Print path
-  debug:
+  ansible.builtin.debug:
     var: path
 
-- name: check if the folder is already exists
+- name: Check if the folder is already exists
   ansible.builtin.stat:
     path: "{{ path }}"
   register: stat_result
   ignore_errors: true
 
 - name: Include check_file role to check if files are the same
-  include_role:
+  ansible.builtin.include_role:
     name: check_file
   vars:
     target_file_path: "{{ path }}"
     repo_file_path: "{{ not_loaded_list_var.file_path }}"
   when: stat_result.stat.exists is true
 
-- block:
+- name: Transfer images
+  when: same_files is false or stat_result.stat.exists is false
+  block:
     - name: Clear receive dir
-      file:
+      ansible.builtin.file:
         path: "{{ path }}"
         state: absent
       register: clear_result
       ignore_errors: true
 
     - name: Make receive dir
-      file:
+      ansible.builtin.file:
         path: "{{ path }}"
         state: directory
-        mode: 0755
+        mode: '0755'
       register: file_result
       ignore_errors: true
 
-    - block:
-        - name: Skip when make receive dir fail
-          fail:
-            msg: "{{ 'Make receive dir ' + path + ' fail, quit.' }}"
+    - name: Failure with receive dir
       when: file_result.failed == 1
+      block:
+        - name: Skip when make receive dir fail
+          ansible.builtin.fail:
+            msg: "{{ 'Make receive dir ' + path + ' fail, quit.' }}"
 
-    - block:
-        - name: compose src_list
-          set_fact:
+    - name: Transfer image
+      block:
+        - name: Compose src_list
+          ansible.builtin.set_fact:
             src_list: "{{ src_list | default([]) + [{ 'src': find_result_files_var.path }] }}"
           loop: "{{ find_result.files }}"
           loop_control:
             loop_var: find_result_files_var
 
-        - name: debug src_list
-          debug:
+        - name: Debug src_list
+          ansible.builtin.debug:
             var: src_list
 
         - name: Transfer image to target_system
@@ -90,29 +94,27 @@
           register: sync_result
 
         - name: Print transfer
-          debug:
+          ansible.builtin.debug:
             var: sync_result
 
-        - block:
-            - name: delete the dest file dir
-              file:
+        - name: Sync failure handling
+          when: sync_result.fail_list != []
+          block:
+            - name: Delete the dest file dir
+              ansible.builtin.file:
                 path: "{{ path }}"
                 state: absent
               failed_when: false
               when: delete
 
-            - name: skip when transfer failed
-              fail:
+            - name: Skip when transfer failed
+              ansible.builtin.fail:
                 msg: "One or more ptf file transfer failed, quit."
 
-          when: sync_result.fail_list != []
-
-  when: same_files is false or stat_result.stat.exists is false
-
 - name: Compose
-  set_fact:
+  ansible.builtin.set_fact:
     dest_file_path: "{{ dest_file_path | default([]) + [path] }}"
 
 - name: Print dest_file_path
-  debug:
+  ansible.builtin.debug:
     var: dest_file_path

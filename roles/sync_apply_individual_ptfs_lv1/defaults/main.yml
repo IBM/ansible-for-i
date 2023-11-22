@@ -1,4 +1,4 @@
 ---
-# defaults value for sync_apply_individual_ptfs
+# Default values for sync_apply_individual_ptfs
 already_loaded_list: []
 delete: true

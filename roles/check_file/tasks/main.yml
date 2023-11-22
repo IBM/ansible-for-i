@@ -1,23 +1,23 @@
 ---
-# role for check_file
+# Role for check_file
 # This role will check the image files' checksum between target server and repository server, in order to determine if can skip the transfer or not
-- name: compose same_files
-  set_fact:
+- name: Compose same_files
+  ansible.builtin.set_fact:
     same_files: true
 
 - name: Recursively find files on target server
-  find:
+  ansible.builtin.find:
     paths: "{{ target_file_path }}"
     recurse: true
     get_checksum: true
   register: find_result_target
 
 - name: Print find_result
-  debug:
+  ansible.builtin.debug:
     var: find_result_target
 
 - name: Recursively find files on repo server
-  find:
+  ansible.builtin.find:
     paths: "{{ repo_file_path }}"
     recurse: true
     get_checksum: true
@@ -25,20 +25,20 @@
   register: find_result_repo
 
 - name: Print find_result
-  debug:
+  ansible.builtin.debug:
     var: find_result_repo
 
 - name: Check if target server dir or repo server dir is empty
-  set_fact:
+  ansible.builtin.set_fact:
     same_files: false
   when: find_result_repo.files == [] or find_result_target.files == []
 
 - name: Recursively compare the files' checksum between target server and repo server
-  include_tasks: compare_path.yml
+  ansible.builtin.include_tasks: compare_path.yml
   loop: "{{ find_result_repo.files }}"
   loop_control:
     loop_var: find_result_repo_var
 
 - name: Print same_files
-  debug:
+  ansible.builtin.debug:
     var: same_files

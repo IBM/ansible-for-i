@@ -20,7 +20,7 @@ short_description: Manage host server
 version_added: '1.0.0'
 description:
   - Manage and query IBM i host server service.
-  - For non-IBM i targets, use the M(service) module instead.
+  - For non-IBM i targets, use the M(ansible.builtin.service) module instead.
 options:
   name_list:
     description:
@@ -159,7 +159,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = "2.0.0"
 IBMi_STRSVR = "QSYS/STRHOSTSVR"
 IBMi_ENDSVR = "QSYS/ENDHOSTSVR"
 IBMi_HOST_SERVER_LIST = ["*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP"]

@@ -1,5 +1,5 @@
 ---
-# role for fix_repo_download_add_ptf_group
+# Role for fix_repo_download_add_ptf_group
 # Call ibm.power_ibmi.ibmi_download_fix module to download ptf group,
 # then call ibm.power_ibmi.ibmi_fix_repo module to add information into download_status table in catalog.
 - name: Download PTF group
@@ -10,7 +10,7 @@
   register: download_fix_result
 
 - name: Print download information
-  debug:
+  ansible.builtin.debug:
     var: download_fix_result
 
 - name: Add order information into download_status table
@@ -41,5 +41,5 @@
   when: download_fix_result.order_id is defined
 
 - name: Print add order information result
-  debug:
+  ansible.builtin.debug:
     var: download_status_add_result

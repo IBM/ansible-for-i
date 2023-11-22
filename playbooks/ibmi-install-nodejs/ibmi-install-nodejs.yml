@@ -1,55 +1,66 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-- hosts: all
+- name: Playbook to install nodejs
+  hosts: all
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
-    checkout_dir: 'tmp_nodejs'
+    checkout_dir: "tmp_nodejs"
 
   tasks:
-  - name: Install Node js
-    command: /QOpensys/pkgs/bin/yum install nodejs10 -y
-    ignore_errors: true
+    - name: Install Node js
+      ansible.builtin.command: /QOpensys/pkgs/bin/yum install nodejs10 -y    # noqa: command-instead-of-module
+      # Unable to use ansible.builtin.yum (only for python2) and dnf (for python3) is not yet on IBM i PASE
+      failed_when: false
+      changed_when: true
 
-  - name: verify git has been installed
-    stat:
-      path: /QOpensys/pkgs/bin/git
-    register: git_stat
+    - name: Verify git has been installed
+      ansible.builtin.stat:
+        path: /QOpensys/pkgs/bin/git
+      register: git_stat
 
-  - name: Install git if it is not there
-    command: /QOpensys/pkgs/bin/yum install git -y
-    when: not git_stat.stat.exists
+    - name: Install git if it is not there
+      ansible.builtin.command: /QOpensys/pkgs/bin/yum install git -y    # noqa: command-instead-of-module
+      # Unable to use ansible.builtin.yum (only for python2) and dnf (for python3) is not yet on IBM i PASE
+      when: not git_stat.stat.exists
+      changed_when: not git_stat.stat.exists
 
-  - name: upgrade yum in case EC_POINT_copy error
-    command: /QOpensys/pkgs/bin/yum upgrade -y
+    - name: Upgrade yum in case EC_POINT_copy error
+      ansible.builtin.command: /QOpensys/pkgs/bin/yum upgrade -y    # noqa: command-instead-of-module
+      # Unable to use ansible.builtin.yum (only for python2) and dnf (for python3) is not yet on IBM i PASE
+      changed_when: true
 
-  - name: create symlink for git command to use git module
-    command: ln -fs /QOpensys/pkgs/bin/git /usr/bin/git
-    ignore_errors: true
-    
-  - name: set http.sslVerify for git
-    command: 'git config --global http.sslVerify false'
-    ignore_errors: true 
+    - name: Create symlink for git command to use git module
+      ansible.builtin.command: ln -fs /QOpensys/pkgs/bin/git /usr/bin/git
+      changed_when: true
+      failed_when: false
 
-  - name: clone repo
-    git:
-      repo: 'https://github.com/IBM/ibmi-oss-examples.git'
-      dest: '{{ checkout_dir }}'
+    - name: Set http.sslVerify for git
+      community.general.git_config:
+        name: http.sslVerify
+        scope: global
+        value: false
+      changed_when: true
+      failed_when: false
 
-  - name: npm i
-    shell: "(/QOpensys/pkgs/lib/nodejs10/bin/npm  i  --scripts-prepend-node-path)"
-    args:
-      warn: false
-      chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
-      executable: /usr/bin/sh
+    - name: Clone repo
+      ansible.builtin.git:
+        repo: "https://github.com/IBM/ibmi-oss-examples.git"
+        dest: "{{ checkout_dir }}"    # noqa: latest
+        update: false
 
-  - name: Start the demo application
-    shell: "(nohup /QOpensys/pkgs/lib/nodejs10/bin/node index.js >/dev/null 2>&1 &)"
-    args:
-      warn: false
-      chdir: '{{ checkout_dir }}/nodejs/mynodeapp'
-      executable: /usr/bin/sh
-    async: 10
+    - name: Run npm i
+      ansible.builtin.shell: "(/QOpensys/pkgs/lib/nodejs10/bin/npm  i  --scripts-prepend-node-path)"
+      args:
+        chdir: "{{ checkout_dir }}/nodejs/mynodeapp"
+        executable: /usr/bin/sh
+      changed_when: true
+
+    - name: Start the demo application
+      ansible.builtin.shell: "(nohup /QOpensys/pkgs/lib/nodejs10/bin/node index.js >/dev/null 2>&1 &)"
+      args:
+        chdir: "{{ checkout_dir }}/nodejs/mynodeapp"
+        executable: /usr/bin/sh
+      async: 10
+      changed_when: true

@@ -3,8 +3,8 @@
     cmd: QSYS/WRKCFGSTS CFGTYPE(*LIN) CFGD({{ line_description }}) OUTPUT(*)
   register: designated_lind_query
 
-- name: compose lind_exists and lined_state
-  set_fact:
+- name: Compose lind_exists and lined_state
+  ansible.builtin.set_fact:
     lind_exists: true
     lined_state: "{{ lind_status.split(' ')[-1] }}"
   when: line_description in lind_status
@@ -18,9 +18,10 @@
   when: lind_exists is true and lined_state != 'ACTIVE'
 
 - name: Create a new line description if it doesn't exist
+  when: line_description not in designated_lind_query.stdout
   block:
     - name: Find resource name of ethernet port
-      include: find_resource_name_of_ethernet_port.yml
+      ansible.builtin.include_tasks: find_resource_name_of_ethernet_port.yml
       when: resource_name is undefined or not resource_name
 
     - name: Create line description
@@ -30,4 +31,3 @@
     - name: Vary on the line_description
       ibm.power_ibmi.ibmi_cl_command:
         cmd: VRYCFG CFGOBJ({{ line_description }}) CFGTYPE(*LIN) STATUS(*ON)
-  when: line_description not in designated_lind_query.stdout

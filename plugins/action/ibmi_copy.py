@@ -14,7 +14,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "1.9.2"
+__ibmi_module_version__ = "2.0.0"
 
 display = Display()
 
@@ -76,6 +76,7 @@ class ActionModule(ActionBase):
         result = super().run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
 
+        created = False
         try:
             result = dict(
                 msg="",
@@ -92,7 +93,6 @@ class ActionModule(ActionBase):
                 rc=255,
                 failed=False
             )
-            created = False
             if self._play_context.check_mode:
                 result['skipped'] = True
                 result['msg'] = 'check mode not (yet) supported for this module'

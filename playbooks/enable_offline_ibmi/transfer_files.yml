@@ -3,22 +3,25 @@
 
 # setup ibmi off line
 ---
-- name: check whether the installation {{ package }} package can be found on ansible server
-  stat:
-    path: '{{ package_path }}/{{ package }}'
+- name: Check whether the installation package can be found on ansible server. Package {{ package }}
+  ansible.builtin.stat:
+    path: "{{ package_path }}/{{ package }}"
   delegate_to: localhost
   register: installation_file_state
 
-- set_fact:
+- name: Set transfer cmd
+  ansible.builtin.set_fact:
     transfer_command: "scp {{ package_path }}/{{ package }} {{ ibmi_user }}@{{ ibmi_host }}:{{ target_path }}/"
 
-- name: transfer installation package to remote IBM i and the target directory is {{ target_path }}
+- name: Transfer installation package to remote IBM i and the target directory is {{ target_path }}
   no_log: true
-  shell: 'sshpass -p "{{ ibmi_pass }}" {{ transfer_command }}'
+  ansible.builtin.shell: 'sshpass -p "{{ ibmi_pass }}" {{ transfer_command }}'    # noqa: command-instead-of-shell
   delegate_to: localhost
   when: ibmi_pass != ""
+  changed_when: ibmi_pass != ""
 
-- name: transfer installation package to remote IBM i and the target directory is {{ target_path }}
-  shell: '{{ transfer_command }}'
+- name: Transfer installation package to remote IBM i and the target directory is {{ target_path }}
+  ansible.builtin.shell: "{{ transfer_command }}"    # noqa: command-instead-of-shell
   delegate_to: localhost
   when: ibmi_pass == ""
+  changed_when: ibmi_pass == ""
