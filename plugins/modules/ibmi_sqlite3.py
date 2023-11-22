@@ -161,7 +161,7 @@ from ansible.module_utils.basic import AnsibleModule
 import sqlite3
 import datetime
 
-__ibmi_module_version__ = ""
+__ibmi_module_version__ = "2.0.0"
 
 
 def main():

@@ -163,7 +163,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = ""
+__ibmi_module_version__ = "2.0.0"
 
 images = []
 ptf_repo_lv1_table = 'ptf_repo_lv1_info'

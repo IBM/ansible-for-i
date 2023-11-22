@@ -169,7 +169,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = ""
+__ibmi_module_version__ = "2.0.0"
 
 single_ptf_table = 'single_ptf_info'
 ptf_group_image_table = 'ptf_group_image_info'
