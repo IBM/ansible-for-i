@@ -117,6 +117,7 @@
       ibm.power_ibmi.ibmi_fix_imgclg:
         src: '{{ path }}'
         fix_omit_list: '{{ ptf_omit_list | default([]) }}'
+        apply_type: '{{ apply_type }}'
         rollback: true
       register: apply_result
 
