@@ -252,7 +252,7 @@ Examples
 
    
    - name: create an interface 1
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.11'
        subnet_mask: '255.255.255.0'
        line_description: 'LIND1'
@@ -260,7 +260,7 @@ Examples
        state: 'present'
 
    - name: create an interface 2
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.12'
        line_description: 'LIND1'
        subnet_mask: '255.255.255.0'
@@ -268,7 +268,7 @@ Examples
        alias_name: 'alias'
 
    - name: create an interface 3
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.13'
        line_description: 'LIND1'
        subnet_mask: '255.255.255.0'
@@ -278,7 +278,7 @@ Examples
        alias_name: 'alias13'
 
    - name: create an interface 4
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.14'
        line_description: 'LIND1'
        subnet_mask: '255.255.255.0'
@@ -289,7 +289,7 @@ Examples
        alias_name: 'alias14'
 
    - name: create an interface 5
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.15'
        line_description: 'LIND1'
        vlan_id: '2'
@@ -301,20 +301,20 @@ Examples
        alias_name: 'alias15'
 
    - name: change an interface 1
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.11'
        subnet_mask: '255.255.0.0'
        state: 'present'
 
    - name: change an interface 2
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.12'
        subnet_mask: '255.255.0.0'
        state: 'present'
        alias_name: 'alias2'
 
    - name: change an interface 3
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.11'
        preferred_interface:
          - "9.5.155.12"
@@ -322,28 +322,28 @@ Examples
        state: 'present'
 
    - name: change an interface 4
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.12'
        state: 'present'
        alias_name: 'alias2'
 
    - name: query an interface by ip
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.12'
        state: 'present'
 
    - name: query an interface by alias name
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        alias_name: 'alias14'
        state: 'present'
 
    - name: remove an interface by ip
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        internet_address: '9.5.155.11'
        state: 'absent'
 
    - name: remove an interface by alias name
-     ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+     ibm.power_ibmi.ibmi_tcp_interface:
        alias_name: 'alias2'
        state: 'absent'
 

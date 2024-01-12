@@ -105,13 +105,13 @@ Examples
 
    
    - name: Deleting all Licensed Program Objects, run as USER1.
-     ibmi_ibm.power_ibmi.ibmi_uninstall_product:
+     ibm.power_ibmi.ibmi_uninstall_product:
        product: 5770QU1
        become_user: 'USER1'
        become_user_password: 'yourpassword'
 
    - name: Deleting only the German (NLV 2929) objects for all options of the licensed program 5770QU1.
-     ibmi_ibm.power_ibmi.ibmi_uninstall_product:
+     ibm.power_ibmi.ibmi_uninstall_product:
        product: 5770QU1
        language: 2929
 

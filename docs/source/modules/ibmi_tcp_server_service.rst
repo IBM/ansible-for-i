@@ -95,7 +95,7 @@ Examples
 
    
    - name: start tcp server service
-     ibmi_ibm.power_ibmi.ibmi_tcp_server_service:
+     ibm.power_ibmi.ibmi_tcp_server_service:
        name_list: ['*SSH', '*HTTP']
        state: 'started'
        joblog: True
