@@ -16,7 +16,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum, checksum_s, md5, secure_hash
 from ansible.utils.path import makedirs_safe
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 ifs_dir = '/tmp/.ansible'
 display = Display()
@@ -264,14 +264,16 @@ class ActionModule(ActionBase):
                 return result
             source = self._connection._shell.join_path(source)
             source = self._remote_expand_user(source)
+            remote_stat     = None
             remote_checksum = None
             if not self._connection.become:
                 # calculate checksum for the remote file, don't bother if using become as slurp will be used
                 # Force remote_checksum to follow symlinks because fetch always follows symlinks
-                remote_checksum = self._remote_checksum(source, all_vars=task_vars, follow=True)
+                remote_stat = self._execute_remote_stat(source, all_vars=task_vars, follow=True)
             # use slurp if permissions are lacking or privilege escalation is needed
             remote_data = None
-            if remote_checksum in ('1', '2', None):
+            remote_checksum = remote_stat.get('checksum')
+            if remote_checksum in (None, '1', ''):
                 slurpres = self._execute_module(module_name='slurp', module_args=dict(src=source), task_vars=task_vars)
                 if slurpres.get('failed'):
                     if (slurpres.get('msg').startswith('file not found') or remote_checksum == '1'):
@@ -316,25 +318,7 @@ class ActionModule(ActionBase):
                     target_name = self._play_context.remote_addr
                 dest = f"{self._loader.path_dwim(dest)}/{target_name}/{source_local}"
 
-            dest = dest.replace("//", "/")
-            if remote_checksum in ('0', '1', '2', '3', '4', '5'):
-                result['changed'] = False
-                result['file'] = source
-                if remote_checksum == '0':
-                    result['msg'] = "unable to calculate the checksum of the remote file"
-                elif remote_checksum == '1':
-                    result['msg'] = "the remote file does not exist"
-                elif remote_checksum == '2':
-                    result['msg'] = "no read permission on remote file"
-                elif remote_checksum == '3':
-                    result['msg'] = "remote file is a directory, fetch cannot work on directories"
-                elif remote_checksum == '4':
-                    result['msg'] = "python isn't present on the system.  Unable to compute checksum"
-                elif remote_checksum == '5':
-                    result['msg'] = "stdlib json was not found on the remote machine. Only the raw module can work without those installed"
-
-                result['failed'] = True
-                return result
+            dest = os.path.normpath(dest)
 
             # calculate checksum for the local file
             local_checksum = checksum(dest)

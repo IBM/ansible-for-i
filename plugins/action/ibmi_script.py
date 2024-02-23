@@ -12,7 +12,7 @@ from ansible.module_utils.six import string_types
 from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 display = Display()
 
 
@@ -91,12 +91,14 @@ class ActionModule(ActionBase):
             tmp_src = self._connection._shell.join_path(self._connection._shell.tmpdir, os.path.basename(src))
             display.debug(f"ibm i debug: transfer script file {src} to {tmp_src}")
             self._transfer_file(src, tmp_src)
-
+            
+            remote_stat    = None
             local_checksum = checksum(src)
             if not self._connection.become:
-                remote_checksum = self._remote_checksum(tmp_src, all_vars=task_vars, follow=True)
-
-            if remote_checksum in ('1', '2', None):
+                remote_stat = self._execute_remote_stat(tmp_src, all_vars=task_vars, follow=True)
+            
+            remote_checksum = remote_stat.get('checksum')
+            if remote_checksum in (None, '1', ''):
                 result['stderr'] += f"The permissions are lacking or privilege is needed. remote_checksum:{remote_checksum}"
             elif local_checksum != remote_checksum:
                 result['stderr'] += "local_checksum doesn't match remote_checksum."
