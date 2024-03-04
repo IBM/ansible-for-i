@@ -109,7 +109,7 @@ Examples
 
    
    - name: Query the data of table Persons.
-     ibmi_ibm.power_ibmi.ibmi_sql_query:
+     ibm.power_ibmi.ibmi_sql_query:
        sql: 'select * from Persons'
        become_user: 'USER1'
        become_user_password: 'yourpassword'

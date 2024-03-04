@@ -95,7 +95,7 @@ Examples
 
    
    - name: Synchronize a list of different types of files to host.com.
-     ibmi_ibm.power_ibmi.ibmi_synchronize_files:
+     ibm.power_ibmi.ibmi_synchronize_files:
        src_list:
          - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/test.lib/'}
          - {'src': '/qsys.lib/test.lib/test.file', 'dest': '/qsys.lib/test.lib'}

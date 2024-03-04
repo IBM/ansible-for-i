@@ -94,9 +94,21 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name: start tcp server service
-     ibmi_ibm.power_ibmi.ibmi_tcp_server_service:
-       name_list: ['*SSH', '*HTTP']
+   - name: Start http server with tcp server service
+     ibm.power_ibmi.ibmi_tcp_server_service:
+       name_list: ['*HTTP']
+       state: 'started'
+       joblog: True
+
+   - name: Stop ssh server
+     ibm.power_ibmi.ibmi_tcp_server_service:
+       name_list: ['*SSH']
+       state: 'stopped'
+       joblog: True
+
+   - name: Restart ssh server (in the same playbook as stopping ssh server)
+     ibm.power_ibmi.ibmi_tcp_server_service:
+       name_list: ['*SSH']
        state: 'started'
        joblog: True
 
