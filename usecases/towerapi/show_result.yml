@@ -1,5 +1,5 @@
 - name: Check A Job
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/workflow_jobs/{{ workflow_job.json.id }}/"
     status_code: 200
     method: GET
@@ -13,5 +13,5 @@
   when: workflow_job.json.id | int >= 0
 
 - name: Display The Launch Result
-  debug:
+  ansible.builtin.debug:
     msg: "Workflow Status: {{ workflow_job_info.json.status }}"

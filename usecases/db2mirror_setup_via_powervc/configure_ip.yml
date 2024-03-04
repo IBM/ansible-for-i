@@ -1,13 +1,17 @@
-- debug: var=network
+- name: Display network
+  ansible.builtin.debug:
+    var: network
 
-- include_role:
+- name: Display network info role
+  ansible.builtin.include_role:
     name: display_network_info_via_powervc
     apply:
       delegate_to: powervc
   vars:
     mac_addr: "{{ network['OS-EXT-IPS-MAC:mac_addr'] }}"
 
-- include_role:
+- name: Present IP interface role
+  ansible.builtin.include_role:
     name: present_ip_interface
     apply:
       delegate_to: source

@@ -28,10 +28,9 @@
   # sourceVmNameOnPowerVC -- The vm name of source node displayed on PowerVC.
 
 ---
-- hosts: powervc
+- name: Playbook for DB2 mirror set up with PowerVC
+  hosts: powervc
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
     ## Required parameters
@@ -55,10 +54,10 @@
       {% endraw %}
 
   tasks:
-    - name: set facts
-      set_fact:
+    - name: Set facts
+      ansible.builtin.set_fact:
         imagename: DB2Mirror
-        terminationLevel: 'RECLONE'
+        terminationlevel: 'RECLONE'
         dependent_lpps:
           - {'product_id': '5770SS1', 'product_option': '41', 'feature_code': '5116', 'description': 'HA Switchable Resources'}
           - {'product_id': '5770SS1', 'product_option': '48', 'feature_code': '5120', 'description': 'Db2 Data Mirroring'}
@@ -66,56 +65,57 @@
           - {'product_id': '5770DBM', 'product_option': '*BASE', 'feature_code': '5050', 'description': 'IBM Db2 Mirror for i'}
 
     - name: Ensure required products have been installed and licenses are in place
-      include: check_lpps.yml
+      ansible.builtin.include_tasks: check_lpps.yml
       loop: '{{ dependent_lpps }}'
       loop_control:
         loop_var: lpp
 
     # Check if system name of source node equals to rbd name of source node.
     - name: Query system name of source node
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: 'SELECT HOST_NAME FROM QSYS2.SYSTEM_STATUS_INFO;'
       register: source_system_name
       delegate_to: source
 
-    - name: check system name and *LOCAL RDB name
-      ibmi_sql_query:
+    - name: Check system name and *LOCAL RDB name
+      ibm.power_ibmi.ibmi_sql_query:
         sql: 'SELECT RDB_NAME FROM QSYS2.ASP_INFO WHERE ASP_NUMBER=1;'
       register: source_syscatalogs
       delegate_to: source
 
     - name: Fail the setup because source's system name equals to RDB name of *LOCAL
-      fail:
+      ansible.builtin.fail:
         msg: 'The system name of source equals to RDB name of source. Please change the RDB name.'
       when: source_system_name.row[0]["HOST_NAME"] == source_syscatalogs.row[0]['RDB_NAME']
 
     - name: Fail the setup because source's system name equals to sourceVmNameOnPowerVC
-      fail:
+      ansible.builtin.fail:
         msg: 'The system name of source equals to sourceVmNameOnPowerVC. Please change the vm name on PowerVC.'
       when: source_system_name.row[0]["HOST_NAME"] == sourceVmNameOnPowerVC
 
     # Configure IP interface of source node
     - name: Include display_vm_info_via_powervc role
-      include_role:
+      ansible.builtin.include_role:
         name: display_vm_info_via_powervc
       vars:
         vm_name: '{{ sourceVmNameOnPowerVC }}'
 
-    - name: find required parameters for present_ip_interface
-      include: configure_ip.yml
+    - name: Find required parameters for present_ip_interface
+      ansible.builtin.include_tasks: configure_ip.yml
       loop: '{{vm_info_result.openstack_servers[0].addresses.values() | list | flatten(1)}}'
       loop_control:
         loop_var: network
 
     # Add NRG links to NRG Group
-    - include: add_nrg_links.yml
+    - name: Include tasks from add_nrg_links.yml
+      ansible.builtin.include_tasks: add_nrg_links.yml
       loop: '{{ nrgLinkPairs }}'
       loop_control:
         loop_var: nrg_link
 
     - name: Config db2 mirror on source node
-      ibmi_mirror_setup_source:
-        termination_level: '{{ terminationLevel }}'
+      ibm.power_ibmi.ibmi_mirror_setup_source:
+        termination_level: '{{ terminationlevel }}'
         primary_node: '{{ source_system_name.row[0]["HOST_NAME"] }}'
         secondary_node: '{{ secondaryNode }}'
         primary_hostname: '{{ hostvars["source"]["ansible_ssh_host"] }}'
@@ -126,14 +126,14 @@
       delegate_to: source
 
     - name: Prepare warm clone on source node
-      ibmi_mirror_warm_clone_activity:
+      ibm.power_ibmi.ibmi_mirror_warm_clone_activity:
         operation: suspend
         suspend_timeout: '{{ suspendTimeout }}'
       delegate_to: source
       when: cloneType | upper != 'COLD'
 
     - name: Include change_server_state_via_powervc role
-      include_role:
+      ansible.builtin.include_role:
         name: change_server_state_via_powervc
       vars:
         vm_action: 'stop'
@@ -142,33 +142,34 @@
 
     ## Source setup finished. It is time to setup copy node.
     - name: Capture source node to get an image
-      include_role:
+      ansible.builtin.include_role:
         name: capture_server_via_powervc
       vars:
         image_name: '{{ imageName }}'
         vm_name: '{{ sourceVmNameOnPowerVC }}'
 
-    - name: set_fact
-      set_fact:
+    - name: Set nic_list
+      ansible.builtin.set_fact:
         nic_list: [{'net-name': '{{ copyNodeTCPIP.copy_network_name }}', 'fixed_ip': "{{ copyNodeTCPIP.copy_internet_address }}"}]
 
-    - name: set_fact
-      set_fact:
+    - name: Add NRG links to nic_list
+      ansible.builtin.set_fact:
         nic_list: "{{ nic_list + [{'net-name': nrg_link.copy_network_name, 'fixed_ip': nrg_link.copy_internet_address}] }}"
       when: copyNodeTCPIP.copy_internet_address != nrg_link.copy_internet_address
       loop: '{{ nrgLinkPairs }}'
       loop_control:
         loop_var: nrg_link
 
-    - name: debug nic_list
-      debug: var=nic_list
+    - name: Debug nic_list
+      ansible.builtin.debug:
+        var: nic_list
 
-    - name: pause 2 minutes to wait the image to become active
-      pause:
+    - name: Pause 2 minutes to wait the image to become active
+      ansible.builtin.pause:
         minutes: 2
 
     - name: Deploy a copy node
-      include_role:
+      ansible.builtin.include_role:
         name: deploy_vm_via_powervc
       vars:
         vm_name: '{{ source_system_name.row[0]["HOST_NAME"] }}'
@@ -178,13 +179,13 @@
         availability_zone_name: '{{ availability_zone }}'
 
     - name: Prepare warm clone on source node
-      ibmi_mirror_warm_clone_activity:
+      ibm.power_ibmi.ibmi_mirror_warm_clone_activity:
         operation: resume
       when: cloneType != 'COLD'
       delegate_to: source
 
     - name: Include change_server_state_via_powervc role
-      include_role:
+      ansible.builtin.include_role:
         name: change_server_state_via_powervc
       vars:
         vm_action: 'start'
@@ -192,7 +193,7 @@
       when: cloneType == 'COLD'
 
     - name: Add VM to Ansible in-memory inventory
-      add_host:
+      ansible.builtin.add_host:
         name: copy
         ansible_user: '{{ hostvars["source"]["ansible_ssh_user"] }}'
         ansible_ssh_pass: '{{ hostvars["source"]["ansible_ssh_pass"] }}'
@@ -203,77 +204,77 @@
       no_log: true
 
     - name: Wait for VM to become reachable over SSH
-      wait_for_connection:
+      ansible.builtin.wait_for_connection:
         delay: 600
         sleep: 20
         timeout: 3600
       delegate_to: copy
 
     ## Here is a workaround of the hung issue existing on copy node.
-    - name: reboot the system to wait for the system startup
-      ibmi_reboot:
+    - name: Reboot the system to wait for the system startup
+      ibm.power_ibmi.ibmi_reboot:
       delegate_to: copy
 
-    - name: config the db2 mirror on the copy node
-      ibmi_mirror_setup_copy:
+    - name: Config the db2 mirror on the copy node
+      ibm.power_ibmi.ibmi_mirror_setup_copy:
         ip_address: '{{ copyNodeTCPIP.copy_internet_address }}'
       delegate_to: copy
 
     # Check datetime of source vm and copy vm. Change the copy node's to source node's
-    - name: query system value from source
-      ibmi_sysval:
+    - name: Query system value from source
+      ibm.power_ibmi.ibmi_sysval:
         sysvalue:
           - {'name':'QDATETIME'}
       register: source_qdatetime
       delegate_to: source
 
     - name: Change system value to be same as source
-      ibmi_cl_command:
+      ibm.power_ibmi.ibmi_cl_command:
         cmd: CHGSYSVAL SYSVAL(QDATETIME) VALUE('{{ source_qdatetime.sysval[0].value }}')
       delegate_to: copy
 
     - name: Query system value from copy
-      ibmi_sysval:
+      ibm.power_ibmi.ibmi_sysval:
         sysvalue:
           - {'name':'QDATETIME'}
       delegate_to: copy
 
-    - name: reboot the system to wait for the system startup
-      ibmi_reboot:
+    - name: Reboot the system to wait for the system startup
+      ibm.power_ibmi.ibmi_reboot:
       delegate_to: copy
 
     # Restart NTP on both source and copy node
     - name: Restart NTP on copy node
-      ibmi_cl_command:
+      ibm.power_ibmi.ibmi_cl_command:
         cmd: ENDTCPSVR SERVER(*NTP)
       delegate_to: copy
 
     - name: Restart NTP on copy node
-      pause:
+      ansible.builtin.pause:
         seconds: 60
 
     - name: Restart NTP on copy node
-      ibmi_cl_command:
+      ibm.power_ibmi.ibmi_cl_command:
         cmd: STRTCPSVR SERVER(*NTP) NTPSRV(*CLIENT)
       delegate_to: copy
 
     # Restart NTP on both source and copy node
     - name: Restart NTP on source node
-      ibmi_cl_command:
+      ibm.power_ibmi.ibmi_cl_command:
         cmd: ENDTCPSVR SERVER(*NTP)
       delegate_to: source
 
     - name: Restart NTP on source node
-      pause:
+      ansible.builtin.pause:
         seconds: 60
 
     - name: Restart NTP on source node
-      ibmi_cl_command:
+      ibm.power_ibmi.ibmi_cl_command:
         cmd: STRTCPSVR SERVER(*NTP) NTPSRV(*CLIENT)
       delegate_to: source
 
-    - name: query mirror info from the source
-      ibmi_sql_query:
+    - name: Query mirror info from the source
+      ibm.power_ibmi.ibmi_sql_query:
         sql: 'select * from qsys2.mirror_info'
       register: mirror_info
       delegate_to: source
@@ -281,5 +282,6 @@
       retries: 5
       delay: 20
 
-    - name: debug mirror_info.row
-      debug: var=mirror_info.row
+    - name: Debug mirror_info.row
+      ansible.builtin.debug:
+        var: mirror_info.row

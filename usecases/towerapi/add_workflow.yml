@@ -1,27 +1,29 @@
-- block:
-  - name: Check Workflow Job Template
-    uri:
-      url: "{{ tower_api_url }}/workflow_job_templates/?name={{ workflow_name }}"
-      headers:
-        Authorization: Bearer {{ token }}
-      validate_certs: false
-    register: check_workflow_job_templates
-
-  - block:
-      - name: Delete The Job Template
-        uri:
-          url: "{{ tower_api_url }}/workflow_job_templates/{{ check_workflow_job_templates.json.results[0].id }}/"
-          status_code: 204
-          method: DELETE
-          headers:
-            Authorization: Bearer {{ token }}
-          validate_certs: false
-        register: delete_workflow_job_templates
-    when: check_workflow_job_templates.json.count == 1
+- name: Block for pre_cleanup
   when: pre_cleanup|bool
+  block:
+    - name: Check Workflow Job Template
+      ansible.builtin.uri:
+        url: "{{ tower_api_url }}/workflow_job_templates/?name={{ workflow_name }}"
+        headers:
+          Authorization: Bearer {{ token }}
+        validate_certs: false
+      register: check_workflow_job_templates
+
+    - name: Block for when check_workflow_job_templates.json.count == 1
+      when: check_workflow_job_templates.json.count == 1
+      block:
+        - name: Delete The Job Template
+          ansible.builtin.uri:
+            url: "{{ tower_api_url }}/workflow_job_templates/{{ check_workflow_job_templates.json.results[0].id }}/"
+            status_code: 204
+            method: DELETE
+            headers:
+              Authorization: Bearer {{ token }}
+            validate_certs: false
+          register: delete_workflow_job_templates
 
 - name: Create A Workflow Job Template
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/workflow_job_templates/"
     status_code: 201
     method: POST
@@ -40,9 +42,11 @@
   register: workflow_job_templates
   failed_when: workflow_job_templates.json.id | int < 0
 
-- block:
+- name: Block for when not provision
+  when: not provision|bool
+  block:
     - name: Create A Common Survey Spec
-      uri:
+      ansible.builtin.uri:
         url: "{{ tower_api_url }}/workflow_job_templates/{{ workflow_job_templates.json.id }}/survey_spec/"
         status_code: 200
         method: POST
@@ -114,11 +118,12 @@
               required: false
               default: "{{ host_name.user_input }}"
         validate_certs: false
-  when: not provision|bool
 
-- block:
+- name: Block for when provision
+  when: provision | bool
+  block:
     - name: Create A PowerVC Survey Spec
-      uri:
+      ansible.builtin.uri:
         url: "{{ tower_api_url }}/workflow_job_templates/{{ workflow_job_templates.json.id }}/survey_spec/"
         status_code: 200
         method: POST
@@ -256,4 +261,3 @@
               required: false
               default: "{{ deploy_userdata_value }}"
         validate_certs: false
-  when: provision | bool

@@ -1,10 +1,9 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-- hosts: all
+- name: Playbook to examine system messages
+  hosts: all
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
     become_user_name: null
@@ -12,7 +11,7 @@
 
   tasks:
     - name: Examine history log messages since the previous IPL and determine whether the next IPL will be abnormal or normal
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "WITH last_ipl (ipl_time) AS (
                       SELECT job_entered_system_time
                           FROM TABLE (
@@ -38,17 +37,17 @@
         become_user_password: '{{ become_user_password }}'
       register: next_ipl_status
       tags: next_ipl_indicator
-      ignore_errors: true
+      failed_when: false
 
     - name: Get whether next IPL is abnormal
-      assert:
+      ansible.builtin.assert:
         that:
           - next_ipl_status.row[0].NEXT_IPL_INDICATOR == 'NEXT IPL WILL BE NORMAL'
       tags: next_ipl_indicator
-      ignore_errors: true
+      failed_when: false
 
     - name: Examine all system operator inquiry messages that have a reply
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT a.message_text AS INQUIRY,
               b.message_text AS REPLY,
               B.FROM_USER,
@@ -67,15 +66,16 @@
       register: sys_op_inq_msg
       tags:
         - all_sys_op_inq_msg_with_reply
-      ignore_errors: true
+      failed_when: false
 
     - name: Get all system operator inquiry messages that have a reply
-      debug: msg={{ sys_op_inq_msg.row }}
+      ansible.builtin.debug:
+        msg: "{{ sys_op_inq_msg.row }}"
       tags: all_sys_op_inq_msg_with_reply
-      ignore_errors: true
+      failed_when: false
 
     - name: Examine all system operator inquiry messages that have no reply
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "WITH REPLIED_MSGS (KEY) AS (
                       SELECT a.message_key
                           FROM qsys2.message_queue_info a
@@ -100,9 +100,10 @@
         expected_row_count: 0
       register: sys_op_inq_msg_no_rpy
       tags: all_sys_op_inq_msg_with_no_reply
-      ignore_errors: true
+      failed_when: false
 
     - name: Get all system operator inquiry messages that have a reply
-      debug: msg={{ sys_op_inq_msg_no_rpy.row }}
+      ansible.builtin.debug:
+        msg: "{{ sys_op_inq_msg_no_rpy.row }}"
       tags: all_sys_op_inq_msg_with_no_reply
-      ignore_errors: true
+      failed_when: false

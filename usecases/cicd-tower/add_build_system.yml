@@ -1,65 +1,66 @@
-- hosts: localhost
-  collections:
-    - ibm.power_ibmi
+---
+- name: Add build system playbook
+  hosts: localhost
   tasks:
-    - block:
+    - name: Block for when not provision
+      when: not provision|bool
+      block:
         - name: Add build server to Ansible in-memory inventory
-          add_host:
+          ansible.builtin.add_host:
             name: build_system
-            ansible_ssh_host: '{{ item }}'
-            ansible_user: '{{ build_system_user }}'
-            ansible_ssh_pass: '{{ build_system_pass }}'
+            ansible_ssh_host: "{{ item }}"
+            ansible_user: "{{ build_system_user }}"
+            ansible_ssh_pass: "{{ build_system_pass }}"
             groups: build_systems
             ansible_ssh_extra_args: -o StrictHostKeyChecking=no
             ansible_python_interpreter: /QOpensys/pkgs/bin/python3
           with_items:
             - "{{ host_names.split() }}"
 
-        - name: install dependencies as needed
-          include: ibmi_install_dependencies.yml
+        - name: Install dependencies as needed
+          ansible.builtin.include_tasks: ibmi_install_dependencies.yml
           with_items:
             - "{{ host_names.split() }}"
-      when: not provision|bool
 
-    - block:
-        - name: debug
-          debug:
+    - name: Block for when provision
+      when: provision|bool
+      block:
+        - name: Debug
+          ansible.builtin.debug:
             var: build_system_ip
 
-        - name: set_fact for non-fixed build environment
-          set_fact:
-            build_system_ip: '{{ build_system_ip }}'
-            build_system_user: '{{ build_system_user }}'
-            build_system_pass: '{{ build_system_pass }}'
+        - name: Set_fact for non-fixed build environment
+          ansible.builtin.set_fact:
+            build_system_ip: "{{ build_system_ip }}"
+            build_system_user: "{{ build_system_user }}"
+            build_system_pass: "{{ build_system_pass }}"
 
-        - name: remove existing entry for vm in case ssh header change occurs.
-          known_hosts:
+        - name: Remove existing entry for vm in case ssh header change occurs.
+          ansible.builtin.known_hosts:
             name: "{{ build_system_ip }}"
             path: ~/.ssh/known_hosts
             state: absent
 
-        - name: add vm-{{ build_lib }} to ansible in-memory inventory
-          add_host:
+        - name: Add VM to ansible in-memory inventory (vm-{{ build_lib }})
+          ansible.builtin.add_host:
             name: build_system
-            ansible_ssh_host: '{{ build_system_ip }}'
-            ansible_user: '{{ build_system_user }}'
-            ansible_ssh_pass: '{{ build_system_pass }}'
+            ansible_ssh_host: "{{ build_system_ip }}"
+            ansible_user: "{{ build_system_user }}"
+            ansible_ssh_pass: "{{ build_system_pass }}"
             groups: build_systems
             ansible_ssh_extra_args: -o StrictHostKeyChecking=no
             ansible_python_interpreter: /QOpensys/pkgs/bin/python3
 
-        - name: wait until vm-{{ build_lib }} is up and ssh ready
-          wait_for_connection:
+        - name: Wait until VM is up and ssh ready (vm-{{ build_lib }})
+          ansible.builtin.wait_for_connection:
             sleep: 10
             timeout: 1800
-          delegate_to: 'build_system'
+          delegate_to: build_system
 
-        - name: install dependencies as needed
-          include: ibmi_install_dependencies.yml
-          delegate_to: 'build_system'
+        - name: Install dependencies as needed on {{ build_system }}
+          ansible.builtin.include_tasks: ibmi_install_dependencies.yml
 
-        - name: set build system to host_names
-          set_stats:
+        - name: Set build system to host_names
+          ansible.builtin.set_stats:
             data:
-              host_names: 'build_system'
-      when: provision|bool
+              host_names: build_system

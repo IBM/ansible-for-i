@@ -1,28 +1,30 @@
-- block:
-  - name: Check Github Access Token
-    uri:
-      url: "{{ tower_api_url }}/credentials/?name={{ github_token_name }}"
-      headers:
-        Authorization: Bearer {{ token }}
-      validate_certs: false
-    register: check_github_token
-
-  - block:
-      - name: Delete The Github Access Token
-        uri:
-          url: "{{ tower_api_url }}/credentials/{{ check_github_token.json.results[0].id }}/"
-          status_code: 204
-          method: DELETE
-          headers:
-            Authorization: Bearer {{ token }}
-          validate_certs: false
-        register: delete_github_token
-    when: check_github_token.json.count == 1
+- name: Block for when pre_cleanup
   when: pre_cleanup|bool
+  block:
+    - name: Check Github Access Token
+      ansible.builtin.uri:
+        url: "{{ tower_api_url }}/credentials/?name={{ github_token_name }}"
+        headers:
+          Authorization: Bearer {{ token }}
+        validate_certs: false
+      register: check_github_token
+
+    - name: Block for when github token
+      when: check_github_token.json.count == 1
+      block:
+        - name: Delete The Github Access Token
+          ansible.builtin.uri:
+            url: "{{ tower_api_url }}/credentials/{{ check_github_token.json.results[0].id }}/"
+            status_code: 204
+            method: DELETE
+            headers:
+              Authorization: Bearer {{ token }}
+            validate_certs: false
+          register: delete_github_token
 
 - name: Add A Github Access Token
   no_log: true
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/credentials/"
     status_code: 201
     method: POST

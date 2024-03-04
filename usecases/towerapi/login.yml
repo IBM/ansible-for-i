@@ -1,6 +1,6 @@
-- name: Get a Token
+- name: Get a token
   no_log: true
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/users/1/personal_tokens/"
     method: POST
     status_code: [201]
@@ -14,8 +14,9 @@
       scope: write
     validate_certs: false
     return_content: true
-  register: Token
+  register: tower_token
 
-- set_fact:
-    token: "{{ Token.json.token }}"
-    token_id: "{{ Token.json.id }}"
+- name: Set token info
+  ansible.builtin.set_fact:
+    token: "{{ tower_token.json.token }}"
+    token_id: "{{ tower_token.json.id }}"

@@ -1,22 +1,22 @@
-- name: remove "{{ local_workspace }}"
-  file:
+- name: Remove "{{ local_workspace }}"
+  ansible.builtin.file:
     path: '{{ local_workspace }}'
     state: 'absent'
-  ignore_errors: true
+  failed_when: false
 
-- name: remove build path
-  file:
+- name: Remove build path
+  ansible.builtin.file:
     path: '{{ build_path }}'
     state: 'absent'
   delegate_to: "build_system"
-  ignore_errors: true
+  failed_when: false
   when: not provision
 
-- name: remove build lib
+- name: Remove build lib
   ibm.power_ibmi.ibmi_cl_command:
     cmd: DLTLIB {{ build_lib }}
   delegate_to: "build_system"
-  ignore_errors: true
+  failed_when: false
   when: not provision
 
 - name: Destroy VM when provision

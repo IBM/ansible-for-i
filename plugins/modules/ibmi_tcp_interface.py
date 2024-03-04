@@ -150,7 +150,7 @@ author:
 
 EXAMPLES = r'''
 - name: create an interface 1
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.11'
     subnet_mask: '255.255.255.0'
     line_description: 'LIND1'
@@ -158,7 +158,7 @@ EXAMPLES = r'''
     state: 'present'
 
 - name: create an interface 2
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.12'
     line_description: 'LIND1'
     subnet_mask: '255.255.255.0'
@@ -166,7 +166,7 @@ EXAMPLES = r'''
     alias_name: 'alias'
 
 - name: create an interface 3
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.13'
     line_description: 'LIND1'
     subnet_mask: '255.255.255.0'
@@ -176,7 +176,7 @@ EXAMPLES = r'''
     alias_name: 'alias13'
 
 - name: create an interface 4
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.14'
     line_description: 'LIND1'
     subnet_mask: '255.255.255.0'
@@ -187,7 +187,7 @@ EXAMPLES = r'''
     alias_name: 'alias14'
 
 - name: create an interface 5
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.15'
     line_description: 'LIND1'
     vlan_id: '2'
@@ -199,20 +199,20 @@ EXAMPLES = r'''
     alias_name: 'alias15'
 
 - name: change an interface 1
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.11'
     subnet_mask: '255.255.0.0'
     state: 'present'
 
 - name: change an interface 2
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.12'
     subnet_mask: '255.255.0.0'
     state: 'present'
     alias_name: 'alias2'
 
 - name: change an interface 3
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.11'
     preferred_interface:
       - "9.5.155.12"
@@ -220,28 +220,28 @@ EXAMPLES = r'''
     state: 'present'
 
 - name: change an interface 4
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.12'
     state: 'present'
     alias_name: 'alias2'
 
 - name: query an interface by ip
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.12'
     state: 'present'
 
 - name: query an interface by alias name
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     alias_name: 'alias14'
     state: 'present'
 
 - name: remove an interface by ip
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     internet_address: '9.5.155.11'
     state: 'absent'
 
 - name: remove an interface by alias name
-  ibmi_ibm.power_ibmi.ibmi_tcp_interface:
+  ibm.power_ibmi.ibmi_tcp_interface:
     alias_name: 'alias2'
     state: 'absent'
 '''
@@ -359,7 +359,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_to
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

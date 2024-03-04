@@ -63,7 +63,7 @@ author:
 
 EXAMPLES = r'''
 - name: print the spooled file data
-  ibmi_ibm.power_ibmi.ibmi_spooled_file_data:
+  ibm.power_ibmi.ibmi_spooled_file_data:
     job_name: '024800/CHANGLE/QDFTJOBD'
     spooled_file_name: 'QPSECUSR'
 '''
@@ -133,7 +133,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 import fnmatch
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 
 def main():

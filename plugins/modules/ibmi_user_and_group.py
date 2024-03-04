@@ -146,24 +146,24 @@ author:
 
 EXAMPLES = r'''
 - name: create user profile
-  ibmi_ibm.power_ibmi.ibmi_user_and_group:
+  ibm.power_ibmi.ibmi_user_and_group:
     operation: 'create'
     user: 'changle'
 
 - name: create user profile with become user
-  ibmi_ibm.power_ibmi.ibmi_user_and_group:
+  ibm.power_ibmi.ibmi_user_and_group:
     operation: 'create'
     user: 'changle'
     become_user: 'USER1'
     become_user_password: 'yourpassword'
 
 - name: display user profile
-  ibmi_ibm.power_ibmi.ibmi_user_and_group:
+  ibm.power_ibmi.ibmi_user_and_group:
     operation: 'display'
     user: 'changle'
 
 - name: display group members
-  ibmi_ibm.power_ibmi.ibmi_user_and_group:
+  ibm.power_ibmi.ibmi_user_and_group:
     operation: 'display_group_members'
     user: 'group1'
 '''
@@ -247,7 +247,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 
 def main():

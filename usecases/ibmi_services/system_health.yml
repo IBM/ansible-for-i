@@ -1,10 +1,9 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-- hosts: all
+- name: Playbook for system health
+  hosts: all
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
     become_user_name: null
@@ -12,7 +11,7 @@
 
   tasks:
     - name: What unofficial IBM i code exists in QSYS
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT *
                   FROM TABLE (
                           QSYS2.OBJECT_STATISTICS('QSYS', '*PGM *SRVPGM')
@@ -25,10 +24,10 @@
         expected_row_count: 0
       register: unofficial_code_check
       tags: unofficial_code_check
-      ignore_errors: true
+      failed_when: false
 
     - name: Find tables in System Limits with current_value over 10000000
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "WITH X AS (
                       SELECT ROW_NUMBER() OVER (
                                 PARTITION BY SYSTEM_SCHEMA_NAME,
@@ -54,4 +53,4 @@
       register: large_table
       tags:
         - large_table
-      ignore_errors: true
+      failed_when: false

@@ -56,7 +56,7 @@ author:
 
 EXAMPLES = r'''
 - name: Insert one record to table Persons
-  ibmi_ibm.power_ibmi.ibmi_sql_execute:
+  ibm.power_ibmi.ibmi_sql_execute:
     sql: "INSERT INTO Persons VALUES('919665', 'Le', 'Chang', 'Ring Building', 'Beijing')"
     become_user: 'USER1'
     become_user_password: 'yourpassword'
@@ -147,7 +147,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 
 def main():

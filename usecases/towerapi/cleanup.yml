@@ -1,5 +1,5 @@
 - name: Revoke the used ansible tower token
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/tokens/{{ token_id }}/"
     status_code: 204
     method: DELETE
