@@ -87,7 +87,7 @@ Examples
 
    
    - name: Synchronize c1 save file from IBM i node A to another IBM i node B.
-     ibmi_ibm.power_ibmi.ibmi_synchronize:
+     ibm.power_ibmi.ibmi_synchronize:
        src: '/qsys.lib/test.lib/c1.file'
        remote_user: 'user'
        private_key: '/home/test/id_rsa'

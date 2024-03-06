@@ -82,7 +82,7 @@ Examples
 
    
    - name: Get System Value information
-     ibmi_ibm.power_ibmi.ibmi_sysval:
+     ibm.power_ibmi.ibmi_sysval:
        sysvalue:
          - {'name':'qmaxsgnacn', 'expect':3}
          - {'name':'qmaxsgnacn', 'expect':'000003'}
@@ -91,7 +91,7 @@ Examples
        become_user_password: 'yourpassword'
 
    - name: Compare the returned system values as list
-     ibmi_ibm.power_ibmi.ibmi_sysval:
+     ibm.power_ibmi.ibmi_sysval:
        sysvalue:
          - {'name':'QATNPGM', 'expect':'QEZMAIN   QSYS'}
          - {'name':'QATNPGM', 'expect':'QSYS  QEZMAIN'}
@@ -99,7 +99,7 @@ Examples
          - {'name':'QATNPGM', 'expect':'QSYS QEZMAIN', 'check':'equal_as_list'}
 
    - name: Check if the returned system values are in a range
-     ibmi_ibm.power_ibmi.ibmi_sysval:
+     ibm.power_ibmi.ibmi_sysval:
        sysvalue:
          - {'name':'qmaxsgnacn', 'expect':'[1,8)', 'check':'range'}
          - {'name':'qccsid', 'expect':'[0,65535]', 'check':'range'}

@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ibmi_sqlite3 – Executes a SQL statement via sqlite3 &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -197,12 +199,12 @@
 <section id="examples">
 <h2><a class="toc-backref" href="#id3" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Create table PTFINFO</span>
-<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">database</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/tmp/testdb.sqlite3&quot;</span>
 <span class="w">    </span><span class="nt">sql</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;CREATE</span><span class="nv"> </span><span class="s">TABLE</span><span class="nv"> </span><span class="s">PTFINFO</span><span class="nv"> </span><span class="s">(ID</span><span class="nv"> </span><span class="s">CHAR(10)</span><span class="nv"> </span><span class="s">PRIMARY</span><span class="nv"> </span><span class="s">KEY</span><span class="nv"> </span><span class="s">NOT</span><span class="nv"> </span><span class="s">NULL,</span><span class="nv"> </span><span class="s">PRODUCT</span><span class="nv"> </span><span class="s">CHAR(10)</span><span class="nv"> </span><span class="s">NOT</span><span class="nv"> </span><span class="s">NULL,</span><span class="nv"> </span><span class="s">VRM</span><span class="nv"> </span><span class="s">CHAR(10)</span><span class="nv"> </span><span class="s">NOT</span><span class="nv"> </span><span class="s">NULL,</span><span class="nv"> </span><span class="s">CHECKSUM</span><span class="nv"> </span><span class="s">CHAR(256))&quot;</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Insert some records to table PTFINFO</span>
-<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">database</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/tmp/testdb.sqlite3&quot;</span>
 <span class="w">    </span><span class="nt">sql</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;INSERT</span><span class="nv"> </span><span class="s">INTO</span><span class="nv"> </span><span class="s">PTFINFO</span><span class="nv"> </span><span class="s">(ID,</span><span class="nv"> </span><span class="s">PRODUCT,</span><span class="nv"> </span><span class="s">VRM,</span><span class="nv"> </span><span class="s">CHECKSUM)</span><span class="nv"> </span><span class="s">VALUES</span><span class="nv"> </span><span class="s">(:ID,</span><span class="nv"> </span><span class="s">:PRODUCT,</span><span class="nv"> </span><span class="s">:VRM,</span><span class="nv"> </span><span class="s">:CHECKSUM)&quot;</span>
 <span class="w">    </span><span class="nt">parameters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
@@ -221,25 +223,25 @@
 <span class="w">    </span><span class="p p-Indicator">]</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Find a record to table PTFINFO</span>
-<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">database</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/tmp/testdb.sqlite3&quot;</span>
 <span class="w">    </span><span class="nt">sql</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;SELECT</span><span class="nv"> </span><span class="s">ID</span><span class="nv"> </span><span class="s">FROM</span><span class="nv"> </span><span class="s">PTFINFO</span><span class="nv"> </span><span class="s">WHERE</span><span class="nv"> </span><span class="s">ID</span><span class="nv"> </span><span class="s">=</span><span class="nv"> </span><span class="s">:ID&quot;</span>
 <span class="w">    </span><span class="nt">parameters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="s">&quot;ID&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;SI69379&quot;</span><span class="p p-Indicator">}</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Update a record in table PTFINFO</span>
-<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">database</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/tmp/testdb.sqlite3&quot;</span>
 <span class="w">    </span><span class="nt">sql</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;UPDATE</span><span class="nv"> </span><span class="s">PTFINFO</span><span class="nv"> </span><span class="s">SET</span><span class="nv"> </span><span class="s">CHECKSUM=:CHECKSUM</span><span class="nv"> </span><span class="s">WHERE</span><span class="nv"> </span><span class="s">ID=:ID&quot;</span>
 <span class="w">    </span><span class="nt">parameters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="s">&quot;ID&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;SI69379&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;CHECKSUM&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;abc123&quot;</span><span class="p p-Indicator">}</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Delete a record in table PTFINFO</span>
-<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">database</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/tmp/testdb.sqlite3&quot;</span>
 <span class="w">    </span><span class="nt">sql</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;DELETE</span><span class="nv"> </span><span class="s">FROM</span><span class="nv"> </span><span class="s">PTFINFO</span><span class="nv"> </span><span class="s">WHERE</span><span class="nv"> </span><span class="s">ID=:ID&quot;</span>
 <span class="w">    </span><span class="nt">parameters</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="s">&quot;ID&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;SI69379&quot;</span><span class="p p-Indicator">}</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Delete table PTFINFO</span>
-<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_sqlite3</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">database</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/tmp/testdb.sqlite3&quot;</span>
 <span class="w">    </span><span class="nt">sql</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;DROP</span><span class="nv"> </span><span class="s">TABLE</span><span class="nv"> </span><span class="s">IF</span><span class="nv"> </span><span class="s">EXISTS</span><span class="nv"> </span><span class="s">PTFINFO&quot;</span>
 </pre></div>

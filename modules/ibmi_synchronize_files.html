@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ibmi_synchronize_files – Synchronize a list of files from IBM i node A to another IBM i node B &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -217,7 +219,7 @@
 <section id="examples">
 <h2><a class="toc-backref" href="#id3" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Synchronize a list of different types of files to host.com.</span>
-<span class="w">  </span><span class="nt">ibmi_ibm.power_ibmi.ibmi_synchronize_files</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_synchronize_files</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">src_list</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;/tmp/c1.file&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;/qsys.lib/test.lib/&#39;</span><span class="p p-Indicator">}</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="s">&#39;src&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;/qsys.lib/test.lib/test.file&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;dest&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&#39;/qsys.lib/test.lib&#39;</span><span class="p p-Indicator">}</span>
