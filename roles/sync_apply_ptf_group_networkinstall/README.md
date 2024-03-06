@@ -29,7 +29,7 @@ Example Playbook
   hosts: testhost
 
   vars:
-    ptf_group_info: "{ 'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2025910369', 'file_name': ['S8404V01.BIN'] }"
+    ptf_group_info: { 'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2025910369', 'file_name': ['S8404V01.BIN'] }
     src_host: "{{ src_host }}"
     ptf_omit_list: [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]
 

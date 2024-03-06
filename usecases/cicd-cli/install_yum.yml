@@ -2,14 +2,17 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 
+# All tasks in this file are delegated to "build_system"
 
 - name: Create the installation script on IBM i
-  raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
+  ansible.builtin.raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
   args:
     executable: /QOpensys/usr/bin/qsh
+  delegate_to: "build_system"
+  changed_when: true
 
 - name: Write the content to the installation script on IBM i
-  raw: "echo \"
+  ansible.builtin.raw: "echo \"
 create or replace table qtemp.ftpcmd(cmd char(240)) on replace delete rows;
 create or replace table qtemp.ftplog(line char(240)) on replace delete rows;
 insert into qtemp.ftpcmd(CMD) values
@@ -30,17 +33,23 @@ CL:QSH CMD('touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstra
 \" >> /tmp/bootstrap.sql"
   args:
     executable: /QOpensys/usr/bin/qsh
+  delegate_to: "build_system"
+  changed_when: true
 
 - name: Run the installation script to install yum
-  raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
+  ansible.builtin.raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
   args:
     executable: /QOpensys/usr/bin/qsh
   register: output_of_runsqlstm
+  delegate_to: "build_system"
   failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
+  changed_when: true
 
 - name: Run /QOpensys/pkgs/bin/yum to confirm yum has been installed properly
-  raw: ls -l /QOpensys/pkgs/bin/yum
+  ansible.builtin.raw: ls -l /QOpensys/pkgs/bin/yum
   args:
     executable: /QOpensys/usr/bin/qsh
   register: output_of_yum
+  delegate_to: "build_system"
   failed_when: "'No such path or directory' in output_of_yum"
+  changed_when: false

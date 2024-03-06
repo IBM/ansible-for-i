@@ -1,11 +1,13 @@
-- name: run PGM built with STMFs
+- name: Run PGM built with STMFs
   ibm.power_ibmi.ibmi_cl_command:
     cmd: CALL {{ build_lib }}/SENDMSG
   register: callpgm
+  delegate_to: "build_system"
   when: build_with_stmfs
 
-- name: run PGM built from PF members
+- name: Run PGM built from PF members
   ibm.power_ibmi.ibmi_cl_command:
     cmd: CALL {{ build_lib }}/SAMPLECL
   register: callpgm
+  delegate_to: "build_system"
   when: not build_with_stmfs

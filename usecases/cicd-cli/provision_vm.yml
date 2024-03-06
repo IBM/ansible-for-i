@@ -1,6 +1,6 @@
 # Add powervc host to in-memory inventory
-- name: Add PowerVC host {{ powervc_host }} to Ansible in-memory inventory
-  add_host:
+- name: Add PowerVC host to Ansible in-memory inventory ({{ powervc_host }})
+  ansible.builtin.add_host:
     name: 'powervc'
     ansible_user: '{{ powervc_admin}}'
     ansible_ssh_pass: '{{ powervc_admin_password }}'

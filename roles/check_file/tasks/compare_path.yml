@@ -5,7 +5,7 @@
     same_name: false
 
 - name: Compare path
-  when: same_files is true
+  when: same_files
   block:
     - name: Recursively compare the files' path between target server and repo server one by one
       ansible.builtin.include_tasks: compare_checksum.yml
@@ -17,4 +17,4 @@
     - name: Set same_files to false if no file has the same name on target server
       ansible.builtin.set_fact:
         same_files: false
-      when: same_name is false
+      when: not same_name

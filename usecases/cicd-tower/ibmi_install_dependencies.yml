@@ -1,105 +1,39 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
-- block:
-    - set_fact:
-        yum_installed: false
-
-    - name: Check whether yum has been installed. If not, install it in following tasks.
-      raw: ls -l /QOpensys/pkgs/bin/yum
-      args:
-        executable: /qopensys/usr/bin/qsh
-      register: default_yum_existance
-      ignore_errors: true
-
-    - block:
-        - set_fact:
-            yum_installed: true
-      when: default_yum_existance.rc == 0
-
-    - block:
-        - name: Create the installation script on IBM i
-          raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
-          args:
-            executable: /qopensys/usr/bin/qsh
-
-        - name: Write the content to the installation script on IBM i
-          raw: "echo \"
-        create or replace table qtemp.ftpcmd(cmd char(240)) on replace delete rows;
-        create or replace table qtemp.ftplog(line char(240)) on replace delete rows;
-        insert into qtemp.ftpcmd(CMD) values
-          ('anonymous anonymous@example.com')
-        ,('namefmt 1')
-        ,('lcd /tmp')
-        ,('cd /software/ibmi/products/pase/rpms')
-        ,('bin')
-        ,('get README.md (replace')
-        ,('get bootstrap.tar.Z (replace')
-        ,('get bootstrap.sh (replace')
-        with nc
-        ;
-        CL:OVRDBF FILE(INPUT) TOFILE(QTEMP/FTPCMD) MBR(*FIRST) OVRSCOPE(*JOB);
-        CL:OVRDBF FILE(OUTPUT) TOFILE(QTEMP/FTPLOG) MBR(*FIRST) OVRSCOPE(*JOB);
-        CL:FTP RMTSYS('public.dhe.ibm.com');
-        CL:QSH CMD('touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstrap.sh > /tmp/bootstrap.log 2>&1');
-        \" >> /tmp/bootstrap.sql"
-          args:
-            executable: /qopensys/usr/bin/qsh
-
-        - name: Run the installation script to install yum
-          raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
-          args:
-            executable: /qopensys/usr/bin/qsh
-          register: output_of_runsqlstm
-          failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
-
-        - name: Run /QOpensys/pkgs/bin/yum to confirm yum has been installed properly
-          raw: ls -l /QOpensys/pkgs/bin/yum
-          args:
-            executable: /qopensys/usr/bin/qsh
-          register: output_of_yum
-          failed_when: "'No such path or directory' in output_of_yum"
-
-        - set_fact:
-            yum_installed: true
-      when: "'No such' in default_yum_existance.stdout or '/QOpensys/pkgs/bin/yum: not found' in default_yum_existance.stdout"
-
-    - block:
-        - name: Verify if git installed
-          raw: /QOpensys/pkgs/bin/yum list installed | grep "git"
-          register: package_query_result
-          ignore_errors: true
-
-        - name: Install git if it is not installed
-          raw: /QOpensys/pkgs/bin/yum install git -y
-          when: '"git.ppc64" not in package_query_result.stdout'
-      when: yum_installed
-  delegate_to: "{{ item }}"
+- name: Block for when not provision
   when: not provision|bool
-
-- block:
-    - set_fact:
+  delegate_to: "{{ item }}"
+  block:
+    - name: Initialize yum_installed
+      ansible.builtin.set_fact:
         yum_installed: false
 
     - name: Check whether yum has been installed. If not, install it in following tasks.
-      raw: ls -l /QOpensys/pkgs/bin/yum
+      ansible.builtin.raw: ls -l /QOpensys/pkgs/bin/yum
       args:
         executable: /qopensys/usr/bin/qsh
       register: default_yum_existance
-      ignore_errors: true
+      failed_when: false
+      changed_when: false
 
-    - block:
-        - set_fact:
-            yum_installed: true
+    - name: Block for when default_yum_existance.rc == 0
       when: default_yum_existance.rc == 0
+      block:
+        - name: Set yum_installed
+          ansible.builtin.set_fact:
+            yum_installed: true
 
-    - block:
+    - name: Block to install yum if necessary
+      when: "'No such' in default_yum_existance.stdout or '/QOpensys/pkgs/bin/yum: not found' in default_yum_existance.stdout"
+      block:
         - name: Create the installation script on IBM i
-          raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
+          ansible.builtin.raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
           args:
             executable: /qopensys/usr/bin/qsh
+          changed_when: true
 
         - name: Write the content to the installation script on IBM i
-          raw: "echo \"
+          ansible.builtin.raw: "echo \"
         create or replace table qtemp.ftpcmd(cmd char(240)) on replace delete rows;
         create or replace table qtemp.ftplog(line char(240)) on replace delete rows;
         insert into qtemp.ftpcmd(CMD) values
@@ -120,33 +54,128 @@
         \" >> /tmp/bootstrap.sql"
           args:
             executable: /qopensys/usr/bin/qsh
+          change_when: true
 
         - name: Run the installation script to install yum
-          raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
+          ansible.builtin.raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
           args:
             executable: /qopensys/usr/bin/qsh
           register: output_of_runsqlstm
           failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
+          changed_when: true
 
         - name: Run /QOpensys/pkgs/bin/yum to confirm yum has been installed properly
-          raw: ls -l /QOpensys/pkgs/bin/yum
+          ansible.builtin.raw: ls -l /QOpensys/pkgs/bin/yum
           args:
             executable: /qopensys/usr/bin/qsh
           register: output_of_yum
           failed_when: "'No such path or directory' in output_of_yum"
+          changed_when: false
 
-        - set_fact:
+        - name: Set yum_installed
+          ansible.builtin.set_fact:
             yum_installed: true
-      when: "'No such' in default_yum_existance.stdout or '/QOpensys/pkgs/bin/yum: not found' in default_yum_existance.stdout"
 
-    - block:
+    - name: Block for when yum_installed
+      when: yum_installed
+      block:
         - name: Verify if git installed
-          raw: /QOpensys/pkgs/bin/yum list installed | grep "git"
+          ansible.builtin.raw: /QOpensys/pkgs/bin/yum list installed | grep "git"
           register: package_query_result
-          ignore_errors: true
+          failed_when: false
+          changed_when: false
 
         - name: Install git if it is not installed
-          raw: /QOpensys/pkgs/bin/yum install git -y
+          ansible.builtin.raw: /QOpensys/pkgs/bin/yum install git -y
           when: '"git.ppc64" not in package_query_result.stdout'
-      when: yum_installed
+          changed_when: '"git.ppc64" not in package_query_result.stdout'
+
+- name: Block for when provision
   when: provision|bool
+  delegate_to: build_system
+  block:
+    - name: Initialize yum_installed
+      ansible.builtin.set_fact:
+        yum_installed: false
+
+    - name: Check whether yum has been installed. If not, install it in following tasks.
+      ansible.builtin.raw: ls -l /QOpensys/pkgs/bin/yum
+      args:
+        executable: /qopensys/usr/bin/qsh
+      register: default_yum_existance
+      failed_when: false
+      changed_when: false
+
+    - name: Block for when default_yum_existance.rc == 0
+      when: default_yum_existance.rc == 0
+      block:
+        - name: Set yum_installed
+          ansible.builtin.set_fact:
+            yum_installed: true
+
+    - name: Block for installing yum if necessary
+      when: "'No such' in default_yum_existance.stdout or '/QOpensys/pkgs/bin/yum: not found' in default_yum_existance.stdout"
+      block:
+        - name: Create the installation script on IBM i
+          ansible.builtin.raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
+          args:
+            executable: /qopensys/usr/bin/qsh
+          changed_when: true
+
+        - name: Write the content to the installation script on IBM i
+          ansible.builtin.raw: "echo \"
+        create or replace table qtemp.ftpcmd(cmd char(240)) on replace delete rows;
+        create or replace table qtemp.ftplog(line char(240)) on replace delete rows;
+        insert into qtemp.ftpcmd(CMD) values
+          ('anonymous anonymous@example.com')
+        ,('namefmt 1')
+        ,('lcd /tmp')
+        ,('cd /software/ibmi/products/pase/rpms')
+        ,('bin')
+        ,('get README.md (replace')
+        ,('get bootstrap.tar.Z (replace')
+        ,('get bootstrap.sh (replace')
+        with nc
+        ;
+        CL:OVRDBF FILE(INPUT) TOFILE(QTEMP/FTPCMD) MBR(*FIRST) OVRSCOPE(*JOB);
+        CL:OVRDBF FILE(OUTPUT) TOFILE(QTEMP/FTPLOG) MBR(*FIRST) OVRSCOPE(*JOB);
+        CL:FTP RMTSYS('public.dhe.ibm.com');
+        CL:QSH CMD('touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstrap.sh > /tmp/bootstrap.log 2>&1');
+        \" >> /tmp/bootstrap.sql"
+          args:
+            executable: /qopensys/usr/bin/qsh
+          changed_when: true
+
+        - name: Run the installation script to install yum
+          ansible.builtin.raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
+          args:
+            executable: /qopensys/usr/bin/qsh
+          register: output_of_runsqlstm
+          failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
+          changed_when: "'QSH0005' in output_of_runsqlstm.stdout"
+
+        - name: Run /QOpensys/pkgs/bin/yum to confirm yum has been installed properly
+          ansible.builtin.raw: ls -l /QOpensys/pkgs/bin/yum
+          args:
+            executable: /qopensys/usr/bin/qsh
+          register: output_of_yum
+          failed_when: "'No such path or directory' in output_of_yum"
+          changed_when: false
+
+        - name: Set yum_installed
+          ansible.builtin.set_fact:
+            yum_installed: true
+
+    - name: Block for when yum_installed
+      when: yum_installed
+      block:
+        - name: Verify if git installed
+          ansible.builtin.raw: /QOpensys/pkgs/bin/yum list installed | grep "git"
+          register: package_query_result
+          failed_when: false
+          changed_when: false
+
+        - name: Install git if it is not installed
+          ansible.builtin.raw: /QOpensys/pkgs/bin/yum install git -y
+          when: '"git.ppc64" not in package_query_result.stdout'
+          changed_when: '"git.ppc64" not in package_query_result.stdout'

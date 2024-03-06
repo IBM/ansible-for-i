@@ -123,7 +123,7 @@ import json
 import os
 import pwd
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 
 def main():

@@ -1,4 +1,5 @@
-- hosts: localhost
+- name: Playbook for cicd-cli
+  hosts: localhost
 
   vars:
     build_with_stmfs: false       # Build with STMFs or PF members
@@ -8,42 +9,43 @@
     cleanup: true                 # If clean up build env after build completes
     build_number: "{{ 9999 | random }}"
 
-  collections:
-    - ibm.power_ibmi
   tasks:
-    - set_fact:
+    - name: Set build_lib
+      ansible.builtin.set_fact:
         build_lib: "BUILD_{{ build_number }}"
 
-    - set_fact:
+    - name: Set path and workspace
+      ansible.builtin.set_fact:
         build_path: "/tmp/{{ build_lib }}"
         local_workspace: '~/workspace/{{ build_lib }}'
 
-    - block:
+    - name: Block for CICD steps
+      block:
         - name: Step 1 - clone source code from git
-          include: git_clone.yml
+          ansible.builtin.include_tasks: git_clone.yml
 
-        - block:
-            - name: include provision related vars if provision is true
-              include_vars: provision_vars.yml
+        - name: Block for when provision
+          when: provision
+          block:
+            - name: Include provision related vars if provision is true
+              ansible.builtin.include_vars: provision_vars.yml
 
             - name: Step 2.1 - provision vm on demand
-              include: provision_vm.yml
-          when: provision
+              ansible.builtin.include_tasks: provision_vm.yml
 
         - name: Step 2.2 - add build system to in-memory inventory
-          include: add_build_system.yml
+          ansible.builtin.include_tasks: add_build_system.yml
 
         - name: Step 3 - put source code to build machine
-          include: put_code.yml
+          ansible.builtin.include_tasks: put_code.yml
 
         - name: Step 4 - build your app on build machine
-          include: build.yml
+          ansible.builtin.include_tasks: build.yml
 
-        - name: Step 5 - run test and completes
-          include: post_build_actions.yml
-          delegate_to: "build_system"
+        - name: Step 5 - run test and completes on build machine
+          ansible.builtin.include_tasks: post_build_actions.yml
 
       always:
         - name: Step 6 - cleanup on demand
-          include: cleanup.yml
+          ansible.builtin.include_tasks: cleanup.yml
           when: cleanup

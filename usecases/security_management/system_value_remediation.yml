@@ -1,51 +1,73 @@
 ---
-- set_fact:
+- name: Set compliant
+  ansible.builtin.set_fact:
     compliant: "{{ check_item.compliant }}"
-- block:
-    - block:
-        - pause:
+- name: Block for when not compliant
+  when: not compliant
+  block:
+    - name: Block for various system values
+      when: check_item.name != "QLMTDEVSSN" and check_item.name != "QAUTOVRT" and check_item.name != "QSYSLIBL" and check_item.name != "QUSEADPAUT"
+        and check_item.name != "QAUTOCFG" and check_item.name != "QPWDRQDDIF"
+      block:
+        - name: Prompt for system value
+          ansible.builtin.pause:
             prompt: |
               Do you want to change system value {{ check_item.name }} on {{ ansible_ssh_host }} (Y/N)?
               Expected value: {{ check_item.expect }} | Actual value: {{ check_item.actual }}
           register: user_choice
 
-        - set_fact:
-            user_choice_mode: '{{ user_choice.user_input | upper | trim }}'
+        - name: Set user_choice_mode
+          ansible.builtin.set_fact:
+            user_choice_mode: "{{ user_choice.user_input | upper | trim }}"
 
-        - block:
-            - name: Remediating {{ check_item.name }} on {{ ansible_ssh_host }}
-              ibmi_cl_command:
+        - name: Block for when user_choice_mode == 'Y'
+          when: user_choice_mode == 'Y'
+          block:
+            - name: Remediating check_item.name on {{ ansible_ssh_host }}
+              ibm.power_ibmi.ibmi_cl_command:
                 cmd: CHGSYSVAL SYSVAL({{ check_item.name }}) VALUE('{{ check_item.expect }}')
                 become_user: "{{ become_user_name }}"
                 become_user_password: "{{ become_user_password }}"
               register: remediate
-              ignore_errors: true
+              failed_when: false # We want to continue regardless of rc
 
-            - block:
-                - debug:
+            - name: Block for when remediate.rc == 0
+              when: remediate.rc == 0
+              block:
+                - name: Print check_item name
+                  ansible.builtin.debug:
                     msg: |
                       {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
-                - set_fact:
+                - name: Set success_list
+                  ansible.builtin.set_fact:
                     success_list: "{{ success_list + [ check_item.name ] }}"
-              when: remediate.rc == 0
-            - block:
-                - debug:
+
+            - name: Block for when remediate.rc != 0
+              when: remediate.rc != 0
+              block:
+                - name: Print check_item name
+                  ansible.builtin.debug:
                     msg: |
                       {{ check_item.name }} Remediation failed.
-                - set_fact:
+                - name: Print fail_list
+                  ansible.builtin.set_fact:
                     fail_list: "{{ fail_list + [ check_item.name ] }}"
-              when: remediate.rc != 0
-          when: user_choice_mode == 'Y'
-        - block:
-            - debug:
-                msg: "User cancelled"
-            - set_fact:
-                skip_list: "{{ skip_list + [ check_item.name ] }}"
-          when: user_choice_mode != 'Y'
-      when: check_item.name != "QLMTDEVSSN" and check_item.name != "QAUTOVRT" and check_item.name != "QSYSLIBL" and check_item.name != "QUSEADPAUT" and check_item.name != "QAUTOCFG" and check_item.name != "QPWDRQDDIF"
 
-    - block:
-        - pause:
+        - name: Block for when user_choice_mode != 'Y'
+          when: user_choice_mode != 'Y'
+          block:
+            - name: User cancelled"
+              ansible.builtin.debug:
+                msg: User cancelled
+            - name: Print skip_list
+              ansible.builtin.set_fact:
+                skip_list: "{{ skip_list + [ check_item.name ] }}"
+
+    - name: Block for when name == "QAUTOVRT"
+      when: check_item.name == "QAUTOVRT"
+      block:
+        - name: Prompt for QAUTOVRT input
+          ansible.builtin.pause:
             prompt: |
               Determines whether automatic device creation is allowed and if so, how many devices can
               be configured automatically. Specify a value 1 through 32500 for this system value and is
@@ -54,43 +76,56 @@
               security risk as an infinite number of virtual devices may lead to a denial of service if disk
               capacity is reached. The value should be sufficient enough that enough devices are allocated to
               support the business. Input a number between 1 and 32500. Leave blank and press Enter to skip.
-          register: QAUTOVRT_USER
-        - block:
-            - name: Changing QAUTOVRT to {{ QAUTOVRT_USER.user_input | int }}
-              ibmi_cl_command:
-                cmd: CHGSYSVAL SYSVAL(QAUTOVRT) VALUE({{ QAUTOVRT_USER.user_input | int }})
+          register: qautovrt_user
+
+        - name: Block for user_input | length > 0
+          when: qautovrt_user.user_input | length > 0
+          block:
+            - name: Changing QAUTOVRT to {{ qautovrt_user.user_input | int }}
+              ibm.power_ibmi.ibmi_cl_command:
+                cmd: CHGSYSVAL SYSVAL(QAUTOVRT) VALUE({{ qautovrt_user.user_input | int }})
                 become_user: "{{ become_user_name }}"
                 become_user_password: "{{ become_user_password }}"
               register: remediate
-              ignore_errors: true
+              failed_when: false # We want to continue regardless of rc
 
-            - block:
-                - debug:
+            - name: Block for remediate.rc == 0
+              when: remediate.rc == 0
+              block:
+                - name: Debug message
+                  ansible.builtin.debug:
                     msg: |
                       QAUTOVRT Remediation completes, you can re-run check only mode to see the change.
-                - set_fact:
+                - name: Set success_list
+                  ansible.builtin.set_fact:
                     success_list: "{{ success_list + [ 'QAUTOVRT' ] }}"
-              when: remediate.rc == 0
 
-            - block:
-                - debug:
+            - name: Block for remediate.rc != 0
+              when: remediate.rc != 0
+              block:
+                - name: Failure message
+                  ansible.builtin.debug:
                     msg: |
                       QAUTOVRT Remediation failed.
-                - set_fact:
+                - name: Set fail_list
+                  ansible.builtin.set_fact:
                     fail_list: "{{ fail_list + [ 'QAUTOVRT' ] }}"
-              when: remediate.rc != 0
-          when: QAUTOVRT_USER.user_input | length > 0
 
-        - block:
-            - debug:
-                msg: "User cancelled"
-            - set_fact:
+        - name: Block for user_input | length == 0
+          when: qautovrt_user.user_input | length == 0
+          block:
+            - name: User cancel message
+              ansible.builtin.debug:
+                msg: User cancelled
+            - name: Set skip_list
+              ansible.builtin.set_fact:
                 skip_list: "{{ skip_list + [ 'QAUTOVRT' ] }}"
-          when: QAUTOVRT_USER.user_input | length == 0
-      when: check_item.name == "QAUTOVRT"
 
-    - block:
-        - pause:
+    - name: Case name == "QLMTDEVSSN"
+      when: check_item.name == "QLMTDEVSSN"
+      block:
+        - name: Prompt for QLMTDEVSSN input
+          ansible.builtin.pause:
             prompt: |
               QLMTDEVSSN specifies if users can have concurrent device sessions.
               How many concurrent device sessions do you want to have in the system?
@@ -99,43 +134,56 @@
               QLMTDEVSSN's current value: {{ check_item.actual }}
               Do you want to change system value {{ check_item.name }} on {{ ansible_ssh_host }}?
               Input a number between 1-9. Leave blank and press Enter to skip.
-          register: QLMTDEVSSN_USER
-        - block:
-            - name: Changing QLMTDEVSSN to {{ QLMTDEVSSN_USER.user_input | trim | int }}
-              ibmi_cl_command:
-                cmd: CHGSYSVAL SYSVAL(QLMTDEVSSN) VALUE('{{ QLMTDEVSSN_USER.user_input | trim | int }}')
+          register: qlmtdevssn_user
+
+        - name: Block when user_input
+          when: qlmtdevssn_user.user_input | trim | length > 0
+          block:
+            - name: Changing QLMTDEVSSN to {{ qlmtdevssn_user.user_input | trim | int }}
+              ibm.power_ibmi.ibmi_cl_command:
+                cmd: CHGSYSVAL SYSVAL(QLMTDEVSSN) VALUE('{{ qlmtdevssn_user.user_input | trim | int }}')
                 become_user: "{{ become_user_name }}"
                 become_user_password: "{{ become_user_password }}"
               register: remediate
-              ignore_errors: true
+              failed_when: false # We want to continue regardless of rc
 
-            - block:
-                - debug:
+            - name: Block for when rc == 0
+              when: remediate.rc == 0
+              block:
+                - name: Debug message
+                  ansible.builtin.debug:
                     msg: |
                       QLMTDEVSSN Remediation completes, you can re-run check only mode to see the change.
-                - set_fact:
+                - name: Set success_list
+                  ansible.builtin.set_fact:
                     success_list: "{{ success_list + [ 'QLMTDEVSSN' ] }}"
-              when: remediate.rc == 0
 
-            - block:
-                - debug:
-                    msg: |
-                      QLMTDEVSSN_USER Remediation failed.
-                - set_fact:
-                    fail_list: "{{ fail_list + [ 'QLMTDEVSSN' ] }}"
+            - name: Block when rc != 0
               when: remediate.rc != 0
-          when: QLMTDEVSSN_USER.user_input | trim | length > 0
+              block:
+                - name: Failure message
+                  ansible.builtin.debug:
+                    msg: |
+                      QLMTDEVSSN Remediation failed.
+                - name: Set fail_list
+                  ansible.builtin.set_fact:
+                    fail_list: "{{ fail_list + [ 'QLMTDEVSSN' ] }}"
 
-        - block:
-            - debug:
-                msg: "User cancelled"
-            - set_fact:
+        - name: Block for user cancel
+          when: qlmtdevssn_user.user_input | trim | length == 0
+          block:
+            - name: User cancel message
+              ansible.builtin.debug:
+                msg: User cancelled
+            - name: Display skip_list
+              ansible.builtin.set_fact:
                 skip_list: "{{ skip_list + [ 'QLMTDEVSSN' ] }}"
-          when: QLMTDEVSSN_USER.user_input | trim | length == 0
-      when: check_item.name == "QLMTDEVSSN"
 
-    - block:
-        - pause:
+    - name: Block for name == "QUSEADPAUT"
+      when: check_item.name == "QUSEADPAUT"
+      block:
+        - name: Prompt for QUSEADPAUT input
+          ansible.builtin.pause:
             prompt: |
               Controls those users allowed to create or change programs that use adopted authority from
               other programs that call it. If an authorization list is specified, *PUBLIC(EXCLUDE) should
@@ -144,13 +192,17 @@
               change control personnel responsible for disaster recovery and program change control
               respectively. Do you want to remediate by creating an authorization list named QUSEADPAUT and
               change the system value QUSEADPAUT to QUSEADPAUT? (Y/N)
-          register: QUSEADPAUT_USER
-        - set_fact:
-            QUSEADPAUT_USER_mode: '{{ QUSEADPAUT_USER.user_input | upper | trim }}'
-        - block:
-            - name: create a cl command file on {{ ansible_ssh_host }}
-              copy:
-                dest: "/tmp/create_QUSEADPAUT.cl"
+          register: quseadpaut_user
+        - name: Set user mode
+          ansible.builtin.set_fact:
+            quseadpaut_user_mode: "{{ quseadpaut_user.user_input | upper | trim }}"
+
+        - name: Block for when quseadpaut_user_mode == 'Y'
+          when: quseadpaut_user_mode == 'Y'
+          block:
+            - name: Create a cl command file on {{ ansible_ssh_host }}
+              ansible.builtin.copy:
+                dest: /tmp/create_QUSEADPAUT.cl
                 content: |
                   CRTAUTL AUTL(QUSEADPAUT) AUT(*EXCLUDE)
 
@@ -158,44 +210,55 @@
 
                   CHGSYSVAL SYSVAL(QUSEADPAUT) VALUE(QUSEADPAUT)
                 force: true
-              ignore_errors: true
+                mode: "0755"
+              failed_when: false # We want to continue
 
-            - name: execute the command file to remediate
-              ibmi_script_execute:
-                src: '/tmp/create_QUSEADPAUT.cl'
-                type: 'CL'
-                become_user: '{{ become_user_name }}'
-                become_user_password: '{{ become_user_password }}'
+            - name: Execute the command file to remediate
+              ibm.power_ibmi.ibmi_script_execute:
+                src: /tmp/create_QUSEADPAUT.cl
+                type: CL
+                become_user: "{{ become_user_name }}"
+                become_user_password: "{{ become_user_password }}"
               register: remediate
-              ignore_errors: true
+              failed_when: false # We want to continue regardless of rc
 
-            - block:
-                - debug:
+            - name: Block when emediate.rc == 0
+              when: remediate.rc == 0
+              block:
+                - name: Completion message
+                  ansible.builtin.debug:
                     msg: |
                       QUSEADPAUT Remediation completes, you can re-run check only mode to see the change.
-                - set_fact:
+                - name: Display success_list
+                  ansible.builtin.set_fact:
                     success_list: "{{ success_list + [ 'QUSEADPAUT' ] }}"
-              when: remediate.rc == 0
 
-            - block:
-                - debug:
+            - name: Block when remediate.rc != 0
+              when: remediate.rc != 0
+              block:
+                - name: Failure message
+                  ansible.builtin.debug:
                     msg: |
                       QUSEADPAUT Remediation failed.
-                - set_fact:
+                - name: Display fail_list
+                  ansible.builtin.set_fact:
                     fail_list: "{{ fail_list + [ 'QUSEADPAUT' ] }}"
-              when: remediate.rc != 0
-          when: QUSEADPAUT_USER_mode == 'Y'
 
-        - block:
-            - debug:
-                msg: "User cancelled"
-            - set_fact:
+        - name: Block when quseadpaut_user_mode == 'N' or quseadpaut_user_mode | length == 0
+          when: quseadpaut_user_mode == 'N' or quseadpaut_user_mode | length == 0
+          block:
+            - name: User cancel message
+              ansible.builtin.debug:
+                msg: User cancelled
+            - name: Set skip_list
+              ansible.builtin.set_fact:
                 skip_list: "{{ skip_list + [ 'QUSEADPAUT' ] }}"
-          when: QUSEADPAUT_USER_mode == 'N' or QUSEADPAUT_USER_mode | length == 0 
-      when: check_item.name == "QUSEADPAUT"
 
-    - block:
-        - pause:
+    - name: Block when check_item.name == "QSYSLIBL"
+      when: check_item.name == "QSYSLIBL"
+      block:
+        - name: Prompt for authority
+          ansible.builtin.pause:
             prompt: |
               The security of the System Library List is a vital part of your overall system security. All
               libraries in the System Library List should provide *PUBLIC *USE authority. Any authority
@@ -206,129 +269,165 @@
               Do you want to remediate to ensure each library in the list grants *PUBLIC *USE Object Authority and that
               any additional Users with an authority greater than *USE are properly authorized by
               the business to introduce changes into the library? (Y/N)
-          register: QSYSLIBL_USER
-        - set_fact:
-            QSYSLIBL_USER_mode: '{{ QSYSLIBL_USER.user_input | upper | trim }}'
-        - block:
+          register: qsyslib_user
+        - name: Set qsyslib_user_mode
+          ansible.builtin.set_fact:
+            qsyslib_user_mode: "{{ qsyslib_user.user_input | upper | trim }}"
+        - name: Block when qsyslib_user_mode == 'Y'
+          when: qsyslib_user_mode == 'Y'
+          block:
             - name: Grant *PUBLIC *USE Object Authority to each library in QSYSLIBL
-              ibmi_cl_command:
+              ibm.power_ibmi.ibmi_cl_command:
                 cmd: GRTOBJAUT OBJ({{ item }}) OBJTYPE(*LIB) USER(*PUBLIC) AUT(*USE) REPLACE(*YES)
-                become_user: '{{ become_user_name }}'
-                become_user_password: '{{ become_user_password }}'
+                become_user: "{{ become_user_name }}"
+                become_user_password: "{{ become_user_password }}"
               register: remediate
               with_items:
                 - "{{ check_item.actual.split(' ') }}"
               when: item != ""
 
-            - debug:
+            - name: Remediation completes
+              ansible.builtin.debug:
                 msg: |
                   QSYSLIBL Remediation completes, you can re-run check only mode to see the change.
 
-            - set_fact:
+            - name: Set success_list
+              ansible.builtin.set_fact:
                 success_list: "{{ success_list + [ 'QSYSLIBL' ] }}"
 
           rescue:
-            - debug:
+            - name: Failure message
+              ansible.builtin.debug:
                 msg: |
                   QSYSLIBL Remediation failed.
-            - set_fact:
+            - name: Set fail_list
+              ansible.builtin.set_fact:
                 fail_list: "{{ fail_list + [ 'QSYSLIBL' ] }}"
-          when: QSYSLIBL_USER_mode == 'Y'
 
-        - block:
-            - debug:
-                msg: "User cancelled"
-            - set_fact:
+        - name: Block when qsyslib_user_mode == 'N' or qsyslib_user_mode | length == 0
+          when: qsyslib_user_mode == 'N' or qsyslib_user_mode | length == 0
+          block:
+            - name: Cancel message
+              ansible.builtin.debug:
+                msg: User cancelled
+            - name: Set skip_list
+              ansible.builtin.set_fact:
                 skip_list: "{{ skip_list + [ 'QSYSLIBL' ] }}"
-          when: QSYSLIBL_USER_mode == 'N' or QSYSLIBL_USER_mode | length == 0
-      when: check_item.name == "QSYSLIBL"
 
-    - block:
-        - pause:
+    - name: Block when check_item.name == "QAUTOCFG"
+      when: check_item.name == "QAUTOCFG"
+      block:
+        - name: Prompt for qautocfg_choice
+          ansible.builtin.pause:
             prompt: |
-              In order to make sure that the IBM i stock images can be successfully deployed, QAUTOCFG could not be 
+              In order to make sure that the IBM i stock images can be successfully deployed, QAUTOCFG could not be
               changed to the recommended value during the deployment. The customer can change it after deployment.
               Do you still want to change system value QAUTOCFG on {{ ansible_ssh_host }} (Y/N)?
               Expected value: {{ check_item.expect }} | Actual value: {{ check_item.actual }}
-          register: QAUTOCFG_choice
+          register: qautocfg_choice
 
-        - set_fact:
-            QAUTOCFG_choice_mode: '{{ QAUTOCFG_choice.user_input | upper | trim }}'
+        - name: Set choice mode
+          ansible.builtin.set_fact:
+            qautocfg_choice_mode: "{{ qautocfg_choice.user_input | upper | trim }}"
 
-        - block:
-            - name: Remediating {{ check_item.name }} on {{ ansible_ssh_host }}
-              ibmi_cl_command:
+        - name: Block when qautocfg_choice_mode == 'Y'
+          when: qautocfg_choice_mode == 'Y'
+          block:
+            - name: Remediating check_item.name on {{ ansible_ssh_host }}
+              ibm.power_ibmi.ibmi_cl_command:
                 cmd: CHGSYSVAL SYSVAL({{ check_item.name }}) VALUE('{{ check_item.expect }}')
                 become_user: "{{ become_user_name }}"
                 become_user_password: "{{ become_user_password }}"
               register: remediate
-              ignore_errors: true
+              failed_when: false # We want to continue regardless of rc
 
-            - block:
-                - debug:
+            - name: Block when remediate.rc == 0
+              when: remediate.rc == 0
+              block:
+                - name: Completion
+                  ansible.builtin.debug:
                     msg: |
                       {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
-                - set_fact:
+                - name: Set success_list
+                  ansible.builtin.set_fact:
                     success_list: "{{ success_list + [ check_item.name ] }}"
-              when: remediate.rc == 0
-            - block:
-                - debug:
+
+            - name: Block when remediate.rc != 0
+              when: remediate.rc != 0
+              block:
+                - name: Failure message
+                  ansible.builtin.debug:
                     msg: |
                       {{ check_item.name }} Remediation failed.
-                - set_fact:
+                - name: Set fail_list
+                  ansible.builtin.set_fact:
                     fail_list: "{{ fail_list + [ check_item.name ] }}"
-              when: remediate.rc != 0
-          when: QAUTOCFG_choice_mode == 'Y'
-        - block:
-            - debug:
-                msg: "User cancelled"
-            - set_fact:
-                skip_list: "{{ skip_list + [ check_item.name ] }}"
-          when: QAUTOCFG_choice_mode != 'N' or QAUTOCFG_choice_mode | length == 0
-      when: check_item.name == "QAUTOCFG"
 
-    - block:
-        - pause:
+        - name: Block when qautocfg_choice_mode != 'N' or qautocfg_choice_mode | length == 0
+          when: qautocfg_choice_mode != 'N' or qautocfg_choice_mode | length == 0
+          block:
+            - name: Cancel message
+              ansible.builtin.debug:
+                msg: User cancelled
+            - name: Set skip_list
+              ansible.builtin.set_fact:
+                skip_list: "{{ skip_list + [ check_item.name ] }}"
+
+    - name: Block when check_item.name == "QPWDRQDDIF"
+      when: check_item.name == "QPWDRQDDIF"
+      block:
+        - name: Prompt for QPWDRQDDIF choice
+          ansible.builtin.pause:
             prompt: |
-              In order to make sure that the IBM i stock images can be successfully deployed, QPWDRQDDIF could not be 
+              In order to make sure that the IBM i stock images can be successfully deployed, QPWDRQDDIF could not be
               changed to the recommended value during the deployment. The customer can change it after deployment.
               Do you still want to change system value QPWDRQDDIF on {{ ansible_ssh_host }} (Y/N)?
               Expected value: {{ check_item.expect }} | Actual value: {{ check_item.actual }}
-          register: QPWDRQDDIF_choice
+          register: qpwdrqddif_choice
 
-        - set_fact:
-            QPWDRQDDIF_choice_mode: '{{ QPWDRQDDIF_choice.user_input | upper | trim }}'
+        - name: Set choice mode
+          ansible.builtin.set_fact:
+            qpwdrqddif_choice_mode: "{{ qpwdrqddif_choice.user_input | upper | trim }}"
 
-        - block:
-            - name: Remediating {{ check_item.name }} on {{ ansible_ssh_host }}
-              ibmi_cl_command:
+        - name: Block for when qpwdrqddif_choice_mode == 'Y'
+          when: qpwdrqddif_choice_mode == 'Y'
+          block:
+            - name: Remediating check_item.name on {{ ansible_ssh_host }}
+              ibm.power_ibmi.ibmi_cl_command:
                 cmd: CHGSYSVAL SYSVAL({{ check_item.name }}) VALUE('{{ check_item.expect }}')
                 become_user: "{{ become_user_name }}"
                 become_user_password: "{{ become_user_password }}"
               register: remediate
-              ignore_errors: true
+              failed_when: false # We want to continue regardless of rc
 
-            - block:
-                - debug:
+            - name: Block for when remediate.rc == 0
+              when: remediate.rc == 0
+              block:
+                - name: Completion
+                  ansible.builtin.debug:
                     msg: |
                       {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
-                - set_fact:
+                - name: Set success_list
+                  ansible.builtin.set_fact:
                     success_list: "{{ success_list + [ check_item.name ] }}"
-              when: remediate.rc == 0
-            - block:
-                - debug:
+
+            - name: Block for when remediate.rc != 0
+              when: remediate.rc != 0
+              block:
+                - name: Failure message
+                  ansible.builtin.debug:
                     msg: |
                       {{ check_item.name }} Remediation failed.
-                - set_fact:
+                - name: Set fail_list
+                  ansible.builtin.set_fact:
                     fail_list: "{{ fail_list + [ check_item.name ] }}"
-              when: remediate.rc != 0
-          when: QPWDRQDDIF_choice_mode == 'Y'
-        - block:
-            - debug:
-                msg: "User cancelled"
-            - set_fact:
-                skip_list: "{{ skip_list + [ check_item.name ] }}"
-          when: QPWDRQDDIF_choice_mode != 'N' or QPWDRQDDIF_choice_mode | length == 0
-      when: check_item.name == "QPWDRQDDIF"
 
-  when: not compliant
+        - name: Block for when qpwdrqddif_choice_mode != 'N' or qpwdrqddif_choice_mode | length == 0
+          when: qpwdrqddif_choice_mode != 'N' or qpwdrqddif_choice_mode | length == 0
+          block:
+            - name: Cancel message
+              ansible.builtin.debug:
+                msg: User cancelled
+            - name: Set skip_list
+              ansible.builtin.set_fact:
+                skip_list: "{{ skip_list + [ check_item.name ] }}"

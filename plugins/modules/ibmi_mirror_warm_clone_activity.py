@@ -109,7 +109,7 @@ MrdbConfigComplete = 2
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 
 def mrdb_retrieve_mirror_state(imodule):

@@ -133,7 +133,7 @@ author:
 
 EXAMPLES = r'''
 - name: Do user profile compliance check
-  ibmi_ibm.power_ibmi.ibmi_user_compliance_check:
+  ibm.power_ibmi.ibmi_user_compliance_check:
       users:
         - 'ibmiuser1'
         - 'ibmiuser2'
@@ -217,7 +217,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 parmname_array = [
     'SIGN_ON_ATTEMPTS_NOT_VALID',

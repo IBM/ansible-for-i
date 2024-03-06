@@ -1,16 +1,16 @@
-- name: remove if {{ local_workspace }} exists
-  file:
+- name: Remove, if exists, {{ local_workspace }}
+  ansible.builtin.file:
     path: '{{ local_workspace }}'
     state: 'absent'
 
-- name: create {{ local_workspace }}
-  file:
+- name: Create {{ local_workspace }}
+  ansible.builtin.file:
     path: '{{ local_workspace }}'
     state: 'directory'
     mode: '0755'
 
-- name: git clone from source repository
-  git:
+- name: Git clone from source repository
+  ansible.builtin.git:
     repo: '{{ git_repo_url }}'
     dest: '{{ local_workspace }}'
     version: '{{ git_branch }}'

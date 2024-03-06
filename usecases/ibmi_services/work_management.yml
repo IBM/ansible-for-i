@@ -1,10 +1,9 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-- hosts: all
+- name: Playbook for work management
+  hosts: all
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
     become_user_name: null
@@ -13,7 +12,7 @@
   tasks:
     - name: Review the job scheduled entries which are no longer in effect, either because they
             were explicitly held or because they were scheduled to run a single time and the date has passed.
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT *
                   FROM QSYS2.SCHEDULED_JOB_INFO
                   WHERE STATUS IN (
@@ -26,10 +25,10 @@
         expected_row_count: 0
       register: job_schedule_status
       tags: job_schedule_status
-      ignore_errors: true
+      failed_when: false
 
     - name: Find jobs sitting on a job queue, waiting to run
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT *
                   FROM TABLE (
                           QSYS2.JOB_INFO(JOB_STATUS_FILTER => '*JOBQ')
@@ -40,10 +39,10 @@
       register: job_in_queue
       tags:
         - job_in_queue
-      ignore_errors: true
+      failed_when: false
 
     - name: Find the top 4 consumers of temporary storage, by memory pool, if temporary storage is over 1G
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "WITH TOP_CONSUMERS (JOB_NAME, MEMORY_POOL, AUTHORIZATION_NAME, FUNCTION_TYPE, FUNCTION,
                           TEMPORARY_STORAGE, RANK) AS (
                       SELECT JOB_NAME,
@@ -79,10 +78,10 @@
         expected_row_count: 0
       register: temp_storage_by_memory_pool
       tags: temp_storage_by_memory_pool
-      ignore_errors: true
+      failed_when: false
 
     - name: Find active jobs that use the temporary storage over 1G
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT JOB_NAME,
                     AUTHORIZATION_NAME,
                     TEMPORARY_STORAGE,
@@ -98,11 +97,11 @@
         expected_row_count: 0
       register: temp_storage_by_job
       tags: temp_storage_by_job
-      ignore_errors: true
+      failed_when: false
 
 
     - name: Find the jobs that are encountering more than 2000 lock contention
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT JOB_NAME, DATABASE_LOCK_WAITS,
               NON_DATABASE_LOCK_WAITS,
               DATABASE_LOCK_WAITS + NON_DATABASE_LOCK_WAITS AS Total_Lock_Waits, J.*
@@ -117,11 +116,11 @@
         expected_row_count: 0
       register: lock_waits
       tags: lock_waits
-      ignore_errors: true
+      failed_when: false
 
 
     - name: Identify Host Server jobs currently using >10 Meg of QTEMP
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT qtemp_size,
                     job_name,
                     internal_job_id,
@@ -160,4 +159,4 @@
         expected_row_count: 0
       register: qtemp_usage
       tags: qtemp_usage
-      ignore_errors: true
+      failed_when: false

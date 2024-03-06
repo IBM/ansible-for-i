@@ -1,5 +1,5 @@
 - name: Check A Workflow To Run
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/workflow_job_templates/{{ workflow_job_templates.json.id }}/launch/"
     status_code: 200
     method: GET
@@ -10,7 +10,7 @@
   when: workflow_job_templates.json.id | int >= 0
 
 - name: Launch A Workflow
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/workflow_job_templates/{{ workflow_job_templates.json.id }}/launch/"
     status_code: 201
     method: POST
@@ -19,13 +19,13 @@
     validate_certs: false
   register: workflow_job
   when: workflow_job_templates.json.id | int >= 0 and
-      workflow_job_templates.json.ask_inventory_on_launch == false and
-      workflow_job_templates.json.ask_scm_branch_on_launch == false
+      not workflow_job_templates.json.ask_inventory_on_launch and
+      not workflow_job_templates.json.ask_scm_branch_on_launch
 
 - name: Display The Workflow's URL
-  debug:
+  ansible.builtin.debug:
     msg: "Workflow URL: {{ tower_url | regex_replace('\\/$', '') }}/#/workflows/{{ workflow_job.json.id }}"
 
 - name: Display The Workflow's API URL
-  debug:
+  ansible.builtin.debug:
     msg: "Workflow API URL: {{ tower_api_url }}/workflow_jobs/{{ workflow_job.json.id }}"

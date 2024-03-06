@@ -1,10 +1,9 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-- hosts: "{{ target_system | default('all') }}"
+- name: Playbook to manage user profiles
+  hosts: "{{ target_system | default('all') }}"
   gather_facts: true
-  collections:
-    - ibm.power_ibmi
 
   vars:
     become_user_name: null
@@ -14,56 +13,70 @@
     skip_list: []
 
   tasks:
-    - pause:
+    - name: Prompt for check mode
+      ansible.builtin.pause:
         prompt: |
           You're going to do user profile security compliance check on {{ ansible_ssh_host }}
           Please input A,B or C for mode selection:
           Check only(A) / Remediate only(B) / Check and Remediate(C)
       register: mode
 
-    - set_fact:
+    - name: Set mode
+      ansible.builtin.set_fact:
         mode: "{{ mode.user_input | upper}}"
 
-    - fail:
+    - name: Check mode
+      ansible.builtin.fail:
         msg: "only A/B/C is permitted in mode selection"
       when: mode != 'A' and mode != 'B' and mode != 'C'
 
-    - block:
-        - set_fact:
-            timestamp: '{{ ansible_date_time.iso8601_basic_short }}'
-        - include: user_profile_check.yml
+    - name: Block for when mode != 'B'
       when: mode != 'B'
+      block:
+        - name: Set timestamp
+          ansible.builtin.set_fact:
+            timestamp: '{{ ansible_date_time.iso8601_basic_short }}'
+        - name: Include tasks from user_profile_check.yml
+          ansible.builtin.include_tasks: user_profile_check.yml
 
-    - meta: end_play
+    - name: End play for mode A
+      ansible.builtin.meta: end_play
       when: mode == 'A'
 
-    - block:
-        - block:
-            - pause:
+    - name: Block for when mode != 'A'
+      when: mode != 'A'
+      block:
+        - name: Block for when mode == 'B'
+          when: mode == 'B'
+          block:
+            - name: Prompt for result file
+              ansible.builtin.pause:
                 prompt: |
                   You're going to remediate the vulnerables base on the check.
                   Please input the path to the security check result file.
               register: report_file
 
-            - name:
-              stat:
+            - name: Stat input file
+              ansible.builtin.stat:
                 path: '{{ report_file.user_input }}'
               register: file
 
-            - fail:
+            - name: Check on input report file
+              ansible.builtin.fail:
                 msg: Report file does not exist - {{ report_file.user_input }}
               when: not file.stat.exists
 
             - name: Display the JSON file content
-              shell: cat {{ report_file.user_input }}
+              ansible.builtin.command: cat {{ report_file.user_input }}
               register: result
+              changed_when: false
 
-            - name: save the Json data to a Variable as a Fact
-              set_fact:
+            - name: Save the Json data to a Variable as a Fact
+              ansible.builtin.set_fact:
                 report: "{{ result.stdout | from_json }}"
-          when: mode == 'B'
 
-        - include: user_profile_remediation.yml
+        - name: Include tasks from user_profile_remediation.yml
+          ansible.builtin.include_tasks: user_profile_remediation.yml
           loop: '{{ report }}'
           loop_control:
             loop_var: check_item
@@ -74,7 +87,7 @@
               1. You may re-run the playbook with check only mode to see the change.
               2. We only provide suggestion for remediating item 3.10A and 3.10B because the scenarios
                  on different machines may vary. You may need take action on your demand.
-          debug:
+          ansible.builtin.debug:
             msg:
               - "↓↓↓↓↓↓ Success list ↓↓↓↓↓↓"
               - "{{ success_list }}"
@@ -82,4 +95,3 @@
               - "{{ fail_list }}"
               - "↓↓↓↓↓↓ Skip list ↓↓↓↓↓↓"
               - "{{ skip_list }}"
-      when: mode != 'A'

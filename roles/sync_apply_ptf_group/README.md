@@ -11,7 +11,7 @@ Role Variables
 | `ptf_group_info`      | dict          | The ptf group's information. file_path and file_name are required. file_path must be a folder, and all of this
 ptf group's files should be in this folder. |
 | `src_host`            | str           | The system that has the src ptf group's files, which will be transferred to the target system.|
-| `dest`                | str           | The path that ptf group files would be transferred to. Default is "~".  |
+| `dest`                | str           | The path that ptf group files would be transferred to. Default is "~/PTF/ptfgroup".  |
 | `delete`              | bool          | Whether or not to delete the PTF group install dir after apply. The default is True.  |
 | `ptf_omit_list`       | list          | The list of PTFs which will be omitted. The elements of the list are dict. The key of the dict should be the product ID of the fix that is omitted.  |
 
@@ -31,7 +31,7 @@ Example Playbook
   hosts: testhost
 
   vars:
-    ptf_group_info: "{ 'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2025910369', 'file_name': ['S8404V01.BIN'] }"
+    ptf_group_info: { 'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2025910369', 'file_name': ['S8404V01.BIN'] }
     src_host: "{{ src_host }}"
     ptf_omit_list: [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]
 

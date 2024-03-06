@@ -76,7 +76,7 @@ author:
 
 EXAMPLES = r'''
 - name: Synchronize a list of different types of files to host.com.
-  ibmi_ibm.power_ibmi.ibmi_sync_files:
+  ibm.power_ibmi.ibmi_sync_files:
     src_list:
       - {'src': '/tmp/c1.file', 'dest': '/qsys.lib/test.lib/'}
       - {'src': '/qsys.lib/test.lib/test.file', 'dest': '/qsys.lib/test.lib'}
@@ -166,7 +166,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from tempfile import mkdtemp
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 HAS_PARAMIKO = True
 
 try:

@@ -83,11 +83,11 @@ Examples
 
    
    - name: Start the subsystem QBATCH.
-     ibmi_ibm.power_ibmi.ibmi_start_subsystem:
+     ibm.power_ibmi.ibmi_start_subsystem:
        subsystem: QBATCH
 
    - name: Start a user defined subsystem, which the subsystem description is MYSBS, located at library MYLIB.
-     ibmi_ibm.power_ibmi.ibmi_start_subsystem:
+     ibm.power_ibmi.ibmi_start_subsystem:
        subsystem: MYSBS
        library: MYLIB
        become_user: 'USER1'

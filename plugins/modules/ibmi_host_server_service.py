@@ -159,7 +159,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 IBMi_STRSVR = "QSYS/STRHOSTSVR"
 IBMi_ENDSVR = "QSYS/ENDHOSTSVR"
 IBMi_HOST_SERVER_LIST = ["*ALL", "*CENTRAL", "*DATABASE", "*DTAQ", "*FILE", "*NETPRT", "*RMTCMD", "*SIGNON", "*SVRMAP"]

@@ -1,22 +1,25 @@
 ---
-- set_fact:
+- name: Initialize sysval_vrm
+  ansible.builtin.set_fact:
     sysval_vrm: {}
 
 - name: Compose sysval with VRM
-  set_fact:
+  ansible.builtin.set_fact:
     sysval_vrm: "{{ { 'name': sysval.name, 'expect': sysval.get('expect_' + os400_ver), 'check': sysval.check } }}"
   when: level_mode == '3' and sysval.name in ['QPWDRULES', 'QSSLCSL', 'QSSLCSLCTL', 'QSSLPCL']
 
-- set_fact:
+- name: Set sysvalreal
+  ansible.builtin.set_fact:
     sysvalreal: "{{ sysval_vrm }}"
   when: sysval_vrm != {}
 
-- set_fact:
+- name: Set sysvalreal
+  ansible.builtin.set_fact:
     sysvalreal: "{{ sysval }}"
   when: sysval_vrm == {}
 
 - name: Checking system value {{ sysval.name }}
-  ibmi_sysval:
+  ibm.power_ibmi.ibmi_sysval:
     sysvalue:
       - "{{ sysvalreal }}"
     become_user: "{{ become_user_name }}"
@@ -24,25 +27,28 @@
   register: check
   ignore_errors: true
 
-- set_fact:
+- name: Itemized result with fail_list
+  ansible.builtin.set_fact:
     itemized_result: "{{ itemized_result | default({}) | combine ({ item.key : item.value }) }}"
   with_items:
-    - {'key': 'name', 'value': "{{ check.fail_list[0]['name'] }}"}
-    - {'key': 'expect', 'value': "{{ check.fail_list[0]['expect'] }}"}
-    - {'key': 'actual', 'value': "{{ check.fail_list[0]['value'] }}"}
-    - {'key': 'check', 'value': "{{ check.fail_list[0]['check'] }}"}
-    - {'key': 'compliant', 'value': "{{ check.fail_list[0]['compliant'] }}"}
+    - { key: name, value: "{{ check.fail_list[0]['name'] }}" }
+    - { key: expect, value: "{{ check.fail_list[0]['expect'] }}" }
+    - { key: actual, value: "{{ check.fail_list[0]['value'] }}" }
+    - { key: check, value: "{{ check.fail_list[0]['check'] }}" }
+    - { key: compliant, value: "{{ check.fail_list[0]['compliant'] }}" }
   when: check.rc != 0
 
-- set_fact:
+- name: Itemized result with sysval
+  ansible.builtin.set_fact:
     itemized_result: "{{ itemized_result | default({}) | combine ({ item.key : item.value }) }}"
   with_items:
-    - {'key': 'name', 'value': "{{ check.sysval[0]['name'] }}"}
-    - {'key': 'expect', 'value': "{{ check.sysval[0]['expect'] }}"}
-    - {'key': 'actual', 'value': "{{ check.sysval[0]['value'] }}"}
-    - {'key': 'check', 'value': "{{ check.sysval[0]['check'] }}"}
-    - {'key': 'compliant', 'value': "{{ check.sysval[0]['compliant'] }}"}
+    - { key: name, value: "{{ check.sysval[0]['name'] }}" }
+    - { key: expect, value: "{{ check.sysval[0]['expect'] }}" }
+    - { key: actual, value: "{{ check.sysval[0]['value'] }}" }
+    - { key: check, value: "{{ check.sysval[0]['check'] }}" }
+    - { key: compliant, value: "{{ check.sysval[0]['compliant'] }}" }
   when: check.rc == 0
 
-- set_fact:
+- name: Set report
+  ansible.builtin.set_fact:
     report: "{{ report|default([]) + [itemized_result] }}"

@@ -62,7 +62,7 @@
       vars:
         target_file_path: "{{ path }}"
         repo_file_path: "{{ ptf_group_dir }}"
-      when: stat_result.stat.exists is true
+      when: stat_result.stat.exists
 
     - block:
         - name: Clear receive dir
@@ -129,7 +129,7 @@
               when: sync_result.fail_list != []
           when: file_result.failed == 0
 
-      when: same_files is false or stat_result.stat.exists is false
+      when: (same_files is defined and not same_files) or not stat_result.stat.exists
 
     - name: Get the home dir on target server
       shell: 'echo $HOME'

@@ -23,10 +23,11 @@
   vars:
     target_file_path: "{{ path }}"
     repo_file_path: "{{ ptf_group_info.file_path }}"
-  when: stat_result.stat.exists is true
+    repo_server: "{{ src_host }}"
+  when: stat_result.stat.exists
 
 - name: Set up and transfer images
-  when: same_files is false or stat_result.stat.exists is false
+  when: (same_files is defined and not same_files) or not stat_result.stat.exists
   block:
     - name: Clear receive dir
       ansible.builtin.file:
@@ -56,11 +57,11 @@
 
     - name: Transfer images
       block:
-        - name: Recursively find files on repo server
+        - name: Recursively find files on source host / repo server
           ansible.builtin.find:
             paths: "{{ ptf_group_info.file_path }}"
             recurse: true
-          delegate_to: "{{ repo_server }}"
+          delegate_to: "{{ src_host }}"
           register: find_result_repo
 
         - name: Compose src_list
@@ -97,7 +98,7 @@
                 sync_apply_fail: true
 
 - name: Apply PTFs
-  when: sync_apply_fail is false
+  when: not sync_apply_fail
   block:
     - name: Get the home dir on target server
       ansible.builtin.shell: 'echo $HOME'

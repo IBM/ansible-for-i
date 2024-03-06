@@ -1,12 +1,14 @@
-- block:
-    - name: set_fact for fixed build environment
-      set_fact:
+- name: Block for when not provision
+  when: not provision
+  block:
+    - name: Set fact for fixed build environment
+      ansible.builtin.set_fact:
         build_system_ip: '{{ hostvars["fixed"]["ansible_ssh_host"] }}'
         build_system_user: '{{ hostvars["fixed"]["ansible_ssh_user"] }}'
         build_system_pass: '{{ hostvars["fixed"]["ansible_ssh_pass"] }}'
 
     - name: Add build server to Ansible in-memory inventory
-      add_host:
+      ansible.builtin.add_host:
         name: build_system
         ansible_ssh_host: '{{ build_system_ip }}'
         ansible_user: '{{ build_system_user }}'
@@ -14,23 +16,24 @@
         groups: build_systems
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
         ansible_python_interpreter: /QOpensys/pkgs/bin/python3
-  when: not provision
 
-- block:
-    - name: set_fact for non-fixed build environment
-      set_fact:
+- name: Block for when provision
+  when: provision
+  block:
+    - name: Set fact for non-fixed build environment
+      ansible.builtin.set_fact:
         build_system_ip: "{{ vm_info.server.accessIPv4 }}"
         build_system_user: '{{ hostvars["non-fixed"]["ansible_ssh_user"] }}'
         build_system_pass: '{{ hostvars["non-fixed"]["ansible_ssh_pass"] }}'
 
-    - name: remove existing entry for vm in case ssh header change occurs.
-      known_hosts:
+    - name: Remove existing entry for vm in case ssh header change occurs.
+      ansible.builtin.known_hosts:
         name: "{{ build_system_ip }}"
         path: ~/.ssh/known_hosts
         state: absent
 
-    - name: add vm-{{ build_lib }} to ansible in-memory inventory
-      add_host:
+    - name: Add VM to ansible in-memory inventory (vm-{{ build_lib }})
+      ansible.builtin.add_host:
         name: build_system
         ansible_ssh_host: '{{ build_system_ip }}'
         ansible_user: '{{ build_system_user }}'
@@ -39,18 +42,19 @@
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
         ansible_python_interpreter: /QOpensys/pkgs/bin/python3
 
-    - name: wait until vm-{{ build_lib }} is up and ssh ready
-      wait_for_connection:
+    - name: Wait until VM is up and ssh ready (vm-{{ build_lib }})
+      ansible.builtin.wait_for_connection:
         sleep: 10
         timeout: 3600
       delegate_to: "build_system"
 
-    # optional : add your personal steps of setting up build environment as needed.
-    # - name: Install yum on VM-{{ build_lib }}
-    #   include: install_yum.yml
-    #   delegate_to: "build_system"
+    # Optional : add your personal steps of setting up build environment as needed.
 
-    # - name: install python3 on VM-{{ build_lib }}
-    #   raw: /QOpensys/pkgs/bin/yum update && /QOpensys/pkgs/bin/yum install python3 -y
+    # Note that all tasks in install_yum.yml are delegated to "build_system"
+    # - name: Install yum on VM-{{ build_lib }}
+    #   ansible.builtin.include_tasks: install_yum.yml
+
+    # - name: Install python3 on VM-{{ build_lib }}
+    #   ansible.builtin.raw: /QOpensys/pkgs/bin/yum update && /QOpensys/pkgs/bin/yum install python3 -y
     #   delegate_to: "build_system"
-  when: provision
+    #   changed_when: true

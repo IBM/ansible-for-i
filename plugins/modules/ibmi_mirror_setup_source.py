@@ -194,7 +194,7 @@ ERROR = -1
 
 CLOUDINIT_METADATA_DIR = '/QOpenSys/pkgs/lib/cloudinit/cloud/seed/config_drive/openstack/latest'
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 
 def get_mirror_state_text(state):

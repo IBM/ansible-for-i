@@ -236,7 +236,7 @@ Examples
 
    
    - name: Do user profile compliance check
-     ibmi_ibm.power_ibmi.ibmi_user_compliance_check:
+     ibm.power_ibmi.ibmi_user_compliance_check:
          users:
            - 'ibmiuser1'
            - 'ibmiuser2'

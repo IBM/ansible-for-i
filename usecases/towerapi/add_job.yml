@@ -1,29 +1,33 @@
-- set_fact: template="{{ template_name }}-{{ playbook.split('.')[0] }}"
+- name: Set template
+  ansible.builtin.set_fact:
+    template: "{{ template_name }}-{{ playbook.split('.')[0] }}"
 
-- block:
-  - name: Check Job Template
-    uri:
-      url: "{{ tower_api_url }}/job_templates/?name={{ template }}"
-      headers:
-        Authorization: Bearer {{ token }}
-      validate_certs: false
-    register: check_job_templates
-
-  - block:
-      - name: Delete The Job Template
-        uri:
-          url: "{{ tower_api_url }}/job_templates/{{ check_job_templates.json.results[0].id }}/"
-          status_code: 204
-          method: DELETE
-          headers:
-            Authorization: Bearer {{ token }}
-          validate_certs: false
-        register: delete_job_templates
-    when: check_job_templates.json.count == 1
+- name: Block for when pre_cleanup
   when: pre_cleanup|bool
+  block:
+    - name: Check Job Template
+      ansible.builtin.uri:
+        url: "{{ tower_api_url }}/job_templates/?name={{ template }}"
+        headers:
+          Authorization: Bearer {{ token }}
+        validate_certs: false
+      register: check_job_templates
+
+    - name: Block for when check_job_templates.json.count == 1
+      when: check_job_templates.json.count == 1
+      block:
+        - name: Delete The Job Template
+          ansible.builtin.uri:
+            url: "{{ tower_api_url }}/job_templates/{{ check_job_templates.json.results[0].id }}/"
+            status_code: 204
+            method: DELETE
+            headers:
+              Authorization: Bearer {{ token }}
+            validate_certs: false
+          register: delete_job_templates
 
 - name: Create A Job Template
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/job_templates/"
     status_code: 201
     method: POST
@@ -63,7 +67,7 @@
   failed_when: job_templates.json.id | int < 0
 
 - name: Add credentials to the job template
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/job_templates/{{ job_templates.json.id }}/credentials/"
     status_code: 204
     method: POST
@@ -76,4 +80,4 @@
   when: not provision|bool
 
 - name: Add the job template to the workflow
-  include: add_job_to_workflow.yml
+  ansible.builtin.include_tasks: add_job_to_workflow.yml

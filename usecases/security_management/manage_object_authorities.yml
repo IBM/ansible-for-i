@@ -1,10 +1,9 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
-- hosts: "{{ target_system | default('all') }}"
+- name: Playbook to manage object authorities
+  hosts: "{{ target_system | default('all') }}"
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
     become_user_name: null
@@ -12,7 +11,7 @@
 
   tasks:
     - name: Display the authority of QGPL
-      ibmi_object_authority:
+      ibm.power_ibmi.ibmi_object_authority:
         operation: display
         object_name: QGPL
         object_library: QSYS

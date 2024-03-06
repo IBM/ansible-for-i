@@ -2,8 +2,8 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
 ---
-- hosts: localhost
-  name: Prompt input parameters, press Enter to accept default values.
+- name: Prompt input parameters, press Enter to accept default values.
+  hosts: localhost
   gather_facts: false
   vars_prompt:
     - name: prefix
@@ -98,11 +98,9 @@
     tower_api_url: "{{ tower_url | regex_replace('\\/$', '') }}/api/v2"
     playbooks: "{{ playbook_names.split() }}"
 
-  collections:
-    - ibm.power_ibmi
-
   tasks:
-    - set_fact:
+    - name: Initialize facts
+      ansible.builtin.set_fact:
         credential_name: "{{ prefix }}_machine_cred"
         inventory_name: "{{ prefix }}_systems"
         project_name: "{{ prefix }}_project"
@@ -112,62 +110,77 @@
         get_result_retry: 300
         get_result_retry_delay: 10
 
-    - block:
-        - pause:
+    - name: Block for when not provision
+      when: not provision|bool
+      block:
+        - name: Pause for host_name
+          ansible.builtin.pause:
             prompt: |
               You didn't choose to provision a new VM for building,
               please enter your build machine IP address here (use space as separator for multiple hosts)
           register: host_name
-      when: not provision|bool
 
-    - block:
-        - pause:
+    - name: Block for when provision
+      when: provision|bool
+      block:
+        - name: Pause for powervc_host
+          ansible.builtin.pause:
             prompt: "Enter powervc host for provisioning"
           register: powervc_host
 
-        - pause:
+        - name: Pause for powervc_admin
+          ansible.builtin.pause:
             prompt: "Enter powervc admin for provisioning"
           register: powervc_admin
 
-        - pause:
+        - name: Pause for powervc_admin_password
+          ansible.builtin.pause:
             prompt: "Enter powervc admin password for provisioning"
             echo: false
           register: powervc_admin_password
 
-        - pause:
+        - name: Pause for powervc_project
+          ansible.builtin.pause:
             prompt: "Enter the project name in powervc host for provisioning"
           register: powervc_project
 
-        - pause:
+        - name: Pause for project_domain
+          ansible.builtin.pause:
             prompt: "Enter the project domain name in powervc host for provisioning"
           register: project_domain
 
-        - pause:
+        - name: Pause for user_domain
+          ansible.builtin.pause:
             prompt: "Enter the user_domain in powervc host for provisioning"
           register: user_domain
 
-        - pause:
+        - name: Pause for verify_cert
+          ansible.builtin.pause:
             prompt: "Do you want to verify cert in provisioning? (Yes/No)"
           register: verify_cert
 
-        - pause:
+        - name: Pause for network
+          ansible.builtin.pause:
             prompt: "Enter the Name or ID of a network to attach this instance to"
           register: network
 
-        - pause:
+        - name: Pause for image_name_or_id
+          ansible.builtin.pause:
             prompt: "Enter the image name or id in powervc host for provisioning"
           register: image_name_or_id
 
-        - pause:
+        - name: Pause for flavor_name_or_id
+          ansible.builtin.pause:
             prompt: "Enter the flavor name or id in powervc host for provisioning"
           register: flavor_name_or_id
 
-        - pause:
+        - name: Pause for deploy_timeout
+          ansible.builtin.pause:
             prompt: "Enter the timeout(seconds) value of provisioning VM in powervc host"
           register: deploy_timeout
 
-        - name: set_fact
-          set_fact:
+        - name: Set facts
+          ansible.builtin.set_fact:
             network: '{{ network.user_input }}'
             deploy_userdata_value: |
               {%- raw -%}#!/bin/sh
@@ -176,45 +189,47 @@
               system "chgtcpsvr svrspcval(*sshd) autostart(*yes)"
               system "strtcpsvr *sshd"
               {% endraw %}
-      when: provision|bool
 
-    - block:
+    - name: Block for steps
+      block:
         - name: Step 1 - login and get a Token
-          include: login.yml
+          ansible.builtin.include_tasks: login.yml
 
         - name: Step 2 - add a new inventory
-          include: add_inventory.yml
+          ansible.builtin.include_tasks: add_inventory.yml
 
-        - block:
+        - name: Block for when not provision
+          when: not provision|bool
+          block:
             - name: Step 3 - add new hosts
-              include: add_hosts.yml
+              ansible.builtin.include_tasks: add_hosts.yml
 
             - name: Step 4 - add a host access token
-              include: add_credential.yml
-          when: not provision|bool
+              ansible.builtin.include_tasks: add_credential.yml
 
-        - block:
-            - name: Step 5 - add a github access token
-              include: add_github_token.yml
+        - name: Block for when github_access_token != ""
           when: github_access_token != ""
+          block:
+            - name: Step 5 - add a github access token
+              ansible.builtin.include_tasks: add_github_token.yml
 
         - name: Step 6 - add a new project
-          include: add_project.yml
+          ansible.builtin.include_tasks: add_project.yml
 
         - name: Step 7 - add a workflow template
-          include: add_workflow.yml
+          ansible.builtin.include_tasks: add_workflow.yml
 
         - name: Step 8 - add job templates to the workflow
-          include_tasks: add_job.yml
+          ansible.builtin.include_tasks: add_job.yml
           loop: "{{ playbooks }}"
           loop_control:
             loop_var: playbook
 
         - name: Step 9 - run the workflow
-          include: run_workflow.yml
+          ansible.builtin.include_tasks: run_workflow.yml
 
         - name: Step 10 - show the result
-          include: show_result.yml
+          ansible.builtin.include_tasks: show_result.yml
 
         - name: Step 11 - clean up used tokens
-          include: cleanup.yml
+          ansible.builtin.include_tasks: cleanup.yml

@@ -1,5 +1,5 @@
 - name: Add A Job Template to the Workflow
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/workflow_job_templates/{{ workflow_job_templates.json.id }}/workflow_nodes/"
     status_code: 201
     method: POST
@@ -22,11 +22,12 @@
   register: workflow_job_template_nodes
   failed_when: workflow_job_template_nodes.json.id | int < 0
 
-- set_fact:
+- name: Set workflow_node_body
+  ansible.builtin.set_fact:
     workflow_node_body: '{ "id": {{ workflow_job_template_nodes.json.id | int }} }'
 
 - name: Put The Job Template into the Workflow Queue
-  uri:
+  ansible.builtin.uri:
     url: "{{ tower_api_url }}/workflow_job_template_nodes/{{ previous_node_id }}/success_nodes/"
     status_code: 204
     method: POST
@@ -38,5 +39,6 @@
   register: new_node
   when: previous_node_id is defined and previous_node_id != workflow_job_template_nodes.json.id
 
-- set_fact:
+- name: Set previous_node_id
+  ansible.builtin.set_fact:
     previous_node_id: "{{ workflow_job_template_nodes.json.id }}"

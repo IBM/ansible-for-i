@@ -64,13 +64,13 @@ author:
 
 EXAMPLES = r'''
 - name: Deleting all Licensed Program Objects, run as USER1.
-  ibmi_ibm.power_ibmi.ibmi_uninstall_product:
+  ibm.power_ibmi.ibmi_uninstall_product:
     product: 5770QU1
     become_user: 'USER1'
     become_user_password: 'yourpassword'
 
 - name: Deleting only the German (NLV 2929) objects for all options of the licensed program 5770QU1.
-  ibmi_ibm.power_ibmi.ibmi_uninstall_product:
+  ibm.power_ibmi.ibmi_uninstall_product:
     product: 5770QU1
     language: 2929
 '''
@@ -138,7 +138,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 
 def main():

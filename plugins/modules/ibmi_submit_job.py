@@ -79,7 +79,7 @@ author:
 
 EXAMPLES = r'''
 - name: Submit a batch job and run CALL QGPL/PGM1
-  ibmi_ibm.power_ibmi.ibmi_submit_job:
+  ibm.power_ibmi.ibmi_submit_job:
     cmd: 'CALL QGPL/PGM1'
     parameters: 'JOB(TEST)'
     check_interval: '30s'
@@ -149,7 +149,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

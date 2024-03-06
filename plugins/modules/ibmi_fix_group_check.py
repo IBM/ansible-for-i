@@ -103,7 +103,7 @@ import datetime
 import re
 
 
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/ibm-i-group-ptfs-level"

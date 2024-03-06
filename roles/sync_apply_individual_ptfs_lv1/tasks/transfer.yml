@@ -46,10 +46,11 @@
   vars:
     target_file_path: "{{ path }}"
     repo_file_path: "{{ not_loaded_list_var.file_path }}"
-  when: stat_result.stat.exists is true
+    repo_server: "{{ src_host }}"
+  when: stat_result.stat.exists
 
 - name: Transfer images
-  when: same_files is false or stat_result.stat.exists is false
+  when: (same_files is defined and not same_files) or not stat_result.stat.exists
   block:
     - name: Clear receive dir
       ansible.builtin.file:

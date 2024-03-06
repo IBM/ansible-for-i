@@ -1,42 +1,51 @@
-- name: Create {{ build_lib }} on {{ build_system_ip }}
-  ibmi_cl_command:
+- name: Create build library on {{ build_system_ip }}
+  ibm.power_ibmi.ibmi_cl_command:
     cmd: CRTLIB {{ build_lib }}
   delegate_to: "build_system"
 
-- name: "check if ~/.netrc contains ibm i target login"
-  lineinfile:
+- name: "Check if ~/.netrc contains ibm i target login"
+  ansible.builtin.lineinfile:
     name: ~/.netrc
     line: "machine {{build_system_ip}} login {{build_system_user}} password {{build_system_pass}}"
     state: present
   check_mode: false
 
-- block:
-    - name: Create {{ build_path }} on remote IBM i
+- name: Block for when build_with_stmfs
+  when: build_with_stmfs
+  block:
+    - name: Create build directory on remote IBM i ({{ build_path }})
       ansible.builtin.file:
         path: "{{ build_path }}"
         state: "directory"
+        mode: '0755'
       delegate_to: "build_system"
 
-    - name: combine transfer_command
-      set_fact:
+    # XXX Copy sendMsg.c to local_workspace, e.g., from ansible-for-i-development/tests/integration/targets/ibmi_sync_files/files/sendMsg.c
+    # - name: Copy sendMsg.c to {{ local_workspace }}
+      # ansible.builtin.command: cp ~/ansible/repo/ansible-for-i-development/tests/integration/targets/ibmi_sync_files/files/sendMsg.c {{ local_workspace }}
+      # changed_when: true
+
+    - name: Combine transfer_command
+      ansible.builtin.set_fact:
         transfer_command: "scp {{ local_workspace }}/sendMsg.c {{build_system_user}}@{{build_system_ip}}:{{ build_path }}/sendMsg.c"
 
-    - name: put STMFs to remote IBM i
-      shell:
-        cmd: 'sshpass -p "{{ build_system_pass }}" {{ transfer_command }}'
-  when: build_with_stmfs
+    - name: Put STMFs to remote IBM i
+      ansible.builtin.command: 'sshpass -p "{{ build_system_pass }}" {{ transfer_command }}'
+      changed_when: true
 
-- block:
+- name: Block for when not build_with_stmfs
+  when: not build_with_stmfs
+  block:
     - name: CRTSRCPF on remote IBM i
       ibm.power_ibmi.ibmi_cl_command:
         cmd: CRTSRCPF FILE({{ build_lib }}/QCLSRC)
       delegate_to: "build_system"
 
-    - name: put PF source member to remote IBM i via ftp
-      shell: |
+    - name: Put PF source member to remote IBM i via ftp
+      ansible.builtin.shell: |
         ftp {{ build_system_ip }} <<EOF
         cd {{ build_lib }}
         put {{ local_workspace }}/samplecl.txt QCLSRC.SAMPLECL
         bye
         EOF
-  when: not build_with_stmfs
+      changed_when: true

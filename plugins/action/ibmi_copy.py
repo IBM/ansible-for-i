@@ -14,7 +14,7 @@ from ansible.plugins.action import ActionBase
 from ansible.utils.display import Display
 from ansible.utils.hashing import checksum
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "2.0.0"
+__ibmi_module_version__ = "2.0.1"
 
 display = Display()
 
@@ -191,11 +191,14 @@ class ActionModule(ActionBase):
             self._transfer_file(src, savefile_path)
 
             local_checksum = checksum(src)
+            remote_stat = None
+            remote_checksum = None
             if not self._connection.become:
-                remote_checksum = self._remote_checksum(savefile_path, all_vars=task_vars, follow=True)
+                remote_stat = self._execute_remote_stat(savefile_path, all_vars=task_vars, follow=True)
+                remote_checksum = remote_stat['checksum']
 
-            if remote_checksum in ('1', '2', None):
-                result['msg'] += "remote_checksum error. The permissions are lacking or privilege escalation is needed. "
+            if remote_checksum in ('1', '', None):
+                result['msg'] += "File does not exist, permissions are lacking, or another issue. remote_checksum:{remote_checksum}"
             elif local_checksum != remote_checksum:
                 result['msg'] += "local_checksum doesn't match remote_checksum. "
                 result['failed'] = True
