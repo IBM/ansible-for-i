@@ -14,7 +14,7 @@
 
 # Command example: 
   # ansible-playbook ./sync_apply_ptf_group.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptf_group':
-  # {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]}"
+  # {'ptf_group_number':'SF99740', 'ptf_group_level':'20121'}, 'delete': true, 'ptf_omit_list': [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}], 'apply_type': '*DLYALL'}"
 ---
 - name: Transfer a PTF group files from repo server to target system, and apply
   hosts: '{{ target_system }}'
@@ -86,3 +86,4 @@
       vars:
         ptf_group_info: "{{ ptf_group_information }}"
         src_host: "{{ repo_server }}"
+        apply_type: "{{ apply_type }}"
