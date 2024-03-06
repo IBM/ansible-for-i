@@ -127,7 +127,7 @@
                   meta: end_host
               when: sync_result.fail_list != []
 
-      when: (same_files is defined and not same_files) or not stat_result.stat.stat_result.stat.exists
+      when: (same_files is defined and not same_files) or not stat_result.stat.exists
 
     - name: Get the home dir on target server
       shell: 'echo $HOME'
