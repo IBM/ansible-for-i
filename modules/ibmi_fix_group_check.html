@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
@@ -6,18 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ibmi_fix_group_check – Retrieve the latest PTF group information from PSP server. &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8d563738"></script>
-        <script src="../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -173,6 +171,8 @@
 <li><p>The <code class="docutils literal notranslate"><span class="pre">ibmi_fix_group_check</span></code> module retrieve latest PTF group information from PSP(Preventive Service Planning) server.</p></li>
 <li><p>Refer to <a class="reference external" href="https://www.ibm.com/support/pages/node/667567">https://www.ibm.com/support/pages/node/667567</a> for more details of PSP.</p></li>
 <li><p>ALL PTF groups or specific PTF groups are supported.</p></li>
+<li><p>A PTF group returns a list of PTFs that the group consists of, while a cumulative PTF returns a package ID.</p></li>
+<li><p>The PTF group information is derived from the top level XML web page <a class="reference external" href="https://public.dhe.ibm.com/services/us/igsc/PSP/xmldoc.xml">https://public.dhe.ibm.com/services/us/igsc/PSP/xmldoc.xml</a> with a corresponding XML file at <a class="reference external" href="https://public.dhe.ibm.com/services/us/igsc/PSP/">https://public.dhe.ibm.com/services/us/igsc/PSP/</a> for each PTF group (or text file for a cumulative).</p></li>
 </ul>
 </section>
 <section id="parameters">
@@ -265,7 +265,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;PTF_GROUP_LEVEL&quot;</span><span class="p">:</span> <span class="s2">&quot;46&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_GROUP_NUMBER&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99115&quot;</span><span class="p">,</span> <span class="s2">&quot;RELEASE&quot;</span><span class="p">:</span> <span class="s2">&quot;R610&quot;</span><span class="p">,</span> <span class="s2">&quot;RELEASE_DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;09/28/2015&quot;</span><span class="p">,</span> <span class="s2">&quot;TITLE&quot;</span><span class="p">:</span> <span class="s2">&quot;610 IBM HTTP Server for i&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99738 - 740 Group Security&quot;</span><span class="p">,</span> <span class="s2">&quot;package_id&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">&quot;ptf_group_level&quot;</span><span class="p">:</span> <span class="mi">70</span><span class="p">,</span> <span class="s2">&quot;ptf_group_number&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99738&quot;</span><span class="p">,</span> <span class="s2">&quot;ptf_list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;SJ02177&quot;</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;SI70103&quot;</span><span class="p">],</span> <span class="s2">&quot;release&quot;</span><span class="p">:</span> <span class="s2">&quot;R740&quot;</span><span class="p">,</span> <span class="s2">&quot;release_date&quot;</span><span class="p">:</span> <span class="s2">&quot;10/01/2024&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://public.dhe.ibm.com/services/us/igsc/PSP/SF99738.xml&quot;</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>

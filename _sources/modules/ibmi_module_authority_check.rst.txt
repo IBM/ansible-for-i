@@ -16,7 +16,7 @@ ibmi_module_authority_check -- Check the authority of executing a module.
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_module\_authority\_check`\  module can do the module authority check.
+- The :literal:`ibmi\_module\_authority\_check` module can do the module authority check.
 - This module returns the authority of executing the module specified in the parameter
 
 

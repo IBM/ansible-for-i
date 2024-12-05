@@ -16,7 +16,7 @@ ibmi_start_subsystem -- Start an inactive subsystem
 
 Synopsis
 --------
-- the \ :literal:`ibmi\_start\_subsystem`\  module start an inactive subsystem.
+- the :literal:`ibmi\_start\_subsystem` module start an inactive subsystem.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -48,7 +48,7 @@ become_user_password
 
      
 joblog
-  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
+  If set to :literal:`true`\ , output the available job log even the rc is 0(success).
 
 
   | **required**: false

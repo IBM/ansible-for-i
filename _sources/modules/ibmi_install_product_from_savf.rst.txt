@@ -16,7 +16,7 @@ ibmi_install_product_from_savf -- Install the licensed program(product) from a s
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_install\_product\_from\_savf`\  module installs the product from a save file.
+- The :literal:`ibmi\_install\_product\_from\_savf` module installs the product from a save file.
 
 
 
@@ -28,7 +28,7 @@ Parameters
 
      
 acceptance_cmd
-  The Accept Software Agreement command records the acceptance of the software agreement for a product. It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement. This command cannot be used to accept the Licensed Internal Code or the IBM i \ :literal:`\*Base`\  software agreements. If invalid command specified, message CPDB6D5 with following reason will be received, 'Product cannot be installed in a batch request because the software agreement has not been previously accepted'. In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don't know the command.
+  The Accept Software Agreement command records the acceptance of the software agreement for a product. It is assumed that the caller of this command has previously displayed and obtained acceptance for the terms of the agreement. This command cannot be used to accept the Licensed Internal Code or the IBM i :literal:`\*Base` software agreements. If invalid command specified, message CPDB6D5 with following reason will be received, 'Product cannot be installed in a batch request because the software agreement has not been previously accepted'. In general, a command or program should be implemented by QLPACAGR API, consult the product support if you don't know the command.
 
 
   | **required**: false
@@ -49,7 +49,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -58,7 +58,7 @@ become_user_password
 
      
 joblog
-  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
+  If set to :literal:`true`\ , output the available job log even the rc is 0(success).
 
 
   | **required**: false

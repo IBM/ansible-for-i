@@ -17,7 +17,7 @@ ibmi_host_server_service -- Manage host server
 Synopsis
 --------
 - Manage and query IBM i host server service.
-- For non-IBM i targets, use the \ :ref:`ansible.builtin.service <ansible_collections.ansible.builtin.service_module>`\  module instead.
+- For non-IBM i targets, use the :ref:`ansible.builtin.service <ansible_collections.ansible.builtin.service_module>` module instead.
 
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -59,7 +59,7 @@ extra_parameters
 
      
 joblog
-  If set to \ :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
+  If set to :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
 
 
   | **required**: false
@@ -68,7 +68,7 @@ joblog
 
      
 name_list
-  The name of the host server service. The valid value are \ :literal:`\*ALL`\ , \ :literal:`\*CENTRAL`\ , \ :literal:`\*DATABASE`\ , \ :literal:`\*DTAQ`\ , \ :literal:`\*FILE`\ , \ :literal:`\*NETPRT`\ , \ :literal:`\*RMTCMD`\ , \ :literal:`\*SIGNON`\ , \ :literal:`\*SVRMAP`\ .
+  The name of the host server service. The valid value are :literal:`\*ALL`\ , :literal:`\*CENTRAL`\ , :literal:`\*DATABASE`\ , :literal:`\*DTAQ`\ , :literal:`\*FILE`\ , :literal:`\*NETPRT`\ , :literal:`\*RMTCMD`\ , :literal:`\*SIGNON`\ , :literal:`\*SVRMAP`.
 
 
   | **required**: True
@@ -78,11 +78,11 @@ name_list
 
      
 state
-  \ :literal:`started`\ /\ :literal:`stopped`\  are idempotent actions that will not run commands unless necessary.
+  :literal:`started`\ /\ :literal:`stopped` are idempotent actions that will not run commands unless necessary.
 
-  \ :literal:`restarted`\  will always bounce the service.
+  :literal:`restarted` will always bounce the service.
 
-  \ :strong:`At least one of state and enabled are required.`\ 
+  :strong:`At least one of state and enabled are required.`
 
 
   | **required**: True

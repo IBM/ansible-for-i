@@ -16,7 +16,7 @@ ibmi_fix_compare -- Verify whether the PTFs are installed.
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_fix\_compare`\  module compare the PTF list to target system to see whether the PTF is applied.
+- The :literal:`ibmi\_fix\_compare` module compare the PTF list to target system to see whether the PTF is applied.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

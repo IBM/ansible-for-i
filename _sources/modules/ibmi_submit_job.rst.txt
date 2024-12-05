@@ -16,7 +16,7 @@ ibmi_submit_job -- Submit a job on IBM i system. This module functions like SBMJ
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_submit\_job`\  module submits a job on IBM i system.
+- The :literal:`ibmi\_submit\_job` module submits a job on IBM i system.
 - It waits until the submitted job turns into expected status that is specified.
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -49,7 +49,7 @@ become_user_password
 
      
 check_interval
-  The time interval between current and next checks of the expected status of the submitted job. This option will be ignored if \ :literal:`\*NONE`\  is specified for option status.
+  The time interval between current and next checks of the expected status of the submitted job. This option will be ignored if :literal:`\*NONE` is specified for option status.
 
 
   | **required**: False
@@ -77,7 +77,7 @@ parameters
 
      
 status
-  The expect status list. The module will wait for the job to be turned into one of the expected status specified. If one of the expect status specified matches the status of submitted job, it will return. If \ :literal:`\*NONE`\  is specified, the module will not wait for anything and return right after the job is submitted. The valid options are \ :literal:`\*NONE`\ , \ :literal:`\*ACTIVE`\ , \ :literal:`\*COMPLETE`\ , \ :literal:`\*JOBQ`\ , \ :literal:`\*OUTQ`\ .
+  The expect status list. The module will wait for the job to be turned into one of the expected status specified. If one of the expect status specified matches the status of submitted job, it will return. If :literal:`\*NONE` is specified, the module will not wait for anything and return right after the job is submitted. The valid options are :literal:`\*NONE`\ , :literal:`\*ACTIVE`\ , :literal:`\*COMPLETE`\ , :literal:`\*JOBQ`\ , :literal:`\*OUTQ`.
 
 
   | **required**: false
@@ -88,7 +88,7 @@ status
 
      
 time_out
-  The max time that the module waits for the submitted job is turned into expected status. It returns if the status of the submitted job is not turned into the expected status within the time\_out time. This option will be ignored if \ :literal:`\*NONE`\  is specified for option status.
+  The max time that the module waits for the submitted job is turned into expected status. It returns if the status of the submitted job is not turned into the expected status within the time\_out time. This option will be ignored if :literal:`\*NONE` is specified for option status.
 
 
   | **required**: False

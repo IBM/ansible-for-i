@@ -16,7 +16,7 @@ ibmi_save_product_to_savf -- Save the the licensed program(product) to a save fi
 
 Synopsis
 --------
-- the \ :literal:`ibmi\_save\_product\_to\_savf`\  module saves the product to a save file.
+- the :literal:`ibmi\_save\_product\_to\_savf` module saves the product to a save file.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -59,7 +59,7 @@ check_signature
 
      
 joblog
-  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
+  If set to :literal:`true`\ , output the available job log even the rc is 0(success).
 
 
   | **required**: false
@@ -72,7 +72,7 @@ language
 
   It's the IBM-supplied language feature codes, like German is 2924, English is 2924.
 
-  This parameter is ignored when object\_type \ :literal:`\*PGM`\  is specified.
+  This parameter is ignored when object\_type :literal:`\*PGM` is specified.
 
 
   | **required**: false
@@ -107,7 +107,7 @@ parameters
 
   The default values of parameters for SAVLICPGM will be taken if not specified.
 
-  Parameter CLEAR in SAVLICPGM command should not be specified here, \ :literal:`CLEAR(\*ALL`\ ) already used.
+  Parameter CLEAR in SAVLICPGM command should not be specified here, :literal:`CLEAR(\*ALL`\ ) already used.
 
 
   | **required**: false

@@ -16,8 +16,8 @@ ibmi_synchronize_files -- Synchronize a list of files from IBM i node A to anoth
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_synchronize\_files`\  plugin synchronize a list of files from IBM i node A to another IBM i node B.
-- \ :literal:`ibmi\_synchronize\_files`\  plugin calls ibmi\_sync\_files module.
+- The :literal:`ibmi\_synchronize\_files` plugin synchronize a list of files from IBM i node A to another IBM i node B.
+- :literal:`ibmi\_synchronize\_files` plugin calls ibmi\_sync\_files module.
 - Only supports SAVF(.file) and MBR(only supports "database" subtype Physical files(PF-DTA attribute)) format synchronize between QSYS and QSYS.
 
 

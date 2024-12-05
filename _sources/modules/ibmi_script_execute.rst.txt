@@ -16,7 +16,7 @@ ibmi_script_execute -- Execute a cl/sql script file
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_script\_execute`\  module execute a cl/sql script file on a remote ibm i node.
+- The :literal:`ibmi\_script\_execute` module execute a cl/sql script file on a remote ibm i node.
 - Only support cl/sql script file by now.
 - For sql script, use RUNSQLSTM to process.
 - For non-cl/sql script, use the script plugin instead.
@@ -54,7 +54,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -104,7 +104,7 @@ src
 type
   Specify the script file type.
 
-  Only support \ :literal:`CL`\  or \ :literal:`SQL`\  script by now.
+  Only support :literal:`CL` or :literal:`SQL` script by now.
 
 
   | **required**: True

@@ -16,7 +16,7 @@ ibmi_rtv_command -- Executes a command which is valid only within a CL program o
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_rtv\_command`\  module executes command which used in a CL program or REXX procedure.
+- The :literal:`ibmi\_rtv\_command` module executes command which used in a CL program or REXX procedure.
 - Usually, this kind of commands can not run directly from the 5250 console, like RTVJOBA, RTVNETA.
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -68,7 +68,7 @@ cmd
 
      
 joblog
-  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
+  If set to :literal:`true`\ , output the available job log even the rc is 0(success).
 
   Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL, DSPHDWRSC.
 

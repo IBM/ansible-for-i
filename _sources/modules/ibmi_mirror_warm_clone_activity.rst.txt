@@ -16,7 +16,7 @@ ibmi_mirror_warm_clone_activity -- Performs suspend and resume activity for warm
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_mirror\_warm\_clone\_activity`\  module performs the suspend and resume activity for a warm clone to reach a quiesce point before the clone and resume from that point after clone.
+- The :literal:`ibmi\_mirror\_warm\_clone\_activity` module performs the suspend and resume activity for a warm clone to reach a quiesce point before the clone and resume from that point after clone.
 - The setup source node must reach a quiesce point before tracking changes can begin.
 - If a quiesce point cannot be reached within the specified timeout, then the setup process will not proceed.
 
@@ -41,7 +41,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,18 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installing IBM i collection to Ansible server &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8d563738"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -134,9 +132,12 @@ If you install Python from the package manager for your operating system, you mu
 </section>
 <section id="requirements-for-ibm-i-ansible-server-control-node">
 <h2>Requirements for IBM i Ansible Server / Control Node<a class="headerlink" href="#requirements-for-ibm-i-ansible-server-control-node" title="Link to this heading"></a></h2>
-<p>For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps can be used to install Ansible with pip.</p>
+<p>For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm
+above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps should be executed
+in an SSH session to the IBM i when installing Ansible with pip. This will require the IBM i SSH Daemon to be started with the ‘’STRTCPSVR <a href="#id1"><span class="problematic" id="id2">*</span></a>SSHD’’ command
+if it is not already started.</p>
 <ol class="arabic">
-<li><p>There are some necessary open source packages that must be installed with yum (if not already present):</p>
+<li><p>Use Yum to install the following required open source packages if not already present.</p>
 <blockquote>
 <div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">install</span> <span class="n">git</span>
 <span class="n">yum</span> <span class="n">install</span> <span class="n">python39</span><span class="o">-</span><span class="n">cryptography</span>
@@ -147,10 +148,28 @@ If you install Python from the package manager for your operating system, you mu
 </div>
 </div></blockquote>
 </li>
-<li><p>Configure ~/.profile for language environment variables (verify with ‘’locale’’ command) such as:</p>
+<li><p>Configure your ~/.profile or execute the following commands to set the language environment variables.</p>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">LANG</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
-<span class="n">export</span> <span class="n">LC_ALL</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LANG</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+<span class="n">LC_ALL</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+<span class="n">export</span> <span class="n">LANG</span>
+<span class="n">export</span> <span class="n">LC_ALL</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Verify the language environment with the ‘’locale’’ command.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">locale</span>
+
+<span class="n">LANG</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+<span class="n">LC_COLLATE</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
+<span class="n">LC_CTYPE</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
+<span class="n">LC_MONETARY</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
+<span class="n">LC_NUMERIC</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
+<span class="n">LC_TIME</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
+<span class="n">LC_MESSAGES</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
+<span class="n">LC_ALL</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -169,20 +188,29 @@ If you install Python from the package manager for your operating system, you mu
 </li>
 </ol>
 <p>Note that Ansible core v2.16 cannot be used with the currently available IBM i Python rpm packages (Python 3.9 is highest level).</p>
-</li>
-<li><p>Add the following path to ~/.profile for the ansible executables:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PATH=~/.local/bin:$PATH
+<p>The pip command may also be used directly for installing Ansible. An alternative command for 4(b) is</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="n">ansible</span><span class="o">-</span><span class="n">core</span><span class="o">==</span><span class="mf">2.15.1</span>
 </pre></div>
 </div>
+</div></blockquote>
 </li>
-<li><p>Ensure dependent collections are installed if only using ansible-core. Perform the following collection install commands if ‘’ansible-galaxy collection list’’ doesn’t show these collections.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">openstack</span><span class="o">.</span><span class="n">cloud</span>
-
-<span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">ansible</span><span class="o">.</span><span class="n">posix</span>
+<li><p>Add the following commands to your ~/.profile or execute them to include the ansible executables in your PATH.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>PATH=~/.local/bin:$PATH
+export PATH
 </pre></div>
 </div>
 </li>
 </ol>
+<p>6. Ensure dependent collections are installed if only using ansible-core. Perform the following collection install commands if
+‘’ansible-galaxy collection list’’ doesn’t show these collections.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">openstack</span><span class="o">.</span><span class="n">cloud</span>
+
+<span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">ansible</span><span class="o">.</span><span class="n">posix</span>
+</pre></div>
+</div>
+</div></blockquote>
 </section>
 <section id="installing-using-ansible-galaxy">
 <h2>Installing using Ansible Galaxy<a class="headerlink" href="#installing-using-ansible-galaxy" title="Link to this heading"></a></h2>
@@ -226,9 +254,8 @@ If you install Python from the package manager for your operating system, you mu
 <li><p>python3-ibm_db</p></li>
 </ul>
 </div></blockquote>
-<p>1. 5733SC1 and 5770DG1 are license programs, you can download them at
-<a class="reference external" href="http://www-304.ibm.com/servers/eserver/ess/index.wss">http://www-304.ibm.com/servers/eserver/ess/index.wss</a>.</p>
-<ol class="arabic simple" start="2">
+<ol class="arabic simple">
+<li><p>5733SC1 and 5770DG1 are license programs, you can download them at <a class="reference external" href="http://www-304.ibm.com/servers/eserver/ess/index.wss">http://www-304.ibm.com/servers/eserver/ess/index.wss</a>.</p></li>
 <li><p>python3, python3-itoolkit, python3-ibm_db are open source packages. There are a few ways to install these packages and you could choose from one of them.</p></li>
 </ol>
 <dl class="simple">
@@ -236,7 +263,7 @@ If you install Python from the package manager for your operating system, you mu
 Refer the guide here to install yum <a class="reference external" href="https://bitbucket.org/ibmi/opensource/src/master/docs/yum/">https://bitbucket.org/ibmi/opensource/src/master/docs/yum/</a>. Then install these packages by below command:</p>
 </dd>
 </dl>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Qopensys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">python3</span> <span class="n">python3</span><span class="o">-</span><span class="n">itoolkit</span> <span class="n">python3</span><span class="o">-</span><span class="n">ibm_db</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">python3</span> <span class="n">python3</span><span class="o">-</span><span class="n">itoolkit</span> <span class="n">python3</span><span class="o">-</span><span class="n">ibm_db</span>
 </pre></div>
 </div>
 <p><strong>Installing rpm packages automatically onto IBM i systems which can access internet</strong></p>

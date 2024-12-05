@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -62,7 +62,7 @@ connect_timeout
 controlled_end_delay_time
   Specifies the amount of time(1-99999), in seconds, that the system allows a controlled end to be performed by the active subsystems.
 
-  If the value is greater than 99999, \ :literal:`\*NOLIMIT`\  will be used in PWRDWNSYS command.
+  If the value is greater than 99999, :literal:`\*NOLIMIT` will be used in PWRDWNSYS command.
 
 
   | **required**: false
@@ -225,7 +225,7 @@ Notes
 .. note::
    ansible.cfg needs to specify interpreter\_python=/QOpenSys/pkgs/bin/python3 under[defaults] section.
 
-   Be careful to use \ :literal:`\*CNTRLD`\  for option how\_to\_end, you need to specify the appropriate value for all the timeout options according to the system performance.
+   Be careful to use :literal:`\*CNTRLD` for option how\_to\_end, you need to specify the appropriate value for all the timeout options according to the system performance.
 
 
 

@@ -16,7 +16,7 @@ ibmi_fetch -- Fetch objects or a library from a remote IBM i node and store on l
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_feth`\  is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in a file tree, organized by hostname.
+- The :literal:`ibmi\_feth` is used for fetching objects or a library as a SAVF from remote IBM i node and storing them locally in a file tree, organized by hostname.
 - Save file that already exists at dest will be overwritten if it is different than the new one.
 - For non-IBMi native targets, use the fetch module instead.
 
@@ -72,7 +72,7 @@ force_save
 
      
 format
-  The save file's format. Only support \ :literal:`\*SAVF`\  by now.
+  The save file's format. Only support :literal:`\*SAVF` by now.
 
 
   | **required**: false
@@ -92,7 +92,7 @@ is_lib
 
      
 lib_name
-  The library contains the objects. If is\_lib is \ :literal:`True`\ , lib\_name means the library name.
+  The library contains the objects. If is\_lib is :literal:`True`\ , lib\_name means the library name.
 
 
   | **required**: True
@@ -105,7 +105,7 @@ object_names
 
   One or more object names can be specified. Use space as separator.
 
-  If object type is \ :literal:`\*FILE`\ , then fetch it directly. Only one \ :literal:`\*FILE`\  object will fetch directly at one time.
+  If object type is :literal:`\*FILE`\ , then fetch it directly. Only one :literal:`\*FILE` object will fetch directly at one time.
 
 
   | **required**: false

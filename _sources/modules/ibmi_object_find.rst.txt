@@ -59,7 +59,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -70,7 +70,7 @@ become_user_password
 iasp_name
   The auxiliary storage pool (ASP) where storage is allocated for the object.
 
-  The default value is \ :literal:`\*SYSBAS`\ .
+  The default value is :literal:`\*SYSBAS`.
 
   If an IASP name is specified, objects in this ASP group will be returned, including both SYSBAS and IASP.
 
@@ -101,7 +101,7 @@ lib_name
 
      
 object_name
-  The name of the object that will be returned. Whether regex can be used for object\_name is controlled by \ :literal:`use\_regex`\  option
+  The name of the object that will be returned. Whether regex can be used for object\_name is controlled by :literal:`use\_regex` option
 
 
   | **required**: false

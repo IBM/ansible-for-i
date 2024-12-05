@@ -16,7 +16,7 @@ ibmi_fix_network_install_server -- Setup IBM i Network install server which cont
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_fix`\  module setup IBM i Network install server which contains images files.
+- The :literal:`ibmi\_fix` module setup IBM i Network install server which contains images files.
 - Single PTF, PTF group and TR PTF are supported.
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -139,13 +139,13 @@ rollback
 
      
 virtual_image_name_list
-  The name list of the PTF image file and its directory, for example, \ :literal:`/tmp/5733WQXPTFs/SF99433\_1.bin`\ .
+  The name list of the PTF image file and its directory, for example, :literal:`/tmp/5733WQXPTFs/SF99433\_1.bin`.
 
-  You can specify all the PTF image files under one directory, for example, \ :literal:`/tmp/PTFs/\*ALL`\ .
+  You can specify all the PTF image files under one directory, for example, :literal:`/tmp/PTFs/\*ALL`.
 
   bin and iso image files are supported.
 
-  default is \ :literal:`\*ALL`\  for all the PTF image files under image catalog directory.
+  default is :literal:`\*ALL` for all the PTF image files under image catalog directory.
 
 
   | **required**: false
@@ -156,9 +156,9 @@ virtual_image_name_list
 
      
 virtual_image_name_remove_list
-  The name list of the PTF image file which will be moved from the image catalog, for example, \ :literal:`SF99433\_1.bin`\ .
+  The name list of the PTF image file which will be moved from the image catalog, for example, :literal:`SF99433\_1.bin`.
 
-  default is \ :literal:`\*ALL`\  for all the PTF image files under the image caltalog.
+  default is :literal:`\*ALL` for all the PTF image files under the image caltalog.
 
 
   | **required**: false

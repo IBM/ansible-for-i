@@ -16,9 +16,9 @@ ibmi_object_save -- Save one or more objects
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_object\_save`\  module create an save file on a remote IBM i nodes.
+- The :literal:`ibmi\_object\_save` module create an save file on a remote IBM i nodes.
 - The saved objects and save file are on the remote host, and the save file is not copied to the local host.
-- Only support \ :literal:`\*SAVF`\  as the save file's format by now.
+- Only support :literal:`\*SAVF` as the save file's format by now.
 
 
 
@@ -53,7 +53,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -71,7 +71,7 @@ force_save
 
      
 format
-  The save file's format. Only support \ :literal:`\*SAVF`\  by now.
+  The save file's format. Only support :literal:`\*SAVF` by now.
 
 
   | **required**: false
@@ -82,7 +82,7 @@ format
 
      
 joblog
-  If set to \ :literal:`true`\ , output the avaiable JOBLOG even the rc is 0(success).
+  If set to :literal:`true`\ , output the avaiable JOBLOG even the rc is 0(success).
 
 
   | **required**: false
@@ -302,7 +302,7 @@ Return Values
       
                               
        format
-        | The save file's format. Only support \ :literal:`\*SAVF`\  by now.
+        | The save file's format. Only support :literal:`\*SAVF` by now.
       
         | **returned**: always
         | **type**: str

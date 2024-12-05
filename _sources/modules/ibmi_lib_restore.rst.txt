@@ -16,9 +16,9 @@ ibmi_lib_restore -- Restore one library
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_lib\_restore`\  module restore a save file.
+- The :literal:`ibmi\_lib\_restore` module restore a save file.
 - The restored library and save file are on the remote host.
-- Only support \ :literal:`\*SAVF`\  as the save file's format by now.
+- Only support :literal:`\*SAVF` as the save file's format by now.
 
 
 
@@ -53,7 +53,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -62,7 +62,7 @@ become_user_password
 
      
 format
-  The save file's format. Only support \ :literal:`\*SAVF`\  by now.
+  The save file's format. Only support :literal:`\*SAVF` by now.
 
 
   | **required**: false
@@ -73,7 +73,7 @@ format
 
      
 joblog
-  If set to \ :literal:`true`\ , output the avaiable JOBLOG even the rc is 0(success).
+  If set to :literal:`true`\ , output the avaiable JOBLOG even the rc is 0(success).
 
 
   | **required**: false
@@ -237,7 +237,7 @@ Return Values
       
                               
        format
-        | The save file's format. Only support \ :literal:`\*SAVF`\  by now.
+        | The save file's format. Only support :literal:`\*SAVF` by now.
       
         | **returned**: always
         | **type**: str

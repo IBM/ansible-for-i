@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../">
 <head>
@@ -6,18 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ibmi_cl_command – Executes a CL(Control language) command &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8d563738"></script>
-        <script src="../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -207,6 +205,13 @@
 <div class="line"><strong>type</strong>: str</div>
 </div>
 </dd>
+<dt>is_cmd5250</dt><dd><p>Specifies if the the command is expected to display output.</p>
+<p>Explicitly runs the command using run_command module instead of itoolkit_run_command_once module.</p>
+<div class="line-block">
+<div class="line"><strong>required</strong>: false</div>
+<div class="line"><strong>type</strong>: bool</div>
+</div>
+</dd>
 <dt>joblog</dt><dd><p>If set to <code class="docutils literal notranslate"><span class="pre">true</span></code>, output the available job log even the rc is 0(success).</p>
 <p>Ignored when the CL command with OUTPUT parameter, e.g. DSPLIBL, DSPHDWRSC.</p>
 <div class="line-block">
@@ -223,6 +228,11 @@
 <span class="w">    </span><span class="nt">cmd</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;CRTLIB</span><span class="nv"> </span><span class="s">LIB(TESTLIB)&#39;</span>
 <span class="w">    </span><span class="nt">become_user</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;USER1&#39;</span>
 <span class="w">    </span><span class="nt">become_user_password</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;yourpassword&#39;</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run Check Product Option (CHKPRDOPT) command to verify that licensed programs are fully installed.</span>
+<span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_cl_command</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">cmd</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;CHKPRDOPT</span><span class="nv"> </span><span class="s">*OPSYS&#39;</span>
+<span class="w">    </span><span class="nt">is_cmd5250</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 </section>

@@ -16,7 +16,7 @@ ibmi_download_fix_status -- Checking whether the fix downloading complete
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_download\_fix\_status`\  module check the downloading fix's status.
+- The :literal:`ibmi\_download\_fix\_status` module check the downloading fix's status.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

@@ -16,7 +16,7 @@ ibmi_spooled_file_data -- Returns the content of a spooled file.
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_spooled\_file\_data`\  returns the content of a spooled file.
+- The :literal:`ibmi\_spooled\_file\_data` returns the content of a spooled file.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

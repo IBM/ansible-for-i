@@ -16,7 +16,7 @@ ibmi_tcp_interface -- Add, change, remove or query a tcp/ip interface.
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_tcp\_interface`\  module add, change, remove, start, end or query a tcp/ip interface.
+- The :literal:`ibmi\_tcp\_interface` module add, change, remove, start, end or query a tcp/ip interface.
 - This module provides the similar function of ADDTCPIFC, CHGTCPIFC, RMVTCPIFC, STRTCPIFC, ENDTCPIFC.
 - In addition, the module provides query function for a specific internet address basing on internet address
 - or alias\_name.
@@ -74,7 +74,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

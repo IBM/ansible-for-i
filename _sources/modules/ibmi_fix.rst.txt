@@ -16,7 +16,7 @@ ibmi_fix -- Install, remove or query an individual fix or a set of fixes on to I
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_fix`\  module install fixes to target IBM i system.
+- The :literal:`ibmi\_fix` module install fixes to target IBM i system.
 - The installation file of the fixes should be in the format of save file.
 - The fixes are normally known as PTFs for IBM i users.
 
@@ -41,7 +41,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

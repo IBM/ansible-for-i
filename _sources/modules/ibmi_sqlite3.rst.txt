@@ -16,7 +16,7 @@ ibmi_sqlite3 -- Executes a SQL statement via sqlite3
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_sqlite3`\  module takes the SQL statement as argument.
+- The :literal:`ibmi\_sqlite3` module takes the SQL statement as argument.
 
 
 
@@ -48,7 +48,7 @@ parameters
 
      
 sql
-  The \ :literal:`ibmi\_sqlite3`\  module takes a IBM i SQL statement to run.
+  The :literal:`ibmi\_sqlite3` module takes a IBM i SQL statement to run.
 
 
   | **required**: True
