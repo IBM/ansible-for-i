@@ -16,7 +16,7 @@ ibmi_ethernet_port -- Retrieves all the ethernet ports(both virtual and physical
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_ethernet\_port`\  module lists the ethernet ports information of the system.
+- The :literal:`ibmi\_ethernet\_port` module lists the ethernet ports information of the system.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

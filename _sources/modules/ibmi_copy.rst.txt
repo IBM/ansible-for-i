@@ -16,8 +16,8 @@ ibmi_copy -- Copy a save file from local to a remote IBM i node
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_copy`\  copies a save file from local to a remote IBM i node.
-- \ :literal:`ibmi\_copy`\  will not restore save file on IBM i node.
+- The :literal:`ibmi\_copy` copies a save file from local to a remote IBM i node.
+- :literal:`ibmi\_copy` will not restore save file on IBM i node.
 - For non-IBMi native targets, use the copy module instead.
 
 
@@ -30,11 +30,11 @@ Parameters
 
      
 backup
-  If set force \ :literal:`true`\  and save file already exists on remote, rename the exists remote save file so you can get the original file back.
+  If set force :literal:`true` and save file already exists on remote, rename the exists remote save file so you can get the original file back.
 
   The backup save file name will be the original file name+number[1:9]. For example, the origial file name is obja, then rename the original file to obja1. If obja1 already exists, then rename the original file to obja2... util obja9, then report error.
 
-  Only works when force is \ :literal:`True`\ .
+  Only works when force is :literal:`True`.
 
 
   | **required**: false
@@ -45,9 +45,9 @@ backup
 force
   Influence whether the remote save file must always be replaced.
 
-  If \ :literal:`yes`\ , the remote save file will be replaced.
+  If :literal:`yes`\ , the remote save file will be replaced.
 
-  If \ :literal:`no`\ , the save file will only be transferred if the destination does not exist.
+  If :literal:`no`\ , the save file will only be transferred if the destination does not exist.
 
 
   | **required**: false

@@ -16,7 +16,7 @@ ibmi_fix_product_check -- Check the software product installation status for a f
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_fix\_product\_check`\  module checks if the software product of a fix is installed.
+- The :literal:`ibmi\_fix\_product\_check` module checks if the software product of a fix is installed.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

@@ -16,7 +16,7 @@ ibmi_mirror_setup_copy -- Configures the Db2 Mirror on the target node.
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_mirror\_setup\_copy`\  module configures the Db2 Mirror on the target node after the clone.
+- The :literal:`ibmi\_mirror\_setup\_copy` module configures the Db2 Mirror on the target node after the clone.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -57,7 +57,7 @@ ip_address
 
      
 rdma_subnet_mask
-  Sets the subnet mask if the RDMA links subnet is different than the system IP address. If set to \ :literal:`\*SAME`\ , will retrieve the subnet mask from the system IP address.
+  Sets the subnet mask if the RDMA links subnet is different than the system IP address. If set to :literal:`\*SAME`\ , will retrieve the subnet mask from the system IP address.
 
 
   | **required**: false

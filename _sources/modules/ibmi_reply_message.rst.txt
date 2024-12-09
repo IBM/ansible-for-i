@@ -17,7 +17,7 @@ ibmi_reply_message -- Send a reply message to the sender of an inquiry message
 Synopsis
 --------
 - Send a reply message to the sender of an inquiry message.
-- For non-IBM i targets, use the \ :ref:`ansible.builtin.service <ansible_collections.ansible.builtin.service_module>`\  module instead.
+- For non-IBM i targets, use the :ref:`ansible.builtin.service <ansible_collections.ansible.builtin.service_module>` module instead.
 
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -49,7 +49,7 @@ become_user_password
 
      
 ccsid
-  Coded character set ID, Valid value are "1-65535", \ :literal:`\*HEX`\ , \ :literal:`\*JOB`\ .
+  Coded character set ID, Valid value are "1-65535", :literal:`\*HEX`\ , :literal:`\*JOB`.
 
 
   | **required**: false
@@ -59,7 +59,7 @@ ccsid
 
      
 joblog
-  If set to \ :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
+  If set to :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
 
 
   | **required**: false

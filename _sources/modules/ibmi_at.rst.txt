@@ -16,7 +16,7 @@ ibmi_at -- Schedule a batch job
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_at`\  module schedule a batch job.
+- The :literal:`ibmi\_at` module schedule a batch job.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -76,7 +76,7 @@ job_name
 
      
 joblog
-  If set to \ :literal:`true`\ , output the avaiable JOBLOG even the rc is 0(success).
+  If set to :literal:`true`\ , output the avaiable JOBLOG even the rc is 0(success).
 
 
   | **required**: false
@@ -108,7 +108,7 @@ scddate
 scdday
   Specifies the day of the week on which the job is submitted.
 
-  The valid value are \ :literal:`\*NONE`\ , \ :literal:`\*ALL`\ , \ :literal:`\*MON`\ , \ :literal:`\*TUE`\ , \ :literal:`\*WED`\ , \ :literal:`\*THU`\ , \ :literal:`\*FRI`\ , \ :literal:`\*SAT`\ , \ :literal:`\*SUN`\ .
+  The valid value are :literal:`\*NONE`\ , :literal:`\*ALL`\ , :literal:`\*MON`\ , :literal:`\*TUE`\ , :literal:`\*WED`\ , :literal:`\*THU`\ , :literal:`\*FRI`\ , :literal:`\*SAT`\ , :literal:`\*SUN`.
 
 
   | **required**: false

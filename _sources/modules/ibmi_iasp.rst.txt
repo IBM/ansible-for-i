@@ -53,7 +53,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -82,7 +82,7 @@ extra_parameters
 
      
 joblog
-  If set to \ :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
+  If set to :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
 
 
   | **required**: false
@@ -100,11 +100,11 @@ name
 
      
 operation
-  \ :literal:`create`\ /\ :literal:`delete`\ /\ :literal:`add\_disks`\  are idempotent actions that will not run commands unless necessary.
+  :literal:`create`\ /\ :literal:`delete`\ /\ :literal:`add\_disks` are idempotent actions that will not run commands unless necessary.
 
-  \ :literal:`view`\  will return the iasp state
+  :literal:`view` will return the iasp state
 
-  \ :strong:`At least one of operation are required.`\ 
+  :strong:`At least one of operation are required.`
 
 
   | **required**: True

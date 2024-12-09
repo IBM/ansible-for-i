@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -71,7 +71,7 @@ extra_parameters
 
      
 joblog
-  If set to \ :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
+  If set to :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
 
 
   | **required**: false
@@ -80,11 +80,11 @@ joblog
 
      
 status
-  \ :literal:`on`\ /\ :literal:`off`\  are idempotent actions that will not run commands unless necessary.
+  :literal:`on`\ /\ :literal:`off` are idempotent actions that will not run commands unless necessary.
 
-  \ :literal:`reset`\  will always bounce the service.
+  :literal:`reset` will always bounce the service.
 
-  \ :strong:`At least one of status are required.`\ 
+  :strong:`At least one of status are required.`
 
 
   | **required**: True

@@ -16,7 +16,7 @@ ibmi_sql_execute -- Executes a SQL non-DQL(Data Query Language) statement
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_sql\_execute`\  module takes the SQL non-DQL(Data Query Language) statement as argument.
+- The :literal:`ibmi\_sql\_execute` module takes the SQL non-DQL(Data Query Language) statement as argument.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -50,7 +50,7 @@ become_user_password
 database
   Specified database name, usually, its the iasp name, use WRKRDBDIRE to check Relational Database Directory Entries
 
-  Default to use the \ :literal:`\*LOCAL`\  entry
+  Default to use the :literal:`\*LOCAL` entry
 
 
   | **required**: false
@@ -60,7 +60,7 @@ database
 
      
 joblog
-  If set to \ :literal:`true`\ , output the JOBLOG even success.
+  If set to :literal:`true`\ , output the JOBLOG even success.
 
 
   | **required**: false
@@ -69,7 +69,7 @@ joblog
 
      
 sql
-  The \ :literal:`ibmi\_sql\_execute`\  module takes a IBM i SQL non-DQL(Data Query Language) statement to run.
+  The :literal:`ibmi\_sql\_execute` module takes a IBM i SQL non-DQL(Data Query Language) statement to run.
 
 
   | **required**: True

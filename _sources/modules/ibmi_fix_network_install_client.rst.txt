@@ -16,7 +16,7 @@ ibmi_fix_network_install_client -- Install PTFs on the client via IBM i Network 
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_fix`\  module installs PTFs on the client via IBM i Network install.
+- The :literal:`ibmi\_fix` module installs PTFs on the client via IBM i Network install.
 - Single PTF, PTF group and TR PTF are supported.
 
 
@@ -51,7 +51,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

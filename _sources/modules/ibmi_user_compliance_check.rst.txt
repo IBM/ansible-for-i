@@ -16,7 +16,7 @@ ibmi_user_compliance_check -- Check if the value of a field of user profile is e
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_user\_compliance\_check`\  module can do the user profile compliance check.
+- The :literal:`ibmi\_user\_compliance\_check` module can do the user profile compliance check.
 - Check if the value of a field of user profile is matched with the value of customer input.
 - User can input multi value for the multi-value fields. It includes field
 - SPECIAL\_AUTHORITIES, USER\_ACTION\_AUDIT\_LEVEL, USER\_OPTIONS, SUPPLEMENTAL\_GROUP\_LIST, LOCALE\_JOB\_ATTRIBUTES.
@@ -43,7 +43,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

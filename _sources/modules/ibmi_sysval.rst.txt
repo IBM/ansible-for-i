@@ -16,9 +16,9 @@ ibmi_sysval -- Displays the specified system value
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_sysval`\  module displays the information of the specified system value.
+- The :literal:`ibmi\_sysval` module displays the information of the specified system value.
 - Type of requisite values meaning refer to https://www.ibm.com/support/knowledgecenter/en/ssw\_ibm\_i\_74/apis/qwcrsval.htm
-- If the returned system valus is a list, set \ :literal:`check`\  to \ :literal:`equal\_as\_list`\  to compare it with the \ :literal:`expect`\  value.
+- If the returned system valus is a list, set :literal:`check` to :literal:`equal\_as\_list` to compare it with the :literal:`expect` value.
 
 
 
@@ -41,7 +41,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -50,7 +50,7 @@ become_user_password
 
      
 joblog
-  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
+  If set to :literal:`true`\ , output the available job log even the rc is 0(success).
 
 
   | **required**: false
@@ -61,11 +61,11 @@ joblog
 sysvalue
   Specifies the input system values. The detail explanations of the elements in the dict are as follows
 
-  \ :literal:`name`\  is the name of the system value. (required)
+  :literal:`name` is the name of the system value. (required)
 
-  \ :literal:`expect`\  is the expected returned value. If it is a number, the system value will be converted to a number brfore comparison. (optional)
+  :literal:`expect` is the expected returned value. If it is a number, the system value will be converted to a number brfore comparison. (optional)
 
-  \ :literal:`check`\  is the comparison method, including \ :literal:`equal`\ , \ :literal:`range`\  and \ :literal:`equal\_as\_list`\ . The default value is \ :literal:`equal`\ . (optional)
+  :literal:`check` is the comparison method, including :literal:`equal`\ , :literal:`range` and :literal:`equal\_as\_list`. The default value is :literal:`equal`. (optional)
 
 
   | **required**: True

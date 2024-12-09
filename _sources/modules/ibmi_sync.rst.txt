@@ -16,7 +16,7 @@ ibmi_sync -- Synchronize a save file from current IBM i node A to another IBM i 
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_sync`\  module synchronize a save file from current IBM i node to another IBM i node.
+- The :literal:`ibmi\_sync` module synchronize a save file from current IBM i node to another IBM i node.
 - Only support to synchronize save file by now.
 - For non-IBMi native targets, use the synchronize module instead.
 

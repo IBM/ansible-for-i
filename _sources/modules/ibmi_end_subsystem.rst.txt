@@ -16,7 +16,7 @@ ibmi_end_subsystem -- End an active subsystem.
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_end\_subsystem`\  module ends an active subsystem.
+- The :literal:`ibmi\_end\_subsystem` module ends an active subsystem.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -48,7 +48,7 @@ become_user_password
 
      
 controlled_end_delay_time
-  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, \ :literal:`\*NOLIMIT`\  will be used in ENDSBS command DELAY parameter.
+  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, :literal:`\*NOLIMIT` will be used in ENDSBS command DELAY parameter.
 
 
   | **required**: false
@@ -81,7 +81,7 @@ how_to_end
 
      
 joblog
-  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
+  If set to :literal:`true`\ , output the available job log even the rc is 0(success).
 
 
   | **required**: false
@@ -132,9 +132,9 @@ Notes
 -----
 
 .. note::
-   This module is NOT ALLOWED to end ALL subsystems, use the \ :literal:`ibmi\_cl\_command`\  module instead.
+   This module is NOT ALLOWED to end ALL subsystems, use the :literal:`ibmi\_cl\_command` module instead.
 
-   This module is non-blocking, the ending subsystem may still be in progress, use \ :literal:`ibmi\_display\_subsystem`\  module to check the status.
+   This module is non-blocking, the ending subsystem may still be in progress, use :literal:`ibmi\_display\_subsystem` module to check the status.
 
 
 

@@ -16,7 +16,7 @@ ibmi_uninstall_product -- Delete the objects that make up the licensed program(p
 
 Synopsis
 --------
-- the \ :literal:`ibmi\_uninstall\_product`\  module deletes the objects that make up the product.
+- the :literal:`ibmi\_uninstall\_product` module deletes the objects that make up the product.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -48,7 +48,7 @@ become_user_password
 
      
 joblog
-  If set to \ :literal:`true`\ , output the available JOBLOG even the rc is 0(success).
+  If set to :literal:`true`\ , output the available JOBLOG even the rc is 0(success).
 
 
   | **required**: false

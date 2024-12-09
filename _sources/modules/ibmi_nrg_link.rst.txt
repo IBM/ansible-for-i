@@ -16,7 +16,7 @@ ibmi_nrg_link -- Manages NRGs(Network Redundancy Groups) links
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_nrg\_link`\  module adds or removes a link to one or all of the Db2 Mirror Network Redundancy Groups (NRGs).
+- The :literal:`ibmi\_nrg\_link` module adds or removes a link to one or all of the Db2 Mirror Network Redundancy Groups (NRGs).
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -48,7 +48,7 @@ become_user_password
 
      
 change_load_balance_link_count
-  Indicates whether to increment the load balance link count when \ :literal:`add`\  a new link to the NRG or decrement the load balance link count when \ :literal:`remove`\  a link from the NRG.
+  Indicates whether to increment the load balance link count when :literal:`add` a new link to the NRG or decrement the load balance link count when :literal:`remove` a link from the NRG.
 
 
   | **required**: false
@@ -69,9 +69,9 @@ line_description
 link_priority
   A string that contains an integer value set as the priority of the link. The range of priorities is from 1 to 16, where 1 is the highest priority. Priority values do not need to be unique.
 
-  Required when the operation is \ :literal:`add`\ 
+  Required when the operation is :literal:`add`
 
-  Ignored when the operation is \ :literal:`remove`\ 
+  Ignored when the operation is :literal:`remove`
 
 
   | **required**: false
@@ -103,7 +103,7 @@ operation
 source_address
   A string that contains the local IP address for the link to add. Either an IPv4 or an IPv6 address can be specified.
 
-  When the operation is \ :literal:`remove`\ , it can also contain the following special value \ :literal:`\*ALL`\  to remove all links for this NRG.
+  When the operation is :literal:`remove`\ , it can also contain the following special value :literal:`\*ALL` to remove all links for this NRG.
 
 
   | **required**: True
@@ -114,9 +114,9 @@ source_address
 target_address
   A string that contains the remote IP address for the link to add. Either an IPv4 or an IPv6 address can be specified.
 
-  Required when the operation is \ :literal:`add`\ 
+  Required when the operation is :literal:`add`
 
-  Ignored when the operation is \ :literal:`remove`\ 
+  Ignored when the operation is :literal:`remove`
 
 
   | **required**: false

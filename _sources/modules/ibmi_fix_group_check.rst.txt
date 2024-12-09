@@ -16,9 +16,11 @@ ibmi_fix_group_check -- Retrieve the latest PTF group information from PSP serve
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_fix\_group\_check`\  module retrieve latest PTF group information from PSP(Preventive Service Planning) server.
+- The :literal:`ibmi\_fix\_group\_check` module retrieve latest PTF group information from PSP(Preventive Service Planning) server.
 - Refer to https://www.ibm.com/support/pages/node/667567 for more details of PSP.
 - ALL PTF groups or specific PTF groups are supported.
+- A PTF group returns a list of PTFs that the group consists of, while a cumulative PTF returns a package ID.
+- The PTF group information is derived from the top level XML web page https://public.dhe.ibm.com/services/us/igsc/PSP/xmldoc.xml with a corresponding XML file at https://public.dhe.ibm.com/services/us/igsc/PSP/ for each PTF group (or text file for a cumulative).
 
 
 
@@ -51,7 +53,7 @@ timeout
 
      
 validate_certs
-  If set to \ :literal:`False`\ , the SSL certificate verification will be disabled. It's recommended for test scenario.
+  If set to :literal:`False`\ , the SSL certificate verification will be disabled. It's recommended for test scenario.
 
   It's recommended to enable the SSL certificate verification for security concern.
 
@@ -89,7 +91,7 @@ Notes
 .. note::
    Ansible hosts file need to specify ansible\_python\_interpreter=/QOpenSys/pkgs/bin/python3.
 
-   If the module is delegated to an IBM i server and SSL certificate verification is enabled, package \ :literal:`ca-certificates-mozilla`\  is required.
+   If the module is delegated to an IBM i server and SSL certificate verification is enabled, package :literal:`ca-certificates-mozilla` is required.
 
 
 
@@ -142,7 +144,7 @@ Return Values
 
               .. code-block::
 
-                       [{"PTF_GROUP_LEVEL": "46", "PTF_GROUP_NUMBER": "SF99115", "RELEASE": "R610", "RELEASE_DATE": "09/28/2015", "TITLE": "610 IBM HTTP Server for i"}]
+                       [{"description": "SF99738 - 740 Group Security", "package_id": null, "ptf_group_level": 70, "ptf_group_number": "SF99738", "ptf_list": ["SJ02177", "...", "SI70103"], "release": "R740", "release_date": "10/01/2024", "url": "https://public.dhe.ibm.com/services/us/igsc/PSP/SF99738.xml"}]
             
       
         

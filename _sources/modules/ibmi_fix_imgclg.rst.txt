@@ -16,7 +16,7 @@ ibmi_fix_imgclg -- Install fixes such as PTF, PTF Group, Technology refresh to t
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_fix`\  module install fixes to target IBM i system by image catalog.
+- The :literal:`ibmi\_fix` module install fixes to target IBM i system by image catalog.
 - Single PTF, PTF group and TR PTF are supported.
 
 
@@ -51,7 +51,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false

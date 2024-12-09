@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -49,7 +49,7 @@ become_user_password
 
      
 joblog
-  If set to \ :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
+  If set to :literal:`true`\ , append JOBLOG to stderr/stderr\_lines.
 
 
   | **required**: false

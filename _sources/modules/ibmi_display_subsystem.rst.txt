@@ -16,8 +16,8 @@ ibmi_display_subsystem -- Displays all currently active subsystems or currently 
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_display\_subsystem`\  module displays all currently active subsystems or currently active jobs in a subsystem.
-- In some ways it has equivalent results of WRKSBS if subsystem is \ :literal:`\*ALL`\ , otherwise, it has equivalent results of WRKSBSJOB.
+- The :literal:`ibmi\_display\_subsystem` module displays all currently active subsystems or currently active jobs in a subsystem.
+- In some ways it has equivalent results of WRKSBS if subsystem is :literal:`\*ALL`\ , otherwise, it has equivalent results of WRKSBSJOB.
 
 
 
@@ -40,7 +40,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
+  Use this option to set the password of the user specified in :literal:`become\_user`.
 
 
   | **required**: false
@@ -49,7 +49,7 @@ become_user_password
 
      
 joblog
-  If set to \ :literal:`true`\ , output the available job log even the rc is 0(success).
+  If set to :literal:`true`\ , output the available job log even the rc is 0(success).
 
 
   | **required**: false
@@ -68,7 +68,7 @@ subsystem
 
      
 user
-  Specifies the name of the user whose jobs are displayed, \ :literal:`\*ALL`\  for all users. If subsystem is \ :literal:`\*ALL`\ , this option is ignored.
+  Specifies the name of the user whose jobs are displayed, :literal:`\*ALL` for all users. If subsystem is :literal:`\*ALL`\ , this option is ignored.
 
 
   | **required**: false

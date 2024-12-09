@@ -54,9 +54,12 @@ In order to use this Ansible collection at **release 3.1.0** and beyond, you mus
 Requirements for IBM i Ansible Server / Control Node
 -----------------------------------------------------
 
-For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps can be used to install Ansible with pip.
+For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm
+above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps should be executed
+in an SSH session to the IBM i when installing Ansible with pip. This will require the IBM i SSH Daemon to be started with the ''STRTCPSVR *SSHD'' command
+if it is not already started.
 
-1. There are some necessary open source packages that must be installed with yum (if not already present):
+1. Use Yum to install the following required open source packages if not already present.
 
     ::
 
@@ -66,14 +69,31 @@ For an IBM i Ansible control node, the latest levels of Ansible should be instal
         yum install pase-utf8-locale
         yum install sshpass   # allows specifying ssh password if desired
 
-2. Configure ~/.profile for language environment variables (verify with ''locale'' command) such as:
+2. Configure your ~/.profile or execute the following commands to set the language environment variables.
 
     ::
 
-        export LANG=en_US.UTF-8
-        export LC_ALL=en_US.UTF-8
+        LANG=en_US.UTF-8
+        LC_ALL=en_US.UTF-8
+        export LANG
+        export LC_ALL
 
-3. Install Ansible. Either full ansible (a) or ansible-core (b).
+3. Verify the language environment with the ''locale'' command.
+
+    ::
+
+        locale
+
+        LANG=en_US.UTF-8
+        LC_COLLATE="C"
+        LC_CTYPE="C"
+        LC_MONETARY="C"
+        LC_NUMERIC="C"
+        LC_TIME="C"
+        LC_MESSAGES="C"
+        LC_ALL=en_US.UTF-8
+
+4. Install Ansible. Either full ansible (a) or ansible-core (b).
 
    a. Install Ansible at 8.X level (v2.15 core) or 9.X level (v2.16 core) with pip (skip step 3b). For example, to install level 8.1 that includes v2.15.6 ansible-core use the following:
 
@@ -88,14 +108,22 @@ For an IBM i Ansible control node, the latest levels of Ansible should be instal
           python3 -m pip install --user ansible-core==2.15.1
 
    Note that Ansible core v2.16 cannot be used with the currently available IBM i Python rpm packages (Python 3.9 is highest level).
+   
+   The pip command may also be used directly for installing Ansible. An alternative command for 4(b) is
 
-4. Add the following path to ~/.profile for the ansible executables:
+      ::
+
+          pip3 install ansible-core==2.15.1
+
+5. Add the following commands to your ~/.profile or execute them to include the ansible executables in your PATH.
 
    ::
 
-       export PATH=~/.local/bin:$PATH
+       PATH=~/.local/bin:$PATH
+       export PATH
 
-5. Ensure dependent collections are installed if only using ansible-core. Perform the following collection install commands if ''ansible-galaxy collection list'' doesn't show these collections. 
+6. Ensure dependent collections are installed if only using ansible-core. Perform the following collection install commands if
+''ansible-galaxy collection list'' doesn't show these collections.
 
    ::
 
@@ -147,8 +175,7 @@ Before IBM i systems can be managed-nodes of Ansible, a few dependencies have to
  - python3-itoolkit
  - python3-ibm_db
 
-1. 5733SC1 and 5770DG1 are license programs, you can download them at
-http://www-304.ibm.com/servers/eserver/ess/index.wss.
+1. 5733SC1 and 5770DG1 are license programs, you can download them at http://www-304.ibm.com/servers/eserver/ess/index.wss.
 
 2. python3, python3-itoolkit, python3-ibm_db are open source packages. There are a few ways to install these packages and you could choose from one of them.
 
@@ -158,7 +185,7 @@ http://www-304.ibm.com/servers/eserver/ess/index.wss.
 
 ::
 
-    /Qopensys/pkgs/bin/yum install python3 python3-itoolkit python3-ibm_db 
+    /QOpenSys/pkgs/bin/yum install python3 python3-itoolkit python3-ibm_db 
 
 **Installing rpm packages automatically onto IBM i systems which can access internet**
 

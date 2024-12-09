@@ -16,8 +16,8 @@ ibmi_synchronize -- Synchronize a save file from IBM i node A to another IBM i n
 
 Synopsis
 --------
-- The \ :literal:`ibmi\_synchronize`\  plugin synchronize a save file from IBM i node A to another IBM i node B.
-- \ :literal:`ibmi\_synchronize`\  plugin calls ibmi\_sync module.
+- The :literal:`ibmi\_synchronize` plugin synchronize a save file from IBM i node A to another IBM i node B.
+- :literal:`ibmi\_synchronize` plugin calls ibmi\_sync module.
 - Only support to synchronize save file by now.
 - For non-IBMi native targets, use the synchronize module instead.
 - delegate\_to must be set to IBM i node A, and set hosts to IBM i node B.
