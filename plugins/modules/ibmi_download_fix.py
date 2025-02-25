@@ -442,9 +442,6 @@ def main():
     if image_directory != "*DFT":
         image_directory = f"'{image_directory}'"
 
-    if image_catalog != "*NONE":
-        image_catalog = f"'{image_catalog}'"
-
     command = f'SNDPTFORD PTFID(({ptf_id} {product} {release})) DLVRYFMT({delivery_format}) ORDER({order}) \
     REORDER({reorder}) CHKPTF({check_PTF}) IMGDIR({image_directory}) IMGCLG({image_catalog}) {parameters}'
 
