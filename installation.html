@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installing IBM i collection to Ansible server &mdash; IBM power_ibmi collection 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
@@ -45,7 +45,7 @@
               <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installing IBM i collection to Ansible server</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements-non-ibm-i-ansible-server-control-node">Requirements non-IBM i Ansible Server / Control Node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#requirements-for-ibm-i-ansible-server-control-node">Requirements for IBM i Ansible Server / Control Node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-using-ansible-galaxy">Installing using Ansible Galaxy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
@@ -92,7 +92,7 @@
 <p>Ansible Galaxy is the package manager for Ansible. The collection is published to Ansible Galaxy on a regular basis: <a class="reference external" href="https://galaxy.ansible.com/ibm/power_ibmi">https://galaxy.ansible.com/ibm/power_ibmi</a></p>
 <p>In order to install using Ansible Galaxy, you must:</p>
 <ol class="arabic simple">
-<li><p>Install all of the software listed in <a class="reference internal" href="#requirements"><span class="std std-ref">Requirements</span></a>.</p></li>
+<li><p>Install all of the software listed in <span class="xref std std-ref">Requirements</span>.</p></li>
 <li><p>Follow the instructions for <a class="reference internal" href="#installing-using-ansible-galaxy"><span class="std std-ref">Installing using Ansible Galaxy</span></a>.</p></li>
 </ol>
 </li>
@@ -100,14 +100,14 @@
 <p>You may wish to install the collection from source if you cannot access Ansible Galaxy due to firewall or proxy issues, or if you need to install a version of the collection that has not yet been published.</p>
 <p>In order to install from source, you must:</p>
 <ol class="arabic simple">
-<li><p>Install all of the software listed in <a class="reference internal" href="#requirements"><span class="std std-ref">Requirements</span></a>.</p></li>
+<li><p>Install all of the software listed in <span class="xref std std-ref">Requirements</span>.</p></li>
 <li><p>Follow the instructions for <a class="reference internal" href="#installing-from-source"><span class="std std-ref">Installing from source</span></a>.</p></li>
 </ol>
 </li>
 </ul>
-<section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
-<p>In order to use this Ansible collection at <strong>release 3.1.0</strong> and beyond, you must have the following pre-requisite software installed and available on your Ansible server:</p>
+<section id="requirements-non-ibm-i-ansible-server-control-node">
+<h2>Requirements non-IBM i Ansible Server / Control Node<a class="headerlink" href="#requirements-non-ibm-i-ansible-server-control-node" title="Link to this heading"></a></h2>
+<p>In order to use this Ansible collection at <strong>release 3.2.1</strong> and beyond, you must have the following pre-requisite software installed and available on your Ansible server / control node:</p>
 <p><strong>Python v3.9+</strong></p>
 <blockquote>
 <div><p>Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc).
@@ -117,11 +117,13 @@ If you install Python from the package manager for your operating system, you mu
 <li><p>The unofficial Python version manager: <a class="reference external" href="https://github.com/pyenv/pyenv">https://github.com/pyenv/pyenv</a></p></li>
 </ul>
 </div></blockquote>
-<p><strong>Ansible core v2.15 or v2.16</strong></p>
+<p><strong>Ansible core v2.15 to v2.18</strong></p>
 <blockquote>
 <div><ul class="simple">
 <li><p>Ansible core v2.15 requires Python 3.9+ on the Ansible control node.</p></li>
 <li><p>Ansible core v2.16 requires Python 3.10+ on the Ansible control node.</p></li>
+<li><p>Ansible core v2.17 requires Python 3.10+ on the Ansible control node.</p></li>
+<li><p>Ansible core v2.18 requires Python 3.11+ on the Ansible control node.</p></li>
 </ul>
 <p>The full compatiblity or support matrix for Ansible Core versions and Python levels for the control node and targets is provided at <a class="reference external" href="https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html">https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html</a>.</p>
 <p>Ansible can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc). You can also install it using <code class="docutils literal notranslate"><span class="pre">pip</span></code>, the package manager for Python:</p>
@@ -132,6 +134,18 @@ If you install Python from the package manager for your operating system, you mu
 </section>
 <section id="requirements-for-ibm-i-ansible-server-control-node">
 <h2>Requirements for IBM i Ansible Server / Control Node<a class="headerlink" href="#requirements-for-ibm-i-ansible-server-control-node" title="Link to this heading"></a></h2>
+<p>In order to use this Ansible collection at <strong>release 3.2.1</strong> and beyond, you must have the following pre-requisite software installed and available on your Ansible server / control node:</p>
+<p><strong>Python v3.9 or Python v3.13</strong></p>
+<blockquote>
+<div><p>These are the levels of python provided through the IBM i Open Source Software packages.</p>
+</div></blockquote>
+<p><strong>Ansible core v2.15 or v2.18</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Ansible core v2.15 requires Python 3.9 on the Ansible control node.</p></li>
+<li><p>Ansible core v2.18 requires Python 3.13 on the Ansible control node.</p></li>
+</ul>
+</div></blockquote>
 <p>For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm
 above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps should be executed
 in an SSH session to the IBM i when installing Ansible with pip. This will require the IBM i SSH Daemon to be started with the ‘’STRTCPSVR <a href="#id1"><span class="problematic" id="id2">*</span></a>SSHD’’ command
@@ -148,7 +162,7 @@ if it is not already started.</p>
 </div>
 </div></blockquote>
 </li>
-<li><p>Configure your ~/.profile or execute the following commands to set the language environment variables.</p>
+<li><p>Configure your ~/.profile (~/.bash_profile with bash) or execute the following commands to set the language environment variables.</p>
 <blockquote>
 <div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LANG</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
 <span class="n">LC_ALL</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
@@ -176,7 +190,7 @@ if it is not already started.</p>
 </li>
 <li><p>Install Ansible. Either full ansible (a) or ansible-core (b).</p>
 <ol class="loweralpha">
-<li><p>Install Ansible at 8.X level (v2.15 core) or 9.X level (v2.16 core) with pip (skip step 3b). For example, to install level 8.1 that includes v2.15.6 ansible-core use the following:</p>
+<li><p>Install Ansible at 8.X level (v2.15 core) or 11.X level (v2.18 core) with pip (skip step 3b). For example, to install level 8.1 that includes v2.15.6 ansible-core use the following:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">ansible</span><span class="o">==</span><span class="mf">8.1</span>
 </pre></div>
 </div>
@@ -187,7 +201,7 @@ if it is not already started.</p>
 </div>
 </li>
 </ol>
-<p>Note that Ansible core v2.16 cannot be used with the currently available IBM i Python rpm packages (Python 3.9 is highest level).</p>
+<p>Note that Ansible core v2.16 and v2.17 cannot be used with the currently available IBM i Python rpm packages on an IBM i server / control node.</p>
 <p>The pip command may also be used directly for installing Ansible. An alternative command for 4(b) is</p>
 <blockquote>
 <div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="n">ansible</span><span class="o">-</span><span class="n">core</span><span class="o">==</span><span class="mf">2.15.1</span>
@@ -256,7 +270,9 @@ export PATH
 </div></blockquote>
 <ol class="arabic simple">
 <li><p>5733SC1 and 5770DG1 are license programs, you can download them at <a class="reference external" href="http://www-304.ibm.com/servers/eserver/ess/index.wss">http://www-304.ibm.com/servers/eserver/ess/index.wss</a>.</p></li>
-<li><p>python3, python3-itoolkit, python3-ibm_db are open source packages. There are a few ways to install these packages and you could choose from one of them.</p></li>
+<li><p>python3, python3-itoolkit, python3-ibm_db are open source packages. There are a few ways to install these packages and you could choose from one of them.
+To ensure a specific Python level, e.g., Python 3.9, that is compatible with the version of Ansible core on the control node,
+the python package prefix should instead specifiy the full Python level, e.g., python39 instead of python3, for installation.</p></li>
 </ol>
 <dl class="simple">
 <dt><strong>Installing rpm packages manually</strong></dt><dd><p>Rpm packages can be installed via ‘yum’ packages manager on IBM i. However, yum is not shipped by IBM i by default.
