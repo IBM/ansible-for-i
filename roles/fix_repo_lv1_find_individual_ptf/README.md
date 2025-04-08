@@ -39,7 +39,7 @@ Example Playbook
 
     - name: print ptf_find_result
       debug:
-        var: fix_repo_lv1_find_individual_ptf_iptf_find_result
+        var: fix_repo_lv1_find_individual_ptf_ptf_find_result
 
     - name: print ptf_fail_list
       debug:

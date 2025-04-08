@@ -16,5 +16,5 @@
 - name: Compose failed list
   ansible.builtin.set_fact:
     download_individual_ptfs_download_fail_list: "{{ download_individual_ptfs_download_fail_list | default([]) +
-      [ {'ptf_id': download_ptf.ptf_id, 'fail_reason': download_result.msg} ] }}"
+      [{'ptf_id': download_ptf.ptf_id, 'fail_reason': download_result.msg}] }}"
   when: download_result.failed or download_result.download_list == []

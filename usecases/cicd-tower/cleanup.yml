@@ -2,7 +2,7 @@
   hosts: localhost
   tasks:
     - name: Block for when cleanup
-      when: cleanup|bool
+      when: cleanup | bool
       block:
         - name: Remove build path
           ansible.builtin.file:
@@ -12,7 +12,7 @@
           with_items:
             - "{{ host_names.split() }}"
           failed_when: false
-          when: not provision|bool
+          when: not provision | bool
 
         - name: Remove build lib
           ibm.power_ibmi.ibmi_cl_command:
@@ -21,10 +21,10 @@
           with_items:
             - "{{ host_names.split() }}"
           failed_when: false
-          when: not provision|bool
+          when: not provision | bool
 
         - name: Block for when provision
-          when: provision|bool
+          when: provision | bool
           block:
             - name: Add PowerVC host to Ansible in-memory inventory ({{ powervc_host }})
               ansible.builtin.add_host:

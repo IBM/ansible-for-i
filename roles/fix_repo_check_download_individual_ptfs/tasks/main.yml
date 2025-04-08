@@ -6,7 +6,7 @@
 
 - name: Compose list
   ansible.builtin.set_fact:
-    list: "{{ list|default([]) + [{'ptf_id': ptfs_list_parm_var }] }}"
+    list: "{{ list | default([]) + [{'ptf_id': ptfs_list_parm_var}] }}"
   loop: "{{ fix_repo_check_download_individual_ptfs_ptfs_list_parm }}"
   loop_control:
     loop_var: ptfs_list_parm_var
@@ -38,7 +38,7 @@
     - name: Compose be downloaded ptfs list
       ansible.builtin.set_fact:
         fix_repo_check_download_individual_ptfs_record_not_found_list: "{{ fix_repo_check_download_individual_ptfs_record_not_found_list | default([]) +
-          [ fail_record ] }}"
+          [fail_record] }}"
       when: fail_record.db_record == 'FILE_NOT_FOUND' or fail_record.db_record == 'RECORD_NOT_FOUND' or fail_record.db_record == 'MATCH_NOT_FOUND'
       with_list: "{{ fix_repo_find_result.fail_list }}"
       loop_control:
@@ -47,7 +47,7 @@
     - name: Compose check_fail_list with error reason
       ansible.builtin.set_fact:
         fix_repo_check_download_individual_ptfs_check_fail_list: "{{ fix_repo_find_result.fail_list |
-          difference( fix_repo_check_download_individual_ptfs_record_not_found_list ) }}"
+          difference(fix_repo_check_download_individual_ptfs_record_not_found_list) }}"
 
     - name: Include download_individual_ptfs role to download a list of individual PTFs
       ansible.builtin.include_role:

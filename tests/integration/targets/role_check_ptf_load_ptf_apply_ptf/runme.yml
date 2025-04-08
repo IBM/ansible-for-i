@@ -63,8 +63,8 @@
         - name: Assert ptf_status
           ansible.builtin.assert:
             that:
-              - check_ptf_ptfs_status['{{test_positive_ptf_list_1[0].ptf_id}}'] == 'NON-EXISTENT' or
-                check_ptf_ptfs_status['{{test_positive_ptf_list_1[0].ptf_id}}'] == 'PERMANENTLY REMOVED'
+              - check_ptf_ptfs_status[test_positive_ptf_list_1[0].ptf_id] == 'NON-EXISTENT' or
+                check_ptf_ptfs_status[test_positive_ptf_list_1[0].ptf_id] == 'PERMANENTLY REMOVED'
 
         - name: Assert the returned parameters
           ansible.builtin.assert:
@@ -113,7 +113,7 @@
         - name: Assert ptf_status
           ansible.builtin.assert:
             that:
-              - check_ptf_ptfs_status['{{test_positive_ptf_list_1[0].ptf_id}}'] == 'LOADED'
+              - check_ptf_ptfs_status[test_positive_ptf_list_1[0].ptf_id] == 'LOADED'
 
         - name: Assert the returned parameters
           ansible.builtin.assert:
@@ -150,7 +150,7 @@
         - name: Assert ptf_status
           ansible.builtin.assert:
             that:
-              - check_ptf_ptfs_status['{{test_positive_ptf_list_1[0].ptf_id}}'] == 'APPLIED'
+              - check_ptf_ptfs_status[test_positive_ptf_list_1[0].ptf_id] == 'APPLIED'
 
         - name: Assert the returned parameters
           ansible.builtin.assert:

@@ -15,7 +15,7 @@
       ansible.builtin.set_stats:
         data:
           vm_name: "VM-BUILD_{{ build_number }}"
-      when: provision|bool
+      when: provision | bool
 
     - name: Display build information
       ansible.builtin.debug:

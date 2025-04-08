@@ -35,7 +35,7 @@
   tasks:
     - name: Set list
       ansible.builtin.set_fact:
-        list: "{{ list|default([]) + [{'ptf_id': item }] }}"
+        list: "{{ list | default([]) + [{'ptf_id': item}] }}"
       loop: "{{ ptfs_list }}"
 
     - name: Get the individual ptfs' information in catalog

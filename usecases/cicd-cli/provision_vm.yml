@@ -2,7 +2,7 @@
 - name: Add PowerVC host to Ansible in-memory inventory ({{ powervc_host }})
   ansible.builtin.add_host:
     name: 'powervc'
-    ansible_user: '{{ powervc_admin}}'
+    ansible_user: '{{ powervc_admin }}'
     ansible_ssh_pass: '{{ powervc_admin_password }}'
     ansible_ssh_extra_args: -o StrictHostKeyChecking=no
     ansible_python_interpreter: /usr/bin/python3

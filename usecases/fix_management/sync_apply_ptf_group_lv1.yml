@@ -67,7 +67,7 @@
 
     - name: Compose files name list
       ansible.builtin.set_fact:
-        files_name_list: "{{ files_name_list | default( [] ) + [image_files_var.file] }}"
+        files_name_list: "{{ files_name_list | default([]) + [image_files_var.file] }}"
       loop: "{{ fix_repo_find_result.success_list[0].query_result[0].image_files }}"
       loop_control:
         loop_var: image_files_var

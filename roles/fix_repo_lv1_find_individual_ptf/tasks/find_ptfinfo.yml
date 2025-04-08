@@ -5,7 +5,7 @@
     var: list_var
 
 - name: Get the individual ptfs' information in catalog
-  ansible.builtin.ibmi_fix_repo_lv1:
+  ibm.power_ibmi.ibmi_fix_repo_lv1:
     image_root: "{{ fix_repo_lv1_find_individual_ptf_image_root }}"
     checksum: true
     action: "find"

@@ -101,7 +101,7 @@
           block:
             - name: Compose src_list
               ansible.builtin.set_fact:
-                src_list: "{{ src_list | default([]) + [{ 'src': find_result_files_var.path }] }}"
+                src_list: "{{ src_list | default([]) + [{'src': find_result_files_var.path}] }}"
               loop: "{{ find_result.files }}"
               loop_control:
                 loop_var: find_result_files_var

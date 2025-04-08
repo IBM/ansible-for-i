@@ -23,7 +23,7 @@
 
     - name: Set mode
       ansible.builtin.set_fact:
-        mode: "{{ mode.user_input | upper}}"
+        mode: "{{ mode.user_input | upper }}"
 
     - name: Check mode
       ansible.builtin.fail:

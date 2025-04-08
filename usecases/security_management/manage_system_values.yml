@@ -22,7 +22,7 @@
 
     - name: Set mode
       ansible.builtin.set_fact:
-        mode: "{{ mode.user_input | upper}}"
+        mode: "{{ mode.user_input | upper }}"
 
     - name: Mode selection check
       ansible.builtin.fail:
@@ -246,14 +246,14 @@
 
         - name: Initialize info
           ansible.builtin.set_fact:
-            os400_ver: "{{osinfo.stdout}}"
+            os400_ver: "{{ osinfo.stdout }}"
             ptfs: []
             ptf_groups: []
           failed_when: osinfo.rc != 0
 
         - name: OS version
           ansible.builtin.debug:
-            msg: "{{os400_ver}}"
+            msg: "{{ os400_ver }}"
 
         - name: Check if system values compliant with expected
           ansible.builtin.include_tasks: system_value_check.yml
@@ -287,7 +287,7 @@
               ignore_errors: true
             - name: Set autovrt_result for non-zero
               ansible.builtin.set_fact:
-                autovrt_result: "{{ autovrt_result | default({}) | combine ({ item.key : item.value }) }}"
+                autovrt_result: "{{ autovrt_result | default({}) | combine({item.key: item.value}) }}"
               with_items:
                 - { key: name, value: QAUTOVRT }
                 - { key: actual, value: "{{ autovrt.sysval[0]['value'] }}" }
@@ -295,7 +295,7 @@
               when: autovrt.rc == 0 and autovrt.sysval[0]['value'] != "0"
             - name: Set autovrt_result with non-zero
               ansible.builtin.set_fact:
-                autovrt_result: "{{ autovrt_result | default({}) | combine ({ item.key : item.value }) }}"
+                autovrt_result: "{{ autovrt_result | default({}) | combine({item.key: item.value}) }}"
               with_items:
                 - { key: name, value: QAUTOVRT }
                 - { key: actual, value: "{{ autovrt.sysval[0]['value'] }}" }
@@ -303,7 +303,7 @@
               when: autovrt.rc == 0 and autovrt.sysval[0]['value'] == "0"
             - name: Set report
               ansible.builtin.set_fact:
-                report: "{{ report|default([]) + [autovrt_result] }}"
+                report: "{{ report | default([]) + [autovrt_result] }}"
 
             - name: Checking particular system values - QLMTDEVSSN
               ibm.power_ibmi.ibmi_sysval:
@@ -313,7 +313,7 @@
               ignore_errors: true
             - name: Set qlmtdevssn result non-zero value
               ansible.builtin.set_fact:
-                qlmtdevssn_result: "{{ qlmtdevssn_result | default({}) | combine ({ item.key : item.value }) }}"
+                qlmtdevssn_result: "{{ qlmtdevssn_result | default({}) | combine({item.key: item.value}) }}"
               with_items:
                 - { key: name, value: QLMTDEVSSN }
                 - { key: actual, value: "{{ qlmtdevssn.sysval[0]['value'] }}" }
@@ -321,7 +321,7 @@
               when: qlmtdevssn.rc == 0 and qlmtdevssn.sysval[0]['value'] != "0"
             - name: Set qlmtdevssn result zero value
               ansible.builtin.set_fact:
-                qlmtdevssn_result: "{{ qlmtdevssn_result | default({}) | combine ({ item.key : item.value }) }}"
+                qlmtdevssn_result: "{{ qlmtdevssn_result | default({}) | combine({item.key: item.value}) }}"
               with_items:
                 - { key: name, value: QLMTDEVSSN }
                 - { key: actual, value: "{{ qlmtdevssn.sysval[0]['value'] }}" }
@@ -329,7 +329,7 @@
               when: qlmtdevssn.rc == 0 and qlmtdevssn.sysval[0]['value'] == "0"
             - name: Set report
               ansible.builtin.set_fact:
-                report: "{{ report|default([]) + [qlmtdevssn_result] }}"
+                report: "{{ report | default([]) + [qlmtdevssn_result] }}"
 
         - name: Block for checking QUSEADPAUT
           block:
@@ -341,7 +341,7 @@
               ignore_errors: true
             - name: Set quseadpaut_result when not *NONE value
               ansible.builtin.set_fact:
-                quseadpaut_result: "{{ quseadpaut_result | default({}) | combine ({ item.key : item.value }) }}"
+                quseadpaut_result: "{{ quseadpaut_result | default({}) | combine({item.key: item.value}) }}"
               with_items:
                 - { key: name, value: QUSEADPAUT }
                 - { key: actual, value: "{{ quseadpaut.sysval[0]['value'] }}" }
@@ -349,7 +349,7 @@
               when: quseadpaut.rc == 0 and quseadpaut.sysval[0]['value'] != "*NONE"
             - name: Set quseadpaut_result when *NONE value
               ansible.builtin.set_fact:
-                quseadpaut_result: "{{ quseadpaut_result | default({}) | combine ({ item.key : item.value }) }}"
+                quseadpaut_result: "{{ quseadpaut_result | default({}) | combine({item.key: item.value}) }}"
               with_items:
                 - { key: name, value: QUSEADPAUT }
                 - { key: actual, value: "{{ quseadpaut.sysval[0]['value'] }}" }
@@ -357,7 +357,7 @@
               when: quseadpaut.rc == 0 and quseadpaut.sysval[0]['value'] == "*NONE"
             - name: Set report
               ansible.builtin.set_fact:
-                report: "{{ report|default([]) + [quseadpaut_result] }}"
+                report: "{{ report | default([]) + [quseadpaut_result] }}"
 
         - name: Block for checking QSYSLIBL
           block:
@@ -370,7 +370,7 @@
 
             - name: Check each library in QSYSLIBL to see if *PUBLIC authority is set to *USE
               ibm.power_ibmi.ibmi_sql_query:
-                sql: SELECT * FROM QSYS2.OBJECT_PRIVILEGES WHERE SYSTEM_OBJECT_NAME = '{{item}}' AND SYSTEM_OBJECT_SCHEMA = 'QSYS'
+                sql: SELECT * FROM QSYS2.OBJECT_PRIVILEGES WHERE SYSTEM_OBJECT_NAME = '{{ item }}' AND SYSTEM_OBJECT_SCHEMA = 'QSYS'
                   AND OBJECT_TYPE = '*LIB' AND AUTHORIZATION_NAME = '*PUBLIC' AND OBJECT_AUTHORITY = '*USE'
               register: sql
               with_items:
@@ -379,7 +379,7 @@
               failed_when: sql.row_count == 0
             - name: Set qsyslibl_result
               ansible.builtin.set_fact:
-                qsyslibl_result: "{{ qsyslibl_result | default({}) | combine ({ item.key : item.value }) }}"
+                qsyslibl_result: "{{ qsyslibl_result | default({}) | combine({item.key: item.value}) }}"
               with_items:
                 - { key: name, value: QSYSLIBL }
                 - { key: actual, value: "{{ qsyslibl.sysval[0]['value'] }}" }
@@ -387,7 +387,7 @@
           rescue:
             - name: Set qsyslibl_result
               ansible.builtin.set_fact:
-                qsyslibl_result: "{{ qsyslibl_result | default({}) | combine ({ item.key : item.value }) }}"
+                qsyslibl_result: "{{ qsyslibl_result | default({}) | combine({item.key: item.value}) }}"
               with_items:
                 - { key: name, value: QSYSLIBL }
                 - { key: actual, value: "{{ qsyslibl.sysval[0]['value'] }}" }
@@ -395,7 +395,7 @@
 
         - name: Set report
           ansible.builtin.set_fact:
-            report: "{{ report|default([]) + [qsyslibl_result] }}"
+            report: "{{ report | default([]) + [qsyslibl_result] }}"
 
         - name: Generate report to file
           ansible.builtin.copy:

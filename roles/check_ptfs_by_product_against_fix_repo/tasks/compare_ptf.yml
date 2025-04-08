@@ -13,7 +13,7 @@
 - name: Compose ptf_status
   ansible.builtin.set_fact:
     check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
-      [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'Product not installed on target system' }] }}"
+      [{'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'Product not installed on target system'}] }}"
   when: result.row|length == 0
   no_log: true
 
@@ -21,7 +21,7 @@
   block:
     - name: Compose PTF status list on target system
       ansible.builtin.set_fact:
-        ptf_on_system: "{{ ptf_on_system | default({}) | combine({ record.PTF_IDENTIFIER: record.PTF_LOADED_STATUS }) }}"
+        ptf_on_system: "{{ ptf_on_system | default({}) | combine({record.PTF_IDENTIFIER: record.PTF_LOADED_STATUS}) }}"
       with_list: "{{ result.row }}"
       loop_control:
         loop_var: record
@@ -30,7 +30,7 @@
 
     - name: PTF does not exist
       ansible.builtin.set_fact:
-        ptf_list: "{{ ptf_list | default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT' }] }}"
+        ptf_list: "{{ ptf_list | default([]) + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT'}] }}"
       when: not ptf_on_system.get(ptf_info.ptf_id)
       with_list: "{{ ptf_info_list }}"
       loop_control:
@@ -38,7 +38,7 @@
 
     - name: PTF not applied
       ansible.builtin.set_fact:
-        ptf_list: "{{ ptf_list | default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id] }] }}"
+        ptf_list: "{{ ptf_list | default([]) + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id]}] }}"
       when:
         - ptf_on_system.get(ptf_info.ptf_id)
         - ptf_on_system[ptf_info.ptf_id] != 'APPLIED'
@@ -50,7 +50,7 @@
 
     - name: PTF applied
       ansible.builtin.set_fact:
-        ptf_list: "{{ ptf_list | default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id] }] }}"
+        ptf_list: "{{ ptf_list | default([]) + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id]}] }}"
       when:
         - ptf_on_system.get(ptf_info.ptf_id)
         - ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or
@@ -63,6 +63,6 @@
     - name: Compose ptf_status
       ansible.builtin.set_fact:
         check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
-          [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'OK', 'PTF_LIST': ptf_list }] }}"
+          [{'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'OK', 'PTF_LIST': ptf_list}] }}"
       no_log: true
       when: result.row | length > 0

@@ -18,7 +18,7 @@
 
   vars:
     group_list: []
-    check_ptf_groups_against_fix_repo_repo_server: "{{repo_server}}"
+    check_ptf_groups_against_fix_repo_repo_server: "{{ repo_server }}"
     check_ptf_groups_against_fix_repo_type: "latest"
 
   tasks:

@@ -6,7 +6,7 @@
 - name: "Check if ~/.netrc contains ibm i target login"
   ansible.builtin.lineinfile:
     name: ~/.netrc
-    line: "machine {{build_system_ip}} login {{build_system_user}} password {{build_system_pass}}"
+    line: "machine {{ build_system_ip }} login {{ build_system_user }} password {{ build_system_pass }}"
     state: present
   check_mode: false
 
@@ -27,7 +27,7 @@
 
     - name: Combine transfer_command
       ansible.builtin.set_fact:
-        transfer_command: "scp {{ local_workspace }}/sendMsg.c {{build_system_user}}@{{build_system_ip}}:{{ build_path }}/sendMsg.c"
+        transfer_command: "scp {{ local_workspace }}/sendMsg.c {{ build_system_user }}@{{ build_system_ip }}:{{ build_path }}/sendMsg.c"
 
     - name: Put STMFs to remote IBM i
       ansible.builtin.command: 'sshpass -p "{{ build_system_pass }}" {{ transfer_command }}'

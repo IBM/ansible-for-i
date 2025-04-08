@@ -321,9 +321,9 @@
       block:
         - name: Set ARE template file which will be removed on the client
           ansible.builtin.set_fact:
-            template_to_remove: "{{ template_dir_on_client }}/{{ template_name | basename}}"
+            template_to_remove: "{{ template_dir_on_client }}/{{ template_name | basename }}"
 
         - name: Remove ARE template file on the client if needed
           ansible.builtin.file:
-            path: "{{template_to_remove | replace('//', '/')}}"
+            path: "{{ template_to_remove | replace('//', '/') }}"
             state: absent

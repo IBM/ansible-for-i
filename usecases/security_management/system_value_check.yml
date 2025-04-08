@@ -5,7 +5,7 @@
 
 - name: Compose sysval with VRM
   ansible.builtin.set_fact:
-    sysval_vrm: "{{ { 'name': sysval.name, 'expect': sysval.get('expect_' + os400_ver), 'check': sysval.check } }}"
+    sysval_vrm: "{{ {'name': sysval.name, 'expect': sysval.get('expect_' + os400_ver), 'check': sysval.check} }}"
   when: level_mode == '3' and sysval.name in ['QPWDRULES', 'QSSLCSL', 'QSSLCSLCTL', 'QSSLPCL']
 
 - name: Set sysvalreal
@@ -29,7 +29,7 @@
 
 - name: Itemized result with fail_list
   ansible.builtin.set_fact:
-    itemized_result: "{{ itemized_result | default({}) | combine ({ item.key : item.value }) }}"
+    itemized_result: "{{ itemized_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - { key: name, value: "{{ check.fail_list[0]['name'] }}" }
     - { key: expect, value: "{{ check.fail_list[0]['expect'] }}" }
@@ -40,7 +40,7 @@
 
 - name: Itemized result with sysval
   ansible.builtin.set_fact:
-    itemized_result: "{{ itemized_result | default({}) | combine ({ item.key : item.value }) }}"
+    itemized_result: "{{ itemized_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - { key: name, value: "{{ check.sysval[0]['name'] }}" }
     - { key: expect, value: "{{ check.sysval[0]['expect'] }}" }
@@ -51,4 +51,4 @@
 
 - name: Set report
   ansible.builtin.set_fact:
-    report: "{{ report|default([]) + [itemized_result] }}"
+    report: "{{ report | default([]) + [itemized_result] }}"

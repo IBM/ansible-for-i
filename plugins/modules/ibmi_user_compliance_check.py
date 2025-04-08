@@ -217,7 +217,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.2.0"
+__ibmi_module_version__ = "3.2.1"
 
 parmname_array = [
     'SIGN_ON_ATTEMPTS_NOT_VALID',
@@ -407,6 +407,11 @@ def main():
     check_home_directory = False
     out1 = []
     out2 = []
+    user_action_audit_level_expect = []
+    user_option_expect = []
+    supplemental_group_list_expect = []
+    locale_job_attributes_expect = []
+    home_directory_expect = []
     # check input value
     for field in fields:
         if field.get('name') is None:

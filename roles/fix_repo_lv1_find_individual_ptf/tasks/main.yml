@@ -8,7 +8,7 @@
 
 - name: Compose ptf input list
   ansible.builtin.set_fact:
-    list: "{{ list|default([]) + [{'ptf': item }] }}"
+    list: "{{ list | default([]) + [{'ptf': item}] }}"
   loop: "{{ fix_repo_lv1_find_individual_ptf_ptfs_list }}"
 
 - name: Print PTF list

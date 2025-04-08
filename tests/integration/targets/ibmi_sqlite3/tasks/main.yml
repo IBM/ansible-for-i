@@ -5,7 +5,7 @@
       superuser: "{{ansible_ssh_user}}"
       ibmi_user: "ZHYAO"
       ibmi_pass: '{{ansible_ssh_pass}}'
-      when: ansible_ssh_pass is defined
+    when: ansible_ssh_pass is defined
 
   - name: TC01 - run the SQL command to create a table
     ibmi_sqlite3:

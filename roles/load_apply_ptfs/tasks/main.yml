@@ -27,7 +27,7 @@
 - name: Set return vars when load_ptf role invoked
   ansible.builtin.set_fact:
     load_apply_ptfs_load_success_list: "{{ load_ptf_load_success_list }}"
-    load_apply_ptfs_load_fail_list: "{{ load_ptf_load_fail_list  }}"
+    load_apply_ptfs_load_fail_list: "{{ load_ptf_load_fail_list }}"
     load_apply_ptfs_load_fail_dict: "{{  load_ptf_load_fail_dict }}"
   when: load_apply_ptfs_are_ptfs_to_load
 
@@ -42,7 +42,7 @@
     apply_ptf_to_be_applied_list: "{{ load_apply_ptfs_load_success_list | default([]) + load_apply_ptfs_loaded_list }}"
     apply_ptf_apply_all_loaded_ptfs: "{{  load_apply_ptfs_apply_all_loaded_ptf }}"
     apply_ptf_temp_or_perm: "{{ load_apply_ptfs_temp_or_perm }}"
-    apply_ptf_delayed_option: "{{ load_apply_ptfs_delayed_option  }}"
+    apply_ptf_delayed_option: "{{ load_apply_ptfs_delayed_option }}"
     apply_ptf_auto_ipl: "{{  load_apply_ptfs_auto_ipl }}"
   when: load_apply_ptfs_are_ptfs_to_apply
 
