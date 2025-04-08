@@ -3,7 +3,7 @@
   hosts: localhost
   tasks:
     - name: Block for when not provision
-      when: not provision|bool
+      when: not provision | bool
       block:
         - name: Add build server to Ansible in-memory inventory
           ansible.builtin.add_host:
@@ -23,7 +23,7 @@
             - "{{ host_names.split() }}"
 
     - name: Block for when provision
-      when: provision|bool
+      when: provision | bool
       block:
         - name: Debug
           ansible.builtin.debug:

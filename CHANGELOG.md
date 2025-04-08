@@ -1,5 +1,53 @@
 # Change Log
 
+## v3.2.1 (2025-04-08)
+
+The collection is verified on Ansible core 2.17 and 2.18 with this release.
+
+Ansible core 2.17 is only an option with a non IBM i control node
+because of the jump in IBM i Python support to version 3.13 from version 3.9
+without any intermediate levels. Ansible core 2.17 requires Python levels
+from 3.10 to 3.12 on the control node.
+
+Ansible core 2.18 requires Python levels from 3.11 to 3.13 on the control node,
+which allows supporting an IBM i control node with python 3.13.
+
+Please refer to the Ansible core support matrix at <https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html> for full
+details on Ansible core and Python level compatibility with control and target nodes.
+
+### Changes for supporting Ansible core 2.17 and 2.18
+
+- Clean up Jinja2 spacing in numerous YAML files to remove ansible-lint warnings that Redhat asked to be cleaned up for next release.
+
+- Remove use of yum module and instead use raw or command module to invoke yum because the yum module was removed from Ansible version 2.17.
+
+- Fix ansible sanity test pylint failures with Ansible 2.18 (use before assignment).
+
+### Changes to resolve testing issues
+
+- Fix ibmi_reboot module current date/time calls to use a non-deprecated interface.
+
+- Roll back ibmi_cl_command integration test to an older version that properly tests the ibmi_cl_command module instead of testing ibmi_copy module.
+
+- Add new TC to ibmi_download_fix to exercise optional image catalog parameter. Also reduce timeout for a TC to ensure failure. Jinja 2 template error fixes.
+
+- Fixing Jinja 2 template errors in various integration tests cases.
+
+- Fixng TCs and skipping some broken TCs (fix later) in various integration tests.
+
+- With the ibmi_at test, we now use an additional argument with RMVJOBSCDE to ensure full clean-up.
+
+- Various fixes with ibmi_display_fix test that include new 7.4 PTFs.
+
+### Bug fixes
+
+- Fix ibmi_download fix module handling of optional image_catalog parameter.
+  GitHub issue 221: <https://github.com/IBM/ansible-for-i/issues/221>.
+
+- Fix incorrect FQCN in role fix_repo_lv1_find_individual_ptf reference to module ibmi_fix_repo_lv1.
+
+- Fix typo for role variable example in role fix_repo_lv1_find_individual_ptf README.
+
 ## v3.2.0 (2024-12-06)
 
 This release includes minor enhancements requested from github issues and/or provided in contributed code

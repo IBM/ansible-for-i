@@ -35,7 +35,7 @@
 - name: Got record failed from repository server
   ansible.builtin.set_fact:
     check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
-      [{ 'PRODUCT': prod.product, 'PRODUCT_STATUS': 'Record not found in repository DB' }] }}"
+      [{'PRODUCT': prod.product, 'PRODUCT_STATUS': 'Record not found in repository DB'}] }}"
   when: product_info.get('fail_list')
   with_list: "{{ product_info.fail_list }}"
   loop_control:

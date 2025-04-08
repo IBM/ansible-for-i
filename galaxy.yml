@@ -15,7 +15,7 @@ namespace: ibm
 name: power_ibmi
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 3.2.0
+version: 3.2.1
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -60,7 +60,7 @@ tags: [infrastructure, ibmi, power, ibm]
 dependencies: {}
 
 # The URL of the originating SCM repository
-repository: https://github.com/IBM/ansible-for-i/tree/1.4.0
+repository: https://github.com/IBM/ansible-for-i/tree/devel
 
 # The URL to any online docs
 documentation: https://ibm.github.io/ansible-for-i/index.html
@@ -88,6 +88,7 @@ build_ignore:
   - tests/sanity
   - plugins/modules/ibmi_powervc_os_server_capture.py
   - changelogs/.plugin-cache.yaml
+  - .vscode
 # Exclude unnecessary RH files or temporary files for dual Ansible Galaxy and Redhat AAP build
   - requirements-RH.yml
   - requirements.yml.ORG

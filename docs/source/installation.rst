@@ -25,10 +25,10 @@ There are two options to install IBM i collection for Ansible:
   1. Install all of the software listed in :ref:`Requirements`.
   2. Follow the instructions for :ref:`Installing from source`.
 
-Requirements
-------------
+Requirements non-IBM i Ansible Server / Control Node
+----------------------------------------------------
 
-In order to use this Ansible collection at **release 3.1.0** and beyond, you must have the following pre-requisite software installed and available on your Ansible server:
+In order to use this Ansible collection at **release 3.2.1** and beyond, you must have the following pre-requisite software installed and available on your Ansible server / control node:
 
 **Python v3.9+**
 
@@ -38,10 +38,12 @@ In order to use this Ansible collection at **release 3.1.0** and beyond, you mus
     - The official Python website: https://www.python.org/downloads/
     - The unofficial Python version manager: https://github.com/pyenv/pyenv
 
-**Ansible core v2.15 or v2.16**
+**Ansible core v2.15 to v2.18**
 
     - Ansible core v2.15 requires Python 3.9+ on the Ansible control node.
     - Ansible core v2.16 requires Python 3.10+ on the Ansible control node.
+    - Ansible core v2.17 requires Python 3.10+ on the Ansible control node.
+    - Ansible core v2.18 requires Python 3.11+ on the Ansible control node.
 
     The full compatiblity or support matrix for Ansible Core versions and Python levels for the control node and targets is provided at https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html.
 
@@ -53,6 +55,18 @@ In order to use this Ansible collection at **release 3.1.0** and beyond, you mus
 
 Requirements for IBM i Ansible Server / Control Node
 -----------------------------------------------------
+
+In order to use this Ansible collection at **release 3.2.1** and beyond, you must have the following pre-requisite software installed and available on your Ansible server / control node:
+
+**Python v3.9 or Python v3.13**
+
+    These are the levels of python provided through the IBM i Open Source Software packages.
+
+**Ansible core v2.15 or v2.18**
+
+    - Ansible core v2.15 requires Python 3.9 on the Ansible control node.
+    - Ansible core v2.18 requires Python 3.13 on the Ansible control node.
+
 
 For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm
 above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps should be executed
@@ -69,7 +83,7 @@ if it is not already started.
         yum install pase-utf8-locale
         yum install sshpass   # allows specifying ssh password if desired
 
-2. Configure your ~/.profile or execute the following commands to set the language environment variables.
+2. Configure your ~/.profile (~/.bash_profile with bash) or execute the following commands to set the language environment variables.
 
     ::
 
@@ -95,7 +109,7 @@ if it is not already started.
 
 4. Install Ansible. Either full ansible (a) or ansible-core (b).
 
-   a. Install Ansible at 8.X level (v2.15 core) or 9.X level (v2.16 core) with pip (skip step 3b). For example, to install level 8.1 that includes v2.15.6 ansible-core use the following:
+   a. Install Ansible at 8.X level (v2.15 core) or 11.X level (v2.18 core) with pip (skip step 3b). For example, to install level 8.1 that includes v2.15.6 ansible-core use the following:
 
       ::
 
@@ -107,7 +121,7 @@ if it is not already started.
 
           python3 -m pip install --user ansible-core==2.15.1
 
-   Note that Ansible core v2.16 cannot be used with the currently available IBM i Python rpm packages (Python 3.9 is highest level).
+   Note that Ansible core v2.16 and v2.17 cannot be used with the currently available IBM i Python rpm packages on an IBM i server / control node.
    
    The pip command may also be used directly for installing Ansible. An alternative command for 4(b) is
 
@@ -178,6 +192,8 @@ Before IBM i systems can be managed-nodes of Ansible, a few dependencies have to
 1. 5733SC1 and 5770DG1 are license programs, you can download them at http://www-304.ibm.com/servers/eserver/ess/index.wss.
 
 2. python3, python3-itoolkit, python3-ibm_db are open source packages. There are a few ways to install these packages and you could choose from one of them.
+   To ensure a specific Python level, e.g., Python 3.9, that is compatible with the version of Ansible core on the control node,
+   the python package prefix should instead specifiy the full Python level, e.g., python39 instead of python3, for installation.
 
 **Installing rpm packages manually**
     Rpm packages can be installed via 'yum' packages manager on IBM i. However, yum is not shipped by IBM i by default.

@@ -103,7 +103,7 @@
 
     - name: Find required parameters for present_ip_interface
       ansible.builtin.include_tasks: configure_ip.yml
-      loop: '{{display_vm_info_via_powervc_vm_info_result.openstack_servers[0].addresses.values() | list | flatten(1)}}'
+      loop: '{{ display_vm_info_via_powervc_vm_info_result.openstack_servers[0].addresses.values() | list | flatten(1) }}'
       loop_control:
         loop_var: network
 

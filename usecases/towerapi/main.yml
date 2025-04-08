@@ -111,7 +111,7 @@
         get_result_retry_delay: 10
 
     - name: Block for when not provision
-      when: not provision|bool
+      when: not provision | bool
       block:
         - name: Pause for host_name
           ansible.builtin.pause:
@@ -121,7 +121,7 @@
           register: host_name
 
     - name: Block for when provision
-      when: provision|bool
+      when: provision | bool
       block:
         - name: Pause for powervc_host
           ansible.builtin.pause:
@@ -199,7 +199,7 @@
           ansible.builtin.include_tasks: add_inventory.yml
 
         - name: Block for when not provision
-          when: not provision|bool
+          when: not provision | bool
           block:
             - name: Step 3 - add new hosts
               ansible.builtin.include_tasks: add_hosts.yml

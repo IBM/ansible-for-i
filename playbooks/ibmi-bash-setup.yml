@@ -16,12 +16,10 @@
         - { src: yum, dest: yum }
       tags: yum
 
-    - name: Install Bash with "latest" version (use "present" for a production env)
-      ansible.builtin.yum:
-        pkg:
-          - bash
-        state: latest    # noqa package-latest
-        update_cache: false
+    - name: Install Bash with latest version
+      # The yum module is removed from Ansible core with version 2.17, so use the raw module to invoke yum until the dnf package arrives for IBM i.
+      ansible.builtin.raw: "/QOpenSys/pkgs/bin/yum install bash -y"
+      changed_when: true
       tags: yum
 
     - name: Define default shell as Bash

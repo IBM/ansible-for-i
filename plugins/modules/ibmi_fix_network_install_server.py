@@ -268,7 +268,7 @@ except ImportError:
     HAS_ITOOLKIT = False
 HAS_IBM_DB = True
 
-__ibmi_module_version__ = "3.2.0"
+__ibmi_module_version__ = "3.2.1"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -1224,6 +1224,8 @@ def main():
         current_device_name = (info_return['Virtual_Device_Name']).strip()
         if ((current_device_name != "") and (current_device_name.upper() != device_name.strip().upper())):
             module.fail_json(msg="Incorrect device_name input: " + device_name)
+
+    image_catalog_entries = []
 
     if operation == 'setup_only':
         rc, out, err, command_log = setup_operation(ibmi_module, module, image_catalog_name, device_name, image_catalog_directory, rollback)

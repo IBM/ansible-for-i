@@ -1,17 +1,17 @@
 ---
 - name: Set result and id
   ansible.builtin.set_fact:
-    result: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).result }}"
-    id: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).id }}"
+    result: "{{ (report | selectattr('id', 'search', check_item.id) | list | first).result }}"
+    id: "{{ (report | selectattr('id', 'search', check_item.id) | list | first).id }}"
 
 - name: Block for when result == 'FAIL' and id != '3.10A' and id != '3.10B'
   when: result == 'FAIL' and id != '3.10A' and id != '3.10B'
   block:
     - name: Set desc, vulnerables, remediation
       ansible.builtin.set_fact:
-        desc: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).desc }}"
-        vulnerables: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).vulnerables }}"
-        remediation: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).remediation }}"
+        desc: "{{ (report | selectattr('id', 'search', check_item.id) | list | first).desc }}"
+        vulnerables: "{{ (report | selectattr('id', 'search', check_item.id) | list | first).vulnerables }}"
+        remediation: "{{ (report | selectattr('id', 'search', check_item.id) | list | first).remediation }}"
     - name: Block for when id != '3.2'
       when: id != '3.2'
       block:
@@ -35,7 +35,7 @@
       block:
         - name: Set failed_by
           ansible.builtin.set_fact:
-            failed_by: "{{ (report |  selectattr('id', 'search', check_item.id) | list | first).failed_by }}"
+            failed_by: "{{ (report | selectattr('id', 'search', check_item.id) | list | first).failed_by }}"
         - name: Prompt for fix actions
           ansible.builtin.pause:
             prompt: |
@@ -64,11 +64,11 @@
               with_items: "{{ user_choice_mode.split(',') }}"
             - name: Remediation successfully
               ansible.builtin.set_fact:
-                success_list: "{{ success_list + [ id ] }}"
+                success_list: "{{ success_list + [id] }}"
           rescue:
             - name: Remediation failed
               ansible.builtin.set_fact:
-                fail_list: "{{ fail_list + [ id ] }}"
+                fail_list: "{{ fail_list + [id] }}"
 
         - name: Block for when user_choice_mode | length > 0 and user_choice_mode == 'A'
           when: user_choice_mode | length > 0 and user_choice_mode == 'A'
@@ -81,11 +81,11 @@
               with_items: "{{ vulnerables.split(',') }}"
             - name: Remediation successfully
               ansible.builtin.set_fact:
-                success_list: "{{ success_list + [ id ] }}"
+                success_list: "{{ success_list + [id] }}"
           rescue:
             - name: Remediation failed
               ansible.builtin.set_fact:
-                fail_list: "{{ fail_list + [ id ] }}"
+                fail_list: "{{ fail_list + [id] }}"
 
     - name: Block for when '"USER_NAME_REPLACE" in remediation and id != "3.2"'
       when: '"USER_NAME_REPLACE" in remediation and id != "3.2"'
@@ -101,11 +101,11 @@
               with_items: "{{ user_choice_mode.split(',') }}"
             - name: Remediation successfully
               ansible.builtin.set_fact:
-                success_list: "{{ success_list + [ id ] }}"
+                success_list: "{{ success_list + [id] }}"
           rescue:
             - name: Remediation failed
               ansible.builtin.set_fact:
-                fail_list: "{{ fail_list + [ id ] }}"
+                fail_list: "{{ fail_list + [id] }}"
 
         - name: Block for when user_choice_mode | length > 0 and user_choice_mode == 'A'
           when: user_choice_mode | length > 0 and user_choice_mode == 'A'
@@ -118,11 +118,11 @@
               with_items: "{{ vulnerables.split(',') }}"
             - name: Remediation successfully
               ansible.builtin.set_fact:
-                success_list: "{{ success_list + [ id ] }}"
+                success_list: "{{ success_list + [id] }}"
           rescue:
             - name: Remediation failed
               ansible.builtin.set_fact:
-                fail_list: "{{ fail_list + [ id ] }}"
+                fail_list: "{{ fail_list + [id] }}"
 
     - name: Block for when id == '3.2'
       when: id == '3.2'
@@ -145,11 +145,11 @@
                 - "{{ failed_by.split(',') }}"
             - name: Remediation successfully
               ansible.builtin.set_fact:
-                success_list: "{{ success_list + [ id ] }}"
+                success_list: "{{ success_list + [id] }}"
           rescue:
             - name: Remediation failed
               ansible.builtin.set_fact:
-                fail_list: "{{ fail_list + [ id ] }}"
+                fail_list: "{{ fail_list + [id] }}"
 
     - name: Block for when id == '5.1' or id == '5.2'
       when: id == '5.1' or id == '5.2'
@@ -161,11 +161,11 @@
             become_user_password: '{{ become_user_password }}'
         - name: Remediation successfully
           ansible.builtin.set_fact:
-            success_list: "{{ success_list + [ id ] }}"
+            success_list: "{{ success_list + [id] }}"
       rescue:
         - name: Remediation failed
           ansible.builtin.set_fact:
-            fail_list: "{{ fail_list + [ id ] }}"
+            fail_list: "{{ fail_list + [id] }}"
 
     - name: Block for when user_choice_mode | length == 0
       when: user_choice_mode | length == 0
@@ -175,4 +175,4 @@
             msg: User cancelled.
         - name: Write skip list
           ansible.builtin.set_fact:
-            skip_list: "{{ skip_list + [ id ] }}"
+            skip_list: "{{ skip_list + [id] }}"

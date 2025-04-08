@@ -17,8 +17,8 @@
   gather_facts: false
 
   vars:
-    check_ptfs_by_product_against_fix_repo_product: "{{product}}"
-    check_ptfs_by_product_against_fix_repo_repo_server: "{{repo_server}}"
+    check_ptfs_by_product_against_fix_repo_product: "{{ product }}"
+    check_ptfs_by_product_against_fix_repo_repo_server: "{{ repo_server }}"
 
   tasks:
     - name: Compare the product ptfs

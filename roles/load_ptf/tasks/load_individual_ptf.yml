@@ -16,14 +16,14 @@
 
 - name: Log success in result
   ansible.builtin.set_fact:
-    load_ptf_load_success_list: "{{ load_ptf_load_success_list|default([]) + [ load_ptf ] }}"
+    load_ptf_load_success_list: "{{ load_ptf_load_success_list | default([]) + [load_ptf] }}"
   when: load_result.failed == 0
 
 - name: Log load_fail_dict in load_fail_list
   ansible.builtin.set_fact:
-    load_ptf_load_fail_list: "{{ load_ptf_load_fail_list | default([]) + [ load_ptf ] }}"
+    load_ptf_load_fail_list: "{{ load_ptf_load_fail_list | default([]) + [load_ptf] }}"
     load_ptf_load_fail_dict: "{{ load_ptf_load_fail_dict | default({}) |
-      combine(load_result.load_fail_dict | default({ 'UNDEFINED' : 'LOAD_FAIL' })) }}"
+      combine(load_result.load_fail_dict | default({'UNDEFINED': 'LOAD_FAIL'})) }}"
   when: load_result.failed != 0
 
 # - name: Log fail dict in result

@@ -49,7 +49,7 @@
 
     - name: Compose src_list
       ansible.builtin.set_fact:
-        image_src_list: "{{ image_src_list | default([]) + [{ 'src': find_result_var.path, 'dest': find_result_var.path | dirname }] }}"
+        image_src_list: "{{ image_src_list | default([]) + [{'src': find_result_var.path, 'dest': find_result_var.path | dirname}] }}"
       loop: "{{ find_result.files }}"
       loop_control:
         loop_var: find_result_var

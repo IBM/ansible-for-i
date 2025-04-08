@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 from ansible.errors import AnsibleError
 from ansible.errors import AnsibleConnectionFailure
@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 
 display = Display()
 
-__ibmi_module_version__ = "3.2.0"
+__ibmi_module_version__ = "3.2.1"
 
 
 class TimedOutException(Exception):
@@ -204,7 +204,7 @@ class ActionModule(RebootActionModule, ActionBase):
         display.vvv(f'{self._task.action}: perform_reboot: become to user: {become_user}')
         become_user_password = self._task.args.get('become_user_password')
         result = {}
-        result['start'] = datetime.utcnow()
+        result['start'] = datetime.now(timezone.utc)
         try:
             self.validate_int()
             shutdown_command_args = self.get_shutdown_command_args(distribution)
@@ -238,7 +238,7 @@ class ActionModule(RebootActionModule, ActionBase):
         display.vvv(f"{self._task.action}: Waiting for {delay_time} seconds to reboot")
         time.sleep(int(delay_time))
         display.vvv(f"{self._task.action}: rebooting server with command '{reboot_command}'")
-        result['start'] = datetime.utcnow()
+        result['start'] = datetime.now(timezone.utc)
         try:
             module_output = self._execute_module(
                 task_vars=task_vars,
@@ -249,7 +249,7 @@ class ActionModule(RebootActionModule, ActionBase):
                     "become_user_password": become_user_password
                 }
             )
-            result['start'] = datetime.utcnow()
+            result['start'] = datetime.now(timezone.utc)
             reboot_result = module_output
             if reboot_result['rc'] != 0:
                 stdout = reboot_result['stdout']

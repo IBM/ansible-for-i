@@ -66,7 +66,7 @@
 
     - name: rmvjobsche
       ibmi_cl_command:
-        cmd: 'RMVJOBSCDE JOB(TESTALL)'
+        cmd: 'RMVJOBSCDE JOB(TESTALL) ENTRYNBR(*ALL)'
       when: "system_values['QLANGID'] == 'ENU'"
 
     - name: TC03 schedule job with addtional parameters options
@@ -89,7 +89,7 @@
 
     - name: TC03 rmvjobsche
       ibmi_cl_command:
-        cmd: 'RMVJOBSCDE JOB(TESTALL)'
+        cmd: 'RMVJOBSCDE JOB(TESTALL) ENTRYNBR(*ALL)'
 
     # test negative test cases
     - name: TC04 schedule job with invalid job_name
@@ -242,7 +242,7 @@
 
     - name: rmvjobsche
       ibmi_cl_command:
-        cmd: 'RMVJOBSCDE JOB(TESTALL)'
+        cmd: 'RMVJOBSCDE JOB(TESTALL) ENTRYNBR(*ALL)'
       ignore_errors: true
 
     - name: delete script local

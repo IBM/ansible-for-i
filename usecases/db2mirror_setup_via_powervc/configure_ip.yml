@@ -17,11 +17,11 @@
     apply:
       delegate_to: source
   vars:
-    present_ip_interface_mac_address_of_ethernet_port: '{{ display_network_info_via_powervc_interface_info.mac_addr.upper().split(":") |join() }}'
+    present_ip_interface_mac_address_of_ethernet_port: '{{ display_network_info_via_powervc_interface_info.mac_addr.upper().split(":") | join() }}'
     present_ip_interface_ip_address: '{{ ip_info.1.ip_address }}'
     present_ip_interface_next_hop: '{{ ip_info.0.gateway_ip }}'
     present_ip_interface_netmask: "{{ ip_info.0.cidr | ansible.utils.ipaddr('netmask') }}"
   when: ip_info.0.id == ip_info.1.subnet_id and ip_info.0.ip_version == 4
-  loop: "{{ display_network_info_via_powervc_interface_info.subnet | product(display_network_info_via_powervc_interface_info.fixed_ips) |list }}"
+  loop: "{{ display_network_info_via_powervc_interface_info.subnet | product(display_network_info_via_powervc_interface_info.fixed_ips) | list }}"
   loop_control:
     loop_var: ip_info

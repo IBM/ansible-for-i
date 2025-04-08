@@ -16,10 +16,10 @@
 
 - name: Compose apply success list
   ansible.builtin.set_fact:
-    apply_loaded_success_list: "{{ apply_loaded_success_list | default([]) + [ already_loaded_list_var.ptf_id ] }}"
+    apply_loaded_success_list: "{{ apply_loaded_success_list | default([]) + [already_loaded_list_var.ptf_id] }}"
   when: ibmi_fix_result.rc == 0
 
 - name: Compose apply fail list
   ansible.builtin.set_fact:
-    apply_loaded_fail_list: "{{ apply_loaded_fail_list | default([]) + [ already_loaded_list_var.ptf_id ] }}"
+    apply_loaded_fail_list: "{{ apply_loaded_fail_list | default([]) + [already_loaded_list_var.ptf_id] }}"
   when: ibmi_fix_result.rc != 0

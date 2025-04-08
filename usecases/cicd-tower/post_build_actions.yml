@@ -16,7 +16,7 @@
       ibm.power_ibmi.ibmi_cl_command:
         cmd: CALL {{ build_lib }}/SENDMSG
       register: callpgm
-      when: build_with_stmfs|bool
+      when: build_with_stmfs | bool
       delegate_to: '{{ item }}'
       with_items:
         - "{{ host_names.split() }}"
@@ -25,7 +25,7 @@
       ibm.power_ibmi.ibmi_cl_command:
         cmd: CALL {{ build_lib }}/SAMPLECL
       register: callpgm
-      when: not build_with_stmfs|bool
+      when: not build_with_stmfs | bool
       delegate_to: '{{ item }}'
       with_items:
         - "{{ host_names.split() }}"

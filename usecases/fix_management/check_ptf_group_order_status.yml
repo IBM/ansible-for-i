@@ -51,7 +51,7 @@
 
       - name: Compose downloading order id list
         ansible.builtin.set_fact:
-         downloading_order_id_list: "{{ downloading_order_id_list|default([]) + [ order_info.order_id ] }}"
+         downloading_order_id_list: "{{ downloading_order_id_list | default([]) + [order_info.order_id] }}"
         loop: '{{ downloading_order_info_list }}'
         loop_control:
          loop_var: order_info
@@ -63,7 +63,7 @@
 
       - name: Compose complete order id list
         ansible.builtin.set_fact:
-         complete_order_id_list: "{{ complete_order_id_list|default([]) + [ order.order_id ] }}"
+         complete_order_id_list: "{{ complete_order_id_list | default([]) + [order.order_id] }}"
         loop: '{{ result_ds.status }}'
         loop_control:
          loop_var: order
@@ -72,8 +72,8 @@
       - name: Compose parameters to update order download status
         ansible.builtin.set_fact:
          formatted_order_list:
-          "{{ formatted_order_list|default([]) +
-          [{ 'order_id': order_info.order_id, 'file_path': order_info.file_path, 'download_status': 'DOWNLOADED' }] }}"
+          "{{ formatted_order_list | default([]) +
+          [{'order_id': order_info.order_id, 'file_path': order_info.file_path, 'download_status': 'DOWNLOADED'}] }}"
         when: order_info.order_id in complete_order_id_list
         loop: '{{ downloading_order_info_list }}'
         loop_control:

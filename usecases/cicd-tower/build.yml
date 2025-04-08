@@ -51,13 +51,13 @@
     - name: Call CL command to build application
       ibm.power_ibmi.ibmi_cl_command:
         cmd: CRTBNDCPP PGM({{ build_lib }}/SENDMSG) SRCSTMF('{{ build_path }}/sendMsg.c')
-      when: build_with_stmfs|bool
+      when: build_with_stmfs | bool
       delegate_to: '{{ item }}'
       with_items:
         - "{{ host_names.split() }}"
 
     - name: Block for when not build_with_stmfs
-      when: not build_with_stmfs|bool
+      when: not build_with_stmfs | bool
       block:
         - name: CRTSRCPF on remote IBM i
           ibm.power_ibmi.ibmi_cl_command:

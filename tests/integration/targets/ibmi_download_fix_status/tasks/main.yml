@@ -42,8 +42,8 @@
     assert:
       that:
         - ds.status is defined 
-        - ds.status[0]['order_id'] == "{{download_ptf_group_result.order_id}}"
-        - ds.status[0]['file_path'] == "{{download_ptf_group_result.file_path}}"
+        - ds.status[0]['order_id'] == download_ptf_group_result.order_id
+        - ds.status[0]['file_path'] == download_ptf_group_result.file_path
         - ds.status[0]['download_status'] == "DOWNLOADED"
         - ds.status[0]['complete_time'] != "UNKNOWN"
 

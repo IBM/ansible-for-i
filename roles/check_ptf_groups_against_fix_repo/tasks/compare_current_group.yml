@@ -33,14 +33,14 @@
 
 - name: Compose ptf status list on targret system
   ansible.builtin.set_fact:
-    ptfs_on_system: "{{ ptfs_on_system | default({}) | combine({ ptf.PTF_IDENTIFIER: ptf.PTF_LOADED_STATUS }) }}"
+    ptfs_on_system: "{{ ptfs_on_system | default({}) | combine({ptf.PTF_IDENTIFIER: ptf.PTF_LOADED_STATUS}) }}"
   with_list: "{{ ptf_info.ptf_list }}"
   loop_control:
     loop_var: ptf
 
 - name: PTF does not exist
   ansible.builtin.set_fact:
-    ptf_not_installed: "{{ ptf_not_installed | default([]) + [{ 'PTF_IDENTIFIER': ptf.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT' }] }}"
+    ptf_not_installed: "{{ ptf_not_installed | default([]) + [{'PTF_IDENTIFIER': ptf.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT'}] }}"
   when:
     - not ptfs_on_system.get(ptf.ptf_id)
     - ptf.product in product_list
@@ -50,7 +50,7 @@
 
 - name: PTF exists but status is not APPLIED, PERMANENTLY APPLIED or SUPERSEDED
   ansible.builtin.set_fact:
-    ptf_not_installed: "{{ ptf_not_installed | default([]) + [{ 'PTF_IDENTIFIER': ptf.PTF_IDENTIFIER, 'PTF_LOADED_STATUS': ptf.PTF_LOADED_STATUS }] }}"
+    ptf_not_installed: "{{ ptf_not_installed | default([]) + [{'PTF_IDENTIFIER': ptf.PTF_IDENTIFIER, 'PTF_LOADED_STATUS': ptf.PTF_LOADED_STATUS}] }}"
   when:
     - ptf.PTF_LOADED_STATUS != "APPLIED"
     - ptf.PTF_LOADED_STATUS != "PERMANENTLY APPLIED"
@@ -64,5 +64,5 @@
 - name: Compose group_status
   ansible.builtin.set_fact:
     check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([])
-      + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level,
-           'PTF_GROUP_STATUS': 'NOT INSTALLED', 'PTF_NOT_INSTALLED': ptf_not_installed }] }}"
+      + [{'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level,
+          'PTF_GROUP_STATUS': 'NOT INSTALLED', 'PTF_NOT_INSTALLED': ptf_not_installed}] }}"

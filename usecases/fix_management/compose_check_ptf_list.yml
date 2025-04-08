@@ -9,7 +9,7 @@
 
 - name: Compose ptf_dict
   ansible.builtin.set_fact:
-    ptf_dict: "{{ ptf_dict|default({}) | combine({'ptf_id': ptf_find_result_var.query_item.ptf, 'product': ordered_ptf_var.product, \
+    ptf_dict: "{{ ptf_dict | default({}) | combine({'ptf_id': ptf_find_result_var.query_item.ptf, 'product': ordered_ptf_var.product, \
     'release': ordered_ptf_var.vrm, 'file_path': ptf_find_result_var.query_result[0].image_path}) }}"
   when: ordered_ptf_var.ptf == ptf_find_result_var.query_item.ptf
   loop: "{{ ptf_find_result_var.query_result[0].ordered_ptf }}"
@@ -22,4 +22,4 @@
 
 - name: Compose check_ptf_list
   ansible.builtin.set_fact:
-    check_ptf_list: "{{ check_ptf_list|default([]) + [ptf_dict] }}"
+    check_ptf_list: "{{ check_ptf_list | default([]) + [ptf_dict] }}"

@@ -40,7 +40,7 @@
                       {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
                 - name: Set success_list
                   ansible.builtin.set_fact:
-                    success_list: "{{ success_list + [ check_item.name ] }}"
+                    success_list: "{{ success_list + [check_item.name] }}"
 
             - name: Block for when remediate.rc != 0
               when: remediate.rc != 0
@@ -51,7 +51,7 @@
                       {{ check_item.name }} Remediation failed.
                 - name: Print fail_list
                   ansible.builtin.set_fact:
-                    fail_list: "{{ fail_list + [ check_item.name ] }}"
+                    fail_list: "{{ fail_list + [check_item.name] }}"
 
         - name: Block for when user_choice_mode != 'Y'
           when: user_choice_mode != 'Y'
@@ -61,7 +61,7 @@
                 msg: User cancelled
             - name: Print skip_list
               ansible.builtin.set_fact:
-                skip_list: "{{ skip_list + [ check_item.name ] }}"
+                skip_list: "{{ skip_list + [check_item.name] }}"
 
     - name: Block for when name == "QAUTOVRT"
       when: check_item.name == "QAUTOVRT"
@@ -98,7 +98,7 @@
                       QAUTOVRT Remediation completes, you can re-run check only mode to see the change.
                 - name: Set success_list
                   ansible.builtin.set_fact:
-                    success_list: "{{ success_list + [ 'QAUTOVRT' ] }}"
+                    success_list: "{{ success_list + ['QAUTOVRT'] }}"
 
             - name: Block for remediate.rc != 0
               when: remediate.rc != 0
@@ -109,7 +109,7 @@
                       QAUTOVRT Remediation failed.
                 - name: Set fail_list
                   ansible.builtin.set_fact:
-                    fail_list: "{{ fail_list + [ 'QAUTOVRT' ] }}"
+                    fail_list: "{{ fail_list + ['QAUTOVRT'] }}"
 
         - name: Block for user_input | length == 0
           when: qautovrt_user.user_input | length == 0
@@ -119,7 +119,7 @@
                 msg: User cancelled
             - name: Set skip_list
               ansible.builtin.set_fact:
-                skip_list: "{{ skip_list + [ 'QAUTOVRT' ] }}"
+                skip_list: "{{ skip_list + ['QAUTOVRT'] }}"
 
     - name: Case name == "QLMTDEVSSN"
       when: check_item.name == "QLMTDEVSSN"
@@ -156,7 +156,7 @@
                       QLMTDEVSSN Remediation completes, you can re-run check only mode to see the change.
                 - name: Set success_list
                   ansible.builtin.set_fact:
-                    success_list: "{{ success_list + [ 'QLMTDEVSSN' ] }}"
+                    success_list: "{{ success_list + ['QLMTDEVSSN'] }}"
 
             - name: Block when rc != 0
               when: remediate.rc != 0
@@ -167,7 +167,7 @@
                       QLMTDEVSSN Remediation failed.
                 - name: Set fail_list
                   ansible.builtin.set_fact:
-                    fail_list: "{{ fail_list + [ 'QLMTDEVSSN' ] }}"
+                    fail_list: "{{ fail_list + ['QLMTDEVSSN'] }}"
 
         - name: Block for user cancel
           when: qlmtdevssn_user.user_input | trim | length == 0
@@ -177,7 +177,7 @@
                 msg: User cancelled
             - name: Display skip_list
               ansible.builtin.set_fact:
-                skip_list: "{{ skip_list + [ 'QLMTDEVSSN' ] }}"
+                skip_list: "{{ skip_list + ['QLMTDEVSSN'] }}"
 
     - name: Block for name == "QUSEADPAUT"
       when: check_item.name == "QUSEADPAUT"
@@ -231,7 +231,7 @@
                       QUSEADPAUT Remediation completes, you can re-run check only mode to see the change.
                 - name: Display success_list
                   ansible.builtin.set_fact:
-                    success_list: "{{ success_list + [ 'QUSEADPAUT' ] }}"
+                    success_list: "{{ success_list + ['QUSEADPAUT'] }}"
 
             - name: Block when remediate.rc != 0
               when: remediate.rc != 0
@@ -242,7 +242,7 @@
                       QUSEADPAUT Remediation failed.
                 - name: Display fail_list
                   ansible.builtin.set_fact:
-                    fail_list: "{{ fail_list + [ 'QUSEADPAUT' ] }}"
+                    fail_list: "{{ fail_list + ['QUSEADPAUT'] }}"
 
         - name: Block when quseadpaut_user_mode == 'N' or quseadpaut_user_mode | length == 0
           when: quseadpaut_user_mode == 'N' or quseadpaut_user_mode | length == 0
@@ -252,7 +252,7 @@
                 msg: User cancelled
             - name: Set skip_list
               ansible.builtin.set_fact:
-                skip_list: "{{ skip_list + [ 'QUSEADPAUT' ] }}"
+                skip_list: "{{ skip_list + ['QUSEADPAUT'] }}"
 
     - name: Block when check_item.name == "QSYSLIBL"
       when: check_item.name == "QSYSLIBL"
@@ -293,7 +293,7 @@
 
             - name: Set success_list
               ansible.builtin.set_fact:
-                success_list: "{{ success_list + [ 'QSYSLIBL' ] }}"
+                success_list: "{{ success_list + ['QSYSLIBL'] }}"
 
           rescue:
             - name: Failure message
@@ -302,7 +302,7 @@
                   QSYSLIBL Remediation failed.
             - name: Set fail_list
               ansible.builtin.set_fact:
-                fail_list: "{{ fail_list + [ 'QSYSLIBL' ] }}"
+                fail_list: "{{ fail_list + ['QSYSLIBL'] }}"
 
         - name: Block when qsyslib_user_mode == 'N' or qsyslib_user_mode | length == 0
           when: qsyslib_user_mode == 'N' or qsyslib_user_mode | length == 0
@@ -312,7 +312,7 @@
                 msg: User cancelled
             - name: Set skip_list
               ansible.builtin.set_fact:
-                skip_list: "{{ skip_list + [ 'QSYSLIBL' ] }}"
+                skip_list: "{{ skip_list + ['QSYSLIBL'] }}"
 
     - name: Block when check_item.name == "QAUTOCFG"
       when: check_item.name == "QAUTOCFG"
@@ -350,7 +350,7 @@
                       {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
                 - name: Set success_list
                   ansible.builtin.set_fact:
-                    success_list: "{{ success_list + [ check_item.name ] }}"
+                    success_list: "{{ success_list + [check_item.name] }}"
 
             - name: Block when remediate.rc != 0
               when: remediate.rc != 0
@@ -361,7 +361,7 @@
                       {{ check_item.name }} Remediation failed.
                 - name: Set fail_list
                   ansible.builtin.set_fact:
-                    fail_list: "{{ fail_list + [ check_item.name ] }}"
+                    fail_list: "{{ fail_list + [check_item.name] }}"
 
         - name: Block when qautocfg_choice_mode != 'N' or qautocfg_choice_mode | length == 0
           when: qautocfg_choice_mode != 'N' or qautocfg_choice_mode | length == 0
@@ -371,7 +371,7 @@
                 msg: User cancelled
             - name: Set skip_list
               ansible.builtin.set_fact:
-                skip_list: "{{ skip_list + [ check_item.name ] }}"
+                skip_list: "{{ skip_list + [check_item.name] }}"
 
     - name: Block when check_item.name == "QPWDRQDDIF"
       when: check_item.name == "QPWDRQDDIF"
@@ -409,7 +409,7 @@
                       {{ check_item.name }} Remediation completes, you can re-run check only mode to see the change.
                 - name: Set success_list
                   ansible.builtin.set_fact:
-                    success_list: "{{ success_list + [ check_item.name ] }}"
+                    success_list: "{{ success_list + [check_item.name] }}"
 
             - name: Block for when remediate.rc != 0
               when: remediate.rc != 0
@@ -420,7 +420,7 @@
                       {{ check_item.name }} Remediation failed.
                 - name: Set fail_list
                   ansible.builtin.set_fact:
-                    fail_list: "{{ fail_list + [ check_item.name ] }}"
+                    fail_list: "{{ fail_list + [check_item.name] }}"
 
         - name: Block for when qpwdrqddif_choice_mode != 'N' or qpwdrqddif_choice_mode | length == 0
           when: qpwdrqddif_choice_mode != 'N' or qpwdrqddif_choice_mode | length == 0
@@ -430,4 +430,4 @@
                 msg: User cancelled
             - name: Set skip_list
               ansible.builtin.set_fact:
-                skip_list: "{{ skip_list + [ check_item.name ] }}"
+                skip_list: "{{ skip_list + [check_item.name] }}"

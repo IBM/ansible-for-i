@@ -43,7 +43,7 @@
 - name: Set check31_result
   ansible.builtin.set_fact:
     check31_result: "{{ check31_result | default({}) |
-      combine ({ item.key : item.value }) }}"
+      combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.1'}
     - {'key': 'desc', 'value': '3.1 PUBLIC authority to all user
@@ -98,7 +98,7 @@
 - name: Set check32_result
   ansible.builtin.set_fact:
     check32_result: "{{ check32_result | default({}) |
-      combine ({ item.key : item.value }) }}"
+      combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.2'}
     - {'key': 'desc', 'value': "3.2 All Private authorities to all user
@@ -130,7 +130,7 @@
         check33_failed_items: "{{ check33.row | map(attribute='SYS_ONAME') | join(', ') }}"
     - name: Set check33_result
       ansible.builtin.set_fact:
-        check33_result: "{{ check33_result | default({}) | combine ({ item.key : item.value }) }}"
+        check33_result: "{{ check33_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '3.3'}
         - {'key': 'desc', 'value': "3.3 All IBM Supplied Profiles shall be owned by QSYS
@@ -144,7 +144,7 @@
 
 - name: Set check33_result
   ansible.builtin.set_fact:
-    check33_result: "{{ check33_result | default({}) | combine ({ item.key : item.value }) }}"
+    check33_result: "{{ check33_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.3'}
     - {'key': 'desc', 'value': "3.3 All IBM Supplied Profiles shall be owned by QSYS with the
@@ -176,10 +176,10 @@
   block:
     - name: Set check36_failed_items
       ansible.builtin.set_fact:
-        check36_failed_items: "{{ check36.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+        check36_failed_items: "{{ check36.row | map(attribute='USER_NAME') | unique | join(', ') }}"
     - name: Set check36_result
       ansible.builtin.set_fact:
-        check36_result: "{{ check36_result | default({}) | combine ({ item.key : item.value }) }}"
+        check36_result: "{{ check36_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '3.6'}
         - {'key': 'desc', 'value': "3.6 Default passwords provide an opportunity for someone to enter your system,
@@ -194,7 +194,7 @@
 
 - name: Set check36_result
   ansible.builtin.set_fact:
-    check36_result: "{{ check36_result | default({}) | combine ({ item.key : item.value }) }}"
+    check36_result: "{{ check36_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.6'}
     - {'key': 'desc', 'value': "3.6 Default passwords provide an opportunity for someone to enter your system,
@@ -224,10 +224,10 @@
   block:
     - name: Set check37_failed_items
       ansible.builtin.set_fact:
-        check37_failed_items: "{{ check37.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+        check37_failed_items: "{{ check37.row | map(attribute='USER_NAME') | unique | join(', ') }}"
     - name: Set check37_result
       ansible.builtin.set_fact:
-        check37_result: "{{ check37_result | default({}) | combine ({ item.key : item.value }) }}"
+        check37_result: "{{ check37_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '3.7'}
         - {'key': 'desc', 'value': "3.7 Disable inactive user profiles within 90 days."}
@@ -237,7 +237,7 @@
 
 - name: Set check37_result
   ansible.builtin.set_fact:
-    check37_result: "{{ check37_result | default({}) | combine ({ item.key : item.value }) }}"
+    check37_result: "{{ check37_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.7'}
     - {'key': 'desc', 'value': "3.7 Disable inactive user profiles within 90 days."}
@@ -266,10 +266,10 @@
   block:
     - name: Set check38_failed_items
       ansible.builtin.set_fact:
-        check38_failed_items: "{{ check38.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+        check38_failed_items: "{{ check38.row | map(attribute='USER_NAME') | unique | join(', ') }}"
     - name: Set check38_result
       ansible.builtin.set_fact:
-        check38_result: "{{ check38_result | default({}) | combine ({ item.key : item.value }) }}"
+        check38_result: "{{ check38_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '3.8'}
         - {'key': 'desc', 'value': "3.8 User Profiles with non-expiring passwords are never required to change their
@@ -286,7 +286,7 @@
 
 - name: Set check38_result
   ansible.builtin.set_fact:
-    check38_result: "{{ check38_result | default({}) | combine ({ item.key : item.value }) }}"
+    check38_result: "{{ check38_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.8'}
     - {'key': 'desc', 'value': "3.8 User Profiles with non-expiring passwords are never required to change their
@@ -315,10 +315,10 @@
   block:
     - name: Set check39_failed_items
       ansible.builtin.set_fact:
-        check39_failed_items: "{{ check39.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+        check39_failed_items: "{{ check39.row | map(attribute='USER_NAME') | unique | join(', ') }}"
     - name: Set check39_result
       ansible.builtin.set_fact:
-        check39_result: "{{ check39_result | default({}) | combine ({ item.key : item.value }) }}"
+        check39_result: "{{ check39_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '3.9'}
         - {'key': 'desc', 'value': "3.9 User Profiles with command line access can run commands
@@ -329,7 +329,7 @@
 
 - name: Set check39_result
   ansible.builtin.set_fact:
-    check39_result: "{{ check39_result | default({}) | combine ({ item.key : item.value }) }}"
+    check39_result: "{{ check39_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.9'}
     - {'key': 'desc', 'value': "3.9 User Profiles with command line access can run commands they are
@@ -359,7 +359,7 @@
   block:
     - name: Set check310a_result
       ansible.builtin.set_fact:
-        check310a_result: "{{ check310a_result | default({}) | combine ({ item.key : item.value }) }}"
+        check310a_result: "{{ check310a_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '3.10A'}
         - {'key': 'desc', 'value': "3.10A Check some parameters if they  match the
@@ -390,7 +390,7 @@
 
 - name: Set check310a_result
   ansible.builtin.set_fact:
-    check310a_result: "{{ check310a_result | default({}) | combine ({ item.key : item.value }) }}"
+    check310a_result: "{{ check310a_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.10A'}
     - {'key': 'desc', 'value': "3.10A Check some parameters if they match the default values
@@ -414,7 +414,7 @@
   block:
     - name: Set check310b_result
       ansible.builtin.set_fact:
-        check310b_result: "{{ check310b_result | default({}) | combine ({ item.key : item.value }) }}"
+        check310b_result: "{{ check310b_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '3.10B'}
         - {'key': 'desc', 'value': "3.10B To check if IBM Supplied Profiles are being used as Group Profiles."}
@@ -455,7 +455,7 @@
 
 - name: Set check310b_result
   ansible.builtin.set_fact:
-    check310b_result: "{{ check310b_result | default({}) | combine ({ item.key : item.value }) }}"
+    check310b_result: "{{ check310b_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.10B'}
     - {'key': 'desc', 'value': "3.10B To check if IBM Supplied Profiles are being used as Group Profiles."}
@@ -479,10 +479,10 @@
   block:
     - name: Set check311_failed_items
       ansible.builtin.set_fact:
-        check311_failed_items: "{{ check311.row | map(attribute='USER_NAME') |unique | join(', ') }}"
+        check311_failed_items: "{{ check311.row | map(attribute='USER_NAME') | unique | join(', ') }}"
     - name: Set check311_result
       ansible.builtin.set_fact:
-        check311_result: "{{ check311_result | default({}) | combine ({ item.key : item.value }) }}"
+        check311_result: "{{ check311_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '3.11'}
         - {'key': 'desc', 'value': "Group profiles should not have a password as they are usually
@@ -493,7 +493,7 @@
 
 - name: Set check311_result
   ansible.builtin.set_fact:
-    check311_result: "{{ check311_result | default({}) | combine ({ item.key : item.value }) }}"
+    check311_result: "{{ check311_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '3.11'}
     - {'key': 'desc', 'value': "Group profiles should not have a password as they are usually
@@ -514,7 +514,7 @@
   block:
     - name: Set check51_result
       ansible.builtin.set_fact:
-        check51_result: "{{ check51_result | default({}) | combine ({ item.key : item.value }) }}"
+        check51_result: "{{ check51_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '5.1'}
         - {'key': 'desc', 'value': "QSECOFR Profile Shall Be DISABLED."}
@@ -524,7 +524,7 @@
 
 - name: Set check51_result
   ansible.builtin.set_fact:
-    check51_result: "{{ check51_result | default({}) | combine ({ item.key : item.value }) }}"
+    check51_result: "{{ check51_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '5.1'}
     - {'key': 'desc', 'value': "QSECOFR Profile Shall Be DISABLED."}
@@ -545,7 +545,7 @@
   block:
     - name: Set check52_result
       ansible.builtin.set_fact:
-        check52_result: "{{ check52_result | default({}) | combine ({ item.key : item.value }) }}"
+        check52_result: "{{ check52_result | default({}) | combine({item.key: item.value}) }}"
       with_items:
         - {'key': 'id', 'value': '5.2'}
         - {'key': 'desc', 'value': "QSECOFR Shall Not be Configured as a Group Profile."}
@@ -555,7 +555,7 @@
 
 - name: Set check52_result
   ansible.builtin.set_fact:
-    check52_result: "{{ check52_result | default({}) | combine ({ item.key : item.value }) }}"
+    check52_result: "{{ check52_result | default({}) | combine({item.key: item.value}) }}"
   with_items:
     - {'key': 'id', 'value': '5.2'}
     - {'key': 'desc', 'value': "QSECOFR Shall Not be Configured as a Group Profile."}
@@ -565,8 +565,8 @@
 - name: Set report
   ansible.builtin.set_fact:
     report: "{{ [check31_result] + [check32_result] + [check33_result] + [check36_result]
-      + [check37_result]  + [check38_result]  + [check39_result] + [check310a_result]
-        + [check310b_result]  + [check311_result]  + [check51_result] + [check52_result]}}"
+      + [check37_result] + [check38_result] + [check39_result] + [check310a_result]
+        + [check310b_result] + [check311_result] + [check51_result] + [check52_result] }}"
 
 - name: Generate report to file
   ansible.builtin.copy:

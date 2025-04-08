@@ -16,21 +16,21 @@
         - { src: yum, dest: yum }
 
     - name: Install useful OSS utils for IBM i PASE
-      ansible.builtin.yum:
-        pkg:
-          - less # text reader
-          - rsync # synchronize files
-          - ibmichroot # chroot for IBM i
-          - ncdu # storage space viewer
-          - chsh # define default shell
-          - mc # file browser
-          - curl # download files
-          - wget # download files
-          - p7zip # 7zip support
-          - jq # sed for JSON data
-          - logrotate # logs file rotation
-          - tmux # terminal multiplexer
-          - bash # shell
-          - nano # text editor
-        state: present
-        update_cache: false
+      # The yum module is removed from Ansible core with version 2.17, so use the raw module to invoke yum until the dnf package arrives for IBM i.
+      ansible.builtin.raw: /QOpenSys/pkgs/bin/yum install
+                              less
+                              rsync
+                              ibmichroot
+                              ncdu
+                              chsh
+                              mc
+                              curl
+                              wget
+                              p7zip
+                              jq
+                              logrotate
+                              tmux
+                              bash
+                              nano
+                              -y
+      changed_when: true

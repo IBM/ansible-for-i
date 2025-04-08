@@ -3,7 +3,7 @@
   hosts: localhost
   tasks:
     - name: Block for when provision
-      when: provision|bool
+      when: provision | bool
       block:
         - name: Step 1.1 - Add PowerVC host to Ansible in-memory inventory ({{ powervc_host }})
           ansible.builtin.add_host:
@@ -27,7 +27,7 @@
             name: '{{ vm_name }}'
             image: '{{ image_name_or_id }}'
             flavor: '{{ flavor_name_or_id }}'
-            verify: '{{ verify_cert | bool}}'
+            verify: '{{ verify_cert | bool }}'
             network: '{{ network }}'
             timeout: '{{ deploy_timeout }}'
             userdata: '{{ deploy_userdata }}'

@@ -55,8 +55,8 @@
           - display_fix_info.requisite_ptf_info[0]['REQUISITE_IS_CONDITIONAL'] is defined
           - display_fix_info.requisite_ptf_info[0]['REQUISITE_IS_REQUIRED'] is defined
           - display_fix_info.requisite_ptf_info[0]['REQUISITE_LOAD_ID'] is defined 
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_MAX_LEVLE'] is defined
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_MIN_LEVLE'] is defined
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_MAX_LEVEL'] is defined
+          - display_fix_info.requisite_ptf_info[0]['REQUISITE_MIN_LEVEL'] is defined
           - display_fix_info.requisite_ptf_info[0]['REQUISITE_OPTION'] is defined
           - display_fix_info.requisite_ptf_info[0]['REQUISITE_PRODUCT_ID'] is defined 
           - display_fix_info.requisite_ptf_info[0]['REQUISITE_PTF_ID'] != ''

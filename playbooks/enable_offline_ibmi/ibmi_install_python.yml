@@ -27,7 +27,7 @@
 
     - name: Set up rpm list
       ansible.builtin.set_fact:
-        rpm_list: "{{  rpm_list|default([]) + [rpm_full_path.split('/')[-1]]  }}"
+        rpm_list: "{{ rpm_list | default([]) + [rpm_full_path.split('/')[-1]] }}"
       loop: "{{ python_file_list.stdout_lines }}"
       loop_control:
         loop_var: rpm_full_path
