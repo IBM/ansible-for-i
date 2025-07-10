@@ -247,7 +247,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.2.1"
+__ibmi_module_version__ = "3.3.0"
 
 
 def main():
@@ -299,6 +299,9 @@ def main():
     become_user = module.params['become_user']
     become_user_password = module.params['become_user_password']
 
+    # Idempotent case: note when the operation was already performed, e.g, a delete operation on a user profile that doesn't exist.
+    operation_done = False
+
     # handle value for special_authority
     if isinstance(special_authority, list) and len(special_authority) > 1:
         single_value = ['*USRCLS', '*NONE', '*SAME']
@@ -312,6 +315,27 @@ def main():
     for item in special_authority:
         authorities = authorities + ' ' + item
     authorities = authorities.strip().upper()
+
+    try:
+        ibmi_module = imodule.IBMiModule(
+            become_user_name=become_user, become_user_password=become_user_password)
+    except Exception as inst:
+        message = f'Exception occurred: {inst}'
+        module.fail_json(rc=999, msg=message)
+
+    # Check to see if the user exists
+    chkobj_cmd = f'QSYS/CHKOBJ OBJ(QSYS/{user}) OBJTYPE(*USRPRF)'
+    ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
+    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(chkobj_cmd)
+    if rc != 0:
+        user_exist = False
+    else:
+        user_exist = True
+
+    # If the user exists, then a create operation is executed as a change operation for idempotency (instead of returning an error).
+    if (operation == 'create') and user_exist:
+        ibmi_util.log_info("A create operation on an existing user profile is executed as a change operation for idempotency" , module._name)
+        operation = 'change'
 
     # convert default value for operation create
     if operation == 'create':
@@ -332,13 +356,6 @@ def main():
         if text == '' or text == '*SAME':
             text = 'Create by Ansible'
 
-    try:
-        ibmi_module = imodule.IBMiModule(
-            become_user_name=become_user, become_user_password=become_user_password)
-    except Exception as inst:
-        message = f'Exception occurred: {inst}'
-        module.fail_json(rc=999, msg=message)
-
     # Check to see if the group exists
     chkobj_cmd = f'QSYS/CHKOBJ OBJ(QSYS/{user_group}) OBJTYPE(*USRPRF)'
     ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
@@ -348,18 +365,10 @@ def main():
     else:
         group_exist = True
 
-    # Check to see if the user exists
-    chkobj_cmd = f'QSYS/CHKOBJ OBJ(QSYS/{user}) OBJTYPE(*USRPRF)'
-    ibmi_util.log_info("Command to run: " + chkobj_cmd, module._name)
-    rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(chkobj_cmd)
-    if rc != 0:
-        user_exist = False
-    else:
-        user_exist = True
-
     if operation == 'create':
         if user_exist:
-            module.fail_json(rc=256, msg=f"User profile {user} already exists")
+            # Case should not occur because treating as a change operation
+            module.fail_json(rc=256, msg=f"Unexpected case where user profile {user} already exists")
         if (user_group != '*NONE') and (not group_exist):
             module.fail_json(rc=256, msg=f"Group profile {user_group} not found")
 
@@ -376,9 +385,10 @@ def main():
             USRCLS({user_class}) SPCAUT({authorities}) GRPPRF({user_group}) OWNER({owner}) TEXT('{text}') {parameters}"
 
     elif operation == 'delete':
-        if not user_exist:
-            module.fail_json(rc=256, msg=f"User profile {user} not found")
         command = f'QSYS/DLTUSRPRF USRPRF({user}) {parameters}'
+        # Idempotency case if user profile does not exist
+        if not user_exist:
+            operation_done = True
 
     elif operation == 'display':
         if not user_exist:
@@ -395,7 +405,10 @@ def main():
         rc, out, err, job_log = ibmi_module.itoolkit_run_sql_once(command)
     else:
         command = ' '.join(command.split())  # keep only one space between adjacent strings
-        rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
+        if operation_done:
+            rc = 0
+        else:
+            rc, out, err, job_log = ibmi_module.itoolkit_run_command_once(command)
 
     if operation == 'display' or operation == 'display_group_members':
         if rc:
@@ -430,13 +443,22 @@ def main():
             message = f'non-zero return code:{rc}'
             module.fail_json(msg=message, **result_failed)
         else:
-            result_success = dict(
-                command=command,
-                stdout=out,
-                rc=rc,
-                job_log=job_log,
-                changed=True,
-            )
+            if operation_done:
+                result_success = dict(
+                    command=command,
+                    stdout='',
+                    rc=rc,
+                    job_log='',
+                    changed=False,
+                )
+            else:
+                result_success = dict(
+                    command=command,
+                    stdout=out,
+                    rc=rc,
+                    job_log=job_log,
+                    changed=True,
+                )
             if not joblog:
                 empty_list = []
                 result_success.update({'job_log': empty_list})

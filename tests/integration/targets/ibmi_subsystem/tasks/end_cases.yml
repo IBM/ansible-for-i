@@ -1,0 +1,210 @@
+# test code for the ibmi_subsystem module end operation
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block:
+    # Tests for end operation
+
+    - name: Print header for end operation testing
+      debug:
+        msg: "Performing end operation test cases"
+
+    - name: TC01 check whether QBATCH is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result_orig
+
+    - name: TC01 start subsystem if it is not running
+      ibmi_subsystem:
+        operation: start
+        subsystem: QBATCH
+        library: QSYS
+      when: sql_result_orig.row | length == 0
+
+    - name: TC02 end the host server if it is running
+      ibmi_subsystem:
+        operation: end
+        subsystem: QBATCH
+        how_to_end: '*IMMED'
+        controlled_end_delay_time: 60
+        end_subsystem_option: '*DFT'
+        parameters: ''
+      register: endsbs_result
+
+    - name: TC02 assert the returned parameters
+      assert:
+        that: 
+          #- "'CPF0943' in endsbs_result.stdout"
+          - endsbs_result.stderr is defined
+          - endsbs_result.stderr_lines is defined 
+          - endsbs_result.stdout_lines is defined
+          - endsbs_result.rc == 0
+          - endsbs_result.job_log == []
+  
+    - name: TC02 pause 20 seconds to wait for sbs end
+      pause: 
+        seconds: 20
+
+    - name: TC02 check whether QBATCH is running
+      ibmi_sql_query:
+        sql: "SELECT * 
+              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: sql_result
+      failed_when: sql_result.row | length != 0 
+
+    - name: TC03 start subsystem with all supported options
+      ibmi_subsystem:
+        operation: start
+        subsystem: QBATCH
+        library: QSYS
+
+    - name: TC03 pause 20 seconds to wait for sbs start
+      pause: 
+        seconds: 20
+
+    - name: TC03 end subsystem with only required options
+      ibmi_subsystem:
+        operation: end
+        subsystem: QBATCH
+        joblog: true
+      register: endsbs_result
+
+    - name: TC03 assert the returned parameters
+      assert:
+        that: 
+          - endsbs_result.stderr is defined
+          - endsbs_result.stderr_lines is defined 
+          - endsbs_result.stdout_lines is defined
+          - endsbs_result.rc == 0
+          - endsbs_result.job_log != []
+
+    - name: TC03 pause 20 seconds to wait for sbs end
+      pause: 
+        seconds: 20
+
+    - name: TC04 start subsystem with default options
+      ibmi_subsystem:
+        operation: start
+        subsystem: QBATCH
+
+    - name: TC04 pause 20 seconds to wait for sbs start 
+      pause: 
+        seconds: 20
+
+    - name: TC04 end the subsystem
+      ibmi_subsystem:
+        operation: end
+        subsystem: QBATCH
+        how_to_end: '*CNTRLD'
+        controlled_end_delay_time: 60
+        end_subsystem_option: ['*NOJOBLOG', '*CHGPTY']
+      register: endsbs_result
+
+    - name: TC04 assert the returned parameters
+      assert:
+        that: 
+          #- "'CPF0943' in endsbs_result.stdout"
+          - endsbs_result.stderr is defined
+          - endsbs_result.stderr_lines is defined 
+          - endsbs_result.stdout_lines is defined
+          - endsbs_result.rc == 0
+
+    - name: TC05 Idempotent end case, end an inactive subsystem
+      ibmi_subsystem:
+        operation: end
+        subsystem: QBATCH          
+      register: endsbs_result
+      failed_when: "endsbs_result.rc != 0"
+
+    - name: TC05 assert the returned parameters
+      assert:
+        that: 
+          - endsbs_result.job_log == []
+
+    - name: TC06 end negative, end all inactive subsystems
+      ibmi_subsystem:
+        operation: end
+        subsystem: '*all'          
+      register: endsbs_result
+      failed_when: "'End all subsystems is NOT allowed' not in endsbs_result.msg"
+  
+    - name: TC07 end negative, end all inactive subsystems
+      ibmi_subsystem:
+        operation: end
+        subsystem: '*ALL'        
+      register: endsbs_result
+      failed_when: "'End all subsystems is NOT allowed' not in endsbs_result.msg"
+
+    - name: TC08 end negative, end a non-existing sbs
+      ibmi_subsystem:
+        operation: end
+        subsystem: abc
+        joblog: true   
+      register: endsbs_result
+      failed_when: "endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1054') | map(attribute='MESSAGE_ID') | list | length == 0"
+
+    - name: TC08 assert the returned parameters
+      assert:
+        that:
+          - endsbs_result.job_log != []
+
+    - name: Retest TC08 with CL command
+      ibmi_cl_command:
+        cmd: 'QSYS/ENDSBS SBS(ABC) OPTION(*CNTRLD) DELAY(*NOLIMIT) ENDSBSOPT(*DFT )'
+      register: other_endsbs_result
+      ignore_errors: true
+
+    - name: TC09 end negative, end a sbs whose name is more than 10 characters
+      ibmi_subsystem:
+        operation: end
+        subsystem: abcdefghigklmn   
+      register: endsbs_result 
+      failed_when: "'subsystem exceeds 10 characters' not in endsbs_result.msg"
+
+    - name: TC10 end negative, end with a wrong how_to_end
+      ibmi_subsystem:
+        operation: end
+        subsystem: QBATCH    
+        how_to_end: abc
+      register: endsbs_result 
+      failed_when: "'value of how_to_end must be one of:' not in endsbs_result.msg"
+  
+    - name: TC11 end negative, end with a wrong end_subsystem_option
+      ibmi_subsystem:
+        operation: end
+        subsystem: QBATCH    
+        end_subsystem_option: abc
+      register: endsbs_result 
+      failed_when: "'value of end_subsystem_option must be one or more of:' not in endsbs_result.msg"
+
+    - name: TC12 end negative, end with a wrong controlled_end_delay_time
+      ibmi_subsystem:
+        operation: end
+        subsystem: QBATCH    
+        controlled_end_delay_time: abc
+      register: endsbs_result 
+      failed_when: "'cannot be converted to an int' not in endsbs_result.msg"
+      
+    - name: TC13 end negative, missing required option for operation
+      ibmi_subsystem:
+        subsystem: QBATCH
+      register: negsbs_result
+      failed_when: "'missing required argument' not in negsbs_result.msg"
+
+    - name: TC13B end negative, missing required option for subsystem
+      ibmi_subsystem:
+        operation: end
+      register: endsbs_result
+      failed_when: "'missing required argument' not in endsbs_result.msg"
+
+    - name: TC14 end negative, provide invalid option for end
+      ibmi_subsystem:
+        operation: end
+        subsystem: QBATCH    
+        abc: true
+      register: endsbs_result
+      failed_when: "'Unsupported parameters' not in endsbs_result.msg" 

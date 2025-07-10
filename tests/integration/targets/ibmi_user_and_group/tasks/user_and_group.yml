@@ -1,27 +1,29 @@
 - block:
-    - name: TC03 create a user profile with required options
+    - name: TC03 create a group profile with required options
       ibmi_user_and_group:
         operation: 'create'
         user: '{{new_group[0]}}'
       register: user_result
 
-    - name: TC03 assert return options
+    - name: TC03 assert create return options
       assert: 
         that:
+          - user_result.rc == 0
           - user_result.stdout is defined
           - user_result.stderr is not defined
           - user_result.stdout_lines is defined
           - user_result.stderr_lines is not defined 
 
-    - name: TC04 display the cerated user profile
+    - name: TC04 display the created group profile
       ibmi_user_and_group:
         operation: 'display'
         user: '{{new_group[0]}}'
       register: user_result
 
-    - name: TC04 assert return options
+    - name: TC04 assert display return options
       assert: 
         that:
+          - user_result.rc == 0
           - user_result.result_set | length == 1
           - user_result.result_set[0]['AUTHORIZATION_NAME'] == new_group[0].upper()
           - user_result.result_set[0]['SET_PASSWORD_TO_EXPIRE'] == 'NO'
@@ -32,15 +34,16 @@
           - (user_result.result_set[0]['TEXT_DESCRIPTION']).upper() == 'CREATE BY ANSIBLE'
           - user_result.result_set[0]['GROUP_ID_NUMBER'] | int == 0
 
-    - name: TC05 display the cerated user profile to ensure no member belong to the profile.
+    - name: TC05 display the created group profile to ensure no member belong to the profile.
       ibmi_user_and_group:
         operation: 'display_group_members'
         user: '{{new_group[0]}}'
       register: user_result
 
-    - name: TC05 assert return options
+    - name: TC05 assert display return options
       assert: 
         that:
+          - user_result.rc == 0
           - user_result.stdout is not defined
           - user_result.stderr is not defined
           - user_result.stdout_lines is not defined
@@ -62,15 +65,25 @@
         parameters: "HOMEDIR('/home/abc')"
       register: user_result
 
-    - name: TC07 display the cerated user profile
+    - name: TC06 assert create return options
+      assert:
+        that:
+          - user_result.rc == 0
+          - user_result.stdout is defined
+          - user_result.stderr is not defined
+          - user_result.stdout_lines is defined
+          - user_result.stderr_lines is not defined
+
+    - name: TC07 display the created user profile
       ibmi_user_and_group:
         operation: 'display'
         user: '{{new_user[0]}}'
       register: user_result
 
-    - name: TC07 assert return options
+    - name: TC07 assert display return options
       assert: 
         that:
+          - user_result.rc == 0
           - user_result.result_set | length == 1
           - user_result.result_set[0]['AUTHORIZATION_NAME'] == new_user[0].upper()
           - user_result.result_set[0]['SET_PASSWORD_TO_EXPIRE'] == 'YES'
@@ -83,15 +96,16 @@
           - user_result.result_set[0]['USER_CLASS_NAME'] == '*SYSOPR'
           - user_result.result_set[0]['HOME_DIRECTORY'] == '/HOME/ABC'
 
-    - name: TC08 display the cerated user profile to ensure no member belong to the profile.
+    - name: TC08 display the created group profile to ensure a member belong to the profile.
       ibmi_user_and_group:
         operation: 'display_group_members'
         user: '{{new_group[0]}}'
       register: user_result
 
-    - name: TC08 assert return options
-      assert: 
+    - name: TC08 assert display return options
+      assert:
         that:
+          - user_result.rc == 0
           - user_result.stdout is not defined
           - user_result.stderr is not defined
           - user_result.stdout_lines is not defined
@@ -101,7 +115,7 @@
           - user_result.result_set[0]['USER_PROFILE_NAME'] == new_user[0].upper()
           - user_result.result_set[0]['USER_TEXT'] == 'ANSIBLE TESTING'
 
-    - name: TC09 create a user profile with all supported options
+    - name: TC09 create a group profile with all supported options
       ibmi_user_and_group:
         operation: 'create'
         user: '{{new_group[1]}}'
@@ -110,20 +124,75 @@
         special_authority: ['*ALLOBJ', '*AUDIT']
       register: user_result
 
-    - name: TC10 change a user profile with only required options
+    - name: TC09 assert create return options
+      assert:
+        that:
+          - user_result.rc == 0
+          - user_result.stdout is defined
+          - user_result.stderr is not defined
+          - user_result.stdout_lines is defined
+          - user_result.stderr_lines is not defined
+
+    - name: TC09 display the created group profile
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{new_group[1]}}'
+      register: user_result
+
+    - name: TC09 assert display return options
+      assert:
+        that:
+          - user_result.rc == 0
+          - user_result.stdout is not defined
+          - user_result.stderr is not defined
+          - user_result.stdout_lines is not defined
+          - user_result.stderr_lines is not defined
+          - user_result.result_set | length == 1
+          - user_result.result_set[0]['AUTHORIZATION_NAME'] == new_group[1].upper()
+
+    - name: TC10 create for an existing user profile with only required options (perform change for idempotency)
+      ibmi_user_and_group:
+        operation: 'create'
+        user: '{{new_user[0]}}'
+        text: 'CREATE CHANGED BY ANSIBLE'
+      register: user_result
+
+    - name: TC10 assert create (change) return options
+      assert:
+        that:
+          - user_result.rc == 0
+          - user_result.stdout is defined
+          - user_result.stderr is not defined
+          - user_result.stdout_lines is defined
+          - user_result.stderr_lines is not defined
+
+    - name: TC10 display the created (changed) user profile
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{new_user[0]}}'
+      register: user_result
+
+    - name: TC10 assert display return options
+      assert:
+        that:
+          - user_result.rc == 0
+          - user_result.result_set | length == 1
+          - user_result.result_set[0]['TEXT_DESCRIPTION'] == 'CREATE CHANGED BY ANSIBLE'
+
+    - name: TC11 change a user profile with only required options
       ibmi_user_and_group:
         operation: 'change'
         user: '{{new_user[0]}}'
         text: 'CHANGED BY ANSIBLE'
       register: user_result
 
-    - name: TC11 display the cerated user profile
+    - name: TC11 display the changed user profile
       ibmi_user_and_group:
         operation: 'display'
         user: '{{new_user[0]}}'
       register: user_result
 
-    - name: TC11 assert return options
+    - name: TC11 assert display return options
       assert: 
         that:
           - user_result.result_set | length == 1
@@ -135,7 +204,7 @@
           - user_result.result_set[0]['OWNER'] == '*GRPPRF'
           - user_result.result_set[0]['TEXT_DESCRIPTION'] == 'CHANGED BY ANSIBLE'
 
-    - name: TC12 change a user profile with all supported options
+    - name: TC12 change a user profile with all supported options to new group
       ibmi_user_and_group:
         operation: 'change'
         user: '{{new_user[0]}}'
@@ -150,7 +219,7 @@
         parameters: "HOMEDIR('/home/{{new_user[0]}}')"
       register: user_result
 
-    - name: TC13 display the cerated user profile
+    - name: TC13 display the changed user profile
       ibmi_user_and_group:
         operation: 'display'
         user: '{{new_user[0]}}'
@@ -160,7 +229,7 @@
       set_fact:
         home_dir_path: "/HOME/{{new_user[0].upper()}}"
 
-    - name: TC13 assert return options
+    - name: TC13 assert display return options
       assert: 
         that:
           - user_result.result_set | length == 1
@@ -173,18 +242,19 @@
           - user_result.result_set[0]['USER_CLASS_NAME'] == '*SECOFR'
           - user_result.result_set[0]['HOME_DIRECTORY'] == home_dir_path
 
-    - name: TC14 display the cerated user profile to ensure no member belong to the profile.
+    - name: TC14 display the changed group profile to ensure no member belong to the original group profile.
       ibmi_user_and_group:
         operation: 'display_group_members'
         user: '{{new_group[0]}}'
       register: user_result
 
-    - name: TC14 assert return options
+    - name: TC14 assert display return options
       assert: 
         that:
+          - user_result.rc == 0
           - user_result.result_set | length == 0
 
-    - name: TC15 display the cerated user profile to ensure no member belong to the profile.
+    - name: TC15 display the created group profile to ensure a member belong to the profile.
       ibmi_user_and_group:
         operation: 'display_group_members'
         user: '{{new_group[1]}}'
@@ -202,33 +272,46 @@
           - user_result.result_set[0]['USER_PROFILE_NAME'] == new_user[0].upper()
           - user_result.result_set[0]['USER_TEXT'] == 'ANSIBLE TESTING'
 
-    - name: TC16 delete a user profile
+    - name: TC16 delete a group profile without users
       ibmi_user_and_group:
         operation: 'delete'
         user: '{{new_group[0]}}'
       register: user_result
 
     - name: TC16 assert return options
-      assert: 
+      assert:
         that:
           - user_result.stdout is defined
           - user_result.stderr is not defined
           - user_result.stdout_lines is defined
           - user_result.stderr_lines is not defined 
           - user_result.result_set is not defined
+          - user_result.changed
+
+    - name: TC16B delete the group profile again (idempotency test with already deleted group profile)
+      ibmi_user_and_group:
+        operation: 'delete'
+        user: '{{new_group[0]}}'
+      register: user_result
+
+    - name: TC16B assert return options
+      assert:
+        that:
+          - user_result.rc == 0
+          - not user_result.changed
 
     - name: TC17 set facts
       set_fact:
         fail_msg: "User {{new_group[0]}} not found"
 
-    - name: TC17 display the created user profile
+    - name: TC17 display the deleted group profile
       ibmi_user_and_group:
         operation: 'display'
         user: '{{new_group[0]}}'
       register: user_result
       failed_when: fail_msg not in user_result.msg
 
-    - name: TC18 delete a group which has a user member
+    - name: TC18 delete a group which has a user member (fails)
       ibmi_user_and_group:
         operation: 'delete'
         user: '{{new_group[1]}}'
@@ -237,7 +320,7 @@
       # CPF2258: Group profile ANGRP2 not deleted
       ignore_errors: true
 
-    - name: TC18 assert return options
+    - name: TC18 assert delete return options
       assert: 
         that:
           - user_result.stdout is not defined
@@ -248,7 +331,7 @@
          #- "'CPF2258' in user_result.stderr"
           - user_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2258') | map(attribute='MESSAGE_ID') | list | length >=1
 
-    - name: TC19 delete a group which has a user member
+    - name: TC19 delete a user profile
       ibmi_user_and_group:
         operation: 'delete'
         user: '{{item}}'
@@ -256,15 +339,40 @@
       register: user_result
       loop: "{{new_user}}"
 
-    - name: TC20 delete a group which has a user member
+    - name: TC19 assert delete return options
+      assert:
+        that:
+          - user_result.results[0].rc == 0
+          - user_result.results[0].changed
+
+    - name: TC19A delete a user profile that is already deleted (idempotency)
+      ibmi_user_and_group:
+        operation: 'delete'
+        user: '{{item}}'
+        parameters: "OWNOBJOPT(*DLT)"
+      register: user_result
+      loop: "{{new_user}}"
+
+    - name: TC19A assert delete return options
+      assert:
+        that:
+          - user_result.results[0].rc == 0
+          - not user_result.results[0].changed
+
+    - name: TC20 delete a group which has no user members
       ibmi_user_and_group:
         operation: 'delete'
         user: '{{new_group[1]}}'
         parameters: "OWNOBJOPT(*DLT)"
       register: user_result
 
+    - name: TC20 assert delete return options
+      assert:
+        that:
+          - user_result.rc == 0
+
   always:
-    - name: delete user profile
+    - name: delete user and group profiles
       ibmi_cl_command: 
         cmd: dltusrprf USRPRF({{item}}) OWNOBJOPT(*DLT)
       ignore_errors: true

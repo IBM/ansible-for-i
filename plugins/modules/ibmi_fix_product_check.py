@@ -51,12 +51,12 @@ EXAMPLES = r'''
         "product": "5770UME",
         "ptf_id": "SI67856",
         "release": "V1R4M0"
-        }
+      }
       - {
         "product": "5733SC1",
         "ptf_id": "SI73751",
         "release": "V7R2M0"
-        }
+      }
 '''
 
 RETURN = r'''
@@ -111,7 +111,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "3.2.1"
+__ibmi_module_version__ = "3.3.0"
 
 
 def get_product_info(imodule, product_id, release_level, product_option, load_id):

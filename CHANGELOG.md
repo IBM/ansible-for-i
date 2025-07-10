@@ -1,5 +1,30 @@
 # Change Log
 
+## v3.3.0 (2025-07-09)
+
+This release focuses on minor improvements to make more collection modules idempotent.
+
+### New modules
+
+- ibmi_subsystem - manage a subsystem with various operations including display, start, end, and restart. Consolidate subsystem functionality to a single module and follow idempotency with the subsystem state (e.g., starting an active subsystem will return success and perform no action).
+
+### Deprecated features
+
+- ibmi_display_subsystem is deprecated and will be removed in a year. Use ibm.power_ibmi.ibmi_subsystem with 'display' operation instead.
+- ibmi_end_subsystem is deprecated and will be removed in a year. Use ibm.power_ibmi.ibmi_subsystem with 'end' operation instead.
+- ibmi_start_subsystem is deprecated and will be removed in a year. Use ibm.power_ibmi.ibmi_subsystem with 'start' operation instead.
+
+### Bug fixes
+
+- Changes to make ibmi_user_and_group module idempotent.
+  Github issue 150: <https://github.com/IBM/ansible-for-i/issues/150>
+- Fixes for some Ansible lint and Python lint errors.
+
+### Documentation
+
+- Note current issue with running Python 3.13 on an IBM i target node; Github issue 229: <https://github.com/IBM/ansible-for-i/issues/229>. Users must use Python 3.9 on IBM i target nodes for now.
+- Note that users of Ansible core 2.15 should remain at collection version 3.2.0 due to changes with the ibmi_reboot module or else move to Ansible core 2.16 or higher.
+
 ## v3.2.1 (2025-04-08)
 
 The collection is verified on Ansible core 2.17 and 2.18 with this release.

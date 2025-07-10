@@ -37,11 +37,10 @@ author:
 EXAMPLES = r'''
 - name: Do module authority check
   ibm.power_ibmi.ibmi_user_compliance_check:
-       modulelist:
-        - 'ibmi_copy'
-        - 'ibmi_display_subsystem'
-        - 'ibmi_invaild_module'
-
+    modulelist:
+      - 'ibmi_copy'
+      - 'ibmi_display_subsystem'
+      - 'ibmi_invaild_module'
 '''
 
 
@@ -68,7 +67,7 @@ authority_result:
 
 from ansible.module_utils.basic import AnsibleModule
 
-__ibmi_module_version__ = "3.2.1"
+__ibmi_module_version__ = "3.3.0"
 
 module_authority_map = {
     'ibmi_at': ['*NONE'],
