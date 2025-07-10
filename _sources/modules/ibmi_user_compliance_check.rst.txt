@@ -237,15 +237,14 @@ Examples
    
    - name: Do user profile compliance check
      ibm.power_ibmi.ibmi_user_compliance_check:
-         users:
-           - 'ibmiuser1'
-           - 'ibmiuser2'
-           - 'ibmiuser3'
-         fields:
-           - {'name':'status', 'expect':['*enabled']}
-           - {'name':'NO_PASSWORD_INDICATOR', 'expect':['no']}
-           - {'name':'SPECIAL_AUTHORITIES', 'expect': ['*JOBCTL','*SAVSYS']}
-
+       users:
+         - 'ibmiuser1'
+         - 'ibmiuser2'
+         - 'ibmiuser3'
+       fields:
+         - {'name':'status', 'expect':['*enabled']}
+         - {'name':'NO_PASSWORD_INDICATOR', 'expect':['no']}
+         - {'name':'SPECIAL_AUTHORITIES', 'expect': ['*JOBCTL', '*SAVSYS']}
 
 
 
