@@ -10,13 +10,17 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
+                    'status': ['deprecated'],
                     'supported_by': 'community'}
 
 DOCUMENTATION = r'''
 module: ibmi_end_subsystem
 short_description: End an active subsystem.
 version_added: '1.0.0'
+deprecated:
+  removed_at_date: "2026-07-09"
+  why: Functionality is now included in ibmi_subsystem module
+  alternative: Use M(ibm.power_ibmi.ibmi_subsystem) instead.
 description:
     - The C(ibmi_end_subsystem) module ends an active subsystem.
 options:
@@ -152,7 +156,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.2.1"
+__ibmi_module_version__ = "3.3.0"
 
 
 def main():

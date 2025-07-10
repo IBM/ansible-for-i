@@ -1,0 +1,29 @@
+# test code for the ibmi_subsystem module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+- block:
+    # Test subsystem operations display, start, end, and restart
+
+    # Tests for display operation
+    - ansible.builtin.include_tasks: display_cases.yml
+
+    # Tests for start operation
+    - ansible.builtin.include_tasks: start_cases.yml
+
+    # Tests for end operation
+    - ansible.builtin.include_tasks: end_cases.yml
+
+    # Tests for restart operation
+    - ansible.builtin.include_tasks: restart_cases.yml
+
+    # Tests for using become parameters
+    - ansible.builtin.include_tasks: become.yml
+
+  always:
+    - name: Ensure QBATCH is active at end of test.
+      ibmi_cl_command:
+        cmd: 'STRSBS SBSD(QBATCH)'
+      when: sql_result.row | length == 1
+      ignore_errors: true    

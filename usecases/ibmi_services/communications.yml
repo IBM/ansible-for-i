@@ -21,7 +21,7 @@
       tags: review_most_data_transfer_connections
       failed_when: false
 
-    - name: Get the connections that are transferring the most data
+    - name: Get the connections that are transferring the most data from net stat information
       ansible.builtin.debug:
         msg: "{{ net_stat_query_1.row }}"
       tags: review_most_data_transfer_connections
@@ -70,7 +70,7 @@
       tags: tcp_ip_routes
       failed_when: false
 
-    - name: Get the connections that are transferring the most data
+    - name: Get the connections that are transferring the most data from TCP/IP route information
       ansible.builtin.debug:
         msg: "{{ tcp_ip_routes.row }}"
       tags: tcp_ip_routes

@@ -114,7 +114,7 @@ import xml.etree.ElementTree as ET
 import re
 
 
-__ibmi_module_version__ = "3.2.1"
+__ibmi_module_version__ = "3.3.0"
 
 PSP_URL = "https://public.dhe.ibm.com/services/us/igsc/PSP/xmldoc.xml"
 PTF_URL_TEMPLATE = "https://public.dhe.ibm.com/services/us/igsc/PSP/{}.xml"

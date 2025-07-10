@@ -47,11 +47,10 @@ Examples
    
    - name: Do module authority check
      ibm.power_ibmi.ibmi_user_compliance_check:
-          modulelist:
-           - 'ibmi_copy'
-           - 'ibmi_display_subsystem'
-           - 'ibmi_invaild_module'
-
+       modulelist:
+         - 'ibmi_copy'
+         - 'ibmi_display_subsystem'
+         - 'ibmi_invaild_module'
 
 
 

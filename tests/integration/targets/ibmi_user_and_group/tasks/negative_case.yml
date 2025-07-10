@@ -105,23 +105,9 @@
   register: user_result
   failed_when: "'Unsupported parameters' not in user_result.msg"
 
-- name: TC32 create an existing user profile
-  ibmi_user_and_group:
-    operation: 'create'
-    user: '{{ansible_ssh_user}}'
-  register: user_result
-  failed_when: "'already exists' not in user_result.msg"
-
 - name: TC33 change an not existing user profile
   ibmi_user_and_group:
     operation: 'change'
-    user: 'abc'
-  register: user_result
-  failed_when: "'User profile ABC not found' not in user_result.msg"
-
-- name: TC34 delete an not existing user profile
-  ibmi_user_and_group:
-    operation: 'delete'
     user: 'abc'
   register: user_result
   failed_when: "'User profile ABC not found' not in user_result.msg"

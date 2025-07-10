@@ -71,12 +71,12 @@ Examples
            "product": "5770UME",
            "ptf_id": "SI67856",
            "release": "V1R4M0"
-           }
+         }
          - {
            "product": "5733SC1",
            "ptf_id": "SI73751",
            "release": "V7R2M0"
-           }
+         }
 
 
 

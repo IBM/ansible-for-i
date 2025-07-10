@@ -145,7 +145,7 @@ Examples
 .. code-block:: yaml+jinja
 
    
-   - name:  Find all journals and journal receivers in library WYTEST.
+   - name: Find all journals and journal receivers in library WYTEST.
      ibm.power_ibmi.ibmi_object_find:
        object_name: '*ALL'
        object_type_list: '*JRN *JRNRCV'
@@ -153,21 +153,21 @@ Examples
        age: '1w'
        age_stamp: 'ctime'
 
-   - name:  Find all the object names that contains 'ABC' with regex.
+   - name: Find all the object names that contains 'ABC' with regex.
      ibm.power_ibmi.ibmi_object_find:
        object_name: 'ABC+'
        object_type_list: '*ALL'
        lib_name: '*ALL'
        use_regex: true
 
-   - name: find library WYTEST in sysbas
+   - name: Find library WYTEST in sysbas
      ibm.power_ibmi.ibmi_object_find:
        lib_name: 'QSYS'
        iasp_name: '*SYSBAS'
        object_name: 'WYTEST'
        object_type_list: "*LIB"
 
-   - name: find object OBJABC in asp group WYTEST2
+   - name: Find object OBJABC in asp group WYTEST2
      ibm.power_ibmi.ibmi_object_find:
        lib_name: '*ALL'
        iasp_name: 'WYTEST2'

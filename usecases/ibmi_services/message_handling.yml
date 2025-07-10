@@ -102,7 +102,7 @@
       tags: all_sys_op_inq_msg_with_no_reply
       failed_when: false
 
-    - name: Get all system operator inquiry messages that have a reply
+    - name: Get all system operator inquiry messages that have no reply
       ansible.builtin.debug:
         msg: "{{ sys_op_inq_msg_no_rpy.row }}"
       tags: all_sys_op_inq_msg_with_no_reply
