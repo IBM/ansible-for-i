@@ -57,7 +57,9 @@ tags: [infrastructure, ibmi, power, ibm]
 # collection label 'namespace.name'. The value is a version range
 # L(specifiers,https://python-semanticversion.readthedocs.io/en/latest/#requirement-specification). Multiple version
 # range specifiers can be set and are separated by ','
-dependencies: {}
+dependencies:
+  "ansible.posix" : "*"
+  "openstack.cloud" : "*"
 
 # The URL of the originating SCM repository
 repository: https://github.com/IBM/ansible-for-i/tree/devel
