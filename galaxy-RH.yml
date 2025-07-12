@@ -59,7 +59,6 @@ tags: [infrastructure, ibmi, power, ibm]
 # range specifiers can be set and are separated by ','
 dependencies:
   "ansible.posix" : "*"
-  "openstack.cloud" : "*"
 
 # The URL of the originating SCM repository
 repository: https://github.com/IBM/ansible-for-i/tree/devel
@@ -91,6 +90,15 @@ build_ignore:
   - plugins/modules/ibmi_powervc_os_server_capture.py
   - changelogs/.plugin-cache.yaml
   - .vscode
+# Ignore PowerVC related roles and use cases for build due to Redhat certification requirement
+  - roles/capture_server_via_powervc
+  - roles/change_server_state_via_powervc
+  - roles/deploy_vm_via_powervc
+  - roles/display_network_info_via_powervc
+  - roles/display_vm_info_via_powervc
+  - usecases/cicd-cli
+  - usecases/cicd-tower
+  - usecases/db2mirror_setup_via_powervc
 # Exclude unnecessary RH files or temporary files for dual Ansible Galaxy and Redhat AAP build
   - requirements-RH.yml
   - requirements.yml.ORG
