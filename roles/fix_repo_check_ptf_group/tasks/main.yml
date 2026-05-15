@@ -35,8 +35,8 @@
         action: "find"
         parameters:
           - "{{ {'ptf_group_number': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].ptf_group_number,
-          'ptf_group_level': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].ptf_group_level,
-          'release_date': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].release_date} }}"
+            'ptf_group_level': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].ptf_group_level,
+            'release_date': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].release_date} }}"
       register: fix_repo_check_ptf_group_ptf_group_find_result
       when: fix_repo_check_ptf_group_fix_group_check_result.group_info != []
 
@@ -53,8 +53,8 @@
             action: "find"
             parameters:
               - "{{ {'ptf_group_number': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].ptf_group_number,
-              'ptf_group_level': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].ptf_group_level,
-              'release_date': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].release_date} }}"
+                'ptf_group_level': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].ptf_group_level,
+                'release_date': fix_repo_check_ptf_group_fix_group_check_result.group_info[0].release_date} }}"
           register: fix_repo_check_ptf_group_download_status_find_result
           when: fix_repo_check_ptf_group_fix_group_check_result.group_info != []
 

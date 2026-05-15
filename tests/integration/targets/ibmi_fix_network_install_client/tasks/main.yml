@@ -30,8 +30,8 @@
       ansible_user: 'zhaoyao'
       ansible_ssh_pass: 'zy1982sj'
       ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
-
+      # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
   - name: run test
     ansible.builtin.import_tasks: test.yml
     delegate_to: 'cclient'  

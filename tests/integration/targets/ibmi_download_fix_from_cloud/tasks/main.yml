@@ -1,0 +1,10 @@
+---
+# Integration tests for ibmi_download_fix_from_cloud module
+# Copyright (c) IBM Corporation 2019, 2020
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+
+- name: Include positive test cases
+  ansible.builtin.include_tasks: positive_tests.yml
+
+- name: Include negative test cases
+  ansible.builtin.include_tasks: negative_tests.yml

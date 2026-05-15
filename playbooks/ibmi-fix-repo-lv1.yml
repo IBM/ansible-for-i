@@ -5,16 +5,16 @@
 # Provide example for manipulating a level 1 PTF database
 ---
 - name: Playbook example using level 1 fix repository
-  hosts: repo2
+  hosts: all
   gather_facts: false
 
   tasks:
     - name: Tasks to exercise ibmi_fix_repo_lv1
       block:
-        - name: Scan PTF info from image root
+        - name: Scan PTF info from image root (customize image_root)
           ibm.power_ibmi.ibmi_fix_repo_lv1:
             action: "refresh"
-            image_root: "/home/pengzy/PTF"
+            image_root: "/home/tester/PTF"
           register: scanning_info
 
         - name: Task display_scanning_info

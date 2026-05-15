@@ -5,23 +5,24 @@
   tasks:
     - name: Run module to check the latest level
       ibm.power_ibmi.ibmi_fix_group_check:
-        groups: 'SF99663'  # select a small ptf group to test
+        groups: 'SF99667'  # select a small ptf group to test
       register: group_check_result
 
-      # - name: Add VM to Ansible in-memory inventory
-      #  add_host:
-      #    name: "repo_server_name"
-      #    ansible_ssh_host: ut51p43.rch.stglabs.ibm.com
-      #    ansible_user: tester
-      #    groups: ibmi
-      #    ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-      #    ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+    - name: Add VM to Ansible in-memory inventory
+      add_host:
+        name: "repo_server"
+        ansible_ssh_host: ut23p84.rch.stglabs.ibm.com
+        ansible_user: tester
+        groups: ibmi
+        ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
 
     - name: Include fix_repo_download_add_ptf_group role to download the ptf group and add information into catalog download_status table
-      ansible.builtin.include_role:
+      ansible.builtin.import_role:
         name: fix_repo_download_add_ptf_group
       vars:
         fix_repo_download_add_ptf_group_ptf_group_info: "{{group_check_result.group_info[0]}}"
+      delegate_to: "repo_server"
 
     - name: Use ibmi_download_fix_status to determine if the downloading is completed.
       ibm.power_ibmi.ibmi_download_fix_status:
@@ -31,13 +32,14 @@
       until: ds.status[0]['download_status'] == "DOWNLOADED"
       retries: 100
       delay: 30
+      delegate_to: "repo_server"
 
     - name: Assert values
       ansible.builtin.assert:
         that:
           - fix_repo_download_add_ptf_group_download_fix_result is defined
           - fix_repo_download_add_ptf_group_download_status_add_result is defined
-          - fix_repo_download_add_ptf_group_download_fix_result.command.find("SF99663") != -1
+          - fix_repo_download_add_ptf_group_download_fix_result.command.find("SF99667") != -1
           - fix_repo_download_add_ptf_group_download_fix_result.command.find("SNDPTFORD") != -1
           - fix_repo_download_add_ptf_group_download_fix_result.file_path != ""
           - fix_repo_download_add_ptf_group_download_fix_result.msg == "SNDPTFORD successfully ended."
@@ -58,4 +60,5 @@
 
     # negative cases
     - name: Include neg cases
-      ansible.builtin.include_tasks: neg_case.yml
+      ansible.builtin.import_tasks: neg_case.yml
+      delegate_to: "repo_server"

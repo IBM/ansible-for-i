@@ -1,0 +1,9 @@
+---
+# Default values for sync_apply_individual_ptfs_local
+sync_apply_individual_ptfs_local_dest: "/qsys.lib/qgpl.lib"
+sync_apply_individual_ptfs_local_already_loaded_list: []
+sync_apply_individual_ptfs_local_delete: true
+sync_apply_individual_ptfs_local_apply_all_loaded_ptf: true
+sync_apply_individual_ptfs_local_temp_or_perm: '*TEMP'
+sync_apply_individual_ptfs_local_delayed_option: '*IMMDLY'
+sync_apply_individual_ptfs_local_auto_ipl: false

@@ -343,7 +343,7 @@
       assert:
         that:
           - user_result.results[0].rc == 0
-          - user_result.results[0].changed
+          - user_result.results[0].changed | bool
 
     - name: TC19A delete a user profile that is already deleted (idempotency)
       ibmi_user_and_group:
@@ -357,7 +357,7 @@
       assert:
         that:
           - user_result.results[0].rc == 0
-          - not user_result.results[0].changed
+          - not user_result.results[0].changed | bool
 
     - name: TC20 delete a group which has no user members
       ibmi_user_and_group:

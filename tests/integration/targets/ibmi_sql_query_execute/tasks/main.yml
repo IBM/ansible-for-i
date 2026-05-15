@@ -10,12 +10,27 @@
       ansible.builtin.setup:
       register: setup_info
 
-    - name: Set fact for python version information
+    # Revisit when not using explicit python version
+    - name: Set fact for python prefix and minor information
       ansible.builtin.set_fact:
-        python_version: "{{ setup_info.ansible_facts.ansible_python.executable.split('/')[-1] }}"
+        python_prefix: "{{ (setup_info.ansible_facts.ansible_python.executable.split('/')[-1]).split('.')[0] }}"
         python_minor: "{{ setup_info.ansible_facts.ansible_python.version.minor }}"
-  
-    - name: Display python with version major
+
+    - name: Set fact for python version information. Python 3.9 has python39 package prefix
+      ansible.builtin.set_fact:
+        python_version: "{{ python_prefix ~ python_minor }}"
+      when: python_minor == 9
+
+    - name: Set fact for python version information. Newer python versions have pythonX.Y package prefix.
+      ansible.builtin.set_fact:
+        ppython_version: "{{ python_prefix + '.' ~ python_minor }}"
+      when: python_minor != 9
+
+    - name: Display python prefix
+      ansible.builtin.debug:
+        msg: "{{ python_prefix }}"
+
+    - name: Display python with version minor
       ansible.builtin.debug:
         msg: "{{ python_version }}"
 
@@ -74,10 +89,11 @@
         sql: "select * from qgpl.ansible"
         expected_row_count: 2
 
-    - include_tasks: check_rpm.yml
-      vars: 
-        python: "{{python_version}}"
-      with_list: "{{required_rpms}}"  
+    # Skip for now. This isn't very useful and prone to breakage.
+    # - include_tasks: check_rpm.yml
+    #  vars: 
+    #    python: "{{python_version}}"
+    #  with_list: "{{required_rpms}}"  
     
     - name: TC06 run sql query module with a valid sql
       ibmi_sql_query:

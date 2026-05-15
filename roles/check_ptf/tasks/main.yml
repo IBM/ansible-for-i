@@ -99,7 +99,7 @@
   ansible.builtin.include_tasks: find_ptfinfo.yml
   with_list: "{{ to_be_loadednumber }}"
   loop_control:
-    loop_var: ptf_id
+    loop_var: ptf_id_var
 
 - name: Set to_be_loaded
   ansible.builtin.set_fact:
@@ -128,7 +128,7 @@
   ansible.builtin.include_tasks: find_ptfinfo.yml
   with_list: "{{ loaded }}"
   loop_control:
-    loop_var: ptf_id
+    loop_var: ptf_id_var
 
 - name: Compose check_ptf_loaded_ptfs_list
   ansible.builtin.set_fact:
@@ -139,7 +139,7 @@
   ansible.builtin.include_tasks: find_ptfinfo.yml
   with_list: "{{ temporarily_applied }}"
   loop_control:
-    loop_var: ptf_id
+    loop_var: ptf_id_var
 
 - name: Compose check_ptf_temporarily_applied_list
   ansible.builtin.set_fact:

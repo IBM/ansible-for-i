@@ -3,7 +3,7 @@
 #
 
 all:
-	ansible-doc-extractor --template templates/module.rst.j2 source/modules ../plugins/modules/*.py
+	ansible-doc-extractor --template templates/module.rst.j2 source/modules ${SOURCE_DIR}/plugins/modules/*.py
 	sphinx-build -b html source build
 	touch build/.nojekyll
 

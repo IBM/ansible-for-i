@@ -31,7 +31,7 @@ options:
 
 
 author:
-- Zhou Yu (@zhouyu)
+  - Zhou Yu (@zhouyu)
 '''
 
 EXAMPLES = r'''
@@ -67,7 +67,7 @@ authority_result:
 
 from ansible.module_utils.basic import AnsibleModule
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 module_authority_map = {
     'ibmi_at': ['*NONE'],

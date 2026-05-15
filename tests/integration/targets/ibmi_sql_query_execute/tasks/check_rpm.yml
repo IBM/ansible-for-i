@@ -1,3 +1,4 @@
+# Revisit this test for expected error messages with missing packages
 - name: Verify {{item}} installed
   raw: /QOpensys/pkgs/bin/yum list {{python}}-{{item}}
   register: rpm_query_result

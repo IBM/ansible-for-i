@@ -38,7 +38,7 @@ options:
     type: str
 
 author:
-- Jin Yifan(@jinyifan)
+  - Jin Yifan(@jinyifan)
 '''
 
 EXAMPLES = r'''
@@ -130,7 +130,7 @@ except ImportError:
     HAS_ITOOLKIT = False
 
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def getNonconfigureDisk(imodule, time):

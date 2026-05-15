@@ -124,7 +124,7 @@
     - name: Compose path
       ansible.builtin.set_fact:
         path: "{{ path | regex_replace('~', home_dir.stdout) }}"
-      when: path | regex_search("^~")
+      when: path | regex_search("^~") | length > 0
 
     # - name: Debug path
     #   ansible.builtin.debug:

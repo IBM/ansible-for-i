@@ -3,7 +3,7 @@
   ansible.builtin.set_fact:
     ptf_list: []
     ptf_on_system: {}
-    ptf_info_list: "{{ product_info.success_list }}"
+    ptf_info_list: "{{ product_info.success_list | default([]) }}"
 
 - name: Query PTF information from target system
   ibm.power_ibmi.ibmi_sql_query:
@@ -14,7 +14,7 @@
   ansible.builtin.set_fact:
     check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
       [{'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'Product not installed on target system'}] }}"
-  when: result.row|length == 0
+  when: result.row | length == 0
   no_log: true
 
 - name: Start to check PTFs
@@ -31,7 +31,7 @@
     - name: PTF does not exist
       ansible.builtin.set_fact:
         ptf_list: "{{ ptf_list | default([]) + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT'}] }}"
-      when: not ptf_on_system.get(ptf_info.ptf_id)
+      when: ptf_on_system.get(ptf_info.ptf_id) is none
       with_list: "{{ ptf_info_list }}"
       loop_control:
         loop_var: ptf_info
@@ -40,7 +40,7 @@
       ansible.builtin.set_fact:
         ptf_list: "{{ ptf_list | default([]) + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id]}] }}"
       when:
-        - ptf_on_system.get(ptf_info.ptf_id)
+        - ptf_on_system.get(ptf_info.ptf_id) is not none
         - ptf_on_system[ptf_info.ptf_id] != 'APPLIED'
         - ptf_on_system[ptf_info.ptf_id] != 'PERMANENTLY APPLIED'
         - ptf_on_system[ptf_info.ptf_id] != 'SUPERSEDED'
@@ -52,7 +52,7 @@
       ansible.builtin.set_fact:
         ptf_list: "{{ ptf_list | default([]) + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id]}] }}"
       when:
-        - ptf_on_system.get(ptf_info.ptf_id)
+        - ptf_on_system.get(ptf_info.ptf_id) is not none
         - ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or
           ptf_on_system[ptf_info.ptf_id] == 'PERMANENTLY APPLIED' or
           ptf_on_system[ptf_info.ptf_id] == 'SUPERSEDED'

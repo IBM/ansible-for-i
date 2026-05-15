@@ -106,7 +106,7 @@ notes:
    - Issue ADDDIRE command to add the user to the system distribution directory entry
    - Issue WRKDIRE command to check the current system distribution directory entries
 seealso:
-- module: ibmi_fix
+  - module: ibm.power_ibmi.ibmi_fix
 
 author:
     - Wang Yuyu (@wangyuyu)
@@ -268,7 +268,7 @@ except ImportError:
     HAS_ITOOLKIT = False
 HAS_IBM_DB = True
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255

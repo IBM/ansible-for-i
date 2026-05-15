@@ -114,9 +114,9 @@ notes:
     - Be careful to use C(*CNTRLD) for option how_to_end,
       you need to specify the appropriate value for all the timeout options according to the system performance.
 seealso:
-- module: reboot
+  - module: ansible.builtin.reboot
 author:
-- Chang Le (@changlexc)
+  - Chang Le (@changlexc)
 '''
 
 EXAMPLES = r'''

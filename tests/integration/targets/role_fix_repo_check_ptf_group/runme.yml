@@ -7,23 +7,25 @@
   tasks:
     - name: Run module to check the latest level
       ibmi_fix_group_check:
-        groups: 'SF99663'  # select a small ptf group to test
+        groups: 'SF99667'  # select a small ptf group to test
       register: group_check_result
 
     - name: Add VM to Ansible in-memory inventory
       add_host:
-        name: "repo_server_name"
+        name: "repo_server"
         ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
         ansible_user: tester
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+        # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
 
     - name: Include fix_repo_download_add_ptf_group role to download the ptf group and add information into catalog download_status table
-      include_role:
+      import_role:
         name: fix_repo_download_add_ptf_group
       vars:
         fix_repo_download_add_ptf_group_ptf_group_info: "{{group_check_result.group_info[0]}}"
+      delegate_to: "repo_server"
 
     - name: Assert return parameters defined for fix_repo_download_add_ptf_group
       ansible.builtin.assert:
@@ -39,11 +41,12 @@
       until: ds.status[0]['download_status'] == "DOWNLOADED"
       retries: 100
       delay: 30
+      delegate_to: "repo_server"
 
     - name: assert values
       assert:
         that:
-          - fix_repo_download_add_ptf_group_download_fix_result.command.find("SF99663") != -1
+          - fix_repo_download_add_ptf_group_download_fix_result.command.find("SF99667") != -1
           - fix_repo_download_add_ptf_group_download_fix_result.command.find("SNDPTFORD") != -1
           - fix_repo_download_add_ptf_group_download_fix_result.file_path != ""
           - fix_repo_download_add_ptf_group_download_fix_result.msg == "SNDPTFORD successfully ended."
@@ -52,8 +55,12 @@
           - fix_repo_download_add_ptf_group_download_status_add_result.row_changed == 1
           - fix_repo_download_add_ptf_group_download_status_add_result.sql is defined
           - fix_repo_download_add_ptf_group_download_status_add_result.type == "download_status"
-          - fix_repo_download_add_ptf_group_download_status_add_result.parameters | selectattr('file_path','equalto', fix_repo_download_add_ptf_group_download_fix_result.file_path)
-          - fix_repo_download_add_ptf_group_download_status_add_result.parameters | selectattr('order_id','equalto', fix_repo_download_add_ptf_group_download_fix_result.order_id)
-          - fix_repo_download_add_ptf_group_download_status_add_result.parameters | selectattr('ptf_group_number','equalto', group_check_result.group_info[0]['ptf_group_number'])
+          - fix_repo_download_add_ptf_group_download_status_add_result.parameters |
+            selectattr('file_path','equalto', fix_repo_download_add_ptf_group_download_fix_result.file_path) | list | length > 0
+          - fix_repo_download_add_ptf_group_download_status_add_result.parameters |
+            selectattr('order_id','equalto', fix_repo_download_add_ptf_group_download_fix_result.order_id) | list | length > 0
+          - fix_repo_download_add_ptf_group_download_status_add_result.parameters |
+            selectattr('ptf_group_number','equalto', group_check_result.group_info[0]['ptf_group_number']) | list | length > 0
           - fix_repo_download_add_ptf_group_download_status_add_result.parameters[0]['ptf_group_level'] == group_check_result.group_info[0]['ptf_group_level']
-          - fix_repo_download_add_ptf_group_download_status_add_result.parameters | selectattr('release_date','equalto', group_check_result.group_info[0]['release_date'])
+          - fix_repo_download_add_ptf_group_download_status_add_result.parameters |
+            selectattr('release_date','equalto', group_check_result.group_info[0]['release_date']) | list | length > 0

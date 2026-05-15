@@ -21,6 +21,11 @@
   - name: TC00 - get ansible host os400 version
     shell: system "DSPSFWRSC" | grep "5770SS1" | head -n 1 | awk '{print $2}'
     register: osinfo
+  - set_fact:  # pre-define some valid ptfs in systems for each os version, they should be ready on host for testing
+      ptfs: ['SJ09193', 'SJ09013']
+      ptf_grps: ['SF99963']
+      vvrrmm: "070600"
+    when: os400_ver == "V7R6M0"
   - set_fact:
       os400_ver: "{{osinfo.stdout}}"
     failed_when: osinfo.rc != 0
@@ -245,13 +250,16 @@
     register: dl_single_ptf_result
     failed_when: dl_single_ptf_result.rc != 0
 
+  # FIXME: this is timing out. Why?
+  # File is downloaded, but ibmi_download_fix_status is not finding that result.
+  # May need to check the image directory versus using SQL query with image catalog scenario.
   - name: TC07 - wait until image downloaded with ibmi_download_fix_status
     ibmi_download_fix_status:
       order_list: "{{dl_single_ptf_result.order_id}}"
     register: ds
     failed_when: ds.rc != 0
     until: ds.status[0]['download_status'] == "DOWNLOADED"
-    retries: 100
+    retries: 30
     delay: 30
 
   - name: TC07 - Comparison string for assertion

@@ -105,7 +105,7 @@ notes:
     - ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
     - Need install 5770SS1 option 39 on remote IBM i for regex usage
 seealso:
-    - module: fetch
+    - module: ansible.builtin.fetch
 author:
     - Peng Zengyu (@pengzengyufish)
 '''

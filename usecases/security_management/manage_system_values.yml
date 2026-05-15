@@ -236,9 +236,10 @@
                 check: equal
           when: level_mode == '3'
 
-        - name: Get ansible host os400 version
+        - name: Get ansible host os400 version # noqa: risky-shell-pipe
           ansible.builtin.shell:
-            cmd: set -o pipefail && system "DSPSFWRSC" | grep "5770SS1" | head -n 1 | awk '{print $2}'
+          # cmd: set -o pipefail && system "DSPSFWRSC" | grep "5770SS1" | head -n 1 | awk '{print $2}'
+            cmd: system "DSPSFWRSC" | grep "5770SS1" | head -n 1 | awk '{print $2}'
           args:
             executable: /bin/bash
           register: osinfo

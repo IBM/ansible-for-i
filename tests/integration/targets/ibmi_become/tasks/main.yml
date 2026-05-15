@@ -14,7 +14,7 @@
     - name: assert the count (and handle case where module log does not exist)
       assert:
         that:
-         - (check_pwd_count.stdout | int > 0) or ("'cannot open' in check_pwd_count.stderr")
+         - (check_pwd_count.stdout | int > 0) or ('No such file or directory' in check_pwd_count.stderr)
 
     - name: cleanup module.log
       file:
@@ -445,6 +445,7 @@
         ansible_ssh_user: '{{ansible_ssh_user_org}}'
         ansible_ssh_pass: '{{ansible_ssh_pass_org}}'
       #no_log: true
+      when: ansible_ssh_user_org is defined
       ignore_errors: true
 
     - name: delete the user profile

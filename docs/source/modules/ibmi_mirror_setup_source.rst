@@ -16,7 +16,7 @@ ibmi_mirror_setup_source -- Configures the Db2 Mirror on the source node
 
 Synopsis
 --------
-- The :literal:`ibmi\_mirror\_setup\_source` module configures the Db2 Mirror on the source node and sets the configuration state to initializing.
+- The \ :literal:`ibmi\_mirror\_setup\_source`\  module configures the Db2 Mirror on the source node and sets the configuration state to initializing.
 
 
 
@@ -39,7 +39,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in :literal:`become\_user`.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -166,7 +166,7 @@ See Also
 
 .. seealso::
 
-   - :ref:`ibmi_mirror_setup_copy_module`
+   - :ref:`ibm.power_ibmi.ibmi_mirror_setup_copy_module`
 
 
   

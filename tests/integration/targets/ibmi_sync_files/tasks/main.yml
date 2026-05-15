@@ -29,7 +29,8 @@
       ansible_user: tester
       ansible_ssh_pass: passw0rd
       ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+      # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
 
   - name: Add VM to Ansible in-memory inventory
     add_host:
@@ -38,7 +39,8 @@
       ansible_user: tester
       ansible_ssh_pass: passw0rd
       ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+      # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
 
   - name: Add VM to Ansible in-memory inventory
     add_host:
@@ -47,7 +49,8 @@
       ansible_user: tester
       ansible_ssh_pass: passw0rd
       ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+      # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
 
   - name: TC00 - install paramiko on os400 node A and B if not exists
     command:

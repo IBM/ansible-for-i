@@ -89,7 +89,7 @@ options:
 notes:
    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3(or python2)
 seealso:
-- module: ibmi_fix_imgclg
+  - module: ibm.power_ibmi.ibmi_fix_imgclg
 
 author:
     - Wang Yun (@airwangyun)
@@ -271,7 +271,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999

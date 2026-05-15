@@ -103,7 +103,7 @@ options:
 notes:
    - Ansible hosts file need to specify ansible_python_interpreter=/QOpenSys/pkgs/bin/python3
 seealso:
-- module: ibmi_fix
+  - module: ibm.power_ibmi.ibmi_fix
 
 author:
     - Wang Yuyu (@wangyuyu)
@@ -268,7 +268,7 @@ except ImportError:
     HAS_ITOOLKIT = False
 HAS_IBM_DB = True
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255

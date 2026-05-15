@@ -48,7 +48,7 @@ options:
     type: str
 
 author:
-- Xu Meng(@dmabupt)
+  - Xu Meng(@dmabupt)
 '''
 
 EXAMPLES = r'''
@@ -169,7 +169,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 sysval_array = [

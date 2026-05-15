@@ -15,7 +15,7 @@ namespace: ibm
 name: power_ibmi
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 3.3.0
+version: 3.4.0
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -79,6 +79,8 @@ issues: https://github.com/IBM/ansible-for-i/issues
 build_ignore:
   - ansible.cfg
   - ansible_source.patch
+# Fix for ansible lint issue with VSC that causes collection build to crawl
+  - "**/.ansible"
   - .gitignore
   - .travis.yml
   - .script

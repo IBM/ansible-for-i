@@ -33,13 +33,13 @@
 
 - name: Set whether there are ptfs to apply (some loaded)
   ansible.builtin.set_fact:
-    load_apply_ptfs_are_ptfs_to_apply: "{{ load_apply_ptfs_load_success_list | default([]) + load_apply_ptfs_loaded_list != [] }}"
+    load_apply_ptfs_are_ptfs_to_apply: "{{ load_apply_ptfs_load_success_list + load_apply_ptfs_loaded_list | default([]) != [] }}"
 
 - name: Include apply_ptf role to apply PTFs
   ansible.builtin.include_role:
     name: apply_ptf
   vars:
-    apply_ptf_to_be_applied_list: "{{ load_apply_ptfs_load_success_list | default([]) + load_apply_ptfs_loaded_list }}"
+    apply_ptf_to_be_applied_list: "{{ load_apply_ptfs_load_success_list + load_apply_ptfs_loaded_list | default([]) }}"
     apply_ptf_apply_all_loaded_ptfs: "{{  load_apply_ptfs_apply_all_loaded_ptf }}"
     apply_ptf_temp_or_perm: "{{ load_apply_ptfs_temp_or_perm }}"
     apply_ptf_delayed_option: "{{ load_apply_ptfs_delayed_option }}"

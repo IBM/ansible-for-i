@@ -1,0 +1,293 @@
+---
+# Positive test cases for ibmi_download_fix_from_cloud module
+# These tests verify successful module operation
+
+# NOTE: PTF SJ08667 is a small PTF for 7.6 release.
+#       Replace this PTF with an appropriate one for your test environment.
+# NOTE: Replace the credentials with valid machine credentials for your test system.
+
+- name: Set test variables
+  ansible.builtin.set_fact:
+    test_ptf_id: "SJ08667" # Small PTF for 7.6 release
+    test_download_dir: "/tmp/ansible_test_ptf_download_{{ ansible_date_time.epoch }}"
+    test_credentials:
+      machine_model: "HEX" # TODO: Replace with actual machine model
+      machine_type: "9080" # TODO: Replace with actual machine type
+      serial_number: "XXXXXXX" # TODO: Replace with actual serial number
+      country: "US" # TODO: Replace with actual country code
+
+- name: TC01 - Preview operation (no download)
+  block:
+    - name: TC01 - Preview PTF information
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "preview"
+        directory: "{{ test_download_dir }}"
+      register: preview_result
+      delegate_to: localhost
+
+    - name: Assert preview operation succeeded
+      ansible.builtin.assert:
+        that:
+          - preview_result is defined
+          - preview_result.rc == 0
+          - preview_result.updates is defined
+          - preview_result.updates | length > 0
+          - preview_result.msg is defined
+        fail_msg: "Preview operation failed"
+        success_msg: "Preview operation succeeded"
+
+    - name: Display preview results
+      ansible.builtin.debug:
+        var: preview_result
+
+- name: TC02 - Validate operation (check entitlement without download)
+  block:
+    - name: TC02 - Validate PTF entitlement
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "validate"
+        directory: "{{ test_download_dir }}"
+      register: validate_result
+      delegate_to: localhost
+
+    - name: Assert validate operation succeeded
+      ansible.builtin.assert:
+        that:
+          - validate_result is defined
+          - validate_result.rc == 0
+          - validate_result.entitlement_verified is defined
+          - validate_result.entitlement_verified == true
+          - validate_result.msg is defined
+        fail_msg: "Validate operation failed"
+        success_msg: "Validate operation succeeded"
+
+    - name: Display validate results
+      ansible.builtin.debug:
+        var: validate_result
+
+- name: TC03 - Download operation without requisites
+  block:
+    - name: TC03 - Download PTF without requisites
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "{{ test_download_dir }}"
+        include_requisites: false
+        clean_directory: true
+      register: download_result
+      delegate_to: localhost
+
+    - name: Assert download operation succeeded
+      ansible.builtin.assert:
+        that:
+          - download_result is defined
+          - download_result.rc == 0
+          - download_result.entitlement_verified is defined
+          - download_result.entitlement_verified == true
+          - download_result.download_list is defined
+          - download_result.download_list | length > 0
+          - download_result.download_list[0].ptf_id is defined
+          - download_result.download_list[0].file_name is defined
+          - download_result.download_list[0].file_path is defined
+          - download_result.download_list[0].product is defined
+          - download_result.download_list[0].release is defined
+        fail_msg: "Download operation failed"
+        success_msg: "Download operation succeeded"
+
+    - name: Display download results
+      ansible.builtin.debug:
+        var: download_result
+
+    - name: Verify downloaded files exist
+      ansible.builtin.stat:
+        path: "{{ test_download_dir }}/{{ download_result.download_list[0].file_name }}"
+      register: savefile_stat
+      delegate_to: localhost
+
+    - name: Assert save file exists
+      ansible.builtin.assert:
+        that:
+          - savefile_stat.stat.exists
+          - savefile_stat.stat.isreg or savefile_stat.stat.islnk
+        fail_msg: "Downloaded save file does not exist"
+        success_msg: "Downloaded save file exists"
+
+    - name: Check for cover letter file
+      ansible.builtin.stat:
+        path: "{{ test_download_dir }}/Q{{ test_ptf_id }}.MBR"
+      register: coverletter_stat
+      delegate_to: localhost
+
+    - name: Assert cover letter exists
+      ansible.builtin.assert:
+        that:
+          - coverletter_stat.stat.exists
+          - coverletter_stat.stat.isreg or coverletter_stat.stat.islnk
+        fail_msg: "Cover letter file does not exist"
+        success_msg: "Cover letter file exists"
+
+  always:
+    - name: Clean up downloaded files (TC03)
+      ansible.builtin.file:
+        path: "{{ test_download_dir }}"
+        state: absent
+      delegate_to: localhost
+      failed_when: false
+
+- name: TC04 - Download operation with requisites
+  block:
+    - name: TC04 - Create new download directory for requisites test
+      ansible.builtin.set_fact:
+        test_download_dir_req: "/tmp/ansible_test_ptf_download_req_{{ ansible_date_time.epoch }}"
+
+    - name: TC04 - Download PTF with requisites
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "{{ test_download_dir_req }}"
+        include_requisites: true
+        clean_directory: true
+      register: download_req_result
+      delegate_to: localhost
+
+    - name: Assert download with requisites succeeded
+      ansible.builtin.assert:
+        that:
+          - download_req_result is defined
+          - download_req_result.rc == 0
+          - download_req_result.entitlement_verified == true
+          - download_req_result.download_list is defined
+          - download_req_result.download_list | length >= 1
+        fail_msg: "Download with requisites failed"
+        success_msg: "Download with requisites succeeded"
+
+    - name: Display download with requisites results
+      ansible.builtin.debug:
+        var: download_req_result
+
+  always:
+    - name: Clean up downloaded files (TC04)
+      ansible.builtin.file:
+        path: "{{ test_download_dir_req }}"
+        state: absent
+      delegate_to: localhost
+      failed_when: false
+
+- name: TC05 - Download to existing directory without clean
+  block:
+    - name: TC05 - Create test directory
+      ansible.builtin.file:
+        path: "{{ test_download_dir }}_existing"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+
+    - name: Create a dummy file in directory
+      ansible.builtin.copy:
+        content: "test content"
+        dest: "{{ test_download_dir }}_existing/dummy.txt"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: TC05 - Download PTF to existing directory without clean
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "{{ test_download_dir }}_existing"
+        include_requisites: false
+        clean_directory: false
+      register: download_existing_result
+      delegate_to: localhost
+
+    - name: Assert download to existing directory succeeded
+      ansible.builtin.assert:
+        that:
+          - download_existing_result is defined
+          - download_existing_result.rc == 0
+          - download_existing_result.download_list is defined
+        fail_msg: "Download to existing directory failed"
+        success_msg: "Download to existing directory succeeded"
+
+    - name: Verify dummy file still exists
+      ansible.builtin.stat:
+        path: "{{ test_download_dir }}_existing/dummy.txt"
+      register: dummy_stat
+      delegate_to: localhost
+
+    - name: Assert dummy file was not deleted
+      ansible.builtin.assert:
+        that:
+          - dummy_stat.stat.exists
+        fail_msg: "Dummy file was incorrectly deleted"
+        success_msg: "Dummy file preserved as expected"
+
+  always:
+    - name: Clean up test directory (TC05)
+      ansible.builtin.file:
+        path: "{{ test_download_dir }}_existing"
+        state: absent
+      delegate_to: localhost
+      failed_when: false
+
+- name: TC06 - Download with clean_directory option
+  block:
+    - name: TC06 - Create test directory
+      ansible.builtin.file:
+        path: "{{ test_download_dir }}_clean"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+
+    - name: Create a dummy file in directory
+      ansible.builtin.copy:
+        content: "test content to be cleaned"
+        dest: "{{ test_download_dir }}_clean/to_be_deleted.txt"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: TC06 - Download PTF with clean_directory option
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "{{ test_download_dir }}_clean"
+        include_requisites: false
+        clean_directory: true
+      register: download_clean_result
+      delegate_to: localhost
+
+    - name: Assert download with clean succeeded
+      ansible.builtin.assert:
+        that:
+          - download_clean_result is defined
+          - download_clean_result.rc == 0
+          - download_clean_result.download_list is defined
+        fail_msg: "Download with clean_directory failed"
+        success_msg: "Download with clean_directory succeeded"
+
+    - name: Verify dummy file was deleted
+      ansible.builtin.stat:
+        path: "{{ test_download_dir }}_clean/to_be_deleted.txt"
+      register: deleted_stat
+      delegate_to: localhost
+
+    - name: Assert dummy file was deleted
+      ansible.builtin.assert:
+        that:
+          - not deleted_stat.stat.exists
+        fail_msg: "Dummy file was not deleted as expected"
+        success_msg: "Dummy file was deleted as expected"
+
+  always:
+    - name: Clean up test directory (TC06)
+      ansible.builtin.file:
+        path: "{{ test_download_dir }}_clean"
+        state: absent
+      delegate_to: localhost
+      failed_when: false

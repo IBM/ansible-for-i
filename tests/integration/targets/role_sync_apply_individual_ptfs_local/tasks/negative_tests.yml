@@ -1,0 +1,140 @@
+---
+# Negative test cases for role sync_apply_individual_ptfs_local
+# These tests verify proper error handling and validation
+
+- name: Set test variables for negative tests
+  ansible.builtin.set_fact:
+    test_ptf_id_neg: "SJ08667"
+    test_local_ptf_dir_neg: "/tmp/ansible_test_local_ptfs_neg_{{ ansible_date_time.epoch }}"
+    test_credentials:
+      machine_model: "HEX" # TODO: Replace with actual machine model
+      machine_type: "9080" # TODO: Replace with actual machine type
+      serial_number: "XXXXXXX" # TODO: Replace with actual serial number
+      country: "US" # TODO: Replace with actual country code
+
+- name: Download PTF for negative testing
+  block:
+    - name: Download PTF with ibmi_download_fix_from_cloud
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id_neg }}"
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "{{ test_local_ptf_dir_neg }}"
+        include_requisites: false
+        clean_directory: true
+      register: download_result_neg
+      delegate_to: localhost
+
+    - name: Assert download succeeded
+      ansible.builtin.assert:
+        that:
+          - download_result_neg is defined
+          - download_result_neg.rc == 0
+          - download_result_neg.download_list is defined
+          - download_result_neg.download_list | length > 0
+        fail_msg: "PTF download failed for negative tests"
+        success_msg: "PTF download succeeded for negative tests"
+
+    - name: Set PTF details from download result
+      ansible.builtin.set_fact:
+        test_ptf_product_neg: "{{ download_result_neg.download_list[0].product }}"
+        test_ptf_release_neg: "{{ download_result_neg.download_list[0].release }}"
+        test_ptf_file_name_neg: "{{ download_result_neg.download_list[0].file_name }}"
+        test_ptf_file_path_neg: "{{ download_result_neg.download_list[0].file_path }}"
+
+    - name: Display PTF details for negative tests
+      ansible.builtin.debug:
+        msg:
+          - "PTF ID: {{ test_ptf_id_neg }}"
+          - "Product: {{ test_ptf_product_neg }}"
+          - "Release: {{ test_ptf_release_neg }}"
+          - "File Name: {{ test_ptf_file_name_neg }}"
+          - "File Path: {{ test_ptf_file_path_neg }}"
+
+- name: TC01 - Missing PTF files (file not found)
+  block:
+    - name: TC01 - Test role with non-existent PTF files
+      ansible.builtin.include_role:
+        name: sync_apply_individual_ptfs_local
+      vars:
+        sync_apply_individual_ptfs_local_not_loaded_list:
+          - ptf_id: "XX99999"
+            product: "5770SS1"
+            file_name: "QXX99999.FILE"
+            file_path: "/nonexistent/path/"
+            release: "V7R6M0"
+        sync_apply_individual_ptfs_local_already_loaded_list: []
+        sync_apply_individual_ptfs_local_delete: true
+        sync_apply_individual_ptfs_local_apply_all_loaded_ptfs: true
+        sync_apply_individual_ptfs_local_temp_or_perm: "*TEMP"
+        sync_apply_individual_ptfs_local_delayed_option: "*IMMDLY"
+        sync_apply_individual_ptfs_local_auto_ipl: false
+      ignore_errors: true
+      register: missing_file_result
+
+    - name: TC01 - Assert role return variables are defined even on failure
+      ansible.builtin.assert:
+        that:
+          - sync_apply_individual_ptfs_local_sync_success_list is defined
+          - sync_apply_individual_ptfs_local_sync_fail_list is defined
+          - sync_apply_individual_ptfs_local_load_success_list is defined
+          - sync_apply_individual_ptfs_local_load_fail_list is defined
+          - sync_apply_individual_ptfs_local_load_fail_dict is defined
+          - sync_apply_individual_ptfs_local_apply_fail_with_requisite_list is defined
+          - sync_apply_individual_ptfs_local_apply_fail_dict is defined
+          - sync_apply_individual_ptfs_local_requisite_list is defined
+          - sync_apply_individual_ptfs_local_apply_success_list is defined
+          - sync_apply_individual_ptfs_local_apply_fail_list is defined
+        fail_msg: "Role return variables not properly defined on failure"
+        success_msg: "Role return variables defined correctly on failure"
+
+    - name: TC01 - Assert sync_fail_list has an entry from ibmi_copy failure with savf
+      ansible.builtin.assert:
+        that:
+          - sync_apply_individual_ptfs_local_sync_fail_list is defined
+          - sync_apply_individual_ptfs_local_sync_fail_list | length > 0
+        fail_msg: "Role return variable for sync failure list should not be empty"
+        success_msg: "Role return variables for sync failure list is not empty as expected"
+
+    - name: TC01 - Display missing file results
+      ansible.builtin.debug:
+        msg:
+          - "load_fail_list: {{ sync_apply_individual_ptfs_local_load_fail_list }}"
+          - "load_fail_dict: {{ sync_apply_individual_ptfs_local_load_fail_dict }}"
+
+- name: TC02 - Empty not_loaded_list and already_loaded_list
+  block:
+    - name: TC02 - Test role with empty lists (and don't apply all loaded PTFs)
+      ansible.builtin.include_role:
+        name: sync_apply_individual_ptfs_local
+      vars:
+        sync_apply_individual_ptfs_local_not_loaded_list: []
+        sync_apply_individual_ptfs_local_already_loaded_list: []
+        sync_apply_individual_ptfs_local_delete: true
+        sync_apply_individual_ptfs_local_apply_all_loaded_ptfs: false
+        sync_apply_individual_ptfs_local_temp_or_perm: "*TEMP"
+        sync_apply_individual_ptfs_local_delayed_option: "*IMMDLY"
+        sync_apply_individual_ptfs_local_auto_ipl: false
+      ignore_errors: true
+      register: empty_list_result
+
+    - name: TC02 - Display empty list results
+      ansible.builtin.debug:
+        var: empty_list_result
+
+    - name: TC02 - Assert role handles empty lists gracefully
+      ansible.builtin.assert:
+        that:
+          - sync_apply_individual_ptfs_local_load_success_list is defined
+          - sync_apply_individual_ptfs_local_load_success_list | length == 0
+          - sync_apply_individual_ptfs_local_apply_success_list is defined
+          - sync_apply_individual_ptfs_local_apply_success_list | length == 0
+        fail_msg: "Role did not handle empty lists correctly"
+        success_msg: "Role handled empty lists correctly"
+
+- name: Final cleanup - Remove downloaded PTF directory for negative tests
+  ansible.builtin.file:
+    path: "{{ test_local_ptf_dir_neg }}"
+    state: absent
+  delegate_to: localhost
+  failed_when: false

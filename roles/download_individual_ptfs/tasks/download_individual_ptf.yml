@@ -10,7 +10,7 @@
 
 - name: Compose successful list
   ansible.builtin.set_fact:
-    download_individual_ptfs_download_success_list: "{{ download_individual_ptfs_download_success_list | default([]) + download_result.download_list }}"
+    download_individual_ptfs_download_success_list: "{{ download_individual_ptfs_download_success_list + download_result.download_list }}"
   when: download_result.download_list != []
 
 - name: Compose failed list

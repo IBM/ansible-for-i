@@ -60,10 +60,10 @@ options:
     type: str
 
 seealso:
-- module: service
+  - module: ansible.builtin.service
 
 author:
-- Jin Yifan(@jinyifan)
+  - Jin Yifan(@jinyifan)
 '''
 
 EXAMPLES = r'''
@@ -170,7 +170,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 IBMi_STRSVR = "QSYS/STRTCPSVR"
 IBMi_ENDSVR = "QSYS/ENDTCPSVR"
 IBMi_TCP_SERVER_LIST = ["*ALL", "*AUTOSTART", "*BOOTP", "*DBG", "*DDM", "*DHCP", "*DIRSRV", "*DLFM", "*DNS",

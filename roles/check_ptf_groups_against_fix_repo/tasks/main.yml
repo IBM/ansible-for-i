@@ -3,18 +3,24 @@
 - name: Fail the playbook if repo_server is invalid
   ansible.builtin.fail:
     msg: "Repository server is not provided, please provide the repository server."
-  when: not check_ptf_groups_against_fix_repo_repo_server or check_ptf_groups_against_fix_repo_repo_server is undefined
+  when: >
+    check_ptf_groups_against_fix_repo_repo_server is undefined
+    or not check_ptf_groups_against_fix_repo_repo_server
 
 - name: Fail the playbook if group_list is invalid
   ansible.builtin.fail:
-    msg: "check_ptf_groups_against_fix_repo_group_list is not provided, please provide the group list."
-  when: check_ptf_groups_against_fix_repo_group_list == [] or check_ptf_groups_against_fix_repo_group_list is undefined
+    msg: >-
+      check_ptf_groups_against_fix_repo_group_list is not provided,
+      please provide the group list.
+  when: >
+    check_ptf_groups_against_fix_repo_group_list is undefined
+    or check_ptf_groups_against_fix_repo_group_list == []
 
 - name: Fail the playbook if type is invalid
   ansible.builtin.fail:
     msg: "Invalid input of check_ptf_groups_against_fix_repo_type '{{ check_ptf_groups_against_fix_repo_type }}'.
       Available options for check_ptf_groups_against_fix_repo_type: 'current' and 'latest'."
-  when: check_ptf_groups_against_fix_repo_type != 'current' and check_ptf_groups_against_fix_repo_type != 'latest'
+  when: check_ptf_groups_against_fix_repo_type not in ['current', 'latest']
 
 - name: Initialize the variables
   ansible.builtin.set_fact:
@@ -29,7 +35,14 @@
   block:
     - name: Compose fix repo parameters
       ansible.builtin.set_fact:
-        check_group_list: "{{ check_group_list | default([]) + [{'ptf_group_number': group, 'additional_param': 'ORDER BY ptf_group_level DESC LIMIT 1'}] }}"
+        check_group_list: >-
+          {{
+            check_group_list | default([])
+            + [{
+              'ptf_group_number': group,
+              'additional_param': 'ORDER BY ptf_group_level DESC LIMIT 1'
+            }]
+          }}
       with_list: "{{ check_ptf_groups_against_fix_repo_group_list }}"
       loop_control:
         loop_var: group
@@ -44,19 +57,25 @@
 
     - name: Got record failed from repository server
       ansible.builtin.set_fact:
-        check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([]) \
-                       + [{'PTF_GROUP_NUMBER': group.ptf_group_number, 'PTF_GROUP_STATUS': 'Record not found in repository DB'}] }}"
-      when: group_info.get('fail_list')
-      with_list: "{{ group_info.fail_list }}"
+        check_ptf_groups_against_fix_repo_group_status: >-
+          {{
+            check_ptf_groups_against_fix_repo_group_status | default([])
+            + [{
+              'PTF_GROUP_NUMBER': group.ptf_group_number,
+              'PTF_GROUP_STATUS': 'Record not found in repository DB'
+            }]
+          }}
+      when: group_info.get('fail_list') is not none
+      with_list: "{{ group_info.fail_list | default([]) }}"
       loop_control:
         loop_var: group
 
     - name: Compare the group on target system
       ansible.builtin.include_tasks: compare_latest_group.yml
-      with_list: "{{ group_info.success_list }}"
+      with_list: "{{ group_info.success_list | default([]) }}"
       loop_control:
         loop_var: group
-      when: group_info.get('success_list')
+      when: group_info.get('success_list') is not none
 
 - name: Compare current ptf group level against repository server
   when: check_ptf_groups_against_fix_repo_type == "current"
@@ -67,10 +86,16 @@
 
     - name: Retrieve group information from target system
       ibm.power_ibmi.ibmi_sql_query:
-        sql: "SELECT PTF_GROUP_NAME, PTF_GROUP_DESCRIPTION, PTF_GROUP_LEVEL, PTF_GROUP_STATUS \
-              FROM QSYS2.GROUP_PTF_INFO \
-              WHERE PTF_GROUP_LEVEL IN (SELECT MAX(PTF_GROUP_LEVEL) \
-              FROM QSYS2.GROUP_PTF_INFO WHERE PTF_GROUP_NAME IN ('{{ group_list_str }}') GROUP BY PTF_GROUP_NAME)"
+        sql: >-
+          SELECT PTF_GROUP_NAME, PTF_GROUP_DESCRIPTION, PTF_GROUP_LEVEL,
+          PTF_GROUP_STATUS
+          FROM QSYS2.GROUP_PTF_INFO
+          WHERE PTF_GROUP_LEVEL IN (
+            SELECT MAX(PTF_GROUP_LEVEL)
+            FROM QSYS2.GROUP_PTF_INFO
+            WHERE PTF_GROUP_NAME IN ('{{ group_list_str }}')
+            GROUP BY PTF_GROUP_NAME
+          )
       register: result
 
     - name: Compose the group name list
@@ -105,8 +130,15 @@
 
     - name: Compose group check list of 'NOT INSTALLED' for compare
       ansible.builtin.set_fact:
-        check_group_list: "{{ check_group_list | default([]) + [{'ptf_group_number': group.PTF_GROUP_NAME.strip(),
-          'ptf_group_level': group.PTF_GROUP_LEVEL, 'additional_param': 'ORDER BY release_date DESC LIMIT 1'}] }}"
+        check_group_list: >-
+          {{
+            check_group_list | default([])
+            + [{
+              'ptf_group_number': group.PTF_GROUP_NAME.strip(),
+              'ptf_group_level': group.PTF_GROUP_LEVEL,
+              'additional_param': 'ORDER BY release_date DESC LIMIT 1'
+            }]
+          }}
       when: group.PTF_GROUP_STATUS.strip() == "NOT INSTALLED"
       with_list: "{{ result.row }}"
       loop_control:
@@ -125,16 +157,16 @@
         check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([]) +
           [{'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level,
           'PTF_GROUP_STATUS': 'Record not found in repository DB'}] }}"
-      when: group_info.get('fail_list')
-      with_list: "{{ group_info.fail_list }}"
+      when: group_info.get('fail_list') is not none
+      with_list: "{{ group_info.fail_list | default([]) }}"
       loop_control:
         loop_var: group
 
     - name: Compare the group on target system
       ansible.builtin.include_tasks: compare_current_group.yml
-      with_list: "{{ group_info.success_list }}"
+      with_list: "{{ group_info.success_list | default([]) }}"
       loop_control:
         loop_var: group
       when:
-        - group_info.get('success_list')
+        - group_info.get('success_list') is not none
         - group_info.success_list | length > 0

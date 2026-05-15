@@ -1,0 +1,456 @@
+---
+# Positive test cases for role sync_apply_individual_ptfs_local
+# These tests verify successful operations of the role
+
+# NOTE: PTF SJ08667 is a small PTF for 7.6 release (replace with actual PTF for your test environment)
+# NOTE: Replace credentials with valid machine credentials for your test system
+
+- name: Set test variables for positive tests
+  ansible.builtin.set_fact:
+    test_ptf_id: "SJ08667" # Small PTF for 7.6 release
+    test_local_ptf_dir: "/tmp/ansible_test_local_ptfs_{{ ansible_date_time.epoch }}"
+    test_credentials:
+      machine_model: "HEX" # TODO: Replace with actual machine model
+      machine_type: "9080" # TODO: Replace with actual machine type
+      serial_number: "XXXXXXX" # TODO: Replace with actual serial number
+      country: "US" # TODO: Replace with actual country code
+
+- name: Download PTF for testing
+  block:
+    - name: Download PTF with ibmi_download_fix_from_cloud
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "{{ test_local_ptf_dir }}"
+        include_requisites: false
+        clean_directory: true
+      register: download_result
+      delegate_to: localhost
+
+    - name: Assert download succeeded
+      ansible.builtin.assert:
+        that:
+          - download_result is defined
+          - download_result.rc == 0
+          - download_result.download_list is defined
+          - download_result.download_list | length > 0
+        fail_msg: "PTF download failed"
+        success_msg: "PTF download succeeded"
+
+    - name: Set PTF details from download result
+      ansible.builtin.set_fact:
+        test_ptf_product: "{{ download_result.download_list[0].product }}"
+        test_ptf_release: "{{ download_result.download_list[0].release }}"
+        test_ptf_file_name: "{{ download_result.download_list[0].file_name }}"
+        test_ptf_file_path: "{{ download_result.download_list[0].file_path }}"
+
+    - name: Display PTF details
+      ansible.builtin.debug:
+        msg:
+          - "PTF ID: {{ test_ptf_id }}"
+          - "Product: {{ test_ptf_product }}"
+          - "Release: {{ test_ptf_release }}"
+          - "File Name: {{ test_ptf_file_name }}"
+          - "File Path: {{ test_ptf_file_path }}"
+
+- name: TC01 - Sync and apply single PTF with delete option false
+  block:
+    - name: TC01 - Include check_ptf role to determine PTF status
+      ansible.builtin.include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list:
+          - ptf_id: "{{ test_ptf_id }}"
+            product: "{{ test_ptf_product }}"
+            file_name: "{{ test_ptf_file_name }}"
+            file_path: "{{ test_ptf_file_path }}"
+            release: "{{ test_ptf_release }}"
+
+    - name: Display check_ptf results
+      ansible.builtin.debug:
+        msg:
+          - "check_ptf_not_loaded_ptfs_list: {{ check_ptf_not_loaded_ptfs_list }}"
+          - "check_ptf_loaded_ptfs_list: {{ check_ptf_loaded_ptfs_list }}"
+
+    - name: TC01 - Test sync_apply_individual_ptfs_local role with delete=false
+      ansible.builtin.include_role:
+        name: sync_apply_individual_ptfs_local
+      vars:
+        sync_apply_individual_ptfs_local_not_loaded_list: "{{ check_ptf_not_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_already_loaded_list: "{{ check_ptf_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_delete: false
+        sync_apply_individual_ptfs_local_apply_all_loaded_ptfs: true
+        sync_apply_individual_ptfs_local_temp_or_perm: "*TEMP"
+        sync_apply_individual_ptfs_local_delayed_option: "*IMMDLY"
+        sync_apply_individual_ptfs_local_auto_ipl: false
+      when: check_ptf_not_loaded_ptfs_list | length > 0 or check_ptf_loaded_ptfs_list | length > 0
+
+    - name: Query applied PTF after role execution
+      ibm.power_ibmi.ibmi_fix:
+        operation: "query"
+        fix_list:
+          - "{{ test_ptf_id }}"
+      register: queried_ptf_info
+
+    - name: Assert queried PTF is present and applied
+      ansible.builtin.assert:
+        that:
+          - queried_ptf_info.rc == 0
+          - queried_ptf_info.ptf_not_on_system_list is defined
+          - test_ptf_id not in queried_ptf_info.ptf_not_on_system_list
+          - queried_ptf_info.ptf_list is defined
+          - queried_ptf_info.ptf_list | length > 0
+          - queried_ptf_info.ptf_list[0].PTF_IDENTIFIER == test_ptf_id
+          - queried_ptf_info.ptf_list[0].PTF_LOADED_STATUS == 'APPLIED'
+        fail_msg: "Queried PTF was not present and applied after role execution"
+        success_msg: "Queried PTF is present and applied after role execution"
+
+    - name: Display queried PTF results
+      ansible.builtin.debug:
+        var: queried_ptf_info
+
+    - name: Assert role return variables are defined
+      ansible.builtin.assert:
+        that:
+          - sync_apply_individual_ptfs_local_load_success_list is defined
+          - sync_apply_individual_ptfs_local_load_fail_list is defined
+          - sync_apply_individual_ptfs_local_load_fail_dict is defined
+          - sync_apply_individual_ptfs_local_apply_fail_with_requisite_list is defined
+          - sync_apply_individual_ptfs_local_apply_fail_dict is defined
+          - sync_apply_individual_ptfs_local_requisite_list is defined
+          - sync_apply_individual_ptfs_local_apply_success_list is defined
+          - sync_apply_individual_ptfs_local_apply_fail_list is defined
+        fail_msg: "Role return variables not properly defined"
+        success_msg: "All role return variables are defined"
+
+    - name: Display role results
+      ansible.builtin.debug:
+        msg:
+          - "load_success_list: {{ sync_apply_individual_ptfs_local_load_success_list }}"
+          - "load_fail_list: {{ sync_apply_individual_ptfs_local_load_fail_list }}"
+          - "apply_success_list: {{ sync_apply_individual_ptfs_local_apply_success_list }}"
+          - "apply_fail_list: {{ sync_apply_individual_ptfs_local_apply_fail_list }}"
+
+  always:
+    - name: Remove the PTF (TC01 cleanup)
+      ibm.power_ibmi.ibmi_fix:
+        operation: "remove"
+        delayed_option: "*NO"
+        temp_or_perm: "*PERM"
+        fix_list:
+          - "{{ test_ptf_id }}"
+        product_id: "{{ test_ptf_product }}"
+      register: rm_ptf_info
+      ignore_errors: true
+
+    - name: Display PTF removal result
+      ansible.builtin.debug:
+        var: rm_ptf_info
+
+- name: TC02 - Apply already loaded PTF
+  block:
+    - name: TC02 - Load PTF using load_ptf role
+      ansible.builtin.include_role:
+        name: load_ptf
+      vars:
+        load_ptf_to_be_loaded_list:
+          - ptf_id: "{{ test_ptf_id }}"
+            product: "{{ test_ptf_product }}"
+            file_name: "{{ test_ptf_file_name }}"
+            file_path: "{{ test_ptf_file_path }}"
+            release: "{{ test_ptf_release }}"
+        load_ptf_remote_lib: "QGPL"
+
+    - name: Display load_ptf results
+      ansible.builtin.debug:
+        msg:
+          - "load_ptf_load_success_list: {{ load_ptf_load_success_list }}"
+          - "load_ptf_load_fail_list: {{ load_ptf_load_fail_list }}"
+
+    - name: TC02 - Test sync_apply_individual_ptfs_local role with already loaded PTF
+      ansible.builtin.include_role:
+        name: sync_apply_individual_ptfs_local
+      vars:
+        sync_apply_individual_ptfs_local_not_loaded_list: []
+        sync_apply_individual_ptfs_local_already_loaded_list:
+          - ptf_id: "{{ test_ptf_id }}"
+            product: "{{ test_ptf_product }}"
+        sync_apply_individual_ptfs_local_delete: false
+        sync_apply_individual_ptfs_local_apply_all_loaded_ptfs: true
+        sync_apply_individual_ptfs_local_temp_or_perm: "*TEMP"
+        sync_apply_individual_ptfs_local_delayed_option: "*IMMDLY"
+        sync_apply_individual_ptfs_local_auto_ipl: false
+
+    - name: Query applied PTF after role execution
+      ibm.power_ibmi.ibmi_fix:
+        operation: "query"
+        fix_list:
+          - "{{ test_ptf_id }}"
+      register: queried_ptf_info
+
+    - name: Assert queried PTF is present and applied
+      ansible.builtin.assert:
+        that:
+          - queried_ptf_info.rc == 0
+          - queried_ptf_info.ptf_not_on_system_list is defined
+          - test_ptf_id not in queried_ptf_info.ptf_not_on_system_list
+          - queried_ptf_info.ptf_list is defined
+          - queried_ptf_info.ptf_list | length > 0
+          - queried_ptf_info.ptf_list[0].PTF_IDENTIFIER == test_ptf_id
+          - queried_ptf_info.ptf_list[0].PTF_LOADED_STATUS == 'APPLIED'
+          # - queried_ptf_info.ptf_list[0].PTF_LOADED_STATUS in ['APPLIED', 'PERMANENTLY APPLIED']
+        fail_msg: "Queried PTF was not present and applied after role execution"
+        success_msg: "Queried PTF is present and applied after role execution"
+
+    - name: Display queried PTF results
+      ansible.builtin.debug:
+        var: queried_ptf_info
+
+    - name: Assert already loaded PTF handled correctly
+      ansible.builtin.assert:
+        that:
+          - sync_apply_individual_ptfs_local_apply_success_list is defined or sync_apply_individual_ptfs_local_apply_fail_list is defined
+        fail_msg: "Already loaded PTF not handled correctly"
+        success_msg: "Already loaded PTF handled correctly"
+
+    - name: Display already loaded PTF results
+      ansible.builtin.debug:
+        msg:
+          - "apply_success_list: {{ sync_apply_individual_ptfs_local_apply_success_list }}"
+          - "apply_fail_list: {{ sync_apply_individual_ptfs_local_apply_fail_list }}"
+
+  always:
+    - name: Remove the PTF (TC02 cleanup)
+      ibm.power_ibmi.ibmi_fix:
+        operation: "remove"
+        delayed_option: "*NO"
+        temp_or_perm: "*PERM"
+        fix_list:
+          - "{{ test_ptf_id }}"
+        product_id: "{{ test_ptf_product }}"
+      register: rm_ptf_info
+      ignore_errors: true
+
+    - name: Display PTF removal result
+      ansible.builtin.debug:
+        var: rm_ptf_info
+
+- name: TC03 - Sync and apply single PTF with delete option true
+  block:
+    - name: TC03 - Include check_ptf role to determine PTF status
+      ansible.builtin.include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list:
+          - ptf_id: "{{ test_ptf_id }}"
+            product: "{{ test_ptf_product }}"
+            file_name: "{{ test_ptf_file_name }}"
+            file_path: "{{ test_ptf_file_path }}"
+            release: "{{ test_ptf_release }}"
+
+    - name: TC03 - Test sync_apply_individual_ptfs_local role with delete=true
+      ansible.builtin.include_role:
+        name: sync_apply_individual_ptfs_local
+      vars:
+        sync_apply_individual_ptfs_local_not_loaded_list: "{{ check_ptf_not_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_already_loaded_list: "{{ check_ptf_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_delete: true
+        sync_apply_individual_ptfs_local_apply_all_loaded_ptfs: true
+        sync_apply_individual_ptfs_local_temp_or_perm: "*TEMP"
+        sync_apply_individual_ptfs_local_delayed_option: "*IMMDLY"
+        sync_apply_individual_ptfs_local_auto_ipl: false
+      when: check_ptf_not_loaded_ptfs_list | length > 0 or check_ptf_loaded_ptfs_list | length > 0
+
+    - name: Query applied PTF after role execution
+      ibm.power_ibmi.ibmi_fix:
+        operation: "query"
+        fix_list:
+          - "{{ test_ptf_id }}"
+      register: queried_ptf_info
+
+    - name: Assert queried PTF is present and applied
+      ansible.builtin.assert:
+        that:
+          - queried_ptf_info.rc == 0
+          - queried_ptf_info.ptf_not_on_system_list is defined
+          - test_ptf_id not in queried_ptf_info.ptf_not_on_system_list
+          - queried_ptf_info.ptf_list is defined
+          - queried_ptf_info.ptf_list | length > 0
+          - queried_ptf_info.ptf_list[0].PTF_IDENTIFIER == test_ptf_id
+          - queried_ptf_info.ptf_list[0].PTF_LOADED_STATUS == 'APPLIED'
+        fail_msg: "Queried PTF was not present and applied after role execution"
+        success_msg: "Queried PTF is present and applied after role execution"
+
+    - name: Display queried PTF results
+      ansible.builtin.debug:
+        var: queried_ptf_info
+
+    - name: Assert role processed correctly
+      ansible.builtin.assert:
+        that:
+          - sync_apply_individual_ptfs_local_load_success_list is defined
+          - sync_apply_individual_ptfs_local_apply_success_list is defined
+        fail_msg: "Role did not process correctly"
+        success_msg: "Role processed successfully"
+
+    - name: Display role results
+      ansible.builtin.debug:
+        msg:
+          - "load_success_list: {{ sync_apply_individual_ptfs_local_load_success_list }}"
+          - "apply_success_list: {{ sync_apply_individual_ptfs_local_apply_success_list }}"
+
+  always:
+    - name: Remove the PTF (TC03 cleanup)
+      ibm.power_ibmi.ibmi_fix:
+        operation: "remove"
+        delayed_option: "*NO"
+        temp_or_perm: "*PERM"
+        fix_list:
+          - "{{ test_ptf_id }}"
+        product_id: "{{ test_ptf_product }}"
+      register: rm_ptf_info
+      ignore_errors: true
+
+    - name: Display PTF removal result
+      ansible.builtin.debug:
+        var: rm_ptf_info
+
+- name: TC04 - Permanent apply with delayed option (SKIP FOR NOW)
+  when: false
+  block:
+    - name: TC04 - Include check_ptf role to determine PTF status
+      ansible.builtin.include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list:
+          - ptf_id: "{{ test_ptf_id }}"
+            product: "{{ test_ptf_product }}"
+            file_name: "{{ test_ptf_file_name }}"
+            file_path: "{{ test_ptf_file_path }}"
+            release: "{{ test_ptf_release }}"
+
+    - name: TC04 - Test sync_apply_individual_ptfs_local role with permanent apply
+      ansible.builtin.include_role:
+        name: sync_apply_individual_ptfs_local
+      vars:
+        sync_apply_individual_ptfs_local_not_loaded_list: "{{ check_ptf_not_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_already_loaded_list: "{{ check_ptf_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_delete: true
+        sync_apply_individual_ptfs_local_apply_all_loaded_ptfs: true
+        # sync_apply_individual_ptfs_local_temp_or_perm: "*PERM"
+        # sync_apply_individual_ptfs_local_delayed_option: "*YES"
+        sync_apply_individual_ptfs_local_temp_or_perm: "*TEMP"
+        sync_apply_individual_ptfs_local_auto_ipl: false
+      when: check_ptf_not_loaded_ptfs_list | length > 0 or check_ptf_loaded_ptfs_list | length > 0
+
+    - name: Assert permanent apply processed
+      ansible.builtin.assert:
+        that:
+          - sync_apply_individual_ptfs_local_load_success_list is defined
+        fail_msg: "Permanent apply not processed correctly"
+        success_msg: "Permanent apply processed successfully"
+
+    - name: Display permanent apply results
+      ansible.builtin.debug:
+        var: sync_apply_individual_ptfs_local_apply_success_list
+
+  always:
+    - name: Remove the PTF (TC04 cleanup)
+      ibm.power_ibmi.ibmi_fix:
+        operation: "remove"
+        delayed_option: "*NO"
+        temp_or_perm: "*PERM"
+        fix_list:
+          - "{{ test_ptf_id }}"
+        product_id: "{{ test_ptf_product }}"
+      register: rm_ptf_info
+      ignore_errors: true
+
+    - name: Display PTF removal result
+      ansible.builtin.debug:
+        var: rm_ptf_info
+
+- name: TC05 - Immediate apply with temp_or_perm set to TEMP
+  block:
+    - name: TC05 - Include check_ptf role to determine PTF status
+      ansible.builtin.include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list:
+          - ptf_id: "{{ test_ptf_id }}"
+            product: "{{ test_ptf_product }}"
+            file_name: "{{ test_ptf_file_name }}"
+            file_path: "{{ test_ptf_file_path }}"
+            release: "{{ test_ptf_release }}"
+
+    - name: TC05 - Test sync_apply_individual_ptfs_local role with immediate temp apply
+      ansible.builtin.include_role:
+        name: sync_apply_individual_ptfs_local
+      vars:
+        sync_apply_individual_ptfs_local_not_loaded_list: "{{ check_ptf_not_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_already_loaded_list: "{{ check_ptf_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_delete: true
+        sync_apply_individual_ptfs_local_apply_all_loaded_ptfs: true
+        sync_apply_individual_ptfs_local_temp_or_perm: "*TEMP"
+        sync_apply_individual_ptfs_local_delayed_option: "*IMMDLY"
+        sync_apply_individual_ptfs_local_auto_ipl: false
+      when: check_ptf_not_loaded_ptfs_list | length > 0 or check_ptf_loaded_ptfs_list | length > 0
+
+    - name: Query applied PTF after role execution
+      ibm.power_ibmi.ibmi_fix:
+        operation: "query"
+        fix_list:
+          - "{{ test_ptf_id }}"
+      register: queried_ptf_info
+
+    - name: Assert queried PTF is present and applied
+      ansible.builtin.assert:
+        that:
+          - queried_ptf_info.rc == 0
+          - queried_ptf_info.ptf_not_on_system_list is defined
+          - test_ptf_id not in queried_ptf_info.ptf_not_on_system_list
+          - queried_ptf_info.ptf_list is defined
+          - queried_ptf_info.ptf_list | length > 0
+          - queried_ptf_info.ptf_list[0].PTF_IDENTIFIER == test_ptf_id
+          - queried_ptf_info.ptf_list[0].PTF_LOADED_STATUS == 'APPLIED'
+        fail_msg: "Queried PTF was not present and applied after role execution"
+        success_msg: "Queried PTF is present and applied after role execution"
+
+    - name: Display queried PTF results
+      ansible.builtin.debug:
+        var: queried_ptf_info
+
+    - name: Assert immediate temp apply processed
+      ansible.builtin.assert:
+        that:
+          - sync_apply_individual_ptfs_local_load_success_list is defined
+        fail_msg: "Immediate temp apply not processed correctly"
+        success_msg: "Immediate temp apply processed successfully"
+
+    - name: Display immediate temp apply results
+      ansible.builtin.debug:
+        var: sync_apply_individual_ptfs_local_apply_success_list
+
+  always:
+    - name: Remove the PTF (TC05 cleanup)
+      ibm.power_ibmi.ibmi_fix:
+        operation: "remove"
+        delayed_option: "*NO"
+        temp_or_perm: "*PERM"
+        fix_list:
+          - "{{ test_ptf_id }}"
+        product_id: "{{ test_ptf_product }}"
+      register: rm_ptf_info
+      ignore_errors: true
+
+    - name: Display PTF removal result
+      ansible.builtin.debug:
+        var: rm_ptf_info
+
+- name: Final cleanup - Remove downloaded PTF directory
+  ansible.builtin.file:
+    path: "{{ test_local_ptf_dir }}"
+    state: absent
+  delegate_to: localhost
+  failed_when: false

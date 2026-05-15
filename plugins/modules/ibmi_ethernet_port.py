@@ -46,10 +46,10 @@ notes:
     https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_74/apis/qgyrhri.htm
 
 seealso:
-- module: ibmi_cl_command
+  - module: ibm.power_ibmi.ibmi_cl_command
 
 author:
-- Chang Le(@changlexc)
+  - Chang Le(@changlexc)
 '''
 
 EXAMPLES = r'''
@@ -140,7 +140,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def get_info_from_resource_name(imodule, resource_name):
