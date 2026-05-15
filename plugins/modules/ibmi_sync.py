@@ -111,7 +111,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 HAS_PARAMIKO = True
 
 try:
@@ -199,8 +199,10 @@ def main():
                 except Exception as e:
                     return_error(module, f"Put {to_text(e)} to remote host exception. Use -vvv for more information.", result)
 
+                # Hitting an issue with "mv", so now using "cp" and "rm" pairing instead.
                 ibmi_util.log_debug("mv " + ifs_name + " " + dest, module._name)
-                stdin, stdout, stderr = ssh.exec_command(f'mv {ifs_name} {dest}')
+                # stdin, stdout, stderr = ssh.exec_command(f'mv {ifs_name} {dest}')
+                stdin, stdout, stderr = ssh.exec_command(f'cp {ifs_name} {dest} && rm {ifs_name}')
                 line = stderr.readlines()
                 if line != []:
                     return_error(module, f"Failed to mv file to qsys. qsys dir = {dest}. {line}", result)

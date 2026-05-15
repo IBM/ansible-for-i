@@ -5,6 +5,6 @@
     - ibm.power_ibmi
 
   tasks:
-    # positive cases is covered in role_check_ptf_group, only run negative testcase here. 
+    # positive cases is covered in role_check_ptf_group, only run negative testcase here.
     # negative cases
     - ansible.builtin.include_tasks: neg_case.yml

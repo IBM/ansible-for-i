@@ -20,9 +20,9 @@
 - name: Query ip interfaces from source system
   ibm.power_ibmi.ibmi_sql_query:
     sql: "SELECT INTERNET_ADDRESS,CONNECTION_TYPE,SUBNET_MASK,PREFIX_LENGTH,LINE_DESCRIPTION,
-    VIRTUAL_LAN_ID,PREFIX_LENGTH from QSYS2.NETSTAT_INTERFACE_INFO WHERE (INTERNET_ADDRESS =
-    '{{ present_ip_interface_ip_address }}') AND (INTERFACE_LINE_TYPE = 'ELAN' OR INTERFACE_LINE_TYPE = 'VETH'
-    OR LINE_DESCRIPTION = '*VIRTUALIP') AND INTERNET_ADDRESS not in ('*IP6SAC', '*IP4DHCP')"
+      VIRTUAL_LAN_ID,PREFIX_LENGTH from QSYS2.NETSTAT_INTERFACE_INFO WHERE (INTERNET_ADDRESS =
+      '{{ present_ip_interface_ip_address }}') AND (INTERFACE_LINE_TYPE = 'ELAN' OR INTERFACE_LINE_TYPE = 'VETH'
+      OR LINE_DESCRIPTION = '*VIRTUALIP') AND INTERNET_ADDRESS not in ('*IP6SAC', '*IP4DHCP')"
   register: existing_ip_interfaces
 
 - name: Create a new IP interface when it doesn't exist
@@ -85,7 +85,7 @@
     - name: Query existing route
       ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT * FROM QSYS2.NETSTAT_ROUTE_INFO
-  WHERE NEXT_HOP = '{{ present_ip_interface_next_hop }}'"
+          WHERE NEXT_HOP = '{{ present_ip_interface_next_hop }}'"
       register: route_info
 
     - name: Create route if present_ip_interface_next_hop is provided.

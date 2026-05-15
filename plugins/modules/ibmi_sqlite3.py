@@ -40,7 +40,7 @@ options:
     required: false
 
 author:
-- Xu Meng(@dmabupt)
+  - Xu Meng(@dmabupt)
 '''
 
 EXAMPLES = r'''
@@ -161,7 +161,7 @@ from ansible.module_utils.basic import AnsibleModule
 import sqlite3
 import datetime
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def main():

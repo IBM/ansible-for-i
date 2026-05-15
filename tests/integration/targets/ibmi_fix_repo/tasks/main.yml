@@ -32,11 +32,11 @@
     register: install_status
     failed_when: install_status.rc != 0
 
-  - name: TC00B - install pip3-requests as needed
-    command:
-      cmd: /QOpenSys/pkgs/bin/pip3 install requests
-    register: install_status
-    failed_when: install_status.rc != 0
+#  - name: TC00B - install pip3-requests as needed
+#    command:
+#      cmd: /QOpenSys/pkgs/bin/pip3 install requests
+#    register: install_status
+#    failed_when: install_status.rc != 0
 
   - name: TC00C - get latest group ptf info on PSP
     ibmi_fix_group_check:
@@ -88,9 +88,9 @@
     assert:
       that:
         - find_ds.success_list | length == 1
-        - find_ds.success_list | selectattr('order_id', 'equalto', download_fix.order_id)
-        - find_ds.success_list | selectattr('file_path', 'equalto', download_fix.file_path)
-        - find_ds.success_list | selectattr('download_status', 'equalto', 'DOWNLOADING')                
+        - find_ds.success_list | selectattr('order_id', 'equalto', download_fix.order_id) | list | length == 1
+        - find_ds.success_list | selectattr('file_path', 'equalto', download_fix.file_path) | list | length == 1
+        - find_ds.success_list | selectattr('download_status', 'equalto', 'DOWNLOADING') | list | length == 1               
         - find_ds.type == "download_status"
 
   - name: TC01C - wait for download completes
@@ -125,17 +125,16 @@
         - update_ds.action == "update"
         - update_ds.row_changed == 1
         - update_ds.type == "download_status"      
-        - upd_result.parameters | selectattr('checksum', 'defined')
+        - upd_result.parameters[0].checksum is defined
         #- upd_result.parameters | selectattr('description', 'defined')
-        - upd_result.parameters | selectattr('file_name', 'defined')
-        - upd_result.parameters | selectattr('checksum', 'defined')
-        - upd_result.parameters | selectattr('order_id','equalto', download_fix.order_id)
-        - upd_result.parameters | selectattr('ptf_group_level', 'equalto', returned_ptf_group_level | int)
-        - upd_result.parameters | selectattr('ptf_group_number', 'equalto', returned_ptf_group_number)
+        - upd_result.parameters[0].file_name is defined
+        - upd_result.parameters | selectattr('order_id','equalto', download_fix.order_id) | list | length == 1
+        - upd_result.parameters | selectattr('ptf_group_level', 'equalto', returned_ptf_group_level | int) | list | length == 1
+        - upd_result.parameters | selectattr('ptf_group_number', 'equalto', returned_ptf_group_number) | list | length == 1
         #- upd_result.parameters | selectattr('ptf_list', 'defined')
-        - upd_result.parameters | selectattr('release_date', 'equalto', returned_ptf_group_release_date)
+        - upd_result.parameters | selectattr('release_date', 'equalto', returned_ptf_group_release_date) | list | length == 1
         #- upd_result.parameters | selectattr('url', 'defined')
-        #- upd_result.parameters | selectattr('release', 'match','R[0-9][0-9][0-9]')
+        #- upd_result.parameters | selectattr('release', 'match','R[0-9][0-9][0-9]') | list | length == 1
         - upd_result.sql is defined
         - upd_result.type == 'ptf_group'
 
@@ -154,19 +153,19 @@
         - query_result.action == 'find'
         - query_result.type == 'ptf_group'
         - query_result.sql is defined
-        - query_result.success_list | selectattr('add_time','defined')
-        - query_result.success_list | selectattr('checksum','defined')
-        - query_result.success_list | selectattr('description','defined')
-        - query_result.success_list | selectattr('file_name','defined')
-        - query_result.success_list | selectattr('file_path','equalto', download_fix.file_path)
-        - query_result.success_list | selectattr('id','defined')
-        - query_result.success_list | selectattr('order_id','equalto', download_fix.order_id)
-        - query_result.success_list | selectattr('ptf_group_level','equalto', returned_ptf_group_level | int)
-        - query_result.success_list | selectattr('ptf_group_number','equalto', returned_ptf_group_number)
-        - query_result.success_list | selectattr('ptf_group_status','equalto','Match')
-        - query_result.success_list | selectattr('ptf_list','defined')
-        - query_result.success_list | selectattr('release','R[0-9][0-9][0-9]')
-        - query_result.success_list | selectattr('release_date','equalto', returned_ptf_group_release_date)
+        - query_result.success_list[0].add_time is defined
+        - query_result.success_list[0].checksum is defined
+        - query_result.success_list[0].description is defined
+        - query_result.success_list[0].file_name is defined
+        - query_result.success_list | selectattr('file_path','equalto', download_fix.file_path)  | list | length == 1
+        - query_result.success_list[0].id is defined
+        - query_result.success_list | selectattr('order_id','equalto', download_fix.order_id)  | list | length == 1
+        - query_result.success_list | selectattr('ptf_group_level','equalto', returned_ptf_group_level | int)  | list | length == 1
+        - query_result.success_list | selectattr('ptf_group_number','equalto', returned_ptf_group_number)  | list | length == 1
+        - query_result.success_list | selectattr('db_record','equalto','MATCH')  | list | length == 1
+        - query_result.success_list[0].ptf_list is defined
+        #- query_result.success_list | selectattr('release','R[0-9][0-9][0-9]')  | list | length == 1
+        - query_result.success_list | selectattr('release_date','equalto', returned_ptf_group_release_date)  | list | length == 1
 
   - name: TC01F - find download_status with additional parameters
     ibmi_fix_repo:
@@ -201,8 +200,8 @@
         - delete_result.action == 'delete'
         - delete_result.type == 'ptf_group'
         - delete_result.sql is defined 
-        - delete_result.parameters | selectattr('order_id','equalto', download_fix.order_id)
-        - delete_result.parameters | selectattr('file_path','equalto', download_fix.file_path)
+        - delete_result.parameters | selectattr('order_id','equalto', download_fix.order_id) | list | length == 1
+        - delete_result.parameters | selectattr('file_path','equalto', download_fix.file_path) | list | length == 1
         - delete_result.row_changed == 1
 
   - name: TC01H - delete some PTFs records
@@ -322,8 +321,8 @@
     assert:
       that:
         - sp_result.action == "find"
-        - sp_result.success_list | length == 1  
-        - sp_result.success_list[0]['file_path'] == "/QSYS.LIB/TEMPLIB.LIB/{{dl_sp.download_list[0]['file_name']}}.FILE" # only hit the latest one
+        - sp_result.success_list | length == 1
+        - sp_result.success_list[0]['file_path'] == "/QSYS.LIB/TEMPLIB.LIB/" ~ dl_sp.download_list[0]['file_name'] ~ ".FILE" # only hit the latest one
         - sp_result.row_changed == -1
         - sp_result.type == "single_ptf"
         - sp_result.fail_list | length == 2
@@ -343,7 +342,7 @@
       that:
         - sp_result.action == "find"
         - sp_result.success_list | length == 1
-        - sp_result.success_list | selectattr('db_record', 'equalto', 'MATCH')
+        - sp_result.success_list | selectattr('db_record', 'equalto', 'MATCH') | list | length == 1
         - sp_result.row_changed == -1
         - sp_result.type == "single_ptf"
         - sp_result.fail_list is not defined
@@ -392,8 +391,8 @@
   - name: TC03 - Assert values
     assert:
       that:
-        - neg_result.fail_list | selectattr('msg', 'equalto', 'Specified image path [/QIBM/UserData/OS/Service/ECS/PTF/notexist] is not a valid directory')
-        - neg_result.fail_list | selectattr('rc', 'equalto', '-2')
+        - neg_result.fail_list | selectattr('msg', 'equalto', 'Specified image path [/QIBM/UserData/OS/Service/ECS/PTF/notexist] is not a valid directory') | list | length == 1
+        - neg_result.fail_list | selectattr('rc', '==', -2) | list | length == 1
 
   - name: TC04A - Negative test - missing required parameters for ptf_group. ptf_group_number, ptf_group_level, release_date, file_path are required
     ibmi_fix_repo:
@@ -410,8 +409,8 @@
   - name: TC04A - Assert values
     assert:
       that:
-        - neg_result.fail_list | selectattr('msg', 'Match', 'Required parameter * is missing in parameters')
-        - neg_result.fail_list | selectattr('rc', 'equalto', '-1')
+        - neg_result.fail_list | selectattr('msg', 'match', 'Required parameter \\[.*\\] is missing in parameters') | list | length >= 1
+        - neg_result.fail_list | selectattr('rc', 'equalto', -1) | list | length >= 1
         - neg_result.fail_list | length == 4
 
   - name: TC04B - Negative test - missing required parameters for single_ptf, id and product are must
@@ -427,8 +426,8 @@
   - name: TC04B - Assert values
     assert:
       that:
-        - neg_result.fail_list | selectattr('msg', 'Match', 'Required parameter * is missing in parameters')
-        - neg_result.fail_list | selectattr('rc', 'equalto', '-1')
+        - neg_result.fail_list | selectattr('msg', 'match', 'Required parameter \\[.*\\] is missing in parameters') | list | length == 2
+        - neg_result.fail_list | selectattr('rc', 'equalto', -1) | list | length == 2
         - neg_result.fail_list | length == 2
 
   - name: TC04C - Negative test - missing required parameters for download_status, order_id is required
@@ -442,8 +441,8 @@
   - name: TC04C - Assert values
     assert:
       that:
-        - neg_result.fail_list | selectattr('msg', 'Match', 'Required parameter * is missing in parameters')
-        - neg_result.fail_list | selectattr('rc', 'equalto', '-1')
+        - neg_result.fail_list | selectattr('msg', 'match', 'Required parameter \\[.*\\] is missing in parameters') | list | length == 1
+        - neg_result.fail_list | selectattr('rc', 'equalto', -1) | list | length == 1
         - neg_result.fail_list | length == 1
 
   - name: TC04D - Negative test - delete a non-existing record from db
@@ -491,12 +490,16 @@
     assert:
       that:
         - neg_result.fail_list | length == 4
-        - neg_result.fail_list[0] | selectattr('msg','equalto','Required parameter [file_path] is missing in parameters')
-        - neg_result.fail_list[0] | selectattr('rc','equalto','-1')
-        - neg_result.fail_list[0] | selectattr('ptf_id','equalto', ptfs[0])
-        - neg_result.fail_list[1] | selectattr('msg','equalto','Target image file [/QSYS.LIB/QGPL.LIB/NOTEXIST.FILE] is not readable')
-        - neg_result.fail_list[1] | selectattr('rc','equalto','-3')
-        - neg_result.fail_list[1] | selectattr('ptf_id','equalto', ptfs[0])
+        - neg_result.fail_list[0]['msg'] == 'Required parameter [ptf_id] is missing in parameters'
+        - neg_result.fail_list[0]['rc'] == -1
+        - neg_result.fail_list[0]['product'] == '5770SS1'
+        - neg_result.fail_list[1]['msg'] == 'Required parameter [product] is missing in parameters'
+        - neg_result.fail_list[1]['rc'] == -1
+        - neg_result.fail_list[1]['ptf_id'] == ptfs[0]
+        - neg_result.fail_list[2]['msg'] == 'Input parameter (product) [NONEXIST] is not valid'
+        - neg_result.fail_list[2]['rc'] == -2
+        - neg_result.fail_list[3]['msg'] == 'Target image file [/QSYS.LIB/QGPL.LIB/NOTEXIST.FILE] not found'
+        - neg_result.fail_list[3]['rc'] == -4
 
   - name: TC04G - Negative test - try to find a non-exist single_ptf record 
     ibmi_fix_repo:
@@ -509,14 +512,14 @@
   - name: TC04G - Assert Values
     assert:
       that:
-        - neg_result.parameters | selectattr('db_record','equalto', 'RECORD_NOT_FOUND')
+        - neg_result.fail_list | selectattr('db_record','equalto', 'RECORD_NOT_FOUND') | list | length == 1
 
   - name: TC04H - Negative test - try to delete a non-exist single_ptf record    
     ibmi_fix_repo:
       action: 'delete'  
       type: 'single_ptf'
       parameters:
-        - {'ptf_id':'{{ptfs[2]}}'}  
+        - {'ptf_id':'{{ptfs[2]}}'}
     register: neg_result  
 
   - name: TC04H - Assert Values

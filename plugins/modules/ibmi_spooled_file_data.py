@@ -55,10 +55,10 @@ options:
     type: str
 
 seealso:
-- module: ibmi_submit_job
+  - module: ibm.power_ibmi.ibmi_submit_job
 
 author:
-- Chang Le(@changlexc)
+  - Chang Le(@changlexc)
 '''
 
 EXAMPLES = r'''
@@ -133,7 +133,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 import fnmatch
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def main():

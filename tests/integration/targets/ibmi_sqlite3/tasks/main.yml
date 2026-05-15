@@ -1,9 +1,16 @@
+- name: Assert required variables are defined
+  assert:
+    that:
+      - ansible_ssh_user is defined
+      - ansible_ssh_pass is defined
+    fail_msg: "Required variables ansible_ssh_user and ansible_ssh_pass must be defined"
+
 - block:
   - name: set some variables for test
     no_log: true
     set_fact: 
       superuser: "{{ansible_ssh_user}}"
-      ibmi_user: "ZHYAO"
+      ibmi_user: "TESTUSER"
       ibmi_pass: '{{ansible_ssh_pass}}'
     when: ansible_ssh_pass is defined
 
@@ -259,6 +266,11 @@
         database: "/tmp/testdb.sqlite3"
         sql: "DROP TABLE IF EXISTS us_states"
 
+    - name: Remove DB /tmp/testdb.sqlite3
+      command: rm -f /tmp/testdb.sqlite3
+      register: rmvf_result
+      failed_when: rmvf_result.rc != 0
+
     - name: set_fact
       set_fact:
         super_user_db: "/home/{{superuser}}/testdb.sqlite3"
@@ -273,7 +285,7 @@
         operation: 'display'
         user: '{{ibmi_user}}'
       register: dspusr  
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: remove *USER profile
       ibmi_cl_command:

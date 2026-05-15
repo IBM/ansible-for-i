@@ -114,7 +114,7 @@ import xml.etree.ElementTree as ET
 import re
 
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 PSP_URL = "https://public.dhe.ibm.com/services/us/igsc/PSP/xmldoc.xml"
 PTF_URL_TEMPLATE = "https://public.dhe.ibm.com/services/us/igsc/PSP/{}.xml"
@@ -183,8 +183,12 @@ def get_ptf_list_from_xml_or_txt(group_number, validate_certs, timeout):
         response = urls.open_url(ptf_url, validate_certs=validate_certs, timeout=timeout, http_agent=HTTP_AGENT)
         r = response.read().decode("utf-8")
         root = ET.fromstring(r)
-        for number in root.findall('.//number'):
-            ptf_list.append(number.text)
+        for ptf in root.findall('ptf'):
+            ptf_id = ptf.find('number')
+            product = ptf.find('licpgm')
+            apar = ptf.find('apar')
+            date = ptf.find('date')
+            ptf_list.append(dict(ptf_id=ptf_id.text, product=product.text, apar=apar.text, date=date.text))
         return ptf_list, package_id, ptf_url
     except Exception as e:
         # If XML file is not found, try fetching the TXT file

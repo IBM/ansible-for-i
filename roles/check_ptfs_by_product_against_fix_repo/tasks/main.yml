@@ -36,11 +36,11 @@
   ansible.builtin.set_fact:
     check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
       [{'PRODUCT': prod.product, 'PRODUCT_STATUS': 'Record not found in repository DB'}] }}"
-  when: product_info.get('fail_list')
-  with_list: "{{ product_info.fail_list }}"
+  when: product_info.get('fail_list') is not none
+  with_list: "{{ product_info.fail_list | default([]) }}"
   loop_control:
     loop_var: prod
 
 - name: Compare the ptfs on target system
   ansible.builtin.include_tasks: compare_ptf.yml
-  when: product_info.get('success_list')
+  when: product_info.get('success_list') is not none

@@ -10,15 +10,15 @@
 
     - name: Add download server VM to Ansible in-memory inventory
       add_host:
-        name: 'ut2026p8.rch.stglabs.ibm.com'
+        name: 'repo_server'
         ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
         ansible_user: tester
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        ansible_python_interpreter: /QOpensys/pkgs/bin/python3
-
+        # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
     - ansible.builtin.import_tasks: cleanup.yml
-      delegate_to: "ut2026p8.rch.stglabs.ibm.com"
+      delegate_to: "repo_server"
 
     - name: IBM i download a list of individual PTFs
       include_role:
@@ -28,7 +28,7 @@
           - {'ptf_id': "{{ptfs[0]}}"}
           - {'ptf_id': "{{ptfs[1]}}"}
         download_individual_ptfs_order: '*PTFID'
-        download_individual_ptfs_download_server: "ut2026p8.rch.stglabs.ibm.com"
+        download_individual_ptfs_download_server: "repo_server"
 
     - name: assert values
       assert:
@@ -44,4 +44,4 @@
         
     - name: negative test
       ansible.builtin.import_tasks: neg_case.yml      
-      delegate_to: "ut2026p8.rch.stglabs.ibm.com"
+      delegate_to: "repo_server"

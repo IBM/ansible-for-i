@@ -38,8 +38,8 @@
     - name: Query the list of ptfs which requires an IPL
       ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT PTF_IDENTIFIER, PTF_PRODUCT_ID, PTF_IPL_ACTION, A.*
-        FROM QSYS2.PTF_INFO A
-        WHERE PTF_IPL_ACTION <> 'NONE'"
+          FROM QSYS2.PTF_INFO A
+          WHERE PTF_IPL_ACTION <> 'NONE'"
       register: query_ptf_result
 
     - name: Debug msg

@@ -1,5 +1,63 @@
 # Change Log
 
+## v3.4.0 (2026-05-15)
+
+This release focuses on supporting Ansible core 2.19 and adding new download and install functionality for IBM Concert to perform CVE patching on IBM i.
+
+The collection is verified on Ansible core 2.19 with this release (modules, roles, and high usage playbooks and use cases are tested).
+
+### New modules
+
+- ibmi_download_fix_from_cloud: download fixes to a Linux server (non-IBM i server) using the cloud API to Electronic Fix Delivery (EFD). Currently this only supports save files. Virtual image support is planned for later this year once the cloud API supports virtual images.
+
+### New roles
+
+- sync_apply_individual_ptfs_local: transfer PTF save files and cover letters from the local Ansible control node to an IBM i target system, then load and apply the PTFs. This role is designed to work with PTFs downloaded via ibmi_download_fix_from_cloud module.
+
+### Changes for supporting Ansible core 2.19
+
+- Fixed Ansible lint failures and sanity test failures for Ansible core 2.19.
+
+- Corrected conditional expressions in roles and use cases to properly evaluate to boolean values instead of relying on integer values.
+
+- Fixed integration test cases with proper conditional expressions to prevent runtime errors.
+
+- Corrected Jinja2 template usage in integration tests to avoid "untrusted template" errors by removing nested template expressions and using inline expressions in assert statements.
+
+- Added default empty lists where needed/missing in conditionals.
+
+### Bug fixes
+
+- Fixed ibmi_fix_group_check module to properly grab all associated PTF information (product, apar, date) when using XML group PTF information, not just PTF IDs. This resolves issues with the check_ptf_groups_against_fix_repo role.
+
+- Recognized new PTF prefixes SJ and MJ in ibmi_fix_check module. Github issue 230: <https://github.com/IBM/ansible-for-i/issues/230>.
+
+- Minor fixes for ibmi_sync and ibmi_sync_files modules discovered during test execution.
+
+### Testing improvements
+
+- Ensured integration tests target Python 3.9 on IBM i nodes (until Python 3.13 target issue is resolved).
+
+- Added 7.6 PTFs for various integration tests.
+
+- Updated integration test assertions to handle changing error messages.
+
+- Fixed assertion conditionals with explicit type usage and proper Jinja2 template syntax.
+
+### Documentation
+
+- Updated documentation for new ibmi_download_fix_from_cloud module.
+
+- Added new script to build and install collection.
+
+### Other changes
+
+- Updated sample playbooks and use cases that had issues.
+
+- Various corrections to playbooks exercised in Ansible LUG workshop.
+
+- Minor fixes for building and publishing the collection.
+
 ## v3.3.0 (2025-07-09)
 
 This release focuses on minor improvements to make more collection modules idempotent.

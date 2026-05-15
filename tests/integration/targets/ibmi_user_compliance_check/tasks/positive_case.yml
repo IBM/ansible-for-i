@@ -104,9 +104,9 @@
       - {'name':'HOME_DIRECTORY', 'expect':['/home/USER3']}
       - {'name':'LOCALE_PATH_NAME', 'expect':['*SYSVAL']}
       - {'name':'USER_DEFAULT_PASSWORD', 'expect':['NO']}
-      - {'name':'USER_OWNER', 'expect':['{{UserOwner}}']}
-      - {'name':'USER_CREATOR', 'expect':['{{UserCreator}}']}
-      - {'name':'SIZE', 'expect':['{{Size}}']}
+      - {'name':'USER_OWNER', 'expect':['{{ UserOwner | string }}']}
+      - {'name':'USER_CREATOR', 'expect':['{{ UserCreator | string }}']}
+      - {'name':'SIZE', 'expect':['{{ Size | string }}']}
       - {'name':'AUTHORITY_COLLECTION_ACTIVE', 'expect':['NO']}
       - {'name':'AUTHORITY_COLLECTION_REPOSITORY_EXISTS', 'expect':['NO']}
       - {'name':'status', 'expect':['*disabled']}
@@ -127,7 +127,7 @@
       - {'name':'LIMIT_DEVICE_SESSIONS', 'expect':['*SYSVAL']}
       - {'name':'KEYBOARD_BUFFERING', 'expect':['*SYSVAL']}
       - {'name':'MAXIMUM_ALLOWED_STORAGE', 'expect':['9223372036854775807']}
-      - {'name':'STORAGE_USED', 'expect': ['{{StorageUsed}}']}
+      - {'name':'STORAGE_USED', 'expect': ['{{ StorageUsed | string }}']}
       - {'name':'HIGHEST_SCHEDULING_PRIORITY', 'expect':['3']}
       - {'name':'JOB_DESCRIPTION_NAME', 'expect':['QDFTJOBD']}
       - {'name':'JOB_DESCRIPTION_LIBRARY_NAME', 'expect':['QGPL']}
@@ -144,7 +144,7 @@
       - {'name':'SORT_SEQUENCE_TABLE_NAME', 'expect':['*SYSVAL']}
       - {'name':'OBJECT_AUDITING_VALUE', 'expect':['*NONE']}
       - {'name':'GROUP_AUTHORITY_TYPE', 'expect':['*PRIVATE']}
-      - {'name':'USER_ID_NUMBER', 'expect': ['{{UserId}}']}
+      - {'name':'USER_ID_NUMBER', 'expect': ['{{ UserId | string }}']}
       - {'name':'LOCALE_JOB_ATTRIBUTES', 'expect':['*SYSVAL']}
       - {'name':'GROUP_MEMBER_INDICATOR', 'expect':['NO']}
       - {'name':'DIGITAL_CERTIFICATE_INDICATOR', 'expect':['NO']}
@@ -156,7 +156,7 @@
   ignore_errors: true
 
 # TODO: Revisit why result_set not empty
-- name: Ta07 result assert
+- name: TA07 result assert
   assert: 
     that:
       - user_result.rc == 0

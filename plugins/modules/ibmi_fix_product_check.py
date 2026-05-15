@@ -37,7 +37,7 @@ options:
       - Use this option to set the password of the user specified in C(become_user).
     type: str
 seealso:
-- module: ibmi_fix
+  - module: ibm.power_ibmi.ibmi_fix
 
 author:
 - Chang Le(@changlexc)
@@ -111,7 +111,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def get_product_info(imodule, product_id, release_level, product_option, load_id):

@@ -1,0 +1,316 @@
+---
+# Negative test cases for ibmi_download_fix_from_cloud module
+# These tests verify proper error handling and validation
+
+- name: Set test variables for negative tests
+  ansible.builtin.set_fact:
+    test_ptf_id: "SJ08667" # Valid PTF ID for tests that need it
+    test_download_dir_neg: "/tmp/ansible_test_ptf_download_neg_{{ ansible_date_time.epoch }}"
+    test_credentials:
+      machine_model: "HEX"
+      machine_type: "9080"
+      serial_number: "XXXXXXX"
+      country: "US"
+    test_invalid_credentials:
+      machine_model: "INVALID"
+      machine_type: "0000"
+      serial_number: "0000000"
+      country: "XX"
+
+- name: TC01 - Invalid credentials (entitlement check)
+  block:
+    - name: TC01 - Attempt download with invalid credentials
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_invalid_credentials }}"
+        operation: "validate"
+        directory: "{{ test_download_dir_neg }}_cred"
+      register: invalid_cred_result
+      delegate_to: localhost
+      failed_when: false
+
+    - name: Assert invalid credentials failed
+      ansible.builtin.assert:
+        that:
+          - invalid_cred_result is defined
+          - invalid_cred_result.msg is defined
+          - "'Client.Authentication.NotAuthorized' in invalid_cred_result.msg"
+        fail_msg: "Invalid credentials should have failed entitlement check"
+        success_msg: "Invalid credentials correctly failed entitlement check"
+
+    - name: Display invalid credentials error
+      ansible.builtin.debug:
+        var: invalid_cred_result
+
+  always:
+    - name: Clean up (TC01)
+      ansible.builtin.file:
+        path: "{{ test_download_dir_neg }}_cred"
+        state: absent
+      delegate_to: localhost
+      failed_when: false
+
+- name: TC02 - Missing required parameter (ptf_id)
+  block:
+    - name: TC02 - Attempt download without PTF ID
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "{{ test_download_dir_neg }}_missing"
+      register: missing_ptf_result
+      delegate_to: localhost
+      failed_when: false
+      # args[module]: Intentionally missing ptf_id to test error handling
+      tags:
+        - skip_ansible_lint
+
+    - name: Assert missing PTF ID failed
+      ansible.builtin.assert:
+        that:
+          - missing_ptf_result is defined
+          - missing_ptf_result.msg is defined
+          - "'missing required arguments: ptf_id' in missing_ptf_result.msg"
+        fail_msg: "Missing PTF ID should have failed"
+        success_msg: "Missing PTF ID correctly failed"
+
+    - name: Display missing parameter error
+      ansible.builtin.debug:
+        var: missing_ptf_result
+
+  always:
+    - name: Clean up (TC02)
+      ansible.builtin.file:
+        path: "{{ test_download_dir_neg }}_missing"
+        state: absent
+      delegate_to: localhost
+      failed_when: false
+
+- name: TC03 - Missing required parameter (credentials)
+  block:
+    - name: TC03 - Attempt download without credentials
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        operation: "download"
+        directory: "{{ test_download_dir_neg }}_nocred"
+      register: missing_cred_result
+      delegate_to: localhost
+      failed_when: false
+      # args[module]: Intentionally missing credentials to test error handling
+      tags:
+        - skip_ansible_lint
+
+    - name: Assert missing credentials failed
+      ansible.builtin.assert:
+        that:
+          - missing_cred_result is defined
+          - missing_cred_result.msg is defined
+          - "'missing required arguments: credentials' in missing_cred_result.msg"
+        fail_msg: "Missing credentials should have failed"
+        success_msg: "Missing credentials correctly failed"
+
+    - name: Display missing credentials error
+      ansible.builtin.debug:
+        var: missing_cred_result
+
+  always:
+    - name: Clean up (TC03)
+      ansible.builtin.file:
+        path: "{{ test_download_dir_neg }}_nocred"
+        state: absent
+      delegate_to: localhost
+      failed_when: false
+
+- name: TC04 - Missing required parameter (directory for download operation)
+  block:
+    - name: TC04 - Attempt download without directory
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+      register: missing_dir_result
+      delegate_to: localhost
+      failed_when: false
+      # args[module]: Intentionally missing directory to test error handling
+      tags:
+        - skip_ansible_lint
+
+    - name: Assert missing directory failed
+      ansible.builtin.assert:
+        that:
+          - missing_dir_result is defined
+          - missing_dir_result.msg is defined
+          - "'missing required arguments: directory' in missing_dir_result.msg"
+        fail_msg: "Missing directory should have failed"
+        success_msg: "Missing directory correctly failed"
+
+    - name: Display missing directory error
+      ansible.builtin.debug:
+        var: missing_dir_result
+
+- name: TC05 - Invalid operation value
+  block:
+    - name: TC05 - Attempt operation with invalid value
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "invalid_operation"
+        directory: "{{ test_download_dir_neg }}_invalid_op"
+      register: invalid_op_result
+      delegate_to: localhost
+      failed_when: false
+
+    - name: Assert invalid operation failed
+      ansible.builtin.assert:
+        that:
+          - invalid_op_result is defined
+          - invalid_op_result.msg is defined
+          - "'value of operation must be one of' in invalid_op_result.msg"
+        fail_msg: "Invalid operation should have failed"
+        success_msg: "Invalid operation correctly failed"
+
+    - name: Display invalid operation error
+      ansible.builtin.debug:
+        var: invalid_op_result
+
+  always:
+    - name: Clean up (TC05)
+      ansible.builtin.file:
+        path: "{{ test_download_dir_neg }}_invalid_op"
+        state: absent
+      delegate_to: localhost
+      failed_when: false
+
+- name: TC06 - Invalid directory path (permission denied)
+  block:
+    - name: TC06 - Attempt download to restricted directory
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "/root/restricted_dir"
+        include_requisites: false
+      register: restricted_dir_result
+      delegate_to: localhost
+      failed_when: false
+
+    - name: Assert restricted directory failed
+      ansible.builtin.assert:
+        that:
+          - restricted_dir_result is defined
+          - restricted_dir_result.failed_when_suppressed_exception is defined
+          - "'(traceback unavailable)' in restricted_dir_result.failed_when_suppressed_exception"
+          - restricted_dir_result.updates is not defined
+          - restricted_dir_result.download_list is not defined
+        fail_msg: "Restricted directory should have failed"
+        success_msg: "Restricted directory correctly failed"
+
+    - name: Display restricted directory error
+      ansible.builtin.debug:
+        var: restricted_dir_result
+
+- name: TC07 - Incomplete credentials dictionary
+  block:
+    - name: Set incomplete credentials
+      ansible.builtin.set_fact:
+        incomplete_credentials:
+          machine_model: "HEX"
+          machine_type: "9080"
+          # Missing serial_number and country
+
+    - name: TC07 - Attempt download with incomplete credentials
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ incomplete_credentials }}"
+        operation: "validate"
+        directory: "{{ test_download_dir_neg }}_incomplete"
+      register: incomplete_cred_result
+      delegate_to: localhost
+      failed_when: false
+
+    - name: Assert incomplete credentials failed
+      ansible.builtin.assert:
+        that:
+          - incomplete_cred_result is defined
+          - incomplete_cred_result.msg is defined
+          - "'Credentials missing some required fields' in incomplete_cred_result.msg"
+        fail_msg: "Incomplete credentials should have failed"
+        success_msg: "Incomplete credentials correctly failed"
+
+    - name: Display incomplete credentials error
+      ansible.builtin.debug:
+        var: incomplete_cred_result
+
+  always:
+    - name: Clean up (TC07)
+      ansible.builtin.file:
+        path: "{{ test_download_dir_neg }}_incomplete"
+        state: absent
+      delegate_to: localhost
+      failed_when: false
+
+- name: TC08 - Empty PTF ID
+  block:
+    - name: TC08 - Attempt download with empty PTF ID
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: ""
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "{{ test_download_dir_neg }}_empty"
+      register: empty_ptf_result
+      delegate_to: localhost
+      failed_when: false
+
+    - name: Assert empty PTF ID failed
+      ansible.builtin.assert:
+        that:
+          - empty_ptf_result is defined
+          - empty_ptf_result.msg is defined
+          - "'PTF id was not provided' in empty_ptf_result.msg"
+        fail_msg: "Empty PTF ID should have failed"
+        success_msg: "Empty PTF ID correctly failed"
+
+    - name: Display empty PTF ID error
+      ansible.builtin.debug:
+        var: empty_ptf_result
+
+  always:
+    - name: Clean up (TC08)
+      ansible.builtin.file:
+        path: "{{ test_download_dir_neg }}_empty"
+        state: absent
+      delegate_to: localhost
+      failed_when: false
+
+- name: TC09 - Invalid boolean value for include_requisites
+  block:
+    - name: TC09 - Attempt download with invalid include_requisites value
+      ibm.power_ibmi.ibmi_download_fix_from_cloud:
+        ptf_id: "{{ test_ptf_id }}"
+        credentials: "{{ test_credentials }}"
+        operation: "download"
+        directory: "{{ test_download_dir_neg }}_invalid_bool"
+        include_requisites: "invalid_value"
+      register: invalid_bool_result
+      delegate_to: localhost
+      failed_when: false
+
+    - name: Assert invalid boolean value failed
+      ansible.builtin.assert:
+        that:
+          - invalid_bool_result is defined
+          - invalid_bool_result.msg is defined
+          - "'is not a valid boolean' in invalid_bool_result.msg"
+        fail_msg: "Invalid boolean value should have failed"
+        success_msg: "Invalid boolean value correctly failed"
+
+    - name: Display invalid boolean error
+      ansible.builtin.debug:
+        var: invalid_bool_result
+
+  always:
+    - name: Clean up (TC09)
+      ansible.builtin.file:
+        path: "{{ test_download_dir_neg }}_invalid_bool"
+        state: absent
+      delegate_to: localhost
+      failed_when: false

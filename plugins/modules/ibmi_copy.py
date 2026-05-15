@@ -54,7 +54,7 @@ options:
 notes:
     - ansible.cfg needs to specify interpreter_python=/QOpenSys/pkgs/bin/python3 under[defaults] section
 seealso:
-    - module: copy
+    - module: ansible.builtin.copy
 author:
     - Peng Zengyu (@pengzengyufish)
 '''

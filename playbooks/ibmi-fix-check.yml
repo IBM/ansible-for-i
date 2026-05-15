@@ -9,16 +9,16 @@
   gather_facts: false
 
   tasks:
-    - name: Task query_two_ptf
+    - name: Task query some ptfs
       ibm.power_ibmi.ibmi_fix_check:
         ptfs:
-          - "SI71691"
-          - "SI74112"
-      register: two_ptf
+          - SI84544
+          - MF71486
+      register: some_ptfs
 
-    - name: Task display_two_ptf
+    - name: Task display some ptfs
       ansible.builtin.debug:
-        msg: "{{ two_ptf }}"
+        msg: "{{ some_ptfs }}"
 
     - name: Task deep_search_ptf
       ibm.power_ibmi.ibmi_fix_check:

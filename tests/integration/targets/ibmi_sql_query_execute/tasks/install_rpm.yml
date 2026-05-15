@@ -7,10 +7,10 @@
   raw: /QOpensys/pkgs/bin/yum install {{python}}-{{item}} -y
   when: rpm_query_result.stdout == ""
 
-- name: Verify {{item}} installed
-  raw: /QOpensys/pkgs/bin/yum list {{python}}{{python_minor}}-{{item}}
-  register: rpm_query_result
+# - name: Verify {{item}} installed
+#  raw: /QOpensys/pkgs/bin/yum list {{python}}{{python_minor}}-{{item}}
+#  register: rpm_query_result
 
-- name: Install {{item}} if it is not installed
-  raw: /QOpensys/pkgs/bin/yum install {{python}}{{python_minor}}-{{item}} -y
-  when: rpm_query_result.stdout == ""
+# - name: Install {{item}} if it is not installed
+#  raw: /QOpensys/pkgs/bin/yum install {{python}}{{python_minor}}-{{item}} -y
+#  when: rpm_query_result.stdout == ""

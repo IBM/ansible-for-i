@@ -8,6 +8,8 @@
         group_73: 'SF99723'
         group_72: 'SF99714'
         group_74: 'SF99663'
+        group_75: 'SF99953'
+        group_76: 'SF99963'
 
     - name: Query the os version of target IBM i
       ibm.power_ibmi.ibmi_sql_query:
@@ -25,7 +27,8 @@
         ansible_user: tester
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+        # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
 
     - name: Check and download the latest level of PTF group on repo, get ready for sync
       delegate_to: "fix_repo"
@@ -106,6 +109,7 @@
       ignore_errors: true
       when: fix_repo_check_ptf_group_ptf_group_find_result.fail_list is defined
 
+    # TODO: further checking should occcur here
     - name: Assert sync_apply_ptf_group return variables
       ansible.builtin.assert:
         that:

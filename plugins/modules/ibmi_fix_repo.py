@@ -49,7 +49,7 @@ options:
     elements: dict
 
 author:
-- Xu Meng(@dmabupt)
+  - Xu Meng(@dmabupt)
 '''
 
 EXAMPLES = r'''
@@ -169,7 +169,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 single_ptf_table = 'single_ptf_info'
 ptf_group_image_table = 'ptf_group_image_info'

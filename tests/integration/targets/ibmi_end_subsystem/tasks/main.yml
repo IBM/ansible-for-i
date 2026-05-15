@@ -8,8 +8,8 @@
     - name: TC01 check whether QBATCH is running
       ibmi_sql_query:
         sql: "SELECT * 
-    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
       register: sql_result_orig
 
     - name: TC01 start subsystem if it isnot running
@@ -44,8 +44,8 @@
     - name: TC02 check whether QBATCH is running
       ibmi_sql_query:
         sql: "SELECT * 
-    FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-                SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
       register: sql_result
       failed_when: sql_result.row | length != 0 
 

@@ -31,7 +31,7 @@
         that:
           - jobacn_attr.rc == 0
           - jobacn_attr.output['JOBACN'] == '*REJECT'
-          - jobacn_att.job_log == []
+          - jobacn_attr.job_log == []
       tags: JOBACN
       failed_when: false
 

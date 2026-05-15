@@ -1,0 +1,105 @@
+# Copyright (c) IBM Corporation 2019, 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+#
+# sync_apply_individual_ptfs_local.yml
+# Provides an example for the use of the role sync_apply_individual_ptfs_local.
+# This playbook assumes the PTF files are on the local node / Ansible control node (localhost).
+#
+# Description:
+# This playbook will first call the check_ptf role to check which ptfs are not already applied or loaded on the target system(s).
+# The sync_apply_individual_ptfs role is then used to transfer the unloaded or unapplied ptfs to the target system(s), and
+# these ptfs are then loaded, if needed, and applied.
+#
+# Parameters:
+# ptfs_list     -- The list of PTFs to be processed. Each PTF list entry is a dictionary with the following keys and
+#                  example values:
+#                  {
+#                    "file_name": "QSJ02958.FILE",
+#                    "file_path": "/home/gjertsen/ansible/ptf_repo/SJ02958/",
+#                    "ptf_id": "SJ02958",
+#                    "release": "V7R4M0",
+#                    "product": "5770SS1"
+#                  }
+#                  Note that the download_list returned by the download module ibmi_download_fix_from_cloud
+#                  will provide the proper input for this parameter.
+# target_system -- The target IBM i server that receives and applies the PTFs.
+# delete        -- Specifies whether or not to delete the copied install image on the target server after apply.
+#                  The default value is True.
+# apply_all_loaded_ptfs -- Used by apply_ptf role. Controls whether all loaded ptf will be applied.
+#                          When the value is true, 'to_be_applied_list' will be ignored. The default value is True.
+# temp_or_perm   -- Controls whether the target PTFs will be permanent applied or temporary applied.
+#                   Value can be '*TEMP' or '*PERM'. Default value is '*TEMP'.
+# delayed_option -- Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'.
+#                   Default value is '*IMMDLY'.
+# auto_ipl       -- Controls whether an immediate reboot will be launched automatically if at least one ptf requests
+#                   an IPL for permanent applied or temporary applied. The default value is False.
+# Command example:
+#
+# ansible-playbook ./sync_apply_individual_ptfs_local.yml -e "{'target_system': 'systemA',
+#     'ptfs_list': [{'file_name': 'QSJ02958.FILE', 'file_path': '/home/gjertsen/ansible/ptf_repo/SJ02958/',
+#     'ptf_id': 'SJ02958', 'release': 'V7R4M0', 'product': '5770SS1'}],
+#     'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP', 'delayed_option': '*IMMDLY', 'auto_ipl': false,
+#     'delete': true}"
+
+---
+- name: Example playbook on the use of ibmi_sync_apply_individual_ptfs_local role
+  hosts: '{{ target_system | default([]) }}'
+  gather_facts: false
+
+  tasks:
+
+    - name: Include check_ptf role to determine which ptfs need to apply
+      ansible.builtin.include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list: "{{ ptfs_list }}"
+
+    - name: Display returned check_ptf role vars
+      ansible.builtin.debug:
+        msg:
+          - "check_ptf_ptfs_info": "{{ check_ptf_ptfs_info }}"
+          - "check_ptf_ptfs_status": "{{ check_ptf_ptfs_status }}"
+          - "check_ptf_not_loaded_ptfs_list": "{{ check_ptf_not_loaded_ptfs_list }}"
+          - "check_ptf_loaded_ptfs_list": "{{ check_ptf_loaded_ptfs_list }}"
+          - "check_ptf_product_not_installed_ptfs": "{{ check_ptf_product_not_installed_ptfs }}"
+          - "check_ptf_temporarily_applied_list": "{{ check_ptf_temporarily_applied_list }}"
+
+    - name: Handle no PTFs to apply case
+      when: check_ptf_not_loaded_ptfs_list == [] and check_ptf_loaded_ptfs_list == []
+      block:
+        - name: Debug msg
+          ansible.builtin.debug:
+            msg: "No individual PTFs need to be applied. Exiting."
+
+        - name: End host
+          ansible.builtin.meta: end_host
+
+    - name: Test role sync_apply_individual_ptfs_local
+      ansible.builtin.include_role:
+        name: sync_apply_individual_ptfs_local
+      vars:
+        sync_apply_individual_ptfs_local_not_loaded_list: "{{ check_ptf_not_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_already_loaded_list: "{{ check_ptf_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_local_delete: "{{ delete | default(True) }}"
+        sync_apply_individual_ptfs_local_apply_all_loaded_ptfs: "{{ apply_all_loaded_ptfs | default(True) }}"
+        sync_apply_individual_ptfs_local_temp_or_perm: "{{ temp_or_perm | default('*TEMP') }}"
+        sync_apply_individual_ptfs_local_delayed_option: "{{ delayed_option | default('*IMMDLY') }}"
+        sync_apply_individual_ptfs_local_auto_ipl: "{{ auto_ipl | default(False) }}"
+
+    - name: Include check_ptf role again to get the final applied result
+      ansible.builtin.include_role:
+        name: check_ptf
+      vars:
+        check_ptf_list: "{{ ptfs_list }}"
+
+    - name: Display returned sync_apply_individual_ptfs_local role vars
+      ansible.builtin.debug:
+        msg:
+          "sync_apply_individual_ptfs_local_load_success_list": "{{ sync_apply_individual_ptfs_local_load_success_list }}"
+          "sync_apply_individual_ptfs_local_load_fail_list": "{{ sync_apply_individual_ptfs_local_load_fail_list }}"
+          "sync_apply_individual_ptfs_local_load_fail_dict": "{{ sync_apply_individual_ptfs_local_load_fail_dict }}"
+          "sync_apply_individual_ptfs_local_apply_fail_with_requisite_list": "{{ sync_apply_individual_ptfs_local_apply_fail_with_requisite_list }}"
+          "sync_apply_individual_ptfs_local_apply_fail_dict": "{{ sync_apply_individual_ptfs_local_apply_fail_dict }}"
+          "sync_apply_individual_ptfs_local_requisite_list": "{{ sync_apply_individual_ptfs_local_requisite_list }}"
+          "sync_apply_individual_ptfs_local_apply_success_list": "{{ sync_apply_individual_ptfs_local_apply_success_list }}"
+          "sync_apply_individual_ptfs_local_apply_fail_list": "{{ sync_apply_individual_ptfs_local_apply_fail_list }}"

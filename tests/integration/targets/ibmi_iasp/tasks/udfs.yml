@@ -16,11 +16,11 @@
 
 - name: assert the returned parameters
   assert:
-    that: 
+    that:
       - iasp_result.asp_info | length == 1
       - iasp_result.asp_info[0]['ASP_TYPE'] == 'UDFS'
-      - iasp_result.asp_info[0]['RESOURCE_NAME'] == '{{new_iasp[0]}}'
-      - iasp_result.asp_info[0]['NUMBER_OF_DISK_UNITS'] | int == 2 
+      - iasp_result.asp_info[0]['RESOURCE_NAME'] == new_iasp[0]
+      - iasp_result.asp_info[0]['NUMBER_OF_DISK_UNITS'] | int == 2
 
 - name: query non-configured disks
   ibmi_get_nonconfigure_disks:
@@ -28,8 +28,8 @@
 
 - name: assert the returned parameters
   assert:
-    that: 
-      - "{{disk_result['disks'].split(' ') | length }} == {{disk_list | length -2 }}"
+    that:
+      - disk_result['disks'].split(' ') | length == disk_list | length - 2
 
 - name: add disk to the iasp
   ibmi_iasp:
@@ -46,20 +46,20 @@
 
 - name: assert the returned parameters
   assert:
-    that: 
+    that:
       - iasp_result.asp_info | length == 1
       - iasp_result.asp_info[0]['ASP_TYPE'] == 'UDFS'
-      - iasp_result.asp_info[0]['RESOURCE_NAME'] == '{{new_iasp[0]}}'
+      - iasp_result.asp_info[0]['RESOURCE_NAME'] == new_iasp[0]
       - iasp_result.asp_info[0]['NUMBER_OF_DISK_UNITS'] | int == 4
 
 - name: query non-configured disks
   ibmi_get_nonconfigure_disks:
   register: disk_result
 
-- name: assert the returned parameters
+- name: assert the returned parameters (all disks are configured, no unconfigured disks)
   assert:
-    that: 
-      - "{{disk_result['disks'].split(' ') | length }} == {{disk_list | length -4 }}"
+    that:
+      - disk_result['disks'] | length == 0
 
 - name: vary on the iasp
   ibmi_device_vary:
@@ -83,5 +83,5 @@
 
 - name: assert the returned parameters
   assert:
-    that: 
-      - "{{disk_result['disks'].split(' ') | length }} == {{disk_list | length }}"
+    that:
+      - disk_result['disks'].split(' ') | length == disk_list | length

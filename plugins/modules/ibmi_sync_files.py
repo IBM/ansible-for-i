@@ -166,7 +166,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_text
 from tempfile import mkdtemp
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 HAS_PARAMIKO = True
 
 try:
@@ -314,9 +314,13 @@ def main():
             result.update({'stderr': '', 'rc': 0, 'delta': str(delta), 'success_list': success_list, 'fail_list': fail_list})
             module.exit_json(**result)
         else:
-            result['msg'] = "No files were successfully transferred."
-            result.update({'stderr': '', 'rc': 255, 'delta': str(delta), 'success_list': success_list, 'fail_list': fail_list})
-            module.fail_json(**result)
+            # Do not flag as an error even if no files are transferred because a caller using delegate_to with 2.19+ will
+            # end up with a difficult to handle CapturedErrorSummary and have no return information due to resulting exception.
+            # It is preferable to use a success rc and the returned fail list information for the caller to be able to examine
+            # (or perhaps an alternate result besides rc should be used here).
+            result['msg'] = "No files were successfully transferred. Refer to fail_list."
+            result.update({'stderr': '', 'rc': 0, 'delta': str(delta), 'success_list': success_list, 'fail_list': fail_list})
+            module.exit_json(**result)
 
     except Exception as e:
         return_error(module, f"Exception. {to_text(e)}. Use -vvv for more information.", result)

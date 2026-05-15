@@ -18,10 +18,11 @@ In order to use the Ansible collection for Power Systems on IBM i with <b>releas
 
     The unofficial Python version manager: <a href="https://github.com/pyenv/pyenv" target="_blank">unofficial Python version manager</a>
 
-  * <b>Ansible core v2.16 to v2.18</b>
+  * <b>Ansible core v2.16 to v2.19</b>
     - Ansible core v2.16 requires Python 3.10+ on the Ansible control node.
     - Ansible core v2.17 requires Python 3.10+ on the Ansible control node.
     - Ansible core v2.18 requires Python 3.11+ on the Ansible control node.
+    - Ansible core v2.19 requires Python 3.11+ on the Ansible control node.
 
     Users of Ansible core 2.15 should remain at collection release 3.2.0 due to changes with the ibmi_reboot module that support the latest Ansible core versions.
 
@@ -33,8 +34,8 @@ In order to use the Ansible collection for Power Systems on IBM i with <b>releas
   * <b>Python v3.13</b>
     - This level of python is provided through the IBM i Open Source Software packages.
 
-  * <b>Ansible core v2.18</b>
-    - Ansible core v2.18 requires Python 3.13 on the Ansible control node.
+  * <b>Ansible core v2.18 to v2.19</b>
+    - Ansible core v2.18 and v2.19 require Python 3.13 on the Ansible control node.
 
     Users of Ansible core 2.15 should remain at collection release 3.2.0 due to changes in the ibmi_reboot module that support the latest Ansible core versions.
 
@@ -73,7 +74,7 @@ There are other playbook examples in the <a href="https://github.com/IBM/ansible
 ## Testing
 
 The collection testing consists of the executing the Ansible sanity test, applying the Ansible lint tool on all published YAML source, and applying the set of <a href="https://github.com/IBM/ansible-for-i/tree/devel/tests/integration/targets" target="_blank">integration tests</a> for the collection modules and roles.
-The collection testing environment uses Ansible core 2.16 and various Python levels such as 3.10, 3.11, and 3.12 with the control node and Python level 3.9 on the IBM i target node.
+The collection testing environment uses Ansible core 2.19 and various Python levels such as 3.11 to 3.13 with the control node and Python level 3.9 on the IBM i target node.
 
 ## Contributing
 
@@ -81,7 +82,11 @@ Users may contribute to the collection by creating a <a href="https://github.com
 
 ## Support
 
-Users can open an issue for any suspected bugs (or enhancement requests, etc.) as a <a href="https://github.com/IBM/ansible-for-i/issues" target="_blank">github issue</a>. Github issues are addressed based on potential severity/impact of a problem, frequency of a problem, along with development availability. Collection issues can also be raised to IBM by users with formal support.
+As Red Hat Ansible Certified Content, this collection is entitled to support through the Red Hat Ansible Automation Platform (AAP) using the
+**Create issue** button on the top right corner.
+
+If a support case cannot be opened with Red Hat and the collection has been obtained either from Galaxy or GitHub, then
+users can open an issue for any suspected bugs (or enhancement requests, etc.) as a <a href="https://github.com/IBM/ansible-for-i/issues" target="_blank">Github issue</a> with the ansible-for-i Github project. Github issues are addressed by IBM based on potential severity/impact of a problem, frequency of a problem, and developer resource availability. Other community members (non-IBM) may also help with Github issues.
 
 ## Release Notes and Roadmap
 

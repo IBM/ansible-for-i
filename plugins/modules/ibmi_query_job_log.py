@@ -46,7 +46,7 @@ options:
       - Use this option to set the password of the user specified in C(become_user).
     type: str
 author:
-- Jin Yi Fan(@jinyifan)
+  - Jin Yi Fan(@jinyifan)
 '''
 
 EXAMPLES = r'''
@@ -130,7 +130,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def main():

@@ -12,7 +12,7 @@
         ansible_user: tester 
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        ansible_python_interpreter: /QOpensys/pkgs/bin/python3  
-
+         # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
     # positive cases is covered in role_check_ptf_group, only run negative testcase here.     
     - ansible.builtin.include_tasks: neg_case.yml

@@ -70,10 +70,10 @@ options:
     default: 5
 
 seealso:
-- module: ibmi_cl_command
+  - module: ibm.power_ibmi.ibmi_cl_command
 
 author:
-- Chang Le(@changlexc)
+  - Chang Le(@changlexc)
 '''
 
 EXAMPLES = r'''
@@ -123,7 +123,7 @@ import json
 import os
 import pwd
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def main():

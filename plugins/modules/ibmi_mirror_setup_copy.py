@@ -43,10 +43,10 @@ options:
     type: str
 
 seealso:
-- module: ibmi_mirror_setup_source
+  - module: ibm.power_ibmi.ibmi_mirror_setup_source
 
 author:
-- Chang Le(@changlexc)
+  - Chang Le(@changlexc)
 '''
 
 EXAMPLES = r'''
@@ -131,7 +131,7 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def _is_ipv4_addr(ip):

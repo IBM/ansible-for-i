@@ -130,7 +130,7 @@ import time
 import re
 
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/ibm-i-group-ptfs-level"
@@ -254,7 +254,7 @@ def get_ptf_info_from_web(ptfs, expanded_requisites, certs, timeout):
     ptf_list = []
     ptfs = list(set([x.upper() for x in ptfs]))
     for ptf in ptfs:
-        if re.match(r'(SI|MF)\d{5}', ptf):
+        if re.match(r'(SI|MF|SJ|MJ)\d{5}', ptf):
             req_list = get_ptf_req_from_web(ptf, [], expanded_requisites, certs, timeout)
             ptf_list.append(dict(
                 ptf_id=ptf,
@@ -266,7 +266,7 @@ def get_ptf_info_from_web(ptfs, expanded_requisites, certs, timeout):
 # url: https://www.ibm.com/support/pages/ptf/SI71691
 # ptfs: 'SI71691'
 def get_ptf_req_from_web(ptf, reqs, expanded_requisites, certs, timeout):
-    pattern_link = re.compile(r'<tt>(?P<req>(CO|PRE|DIST)).+?(?P<prod>\d{4}\w{3}).+?(?P<ptf>(SI|MF)\d{5}).+?</tt><br>')
+    pattern_link = re.compile(r'<tt>(?P<req>(CO|PRE|DIST)).+?(?P<prod>\d{4}\w{3}).+?(?P<ptf>(SI|MF|SJ|MJ)\d{5}).+?</tt><br>')
     response = ''
     url = 'https://www.ibm.com/support/pages/ptf/' + ptf
     time.sleep(1)

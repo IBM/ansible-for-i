@@ -43,7 +43,7 @@
         - chksysval_qmaxsign_result.sysval[0].name == 'QMAXSIGN'
         - chksysval_qmaxsign_result.sysval[0].type == '8A'
         - chksysval_qmaxsign_result.sysval[0].value == chksysval_qmaxsign_result.sysval[0].expect
-        - chksysval_qmaxsign_result.sysval | selectattr('compliant', 'equalto', true)
+        - chksysval_qmaxsign_result.sysval | selectattr('compliant', 'equalto', true) | list | length == 1
         
 
   - name: TC03 - Display many system values

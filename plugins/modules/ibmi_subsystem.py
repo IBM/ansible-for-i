@@ -111,9 +111,9 @@ notes:
     - Due to the non-atomic and asynchronous nature of various operations that change the subsystem state, an error may occur with this type of operation
       if the subsystem is currently in a transition state from active to inactive or vice-versa.
 seealso:
-- module: ibmi_cl_command
+  - module: ibm.power_ibmi.ibmi_cl_command
 author:
-- Rob Gjertsen (@gjertsen)
+  - Rob Gjertsen (@gjertsen)
 '''
 
 EXAMPLES = r'''
@@ -283,7 +283,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 import time
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def main():

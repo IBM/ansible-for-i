@@ -84,7 +84,7 @@
     operation: 'add_disks'
     disks: "{{disk_list[2]}}"
   register: neg_result
-  failed_when: "'ASP abc does not exsit' not in neg_result.stdout or 'not exsit' not in neg_result.stderr" 
+  failed_when: "'ASP abc does not exist' not in neg_result.stdout or 'not exist' not in neg_result.stderr" 
 
 - name: display an not existing-iasp
   ibmi_iasp:
@@ -96,7 +96,7 @@
 - name: assert error
   assert:
     that:
-      - "'not exsit' in neg_result.stdout or 'not exsit' in neg_result.stderr" 
+      - "'not exist' in neg_result.stdout or 'not exist' in neg_result.stderr" 
 
 - name: create an iasp with existing name
   ibmi_iasp:
@@ -109,7 +109,7 @@
 - name: assert error
   assert:
     that:
-      - "'already exsit' in iasp_result.stderr or 'already exsit' in iasp_result.stdout"
+      - "'already exist' in iasp_result.stderr or 'already exist' in iasp_result.stdout"
 
 - name: pause a few minutes to wait for the iasp configured
   pause:

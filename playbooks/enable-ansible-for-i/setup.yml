@@ -30,7 +30,7 @@
 
     - name: Include task list from ibmi-install-yum.yml
       ansible.builtin.include_tasks: ibmi-install-yum.yml
-      when: "'No such' in default_yum_existance.stdout or '/QOpensys/pkgs/bin/yum: not found' in default_yum_existance.stdout"
+      when: "'No such' in default_yum_existance.stdout or 'Error found' in default_yum_existance.stdout"
 
     - name: Include task list
       vars:
@@ -43,7 +43,6 @@
           with_list: "{{ required_rpms }}"
 
     - name: Final set up actions
-      when: yum_installed
       block:
         - name: Find the home directory
           ibm.power_ibmi.ibmi_user_and_group:

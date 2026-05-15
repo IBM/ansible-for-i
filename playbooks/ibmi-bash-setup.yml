@@ -51,4 +51,6 @@
           # LANG: some tools (for example: tmux) need UTF-8 charset
           LANG=EN_US.UTF-8
           export LANG
+          LC_ALL=en_US.UTF-8
+          export LC_ALL
       tags: profile

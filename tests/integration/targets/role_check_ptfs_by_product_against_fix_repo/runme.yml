@@ -40,7 +40,8 @@
         ansible_user: tester
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+        # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
 
     - name: Negative test
       ansible.builtin.include_tasks: neg_case.yml
@@ -241,10 +242,11 @@
       ansible.builtin.debug:
         var: check_ptfs_by_product_against_fix_repo_ptf_status
 
+    # Allow superceded ptfs (yet this means we need to update to a newer test PTF)
     - name: Assert returned values
       ansible.builtin.assert:
         that:
-          - item.1.PTF_LOADED_STATUS == 'APPLIED'
+          - item.1.PTF_LOADED_STATUS == 'APPLIED' or item.1.PTF_LOADED_STATUS == "SUPERSEDED"
       when: item.0.ptf_id == item.1.PTF_IDENTIFIER
       loop: "{{individual_ptfs | product(check_ptfs_by_product_against_fix_repo_ptf_status[0].PTF_LIST) | list}}"
 

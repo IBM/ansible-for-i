@@ -48,10 +48,10 @@ options:
 notes:
     - This module can only run one SQL statement at a time.
 seealso:
-- module: IBMi_sql_query
+  - module: ibm.power_ibmi.ibmi_sql_query
 
 author:
-- Chang Le(@changlexc)
+  - Chang Le(@changlexc)
 '''
 
 EXAMPLES = r'''
@@ -147,7 +147,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.3.0"
+__ibmi_module_version__ = "3.4.0"
 
 
 def main():

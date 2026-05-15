@@ -16,3 +16,9 @@
         object_name: QGPL
         object_library: QSYS
         object_type: '*LIB'
+      register: obj_auth_info
+
+    - name: Display the object authority list
+      ansible.builtin.debug:
+        msg: "object_authority_list: {{ obj_auth_info.object_authority_list }}"
+      when: obj_auth_info.rc == 0
