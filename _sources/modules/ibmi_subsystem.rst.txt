@@ -16,11 +16,11 @@ ibmi_subsystem -- Manage a subsystem with various operations.
 
 Synopsis
 --------
-- The :literal:`ibmi\_subsystem` module allows managing a subsystem with operations for start, end, restart, and display.
-- The :literal:`start` operation starts an inactive subsystem.
-- The :literal:`end` operation ends an active subsystem.
-- The :literal:`restart` operation restarts a subsystem.
-- The :literal:`display` operation displays all currently active subsystems or currently active jobs in a subsystem. In some ways it has equivalent results of WRKSBS if subsystem is :literal:`\*ALL`\ , otherwise, it has equivalent results of WRKSBSJOB.
+- The \ :literal:`ibmi\_subsystem`\  module allows managing a subsystem with operations for start, end, restart, and display.
+- The \ :literal:`start`\  operation starts an inactive subsystem.
+- The \ :literal:`end`\  operation ends an active subsystem.
+- The \ :literal:`restart`\  operation restarts a subsystem.
+- The \ :literal:`display`\  operation displays all currently active subsystems or currently active jobs in a subsystem. In some ways it has equivalent results of WRKSBS if subsystem is \ :literal:`\*ALL`\ , otherwise, it has equivalent results of WRKSBSJOB.
 - Idempotency applies to relevant operations, e.g., a start operation on an already active subystem or an end operation on an inactive subsystem performs no action and returns success.
 
 
@@ -44,7 +44,7 @@ become_user
 
      
 become_user_password
-  Use this option to set the password of the user specified in :literal:`become\_user`.
+  Use this option to set the password of the user specified in \ :literal:`become\_user`\ .
 
 
   | **required**: false
@@ -53,7 +53,7 @@ become_user_password
 
      
 controlled_end_delay_time
-  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, :literal:`\*NOLIMIT` will be used in ENDSBS command DELAY parameter.
+  Specifies the amount of time (in seconds) that is allowed to complete the controlled subsystem end operation. If this amount of time is exceeded and the end operation is not complete, any jobs still being processed in the subsystem are ended immediately. If the value is greater than 99999, \ :literal:`\*NOLIMIT`\  will be used in ENDSBS command DELAY parameter.
 
   This option is only applicable to the end and restart operations.
 
@@ -92,7 +92,7 @@ how_to_end
 
      
 joblog
-  If set to :literal:`true`\ , output the available job log even when the rc is 0 (success).
+  If set to \ :literal:`true`\ , output the available job log even when the rc is 0 (success).
 
 
   | **required**: false
@@ -153,7 +153,7 @@ subsystem
 
      
 user
-  Specifies the name of the user whose jobs are displayed, :literal:`\*ALL` for all users. If subsystem is :literal:`\*ALL`\ , this option is ignored.
+  Specifies the name of the user whose jobs are displayed, \ :literal:`\*ALL`\  for all users. If subsystem is \ :literal:`\*ALL`\ , this option is ignored.
 
   This option is only applicable to the display operation.
 
@@ -225,9 +225,9 @@ Notes
 -----
 
 .. note::
-   This end or restart operation is NOT ALLOWED to end ALL subsystems (\*ALL); use the :literal:`ibmi\_cl\_command` module for this instead.
+   This end or restart operation is NOT ALLOWED to end ALL subsystems (\*ALL); use the \ :literal:`ibmi\_cl\_command`\  module for this instead.
 
-   This module is non-blocking for the start and end operations, so the subsystem may still be in transition after module completion, and the :literal:`ibmi\_display\_subsystem` module should be used to check the subsystem status.
+   This module is non-blocking for the start and end operations, so the subsystem may still be in transition after module completion, and the \ :literal:`ibmi\_display\_subsystem`\  module should be used to check the subsystem status.
 
    Note that the restart operation blocks to wait for the subsystem to end, while it is non-blocking for resuming/starting the subsystem. The controlled\_end\_delay\_time parameter should be used with restart to limit the wait time for subsystem end.
 
@@ -240,7 +240,7 @@ See Also
 
 .. seealso::
 
-   - :ref:`ibmi_cl_command_module`
+   - :ref:`ibm.power_ibmi.ibmi_cl_command_module`
 
 
   

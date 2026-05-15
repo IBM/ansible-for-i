@@ -38,11 +38,12 @@ In order to use this Ansible collection at **release 3.2.1** and beyond, you mus
     - The official Python website: https://www.python.org/downloads/
     - The unofficial Python version manager: https://github.com/pyenv/pyenv
 
-**Ansible core v2.16 to v2.18**
+**Ansible core v2.16 to v2.19**
 
     - Ansible core v2.16 requires Python 3.10+ on the Ansible control node.
     - Ansible core v2.17 requires Python 3.10+ on the Ansible control node.
     - Ansible core v2.18 requires Python 3.11+ on the Ansible control node.
+    - Ansible core v2.19 requires Python 3.11+ on the Ansible control node.
 
 Users of Ansible core 2.15 should remain at collection release 3.2.0 due to changes with the ibmi_reboot module that support the latest Ansible core versions.
 
@@ -63,9 +64,9 @@ In order to use this Ansible collection at **release 3.2.1** and beyond, you mus
 
     This level of python is provided through the IBM i Open Source Software packages.
 
-**v2.18**
+**Ansible core v2.18 to v2.19**
 
-    - Ansible core v2.18 requires Python 3.13 on the Ansible control node.
+    - Ansible core v2.18 and v2.19 require Python 3.13 on the Ansible control node.
 
 Users of Ansible core 2.15 should remain at collection release 3.2.0 due to changes in the ibmi_reboot module that support the latest Ansible core versions.
 
