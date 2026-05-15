@@ -16,7 +16,7 @@ ibmi_fix_group_check -- Retrieve the latest PTF group information from PSP serve
 
 Synopsis
 --------
-- The :literal:`ibmi\_fix\_group\_check` module retrieve latest PTF group information from PSP(Preventive Service Planning) server.
+- The \ :literal:`ibmi\_fix\_group\_check`\  module retrieve latest PTF group information from PSP(Preventive Service Planning) server.
 - Refer to https://www.ibm.com/support/pages/node/667567 for more details of PSP.
 - ALL PTF groups or specific PTF groups are supported.
 - A PTF group returns a list of PTFs that the group consists of, while a cumulative PTF returns a package ID.
@@ -53,7 +53,7 @@ timeout
 
      
 validate_certs
-  If set to :literal:`False`\ , the SSL certificate verification will be disabled. It's recommended for test scenario.
+  If set to \ :literal:`False`\ , the SSL certificate verification will be disabled. It's recommended for test scenario.
 
   It's recommended to enable the SSL certificate verification for security concern.
 
@@ -91,7 +91,7 @@ Notes
 .. note::
    Ansible hosts file need to specify ansible\_python\_interpreter=/QOpenSys/pkgs/bin/python3.
 
-   If the module is delegated to an IBM i server and SSL certificate verification is enabled, package :literal:`ca-certificates-mozilla` is required.
+   If the module is delegated to an IBM i server and SSL certificate verification is enabled, package \ :literal:`ca-certificates-mozilla`\  is required.
 
 
 
