@@ -180,32 +180,81 @@ You can use the ``ansible-galaxy`` command to install a collection built from so
 
     ansible-galaxy collection install ibm-power_ibmi-x.y.z.tar.gz
 
-Enabling IBM i nodes
--------------------------------
+Enabling IBM i Nodes
+----------------------
 
-Before IBM i systems can be managed-nodes of Ansible, a few dependencies have to be installed on IBM i.
+Before IBM i systems can be managed as Ansible nodes, several prerequisite software components must be installed and configured on the IBM i host.
 
- - 5733SC1 Base and Option 1
- - 5770DG1
- - python3
- - python3-itoolkit
- - python3-ibm_db
+Prerequisites
+~~~~~~~~~~~~~
 
-1. 5733SC1 and 5770DG1 are license programs, you can download them at http://www-304.ibm.com/servers/eserver/ess/index.wss.
+The following licensed programs and open-source packages are required:
 
-2. python3, python3-itoolkit, python3-ibm_db are open source packages. There are a few ways to install these packages and you could choose from one of them.
-   To ensure a specific Python level, e.g., Python 3.9, that is compatible with the version of Ansible core on the control node,
-   the python package prefix should instead specifiy the full Python level, e.g., python39 instead of python3, for installation.
+**Licensed Programs (IBM)**
 
-**Installing rpm packages manually**
+- 5733-SC1 (Portable Application Solutions Environment - Base and Option 1)
+- 5770-DG1 (IBM HTTP Server for i)
+
+These licensed programs can be downloaded from IBM Entitled Software Support (ESS):
+https://www.ibm.com/servers/eserver/ess/index.wss
+
+**Open Source Packages**
+
+The following open-source packages must also be installed:
+
+Recommended:
+
+- python39
+- python39-itoolkit
+- python39-ibm_db
+
+Minimum:
+
+- python3
+- python3-itoolkit
+- python3-ibm_db
+
+There are multiple methods available to install open-source packages on IBM i, including Access Client Solutions (ACS), yum, and RPM-based installation.
+
+Python Version Requirements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To ensure compatibility with the version of *ansible-core* running on the control node, it is recommended to install a specific Python version rather than relying
+on the generic `python3` package.
+
+For example, if Python 3.9 is required, install packages using the version-specific prefix:
+
+::
+
+    yum install python39
+    yum install python39-itoolkit
+    yum install python39-ibm_db
+
+Known Issues and Limitations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **Python Version Restriction**
+
+  **Currently, IBM i target/managed nodes must use Python 3.9 or earlier.** Python 3.13 is not supported on target/managed nodes at this time. However, Python 3.13 may still be used on the
+  Ansible control node.
+
+- **ibm_db Package Deprecation**  
+
+  The IBM i open-source ecosystem is deprecating support for the `ibm_db` package in Python v3.13, which is currently required by the IBM i Ansible collection.
+  Future versions of the collection will transition to using ODBC-based connectivity instead.  For additional details, refer to: https://github.com/IBM/ansible-for-i/issues/229
+
+
+Installing rpm packages manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Rpm packages can be installed via 'yum' packages manager on IBM i. However, yum is not shipped by IBM i by default.
     Refer the guide here to install yum https://bitbucket.org/ibmi/opensource/src/master/docs/yum/. Then install these packages by below command:
 
 ::
 
-    /QOpenSys/pkgs/bin/yum install python3 python3-itoolkit python3-ibm_db 
+    /QOpenSys/pkgs/bin/yum install python39 python39-itoolkit python39-ibm_db 
 
-**Installing rpm packages automatically onto IBM i systems which can access internet**
+Installing rpm packages automatically onto IBM i systems which can access internet
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -216,7 +265,8 @@ Before IBM i systems can be managed-nodes of Ansible, a few dependencies have to
     4) Run setup play book with below command:
     ansible-playbook -i host_ibmi.ini enable-ansible-for-i/setup.yml
 
-**Installing rpm packages automatically onto IBM i systems which are offline**
+Installing rpm packages automatically onto IBM i systems which are offline
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     An 'Offline' IBM i means that the IBM i system cannot connect to the internet and is not able to access https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/.
     Before installing them, you can download installation packages to Ansible server.
 
