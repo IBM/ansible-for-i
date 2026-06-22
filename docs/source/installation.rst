@@ -195,8 +195,7 @@ The following licensed programs and open-source packages are required:
 - 5733-SC1 (Portable Application Solutions Environment - Base and Option 1)
 - 5770-DG1 (IBM HTTP Server for i)
 
-These licensed programs can be downloaded from IBM Entitled Software Support (ESS):
-https://www.ibm.com/servers/eserver/ess/index.wss
+These licensed programs can be downloaded from `IBM Entitled Software Support (ESS) <https://www.ibm.com/servers/eserver/ess/index.wss>`_.
 
 **Open Source Packages**
 
@@ -235,19 +234,17 @@ Known Issues and Limitations
 
 - **Python Version Restriction**
 
-  **Currently, IBM i target/managed nodes must use Python 3.9 or earlier.** Python 3.13 is not supported on target/managed nodes at this time. However, Python 3.13 may still be used on the
-  Ansible control node.
+  **Currently, IBM i target/managed nodes must use Python 3.9 or earlier.** Python 3.13 is not supported on target/managed nodes at this time. However, Python 3.13 may still be used on the Ansible control node. `Ansible Community Documentation <https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix>`_ still lists Python v3.9 as a supported Target Python managed node version with the latest versions of *ansible-core*.
 
 - **ibm_db Package Deprecation**  
 
-  The IBM i open-source ecosystem is deprecating support for the `ibm_db` package in Python v3.13, which is currently required by the IBM i Ansible collection.
-  Future versions of the collection will transition to using ODBC-based connectivity instead.  For additional details, refer to: https://github.com/IBM/ansible-for-i/issues/229
+  In Python v3.13, the IBM i Open Source ecosystem is deprecating support for the *ibm_db* package, which is currently required by the IBM i Ansible collection to manage an IBM i node.  Future versions of the collection will transition to using ODBC-based connectivity instead.  For additional details, refer to: https://github.com/IBM/ansible-for-i/issues/229
 
 
 Installing rpm packages manually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Rpm packages can be installed via 'yum' packages manager on IBM i. However, yum is not shipped by IBM i by default.
-    Refer the guide here to install yum https://bitbucket.org/ibmi/opensource/src/master/docs/yum/. Then install these packages by below command:
+    Refer the guide here to install `yum <https://ibmi-oss-docs.readthedocs.io/en/latest/yum/README.html>`_. Then install these packages by below command:
 
 ::
 
