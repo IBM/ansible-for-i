@@ -11,8 +11,11 @@
     ibmi_host: "{{ ansible_ssh_host }}"
     ibmi_user: "{{ ansible_ssh_user }}"
     ibmi_pass: ""
-    required_rpms: [six, itoolkit, ibm_db]
-    is_python39_to_be_installed: true
+    required_rpms: [six, itoolkit, pyodbc]
+    # Default Python level. Override at runtime with: -e python_level=3.9
+    python_level: "3.13"
+    is_python313_to_be_installed: "{{ python_level == '3.13' }}"
+    is_python39_to_be_installed: "{{ python_level == '3.9' }}"
     python_interpreter_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
     python_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
     yum_packages: ["bootstrap.sh", "bootstrap.tar.Z"]
@@ -21,11 +24,17 @@
   tasks:
     - name: Set up actions
       block:
-        - name: Set python39
+        - name: Set python3.13 when that level is selected
+          ansible.builtin.set_fact:
+            python_version: "python3.13"
+            python_interpreter_version: "python3.13"
+          when: is_python313_to_be_installed | bool
+
+        - name: Set python39 when that level is selected
           ansible.builtin.set_fact:
             python_version: "python39"
             python_interpreter_version: "python3.9"
-          when: is_python39_to_be_installed
+          when: is_python39_to_be_installed | bool
 
         - name: Create a local temporary directory
           ansible.builtin.raw: mkdir -p {{ remote_temp_dir }}

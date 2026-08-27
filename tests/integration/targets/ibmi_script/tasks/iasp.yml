@@ -1,7 +1,7 @@
 # Test when all dependent packages are in place  
 - name: Query the iASP existing
   ibmi_sql_query:
-    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1"
   register: iasp_list
 
 - block:
@@ -11,44 +11,56 @@
       asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
       joblog: true
 
-  - name: TC14 run script 
-    ibmi_script:
-      src: 'iasp_cl.txt'
-      type: 'CL'
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-    register: cl_result
+  - name: TC14 - run script with asp_group
+    when: (tc_execute is not defined or 'TC14' in tc_execute) and 'TC14' not in (tc_skip | default([]))
+    block:
+      - name: TC14 run script 
+        ibmi_script:
+          src: 'iasp_cl.txt'
+          type: 'CL'
+          asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        register: cl_result
 
-  - name: TC15 run script 
-    ibmi_script:
-      src: '{{file_path}}/script/iasp_sql.txt'
-      type: 'SQL'
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-    register: sql_result
+  - name: TC15 - run SQL script with asp_group
+    when: (tc_execute is not defined or 'TC15' in tc_execute) and 'TC15' not in (tc_skip | default([]))
+    block:
+      - name: TC15 run script 
+        ibmi_script:
+          src: '{{file_path}}/script/iasp_sql.txt'
+          type: 'SQL'
+          asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        register: sql_result
 
-  - name: TC15 run the SQL command to query a table
-    ibmi_sql_query:
-      sql: "select * from tryiasp1.ansible"
-      expected_row_count: 1
-      database: "{{iasp_list.row[0]['RDB_NAME']}}" 
-    register: sql_query_result
+      - name: TC15 run the SQL command to query a table
+        ibmi_sql_query:
+          sql: "select * from tryiasp1.ansible"
+          expected_row_count: 1
+          database: "{{iasp_list.row[0]['RDB_NAME']}}" 
+        register: sql_query_result
 
-  - name: TC16 run script 
-    ibmi_script:
-      src: 'script/iasp_sql.txt'
-      type: 'SQL'
-      #asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-    register: sql_result
-    #failed_when: "'TRYIASP1 in QSYS type *LIB not found' not in sql_result.stderr"
-    failed_when: "sql_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length ==0"
+  - name: TC16 - run script without asp_group (expect SQL0204)
+    when: (tc_execute is not defined or 'TC16' in tc_execute) and 'TC16' not in (tc_skip | default([]))
+    block:
+      - name: TC16 run script 
+        ibmi_script:
+          src: 'script/iasp_sql.txt'
+          type: 'SQL'
+          #asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+        register: sql_result
+        #failed_when: "'TRYIASP1 in QSYS type *LIB not found' not in sql_result.stderr"
+        failed_when: "sql_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-  - name: TC17 run script with an invalid iasp group
-    ibmi_script:
-      src: '{{file_path}}/script/iasp_sql.txt'
-      type: 'SQL'
-      asp_group: "abc"
-    register: sql_result
-    #failed_when: "'Device ABC not found' not in sql_result.stderr"
-    #failed_when: "sql_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3781') | map(attribute='MESSAGE_ID') | list | length ==0"
+  - name: TC17 - run script with an invalid iasp group
+    when: (tc_execute is not defined or 'TC17' in tc_execute) and 'TC17' not in (tc_skip | default([]))
+    block:
+      - name: TC17 run script with an invalid iasp group
+        ibmi_script:
+          src: '{{file_path}}/script/iasp_sql.txt'
+          type: 'SQL'
+          asp_group: "abc"
+        register: sql_result
+        #failed_when: "'Device ABC not found' not in sql_result.stderr"
+        #failed_when: "sql_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3781') | map(attribute='MESSAGE_ID') | list | length ==0"
   when: iasp_list.row_count != 0
 
   always:

@@ -40,7 +40,7 @@
              'release_date': fix_repo_download_add_ptf_group_ptf_group_info.release_date,
              'description': fix_repo_download_add_ptf_group_ptf_group_info.description,
              'release': fix_repo_download_add_ptf_group_ptf_group_info.release} }}"
-  register: ptf_group_update_result
+  register: fix_repo_download_add_ptf_group_ptf_group_update_result
   when: fix_repo_download_add_ptf_group_download_fix_result.order_id is defined
 
 - name: Print add order information result

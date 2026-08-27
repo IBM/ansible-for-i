@@ -1,0 +1,47 @@
+# BAT (Build Acceptance Test) execute list for ibmi_object_save
+#
+# TC01–TC21 are in save_object.yml (core tests, no iASP needed).
+# TC22–TC31 are in iasp.yml (skipped automatically if no iASP is available).
+#
+# Dependency notes:
+#   TC01        Creates SAVTEST in ARCHLIB — subsequent TCs use force_save or a fresh file.
+#   TC22        Restores seed objects to iASP SAVRST — TC23–TC31 rely on those objects.
+#   TC27        Deletes/recreates iASP SAVRST inline — must run after TC26.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ────────────────
+#
+#   TC01   Save with required options only; assert return values; verify restore.
+#   TC02   Save with all supported options.
+#   TC03   Save with object_names pattern (P*).
+#   TC04   Save with multiple object_names (PGM* A*).
+#   TC04B  Save with multiple object_types (*FILE *JRNRCV).
+#   TC05   Save with target_release=*PRV.
+#   TC06   Save with parameters=ASPDEV(*SYSBAS).
+#   TC07   Save with joblog=true.
+#   TC08   Neg — save file already exists without force_save (expects CPF5813).
+#   TC10   Neg — non-existing object_names ABC123 (expects CPF3770).
+#   TC11   Neg — wrong object library ABC (expects CPF3781).
+#   TC12   Neg — wrong object_types ABC (expects CPD0084).
+#   TC13   Neg — invalid format *MEDDFN (expects validation error).
+#   TC14   Neg — invalid joblog value abc (expects boolean error).
+#   TC15   Neg — invalid force_save value abc (expects boolean error).
+#   TC16   Neg — invalid target_release abc (expects CPD0084).
+#   TC17   Neg — invalid parameters abc (expects CPF0001).
+#   TC18   Neg — unsupported option abc (expects Unsupported parameters).
+#   TC19   Neg — missing required object_lib.
+#   TC20   Neg — missing required savefile_name.
+#   TC21   Neg — missing required savefile_lib.
+#   TC22   iASP: restore seed objects from sysbase to iASP lib.  (requires iASP)
+#   TC23   iASP: save from iASP lib with joblog.                  (requires TC22)
+#   TC24   iASP: save from iASP lib; assert return values.        (requires TC22)
+#   TC25   iASP: restore from iASP save back to iASP.             (requires TC23)
+#   TC26   iASP: save from iASP lib to sysbase lib.               (requires TC22)
+#   TC27   iASP: restore from sysbase savefile to iASP lib.       (requires TC26)
+#   TC28   iASP: save from sysbase lib to iASP lib.               (requires iASP)
+#   TC29   iASP: restore from iASP save to sysbase lib.           (requires TC28)
+#   TC30   iASP: save sysbase→sysbase with asp_group set.         (requires iASP)
+#   TC31   iASP: restore sysbase→sysbase with asp_group set.      (requires TC30)
+
+tc_execute:
+  - TC01
+ 

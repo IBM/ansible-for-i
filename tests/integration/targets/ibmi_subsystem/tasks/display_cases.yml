@@ -3,6 +3,26 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['DISPLAY_TC01','DISPLAY_TC06'])
+#   tc_skip:    optional list of TC IDs to skip
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC descriptions:
+#   DISPLAY_TC01   Display all subsystems with user='*all'.
+#   DISPLAY_TC02   Display all subsystems with default values.
+#   DISPLAY_TC03   Display all subsystems filtered by current user.
+#   DISPLAY_TC04   Setup — end QBATCH if running; wait for inactive state.
+#   DISPLAY_TC05   Setup — start QBATCH if inactive; wait for active state.
+#   DISPLAY_TC06   Display info of QBATCH for all users; assert active_jobs defined.
+#   DISPLAY_TC07   Submit sleep job to QBATCH; display QBATCH; assert job fields.
+#   DISPLAY_TC08   Display QBATCH filtered by current user; assert jobs found.
+#   DISPLAY_TC09   Neg — display QBATCH with non-existing user; assert no jobs.
+#   DISPLAY_TC10   Neg — display subsystem name > 10 chars.
+#   DISPLAY_TC11   Neg — display *ALL with user name > 10 chars.
+#   DISPLAY_TC12   Neg — display non-existing subsystem name.
+#   DISPLAY_TC13   Neg — unsupported module option.
+#
 - block:
     # Tests for display operation: TC01 to TC13
 
@@ -10,194 +30,246 @@
       debug:
         msg: "Performing display operation test cases"
 
-    - name: TC01 display all subsystems
-      ibmi_subsystem:
-        operation: display
-        subsystem: '*ALL'
-        user: '*all'
-      register: dspsbs_result
-   
-    - name: TC01 assert the returned parameters
-      assert:
-        that: 
-          - dspsbs_result.stderr is not defined
-          - dspsbs_result.stderr_lines is not defined 
-          - dspsbs_result.stdout_lines is not defined
-          - dspsbs_result.active_jobs is not defined
-          - dspsbs_result.subsystems | length >= 2 
+    # ─── DISPLAY_TC01 - Display all subsystems ───────────────────────────────────
+    - name: DISPLAY_TC01 - display all subsystems
+      when: (tc_execute is not defined or 'DISPLAY_TC01' in tc_execute) and 'DISPLAY_TC01' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC01 - display all subsystems
+          ibmi_subsystem:
+            operation: display
+            subsystem: '*ALL'
+            user: '*all'
+          register: dspsbs_result
 
-    - name: TC02 display all with default values
-      ibmi_subsystem:
-        operation: display
-        subsystem: '*ALL'
-      register: dspsbs_result
+        - name: DISPLAY_TC01 - assert the returned parameters
+          assert:
+            that:
+              - dspsbs_result.stderr is not defined
+              - dspsbs_result.stderr_lines is not defined
+              - dspsbs_result.stdout_lines is not defined
+              - dspsbs_result.active_jobs is not defined
+              - dspsbs_result.subsystems | length >= 2
 
-    - name: TC02 assert the returned parameters
-      assert:
-        that: 
-          - dspsbs_result.stderr is not defined
-          - dspsbs_result.stderr_lines is not defined 
-          - dspsbs_result.stdout_lines is not defined
-          - dspsbs_result.active_jobs is not defined
-          - dspsbs_result.subsystems | length >= 2
-          - dspsbs_result.subsystems[0] != '+++ success QSYS/WRKSBS'
-          - dspsbs_result.active_jobs is not defined
+    # ─── DISPLAY_TC02 - Display all with default values ──────────────────────────
+    - name: DISPLAY_TC02 - display all with default values
+      when: (tc_execute is not defined or 'DISPLAY_TC02' in tc_execute) and 'DISPLAY_TC02' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC02 - display all with default values
+          ibmi_subsystem:
+            operation: display
+            subsystem: '*ALL'
+          register: dspsbs_result
 
-    - name: TC03 display all with user
-      ibmi_subsystem:
-        operation: display
-        subsystem: '*ALL'
-        user: '{{ ansible_ssh_user }}'
-      register: dspsbs_result_2
+        - name: DISPLAY_TC02 - assert the returned parameters
+          assert:
+            that:
+              - dspsbs_result.stderr is not defined
+              - dspsbs_result.stderr_lines is not defined
+              - dspsbs_result.stdout_lines is not defined
+              - dspsbs_result.active_jobs is not defined
+              - dspsbs_result.subsystems | length >= 2
+              - dspsbs_result.subsystems[0] != '+++ success QSYS/WRKSBS'
+              - dspsbs_result.active_jobs is not defined
 
-    - name: TC04 check whether QBATCH is running
-      ibmi_sql_query:
-        sql: "SELECT * 
-              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result_orig
+    # ─── DISPLAY_TC03 - Display all with user ────────────────────────────────────
+    - name: DISPLAY_TC03 - display all with user
+      when: (tc_execute is not defined or 'DISPLAY_TC03' in tc_execute) and 'DISPLAY_TC03' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC03 - display all with user
+          ibmi_subsystem:
+            operation: display
+            subsystem: '*ALL'
+            user: '{{ ansible_ssh_user }}'
+          register: dspsbs_result_2
 
-    - name: TC04 end QBATCH if it is running
-      ibmi_subsystem:
-        operation: end
-        subsystem: QBATCH
-        how_to_end: '*IMMED'
-      when: "sql_result_orig.row | length == 1"
+    # ─── DISPLAY_TC04 - Setup: end QBATCH if running ─────────────────────────────
+    - name: DISPLAY_TC04 - setup end QBATCH if running
+      when: (tc_execute is not defined or 'DISPLAY_TC04' in tc_execute) and 'DISPLAY_TC04' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC04 - check whether QBATCH is running
+          ibmi_sql_query:
+            sql: "SELECT *
+                  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                  SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+          register: sql_result_orig
 
-    - name: TC04 pause 30 seconds to wait for subsystem ending
-      pause:
-        seconds: 30
+        - name: DISPLAY_TC04 - end QBATCH if it is running
+          ibmi_subsystem:
+            operation: end
+            subsystem: QBATCH
+            how_to_end: '*IMMED'
+          when: "sql_result_orig.row | length == 1"
 
-    - name: TC04 check whether QBATCH is running
-      ibmi_sql_query:
-        sql: "SELECT * 
-              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result_orig
-      until: sql_result_orig.row | length == 0
-      retries: 5
-      delay: 60
+        - name: DISPLAY_TC04 - pause 30 seconds to wait for subsystem ending
+          pause:
+            seconds: 30
 
-    - name: TC05 start subsystem if it is not running
-      ibmi_subsystem:
-        operation: start
-        subsystem: QBATCH
-        library: QSYS
-      when: sql_result_orig.row | length == 0
+        - name: DISPLAY_TC04 - check whether QBATCH is running
+          ibmi_sql_query:
+            sql: "SELECT *
+                  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                  SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+          register: sql_result_orig
+          until: sql_result_orig.row | length == 0
+          retries: 5
+          delay: 60
 
-    - name: TC05 check whether QBATCH is running
-      ibmi_sql_query:
-        sql: "SELECT * 
-              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result_orig
-      until: sql_result_orig.row | length == 1
-      retries: 5
-      delay: 60  
+    # ─── DISPLAY_TC05 - Setup: start QBATCH if inactive ──────────────────────────
+    - name: DISPLAY_TC05 - setup start QBATCH if inactive
+      when: (tc_execute is not defined or 'DISPLAY_TC05' in tc_execute) and 'DISPLAY_TC05' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC05 - start subsystem if it is not running
+          ibmi_subsystem:
+            operation: start
+            subsystem: QBATCH
+            library: QSYS
+          when: sql_result_orig.row | length == 0
 
-    - name: TC06 display info of designated sbs QBATCH for all users
-      ibmi_subsystem:
-        operation: display
-        subsystem: 'QBATCH'
-        user: '*all'
-      register: dspsbs_single_result
+        - name: DISPLAY_TC05 - check whether QBATCH is running
+          ibmi_sql_query:
+            sql: "SELECT *
+                  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                  SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+          register: sql_result_orig
+          until: sql_result_orig.row | length == 1
+          retries: 5
+          delay: 60
 
-    - name: TC06 assert the returned parameters
-      assert:
-        that: 
-          - dspsbs_single_result.stderr is not defined
-          - dspsbs_single_result.stderr_lines is not defined 
-          - dspsbs_single_result.stdout_lines is not defined
-          - dspsbs_single_result.subsystems is not defined
-          - dspsbs_single_result.rc == 0      
-          - dspsbs_single_result.active_jobs is defined
-  
-    - name: TC07 submit a job to QBATCH
-      ibmi_submit_job: 
-        cmd: "QSH CMD('sleep 120s')"
-        status: ['*NONE']
-        parameters: "JOBQ(QGPL/QBATCH)"
+    # ─── DISPLAY_TC06 - Display QBATCH for all users ─────────────────────────────
+    - name: DISPLAY_TC06 - display info of designated sbs QBATCH for all users
+      when: (tc_execute is not defined or 'DISPLAY_TC06' in tc_execute) and 'DISPLAY_TC06' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC06 - display info of designated sbs QBATCH for all users
+          ibmi_subsystem:
+            operation: display
+            subsystem: 'QBATCH'
+            user: '*all'
+          register: dspsbs_single_result
 
-    - name: TC07 display info of designated sbs QBATCH
-      ibmi_subsystem:
-        operation: display
-        subsystem: 'QBATCH'
-      register: dspsbs_single_result
+        - name: DISPLAY_TC06 - assert the returned parameters
+          assert:
+            that:
+              - dspsbs_single_result.stderr is not defined
+              - dspsbs_single_result.stderr_lines is not defined
+              - dspsbs_single_result.stdout_lines is not defined
+              - dspsbs_single_result.subsystems is not defined
+              - dspsbs_single_result.rc == 0
+              - dspsbs_single_result.active_jobs is defined
 
-    - name: TC07 assert the returned parameters
-      assert:
-        that: 
-          - dspsbs_single_result.active_jobs | length > 0
-          - dspsbs_single_result.active_jobs[0].AUTHORIZATION_NAME is defined
-          - dspsbs_single_result.active_jobs[0].CPU_TIME is defined
-          - dspsbs_single_result.active_jobs[0].ELAPSED_ASYNC_DISK_IO_COUNT is defined
-          - dspsbs_single_result.active_jobs[0].ELAPSED_CPU_PERCENTAGE is defined 
-          - dspsbs_single_result.active_jobs[0].ELAPSED_CPU_TIME is defined
-          - dspsbs_single_result.active_jobs[0].ELAPSED_INTERACTION_COUNT is defined 
-          - dspsbs_single_result.active_jobs[0].ELAPSED_PAGE_FAULT_COUNT is defined
-          - dspsbs_single_result.active_jobs[0].ELAPSED_SYNC_DISK_IO_COUNT is defined
-          - dspsbs_single_result.active_jobs[0].ELAPSED_TIME is defined
-          - dspsbs_single_result.active_jobs[0].ELAPSED_TOTAL_DISK_IO_COUNT is defined
-          - dspsbs_single_result.active_jobs[0].ELAPSED_TOTAL_RESPONSE_TIME is defined
-          - dspsbs_single_result.active_jobs[0].FUNCTION is defined 
-          - dspsbs_single_result.active_jobs[0].FUNCTION_TYPE is defined
-          - dspsbs_single_result.active_jobs[0].INTERNAL_JOB_ID is defined 
-          - dspsbs_single_result.active_jobs[0].JOB_END_REASON is defined
-          - dspsbs_single_result.active_jobs[0].JOB_NAME is defined
-          - dspsbs_single_result.active_jobs[0].JOB_STATUS is defined
-          - dspsbs_single_result.active_jobs[0].JOB_TYPE is defined
-          - dspsbs_single_result.active_jobs[0].MEMORY_POOL is defined
-          - dspsbs_single_result.active_jobs[0].ORDINAL_POSITION is defined 
-          - dspsbs_single_result.active_jobs[0].RUN_PRIORITY is defined
-          - dspsbs_single_result.active_jobs[0].SERVER_TYPE is defined 
-          - dspsbs_single_result.active_jobs[0].SUBSYSTEM == 'QBATCH'
-          - dspsbs_single_result.active_jobs[0].SUBSYSTEM_LIBRARY_NAME is defined
-          - dspsbs_single_result.active_jobs[0].TEMPORARY_STORAGE is defined
-          - dspsbs_single_result.active_jobs[0].THREAD_COUNT is defined 
-          - dspsbs_single_result.active_jobs[0].TOTAL_DISK_IO_COUNT is defined
+    # ─── DISPLAY_TC07 - Submit sleep job and verify active_jobs fields ────────────
+    - name: DISPLAY_TC07 - submit a job to QBATCH and display
+      when: (tc_execute is not defined or 'DISPLAY_TC07' in tc_execute) and 'DISPLAY_TC07' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC07 - submit a job to QBATCH
+          ibmi_submit_job:
+            cmd: "QSH CMD('sleep 120s')"
+            status: ['*NONE']
+            parameters: "JOBQ(QGPL/QBATCH)"
 
-    - name: TC08 display subsystem QBATCH with an user
-      ibmi_subsystem:
-        operation: display
-        subsystem: 'QBATCH'
-        user: '{{ ansible_ssh_user }}'
-      register: dspsbs_single_result
-      failed_when: 'dspsbs_single_result.active_jobs | length == 0'
+        - name: DISPLAY_TC07 - display info of designated sbs QBATCH
+          ibmi_subsystem:
+            operation: display
+            subsystem: 'QBATCH'
+          register: dspsbs_single_result
 
-    - name: TC09 display with non-existing user (negative TC)
-      ibmi_subsystem:
-        operation: display
-        subsystem: 'QBATCH'
-        user: 'abc'
-      register: dspsbs_single_result
-      failed_when: 'dspsbs_single_result.active_jobs | length != 0'
+        - name: DISPLAY_TC07 - assert the returned parameters
+          assert:
+            that:
+              - dspsbs_single_result.active_jobs | length > 0
+              - dspsbs_single_result.active_jobs[0].AUTHORIZATION_NAME is defined
+              - dspsbs_single_result.active_jobs[0].CPU_TIME is defined
+              - dspsbs_single_result.active_jobs[0].ELAPSED_ASYNC_DISK_IO_COUNT is defined
+              - dspsbs_single_result.active_jobs[0].ELAPSED_CPU_PERCENTAGE is defined
+              - dspsbs_single_result.active_jobs[0].ELAPSED_CPU_TIME is defined
+              - dspsbs_single_result.active_jobs[0].ELAPSED_INTERACTION_COUNT is defined
+              - dspsbs_single_result.active_jobs[0].ELAPSED_PAGE_FAULT_COUNT is defined
+              - dspsbs_single_result.active_jobs[0].ELAPSED_SYNC_DISK_IO_COUNT is defined
+              - dspsbs_single_result.active_jobs[0].ELAPSED_TIME is defined
+              - dspsbs_single_result.active_jobs[0].ELAPSED_TOTAL_DISK_IO_COUNT is defined
+              - dspsbs_single_result.active_jobs[0].ELAPSED_TOTAL_RESPONSE_TIME is defined
+              - dspsbs_single_result.active_jobs[0].FUNCTION is defined
+              - dspsbs_single_result.active_jobs[0].FUNCTION_TYPE is defined
+              - dspsbs_single_result.active_jobs[0].INTERNAL_JOB_ID is defined
+              - dspsbs_single_result.active_jobs[0].JOB_END_REASON is defined
+              - dspsbs_single_result.active_jobs[0].JOB_NAME is defined
+              - dspsbs_single_result.active_jobs[0].JOB_STATUS is defined
+              - dspsbs_single_result.active_jobs[0].JOB_TYPE is defined
+              - dspsbs_single_result.active_jobs[0].MEMORY_POOL is defined
+              - dspsbs_single_result.active_jobs[0].ORDINAL_POSITION is defined
+              - dspsbs_single_result.active_jobs[0].RUN_PRIORITY is defined
+              - dspsbs_single_result.active_jobs[0].SERVER_TYPE is defined
+              - dspsbs_single_result.active_jobs[0].SUBSYSTEM == 'QBATCH'
+              - dspsbs_single_result.active_jobs[0].SUBSYSTEM_LIBRARY_NAME is defined
+              - dspsbs_single_result.active_jobs[0].TEMPORARY_STORAGE is defined
+              - dspsbs_single_result.active_jobs[0].THREAD_COUNT is defined
+              - dspsbs_single_result.active_jobs[0].TOTAL_DISK_IO_COUNT is defined
 
-    - name: TC10 display non-existing subsystem (negative TC)
-      ibmi_subsystem:
-        operation: display
-        subsystem: 'abcdefghigklmn'   
-      register: neg_result
-      failed_when: "'subsystem exceeds 10 characters' not in neg_result.msg" 
+    # ─── DISPLAY_TC08 - Display QBATCH filtered by current user ──────────────────
+    - name: DISPLAY_TC08 - display subsystem QBATCH with an user
+      when: (tc_execute is not defined or 'DISPLAY_TC08' in tc_execute) and 'DISPLAY_TC08' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC08 - display subsystem QBATCH with an user
+          ibmi_subsystem:
+            operation: display
+            subsystem: 'QBATCH'
+            user: '{{ ansible_ssh_user }}'
+          register: dspsbs_single_result
+          failed_when: 'dspsbs_single_result.active_jobs | length == 0'
 
-    - name: TC11 display a non-existing user for all subsystems (negative TC)
-      ibmi_subsystem:
-        operation: display
-        subsystem: '*ALL'
-        user: 'abcdefghigklmn'   
-      register: neg_result
-      failed_when: "'user exceeds 10 characters' not in neg_result.msg" 
+    # ─── DISPLAY_TC09 - Neg: display with non-existing user ──────────────────────
+    - name: DISPLAY_TC09 - display with non-existing user
+      when: (tc_execute is not defined or 'DISPLAY_TC09' in tc_execute) and 'DISPLAY_TC09' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC09 - display with non-existing user
+          ibmi_subsystem:
+            operation: display
+            subsystem: 'QBATCH'
+            user: 'abc'
+          register: dspsbs_single_result
+          failed_when: 'dspsbs_single_result.active_jobs | length != 0'
 
-    - name: TC12 display a non-existing subsystem (negative TC)
-      ibmi_subsystem:
-        operation: display
-        subsystem: 'abcdef'  
-      register: neg_result 
-      failed_when: "'is not active' not in neg_result.msg"
-      
-    - name: TC13 Provide invalid module option for display (negative TC)
-      ibmi_subsystem:
-        operation: display
-        abc: true
-        subsystem: '*ALL'
-      register: neg_result
-      failed_when: "'Unsupported parameters' not in neg_result.msg"
+    # ─── DISPLAY_TC10 - Neg: display subsystem name > 10 chars ──────────────────
+    - name: DISPLAY_TC10 - display non-existing subsystem name too long
+      when: (tc_execute is not defined or 'DISPLAY_TC10' in tc_execute) and 'DISPLAY_TC10' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC10 - display non-existing subsystem name too long
+          ibmi_subsystem:
+            operation: display
+            subsystem: 'abcdefghigklmn'
+          register: neg_result
+          failed_when: "'subsystem exceeds 10 characters' not in neg_result.msg"
+
+    # ─── DISPLAY_TC11 - Neg: display *ALL with user name > 10 chars ──────────────
+    - name: DISPLAY_TC11 - display a non-existing user for all subsystems
+      when: (tc_execute is not defined or 'DISPLAY_TC11' in tc_execute) and 'DISPLAY_TC11' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC11 - display a non-existing user for all subsystems
+          ibmi_subsystem:
+            operation: display
+            subsystem: '*ALL'
+            user: 'abcdefghigklmn'
+          register: neg_result
+          failed_when: "'user exceeds 10 characters' not in neg_result.msg"
+
+    # ─── DISPLAY_TC12 - Neg: display non-existing subsystem ──────────────────────
+    - name: DISPLAY_TC12 - display a non-existing subsystem
+      when: (tc_execute is not defined or 'DISPLAY_TC12' in tc_execute) and 'DISPLAY_TC12' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC12 - display a non-existing subsystem
+          ibmi_subsystem:
+            operation: display
+            subsystem: 'abcdef'
+          register: neg_result
+          failed_when: "'is not active' not in neg_result.msg"
+
+    # ─── DISPLAY_TC13 - Neg: unsupported module option ───────────────────────────
+    - name: DISPLAY_TC13 - provide invalid module option for display
+      when: (tc_execute is not defined or 'DISPLAY_TC13' in tc_execute) and 'DISPLAY_TC13' not in (tc_skip | default([]))
+      block:
+        - name: DISPLAY_TC13 - provide invalid module option for display
+          ibmi_subsystem:
+            operation: display
+            abc: true
+            subsystem: '*ALL'
+          register: neg_result
+          failed_when: "'Unsupported parameters' not in neg_result.msg"

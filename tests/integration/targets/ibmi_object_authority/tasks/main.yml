@@ -2,56 +2,85 @@
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
-#)
+#
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run — only those TCs run.
+#   tc_skip:    optional list of TC IDs to skip — everything else runs.
+#   If neither is defined, all TCs run.
+#
+# TC descriptions:
+#   TC00   Setup — creates user profiles ANSIUSER1/2, authority lists au_list1/2.
+#          Always runs (not gated by tc_execute).
+#   TCDSP  display_object_authority.yml — TC01-TC12: display, negative display tests.
+#   TCGRT  grant_object_authority.yml  — TC13-TC42: grant/revoke authority tests.
+#   TCAUL  grant_aul_list.yml          — grant/revoke authorization list tests.
+#   TCREF  grant_ref.yml               — TC43-TC47+: grant_ref/revoke_autl tests.
+#   TCIASP iasp.yml                    — iASP-specific grant/revoke tests (skips if no iASP).
 
 - block:
-    - set_fact:
+    # ─── TC00 - Setup (always runs) ──────────────────────────────────────────
+    - name: TC00 - set facts
+      set_fact:
         new_user: [ANSIUSER1, ANSIUSER2]
         au_list: [au_list1, au_list2]
         os_version: "{{ansible_distribution_version}}{{ansible_distribution_release}}"
 
-    - name: create two user profiles
+    - name: TC00 - create two user profiles
       ibmi_cl_command:
         cmd: "crtusrprf usrprf({{item}}) password(passw0rd) status(*enabled) usrcls(*secofr) spcaut(*allobj *iosyscfg *jobctl *secadm *audit *service *splctl *savsys)"
       loop: "{{new_user}}"
       notify: remove user profiles
-      
-    - name: create authority list
+
+    - name: TC00 - create authority lists
       ibmi_cl_command:
         cmd: QSYS/CRTAUTL AUTL({{item}})
       loop: "{{au_list}}"
       notify: remove AUL
 
-    - name: add the new user profiles into AUL
-      ibmi_cl_command: 
-        cmd: ADDAUTLE AUTL({{au_list[0]}}) USER({{new_user[0]}}) AUT(*AUTLMGT *USE) 
+    - name: TC00 - add users into au_list1
+      ibmi_cl_command:
+        cmd: ADDAUTLE AUTL({{au_list[0]}}) USER({{new_user[0]}}) AUT(*AUTLMGT *USE)
 
-    - name: add the new user profiles into AUL
-      ibmi_cl_command: 
-        cmd: ADDAUTLE AUTL({{au_list[0]}}) USER({{new_user[1]}}) AUT(*OBJREF) 
+    - name: TC00 - add users into au_list1 (user2)
+      ibmi_cl_command:
+        cmd: ADDAUTLE AUTL({{au_list[0]}}) USER({{new_user[1]}}) AUT(*OBJREF)
 
-    - name: add the new user profiles into AUL
-      ibmi_cl_command: 
+    - name: TC00 - add users into au_list2
+      ibmi_cl_command:
         cmd: ADDAUTLE AUTL({{au_list[1]}}) USER({{new_user[0]}})
 
-    - name: add the new user profiles into AUL
-      ibmi_cl_command: 
+    - name: TC00 - add users into au_list2 (user2 exclude)
+      ibmi_cl_command:
         cmd: ADDAUTLE AUTL({{au_list[1]}}) USER({{new_user[1]}}) AUT(*EXCLUDE)
 
+    # ─── TCDSP - display_object_authority tests ──────────────────────────────
     - ansible.builtin.include_tasks: display_object_authority.yml
+      when: (tc_execute is not defined or 'TCDSP' in tc_execute) and 'TCDSP' not in (tc_skip | default([]))
+
+    # ─── TCGRT - grant/revoke object authority tests ─────────────────────────
     - ansible.builtin.include_tasks: grant_object_authority.yml
+      when: (tc_execute is not defined or 'TCGRT' in tc_execute) and 'TCGRT' not in (tc_skip | default([]))
+
+    # ─── TCAUL - grant/revoke authorization list tests ───────────────────────
     - ansible.builtin.include_tasks: grant_aul_list.yml
+      when: (tc_execute is not defined or 'TCAUL' in tc_execute) and 'TCAUL' not in (tc_skip | default([]))
+
+    # ─── TCREF - grant_ref tests ─────────────────────────────────────────────
     - ansible.builtin.include_tasks: grant_ref.yml
+      when: (tc_execute is not defined or 'TCREF' in tc_execute) and 'TCREF' not in (tc_skip | default([]))
+
+    # ─── TCIASP - iASP tests (auto-skips if no iASP available) ──────────────
     - ansible.builtin.include_tasks: iasp.yml
+      when: (tc_execute is not defined or 'TCIASP' in tc_execute) and 'TCIASP' not in (tc_skip | default([]))
 
   always:
-    - name: remove AUL
+    - name: Cleanup - remove authority lists
       ibmi_cl_command:
         cmd: QSYS/DLTAUTL AUTL({{item}})
       loop: "{{au_list}}"
       ignore_errors: true
 
-    - name: remove user profiles
+    - name: Cleanup - remove user profiles
       ibmi_cl_command:
         cmd: "QSYS/dltusrprf usrprf({{item}})"
       loop: "{{new_user}}"

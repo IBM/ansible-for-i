@@ -1,0 +1,17 @@
+# BAT (Build Acceptance Test) execute list for ibmi_object_authority
+#
+# TC00 (setup: create user profiles + authority lists) always runs unconditionally.
+#
+# Each TC group maps to one included task file:
+#   TCDSP  — display_object_authority.yml  (TC01-TC12: display + negative display)
+#   TCGRT  — grant_object_authority.yml    (TC13-TC42: grant/revoke authority)
+#   TCAUL  — grant_aul_list.yml            (grant/revoke authorization list)
+#   TCREF  — grant_ref.yml                 (TC43-TC47+: grant_ref tests)
+#   TCIASP — iasp.yml                      (iASP tests; auto-skips if no iASP present)
+
+tc_execute:
+  - TCDSP
+  - TCGRT
+  - TCAUL
+  - TCREF
+  - TCIASP

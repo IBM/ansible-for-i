@@ -119,14 +119,14 @@ EXAMPLES = r'''
     object_types: '*PGM *SRVPGM'
     savefile_name: 'test1'
     dest: '/backup'
-    backup: True
+    backup: true
     target_release: 'V7R2M0'
 
 - name: Fetch objlib libary on a remote IBM i to local, store as /backup/objlib.file.
   ibm.power_ibmi.ibmi_fetch:
     lib_name: 'objlib'
     dest: '/backup'
-    flat: True
+    flat: true
 '''
 
 RETURN = r'''

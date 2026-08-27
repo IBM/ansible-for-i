@@ -1,14 +1,24 @@
-# test code for the ibmi_lib_save module
+---
+# Integration tests for the ibmi_lib_save module
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
-#
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-- block: 
-    ## Setup - Create libraries and objects on test systems
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC06']) — only those TCs run.
+#               TC IDs TC01–TC17 are in save_lib.yml (system ASP).
+#               TC IDs TC18–TC26 are in iasp.yml (iASP — skipped automatically if no iASP found).
+#   tc_skip:    optional list of TC IDs to skip — everything else runs.
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# The outer block/always handles only the /tmp/IBMISAVF.FILE cleanup.
+# Each included file manages its own library setup and cleanup internally.
+#
+
+- block:
     - ansible.builtin.include_tasks: save_lib.yml
     - ansible.builtin.include_tasks: iasp.yml
 
   always:
-    - name: remove copied file
+    - name: Cleanup - remove IBMISAVF.FILE from /tmp/
       command: 'rm -rf /tmp/IBMISAVF.FILE'
       ignore_errors: true

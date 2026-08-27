@@ -1,0 +1,13 @@
+# BAT (Build Acceptance Test) execute list for ibmi_cl_command
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# Dependency note: TC01 → TC03 → TC04 form a chain.
+#   TC01 creates the library, TC03 deletes it, TC04 verifies deletion fails correctly.
+#   All three must be present together in any execute list that includes TC04.
+
+tc_execute:
+  - TC01
+  - TC03
+  - TC04

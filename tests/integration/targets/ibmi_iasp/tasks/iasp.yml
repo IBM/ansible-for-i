@@ -18,13 +18,10 @@
       asp_group: "{{asp_name}}"
       joblog: true
 
-  # TODO: breakage occurs if the asp_group is not specified, so for now
-  # this is specified in the test and will be fixed in the module. Github issue 211.
   - name: check obj without asp_group
     ibmi_cl_command:
       cmd: CHKOBJ OBJ(TRYIASP1/{{asp_name}}) OBJTYPE(*DTAARA) 
       joblog: false
-      asp_group: "{{asp_name}}"
     register: cl_result
     failed_when: cl_result.rc == 0
 
@@ -49,7 +46,6 @@
     ibmi_cl_command:
       cmd: CHKOBJ OBJ(TRYIASP2/data2) OBJTYPE(*DTAARA) 
       joblog: false
-      asp_group: "{{asp_name}}"
     register: cl_result
     failed_when: cl_result.rc == 0
 

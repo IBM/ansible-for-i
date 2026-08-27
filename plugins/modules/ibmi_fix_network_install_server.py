@@ -116,7 +116,7 @@ EXAMPLES = r'''
 - name: Setup IBM i Netwotk install server and add image files of group PTF for LPP 5733WQX
   ibm.power_ibmi.ibmi_fix_network_install_server:
     operation: 'setup_and_addimgclge'
-    rollback: True
+    rollback: true
     virtual_image_name_list:
       - "/tmp/5733WQXPTFs/SF99433_1.bin"
       - "/tmp/5733WQXPTFs/SF99433_2.bin"
@@ -266,9 +266,8 @@ try:
 
 except ImportError:
     HAS_ITOOLKIT = False
-HAS_IBM_DB = True
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -289,6 +288,9 @@ def run_a_list_of_commands(ibmi_module, cmd_key_list, cmd_map):
 
 def get_image_catalog_info(imodule, image_catalog_name):
     conn = imodule.get_connection()
+    if conn is None:
+        conn_err = getattr(imodule, 'conn_error', None)
+        return 1, None, 'No database connection available' + (': ' + conn_err if conn_err else '')
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     image_catalog_name_input = ibmi_util.fmtTo10(image_catalog_name) + "QUSRSYS   "
@@ -344,6 +346,9 @@ def get_image_catalog_info(imodule, image_catalog_name):
 
 def get_image_catalog_info_with_entries(imodule, image_catalog_name, directory_length, reserved_field_length):
     conn = imodule.get_connection()
+    if conn is None:
+        conn_err = getattr(imodule, 'conn_error', None)
+        return 1, None, 'No database connection available' + (': ' + conn_err if conn_err else '')
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     # the location of entries in the returned set is decided by directory_length
@@ -497,7 +502,7 @@ def check_object_existence(db_connection, lib_name, type_name, obj_name):
     obj_existence_expression = "SELECT COUNT(*) " \
                                " FROM TABLE (QSYS2.OBJECT_STATISTICS('" + lib_name + "','" + type_name + "','"\
                                + obj_name + "')) X "
-    out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, obj_existence_expression)
+    out_result_set, err = db2i_tools.db2_sql_query(db_connection, obj_existence_expression)
     if err is None:
         if out_result_set[0][0] != 0:
             # This object alreay exists
@@ -523,6 +528,9 @@ def get_entry_index_in_image_catalog(image_catalog_existing_entries, entry_file_
 
 def setup_operation(ibmi_module, module, image_catalog_name, opt_device_name, dir_target, is_rollback):
     db_conn = ibmi_module.get_connection()
+    if db_conn is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        return IBMi_COMMAND_RC_ERROR, '', 'No database connection available' + (': ' + conn_err if conn_err else ''), ''
     # check the optical device and image catalog exist or not
     device_exist = check_object_existence(db_conn, "QSYS", "*DEVD", opt_device_name)
     imgclg_exist = check_object_existence(db_conn, "QUSRSYS", "*IMGCLG", image_catalog_name)
@@ -1006,6 +1014,9 @@ def rmvimgclge_operation(ibmi_module, module, image_catalog_name, opt_device_nam
 
 def uninstall_operation(ibmi_module, module, image_catalog_name, opt_device_name, remove_image_files, is_rollback):
     db_conn = ibmi_module.get_connection()
+    if db_conn is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        return IBMi_COMMAND_RC_ERROR, '', 'No database connection available' + (': ' + conn_err if conn_err else ''), ''
 
     command_map = {}
     command_log = "Command log of uninstall operation."

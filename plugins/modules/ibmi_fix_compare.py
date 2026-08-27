@@ -100,7 +100,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_ut
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def get_ptf_info(db_connection, ptf_list):
@@ -110,7 +110,7 @@ def get_ptf_info(db_connection, ptf_list):
           " PTF_ACTION_PENDING, PTF_ACTION_REQUIRED, PTF_IPL_REQUIRED," \
           " PTF_STATUS_TIMESTAMP, PTF_CREATION_TIMESTAMP" \
           " FROM QSYS2.PTF_INFO WHERE UPPER(PTF_IDENTIFIER) IN ('" + str_ptf_list + "')"
-    out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
+    out_result_set, err = db2i_tools.db2_sql_query(db_connection, sql)
     out = {}
     if (out_result_set is not None):
         for result in out_result_set:
@@ -123,8 +123,8 @@ def get_ptf_info(db_connection, ptf_list):
                 "PTF_ACTION_PENDING": result[5],
                 "PTF_ACTION_REQUIRED": result[6],
                 "PTF_IPL_REQUIRED": result[7],
-                "PTF_STATUS_TIMESTAMP": result[8],
-                "PTF_CREATION_TIMESTAMP": result[9]
+                "PTF_STATUS_TIMESTAMP": str(result[8]) if result[8] is not None else None,
+                "PTF_CREATION_TIMESTAMP": str(result[9]) if result[9] is not None else None
             }
             # key - PTF_PRODUCT_ID ; value - ptf information
             out.update({result[1]: result_map})
@@ -154,6 +154,10 @@ def main():
         module.fail_json(rc=999, msg=message)
 
     db_conn = ibmi_module.get_connection()
+    if db_conn is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        module.fail_json(msg='No database connection available'
+                         + (': ' + conn_err if conn_err else ''))
 
     ptf_info = []
     err = ''

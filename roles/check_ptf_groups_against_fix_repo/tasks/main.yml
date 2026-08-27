@@ -25,19 +25,19 @@
 - name: Initialize the variables
   ansible.builtin.set_fact:
     check_ptf_groups_against_fix_repo_group_status: []
-    group_on_system: []
-    groups_installed: []
-    groups_not_installed: []
-    check_group_list: []
+    check_ptf_groups_against_fix_repo_group_on_system: []
+    check_ptf_groups_against_fix_repo_groups_installed: []
+    check_ptf_groups_against_fix_repo_groups_not_installed: []
+    check_ptf_groups_against_fix_repo_check_group_list: []
 
 - name: Compare latest ptf group level against repository server
   when: check_ptf_groups_against_fix_repo_type == "latest"
   block:
     - name: Compose fix repo parameters
       ansible.builtin.set_fact:
-        check_group_list: >-
+        check_ptf_groups_against_fix_repo_check_group_list: >-
           {{
-            check_group_list | default([])
+            check_ptf_groups_against_fix_repo_check_group_list | default([])
             + [{
               'ptf_group_number': group,
               'additional_param': 'ORDER BY ptf_group_level DESC LIMIT 1'
@@ -51,9 +51,9 @@
       ibm.power_ibmi.ibmi_fix_repo:
         action: "find"
         type: "ptf_group"
-        parameters: "{{ check_group_list }}"
+        parameters: "{{ check_ptf_groups_against_fix_repo_check_group_list }}"
       delegate_to: "{{ check_ptf_groups_against_fix_repo_repo_server }}"
-      register: group_info
+      register: check_ptf_groups_against_fix_repo_group_info
 
     - name: Got record failed from repository server
       ansible.builtin.set_fact:
@@ -65,24 +65,24 @@
               'PTF_GROUP_STATUS': 'Record not found in repository DB'
             }]
           }}
-      when: group_info.get('fail_list') is not none
-      with_list: "{{ group_info.fail_list | default([]) }}"
+      when: check_ptf_groups_against_fix_repo_group_info.get('fail_list') is not none
+      with_list: "{{ check_ptf_groups_against_fix_repo_group_info.fail_list | default([]) }}"
       loop_control:
         loop_var: group
 
     - name: Compare the group on target system
       ansible.builtin.include_tasks: compare_latest_group.yml
-      with_list: "{{ group_info.success_list | default([]) }}"
+      with_list: "{{ check_ptf_groups_against_fix_repo_group_info.success_list | default([]) }}"
       loop_control:
         loop_var: group
-      when: group_info.get('success_list') is not none
+      when: check_ptf_groups_against_fix_repo_group_info.get('success_list') is not none
 
 - name: Compare current ptf group level against repository server
   when: check_ptf_groups_against_fix_repo_type == "current"
   block:
     - name: Initialize group list for sql command
       ansible.builtin.set_fact:
-        group_list_str: "{{ \"','\".join(check_ptf_groups_against_fix_repo_group_list) }}"
+        check_ptf_groups_against_fix_repo_group_list_str: "{{ \"','\".join(check_ptf_groups_against_fix_repo_group_list) }}"
 
     - name: Retrieve group information from target system
       ibm.power_ibmi.ibmi_sql_query:
@@ -93,15 +93,16 @@
           WHERE PTF_GROUP_LEVEL IN (
             SELECT MAX(PTF_GROUP_LEVEL)
             FROM QSYS2.GROUP_PTF_INFO
-            WHERE PTF_GROUP_NAME IN ('{{ group_list_str }}')
+            WHERE PTF_GROUP_NAME IN ('{{ check_ptf_groups_against_fix_repo_group_list_str }}')
             GROUP BY PTF_GROUP_NAME
           )
-      register: result
+      register: check_ptf_groups_against_fix_repo_result
 
     - name: Compose the group name list
       ansible.builtin.set_fact:
-        group_on_system: "{{ group_on_system | default([]) + [group.PTF_GROUP_NAME.strip()] }}"
-      with_list: "{{ result.row }}"
+        check_ptf_groups_against_fix_repo_group_on_system: >-
+          {{ check_ptf_groups_against_fix_repo_group_on_system | default([]) + [group.PTF_GROUP_NAME.strip()] }}
+      with_list: "{{ check_ptf_groups_against_fix_repo_result.row }}"
       loop_control:
         loop_var: group
 
@@ -109,7 +110,7 @@
       ansible.builtin.set_fact:
         check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([])
           + [{'PTF_GROUP_NUMBER': group, 'PTF_GROUP_STATUS': 'NON-EXISTENT'}] }}"
-      when: group not in group_on_system
+      when: group not in check_ptf_groups_against_fix_repo_group_on_system
       with_list: "{{ check_ptf_groups_against_fix_repo_group_list }}"
       loop_control:
         loop_var: group
@@ -120,7 +121,7 @@
           + [{'PTF_GROUP_NUMBER': group.PTF_GROUP_NAME,
           'CURRENT_PTF_GROUP_LEVEL': group.PTF_GROUP_LEVEL, 'PTF_GROUP_STATUS': group.PTF_GROUP_STATUS}] }}"
       when: group.PTF_GROUP_STATUS.strip() == "INSTALLED"
-      with_list: "{{ result.row }}"
+      with_list: "{{ check_ptf_groups_against_fix_repo_result.row }}"
       loop_control:
         loop_var: group
 
@@ -130,9 +131,9 @@
 
     - name: Compose group check list of 'NOT INSTALLED' for compare
       ansible.builtin.set_fact:
-        check_group_list: >-
+        check_ptf_groups_against_fix_repo_check_group_list: >-
           {{
-            check_group_list | default([])
+            check_ptf_groups_against_fix_repo_check_group_list | default([])
             + [{
               'ptf_group_number': group.PTF_GROUP_NAME.strip(),
               'ptf_group_level': group.PTF_GROUP_LEVEL,
@@ -140,7 +141,7 @@
             }]
           }}
       when: group.PTF_GROUP_STATUS.strip() == "NOT INSTALLED"
-      with_list: "{{ result.row }}"
+      with_list: "{{ check_ptf_groups_against_fix_repo_result.row }}"
       loop_control:
         loop_var: group
 
@@ -148,25 +149,25 @@
       ibm.power_ibmi.ibmi_fix_repo:
         action: "find"
         type: "ptf_group"
-        parameters: "{{ check_group_list }}"
+        parameters: "{{ check_ptf_groups_against_fix_repo_check_group_list }}"
       delegate_to: "{{ check_ptf_groups_against_fix_repo_repo_server }}"
-      register: group_info
+      register: check_ptf_groups_against_fix_repo_group_info
 
     - name: Got record failed from repository server
       ansible.builtin.set_fact:
         check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([]) +
           [{'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level,
           'PTF_GROUP_STATUS': 'Record not found in repository DB'}] }}"
-      when: group_info.get('fail_list') is not none
-      with_list: "{{ group_info.fail_list | default([]) }}"
+      when: check_ptf_groups_against_fix_repo_group_info.get('fail_list') is not none
+      with_list: "{{ check_ptf_groups_against_fix_repo_group_info.fail_list | default([]) }}"
       loop_control:
         loop_var: group
 
     - name: Compare the group on target system
       ansible.builtin.include_tasks: compare_current_group.yml
-      with_list: "{{ group_info.success_list | default([]) }}"
+      with_list: "{{ check_ptf_groups_against_fix_repo_group_info.success_list | default([]) }}"
       loop_control:
         loop_var: group
       when:
-        - group_info.get('success_list') is not none
-        - group_info.success_list | length > 0
+        - check_ptf_groups_against_fix_repo_group_info.get('success_list') is not none
+        - check_ptf_groups_against_fix_repo_group_info.success_list | length > 0

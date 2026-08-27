@@ -70,7 +70,7 @@ EXAMPLES = r'''
   ibm.power_ibmi.ibmi_device_vary:
     device_list: ['IASP1', 'IASP2']
     status: '*ON'
-    joblog: True
+    joblog: true
     become_user: 'USER1'
     become_user_password: 'yourpassword'
 '''
@@ -159,7 +159,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def main():

@@ -1,0 +1,13 @@
+# BAT (Build Acceptance Test) execute list for ibmi_object_find
+#
+# TC00 (check opt 39, copy findobj.FILE to QGPL) always runs unconditionally.
+#
+# TC groups:
+#   TCLNG  — long_name.yml: long schema/table name find tests
+#   TCNEG  — TC01-TC11: negative/invalid parameter tests
+#   TCPOS  — TC12-TC23: positive find tests (restores FINDLIB from FINDOBJ savf)
+#   TCIASP — iasp.yml: iASP-specific tests (auto-skips if no iASP present)
+
+tc_execute:
+  - TCLNG
+  

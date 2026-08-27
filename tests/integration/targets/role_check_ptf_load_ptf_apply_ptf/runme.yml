@@ -35,7 +35,7 @@
 
         - name: Query the os version of target IBM i
           ibm.power_ibmi.ibmi_sql_query:
-            sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+            sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO'
           register: sql_query
 
         - name: Set the ptf group to be used
@@ -179,7 +179,7 @@
 
       - name: Query the os version of target IBM i
         ibm.power_ibmi.ibmi_sql_query:
-          sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+          sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO'
         register: sql_query
 
       - name: Set the ptf group to be used

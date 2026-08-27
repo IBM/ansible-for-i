@@ -1,0 +1,8 @@
+# BAT (Build Acceptance Test) execute list for ibmi_display_subsystem
+#
+# TC01 is a simple read-only display of all active subsystems — no server state changed.
+# TC04/TC05 are excluded from BAT: they stop/start QBATCH with 30-60 second waits.
+# TC06-TC09 are excluded from BAT: they depend on TC04/TC05 having run first.
+
+tc_execute:
+  - TC01

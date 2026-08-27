@@ -3,8 +3,39 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run — each sub-file honours this same variable.
+#               TC IDs are namespaced by operation: DISPLAY_TCxx, START_TCxx, END_TCxx,
+#               RESTART_TCxx, BECOME_TCxx.
+#   tc_skip:    optional list of TC IDs to skip — everything else runs.
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency notes:
+#   DISPLAY_TC04 / DISPLAY_TC05 are setup TCs that cycle QBATCH for the display tests.
+#   DISPLAY_TC07 / DISPLAY_TC08 depend on QBATCH being active (DISPLAY_TC05 left it active).
+#   START_TC03 depends on QBATCH still being active from START_TC02.
+#   END_TC03 / END_TC04 each start QBATCH themselves before ending it.
+#   RESTART_TC00 is a setup TC for all restart tests.
+#   RESTART_TC02 depends on QBATCH being active from RESTART_TC01.
+#   BECOME tests require ansible_ssh_pass to be defined (become credentials).
+#
+# The outer block/always wraps everything so cleanup always fires regardless of failures.
+#
+
 - block:
     # Test subsystem operations display, start, end, and restart
+
+    # ─── Record QBATCH initial state before any test modifies it ─────────────────
+    - name: check whether QBATCH is running before tests begin
+      ibmi_sql_query:
+        sql: "SELECT *
+              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+      register: qbatch_initial_state
+
+    - name: record whether QBATCH was originally running
+      set_fact:
+        qbatch_was_running: "{{ qbatch_initial_state.row | length != 0 }}"
 
     # Tests for display operation
     - ansible.builtin.include_tasks: display_cases.yml
@@ -22,8 +53,16 @@
     - ansible.builtin.include_tasks: become.yml
 
   always:
-    - name: Ensure QBATCH is active at end of test.
+    - name: restore QBATCH to original state - start it if it was running before the test
       ibmi_cl_command:
         cmd: 'STRSBS SBSD(QBATCH)'
-      when: sql_result.row | length == 1
-      ignore_errors: true    
+      when: qbatch_was_running | default(false) | bool
+      ignore_errors: true
+
+    - name: restore QBATCH to original state - stop it if it was not running before the test
+      ibmi_subsystem:
+        operation: end
+        subsystem: QBATCH
+        how_to_end: '*IMMED'
+      when: not (qbatch_was_running | default(false) | bool)
+      ignore_errors: true

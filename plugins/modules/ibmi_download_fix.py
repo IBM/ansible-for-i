@@ -285,7 +285,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 HAS_ITOOLKIT = True
 
@@ -505,10 +505,13 @@ def main():
                     if job_log[i]['MESSAGE_ID'] == 'CPF8C07' or job_log[i]['MESSAGE_ID'] == 'CPI8C02' or job_log[i]['MESSAGE_ID'] == 'CPF8C88':
                         return_error(module, conn, '', '', job_log[i]['MESSAGE_TEXT'], job_log,
                                      ibmi_util.IBMi_COMMAND_RC_ERROR, job_submitted_split, wait, delivery_format, result)
+                    elif job_log[i]['MESSAGE_ID'] == 'CPF8C19' or job_log[i]['MESSAGE_ID'] == 'CPF8C24':
+                        return_error(module, conn, '', '', job_log[i]['MESSAGE_TEXT'], job_log,
+                                     ibmi_util.IBMi_COMMAND_RC_ERROR, job_submitted_split, wait, delivery_format, result)
                     elif job_log[i]['MESSAGE_ID'] == 'CPZ8C38':
                         # order_id = job_log[i]['MESSAGE_TEXT'][18:28]
                         order_id = job_log[i]['MESSAGE_TOKENS'][0:10]
-                        order_start_time = job_log[i]['MESSAGE_TIMESTAMP']
+                        order_start_time = str(job_log[i]['MESSAGE_TIMESTAMP'])
                     elif job_log[i]['MESSAGE_ID'] == 'CPZ8C12':
                         download_list.append({})
                         # download_list[j]['product'] = (job_log[i]['MESSAGE_TEXT'])[4:11]
@@ -517,14 +520,14 @@ def main():
                         download_list[j]['ptf_id'] = job_log[i]['MESSAGE_TOKENS'][0:7]
                         # download_list[j]['release'] = job_log[i]['MESSAGE_TEXT'][20:26]
                         download_list[j]['release'] = job_log[i]['MESSAGE_TOKENS'][15:21]
-                        download_list[j]['download_time'] = job_log[i]['MESSAGE_TIMESTAMP']
+                        download_list[j]['download_time'] = str(job_log[i]['MESSAGE_TIMESTAMP'])
                         download_list[j]['file_name'] = 'Q' + download_list[j]['ptf_id']
                         download_list[j]['file_path'] = '/qsys.lib/qgpl.lib/' + download_list[j]['file_name'] + '.FILE'
                         download_list[j]['order_id'] = order_id
                         j = j + 1
                         success = True
                     elif job_log[i]['MESSAGE_ID'] == 'CPF1164':
-                        order_end_time = job_log[i]['MESSAGE_TIMESTAMP']
+                        order_end_time = str(job_log[i]['MESSAGE_TIMESTAMP'])
                     elif job_log[i]['MESSAGE_ID'] == 'CPF8C32':
                         return_error(module, conn, '', '', 'PTF order cannot be processed. See joblog', job_log,
                                      ibmi_util.IBMi_COMMAND_RC_ERROR, job_submitted_split, wait, delivery_format, result)
@@ -536,7 +539,7 @@ def main():
                     if job_log[i]['MESSAGE_ID'] == 'CPZ8C38':
                         # order_id = job_log[i]['MESSAGE_TEXT'][18:28]
                         order_id = job_log[i]['MESSAGE_TOKENS'][0:10]
-                        order_start_time = job_log[i]['MESSAGE_TIMESTAMP']
+                        order_start_time = str(job_log[i]['MESSAGE_TIMESTAMP'])
                         success = True
                     elif job_log[i]['MESSAGE_ID'] == 'CPF8C32':
                         return_error(module, conn, '', '', 'PTF order cannot be processed. See joblog', job_log,

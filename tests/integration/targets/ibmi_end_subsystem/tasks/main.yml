@@ -1,186 +1,260 @@
-# test code for the ibmi_end_subsytem module
+# test code for the ibmi_end_subsystem module
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC02','TC03']) — only those TCs run
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['TC04']) — everything else runs
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency chain:
+#   TC01  checks if QBATCH is running and starts it if not — setup, always runs
+#   TC02  ends QBATCH (*IMMED) — depends on TC01 having ensured QBATCH is running
+#   TC03  starts QBATCH, then ends it (joblog=true) — depends on TC02 having stopped QBATCH
+#   TC04  starts QBATCH, then ends it (*CNTRLD) — depends on TC03 having stopped QBATCH
+#   TC05  ends an already-inactive QBATCH (expected failure) — depends on TC04 having stopped QBATCH
+#   TC06–TC14  negative/parameter validation tests — independent of QBATCH state
+#
+# TC02–TC05 must be run together as a chain. Each includes a 20-second pause.
+# TC06–TC14 are safe to run in any order independently.
+#
+# become.yml is included unconditionally before TCs — it has its own block/always
+# and will only run its internal TCs if the matching IDs appear in tc_execute.
+#
+
 - block:
     - ansible.builtin.include_tasks: become.yml
-    - name: TC01 check whether QBATCH is running
-      ibmi_sql_query:
-        sql: "SELECT * 
-              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result_orig
 
-    - name: TC01 start subsystem if it isnot running
-      ibmi_start_subsystem:
-        subsystem: QBATCH
-        library: QSYS
-      when: sql_result_orig.row | length == 0
+    # ─── TC01 ─────────────────────────────────────────────────────────────────
+    # TC01 is setup — always runs regardless of tc_execute to ensure QBATCH is
+    # in a known state before TC02 attempts to end it.
+    - name: TC01 - Check whether QBATCH is running
+      block:
+        - name: TC01 check whether QBATCH is running
+          ibmi_sql_query:
+            sql: "SELECT *
+                  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                  SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+          register: sql_result_orig
 
-    - name: TC02 end the host server if it is running
-      ibmi_end_subsystem:
-        subsystem: QBATCH
-        how_to_end: '*IMMED'
-        controlled_end_delay_time: 60
-        end_subsystem_option: '*DFT'
-        parameters: ''
-      register: endsbs_result
+        - name: TC01 start subsystem if it is not running
+          ibmi_start_subsystem:
+            subsystem: QBATCH
+            library: QSYS
+          when: sql_result_orig.row | length == 0
 
-    - name: TC02 assert the returned parameters
-      assert:
-        that: 
-          #- "'CPF0943' in endsbs_result.stdout"
-          - endsbs_result.stderr is defined
-          - endsbs_result.stderr_lines is defined 
-          - endsbs_result.stdout_lines is defined
-          - endsbs_result.rc == 0
-          - endsbs_result.job_log == []
-  
-    - name: TC02 pause 20 seconds to wait for sbs end
-      pause: 
-        seconds: 20
+    # ─── TC02 ─────────────────────────────────────────────────────────────────
+    - name: TC02 - End QBATCH with all options (*IMMED)
+      when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+      block:
+        - name: TC02 end the subsystem with all options
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+            how_to_end: '*IMMED'
+            controlled_end_delay_time: 60
+            end_subsystem_option: '*DFT'
+            parameters: ''
+          register: endsbs_result
 
-    - name: TC02 check whether QBATCH is running
-      ibmi_sql_query:
-        sql: "SELECT * 
-              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result
-      failed_when: sql_result.row | length != 0 
+        - name: TC02 assert the returned parameters
+          assert:
+            that:
+              - endsbs_result.stderr is defined
+              - endsbs_result.stderr_lines is defined
+              - endsbs_result.stdout_lines is defined
+              - endsbs_result.rc == 0
+              - endsbs_result.job_log == []
 
-    - name: TC03 start subsystem with all supported options
-      ibmi_start_subsystem:
-        subsystem: QBATCH
-        library: QSYS
+        - name: TC02 pause 20 seconds to wait for subsystem to end
+          pause:
+            seconds: 20
 
-    - name: TC03 pause 20 seconds to wait for sbs end
-      pause: 
-        seconds: 20
+        - name: TC02 check whether QBATCH has stopped
+          ibmi_sql_query:
+            sql: "SELECT *
+                  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                  SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+          register: sql_result
+          failed_when: sql_result.row | length != 0
 
-    - name: TC03 end subsystem with only required options
-      ibmi_end_subsystem:
-        subsystem: QBATCH
-        joblog: true
-      register: endsbs_result
+    # ─── TC03 ─────────────────────────────────────────────────────────────────
+    - name: TC03 - End QBATCH with only required options (joblog=true)
+      when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+      block:
+        - name: TC03 start subsystem before ending
+          ibmi_start_subsystem:
+            subsystem: QBATCH
+            library: QSYS
 
-    - name: TC03 assert the returned parameters
-      assert:
-        that: 
-          - endsbs_result.stderr is defined
-          - endsbs_result.stderr_lines is defined 
-          - endsbs_result.stdout_lines is defined
-          - endsbs_result.rc == 0
-          - endsbs_result.job_log != []
+        - name: TC03 pause 20 seconds to wait for subsystem to start
+          pause:
+            seconds: 20
 
-    - name: TC03 pause 20 seconds to wait for sbs end
-      pause: 
-        seconds: 20
+        - name: TC03 end subsystem with only required options
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+            joblog: true
+          register: endsbs_result
 
-    - name: TC04 start subsystem with default options
-      ibmi_start_subsystem:
-        subsystem: QBATCH
+        - name: TC03 assert the returned parameters
+          assert:
+            that:
+              - endsbs_result.stderr is defined
+              - endsbs_result.stderr_lines is defined
+              - endsbs_result.stdout_lines is defined
+              - endsbs_result.rc == 0
+              - endsbs_result.job_log != []
 
-    - name: TC04 pause 20 seconds to wait for sbs start 
-      pause: 
-        seconds: 20
+        - name: TC03 pause 20 seconds to wait for subsystem to end
+          pause:
+            seconds: 20
 
-    - name: TC04 end the subsystem
-      ibmi_end_subsystem:
-        subsystem: QBATCH
-        how_to_end: '*CNTRLD'
-        controlled_end_delay_time: 60
-        end_subsystem_option: ['*NOJOBLOG', '*CHGPTY']
-      register: endsbs_result
+    # ─── TC04 ─────────────────────────────────────────────────────────────────
+    - name: TC04 - End QBATCH with *CNTRLD and multiple end_subsystem_option values
+      when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+      block:
+        - name: TC04 start subsystem with default options
+          ibmi_start_subsystem:
+            subsystem: QBATCH
 
-    - name: TC04 assert the returned parameters
-      assert:
-        that: 
-          #- "'CPF0943' in endsbs_result.stdout"
-          - endsbs_result.stderr is defined
-          - endsbs_result.stderr_lines is defined 
-          - endsbs_result.stdout_lines is defined
-          - endsbs_result.rc == 0
+        - name: TC04 pause 20 seconds to wait for subsystem to start
+          pause:
+            seconds: 20
 
-    - name: TC05 end an inactive subsystem
-      ibmi_end_subsystem:
-        subsystem: QBATCH          
-      register: endsbs_result
-      #failed_when: "'CPF1054' not in endsbs_result.stderr"
-      failed_when: "endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1054') | map(attribute='MESSAGE_ID') | list | length == 0"
+        - name: TC04 end the subsystem with *CNTRLD
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+            how_to_end: '*CNTRLD'
+            controlled_end_delay_time: 60
+            end_subsystem_option: ['*NOJOBLOG', '*CHGPTY']
+          register: endsbs_result
 
-    - name: TC05 assert the returned parameters
-      assert:
-        that: 
-          - endsbs_result.job_log != []
+        - name: TC04 assert the returned parameters
+          assert:
+            that:
+              - endsbs_result.stderr is defined
+              - endsbs_result.stderr_lines is defined
+              - endsbs_result.stdout_lines is defined
+              - endsbs_result.rc == 0
 
-    - name: TC06 end an inactive subsystem
-      ibmi_end_subsystem:
-        subsystem: '*all'          
-      register: endsbs_result
-      failed_when: "'End all subsystems is NOT allowed' not in endsbs_result.msg"
-  
-    - name: TC07 end an inactive subsystem
-      ibmi_end_subsystem:
-        subsystem: '*ALL'        
-      register: endsbs_result
-      failed_when: "'End all subsystems is NOT allowed' not in endsbs_result.msg"
+    # ─── TC05 ─────────────────────────────────────────────────────────────────
+    - name: TC05 - End an already-inactive subsystem (expected failure)
+      when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+      block:
+        - name: TC05 end an inactive subsystem
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+          register: endsbs_result
+          failed_when: "endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1054') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC08 end a not-existing sbs
-      ibmi_end_subsystem:
-        subsystem: abc 
-        joblog: true   
-      register: endsbs_result 
-      #failed_when: "'CPF1054' not in endsbs_result.stderr"
-      failed_when: "endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1054') | map(attribute='MESSAGE_ID') | list | length == 0"
+        - name: TC05 assert the returned parameters
+          assert:
+            that:
+              - endsbs_result.job_log != []
 
-    - name: TC08 assert the returned parameters
-      assert:
-        that: 
-          - endsbs_result.job_log != []
+    # ─── TC06 ─────────────────────────────────────────────────────────────────
+    - name: TC06 - End subsystem with *all (lowercase — expected failure)
+      when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+      block:
+        - name: TC06 end subsystem with *all lowercase
+          ibmi_end_subsystem:
+            subsystem: '*all'
+          register: endsbs_result
+          failed_when: "'End all subsystems is NOT allowed' not in endsbs_result.msg"
 
-    - name: TC09 end a sbs whose name is more than 10 characters
-      ibmi_end_subsystem:
-        subsystem: abcdefghigklmn   
-      register: endsbs_result 
-      failed_when: "'subsystem exceeds 10 characters' not in endsbs_result.msg"
+    # ─── TC07 ─────────────────────────────────────────────────────────────────
+    - name: TC07 - End subsystem with *ALL (uppercase — expected failure)
+      when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+      block:
+        - name: TC07 end subsystem with *ALL uppercase
+          ibmi_end_subsystem:
+            subsystem: '*ALL'
+          register: endsbs_result
+          failed_when: "'End all subsystems is NOT allowed' not in endsbs_result.msg"
 
-    - name: TC10 end with a wrong how_to_end
-      ibmi_end_subsystem:
-        subsystem: QBATCH    
-        how_to_end: abc
-      register: endsbs_result 
-      failed_when: "'value of how_to_end must be one of:' not in endsbs_result.msg"
-  
-    - name: TC11 end with a wrong end_subsystem_option
-      ibmi_end_subsystem:
-        subsystem: QBATCH    
-        end_subsystem_option: abc
-      register: endsbs_result 
-      failed_when: "'value of end_subsystem_option must be one or more of:' not in endsbs_result.msg"
+    # ─── TC08 ─────────────────────────────────────────────────────────────────
+    - name: TC08 - End a non-existing subsystem (expected failure)
+      when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+      block:
+        - name: TC08 end a non-existing subsystem
+          ibmi_end_subsystem:
+            subsystem: abc
+            joblog: true
+          register: endsbs_result
+          failed_when: "endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1054') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC12 end with a wrong how_to_end
-      ibmi_end_subsystem:
-        subsystem: QBATCH    
-        controlled_end_delay_time: abc
-      register: endsbs_result 
-      failed_when: "'cannot be converted to an int' not in endsbs_result.msg"
-      
-    - name: TC13 Missing required options
-      ibmi_end_subsystem:
-      register: endsbs_result
-      failed_when: "'missing required argument' not in endsbs_result.msg"
+        - name: TC08 assert the returned parameters
+          assert:
+            that:
+              - endsbs_result.job_log != []
 
-    - name: TC14 Provide invalid option
-      ibmi_end_subsystem:
-        subsystem: QBATCH    
-        abc: true
-      register: endsbs_result
-      failed_when: "'Unsupported parameters' not in endsbs_result.msg" 
+    # ─── TC09 ─────────────────────────────────────────────────────────────────
+    - name: TC09 - End a subsystem whose name exceeds 10 characters (expected failure)
+      when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+      block:
+        - name: TC09 end subsystem with name exceeding 10 characters
+          ibmi_end_subsystem:
+            subsystem: abcdefghigklmn
+          register: endsbs_result
+          failed_when: "'subsystem exceeds 10 characters' not in endsbs_result.msg"
+
+    # ─── TC10 ─────────────────────────────────────────────────────────────────
+    - name: TC10 - End with an invalid how_to_end value (expected failure)
+      when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+      block:
+        - name: TC10 end with invalid how_to_end
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+            how_to_end: abc
+          register: endsbs_result
+          failed_when: "'value of how_to_end must be one of:' not in endsbs_result.msg"
+
+    # ─── TC11 ─────────────────────────────────────────────────────────────────
+    - name: TC11 - End with an invalid end_subsystem_option value (expected failure)
+      when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+      block:
+        - name: TC11 end with invalid end_subsystem_option
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+            end_subsystem_option: abc
+          register: endsbs_result
+          failed_when: "'value of end_subsystem_option must be one or more of:' not in endsbs_result.msg"
+
+    # ─── TC12 ─────────────────────────────────────────────────────────────────
+    - name: TC12 - End with an invalid controlled_end_delay_time value (expected failure)
+      when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+      block:
+        - name: TC12 end with invalid controlled_end_delay_time
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+            controlled_end_delay_time: abc
+          register: endsbs_result
+          failed_when: "'cannot be converted to an int' not in endsbs_result.msg"
+
+    # ─── TC13 ─────────────────────────────────────────────────────────────────
+    - name: TC13 - Missing required subsystem option (expected failure)
+      when: (tc_execute is not defined or 'TC13' in tc_execute) and 'TC13' not in (tc_skip | default([]))
+      block:
+        - name: TC13 end with missing required subsystem option
+          ibmi_end_subsystem:
+          register: endsbs_result
+          failed_when: "'missing required argument' not in endsbs_result.msg"
+
+    # ─── TC14 ─────────────────────────────────────────────────────────────────
+    - name: TC14 - Provide an invalid/unsupported option (expected failure)
+      when: (tc_execute is not defined or 'TC14' in tc_execute) and 'TC14' not in (tc_skip | default([]))
+      block:
+        - name: TC14 end with unsupported option
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+            abc: true
+          register: endsbs_result
+          failed_when: "'Unsupported parameters' not in endsbs_result.msg"
 
   always:
-    - name: start the host server if it is running
+    - name: Start QBATCH if it was originally running
       ibmi_cl_command:
         cmd: 'STRSBS SBSD(QBATCH)'
-      when: sql_result_orig.row | length == 1
+      when: sql_result_orig is defined and sql_result_orig.row | length == 1
       ignore_errors: true

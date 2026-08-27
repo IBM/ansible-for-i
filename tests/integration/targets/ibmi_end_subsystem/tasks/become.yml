@@ -1,104 +1,147 @@
-# Test become_user and become_user_password
+# Test become_user and become_user_password for ibmi_end_subsystem
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run — IDs BTC01–BTC05 select become TCs
+#   tc_skip:    optional list of TC IDs to skip
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency chain:
+#   BTC01  checks if QBATCH is running — setup for BTC02
+#   BTC02  ends QBATCH using become_user — depends on BTC01 ensuring QBATCH is running
+#   BTC03  switches ansible_ssh_user to become user — required setup for BTC04/BTC05
+#   BTC04  starts QBATCH using org_user become — depends on BTC01/BTC03
+#   BTC05  ends QBATCH using org_user become — depends on BTC04 having started QBATCH
+#
+# BTC02–BTC05 require --password to be provided (SSH user is switched mid-test).
+# The always: block restores the original SSH user and deletes the test user profile.
+#
+
 - set_fact:
     becomeuser: 'anbecome'
     becomepwd: 'password'
     libname: 'becomelib'
   no_log: true
 
-- block: 
-    - name: create a user profile with required options
+- block:
+    - name: BTC create become user profile
       ibmi_user_and_group:
         operation: 'create'
         user: '{{becomeuser}}'
         password: '{{becomepwd}}'
 
-    - name: display a user profile with required options
+    - name: BTC display become user profile
       ibmi_user_and_group:
         operation: 'display'
         user: '{{becomeuser}}'
       register: user_result
 
-    - name: TC01 check whether QBATCH is running
-      ibmi_sql_query:
-        sql: "SELECT * 
-              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result_orig
+    # ─── BTC01 ────────────────────────────────────────────────────────────────
+    - name: BTC01 - Check whether QBATCH is running (become setup)
+      when: (tc_execute is not defined or 'BTC01' in tc_execute) and 'BTC01' not in (tc_skip | default([]))
+      block:
+        - name: BTC01 check whether QBATCH is running
+          ibmi_sql_query:
+            sql: "SELECT *
+                  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                  SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+          register: sql_result_orig
 
-    - name: TC01 start subsystem if it isnot running
-      ibmi_start_subsystem:
-        subsystem: QBATCH
-        library: QSYS
-      when: sql_result_orig.row | length == 0
+        - name: BTC01 start subsystem if it is not running
+          ibmi_start_subsystem:
+            subsystem: QBATCH
+            library: QSYS
+          when: sql_result_orig.row | length == 0
 
-    - name: TC02 end the host server if it is running
-      ibmi_end_subsystem:
-        subsystem: QBATCH
-        how_to_end: '*IMMED'
-        controlled_end_delay_time: 60
-        end_subsystem_option: '*DFT'
-        parameters: ''
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '{{becomepwd}}'
-      register: endsbs_result
-      failed_when: "endsbs_result.rc != 0 and (endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1038') | map(attribute='MESSAGE_ID') | list | length) == 0"
+    # ─── BTC02 ────────────────────────────────────────────────────────────────
+    - name: BTC02 - End QBATCH using become_user (*IMMED)
+      when: (tc_execute is not defined or 'BTC02' in tc_execute) and 'BTC02' not in (tc_skip | default([]))
+      block:
+        - name: BTC02 end the subsystem using become_user
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+            how_to_end: '*IMMED'
+            controlled_end_delay_time: 60
+            end_subsystem_option: '*DFT'
+            parameters: ''
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '{{becomepwd}}'
+          register: endsbs_result
+          failed_when: "endsbs_result.rc != 0 and (endsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1038') | map(attribute='MESSAGE_ID') | list | length) == 0"
 
-    - name: backup original ansible_ssh_user
-      set_fact:
-        org_user: '{{ansible_ssh_user}}'
+    # ─── BTC03 ────────────────────────────────────────────────────────────────
+    # BTC03 switches the SSH connection to the become user.
+    # Requires ansible_ssh_pass to be defined (pass --password to run_bat_local.sh).
+    - name: BTC03 - Switch SSH user to become user
+      when: (tc_execute is not defined or 'BTC03' in tc_execute) and 'BTC03' not in (tc_skip | default([]))
+      block:
+        - name: BTC03 backup original ansible_ssh_user
+          set_fact:
+            org_user: '{{ansible_ssh_user}}'
 
-    - name: backup original ansible_ssh_pass
-      no_log: true
-      set_fact: 
-        org_user_password: '{{ansible_ssh_pass}}'
-      when: ansible_ssh_pass is defined
+        - name: BTC03 backup original ansible_ssh_pass
+          set_fact:
+            org_user_password: '{{ansible_ssh_pass}}'
+          no_log: true
+          when: ansible_ssh_pass is defined
 
-    - name: set ansible_ssh_user to *USRCLS
-      no_log: true
-      set_fact:
-        ansible_ssh_user: '{{becomeuser}}'
-        ansible_ssh_pass: '{{becomepwd}}'
+        - name: BTC03 switch ansible_ssh_user to become user
+          set_fact:
+            ansible_ssh_user: '{{becomeuser}}'
+            ansible_ssh_pass: '{{becomepwd}}'
+          no_log: true
 
-    - name: TC03 start subsystem if it isnot running
-      ibmi_start_subsystem:
-        subsystem: QBATCH
-        library: QSYS
-        become_user: '{{org_user}}'
-        become_user_password: '{{org_user_password}}'
-      when: sql_result_orig.row | length == 0
+    # ─── BTC04 ────────────────────────────────────────────────────────────────
+    - name: BTC04 - Start QBATCH using org_user become (SSH switched to become user)
+      when: (tc_execute is not defined or 'BTC04' in tc_execute) and 'BTC04' not in (tc_skip | default([]))
+      block:
+        - name: BTC04 start subsystem using org_user become
+          ibmi_start_subsystem:
+            subsystem: QBATCH
+            library: QSYS
+            become_user: '{{org_user}}'
+            become_user_password: '{{org_user_password}}'
+          when: sql_result_orig is defined and sql_result_orig.row | length == 0
 
-    - name: TC04 end the host server if it is running
-      ibmi_end_subsystem:
-        subsystem: QBATCH
-        how_to_end: '*IMMED'
-        controlled_end_delay_time: 60
-        end_subsystem_option: '*DFT'
-        parameters: ''
-        become_user: '{{org_user}}'
-        become_user_password: '{{org_user_password}}'
-      register: endsbs_result
+    # ─── BTC05 ────────────────────────────────────────────────────────────────
+    - name: BTC05 - End QBATCH using org_user become and verify it stopped
+      when: (tc_execute is not defined or 'BTC05' in tc_execute) and 'BTC05' not in (tc_skip | default([]))
+      block:
+        - name: BTC05 end the subsystem using org_user become
+          ibmi_end_subsystem:
+            subsystem: QBATCH
+            how_to_end: '*IMMED'
+            controlled_end_delay_time: 60
+            end_subsystem_option: '*DFT'
+            parameters: ''
+            become_user: '{{org_user}}'
+            become_user_password: '{{org_user_password}}'
+          register: endsbs_result
 
-    - name: TC05 pause 20 seconds to wait for sbs end
-      pause: 
-        seconds: 20
+        - name: BTC05 pause 20 seconds to wait for subsystem to end
+          pause:
+            seconds: 20
 
-    - name: TC05 check whether QBATCH is running
-      ibmi_sql_query:
-        sql: "SELECT * 
-              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result
-      failed_when: sql_result.row | length != 0 
+        - name: BTC05 check whether QBATCH has stopped
+          ibmi_sql_query:
+            sql: "SELECT *
+                  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                  SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+          register: sql_result
+          failed_when: sql_result.row | length != 0
 
   always:
-    - name: set ansible_ssh_user to *USRCLS
-      no_log: true
+    - name: Restore original ansible_ssh_user
       set_fact:
         ansible_ssh_user: '{{org_user.upper()}}'
         ansible_ssh_pass: '{{org_user_password}}'
+      when: org_user is defined
       ignore_errors: true
+      no_log: true
 
-    - name: delete the user profile
+    - name: Delete become user profile
       ibmi_user_and_group:
         operation: 'delete'
         user: '{{becomeuser}}'

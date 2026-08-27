@@ -2,7 +2,7 @@
   ibm.power_ibmi.ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IPL_ACTION, PTF_IDENTIFIER, PTF_LOADED_STATUS, A.*
       FROM QSYS2.PTF_INFO A
-      WHERE PTF_IDENTIFIER = '{{item.ptf_id}}';"
+      WHERE PTF_IDENTIFIER = '{{item.ptf_id}}'"
   register: ptf_result
 
 - name: Remove ptf
@@ -23,14 +23,14 @@
   ibm.power_ibmi.ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IPL_ACTION, PTF_IDENTIFIER, PTF_LOADED_STATUS, A.*
       FROM QSYS2.PTF_INFO A
-      WHERE PTF_IDENTIFIER = '{{item.ptf_id}}';"
+      WHERE PTF_IDENTIFIER = '{{item.ptf_id}}'"
   register: ptf_result
 
 - name: Check any PTFs requires a IPL
   ibm.power_ibmi.ibmi_sql_query:
       sql: "SELECT PTF_IDENTIFIER, PTF_IPL_ACTION, A.*
         FROM QSYS2.PTF_INFO A
-        WHERE PTF_IPL_ACTION = 'TEMPORARILY REMOVED' or PTF_IPL_ACTION = 'PERMANENTLY REMOVED' and PTF_PRODUCT_ID = '{{item.product}}';"
+        WHERE PTF_IPL_ACTION = 'TEMPORARILY REMOVED' or PTF_IPL_ACTION = 'PERMANENTLY REMOVED' and PTF_PRODUCT_ID = '{{item.product}}'"
   register: sql_query
 
 - name: IPL the system to verify the PTF are applied.

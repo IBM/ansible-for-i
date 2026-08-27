@@ -29,12 +29,13 @@
       ibm.power_ibmi.ibmi_fix:
         fix_list: '{{ apply_ptf.ptf_id }}'
         operation: 'query'
-      register: fix_result
+      register: apply_ptf_fix_result
       when: apply_ptf_auto_ipl
 
     - name: Reboot the system immediately if apply_ptf_auto_ipl is set to true and at least one to-be-applied PTF requires an IPL
       ansible.builtin.set_fact:
-        ipl_requested: true
+        apply_ptf_ipl_requested: true
       when:
         - apply_ptf_auto_ipl
-        - fix_result['ptf_list'][0]['PTF_IPL_ACTION'] == 'TEMPORARILY APPLIED' or fix_result['ptf_list'][0]['PTF_IPL_ACTION'] == 'PERMANENTLY APPLIED'
+        - apply_ptf_fix_result['ptf_list'][0]['PTF_IPL_ACTION'] == 'TEMPORARILY APPLIED' or
+          apply_ptf_fix_result['ptf_list'][0]['PTF_IPL_ACTION'] == 'PERMANENTLY APPLIED'

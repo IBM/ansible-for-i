@@ -91,7 +91,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 HAS_ITOOLKIT = True
 
@@ -119,6 +119,7 @@ def main():
         stderr=''
     )
     error = ''
+    rc = 0
     status = []
     complete_time = ''
     file_path = ''
@@ -152,7 +153,7 @@ def main():
                         if id_temp[1:] == order_id:
                             # message exists. set the download_status to 'DOWNLOADED'
                             download_status = 'DOWNLOADED'
-                            complete_time = out[0]['MESSAGE_TIMESTAMP'].strip()[:-7]
+                            complete_time = str(out[0]['MESSAGE_TIMESTAMP']).strip()[:-7]
                             file_path = ''.join(re_list)
 
             status.append({'order_id': order_id, 'download_status': download_status, 'complete_time': complete_time, 'file_path': file_path})
@@ -161,7 +162,8 @@ def main():
         module.exit_json(**result)
 
     except Exception as e_db_connect:
-        module.fail_json(msg=e_db_connect.args[0])
+        result.update({'status': status, 'rc': ibmi_util.IBMi_SQL_RC_ERROR, 'stdout': '', 'stderr': str(e_db_connect)})
+        module.exit_json(**result)
 
 
 if __name__ == '__main__':

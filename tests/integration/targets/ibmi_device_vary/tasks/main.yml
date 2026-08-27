@@ -3,177 +3,231 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC02']) — only those TCs run
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['TC04']) — everything else runs
+#   If neither variable is defined, all TCs run (default behaviour, same as before).
+#
+# TC dependency chain:
+#   TC01  varies on device ANSIT1 — TC02 verifies the on state, TC03 varies it on again (idempotent)
+#   TC04  varies off both devices (depends on TC01 having created them)
+#   TC05–TC09 are negative/error tests (independent of device state)
+#   TC10  tries to vary off a non-existing device (independent)
+#   TC11  tries to vary off with malformed device list (independent)
+#   The outer block/always guarantees cleanup runs even if a TC fails hard.
+#
+
 - block:
-    - set_fact:
+    - name: set up device names used throughout this test
+      set_fact:
         device_name: ["ANSIT1", "ANSIT2"]
 
-    - name: create a device description
+    - name: create device descriptions for testing
       ibmi_cl_command:
-        cmd: CRTDEVOPT DEVD({{item}}) RSRCNAME(*VRT) ONLINE(*YES)
+        cmd: "CRTDEVOPT DEVD({{item}}) RSRCNAME(*VRT) ONLINE(*YES)"
       loop: "{{device_name}}"
 
-    - name: query ip interface from remote system
-      ibmi_sql_query:
-        sql: "SELECT LINE_DESCRIPTION from QSYS2.NETSTAT_INTERFACE_INFO WHERE (INTERFACE_LINE_TYPE = 'ELAN' OR INTERFACE_LINE_TYPE = 'VETH') AND INTERNET_ADDRESS  not in ('*IP6SAC', '*IP4DHCP')"
-      register: ip_interface_info
+    # ─── TC01 ───────────────────────────────────────────────────────────────────
+    - name: TC01 - Vary on a single device
+      when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+      block:
+        - name: TC01 vary on device ANSIT1
+          ibmi_device_vary:
+            device_list: '{{device_name[0]}}'
+            status: '*ON'
+          register: vary_result
 
-    - name: TC01 vry on device
-      ibmi_device_vary:
-        device_list: '{{device_name[0]}}'
-        status: '*ON'
-      register: vary_result
+        - name: TC01 set expected command fact
+          set_fact:
+            vary_cmd: "VRYCFG CFGOBJ({{device_name[0]}}) CFGTYPE(*DEV) STATUS(*ON)"
 
-    - name: TC01 set facts
-      set_fact:
-        vary_cmd: "VRYCFG CFGOBJ({{device_name[0]}}) CFGTYPE(*DEV) STATUS(*ON)"
+        - name: TC01 assert all defined return parameters are present
+          assert:
+            that:
+              - vary_result.job_log is defined
+              - vary_result.start is defined
+              - vary_result.end is defined
+              - vary_result.delta is defined
+              - vary_result.stdout is defined
+              - vary_cmd in vary_result.cmd
+              - vary_result.rc == 0
+              - vary_result.stdout_lines is defined
+              - vary_result.stderr_lines is defined
 
-    - name: TC01 assert the defined parameters are returned
-      assert:
-        that:
-          - vary_result.job_log is defined
-          - vary_result.start is defined
-          - vary_result.end is defined
-          - vary_result.delta is defined
-          - vary_result.stdout is defined
-          - vary_cmd in vary_result.cmd
-          - vary_result.rc == 0
-          - vary_result.stdout_lines is defined
-          - vary_result.stderr_lines is defined
+    # ─── TC02 ───────────────────────────────────────────────────────────────────
+    - name: TC02 - Verify device ANSIT1 is active after vary on
+      when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+      block:
+        - name: TC02 list all active devices
+          ibmi_cl_command:
+            cmd: "QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD(*ALL) STATUS(*ACTIVE)"
+          register: cfg_result
 
-    # - name: TC02 display a device description
-    #   ibmi_cl_command:
-    #     cmd: QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD({{device_name[0]}})
-    #   register: cfg_result
+        - name: TC02 set expected string fact
+          set_fact:
+            device_name_cmd: " {{device_name[0]}}               *DEV"
 
-    # - name: TC02 assert the device has been varied on
-    #   assert:
-    #     that:
-    #       - "' {{device_name[0]}}               *DEV     ACTIVE' in cfg_result.stdout"
+        - name: TC02 assert device ANSIT1 appears in active device list
+          assert:
+            that:
+              - device_name_cmd in cfg_result.stdout
 
-    - name: TC02 display a device description
-      ibmi_cl_command:
-        cmd: QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD(*ALL) STATUS(*ACTIVE)
-      register: cfg_result
+    # ─── TC03 ───────────────────────────────────────────────────────────────────
+    - name: TC03 - Vary on the same device again (idempotent)
+      when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+      block:
+        - name: TC03 vary on device ANSIT1 again (already on)
+          ibmi_device_vary:
+            device_list: '{{device_name[0]}}'
+            status: '*ON'
+          register: vary_result_idempotent
 
-    - name: TC02 set facts
-      set_fact: 
-        device_name_cmd: " {{device_name[0]}}               *DEV"
+        - name: TC03 assert the command completed without error
+          assert:
+            that:
+              - vary_result_idempotent.rc == 0
 
-    - name: TC02 assert the device has been varied on
-      assert:
-        that:
-          - device_name_cmd in cfg_result.stdout
+    # ─── TC04 ───────────────────────────────────────────────────────────────────
+    - name: TC04 - Vary off two devices with extra parameters
+      when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+      block:
+        - name: TC04 vary off both devices with SBMMLTJOB and joblog=true
+          ibmi_device_vary:
+            device_list: '{{device_name}}'
+            status: '*OFF'
+            extra_parameters: 'SBMMLTJOB(*YES)'
+            joblog: true
+          register: vary_off_result
 
-    - name: TC03 vry on device again
-      ibmi_device_vary:
-        device_list: '{{device_name[0]}}'
-        status: '*ON'
-      register: vary_result
+        - name: TC04 assert the command completed without error
+          assert:
+            that:
+              - vary_off_result.rc == 0
+              - vary_off_result.job_log is defined
 
-    - name: TC04 vry off two devices
-      ibmi_device_vary:
-        device_list: '{{device_name}}'
-        status: '*OFF'
-        extra_parameters: 'SBMMLTJOB(*YES)'
-        joblog: true
+    # ─── TC05 ───────────────────────────────────────────────────────────────────
+    - name: TC05 - Vary off without required device_list (expected failure)
+      when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+      block:
+        - name: TC05 vary off without device_list
+          ibmi_device_vary:
+            status: '*OFF'
+            joblog: true
+          register: neg_result
+          failed_when: "'missing required argument' not in neg_result.msg"
 
-    # Test negative path
-    - name: TC05 vry off the device without required parameters
-      ibmi_device_vary:
-        status: '*OFF'
-        joblog: true
-      register: neg_result
-      failed_when: "'missing required argument' not in neg_result.msg"
+    # ─── TC06 ───────────────────────────────────────────────────────────────────
+    - name: TC06 - Vary without required status (expected failure)
+      when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+      block:
+        - name: TC06 vary without status
+          ibmi_device_vary:
+            device_list: '{{device_name}}'
+            extra_parameters: 'RANGE(*OBJ) SBMMLTJOB(*YES)'
+            joblog: true
+          register: neg_result
+          failed_when: "'missing required argument' not in neg_result.msg"
 
-    - name: TC06 vry on the device without required parameters
-      ibmi_device_vary:
-        device_list: '{{device_name}}'
-        extra_parameters: 'RANGE(*OBJ) SBMMLTJOB(*YES)'
-        joblog: true
-      register: neg_result
-      failed_when: "'missing required argument' not in neg_result.msg"
+    # ─── TC07 ───────────────────────────────────────────────────────────────────
+    - name: TC07 - Vary with an unsupported module option (expected failure)
+      when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+      block:
+        - name: TC07 vary with invalid option abc
+          ibmi_device_vary:
+            device_list: '{{device_name}}'
+            status: '*ON'
+            extra_parameters: 'RANGE(*OBJ) SBMMLTJOB(*YES)'
+            joblog: true
+            abc: abc
+          register: neg_result
+          failed_when: "'Unsupported parameters' not in neg_result.msg"
 
-    - name: TC07 with invalid option
-      ibmi_device_vary:
-        device_list: '{{device_name}}'
-        status: '*ON'
-        extra_parameters: 'RANGE(*OBJ) SBMMLTJOB(*YES)'
-        joblog: true
-        abc: abc
-      register: neg_result
-      failed_when: "'Unsupported parameters' not in neg_result.msg"
+    # ─── TC08 ───────────────────────────────────────────────────────────────────
+    - name: TC08 - Vary with invalid extra_parameters (expected failure)
+      when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+      block:
+        - name: TC08 vary with invalid extra_parameters value
+          ibmi_device_vary:
+            device_list: '{{device_name}}'
+            status: '*ON'
+            extra_parameters: ' abc(*abc)'
+            joblog: true
+          register: neg_result
+          failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0006') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC08 with invalid extra_parameters
-      ibmi_device_vary:
-        device_list: '{{device_name}}'
-        status: '*ON'
-        extra_parameters: ' abc(*abc)'
-        joblog: true
-      register: neg_result
-      #failed_when: "'Keyword ABC not valid for this command' not in neg_result.stderr"
-      #failed_when: "'CPF0006' not in neg_result.stderr"
-      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0006') | map(attribute='MESSAGE_ID') | list | length == 0"      
+    # ─── TC09 ───────────────────────────────────────────────────────────────────
+    - name: TC09 - Vary with invalid joblog value (expected failure)
+      when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+      block:
+        - name: TC09 vary with invalid joblog boolean value
+          ibmi_device_vary:
+            device_list: '{{device_name}}'
+            status: '*ON'
+            extra_parameters: 'RANGE(*OBJ) SBMMLTJOB(*YES)'
+            joblog: 'abcabc'
+          register: neg_result
+          failed_when: "'we were unable to convert to bool' not in neg_result.msg"
 
-    - name: TC09 with invalid joblog
-      ibmi_device_vary:
-        device_list: '{{device_name}}'
-        status: '*ON'
-        extra_parameters: 'RANGE(*OBJ) SBMMLTJOB(*YES)'
-        joblog: 'abcabc'
-      register: neg_result
-      failed_when: "'we were unable to convert to bool' not in neg_result.msg"
+    # ─── TC10 ───────────────────────────────────────────────────────────────────
+    - name: TC10 - Vary off a non-existing device (expected failure)
+      when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+      block:
+        - name: TC10 vary off non-existing device abc
+          ibmi_device_vary:
+            device_list: ['abc']
+            status: '*OFF'
+            joblog: true
+          register: vary_result
+          ignore_errors: true
 
-    - name: TC10 vry off the non-existing device
-      ibmi_device_vary:
-        device_list: ['abc']
-        status: '*OFF'
-        joblog: true
-      register: vary_result
-      ignore_errors: true
+        - name: TC10 assert all return parameters are present and rc is non-zero
+          assert:
+            that:
+              - vary_result.start is defined
+              - vary_result.end is defined
+              - vary_result.delta is defined
+              - vary_result.stdout is defined
+              - "'error QSYS/VRYCFG' in vary_result.stderr"
+              - "'VRYCFG CFGOBJ(abc) CFGTYPE(*DEV) STATUS(*OFF) FRCVRYOFF(*YES)' in vary_result.cmd"
+              - vary_result.rc != 0
+              - vary_result.stdout_lines is defined
+              - vary_result.stderr_lines is defined
 
-    - name: TC10 assert the defined parameters are returned
-      assert:
-        that:
-          - vary_result.start is defined
-          - vary_result.end is defined
-          - vary_result.delta is defined
-          - vary_result.stdout is defined
-          - "'error QSYS/VRYCFG' in vary_result.stderr"
-          - "'VRYCFG CFGOBJ(abc) CFGTYPE(*DEV) STATUS(*OFF) FRCVRYOFF(*YES)' in vary_result.cmd"
-          - vary_result.rc != 0
-          - vary_result.stdout_lines is defined
-          - vary_result.stderr_lines is defined
+    # ─── TC11 ───────────────────────────────────────────────────────────────────
+    - name: TC11 - Vary off with malformed device list (expected failure)
+      when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+      block:
+        - name: TC11 vary off with nested list as device entry
+          ibmi_device_vary:
+            device_list:
+              - '{{device_name}}'
+              - 'abc'
+            status: '*OFF'
+            joblog: true
+          register: vary_result
+          ignore_errors: true
 
-    - name: TC11 vry off the device with incorrect device list types
-      ibmi_device_vary:
-        device_list: 
-          - '{{device_name}}'
-          - 'abc'
-        status: '*OFF'
-        joblog: true
-      register: vary_result
-      ignore_errors: true
+        - name: TC11 assert all return parameters are present and rc is non-zero
+          assert:
+            that:
+              - vary_result.start is defined
+              - vary_result.end is defined
+              - vary_result.delta is defined
+              - vary_result.stdout is defined
+              - vary_result.stderr is defined
+              - vary_result.rc != 0
+              - vary_result.stdout_lines is defined
+              - vary_result.stderr_lines is defined
 
-    - name: TC11 assert the defined parameters are returned
-      assert:
-        that:
-          - vary_result.start is defined
-          - vary_result.end is defined
-          - vary_result.delta is defined
-          - vary_result.stdout is defined
-          - vary_result.stderr is defined
-          - vary_result.rc != 0
-          - vary_result.stdout_lines is defined
-          - vary_result.stderr_lines is defined
-  
   always:
-    - name: vary off the device description
+    # ─── Cleanup ────────────────────────────────────────────────────────────────
+    - name: cleanup - vary off both devices (ignore errors in case already off)
       ibmi_cl_command:
-        cmd: VRYCFG CFGOBJ({{item}}) CFGTYPE(*DEV) STATUS(*OFF) 
+        cmd: "VRYCFG CFGOBJ({{item}}) CFGTYPE(*DEV) STATUS(*OFF)"
       ignore_errors: true
       loop: "{{device_name}}"
 
-    - name: delete a device description
+    - name: cleanup - delete device descriptions
       ibmi_cl_command:
-        cmd: DLTDEVD DEVD({{item}})
+        cmd: "DLTDEVD DEVD({{item}})"
       loop: "{{device_name}}"

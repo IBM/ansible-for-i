@@ -38,7 +38,7 @@
       when: github_access_token | length > 0
       changed_when: github_access_token | length > 0
 
-    - name: Git clone from source repository
+    - name: Git clone from source repository (no token)
       ansible.builtin.git:
         repo: "https://{{ git_repo_url | regex_replace('[A-z]*://', '') }}"
         dest: "{{ build_path }}"    # noqa: latest

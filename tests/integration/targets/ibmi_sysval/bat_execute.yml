@@ -1,0 +1,13 @@
+# BAT (Build Acceptance Test) execute list for ibmi_sysval
+#
+# Dependency notes:
+#   TC02 and TC04 expect QMAXSIGN == '000005' and QMAXSGNACN == '3'.
+#   TC05 changes QMAXSIGN to '000013'; the always: block restores both values.
+#   TC01 / TC03 are pure read-only display tests — fully independent.
+#   TC06 is a negative read-only test — fully independent.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ─────────────────
+
+tc_execute:
+  - TC01
+

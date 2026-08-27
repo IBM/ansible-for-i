@@ -1,0 +1,10 @@
+# BAT (Build Acceptance Test) execute list for ibmi_facts
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# TC01  gathers IBM i system facts and asserts all expected keys are present.
+#       Read-only, no server state changes, fast (~2-5s).
+
+tc_execute:
+  - TC01

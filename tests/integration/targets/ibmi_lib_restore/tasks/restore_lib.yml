@@ -1,145 +1,205 @@
-- name: TC01 restore objects to library
-  ibmi_object_restore:
-    object_lib: 'SAVRST'
-    savefile_name: 'IBMISAVF'
-    savefile_lib: 'ARCHLIB'
-  register: rstobj_result
-  #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
-  failed_when: "rstobj_result.rc != 0 and (rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length) == 0"
+---
+# Restore test cases for ibmi_lib_restore
+# Called from main.yml after setup (SAVTEST.FILE must already exist in ARCHLIB).
+#
+# tc_execute / tc_skip variables flow through automatically from main.yml.
+# dlt_crt_lib.yml is called between positive TCs to delete+recreate SAVRST
+# so each restore test starts from a clean empty library.
 
-- ibmi_lib_save:
-    lib_name: 'SAVRST'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
+# ─── TC01 - Verify initial object restore succeeded ───────────────────────────
+- name: TC01 - verify object restore from setup completed successfully
+  when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+  block:
+    - name: TC01 - restore objects from IBMISAVF into SAVRST
+      ibmi_object_restore:
+        object_lib: 'SAVRST'
+        savefile_name: 'IBMISAVF'
+        savefile_lib: 'ARCHLIB'
+      register: rstobj_result
+      failed_when: "rstobj_result.rc != 0 and (rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length) == 0"
 
+    - name: TC01 - save SAVRST to SAVTEST in ARCHLIB (used by TC02-TC14)
+      ibmi_lib_save:
+        lib_name: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+
+# ─── TC02 - Restore lib with only required options ────────────────────────────
 - ansible.builtin.include_tasks: dlt_crt_lib.yml
 
-- name: TC02 restore library with only required options
-  ibmi_lib_restore:
-    saved_lib: 'SAVRST'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-  register: rstlib_result
+- name: TC02 - restore lib with only required options
+  when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+  block:
+    - name: TC02 - restore library
+      ibmi_lib_restore:
+        saved_lib: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+      register: rstlib_result
 
-- name: TC02 assert the returned parameters of ibmi_lib_restore
-  assert:
-    that:
-      - rstlib_result.start != ''
-      - rstlib_result.end != ''
-      - rstlib_result.delta != ''
-      - rstlib_result.rc == 0
-      - rstlib_result.stdout != ''
-      - rstlib_result.stdout_lines != ''
-      - rstlib_result.saved_lib == 'SAVRST'
-      - rstlib_result.savefile_name == 'SAVTEST'
-      - rstlib_result.savefile_lib == 'ARCHLIB'
-      - rstlib_result.format == '*SAVF'
+    - name: TC02 - assert returned parameters
+      assert:
+        that:
+          - rstlib_result.start != ''
+          - rstlib_result.end != ''
+          - rstlib_result.delta != ''
+          - rstlib_result.rc == 0
+          - rstlib_result.stdout != ''
+          - rstlib_result.stdout_lines != ''
+          - rstlib_result.saved_lib == 'SAVRST'
+          - rstlib_result.savefile_name == 'SAVTEST'
+          - rstlib_result.savefile_lib == 'ARCHLIB'
+          - rstlib_result.format == '*SAVF'
 
+# ─── TC03 - Restore lib with all supported options ────────────────────────────
 - ansible.builtin.include_tasks: dlt_crt_lib.yml
 
-- name: TC03 restore lib with all supported options
-  ibmi_lib_restore:
-    saved_lib: 'SAVRST'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-    format: '*SAVF'
-    joblog: 'false'
-    parameters: ''
-  register: rstlib_result
+- name: TC03 - restore lib with all supported options
+  when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+  block:
+    - name: TC03 - restore lib with format, joblog=false, parameters=''
+      ibmi_lib_restore:
+        saved_lib: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        format: '*SAVF'
+        joblog: 'false'
+        parameters: ''
+      register: rstlib_result
 
+    - name: TC03 - assert restore succeeded
+      assert:
+        that:
+          - rstlib_result.rc == 0
+
+# ─── TC04 - Restore lib with OPTION(*NEW) STRJRN(*NO) and verify object count ─
 - ansible.builtin.include_tasks: dlt_crt_lib.yml
 
-- name: TC04 restore library with parameters
-  ibmi_lib_restore:
-    saved_lib: 'SAVRST'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-    joblog: 'true'
-    parameters: 'OPTION(*NEW) STRJRN(*NO)'
+- name: TC04 - restore lib with OPTION(*NEW) STRJRN(*NO) and verify 6 objects
+  when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+  block:
+    - name: TC04 - restore library with extra CL parameters
+      ibmi_lib_restore:
+        saved_lib: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        joblog: 'true'
+        parameters: 'OPTION(*NEW) STRJRN(*NO)'
 
-- name: TC04 verify all objects have been restored
-  ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
-    expected_row_count: 6
+    - name: TC04 - verify all 6 objects have been restored
+      ibmi_sql_query:
+        sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
+        expected_row_count: 6
 
-# Test negitive path
+# ─── TC05 - Negative: non-existing saved_lib name 'ABC' ──────────────────────
 - ansible.builtin.include_tasks: dlt_crt_lib.yml
 
-- name: TC05 restore lib with not existing library
-  ibmi_lib_restore:
-    saved_lib: 'ABC'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-  register: rstlib_result
-  #failed_when: "'ABC not found' not in rstlib_result.stderr"
-  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
+- name: TC05 - negative - restore with non-existing saved_lib 'ABC'
+  when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+  block:
+    - name: TC05 - restore into non-existing lib 'ABC' (expect CPF3780)
+      ibmi_lib_restore:
+        saved_lib: 'ABC'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+      register: rstlib_result
+      failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-- name: TC06 restore lib with wrong library name
-  ibmi_lib_restore:
-    saved_lib: 'DEF'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-  register: rstlib_result
-  #failed_when: "'CPF3780' not in rstlib_result.stderr"
-  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
+# ─── TC06 - Negative: wrong library name DEF (exists but was never saved) ─────
+- name: TC06 - negative - restore into 'DEF' which was never saved (expect CPF3780)
+  when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+  block:
+    - name: TC06 - restore into DEF (expect CPF3780)
+      ibmi_lib_restore:
+        saved_lib: 'DEF'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+      register: rstlib_result
+      failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3780') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-- name: TC08 restore lib from wrong format
-  ibmi_lib_restore:
-    saved_lib: 'SAVRST'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-    format: '*MEDDFN'
-    joblog: 'true'
-  register: rstlib_result
-  failed_when: "'value of format must be one of: *SAVF' not in rstlib_result.msg"
+# ─── TC08 - Negative: invalid format value ────────────────────────────────────
+- name: TC08 - negative - invalid format value '*MEDDFN'
+  when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+  block:
+    - name: TC08 - restore with invalid format (expect module parameter error)
+      ibmi_lib_restore:
+        saved_lib: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        format: '*MEDDFN'
+        joblog: 'true'
+      register: rstlib_result
+      failed_when: "'value of format must be one of: *SAVF' not in rstlib_result.msg"
 
-- name: TC09 restore lib with wrong joblog
-  ibmi_lib_restore:
-    saved_lib: 'SAVRST'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-    joblog: 'abc'
-  register: rstlib_result
-  failed_when: "'is not a valid boolean' not in rstlib_result.msg"
+# ─── TC09 - Negative: invalid joblog value ────────────────────────────────────
+- name: TC09 - negative - invalid joblog value 'abc'
+  when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+  block:
+    - name: TC09 - restore with non-boolean joblog (expect boolean error)
+      ibmi_lib_restore:
+        saved_lib: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        joblog: 'abc'
+      register: rstlib_result
+      failed_when: "'is not a valid boolean' not in rstlib_result.msg"
 
-- name: TC10 restore lib with an invalid parameters
-  ibmi_lib_restore:
-    saved_lib: 'SAVRST'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-    parameters: 'abc'
-    joblog: 'true'
-  register: rstlib_result
-  #failed_when: "'CPF0001' not in rstlib_result.stderr"
-  failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0006') | map(attribute='MESSAGE_ID') | list | length == 0"
+# ─── TC10 - Negative: invalid CL parameters value ────────────────────────────
+- name: TC10 - negative - invalid CL parameters value 'abc'
+  when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+  block:
+    - name: TC10 - restore with invalid parameters string (expect CPF0006)
+      ibmi_lib_restore:
+        saved_lib: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+        parameters: 'abc'
+        joblog: 'true'
+      register: rstlib_result
+      failed_when: "rstlib_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0006') | map(attribute='MESSAGE_ID') | list | length == 0"
 
+# ─── TC11 - Negative: unsupported module parameter ───────────────────────────
+- name: TC11 - negative - unsupported module parameter 'abc'
+  when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+  block:
+    - name: TC11 - call module with unsupported parameter (expect Unsupported parameters)
+      ibmi_lib_restore:
+        abc: '==-91'
+        saved_lib: 'SAVRST'
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+      register: rstlib_result
+      failed_when: "'Unsupported parameters' not in rstlib_result.msg"
 
-- name: TC11 restore lib with an invalid option
-  ibmi_lib_restore:
-    abc: '==-91'
-    saved_lib: 'SAVRST'
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-  register: rstlib_result
-  failed_when: "'Unsupported parameters' not in rstlib_result.msg"
+# ─── TC12 - Negative: missing required option saved_lib ──────────────────────
+- name: TC12 - negative - missing required option saved_lib
+  when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+  block:
+    - name: TC12 - call module without saved_lib
+      ibmi_lib_restore:
+        savefile_name: 'SAVTEST'
+        savefile_lib: 'ARCHLIB'
+      register: rstlib_result
+      failed_when: "'missing required arguments: saved_lib' not in rstlib_result.msg"
 
-- name: TC12 restore lib without required options
-  ibmi_lib_restore:
-    savefile_name: 'SAVTEST'
-    savefile_lib: 'ARCHLIB'
-  register: rstlib_result
-  failed_when: "'missing required arguments: saved_lib' not in rstlib_result.msg"
+# ─── TC13 - Negative: missing required option savefile_name ──────────────────
+- name: TC13 - negative - missing required option savefile_name
+  when: (tc_execute is not defined or 'TC13' in tc_execute) and 'TC13' not in (tc_skip | default([]))
+  block:
+    - name: TC13 - call module without savefile_name
+      ibmi_lib_restore:
+        saved_lib: 'SAVRST'
+        savefile_lib: 'ARCHLIB'
+      register: rstlib_result
+      failed_when: "'missing required arguments: savefile_name' not in rstlib_result.msg"
 
-- name: TC13 restore lib without required options
-  ibmi_lib_restore:
-    saved_lib: 'SAVRST'
-    savefile_lib: 'ARCHLIB'
-  register: rstlib_result
-  failed_when: "'missing required arguments: savefile_name' not in rstlib_result.msg"
-
-- name: TC14 restore lib without required options
-  ibmi_lib_restore:
-    saved_lib: 'SAVRST'
-    savefile_name: 'SAVTEST'
-  register: rstlib_result
-  failed_when: "'missing required arguments: savefile_lib' not in rstlib_result.msg"
+# ─── TC14 - Negative: missing required option savefile_lib ───────────────────
+- name: TC14 - negative - missing required option savefile_lib
+  when: (tc_execute is not defined or 'TC14' in tc_execute) and 'TC14' not in (tc_skip | default([]))
+  block:
+    - name: TC14 - call module without savefile_lib
+      ibmi_lib_restore:
+        saved_lib: 'SAVRST'
+        savefile_name: 'SAVTEST'
+      register: rstlib_result
+      failed_when: "'missing required arguments: savefile_lib' not in rstlib_result.msg"

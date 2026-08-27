@@ -1,20 +1,20 @@
 - name: Find the line description name
   ansible.builtin.set_fact:
-    find_lind: false
+    present_ip_interface_find_lind: false
 
 - name: Find the line description name
   ansible.builtin.set_fact:
-    lind: "{{ lind_line.split(' ')[1] }}"
-    find_lind: true
+    present_ip_interface_lind: "{{ lind_line.split(' ')[1] }}"
+    present_ip_interface_find_lind: true
   when: "'*LIN' in lind_line"
 
 - name: Display line description
   ibm.power_ibmi.ibmi_cl_command:
-    cmd: dsplind {{ lind }}
-  register: lind_details
-  when: find_lind
+    cmd: dsplind {{ present_ip_interface_lind }}
+  register: present_ip_interface_lind_details
+  when: present_ip_interface_find_lind
 
 - name: Check if resource name exists
   ansible.builtin.set_fact:
-    present_ip_interface_line_description: '{{ lind }}'
-  when: find_lind and resource_name in lind_details.stdout
+    present_ip_interface_line_description: '{{ present_ip_interface_lind }}'
+  when: present_ip_interface_find_lind and present_ip_interface_resource_name in present_ip_interface_lind_details.stdout

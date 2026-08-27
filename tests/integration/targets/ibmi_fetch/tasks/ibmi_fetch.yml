@@ -147,7 +147,7 @@
 
 - name: TC06 assert 2 objects restored to the library
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 2
 
 - ansible.builtin.include_tasks: setup_lib.yml
@@ -171,7 +171,7 @@
 
 - name: TC07 assert 2 objects restored to the library
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 4
 
 - ansible.builtin.include_tasks: setup_lib.yml
@@ -195,7 +195,7 @@
 
 - name: TC08 assert 2 objects restored to the library
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 6
 
 - block:
@@ -230,7 +230,7 @@
 
   - name: TC10 assert 2 objects restored to the library
     ibmi_sql_query:
-      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
       expected_row_count: 2
 
   - ansible.builtin.include_tasks: setup_lib.yml
@@ -252,7 +252,7 @@
 
   - name: TC11 assert 2 objects restored to the library
     ibmi_sql_query:
-      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
       expected_row_count: 4
 
   - ansible.builtin.include_tasks: setup_lib.yml
@@ -274,7 +274,7 @@
 
   - name: TC12 assert 2 objects restored to the library
     ibmi_sql_query:
-      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+      sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
       expected_row_count: 5
   when: "Option39_installed == true "
 
@@ -300,7 +300,7 @@
 
 - name: TC13 assert 2 objects restored to the library
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 8
 - ansible.builtin.include_tasks: setup_lib.yml
 
@@ -354,7 +354,7 @@
 
 - name: TC19 assert 2 objects restored to the library
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 2
 
 - ansible.builtin.include_tasks: setup_lib.yml
@@ -378,7 +378,7 @@
 
 - name: TC20 assert 2 objects restored to the library
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 2
 
 - ansible.builtin.include_tasks: setup_lib.yml
@@ -396,11 +396,11 @@
 
 - name: TC21 list all objects
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
 
 - name: TC21 list all objects
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*FILE', 'IFETCH1') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*FILE', 'IFETCH1') ) AS X"
     expected_row_count: 1
 
 - ansible.builtin.include_tasks: setup_lib.yml
@@ -412,7 +412,7 @@
     object_types: '*FILE'
     savefile_name: 'ifetch1'
     dest: '{{ output_dir }}/fetched'
-    target_release: 'V7R2M0'
+    target_release: '*PRV'
   register: fetch_result
 
 - ansible.builtin.include_tasks: validate_on_i.yml
@@ -423,7 +423,7 @@
 
 - name: TC22 assert 2 objects restored to the library
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 4
 
 - ansible.builtin.include_tasks: setup_lib.yml
@@ -458,5 +458,5 @@
 
 - name: TC23 assert 8 objects restored to the library
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 8

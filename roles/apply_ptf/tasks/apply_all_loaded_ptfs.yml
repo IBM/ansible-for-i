@@ -9,33 +9,33 @@
     temp_or_perm: '{{ apply_ptf_temp_or_perm }}'
     operation: 'apply_only'
   ignore_errors: true
-  register: apply_fix_result
+  register: apply_ptf_apply_fix_result
 
 # - ansible.builtin.debug:
 #     msg: apply all
 
 # - ansible.builtin.debug:
-#     var: apply_fix_result
+#     var: apply_ptf_apply_fix_result
 
 - name: Log fail dict in result
   ansible.builtin.include_tasks: log_apply_fail_info.yml
-  loop: "{{ apply_fix_result.job_log }}"
+  loop: "{{ apply_ptf_apply_fix_result.job_log }}"
   loop_control:
     loop_var: job_log_var
-  when: apply_fix_result.failed != 0
+  when: apply_ptf_apply_fix_result.failed != 0
 
 - name: Get apply_ptf_apply_fail_with_requisite_list
   ansible.builtin.set_fact:
-    apply_ptf_apply_fail_with_requisite_list: "{{ apply_fix_result.requisite_ptf_list | default([]) }}"
+    apply_ptf_apply_fail_with_requisite_list: "{{ apply_ptf_apply_fix_result.requisite_ptf_list | default([]) }}"
 
 - name: Query the list of to-be-applied ptfs which require an IPL
   ibm.power_ibmi.ibmi_sql_query:
     sql: "SELECT PTF_IDENTIFIER, PTF_IPL_ACTION, A.*
   FROM QSYS2.PTF_INFO A
   WHERE PTF_IPL_ACTION = 'TEMPORARILY APPLIED' or PTF_IPL_ACTION = 'PERMANENTLY APPLIED'"
-  register: query_ptf_result
+  register: apply_ptf_query_ptf_result
   when: apply_ptf_auto_ipl
 
 - name: Reboot the system immediately if apply_ptf_auto_ipl is set to true and at least one to-be-applied PTF requires an IPL
   ibm.power_ibmi.ibmi_reboot:
-  when: apply_ptf_auto_ipl and query_ptf_result.row | length > 0
+  when: apply_ptf_auto_ipl and apply_ptf_query_ptf_result.row | length > 0

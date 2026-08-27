@@ -3,236 +3,350 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-- block: 
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC05']) — only those TCs run.
+#   tc_skip:    optional list of TC IDs to skip — everything else runs.
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC descriptions:
+#   TC01   Start *DIRSRV with all parameters; assert cmd contains STRTCPSVR; poll until active.
+#   TC02   Start *DIRSRV when already running (idempotency); assert still running.
+#   TC03   Stop *DIRSRV with all parameters and joblog; assert cmd contains ENDTCPSVR; poll until stopped.
+#   TC04   Stop *DIRSRV when already stopped (idempotency); assert still stopped.
+#   TC05   Start *DIRSRV with extra_parameters (INSTANCE(*ALL)); assert cmd.
+#   TC06   Stop *DIRSRV with extra_parameters (INSTANCE(*ALL)); assert cmd.
+#   TC07   Start multiple servers (*DIRSRV *HTTP); assert cmd.
+#   TC08   Stop multiple servers (*DIRSRV *HTTP); assert cmd.
+#   TC09   Neg — start without name_list; expect "missing required argument".
+#   TC10   Neg — stop without name_list; expect "missing required argument".
+#   TC11   Neg — start without state; expect "missing required argument".
+#   TC12   Neg — run with no options at all; expect "missing required argument".
+#   TC13   Neg — unsupported option; expect "Unsupported parameters".
+#   TC14   Neg — invalid server type in name_list; expect "Value specified for name_list is not valid".
+#   TC15   Neg — invalid extra_parameters; expect CPD0044 in job_log.
+#   TC16   Neg — invalid joblog value; expect "we were unable to convert to bool".
+#   TC17   Neg — start with *AUTOSTART mixed with *HTTP; expect CPD0094 in job_log.
+#
+# The outer block/always wraps everything so cleanup always fires regardless of failures.
+#
+
+- block:
     - name: check whether the QDIRSRV is running
       ibmi_sql_query:
-        sql: "SELECT * 
+        sql: "SELECT *
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
             JOB_NAME_FILTER => 'QUSRDIR',
             CURRENT_USER_LIST_FILTER => 'QDIRSRV',
             SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
       register: sql_result
 
+    - name: record whether QDIRSRV was originally running
+      set_fact:
+        dirsrv_was_running: "{{ sql_result.row | length != 0 }}"
+
     - name: end it if it is running
       ibmi_cl_command:
         cmd: 'ENDTCPSVR SERVER(*DIRSRV) INSTANCE(*all)'
-      when: sql_result.row | length != 0 
+      when: dirsrv_was_running | bool
 
-    - name: TC01 start tcp server with all parameters
-      ibmi_tcp_server_service:
-        name_list: ['*DIRSRV']
-        state: 'started'
-        extra_parameters: ''
-        joblog: false
-      register: start_result
-    
-    - name: TC01 assert the defined parameters are returned
-      assert:
-        that:
-          - start_result.job_log is defined
-          - start_result.start is defined
-          - start_result.end is defined
-          - start_result.delta is defined
-          - start_result.stdout is defined
-          - start_result.stderr is defined
-          - "'QSYS/STRTCPSVR SERVER(*DIRSRV)' in start_result.cmd"
-          - start_result.rc == 0
-          - start_result.stdout_lines is defined
-          - start_result.stderr_lines is defined
+    # ─── TC01 - Start *DIRSRV with all parameters ─────────────────────────────────
+    - name: TC01 - start tcp server with all parameters
+      when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+      block:
+        - name: TC01 - start tcp server with all parameters
+          ibmi_tcp_server_service:
+            name_list: ['*DIRSRV']
+            state: 'started'
+            extra_parameters: ''
+            joblog: false
+          register: start_result
 
-    - name: TC01 assert the host server is running
-      ibmi_sql_query:
-        sql: "SELECT * 
+        - name: TC01 - assert the defined parameters are returned
+          assert:
+            that:
+              - start_result.job_log is defined
+              - start_result.start is defined
+              - start_result.end is defined
+              - start_result.delta is defined
+              - start_result.stdout is defined
+              - start_result.stderr is defined
+              - "'QSYS/STRTCPSVR SERVER(*DIRSRV)' in start_result.cmd"
+              - start_result.rc == 0
+              - start_result.stdout_lines is defined
+              - start_result.stderr_lines is defined
+
+        - name: TC01 - assert the host server is running
+          ibmi_sql_query:
+            sql: "SELECT *
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
             JOB_NAME_FILTER => 'QUSRDIR',
             CURRENT_USER_LIST_FILTER => 'QDIRSRV',
             SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
-      register: sql_result  
-      until: sql_result.row | length == 1
-      retries: 5
-      delay: 300    
+          register: sql_result
+          until: sql_result.row | length == 1
+          retries: 5
+          delay: 300
 
-    - name: TC02 start host server when the host server is running
-      ibmi_tcp_server_service:
-        name_list: ['*DIRSRV']
-        state: 'started'
-        extra_parameters: ''
-        joblog: false
-      register: start_result
+    # ─── TC02 - Start *DIRSRV when already running (idempotency) ─────────────────
+    - name: TC02 - start host server when already running
+      when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+      block:
+        - name: TC02 - start host server when the host server is running
+          ibmi_tcp_server_service:
+            name_list: ['*DIRSRV']
+            state: 'started'
+            extra_parameters: ''
+            joblog: false
+          register: start_result
 
-    - name: TC02 assert the host server is running
-      ibmi_sql_query:
-        sql: "SELECT * 
+        - name: TC02 - assert the host server is still running
+          ibmi_sql_query:
+            sql: "SELECT *
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
             JOB_NAME_FILTER => 'QUSRDIR',
             CURRENT_USER_LIST_FILTER => 'QDIRSRV',
             SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
-        expected_row_count: 1  
+          register: sql_result
+          until: sql_result.row | length == 1
+          retries: 5
+          delay: 300
 
-    - name: TC03 end host server with all parameters
-      ibmi_tcp_server_service:
-        name_list: ['*DIRSRV']
-        state: 'stopped'
-        extra_parameters: ''
-        joblog: true
-      register: end_result
+    # ─── TC03 - Stop *DIRSRV with all parameters ──────────────────────────────────
+    - name: TC03 - end host server with all parameters
+      when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+      block:
+        - name: TC03 - end host server with all parameters
+          ibmi_tcp_server_service:
+            name_list: ['*DIRSRV']
+            state: 'stopped'
+            extra_parameters: ''
+            joblog: true
+          register: end_result
 
-    - name: TC03 assert the definedd parameters are returned
-      assert:
-        that:
-          - end_result.job_log is defined
-          - end_result.start is defined
-          - end_result.end is defined
-          - end_result.delta is defined
-          - end_result.stdout is defined
-          - end_result.stderr is defined
-          - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV) '
-          - end_result.rc == 0
-          - end_result.stdout_lines is defined
-          - end_result.stderr_lines is defined
+        - name: TC03 - assert the defined parameters are returned
+          assert:
+            that:
+              - end_result.job_log is defined
+              - end_result.start is defined
+              - end_result.end is defined
+              - end_result.delta is defined
+              - end_result.stdout is defined
+              - end_result.stderr is defined
+              - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV) '
+              - end_result.rc == 0
+              - end_result.stdout_lines is defined
+              - end_result.stderr_lines is defined
 
-    - name: TC03 pause a few seconds to wait for the tcp service stopped
-      pause:
-        seconds: 20
+        - name: TC03 - pause a few seconds to wait for the tcp service stopped
+          pause:
+            seconds: 20
 
-    - name: TC03 assert the host server is not running
-      ibmi_sql_query:
-        sql: "SELECT * 
+        - name: TC03 - assert the host server is not running
+          ibmi_sql_query:
+            sql: "SELECT *
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
             JOB_NAME_FILTER => 'QUSRDIR',
             CURRENT_USER_LIST_FILTER => 'QDIRSRV',
             SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
-        expected_row_count: 0
+            expected_row_count: 0
 
-    - name: TC04 state==stopped when the host server is not running
-      ibmi_tcp_server_service:
-        name_list: ['*DIRSRV']
-        state: 'stopped'
-        extra_parameters: ''
-        joblog: true
-      register: end_result
+    # ─── TC04 - Stop *DIRSRV when already stopped (idempotency) ──────────────────
+    - name: TC04 - state==stopped when the host server is not running
+      when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+      block:
+        - name: TC04 - state==stopped when the host server is not running
+          ibmi_tcp_server_service:
+            name_list: ['*DIRSRV']
+            state: 'stopped'
+            extra_parameters: ''
+            joblog: true
+          register: end_result
 
-    - name: TC04 assert the host server is not running
-      ibmi_sql_query:
-        sql: "SELECT * 
+        - name: TC04 - assert the host server is still not running
+          ibmi_sql_query:
+            sql: "SELECT *
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
             JOB_NAME_FILTER => 'QUSRDIR',
             CURRENT_USER_LIST_FILTER => 'QDIRSRV',
             SUBSYSTEM_LIST_FILTER => 'QSYSWRK')) X"
-        expected_row_count: 0
+            expected_row_count: 0
 
-    - name: TC05 start host server with extra_parameters
+    # ─── TC05 - Start *DIRSRV with extra_parameters ───────────────────────────────
+    - name: TC05 - start host server with extra_parameters
+      when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+      block:
+        - name: TC05 - start host server with extra_parameters
+          ibmi_tcp_server_service:
+            name_list: ['*DIRSRV']
+            state: 'started'
+            extra_parameters: 'INSTANCE(*ALL)'
+            joblog: false
+          register: start_result
+
+        - name: TC05 - assert the defined parameters are returned
+          assert:
+            that:
+              - start_result.cmd == 'QSYS/STRTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
+
+    # ─── TC06 - Stop *DIRSRV with extra_parameters ────────────────────────────────
+    - name: TC06 - end host server with extra_parameters
+      when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+      block:
+        - name: TC06 - end host server with extra_parameters
+          ibmi_tcp_server_service:
+            name_list: ['*DIRSRV']
+            state: 'stopped'
+            extra_parameters: 'INSTANCE(*ALL)'
+            joblog: true
+          register: end_result
+
+        - name: TC06 - assert the defined parameters are returned
+          assert:
+            that:
+              - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
+
+    # ─── TC07 - Start multiple servers ────────────────────────────────────────────
+    - name: TC07 - start host server with multiple host servers
+      when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+      block:
+        - name: TC07 - start host server with multiple host servers
+          ibmi_tcp_server_service:
+            name_list: ["*DIRSRV", "*HTTP"]
+            state: 'started'
+            joblog: true
+          register: start_result
+
+        - name: TC07 - assert the defined parameters are returned
+          assert:
+            that:
+              - start_result.cmd == 'QSYS/STRTCPSVR SERVER(*DIRSRV *HTTP)  '
+
+    # ─── TC08 - Stop multiple servers ─────────────────────────────────────────────
+    - name: TC08 - end host server with multiple host servers
+      when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+      block:
+        - name: TC08 - end host server with multiple host servers
+          ibmi_tcp_server_service:
+            name_list: ["*DIRSRV", "*HTTP"]
+            state: 'stopped'
+            joblog: true
+          register: end_result
+
+        - name: TC08 - assert the defined parameters are returned
+          assert:
+            that:
+              - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV *HTTP)  '
+
+    # ─── TC09 - Neg: start without name_list ──────────────────────────────────────
+    - name: TC09 - start without name_list
+      when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+      block:
+        - name: TC09 - start host server only required parameters
+          ibmi_tcp_server_service:
+            state: started
+          register: neg_result
+          failed_when: "'missing required argument' not in neg_result.msg"
+
+    # ─── TC10 - Neg: stop without name_list ───────────────────────────────────────
+    - name: TC10 - stop without name_list
+      when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+      block:
+        - name: TC10 - end host server with default values
+          ibmi_tcp_server_service:
+            state: stopped
+          register: neg_result
+          failed_when: "'missing required argument' not in neg_result.msg"
+
+    # ─── TC11 - Neg: start without state ──────────────────────────────────────────
+    - name: TC11 - start without state
+      when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+      block:
+        - name: TC11 - start host server only required parameters
+          ibmi_tcp_server_service:
+            name_list: ["*DIRSRV", "*HTTP"]
+          register: neg_result
+          failed_when: "'missing required argument' not in neg_result.msg"
+
+    # ─── TC12 - Neg: no options at all ────────────────────────────────────────────
+    - name: TC12 - host server with missing required options
+      when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+      block:
+        - name: TC12 - host server with missing required options
+          ibmi_tcp_server_service:
+          register: neg_result
+          failed_when: "'missing required argument' not in neg_result.msg"
+
+    # ─── TC13 - Neg: unsupported option ───────────────────────────────────────────
+    - name: TC13 - with invalid option
+      when: (tc_execute is not defined or 'TC13' in tc_execute) and 'TC13' not in (tc_skip | default([]))
+      block:
+        - name: TC13 - with invalid option
+          ibmi_tcp_server_service:
+            name_list: ["*DIRSRV", "*HTTP"]
+            state: 'stopped'
+            abc: true
+          register: neg_result
+          failed_when: "'Unsupported parameters' not in neg_result.msg"
+
+    # ─── TC14 - Neg: invalid server type in name_list ─────────────────────────────
+    - name: TC14 - with invalid server type
+      when: (tc_execute is not defined or 'TC14' in tc_execute) and 'TC14' not in (tc_skip | default([]))
+      block:
+        - name: TC14 - with invalid server type
+          ibmi_tcp_server_service:
+            name_list: ["abc"]
+            state: 'stopped'
+          register: neg_result
+          failed_when: "'Value specified for name_list is not valid' not in neg_result.msg"
+
+    # ─── TC15 - Neg: invalid extra_parameters ─────────────────────────────────────
+    - name: TC15 - with invalid extra_parameters
+      when: (tc_execute is not defined or 'TC15' in tc_execute) and 'TC15' not in (tc_skip | default([]))
+      block:
+        - name: TC15 - with invalid extra_parameters
+          ibmi_tcp_server_service:
+            name_list: ["*ALL"]
+            state: 'stopped'
+            extra_parameters: 'abc abc'
+            joblog: true
+          register: neg_result
+          failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+    # ─── TC16 - Neg: invalid joblog value ─────────────────────────────────────────
+    - name: TC16 - with invalid joblog
+      when: (tc_execute is not defined or 'TC16' in tc_execute) and 'TC16' not in (tc_skip | default([]))
+      block:
+        - name: TC16 - with invalid joblog
+          ibmi_tcp_server_service:
+            name_list: ["ALL"]
+            state: 'stopped'
+            joblog: 'abcabc'
+          register: neg_result
+          failed_when: "'we were unable to convert to bool' not in neg_result.msg"
+
+    # ─── TC17 - Neg: *AUTOSTART mixed with other servers ──────────────────────────
+    - name: TC17 - start with *AUTOSTART mixed with *HTTP
+      when: (tc_execute is not defined or 'TC17' in tc_execute) and 'TC17' not in (tc_skip | default([]))
+      block:
+        - name: TC17 - start host server with multiple host servers
+          ibmi_tcp_server_service:
+            name_list: ["*HTTP", "*AUTOSTART"]
+            state: 'started'
+            joblog: true
+          register: neg_result
+          failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0094') | map(attribute='MESSAGE_ID') | list | length ==0"
+
+  always:
+    - name: restore QDIRSRV to original state - start it if it was running before the test
       ibmi_tcp_server_service:
         name_list: ['*DIRSRV']
         state: 'started'
         extra_parameters: 'INSTANCE(*ALL)'
-        joblog: false
-      register: start_result
+      when: dirsrv_was_running | default(false) | bool
+      ignore_errors: true
 
-    - name: TC05 assert the definedd parameters are returned
-      assert:
-        that:
-          - start_result.cmd == 'QSYS/STRTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
-
-    - name: TC06 end host server with extra_parameters
-      ibmi_tcp_server_service:
-        name_list: ['*DIRSRV']
-        state: 'stopped'
-        extra_parameters: 'INSTANCE(*ALL)'
-        joblog: true
-      register: end_result
-
-    - name: TC06 assert the definedd parameters are returned
-      assert:
-        that:
-          - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV) INSTANCE(*ALL)'
-
-    - name: TC07 start host server with multiple host servers
-      ibmi_tcp_server_service:
-        name_list: ["*DIRSRV", "*HTTP"]
-        state: 'started'
-        joblog: true
-      register: start_result
-
-    - name: TC07 assert the definedd parameters are returned
-      assert:
-        that:
-          - start_result.cmd == 'QSYS/STRTCPSVR SERVER(*DIRSRV *HTTP)  '
-
-    - name: TC08 end host server with multiple host servers
-      ibmi_tcp_server_service:
-        name_list: ["*DIRSRV", "*HTTP"]
-        state: 'stopped'
-        joblog: true
-      register: end_result
-
-    - name: TC08 assert the defined parameters are returned
-      assert:
-        that:
-          - end_result.cmd == 'QSYS/ENDTCPSVR SERVER(*DIRSRV *HTTP)  '
-
-    # Test negative path
-    - name: TC09 start host server only required parameters
-      ibmi_tcp_server_service:
-        state: started
-      register: neg_result
-      failed_when: "'missing required argument' not in neg_result.msg"
-
-    - name: TC10 end host server with default values
-      ibmi_tcp_server_service:
-        state: stopped
-      register: neg_result
-      failed_when: "'missing required argument' not in neg_result.msg"
-
-    - name: TC11 start host server only required parameters
-      ibmi_tcp_server_service:
-        name_list: ["*DIRSRV", "*HTTP"]
-      register: neg_result
-      failed_when: "'missing required argument' not in neg_result.msg"
-
-    - name: TC12 host server with missing required options
-      ibmi_tcp_server_service:
-      register: neg_result
-      failed_when: "'missing required argument' not in neg_result.msg"
-
-    - name: TC13 with invalid option
-      ibmi_tcp_server_service:
-        name_list: ["*DIRSRV", "*HTTP"]
-        state: 'stopped'
-        abc: true
-      register: neg_result
-      failed_when: "'Unsupported parameters' not in neg_result.msg"
-
-    - name: TC14 with invalid server type
-      ibmi_tcp_server_service:
-        name_list: ["abc"]
-        state: 'stopped'
-      register: neg_result
-      failed_when: "'Value specified for name_list is not valid' not in neg_result.msg"
-
-    - name: TC15 with invalid extra_parameters
-      ibmi_tcp_server_service:
-        name_list: ["*ALL"]
-        state: 'stopped'
-        extra_parameters: 'abc abc'
-        joblog: true
-      register: neg_result
-      #failed_when: "'CPD0044' not in neg_result.stderr"
-      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length ==0"
-
-    - name: TC16 with invalid joblog
-      ibmi_tcp_server_service:
-        name_list: ["ALL"]
-        state: 'stopped'
-        joblog: 'abcabc'
-      register: neg_result
-      failed_when: "'we were unable to convert to bool' not in neg_result.msg"
-
-    - name: TC17 start host server with multiple host servers
-      ibmi_tcp_server_service:
-        name_list: ["*HTTP", "*AUTOSTART"]
-        state: 'started'
-        joblog: true
-      register: neg_result
-      #failed_when: "'CPD0094' not in neg_result.stderr"
-      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0094') | map(attribute='MESSAGE_ID') | list | length ==0"
+    - name: restore QDIRSRV to original state - stop it if it was not running before the test
+      ibmi_cl_command:
+        cmd: 'ENDTCPSVR SERVER(*DIRSRV) INSTANCE(*all)'
+      when: not (dirsrv_was_running | default(false) | bool)
+      ignore_errors: true

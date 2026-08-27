@@ -1,5 +1,39 @@
 # Change Log
 
+## v3.5.0 (2026-08-28)
+
+This release focuses on supporting Python 3.13 for IBM i managed nodes by migrating from ibm_db to pyodbc / ODBC for the DB2 database interface. The README provides detailed information on the differences between
+using pyodbc / ODBC and the previous ibm_db and the install instructions are updated for the new
+ODBC related packages required (iaccess and pyodbc) on IBM i servers instead of the ibm_db package.
+The change should be relatively transparent for users besides the different required packages.
+However, there are some differences in external behavior detailed in the README.
+
+### Changes for migration from ibm_db to ODBC
+
+- Switch to using pyodbc for communication with IBM i database server. Clean up use of terminating semi-colons for single SQL commands. Update install playbooks for pyodbc and ODBC driver. Ensure timestamps are returned as strings. Handle all differences in type converstion for pyodbc.
+- Added failback mode for when the database host server (\*DATABASE) is offline to use iToolkit DirectTransport instead of the normal DatabaseTransport. This allows various modules that do not use SQL operations to continue to work while in the degraded state with the database host server down.
+
+### Other changes
+
+- Fixed online Ansible enablement playbook to switch to another download method instead of using broken anonyomous ftp to download the yum bootstrap files.
+- Role clean up by using role name prefix on all "local" variables in the role.
+- Clean up for Redhat AAP verification and Redhat requested updates.
+
+### Bug fixes
+
+- Github issue 244 fix for role sync_apply_ptf_group: <https://github.com/IBM/ansible-for-i/issues/244>.
+- Github issue 229 resolved with migration to ODBC: <https://github.com/IBM/ansible-for-i/issues/229>.
+
+### Testing improvements
+
+- Most module tests were converted to allow selective test case execution for testing flexibility such as performing a shorter BAT style test. There is additional work in this area for the more complex tests to be included (remaining modules and also roles).
+- Migrated from Travis to Jenkins CICD. Added Jenkinsfile to include basic checks, build, and install, and running BAT test.
+
+### Documentation
+
+- Updated install documentation for using pyodbc and the ODBC driver / iaccess along with limitations.
+- Improved documentation for the Ansible online enable process for managed IBM i servers.
+
 ## v3.4.0 (2026-05-15)
 
 This release focuses on supporting Ansible core 2.19 and adding new download and install functionality for IBM Concert to perform CVE patching on IBM i.

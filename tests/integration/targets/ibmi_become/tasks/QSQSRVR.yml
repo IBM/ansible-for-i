@@ -1,9 +1,9 @@
-- name: query QSQSRVR job
+- name: query QZDASOINIT job
   ibmi_sql_query:
-    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-        JOB_NAME_FILTER => 'QSQSRVR',
-        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+        JOB_NAME_FILTER => 'QZDASOINIT',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X"
     expected_row_count: 0
 
 - name: put a cl script to remote IBM i
@@ -21,12 +21,12 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
   poll: 0
   register: script_sleeper
 
-- name: QSQSRVR_TC01 query QSQSRVR job
+- name: QSQSRVR_TC01 query QZDASOINIT job
   ibmi_sql_query:
-    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-        JOB_NAME_FILTER => 'QSQSRVR',
-        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+        JOB_NAME_FILTER => 'QZDASOINIT',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X"
   register: sql_result
   until: sql_result.row | length == 1
   retries: 4
@@ -49,10 +49,10 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
 
 - name: QSQSRVR_TC02 ensure a new job owned by becomeuser is lanuched
   ibmi_sql_query:
-    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-        JOB_NAME_FILTER => 'QSQSRVR',
-        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+        JOB_NAME_FILTER => 'QZDASOINIT',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X"
   register: sql_result
   until: sql_result.row | length == 2
   retries: 4
@@ -92,12 +92,12 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
   retries: 100
   delay: 1
 
-- name: query QSQSRVR job
+- name: query QZDASOINIT job
   ibmi_sql_query:
-    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-        JOB_NAME_FILTER => 'QSQSRVR',
-        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+        JOB_NAME_FILTER => 'QZDASOINIT',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X"
   register: sql_result
   until: sql_result.row | length == 0
   retries: 10

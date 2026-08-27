@@ -6,8 +6,10 @@
 # Tests are designed to use PTFs that have one prereq
 - block:
     - set_fact:
-        dist_ptf: {'SI86119':'5733SC1'}
-        pre_ptf_74: {'SJ02601':'5770DG1'}
+        # Using a 7.6 PTF for dist_ptf
+        dist_ptf: {'SJ10439':'5770SS1'}
+        pre_ptf_76: {'SJ09445':'5770DG1'}
+        pre_ptf_74: {'SJ09019':'5770DG1'}
         pre_ptf_73: {'SI71962':'5770DG1'}
         pre_ptf_72: {'SI71969':'5770DG1'}
         remote_lib: 'FIXLIB'

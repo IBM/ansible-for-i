@@ -9,22 +9,22 @@
 
 - name: List all the ethernet port information
   ibm.power_ibmi.ibmi_ethernet_port:
-  register: all_ethernet_ports
+  register: present_ip_interface_all_ethernet_ports
 
 - name: Initialize a flag
   ansible.builtin.set_fact:
-    resource_name: ''
+    present_ip_interface_resource_name: ''
 
 - name: Set ethernet port resource names
-  when: all_ethernet_ports.ethernet_ports|length != 0
+  when: present_ip_interface_all_ethernet_ports.ethernet_ports|length != 0
   block:
     - name: Set the resource name of ethernet port
       ansible.builtin.set_fact:
-        resource_name: '{{ ethernet_port.RESOURCE_NAME }}'
+        present_ip_interface_resource_name: '{{ ethernet_port.RESOURCE_NAME }}'
       when: ethernet_port.RESOURCE_NAME == present_ip_interface_resource_name_of_ethernet_port or
             ethernet_port.LOCATION_CODE == present_ip_interface_location_code_of_ethernet_port or
             ethernet_port.DEFAULT_MAC_ADDRESS == present_ip_interface_mac_address_of_ethernet_port
-      loop: '{{ all_ethernet_ports.ethernet_ports }}'
+      loop: '{{ present_ip_interface_all_ethernet_ports.ethernet_ports }}'
       loop_control:
         loop_var: ethernet_port
 
@@ -33,4 +33,4 @@
     msg: 'The designated ethernet port is not found. Please check if a valid
       present_ip_interface_resource_name_of_ethernet_port or present_ip_interface_mac_address_of_ethernet_port or
       present_ip_interface_location_code_of_ethernet_port is provided'
-  when: not resource_name
+  when: not present_ip_interface_resource_name

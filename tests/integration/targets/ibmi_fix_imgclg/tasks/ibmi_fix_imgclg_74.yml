@@ -42,7 +42,7 @@
   ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   register: ptf_status
   failed_when: "ptf_status.row | length != 0 and ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED' and ptf_status.row[0]['PTF_IPL_ACTION'] != 'TEMPORARILY APPLIED'"
   loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
@@ -51,9 +51,9 @@
 
 - name: Query the ptf status
   ibmi_sql_query:
-    sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED 
+    sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
 
 # There is a bug about use_temp_path: true . Change the value to false temporarily.
@@ -74,7 +74,7 @@
   ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   register: ptf_status
   failed_when: "ptf_status.row | length != 0 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'NOT LOADED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'PERMANENTLY REMOVED')"
   loop: "{{(delay_ptf_info.values() | join(' ')).split(' ')}}"
@@ -83,7 +83,7 @@
   ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   register: ptf_status
   failed_when: "ptf_status.row | length != 1 and ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED'"
   loop: "{{(hiper_ptf_info.values() | join(' ')).split(' ')}}"
@@ -92,12 +92,12 @@
 
 - name: Query the ptf status
   ibmi_sql_query:
-    sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED 
+    sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
 
-- name: install immed only 
+- name: install immed only
   ibmi_fix_imgclg:
     src: '{{ remote_dir }}' 
     virtual_image_name_list: '{{ base_image_list}}'
@@ -125,7 +125,7 @@
   ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   register: ptf_status
   failed_when: "ptf_status.row | length != 0 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED' or ptf_status.row[0]['PTF_IPL_ACTION'] != 'NONE')"
   loop: "{{(delay_ptf_info.values() | join(' ')).split(' ')}}"
@@ -134,7 +134,7 @@
   ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   register: ptf_status
   failed_when: "ptf_status.row | length != 1 and ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED'"
   loop: "{{(hiper_ptf_info.values() | join(' ')).split(' ')}}"
@@ -143,9 +143,9 @@
 
 - name: Query the ptf status
   ibmi_sql_query:
-    sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED 
+    sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
 
 - name: install hiper fix only
@@ -167,7 +167,7 @@
   ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   register: ptf_status
   failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'APPLIED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED')"
   loop: "{{(delay_ptf_info.values() | join(' ')).split(' ')}}"
@@ -176,7 +176,7 @@
   ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
     FROM QSYS2.PTF_INFO
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   register: ptf_status
   failed_when: "ptf_status.row | length != 0 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'NOT LOADED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'PERMANENTLY REMOVED')"
   loop: "{{(hiper_ptf_info.values() | join(' ')).split(' ')}}"

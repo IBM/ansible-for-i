@@ -17,30 +17,32 @@
 - name: Query system release
   ibm.power_ibmi.ibmi_sql_query:
     sql: "SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO"
-  register: result
+  register: check_ptfs_by_product_against_fix_repo_os_result
 
 - name: Compose parameter release
   ansible.builtin.set_fact:
-    release: "{{ 'V' + result['row'][0]['OS_VERSION'] + 'R' + result['row'][0]['OS_RELEASE'] + 'M0' }}"
+    check_ptfs_by_product_against_fix_repo_release: >-
+      {{ 'V' + check_ptfs_by_product_against_fix_repo_os_result['row'][0]['OS_VERSION']
+      + 'R' + check_ptfs_by_product_against_fix_repo_os_result['row'][0]['OS_RELEASE'] + 'M0' }}
 
 - name: Retrieve the PTF list by product from repository server
   ibm.power_ibmi.ibmi_fix_repo:
     action: "find"
     type: "single_ptf"
     parameters:
-      - {'product': '{{ check_ptfs_by_product_against_fix_repo_product }}', 'release': '{{ release }}'}
+      - {'product': '{{ check_ptfs_by_product_against_fix_repo_product }}', 'release': '{{ check_ptfs_by_product_against_fix_repo_release }}'}
   delegate_to: "{{ check_ptfs_by_product_against_fix_repo_repo_server }}"
-  register: product_info
+  register: check_ptfs_by_product_against_fix_repo_product_info
 
 - name: Got record failed from repository server
   ansible.builtin.set_fact:
     check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
       [{'PRODUCT': prod.product, 'PRODUCT_STATUS': 'Record not found in repository DB'}] }}"
-  when: product_info.get('fail_list') is not none
-  with_list: "{{ product_info.fail_list | default([]) }}"
+  when: check_ptfs_by_product_against_fix_repo_product_info.get('fail_list') is not none
+  with_list: "{{ check_ptfs_by_product_against_fix_repo_product_info.fail_list | default([]) }}"
   loop_control:
     loop_var: prod
 
 - name: Compare the ptfs on target system
   ansible.builtin.include_tasks: compare_ptf.yml
-  when: product_info.get('success_list') is not none
+  when: check_ptfs_by_product_against_fix_repo_product_info.get('success_list') is not none

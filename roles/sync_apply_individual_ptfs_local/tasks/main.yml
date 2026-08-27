@@ -2,9 +2,9 @@
 # Role for sync_apply_individual_ptfs_local
 - name: Initialize various lists
   ansible.builtin.set_fact:
-    savefile_list: []
-    coverletter_list: []
-    dest_file_list: []
+    sync_apply_individual_ptfs_local_savefile_list: []
+    sync_apply_individual_ptfs_local_coverletter_list: []
+    sync_apply_individual_ptfs_local_dest_file_list: []
 
 # Assumption is that both the save file and associated cover letter are downloaded to a common source directory
 # on the local host such as with module ibmi_download_fix_from_cloud.
@@ -16,12 +16,12 @@
 
 - name: Compose savefile list and coverletter list for copying the files
   ansible.builtin.set_fact:
-    savefile_list: >-
-      {{ savefile_list | default([]) +
+    sync_apply_individual_ptfs_local_savefile_list: >-
+      {{ sync_apply_individual_ptfs_local_savefile_list | default([]) +
       [[not_loaded_list_var.file_path, not_loaded_list_var.file_name] |
       ansible.builtin.path_join] }}
-    coverletter_list: >-
-      {{ coverletter_list | default([]) +
+    sync_apply_individual_ptfs_local_coverletter_list: >-
+      {{ sync_apply_individual_ptfs_local_coverletter_list | default([]) +
       [not_loaded_list_var | combine({'src': [not_loaded_list_var.file_path,
       not_loaded_list_var.file_name | ansible.builtin.splitext | first + '.MBR'] |
       ansible.builtin.path_join})] }}
@@ -36,20 +36,20 @@
     src: "{{ savefile }}"
     lib_name: "{{ (sync_apply_individual_ptfs_local_dest | basename | splitext)[0] }}"
     force: true
-  loop: "{{ savefile_list }}"
+  loop: "{{ sync_apply_individual_ptfs_local_savefile_list }}"
   loop_control:
     loop_var: savefile
   ignore_errors: true
-  register: ibmi_copy_savefile_results
+  register: sync_apply_individual_ptfs_local_ibmi_copy_savefile_results
 
 - name: Transfer PTFs' cover letter to target IBM i system as member of QAPZCOVER.FILE
   ibm.power_ibmi.ibmi_synchronize_files:
     dest: "/QSYS.LIB/QGPL.LIB/QAPZCOVER.FILE"
-    src_list: "{{ coverletter_list }}"
-  when: coverletter_list != []
+    src_list: "{{ sync_apply_individual_ptfs_local_coverletter_list }}"
+  when: sync_apply_individual_ptfs_local_coverletter_list != []
   delegate_to: localhost
   ignore_errors: true
-  register: sync_coverletter_result
+  register: sync_apply_individual_ptfs_local_sync_coverletter_result
 
 # Generate arguments for loading and applying PTFs
 
@@ -64,7 +64,7 @@
       {{ sync_apply_individual_ptfs_local_sync_success_list |
       default([]) + [sync_apply_individual_ptfs_local_not_loaded_list[index]] }}
   when: item.rc == 0
-  loop: "{{ ibmi_copy_savefile_results.results }}"
+  loop: "{{ sync_apply_individual_ptfs_local_ibmi_copy_savefile_results.results }}"
   loop_control:
     index_var: index
 
@@ -74,14 +74,14 @@
       {{ sync_apply_individual_ptfs_local_sync_fail_list |
       default([]) + [sync_apply_individual_ptfs_local_not_loaded_list[index]] }}
   when: item.rc != 0
-  loop: "{{ ibmi_copy_savefile_results.results }}"
+  loop: "{{ sync_apply_individual_ptfs_local_ibmi_copy_savefile_results.results }}"
   loop_control:
     index_var: index
 
 - name: Compose sync coverletter result lists (for debug)
   ansible.builtin.set_fact:
-    sync_coverletter_success_list: "{{ sync_coverletter_result.success_list | default([]) }}"
-    sync_coverletter_fail_list: "{{ sync_coverletter_result.fail_list | default([]) }}"
+    sync_apply_individual_ptfs_local_sync_coverletter_success_list: "{{ sync_apply_individual_ptfs_local_sync_coverletter_result.success_list | default([]) }}"
+    sync_apply_individual_ptfs_local_sync_coverletter_fail_list: "{{ sync_apply_individual_ptfs_local_sync_coverletter_result.fail_list | default([]) }}"
 
 - name: Print the list of successful sync
   ansible.builtin.debug:
@@ -93,11 +93,11 @@
 
 - name: Print the list of successful coverletter sync
   ansible.builtin.debug:
-    var: sync_coverletter_success_list
+    var: sync_apply_individual_ptfs_local_sync_coverletter_success_list
 
 - name: Print the list of failed coverletter sync
   ansible.builtin.debug:
-    var: sync_coverletter_fail_list
+    var: sync_apply_individual_ptfs_local_sync_coverletter_fail_list
 
 - name: Include load_apply_ptfs role to load and apply ptfs
   ansible.builtin.include_role:
@@ -130,8 +130,8 @@
   block:
     - name: Compose dest file path
       ansible.builtin.set_fact:
-        dest_file_list: >-
-          {{ dest_file_list | default([]) +
+        sync_apply_individual_ptfs_local_dest_file_list: >-
+          {{ sync_apply_individual_ptfs_local_dest_file_list | default([]) +
           [[sync_apply_individual_ptfs_local_dest, sync_success_list_var.file_name] |
           ansible.builtin.path_join] }}
       loop: "{{ sync_apply_individual_ptfs_local_sync_success_list }}"
@@ -140,12 +140,12 @@
 
     - name: Print the list of dest file path
       ansible.builtin.debug:
-        var: dest_file_list
+        var: sync_apply_individual_ptfs_local_dest_file_list
 
     - name: Delete the dest file
       ansible.builtin.file:
         path: "{{ dest_file_list_var }}"
         state: absent
-      loop: "{{ dest_file_list }}"
+      loop: "{{ sync_apply_individual_ptfs_local_dest_file_list }}"
       loop_control:
         loop_var: dest_file_list_var

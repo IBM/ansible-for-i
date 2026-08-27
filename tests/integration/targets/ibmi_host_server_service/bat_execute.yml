@@ -1,0 +1,32 @@
+# BAT (Build Acceptance Test) execute list for ibmi_host_server_service
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# TC dependency chain:
+#   TC01 → TC02 → TC03 → TC04  (each leaves the server in a known state for the next)
+#   TC05 → TC06                 (TC06 stops what TC05 started)
+#   TC07 → TC08                 (TC08 stops what TC07 started)
+#   TC09–TC16  Negative/parameter validation — no server state changes, all independent.
+#
+# All TCs are included in BAT:
+#   TC01–TC08  cover the happy-path start/stop lifecycle; fast (no downloads).
+#   TC09–TC16  cover parameter validation; instant (no CL commands execute).
+
+tc_execute:
+  - TC01
+  - TC02
+  - TC03
+  - TC04
+  - TC05
+  - TC06
+  - TC07
+  - TC08
+  - TC09
+  - TC10
+  - TC11
+  - TC12
+  - TC13
+  - TC14
+  - TC15
+  - TC16

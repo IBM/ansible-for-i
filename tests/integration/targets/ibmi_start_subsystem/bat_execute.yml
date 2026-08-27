@@ -1,0 +1,16 @@
+# BAT (Build Acceptance Test) execute list for ibmi_start_subsystem
+#
+# Setup tasks (check/end QBATCH if running) always run.
+#
+#   TC01   Start QBATCH with all options (subsystem + library); assert rc=0 and job_log=[].
+#   TC02   Start QBATCH with default options and joblog=true; assert job_log non-empty.
+#   TC03   Neg — start already-running QBATCH; assert rc != 0.
+#   TC04   Neg — start non-existing sbs abc (expect CPF1013); start QBATCH with wrong lib abc (expect CPF1080).
+#   TC05   Neg — call without required subsystem option; assert missing required argument.
+#   TC06   Neg — call with invalid option abc; assert Unsupported parameters.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ────────────────
+
+tc_execute:
+  - TC01
+  

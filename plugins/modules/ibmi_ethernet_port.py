@@ -140,11 +140,14 @@ kKindPhysEthernet = '0000000000000008000000000000000400000000000004'
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def get_info_from_resource_name(imodule, resource_name):
     conn = imodule.get_connection()
+    if conn is None:
+        conn_err = getattr(imodule, 'conn_error', None)
+        return ERROR, {}, 'No database connection available' + (': ' + conn_err if conn_err else '')
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -212,6 +215,9 @@ def get_info_from_resource_name(imodule, resource_name):
 
 def list_ethernet_ports_info(imodule):
     conn = imodule.get_connection()
+    if conn is None:
+        conn_err = getattr(imodule, 'conn_error', None)
+        return ERROR, [], 'No database connection available' + (': ' + conn_err if conn_err else '')
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(

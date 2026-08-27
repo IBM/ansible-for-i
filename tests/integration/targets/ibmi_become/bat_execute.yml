@@ -1,0 +1,13 @@
+# BAT (Build Acceptance Test) execute list for ibmi_become
+#
+# TC01 is the core test: creates a library using become_user and verifies ownership.
+# Setup tasks (create user) always run — they are required prerequisites.
+#
+# TC_IASP    pseudo-ID to opt-in to the iASP include_tasks block (skipped in BAT)
+# TC_QSQSRVR pseudo-ID to opt-in to the QSQSRVR async-job include_tasks block (skipped in BAT)
+#            QSQSRVR tasks run long async jobs (10-16 min total) — not suitable for BAT.
+#
+# TC02-TC20 are excluded from BAT to keep the run fast.
+
+tc_execute:
+  - TC01

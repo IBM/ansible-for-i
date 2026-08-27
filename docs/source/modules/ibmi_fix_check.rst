@@ -96,7 +96,7 @@ Examples
      ibm.power_ibmi.ibmi_fix_check:
        groups:
          - "SF12345"
-       validate_certs: False
+       validate_certs: false
 
 
 

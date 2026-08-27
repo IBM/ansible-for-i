@@ -4,7 +4,7 @@
   ansible.builtin.set_fact:
     load_ptf_load_success_list: []
     load_ptf_load_fail_list: []
-    option_not_installed: []
+    load_ptf_option_not_installed: []
     load_ptf_load_fail_dict: {}
 
 - name: Load ptfs from save file

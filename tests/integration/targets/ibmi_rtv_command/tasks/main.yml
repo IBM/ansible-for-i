@@ -5,10 +5,20 @@
 #
 
 - ansible.builtin.include_tasks: RTVAUTLE.yml
-- ansible.builtin.include_tasks: RTVNETA.yml
+  when: >
+    tc_execute is not defined or
+    tc_execute | select('match', '^RTVAUTLE_TC') | list | length > 0
 
-- name: Unsupported case
-  ibmi_rtv_command:
-    cmd: 'RTVTBLSRC   TBL(QSYS/TABLE1)  SRCFILE(TBLSRC)  SRCMBR(TABLEOUT) CVTTOUCS(*NO)'
-  register: unsupported_command
-  failed_when: unsupported_command.failed == false
+- ansible.builtin.include_tasks: RTVNETA.yml
+  when: >
+    tc_execute is not defined or
+    tc_execute | select('match', '^RTVNETA_TC') | list | length > 0
+
+- name: TC_UNSUPPORTED - unsupported command
+  when: (tc_execute is not defined or 'TC_UNSUPPORTED' in tc_execute) and 'TC_UNSUPPORTED' not in (tc_skip | default([]))
+  block:
+    - name: Unsupported case
+      ibmi_rtv_command:
+        cmd: 'RTVTBLSRC   TBL(QSYS/TABLE1)  SRCFILE(TBLSRC)  SRCMBR(TABLEOUT) CVTTOUCS(*NO)'
+      register: unsupported_command
+      failed_when: unsupported_command.failed == false

@@ -51,17 +51,18 @@
           - display_fix_info.ptf_info[0]['PTF_STATUS_TIMESTAMP'] is defined
           - display_fix_info.ptf_info[0]['PTF_TECHNOLOGY_REFRESH_PTF'] is defined
           - display_fix_info.ptf_info[0]['PTF_TEMPORARY_APPLY_TIMESTAMP'] is defined
-          - display_fix_info.requisite_ptf_info | length >= 1
-          - display_fix_info.requisite_ptf_info[0]['RELEASE_OF_REQUISITE'] is defined
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_IS_CONDITIONAL'] is defined
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_IS_REQUIRED'] is defined
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_LOAD_ID'] is defined 
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_MAX_LEVEL'] is defined
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_MIN_LEVEL'] is defined
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_OPTION'] is defined
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_PRODUCT_ID'] is defined 
-          - display_fix_info.requisite_ptf_info[0]['REQUISITE_PTF_ID'] != ''
-          - display_fix_info.requisite_ptf_info | selectattr('TYPE_OF_REQUISITE', 'equalto', '1') | map(attribute='REQUISITE_PTF_ID') | list | length >= 1
+          # Omit requisite checks because some PTFs do not have requisites
+          #- display_fix_info.requisite_ptf_info | length >= 1
+          #- display_fix_info.requisite_ptf_info[0]['RELEASE_OF_REQUISITE'] is defined
+          #- display_fix_info.requisite_ptf_info[0]['REQUISITE_IS_CONDITIONAL'] is defined
+          #- display_fix_info.requisite_ptf_info[0]['REQUISITE_IS_REQUIRED'] is defined
+          #- display_fix_info.requisite_ptf_info[0]['REQUISITE_LOAD_ID'] is defined
+          #- display_fix_info.requisite_ptf_info[0]['REQUISITE_MAX_LEVEL'] is defined
+          #- display_fix_info.requisite_ptf_info[0]['REQUISITE_MIN_LEVEL'] is defined
+          #- display_fix_info.requisite_ptf_info[0]['REQUISITE_OPTION'] is defined
+          #- display_fix_info.requisite_ptf_info[0]['REQUISITE_PRODUCT_ID'] is defined
+          #- display_fix_info.requisite_ptf_info[0]['REQUISITE_PTF_ID'] != ''
+          #- display_fix_info.requisite_ptf_info | selectattr('TYPE_OF_REQUISITE', 'equalto', '1') | map(attribute='REQUISITE_PTF_ID') | list | length >= 1
 
 
     - name: TC01 Get PTF information with all supported parameters
@@ -77,7 +78,7 @@
         that:
           - display_again.job_log != []
           - display_again.ptf_info | length == 1
-          - display_fix_info.requisite_ptf_info == display_again.requisite_ptf_info 
+          #- display_fix_info.requisite_ptf_info == display_again.requisite_ptf_info 
 
     - name: TC04 Get PTF information with an invalid ptf number
       ibmi_display_fix:

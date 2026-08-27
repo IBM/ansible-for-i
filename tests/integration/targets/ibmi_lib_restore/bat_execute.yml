@@ -1,0 +1,17 @@
+# BAT (Build Acceptance Test) execute list for ibmi_lib_restore
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# TC dependency notes:
+#   TC01        Requires setup (object restore + lib_save).  Verifies seed data.
+#   TC02–TC04   Positive restore tests; each preceded by dlt_crt_lib.yml reset.
+#               TC02 is the most important — covers the required-only happy path.
+#   TC05–TC06   Negative: non-existing/wrong library names.  Preceded by dlt_crt_lib.yml.
+#   TC08–TC14   Negative: invalid param values and missing required args.  All fast/instant.
+#
+# Note: TC07 does not exist (numbering gap from original test suite).
+
+tc_execute:
+  - TC01
+  

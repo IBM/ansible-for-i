@@ -3,6 +3,21 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC03']) — only those TCs run
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['TC02']) — everything else runs
+#   If neither variable is defined, all TCs run (default behaviour, same as before).
+#
+# TC dependency chain (important when building execute lists):
+#   TC01 creates job schedule entry 'test_at'   — independent
+#   TC02 creates job schedule entry 'testall'   — independent, also guarded by QLANGID==ENU
+#   TC03 creates job schedule entry 'TESTALL'   — independent, has its own inline cleanup
+#   TC04-TC14 are negative tests                — all independent, no server state created
+#
+# The outer block/always structure is preserved so cleanup always runs
+# regardless of which TCs are selected or whether any TC fails.
+#
+
 - block:
     - name: gather_facts
       ibm.power_ibmi.ibmi_facts:
@@ -12,232 +27,260 @@
 
     - command: 'touch /tmp/at.txt'
 
-    # - name: List current QSQSVR job
-    #   ibmi_job:
-    #     name: "QSQSRVR"
-    #     #status: '*ACTIVE'
-    #     status: '*ALL'
-    #     user: '*ALL'
-    #   register: job_info_orig
+    # ─── TC01 ─────────────────────────────────────────────────────────────────
+    - name: TC01 - Schedule job with only required options
+      when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+      block:
+        - name: TC01 schedule job with only required options
+          ibmi_at:
+            job_name: 'test_at'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*ONCE"
+          register: at_result
 
-    - name: TC01 schedule job with only required options
-      ibmi_at:
-        job_name: 'test_at'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*ONCE"
-      register: at_result
+        - name: TC01 assert the returned parameters
+          assert:
+            that:
+              - at_result.command == "QSYS/ADDJOBSCDE JOB(test_at) CMD(QSH CMD('/tmp/at.sh /tmp/at.txt')) FRQ(*ONCE) SCDDATE(*CURRENT) SCDDAY(*NONE)
+                 SCDTIME(*CURRENT) TEXT(*BLANK)"
+              - at_result.msg is defined
+              - at_result.delta is defined
+              - at_result.stdout is defined
+              - at_result.stderr is defined
+              - at_result.rc is defined
+              - at_result.stdout_lines is defined
+              - at_result.stderr is defined
+              - at_result.stderr_lines is defined
+              - at_result.job_log == []
 
-    - name: TC01 assert the returned parameters
-      assert:
-        that:
-          - at_result.command == "QSYS/ADDJOBSCDE JOB(test_at) CMD(QSH CMD('/tmp/at.sh /tmp/at.txt')) FRQ(*ONCE) SCDDATE(*CURRENT) SCDDAY(*NONE)
-             SCDTIME(*CURRENT) TEXT(*BLANK)"
-          - at_result.msg is defined
-          - at_result.delta is defined
-          - at_result.stdout is defined
-          - at_result.stderr is defined
-          - at_result.rc is defined
-          - at_result.stdout_lines is defined
-          - at_result.stderr is defined
-          - at_result.stderr_lines is defined
-          - at_result.job_log == []
+    # ─── TC02 ─────────────────────────────────────────────────────────────────
+    # Note: TC02 also requires QLANGID == ENU on the IBM i server.
+    # Both conditions must be true for TC02 to run.
+    - name: TC02 - Schedule job with all options (ENU locale only)
+      when: >
+        (tc_execute is not defined or 'TC02' in tc_execute) and
+        'TC02' not in (tc_skip | default([])) and
+        system_values['QLANGID'] == 'ENU'
+      block:
+        - name: TC02 schedule job with all options
+          ibmi_at:
+            job_name: 'testall'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*ONCE"
+            scddate: '04/01/2071'
+            scdday: "*NONE"
+            schtime: "11:00:00"
+            text: "Try ansible ibmi_at"
+            parameters: ""
+            joblog: true
+          register: at_result
 
-    - name: TC02 schedule job with all options
-      ibmi_at:
-        job_name: 'testall'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*ONCE"
-        scddate: '04/01/2071'
-       #scddate: '2071/04/01'
-        scdday: "*NONE"
-        schtime: "11:00:00"
-        text: "Try ansible ibmi_at"
-        parameters: ""
-        joblog: true
-      register: at_result
-      when: "system_values['QLANGID'] == 'ENU'"
+        - name: TC02 assert the returned parameters
+          assert:
+            that:
+              - at_result.job_log != []
+              - at_result.command == "QSYS/ADDJOBSCDE JOB(testall) CMD(QSH CMD('/tmp/at.sh /tmp/at.txt')) FRQ(*ONCE) SCDDATE('04/01/2071') SCDDAY(*NONE) SCDTIME('11:00:00') TEXT('Try ansible ibmi_at')"
 
-    - name: TC02 assert the returned parameters
-      assert:
-        that:
-          - at_result.job_log != []
-          - at_result.command == "QSYS/ADDJOBSCDE JOB(testall) CMD(QSH CMD('/tmp/at.sh /tmp/at.txt')) FRQ(*ONCE) SCDDATE('04/01/2071') SCDDAY(*NONE) SCDTIME('11:00:00') TEXT('Try ansible ibmi_at')"
-      when: "system_values['QLANGID'] == 'ENU'"
+        - name: TC02 rmvjobsche
+          ibmi_cl_command:
+            cmd: 'RMVJOBSCDE JOB(TESTALL) ENTRYNBR(*ALL)'
 
-    - name: rmvjobsche
-      ibmi_cl_command:
-        cmd: 'RMVJOBSCDE JOB(TESTALL) ENTRYNBR(*ALL)'
-      when: "system_values['QLANGID'] == 'ENU'"
+    # ─── TC03 ─────────────────────────────────────────────────────────────────
+    - name: TC03 - Schedule job with additional parameters options
+      when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+      block:
+        - name: TC03 schedule job with additional parameters options
+          ibmi_at:
+            job_name: 'TESTALL'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*MONTHLY"
+            scddate: '*NONE'
+            scdday: "*MON"
+            schtime: "11:00:00"
+            text: "Try ansible ibmi_at"
+            parameters: "RELDAYMON(1)"
+            joblog: true
+          register: at_result
 
-    - name: TC03 schedule job with addtional parameters options
-      ibmi_at:
-        job_name: 'TESTALL'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*MONTHLY"
-        scddate: '*NONE'
-        scdday: "*MON"
-        schtime: "11:00:00"
-        text: "Try ansible ibmi_at"
-        parameters: "RELDAYMON(1)"
-        joblog: true
-      register: at_result
+        - name: TC03 assert the returned parameters
+          assert:
+            that:
+              - at_result.command == "QSYS/ADDJOBSCDE JOB(TESTALL) CMD(QSH CMD('/tmp/at.sh /tmp/at.txt')) FRQ(*MONTHLY) SCDDATE(*NONE) SCDDAY(*MON) SCDTIME('11:00:00') TEXT('Try ansible ibmi_at') RELDAYMON(1)"
 
-    - name: TC03 assert the returned parameters
-      assert:
-        that:
-          - at_result.command == "QSYS/ADDJOBSCDE JOB(TESTALL) CMD(QSH CMD('/tmp/at.sh /tmp/at.txt')) FRQ(*MONTHLY) SCDDATE(*NONE) SCDDAY(*MON) SCDTIME('11:00:00') TEXT('Try ansible ibmi_at') RELDAYMON(1)"
+        - name: TC03 rmvjobsche
+          ibmi_cl_command:
+            cmd: 'RMVJOBSCDE JOB(TESTALL) ENTRYNBR(*ALL)'
 
-    - name: TC03 rmvjobsche
-      ibmi_cl_command:
-        cmd: 'RMVJOBSCDE JOB(TESTALL) ENTRYNBR(*ALL)'
+    # ─── TC04 ─────────────────────────────────────────────────────────────────
+    - name: TC04 - Schedule job with invalid job_name starting with digit (expected failure)
+      when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+      block:
+        - name: TC04 schedule job with invalid job_name
+          ibmi_at:
+            job_name: '01234'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*ONCE"
+            scdday: "*NONE"
+            joblog: true
+          register: neg_result
+          failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0078') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    # test negative test cases
-    - name: TC04 schedule job with invalid job_name
-      ibmi_at:
-        job_name: '01234'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*ONCE"
-        scdday: "*NONE"
-        joblog: true
-      register: neg_result
-      #failed_when: "'CPD0078' not in neg_result.stderr"
-      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0078') | map(attribute='MESSAGE_ID') | list | length == 0"
+        - name: TC04 assert result
+          assert:
+            that:
+              - neg_result.job_log != []
 
-    - name: TC04 assert result
-      assert:
-        that:
-          - neg_result.job_log != []
+    # ─── TC05 ─────────────────────────────────────────────────────────────────
+    - name: TC05 - Schedule job with job_name exceeding max length (expected failure)
+      when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+      block:
+        - name: TC05 schedule job with invalid job_name
+          ibmi_at:
+            job_name: 'abcdefghidk'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*ONCE"
+            scdday: "*NONE"
+            joblog: false
+          register: neg_result
+          failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0074') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC05 schedule job with invalid job_name
-      ibmi_at:
-        job_name: 'abcdefghidk'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*ONCE"
-        scdday: "*NONE"
-        joblog: false
-      register: neg_result
-      #failed_when: "'CPD0074' not in neg_result.stderr"
-      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0074') | map(attribute='MESSAGE_ID') | list | length == 0"
+        - name: TC05 assert result
+          assert:
+            that:
+              - neg_result.job_log != []
 
-    - name: TC04 assert result
-      assert:
-        that:
-          - neg_result.job_log != []
+    # ─── TC06 ─────────────────────────────────────────────────────────────────
+    - name: TC06 - Schedule job with invalid cmd (expected failure)
+      when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+      block:
+        - name: TC06 schedule job with invalid cmd
+          ibmi_at:
+            job_name: 'abc'
+            cmd: "111"
+            frequency: "*ONCE"
+            scdday: "*NONE"
+          register: neg_result
+          failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0033') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC06 schedule job with invalid cmd
-      ibmi_at:
-        job_name: 'abc'
-        cmd: "111"
-        frequency: "*ONCE"
-        scdday: "*NONE"
-      register: neg_result
-      #failed_when: "'CPD0033' not in neg_result.stderr"
-      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0033') | map(attribute='MESSAGE_ID') | list | length == 0"
+    # ─── TC07 ─────────────────────────────────────────────────────────────────
+    - name: TC07 - Schedule job with invalid frequency value (expected failure)
+      when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+      block:
+        - name: TC07 schedule job with invalid frequency
+          ibmi_at:
+            job_name: 'abc'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "ABC"
+            scdday: "*NONE"
+          register: neg_result
+          failed_when: "'value of frequency must be one of' not in neg_result.msg"
 
+    # ─── TC08 ─────────────────────────────────────────────────────────────────
+    - name: TC08 - Schedule job with invalid scdday value (expected failure)
+      when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+      block:
+        - name: TC08 schedule job with invalid scdday
+          ibmi_at:
+            job_name: 'abc'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*ONCE"
+            scdday: ['abc', '*MON']
+          register: neg_result
+          failed_when: "'Value specified for scdday is not valid. Valid values are *NONE, *ALL, *MON, *TUE, *WED, *THU, *FRI, *SAT, *SUN' not in neg_result.msg"
 
-    - name: TC07 schedule job with invalid frequence
-      ibmi_at:
-        job_name: 'abc'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "ABC"
-        scdday: "*NONE"
-      register: neg_result
-      failed_when: "'value of frequency must be one of' not in neg_result.msg"
+    # ─── TC09 ─────────────────────────────────────────────────────────────────
+    - name: TC09 - Submit job with conflicting scddate and scdday options (expected failure)
+      when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+      block:
+        - name: TC09 submit job with conflicting options
+          ibmi_at:
+            job_name: 'testall'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*WEEKLY"
+            scddate: '*CURRENT'
+            scdday: "*MON"
+            schtime: "*CURRNET"
+            joblog: true
+          register: at_result
+          ignore_errors: true
 
-    - name: TC08 schedule job with invalid scdday
-      ibmi_at:
-        job_name: 'abc'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*ONCE"
-        scdday: ['abc', '*MON']
-      register: neg_result
-      failed_when: "'Value specified for scdday is not valid. Valid values are *NONE, *ALL, *MON, *TUE, *WED, *THU, *FRI, *SAT, *SUN' not in neg_result.msg"
+        - name: TC09 assert the returned parameters
+          assert:
+            that:
+              - "'Either scddate or scdday need to be *NONE' in at_result.msg"
+              - at_result.delta is defined
+              - at_result.stdout is defined
+              - at_result.stderr is defined
+              - at_result.rc is defined
+              - at_result.stdout_lines is defined
+              - at_result.stderr_lines is defined
 
-    - name: TC09 submit job with conflicting options
-      ibmi_at:
-        job_name: 'testall'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*WEEKLY"
-        scddate: '*CURRENT'
-        scdday: "*MON"
-        schtime: "*CURRNET"
-        joblog: true
-      register: at_result
-      ignore_errors: true
+    # ─── TC10 ─────────────────────────────────────────────────────────────────
+    - name: TC10 - Schedule job with conflicting parameters options (expected failure)
+      when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+      block:
+        - name: TC10 schedule job with conflicting options
+          ibmi_at:
+            job_name: 'testall'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*WEEKLY"
+            scdday: "*NONE"
+            parameters: "abc"
+          register: neg_result
+          failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC09 assert the returned parameters
-      assert:
-        that:
-          - "'Either scddate or scdday need to be *NONE' in at_result.msg"
-          - at_result.delta is defined
-          - at_result.stdout is defined
-          - at_result.stderr is defined
-          - at_result.rc is defined
-          - at_result.stdout_lines is defined
-          - at_result.stderr_lines is defined
+    # ─── TC11 ─────────────────────────────────────────────────────────────────
+    - name: TC11 - Schedule job with unsupported parameter (expected failure)
+      when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+      block:
+        - name: TC11 schedule job with unsupported option
+          ibmi_at:
+            abc: "abcd"
+            job_name: 'testall'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*WEEKLY"
+            scdday: "*NONE"
+          register: neg_result
+          failed_when: "'Unsupported parameters' not in neg_result.msg"
 
-    - name: TC10 schedule job with conflicting options
-      ibmi_at:
-        job_name: 'testall'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*WEEKLY"
-        scdday: "*NONE"
-        parameters: "abc"
-      register: neg_result
-      #failed_when: "'CPD0044' not in neg_result.stderr"
-      failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length == 0"
+    # ─── TC12 ─────────────────────────────────────────────────────────────────
+    - name: TC12 - Schedule job without required frequency option (expected failure)
+      when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+      block:
+        - name: TC12 schedule job without required options
+          ibmi_at:
+            job_name: 'testall'
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+          register: neg_result
+          failed_when: "'missing required arguments: frequency' not in neg_result.msg"
 
-    - name: TC11 schedule job with unsupported option
-      ibmi_at:
-        abc: "abcd"
-        job_name: 'testall'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*WEEKLY"
-        scdday: "*NONE"
-      register: neg_result
-      failed_when: "'Unsupported parameters' not in neg_result.msg"
+    # ─── TC13 ─────────────────────────────────────────────────────────────────
+    - name: TC13 - Schedule job without required cmd option (expected failure)
+      when: (tc_execute is not defined or 'TC13' in tc_execute) and 'TC13' not in (tc_skip | default([]))
+      block:
+        - name: TC13 schedule job without required options
+          ibmi_at:
+            job_name: 'testall'
+            frequency: "*WEEKLY"
+          register: neg_result
+          failed_when: "'missing required arguments: cmd' not in neg_result.msg"
 
-    - name: TC12 schedule job without required options
-      ibmi_at:
-        job_name: 'testall'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        #frequency: "*WEEKLY"
-      register: neg_result
-      failed_when: "'missing required arguments: frequency' not in neg_result.msg"
-
-    - name: TC13 schedule job without required options
-      ibmi_at:
-        job_name: 'testall'
-        #cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*WEEKLY"
-      register: neg_result
-      failed_when: "'missing required arguments: cmd' not in neg_result.msg"
-
-    - name: TC14 schedule job without required options
-      ibmi_at:
-        #job_name: 'testall'
-        cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
-        frequency: "*WEEKLY"
-      register: neg_result
-      failed_when: "'missing required arguments: job_name' not in neg_result.msg"
-
-    # - name: List current QSQSRVR job
-    #   ibmi_job:
-    #     name: "QSQSRVR"
-    #     status: '*ACTIVE'
-    #     user: 'QUSER'
-    #   register: job_info_final
-
-    # - name: assert the final number of QSQSRVR job is not increased too much
-    #   assert:
-    #     that:
-    #       - job_info_final.job_info | length == job_info_orig.job_info | length
+    # ─── TC14 ─────────────────────────────────────────────────────────────────
+    - name: TC14 - Schedule job without required job_name option (expected failure)
+      when: (tc_execute is not defined or 'TC14' in tc_execute) and 'TC14' not in (tc_skip | default([]))
+      block:
+        - name: TC14 schedule job without required options
+          ibmi_at:
+            cmd: "QSH CMD('/tmp/at.sh /tmp/at.txt')"
+            frequency: "*WEEKLY"
+          register: neg_result
+          failed_when: "'missing required arguments: job_name' not in neg_result.msg"
 
   always:
     - name: delete script file
       command: "rm -rf /tmp/at.sh"
 
-    - name: delete script file
+    - name: delete txt file
       command: "rm -rf /tmp/at.txt"
 
     - name: rmvjobsche

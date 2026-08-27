@@ -1,170 +1,229 @@
+# test code for the ibmi_fix_group_check module
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC03']) — only those TCs run
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['TC00']) — everything else runs
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency notes:
+#   TC00  tests validate_certs behaviour — involves yum cert removal/install (BROKEN, see FIXME)
+#   TC01  runs without options — queries all PTF groups, asserts return fields and group_74 coverage
+#   TC02  runs with groups=['*ALL'] delegated to localhost — cross-checks result matches TC01
+#         depends on TC01 having populated group_check_result
+#   TC03  runs with first 3 groups from group_74 — asserts count == 3
+#   TC04  runs with a single PTF group — asserts count == 1
+#   TC06  runs with an invalid group name (string) — asserts empty result
+#   TC07  runs with an invalid group name (list) — asserts empty result
+#   TC08  runs with one group from group_74 and one from group_73 — asserts count == 2
+#   TC09  runs with one valid and one invalid group — asserts count == 1
+#
+# All TCs make network calls to IBM's Fix Group check service (~2-5s each).
+# All are read-only with no server state changes.
+# TC05 is not present — it was removed from the original test file.
+#
 
-# Define group number of different target IBM i
+# Define group numbers for different target IBM i releases
 - set_fact:
     group_74: ['SF99740', 'SF99739', 'SF99704', 'SF99665', 'SF99662', 'SF99738']
     group_73: ['SF99730', 'SF99729', 'SF99703', 'SF99725', 'SF99722', 'SF99728']
     group_72: ['SF99720', 'SF99719', 'SF99702', 'SF99716', 'SF99713', 'SF99718']
 
-# FIXME: Removal of the certificate packages no longer works as expected (would also have to remove yum),
-# so this needs to be rethought for TC00 with validate_certs that is checking for failure.
-- name: remove required packages from ibm i server (currently broken)
-  command: '/QOpensys/pkgs/bin/yum remove ca-certificates-mozilla -y'
-  ignore_errors: true
-- name: remove required packages from ibm i server (currently broken)
-  command: '/QOpensys/pkgs/bin/yum remove ca-certificates -y'
-  ignore_errors: true
+# ─── TC00 ─────────────────────────────────────────────────────────────────────
+# FIXME: Removal of the certificate packages no longer works as expected
+# (would also have to remove yum), so the cert removal steps are broken.
+# The validate_certs=false test still runs; the default validate_certs test
+# and cert re-install are included but may not behave as originally intended.
+- name: TC00 - Test validate_certs behaviour (cert removal currently broken)
+  when: (tc_execute is not defined or 'TC00' in tc_execute) and 'TC00' not in (tc_skip | default([]))
+  block:
+    - name: TC00 remove ca-certificates-mozilla (currently broken — ignore errors)
+      command: '/QOpensys/pkgs/bin/yum remove ca-certificates-mozilla -y'
+      ignore_errors: true
 
-- name: TC00 run module with validate_certs
-  ibmi_fix_group_check:
-    validate_certs: false
-    groups: '{{group_74}}'
-  register: group_check_result
-  failed_when: group_check_result.failed == true
+    - name: TC00 remove ca-certificates (currently broken — ignore errors)
+      command: '/QOpensys/pkgs/bin/yum remove ca-certificates -y'
+      ignore_errors: true
 
-- name: TC00 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result.count == 6
-      - group_check_result.group_info | length == 6
+    - name: TC00 run module with validate_certs=false
+      ibmi_fix_group_check:
+        validate_certs: false
+        groups: '{{group_74}}'
+      register: group_check_result
+      failed_when: group_check_result.failed == true
 
-# FIXME: This is expect to fail when no certificates are available. However, we can't replicate
-# this scenario currently, so we will not check the results for failure.
-- name: TC00 run module with validate_certs
-  ibmi_fix_group_check:
-    groups: '{{group_74}}'
-  register: group_check_result
-  #failed_when: group_check_result.group_info[0].error == ''
-  #failed_when: group_check_result.stderr == ''
+    - name: TC00 assert validate_certs=false returns expected results
+      assert:
+        that:
+          - group_check_result.count == 6
+          - group_check_result.group_info | length == 6
 
-- name: Install required packages from ibm i server
-  command: '/QOpensys/pkgs/bin/yum install ca-certificates* -y'
+    # FIXME: This is expected to fail when no certificates are available.
+    # We cannot replicate this scenario currently so results are not checked.
+    - name: TC00 run module with default validate_certs (no cert check)
+      ibmi_fix_group_check:
+        groups: '{{group_74}}'
+      register: group_check_result
 
-- name: TC00 run module with a single PTF group with validate_certs
-  ibmi_fix_group_check:
-    groups: '{{group_74}}'
-  register: group_check_result
-  failed_when: group_check_result.failed == true
+    - name: TC00 install ca-certificates packages
+      command: '/QOpensys/pkgs/bin/yum install ca-certificates* -y'
 
-- name: TC00 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result.count == 6
-      - group_check_result.group_info | length == 6
+    - name: TC00 run module with a single PTF group after cert reinstall
+      ibmi_fix_group_check:
+        groups: '{{group_74}}'
+      register: group_check_result
+      failed_when: group_check_result.failed == true
 
-- name: TC01 run module without options
-  ibmi_fix_group_check:
-  register: group_check_result
+    - name: TC00 assert results after cert reinstall
+      assert:
+        that:
+          - group_check_result.count == 6
+          - group_check_result.group_info | length == 6
 
-- name: TC01 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result.stderr is defined
-      - group_check_result.rc == 0
-      - group_check_result.count >= 18
-      - group_check_result.group_info | length >= 18
-      - group_check_result.group_info[0]["ptf_group_number"] is defined
-      - group_check_result.group_info[0]["release"] is defined
-      - group_check_result.group_info[0]["release_date"] is defined
-      - group_check_result.group_info[0]["ptf_group_level"] is defined
+# ─── TC01 ─────────────────────────────────────────────────────────────────────
+- name: TC01 - Run module without options and assert all return fields
+  when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+  block:
+    - name: TC01 run module without options
+      ibmi_fix_group_check:
+      register: group_check_result
 
-- name: assert all groups defined in group_74 can be found in the returned list
-  assert:
-    that:
-      - (group_check_result.group_info | selectattr('ptf_group_number', 'equalto', item) | map(attribute='ptf_group_number') | list | length) == 1
-  loop: '{{group_74}}'
+    - name: TC01 assert the defined parameters are returned
+      assert:
+        that:
+          - group_check_result.stderr is defined
+          - group_check_result.rc == 0
+          - group_check_result.count >= 18
+          - group_check_result.group_info | length >= 18
+          - group_check_result.group_info[0]["ptf_group_number"] is defined
+          - group_check_result.group_info[0]["release"] is defined
+          - group_check_result.group_info[0]["release_date"] is defined
+          - group_check_result.group_info[0]["ptf_group_level"] is defined
 
-- name: TC02 run module with groups
-  ibmi_fix_group_check:
-    groups: ['*ALL']
-  delegate_to: localhost
-  register: group_check_result_local
+    - name: TC01 assert all groups defined in group_74 can be found in the returned list
+      assert:
+        that:
+          - (group_check_result.group_info | selectattr('ptf_group_number', 'equalto', item) | map(attribute='ptf_group_number') | list | length) == 1
+      loop: '{{group_74}}'
 
-- name: TC02 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result_local.rc == 0
-      - group_check_result_local.count >= 18
-      - group_check_result_local.group_info | length >= 18
-      - group_check_result_local.group_info[0]["ptf_group_number"] is defined
-      - group_check_result_local.group_info[0]["release"] is defined
-      - group_check_result_local.group_info[0]["release_date"] is defined
-      - group_check_result_local.group_info[0]["ptf_group_level"] is defined
-      - group_check_result_local.group_info == group_check_result.group_info
+# ─── TC02 ─────────────────────────────────────────────────────────────────────
+- name: TC02 - Run module with groups=[*ALL] delegated to localhost
+  when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+  block:
+    - name: TC02 run module with groups=[*ALL] on localhost
+      ibmi_fix_group_check:
+        groups: ['*ALL']
+      delegate_to: localhost
+      register: group_check_result_local
 
-- name: TC03 run module with groups
-  ibmi_fix_group_check:
-    groups: '{{group_74[0:3]}}'
-  register: group_check_result
+    - name: TC02 assert the defined parameters are returned
+      assert:
+        that:
+          - group_check_result_local.rc == 0
+          - group_check_result_local.count >= 18
+          - group_check_result_local.group_info | length >= 18
+          - group_check_result_local.group_info[0]["ptf_group_number"] is defined
+          - group_check_result_local.group_info[0]["release"] is defined
+          - group_check_result_local.group_info[0]["release_date"] is defined
+          - group_check_result_local.group_info[0]["ptf_group_level"] is defined
+          - group_check_result_local.group_info == group_check_result.group_info
 
-- name: TC03 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result.count == 3
-      - group_check_result.group_info | length == 3
+# ─── TC03 ─────────────────────────────────────────────────────────────────────
+- name: TC03 - Run module with first 3 groups from group_74
+  when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+  block:
+    - name: TC03 run module with first 3 groups from group_74
+      ibmi_fix_group_check:
+        groups: '{{group_74[0:3]}}'
+      register: group_check_result
 
-- name: TC04 run module with a single PTF group
-  ibmi_fix_group_check:
-    groups: '{{group_74[0]}}'
-  register: group_check_result
+    - name: TC03 assert the defined parameters are returned
+      assert:
+        that:
+          - group_check_result.count == 3
+          - group_check_result.group_info | length == 3
 
-- name: TC04 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result.count == 1
-      - group_check_result.group_info | length == 1
-      - group_check_result.group_info[0]["ptf_group_number"] == group_74[0]
+# ─── TC04 ─────────────────────────────────────────────────────────────────────
+- name: TC04 - Run module with a single PTF group
+  when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+  block:
+    - name: TC04 run module with a single PTF group
+      ibmi_fix_group_check:
+        groups: '{{group_74[0]}}'
+      register: group_check_result
 
-- name: TC06 run module with an invalid group name
-  ibmi_fix_group_check:
-    groups: 'abc'
-  register: group_check_result
+    - name: TC04 assert the defined parameters are returned
+      assert:
+        that:
+          - group_check_result.count == 1
+          - group_check_result.group_info | length == 1
+          - group_check_result.group_info[0]["ptf_group_number"] == group_74[0]
 
-- name: TC06 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result.stderr is defined
-      - group_check_result.count == 0
-      - group_check_result.group_info == []
+# ─── TC06 ─────────────────────────────────────────────────────────────────────
+- name: TC06 - Run module with an invalid group name (string)
+  when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+  block:
+    - name: TC06 run module with invalid group name as string
+      ibmi_fix_group_check:
+        groups: 'abc'
+      register: group_check_result
 
-- name: TC07 run module with an invalid group name
-  ibmi_fix_group_check:
-    groups: ['abc']
-  register: group_check_result
+    - name: TC06 assert empty result returned for invalid group
+      assert:
+        that:
+          - group_check_result.stderr is defined
+          - group_check_result.count == 0
+          - group_check_result.group_info == []
 
-- name: TC07 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result.stderr is defined
-      - group_check_result.count == 0
-      - group_check_result.group_info == []
+# ─── TC07 ─────────────────────────────────────────────────────────────────────
+- name: TC07 - Run module with an invalid group name (list)
+  when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+  block:
+    - name: TC07 run module with invalid group name as list
+      ibmi_fix_group_check:
+        groups: ['abc']
+      register: group_check_result
 
-- name: TC08 run module with a single PTF group
-  ibmi_fix_group_check:
-    groups:
-      - '{{group_74[0]}}'
-      - '{{group_73[0]}}'
-  register: group_check_result
+    - name: TC07 assert empty result returned for invalid group list
+      assert:
+        that:
+          - group_check_result.stderr is defined
+          - group_check_result.count == 0
+          - group_check_result.group_info == []
 
-- name: TC08 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result.count == 2
-      - group_check_result.group_info | length == 2
+# ─── TC08 ─────────────────────────────────────────────────────────────────────
+- name: TC08 - Run module with one group from group_74 and one from group_73
+  when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+  block:
+    - name: TC08 run module with groups from two different releases
+      ibmi_fix_group_check:
+        groups:
+          - '{{group_74[0]}}'
+          - '{{group_73[0]}}'
+      register: group_check_result
 
-- name: TC09 run module with a single PTF group
-  ibmi_fix_group_check:
-    groups:
-      - '{{group_74[0]}}'
-      - 'abc'
-  register: group_check_result
+    - name: TC08 assert count is 2
+      assert:
+        that:
+          - group_check_result.count == 2
+          - group_check_result.group_info | length == 2
 
-- name: TC09 assert the defined parameters are returned
-  assert:
-    that:
-      - group_check_result.count == 1
-      - group_check_result.group_info | length == 1
-      - group_check_result.group_info[0]["ptf_group_number"] == group_74[0]
+# ─── TC09 ─────────────────────────────────────────────────────────────────────
+- name: TC09 - Run module with one valid and one invalid group
+  when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+  block:
+    - name: TC09 run module with one valid and one invalid group
+      ibmi_fix_group_check:
+        groups:
+          - '{{group_74[0]}}'
+          - 'abc'
+      register: group_check_result
+
+    - name: TC09 assert only the valid group is returned
+      assert:
+        that:
+          - group_check_result.count == 1
+          - group_check_result.group_info | length == 1
+          - group_check_result.group_info[0]["ptf_group_number"] == group_74[0]

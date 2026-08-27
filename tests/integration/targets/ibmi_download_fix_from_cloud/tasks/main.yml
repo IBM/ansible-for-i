@@ -1,7 +1,18 @@
 ---
 # Integration tests for ibmi_download_fix_from_cloud module
-# Copyright (c) IBM Corporation 2019, 2020
+# (c) IBM Corporation 2019, 2020
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run — IDs must match those defined in
+#               positive_tests.yml (PTC01–PTC06) or negative_tests.yml (NTC01–NTC09).
+#               Only the listed IDs will run; all others are skipped.
+#   tc_skip:    optional list of TC IDs to skip — everything else runs.
+#   If neither variable is defined, all TCs in both files run.
+#
+# The tc_execute / tc_skip variables are passed through automatically to the
+# included files — no extra plumbing needed.
+#
 
 - name: Include positive test cases
   ansible.builtin.include_tasks: positive_tests.yml

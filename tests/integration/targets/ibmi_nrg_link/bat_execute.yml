@@ -1,0 +1,15 @@
+# BAT (Build Acceptance Test) execute list for ibmi_nrg_link
+#
+# TC00 (setup: verify 5770SS1 opt 48, create TCP interface) always runs unconditionally.
+#
+# Dependency chain: TC01→TC02→TC03→TC04→TC05→TCNEG
+# Each TC relies on the TCP interface created in TC00.
+# TC01 adds a link that TC02 removes; TC03 adds a link that TC04 removes; TC05 adds then *ALL removes.
+
+tc_execute:
+  - TC01
+  - TC02
+  - TC03
+  - TC04
+  - TC05
+  - TCNEG

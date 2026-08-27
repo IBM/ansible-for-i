@@ -23,7 +23,7 @@
 
     - name: Set fact for python version information. Newer python versions have pythonX.Y package prefix.
       ansible.builtin.set_fact:
-        ppython_version: "{{ python_prefix + '.' ~ python_minor }}"
+        python_version: "{{ python_prefix + '.' ~ python_minor }}"
       when: python_minor != 9
 
     - name: Display python prefix
@@ -51,43 +51,61 @@
       ibmi_cl_command: 
         cmd: QSYS/CRTJRN JRN(QGPL/ANSIJSNJRN) JRNRCV(QGPL/ANSIJSNRCV) TEXT('JOURNAL FOR ANSIBLE')   
 
-    - name: TC00 check gathers query
-      ibmi_sql_query:
-        sql: "SELECT * FROM QSYS2.SYSCATALOGS"
-      register: sql_query_result_8
+    - name: TC00 - check gathers query
+      when: (tc_execute is not defined or 'TC00' in tc_execute) and 'TC00' not in (tc_skip | default([]))
+      block:
+        - name: TC00 check gathers query
+          ibmi_sql_query:
+            sql: "SELECT * FROM QSYS2.SYSCATALOGS"
+          register: sql_query_result_8
 
-    - name: create journal
-      debug: 
-        msg: "{{sql_query_result_8.row}}"  
+        - name: create journal
+          debug: 
+            msg: "{{sql_query_result_8.row}}"  
 
-    - name: TC01 run sql execute module
-      ibmi_sql_execute:
-        sql: "create table qgpl.ansible(id INT not null, name varchar(8), gender varchar(8))" 
-      register: sql_execute_result_2
-      failed_when: "sql_execute_result_2.rc !=0 and sql_execute_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL7905') | map(attribute='MESSAGE_ID') | list | length ==0"
+    - name: TC01 - run sql execute to create table
+      when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+      block:
+        - name: TC01 run sql execute module
+          ibmi_sql_execute:
+            sql: "create table qgpl.ansible(id INT not null, name varchar(8), gender varchar(8))" 
+          register: sql_execute_result_2
+          failed_when: "sql_execute_result_2.rc !=0 and sql_execute_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL7905') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC01 start journal
-      ibmi_cl_command: 
-        cmd: QSYS/STRJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN)  
+        - name: TC01 start journal
+          ibmi_cl_command: 
+            cmd: QSYS/STRJRNPF FILE(QGPL/ANSIBLE) JRN(QGPL/ANSIJSNJRN)  
 
-    - name: TC02 run the SQL command to insert a row
-      ibmi_sql_execute:
-        sql: "INSERT INTO qgpl.ansible VALUES('1', 'User1', 'Female')"
+    - name: TC02 - insert a row
+      when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+      block:
+        - name: TC02 run the SQL command to insert a row
+          ibmi_sql_execute:
+            sql: "INSERT INTO qgpl.ansible VALUES('1', 'User1', 'Female')"
 
-    - name: TC03 run the SQL command to query a table
-      ibmi_sql_query:
-        sql: "select * from qgpl.ansible"
-        expected_row_count: 1
-      register: sql_query_result
+    - name: TC03 - query table and check row count
+      when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+      block:
+        - name: TC03 run the SQL command to query a table
+          ibmi_sql_query:
+            sql: "select * from qgpl.ansible"
+            expected_row_count: 1
+          register: sql_query_result
 
-    - name: TC04 run the SQL command to insert the row again
-      ibmi_sql_execute:
-        sql: "INSERT INTO qgpl.ansible VALUES('2', 'User2', 'Male')"
+    - name: TC04 - insert a second row
+      when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+      block:
+        - name: TC04 run the SQL command to insert the row again
+          ibmi_sql_execute:
+            sql: "INSERT INTO qgpl.ansible VALUES('2', 'User2', 'Male')"
 
-    - name: TC05 run the SQL command to query the table and check row count
-      ibmi_sql_query:
-        sql: "select * from qgpl.ansible"
-        expected_row_count: 2
+    - name: TC05 - query table and check row count is 2
+      when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+      block:
+        - name: TC05 run the SQL command to query the table and check row count
+          ibmi_sql_query:
+            sql: "select * from qgpl.ansible"
+            expected_row_count: 2
 
     # Skip for now. This isn't very useful and prone to breakage.
     # - include_tasks: check_rpm.yml
@@ -95,175 +113,217 @@
     #    python: "{{python_version}}"
     #  with_list: "{{required_rpms}}"  
     
-    - name: TC06 run sql query module with a valid sql
-      ibmi_sql_query:
-        sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
-      register: sql_query_result_2
+    - name: TC06 - run sql query with a valid sql
+      when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+      block:
+        - name: TC06 run sql query module with a valid sql
+          ibmi_sql_query:
+            sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
+          register: sql_query_result_2
 
-    - name: TC06 assert the returned parameters
-      assert:
-        that: 
-          - sql_query_result_2.sql == "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO"
-          - sql_query_result_2.rc == 0
-          - sql_query_result_2.row | length == 1
+        - name: TC06 assert the returned parameters
+          assert:
+            that: 
+              - sql_query_result_2.sql == "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO"
+              - sql_query_result_2.rc == 0
+              - sql_query_result_2.row | length == 1
 
-    - name: TC07 run sql query module with a valid sql and expected_row_count
-      ibmi_sql_query:
-        sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
-        expected_row_count: 1
-      register: sql_query_result_3
+    - name: TC07 - run sql query with valid sql and expected_row_count
+      when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+      block:
+        - name: TC07 run sql query module with a valid sql and expected_row_count
+          ibmi_sql_query:
+            sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
+            expected_row_count: 1
+          register: sql_query_result_3
 
-    - name: TC07 assert the returned parameters
-      assert:
-        that: 
-          - sql_query_result_3.sql == "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO"
-          - sql_query_result_3.rc == 0
-          - sql_query_result_2.row | length == 1
+        - name: TC07 assert the returned parameters
+          assert:
+            that: 
+              - sql_query_result_3.sql == "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO"
+              - sql_query_result_3.rc == 0
+              - sql_query_result_2.row | length == 1
   
-    - name: TC08 run sql execute to query a not existing table
-      ibmi_sql_execute:
-        sql: "SELECT * FROM QSYS2.ABC" 
-        joblog: true
-      register: sql_execute_result_9
-      #failed_when: "'SQL0204' not in sql_execute_result_9.stderr"    
-      failed_when: "sql_execute_result_9.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length ==0"
+    - name: TC08 - run sql execute on a not existing table
+      when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+      block:
+        - name: TC08 run sql execute to query a not existing table
+          ibmi_sql_execute:
+            sql: "SELECT * FROM QSYS2.ABC" 
+            joblog: true
+          register: sql_execute_result_9
+          #failed_when: "'SQL0204' not in sql_execute_result_9.stderr"    
+          failed_when: "sql_execute_result_9.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC09 run a complex SQL command to query IPL
-      ibmi_sql_query:
-        expected_row_count: 1
-        sql: "WITH last_ipl(ipl_time)
+    - name: TC09 - run a complex SQL command to query IPL
+      when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+      block:
+        - name: TC09 run a complex SQL command to query IPL
+          ibmi_sql_query:
+            expected_row_count: 1
+            sql: "WITH last_ipl(ipl_time)
 
-          AS (SELECT job_entered_system_time
+              AS (SELECT job_entered_system_time
 
-             FROM TABLE(qsys2.job_info(job_status_filter => '*ACTIVE', job_user_filter
+                 FROM TABLE(qsys2.job_info(job_status_filter => '*ACTIVE', job_user_filter
 
-             => 'QSYS')) x
+                 => 'QSYS')) x
 
-            WHERE job_name = '000000/QSYS/SCPF')
+                WHERE job_name = '000000/QSYS/SCPF')
 
-            , abnormal(abnormal_count)
+                , abnormal(abnormal_count)
 
-          AS (SELECT COUNT(*)
+              AS (SELECT COUNT(*)
 
-            FROM last_ipl, TABLE(qsys2.history_log_info(ipl_time, CURRENT TIMESTAMP)) x
+                FROM last_ipl, TABLE(qsys2.history_log_info(ipl_time, CURRENT TIMESTAMP)) x
 
-            WHERE message_id IN ('CPC1225'))
+                WHERE message_id IN ('CPC1225'))
 
-            SELECT
+                SELECT
 
-          CASE
+              CASE
 
-          WHEN abnormal_count = 0
+              WHEN abnormal_count = 0
 
-          THEN 'NEXT IPL WILL BE NORMAL'
+              THEN 'NEXT IPL WILL BE NORMAL'
 
-          ELSE 'NEXT IPL WILL BE ABNORMAL - ABNORMAL END COUNT: ' concat abnormal_count
+              ELSE 'NEXT IPL WILL BE ABNORMAL - ABNORMAL END COUNT: ' concat abnormal_count
 
-          END
+              END
 
-          AS next_ipl_indicator FROM abnormal;"
+              AS next_ipl_indicator FROM abnormal"
 
-    - name: TC10 run sql query an non-exist file
-      ibmi_sql_query:
-        sql: "SELECT * FROM QSYS2.ABC" 
-      register: sql_query_error_result_2
-      #failed_when: "'SQL0204' not in sql_query_error_result_2.stderr"
-      failed_when: "sql_query_error_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length ==0"
+    - name: TC10 - run sql query on a non-exist file
+      when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+      block:
+        - name: TC10 run sql query an non-exist file
+          ibmi_sql_query:
+            sql: "SELECT * FROM QSYS2.ABC" 
+          register: sql_query_error_result_2
+          #failed_when: "'SQL0204' not in sql_query_error_result_2.stderr"
+          failed_when: "sql_query_error_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL0204') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC11 run sql query module without sql option
-      ibmi_sql_query:
-      register: sql_query_result_5
-      ignore_errors: true
+    - name: TC11 - run sql query without sql option
+      when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+      block:
+        - name: TC11 run sql query module without sql option
+          ibmi_sql_query:
+          register: sql_query_result_5
+          ignore_errors: true
 
-    - name: TC11 assert the previous task failed because lacks of required parameter sql
-      assert:
-        that:
-          - "'missing required arguments: sql' in sql_query_result_5.msg"
+        - name: TC11 assert the previous task failed because lacks of required parameter sql
+          assert:
+            that:
+              - "'missing required arguments: sql' in sql_query_result_5.msg"
     
-    - name: TC12 run sql query module with a invalid value of sql
-      ibmi_sql_query:
-        sql: abcdefg
-      register: sql_query_result_6
-      ignore_errors: true
+    - name: TC12 - run sql query with an invalid value of sql
+      when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+      block:
+        - name: TC12 run sql query module with a invalid value of sql
+          ibmi_sql_query:
+            sql: abcdefg
+          register: sql_query_result_6
+          ignore_errors: true
 
-    - name: TC12 assert the previous task failed because lacks of required parameter sql
-      assert:
-        that:
-          - sql_query_result_6.rc != 0
+        - name: TC12 assert the previous task failed because lacks of required parameter sql
+          assert:
+            that:
+              - sql_query_result_6.rc != 0
     
-    - name: TC13 run sql query with a valid sql and an invalid expected_row_count
-      ibmi_sql_query:
-        sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
-        expected_row_count: abc
-      register: sql_query_result_7
-      ignore_errors: true
+    - name: TC13 - run sql query with an invalid expected_row_count
+      when: (tc_execute is not defined or 'TC13' in tc_execute) and 'TC13' not in (tc_skip | default([]))
+      block:
+        - name: TC13 run sql query with a valid sql and an invalid expected_row_count
+          ibmi_sql_query:
+            sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
+            expected_row_count: abc
+          register: sql_query_result_7
+          ignore_errors: true
 
-    - name: TC13 assert the previous task failed because of invalid value of expected_row_count
-      assert:
-        that:
-          - "'we were unable to convert to int' in sql_query_result_7.msg"
+        - name: TC13 assert the previous task failed because of invalid value of expected_row_count
+          assert:
+            that:
+              - "'we were unable to convert to int' in sql_query_result_7.msg"
 
-    - name: TC14 run sql query module with a valid sql and a wrong expected_row_count
-      ibmi_sql_query:
-        sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
-        expected_row_count: 10
-      register: sql_query_result_4
-      ignore_errors: true
+    - name: TC14 - run sql query with a wrong expected_row_count
+      when: (tc_execute is not defined or 'TC14' in tc_execute) and 'TC14' not in (tc_skip | default([]))
+      block:
+        - name: TC14 run sql query module with a valid sql and a wrong expected_row_count
+          ibmi_sql_query:
+            sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
+            expected_row_count: 10
+          register: sql_query_result_4
+          ignore_errors: true
 
-    - name: TC14 assert the returned parameters
-      assert:
-        that: 
-          - "'Unexpected row count returned'in sql_query_result_4.msg"
+        - name: TC14 assert the returned parameters
+          assert:
+            that: 
+              - "'Unexpected row count returned'in sql_query_result_4.msg"
     
-    - name: TC15 run sql query module with valid sql, expected_row_count and an invalid option abc
-      ibmi_sql_query:
-        sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
-        expected_row_count: 1
-        invalid_opt: 123
-      register: sql_query_result_8
-      ignore_errors: true
+    - name: TC15 - run sql query with an invalid option
+      when: (tc_execute is not defined or 'TC15' in tc_execute) and 'TC15' not in (tc_skip | default([]))
+      block:
+        - name: TC15 run sql query module with valid sql, expected_row_count and an invalid option abc
+          ibmi_sql_query:
+            sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
+            expected_row_count: 1
+            invalid_opt: 123
+          register: sql_query_result_8
+          ignore_errors: true
 
-    - name: TC15 assert the previous task failed because lacks of required parameter cmd
-      assert:
-        that:
-          - "'Unsupported parameters' in sql_query_result_8.msg"
+        - name: TC15 assert the previous task failed because lacks of required parameter cmd
+          assert:
+            that:
+              - "'Unsupported parameters' in sql_query_result_8.msg"
     
-    - name: TC16 run sql execute without sql option
-      ibmi_sql_execute:
-      register: ibmi_sql_execute_3
-      ignore_errors: true
+    - name: TC16 - run sql execute without sql option
+      when: (tc_execute is not defined or 'TC16' in tc_execute) and 'TC16' not in (tc_skip | default([]))
+      block:
+        - name: TC16 run sql execute without sql option
+          ibmi_sql_execute:
+          register: ibmi_sql_execute_3
+          ignore_errors: true
 
-    - name: TC16 assert the previous task failed because lacks of required parameter sql
-      assert:
-        that:
-          - "'missing required arguments: sql' in ibmi_sql_execute_3.msg"
+        - name: TC16 assert the previous task failed because lacks of required parameter sql
+          assert:
+            that:
+              - "'missing required arguments: sql' in ibmi_sql_execute_3.msg"
     
-    - name: TC17 run sql execute with a invalid valud of sql option
-      ibmi_sql_execute:
-        sql: abcdefg
-      register: ibmi_sql_execute_4
-      ignore_errors: true
+    - name: TC17 - run sql execute with an invalid value of sql
+      when: (tc_execute is not defined or 'TC17' in tc_execute) and 'TC17' not in (tc_skip | default([]))
+      block:
+        - name: TC17 run sql execute with a invalid valud of sql option
+          ibmi_sql_execute:
+            sql: abcdefg
+          register: ibmi_sql_execute_4
+          ignore_errors: true
 
-    - name: TC17 assert the previous task failed because lacks of required parameter sql
-      assert:
-        that:
-          - ibmi_sql_execute_4.rc != 0 
+        - name: TC17 assert the previous task failed because lacks of required parameter sql
+          assert:
+            that:
+              - ibmi_sql_execute_4.rc != 0 
     
-    - name: TC18 run sql execute module with valid sql, expected_row_count and an invalid option abc
-      ibmi_sql_execute:
-        sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
-        invalid_opt: 123
-      register: ibmi_sql_execute_5
-      ignore_errors: true
+    - name: TC18 - run sql execute with an invalid option
+      when: (tc_execute is not defined or 'TC18' in tc_execute) and 'TC18' not in (tc_skip | default([]))
+      block:
+        - name: TC18 run sql execute module with valid sql, expected_row_count and an invalid option abc
+          ibmi_sql_execute:
+            sql: "SELECT * FROM QSYS2.SYSTEM_STATUS_INFO" 
+            invalid_opt: 123
+          register: ibmi_sql_execute_5
+          ignore_errors: true
 
-    - name: TC18 assert the previous task failed because an invalid option
-      assert:
-        that:
-          - "'Unsupported parameters' in ibmi_sql_execute_5.msg"
+        - name: TC18 assert the previous task failed because an invalid option
+          assert:
+            that:
+              - "'Unsupported parameters' in ibmi_sql_execute_5.msg"
 
     - include_tasks: iasp.yml
+      when: >
+        tc_execute is not defined or
+        tc_execute | select('match', '^TC(1[9-9]|2[0-7])$') | list | length > 0
   vars:
-    required_rpms: [itoolkit, ibm_db]
+    required_rpms: [itoolkit, pyodbc]
 #    python_version: "{{ansible_python_interpreter.split('/')[-1]}}"   
 
   always:

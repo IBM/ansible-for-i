@@ -3,8 +3,6 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-# TODO: Incorporate more extensive testing with parameters asp_group and is_cmd5250
-#
 
 - name: cleanup environment
   ibmi_cl_command:
@@ -12,176 +10,217 @@
     joblog: true
   ignore_errors: true
 
-- name: TC01 run CL command module with joblog = False
-  ibmi_cl_command:
-    cmd: crtlib lib(ansible1)
-    joblog: false
-  register: crtlib_result
+# ─── TC01 ────────────────────────────────────────────────────────────────────
+- name: TC01 - Run CL command with joblog=False
+  when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+  block:
+    - name: TC01 run CL command module with joblog = False
+      ibmi_cl_command:
+        cmd: crtlib lib(ansible1)
+        joblog: false
+      register: crtlib_result
 
-- name: TC01 assert the returned parameters when joblog
-  assert:
-    that: 
-      - "'CPF2110' not in crtlib_result"
-      - crtlib_result.joblog == False
-      - crtlib_result.cmd != ""
-      - crtlib_result.stderr == ""
-      - crtlib_result.stderr_lines == []
-      - crtlib_result.rc == 0 
+    - name: TC01 assert the returned parameters when joblog
+      assert:
+        that:
+          - "'CPF2110' not in crtlib_result"
+          - crtlib_result.joblog == False
+          - crtlib_result.cmd != ""
+          - crtlib_result.stderr == ""
+          - crtlib_result.stderr_lines == []
+          - crtlib_result.rc == 0
 
-- name: TC02 run CL command module without joblog
-  ibmi_cl_command:
-    cmd: DSPLIB ansible1
-    joblog: true
-  register: dsplib_result_1
+# ─── TC02 ────────────────────────────────────────────────────────────────────
+- name: TC02 - Run CL command with joblog=True (display library)
+  when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+  block:
+    - name: TC02 run CL command module without joblog
+      ibmi_cl_command:
+        cmd: DSPLIB ansible1
+        joblog: true
+      register: dsplib_result_1
 
-- name: TC02 assert returned parameters without joblog
-  assert:
-    that:
-      - dsplib_result_1.joblog == true 
-      - dsplib_result_1.cmd == "DSPLIB ansible1"
-      - dsplib_result_1.stderr == ""
-      - dsplib_result_1.stderr_lines == []
-      - dsplib_result_1.rc == 0
-      - dsplib_result_1.job_log == [] 
+    - name: TC02 assert returned parameters without joblog
+      assert:
+        that:
+          - dsplib_result_1.joblog == true
+          - dsplib_result_1.cmd == "DSPLIB ansible1"
+          - dsplib_result_1.stderr == ""
+          - dsplib_result_1.stderr_lines == []
+          - dsplib_result_1.rc == 0
+          - dsplib_result_1.job_log == []
 
-- name: TC03 run CL command module with joblog = true
-  ibmi_cl_command:
-    cmd: dltlib lib(ansible1)
-    joblog: true
-  register: dltlib_result_1
+# ─── TC03 ────────────────────────────────────────────────────────────────────
+- name: TC03 - Run CL command with joblog=True (delete library)
+  when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+  block:
+    - name: TC03 run CL command module with joblog = true
+      ibmi_cl_command:
+        cmd: dltlib lib(ansible1)
+        joblog: true
+      register: dltlib_result_1
 
-# Test output parameters
-- name: TC03 assert returned parameters with joblog = true
-  assert:
-    that:
-      - dltlib_result_1.joblog == true
-      - dltlib_result_1.cmd == "dltlib lib(ansible1)"
-      - dltlib_result_1.stderr == ""
-      - dltlib_result_1.stderr_lines == []
-      - dltlib_result_1.rc == 0
-      - dltlib_result_1.job_log != [] 
+    - name: TC03 assert returned parameters with joblog = true
+      assert:
+        that:
+          - dltlib_result_1.joblog == true
+          - dltlib_result_1.cmd == "dltlib lib(ansible1)"
+          - dltlib_result_1.stderr == ""
+          - dltlib_result_1.stderr_lines == []
+          - dltlib_result_1.rc == 0
+          - dltlib_result_1.job_log != []
 
-- name: TC04 run CL command module to delete an not existing module
-  ibmi_cl_command:
-    cmd: dltlib lib(ansible1)
-    joblog: True
-  register: dltlib_result_2
-  ignore_errors: True
+# ─── TC04 ────────────────────────────────────────────────────────────────────
+- name: TC04 - Run CL command to delete a non-existing library (expected failure)
+  when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+  block:
+    - name: TC04 run CL command module to delete a non-existing library
+      ibmi_cl_command:
+        cmd: dltlib lib(ansible1)
+        joblog: true
+      register: dltlib_result_2
+      ignore_errors: true
 
-- name: TC04 assert returned parameters with joblog = True
-  assert:
-    that:
-      - dltlib_result_2.job_log != []
-      - dltlib_result_2.stderr != ""
-      - (dltlib_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length) >= 1
-      - dltlib_result_2.rc != 0
+    - name: TC04 assert returned parameters with joblog = True
+      assert:
+        that:
+          - dltlib_result_2.job_log != []
+          - dltlib_result_2.stderr != ""
+          - (dltlib_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length) >= 1
+          - dltlib_result_2.rc != 0
 
-- name: TC05 run CL command module without any options
-  ibmi_cl_command:
-  register: crtlib_result_2
-  ignore_errors: True
+# ─── TC05 ────────────────────────────────────────────────────────────────────
+- name: TC05 - Run CL command module without any options (expected failure)
+  when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+  block:
+    - name: TC05 run CL command module without any options
+      ibmi_cl_command:
+      register: crtlib_result_2
+      ignore_errors: true
 
-- name: TC05 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - "'missing required arguments: cmd' in crtlib_result_2.msg"
+    - name: TC05 assert the previous task failed because lacks of required parameter cmd
+      assert:
+        that:
+          - "'missing required arguments: cmd' in crtlib_result_2.msg"
 
-- name: TC06 run CL command with joblog but without cmd
-  ibmi_cl_command:
-    joblog: True
-  register: crtlib_result_3
-  ignore_errors: True
+# ─── TC06 ────────────────────────────────────────────────────────────────────
+- name: TC06 - Run CL command with joblog but without cmd (expected failure)
+  when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+  block:
+    - name: TC06 run CL command with joblog but without cmd
+      ibmi_cl_command:
+        joblog: true
+      register: crtlib_result_3
+      ignore_errors: true
 
-- name: TC06 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - "'missing required arguments: cmd' in crtlib_result_2.msg"
+    - name: TC06 assert the previous task failed because lacks of required parameter cmd
+      assert:
+        that:
+          - "'missing required arguments: cmd' in crtlib_result_3.msg"
 
-- name: TC07 run CL command module with an invalid command and joblog=False
-  ibmi_cl_command:
-    cmd: abcdefg
-    joblog: False
-  register: crtlib_result_4
-  ignore_errors: True
+# ─── TC07 ────────────────────────────────────────────────────────────────────
+- name: TC07 - Run CL command with an invalid command and joblog=False (expected failure)
+  when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+  block:
+    - name: TC07 run CL command module with an invalid command and joblog=False
+      ibmi_cl_command:
+        cmd: abcdefg
+        joblog: false
+      register: crtlib_result_4
+      ignore_errors: true
 
-- name: TC07 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - crtlib_result_4.stderr != ""
-      - (crtlib_result_4.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0030') | map(attribute='MESSAGE_ID') | list | length) >= 1
+    - name: TC07 assert the previous task failed with invalid command
+      assert:
+        that:
+          - crtlib_result_4.stderr != ""
+          - (crtlib_result_4.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0030') | map(attribute='MESSAGE_ID') | list | length) >= 1
 
-- name: TC08 run CL command module with an invalid command and joblog = True
-  ibmi_cl_command:
-    cmd: abcdefg
-    joblog: True
-  register: crtlib_result_5
-  ignore_errors: True
+# ─── TC08 ────────────────────────────────────────────────────────────────────
+- name: TC08 - Run CL command with an invalid command and joblog=True (expected failure)
+  when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+  block:
+    - name: TC08 run CL command module with an invalid command and joblog = True
+      ibmi_cl_command:
+        cmd: abcdefg
+        joblog: true
+      register: crtlib_result_5
+      ignore_errors: true
 
-- name: TC08 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - crtlib_result_5.stderr != ""
-      - (crtlib_result_5.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0030') | map(attribute='MESSAGE_ID') | list | length) >= 1
+    - name: TC08 assert the previous task failed with invalid command
+      assert:
+        that:
+          - crtlib_result_5.stderr != ""
+          - (crtlib_result_5.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0030') | map(attribute='MESSAGE_ID') | list | length) >= 1
 
-- name: TC09 run CL command module with a valid command and an invalid joblog value
-  ibmi_cl_command:
-    cmd: dsplib ansible1
-    joblog: abcdefg
-  register: dsplib_result_2
-  ignore_errors: True
+# ─── TC09 ────────────────────────────────────────────────────────────────────
+- name: TC09 - Run CL command with a valid command and an invalid joblog value (expected failure)
+  when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+  block:
+    - name: TC09 run CL command module with a valid command and an invalid joblog value
+      ibmi_cl_command:
+        cmd: dsplib ansible1
+        joblog: abcdefg
+      register: dsplib_result_2
+      ignore_errors: true
 
-- name: TC09 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - "'is not a valid boolean' in dsplib_result_2.msg"
+    - name: TC09 assert the previous task failed because joblog value is not a valid boolean
+      assert:
+        that:
+          - "'is not a valid boolean' in dsplib_result_2.msg"
 
-- name: TC10 run CL command module with valid cmd, joblog=True and an invalid option abc
-  ibmi_cl_command:
-    cmd: dsplib ansible1
-    joblog: True
-    invalid_opt: 123
-  register: dsplib_result_3
-  ignore_errors: True
+# ─── TC10 ────────────────────────────────────────────────────────────────────
+- name: TC10 - Run CL command with an unsupported parameter (expected failure)
+  when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+  block:
+    - name: TC10 run CL command module with valid cmd, joblog=True and an invalid option
+      ibmi_cl_command:
+        cmd: dsplib ansible1
+        joblog: true
+        invalid_opt: 123
+      register: dsplib_result_3
+      ignore_errors: true
 
-- name: TC10 assert the previous task failed because lacks of required parameter cmd
-  assert:
-    that:
-      - "'Unsupported parameters' in dsplib_result_3.msg"
+    - name: TC10 assert the previous task failed because of unsupported parameter
+      assert:
+        that:
+          - "'Unsupported parameters' in dsplib_result_3.msg"
 
-- name: TC11 Run CL command DSPLIBL with OUTPUT parameter
-  ibmi_cl_command:
-    cmd: DSPLIBL
-  register: dsplibl_result_1
+# ─── TC11 ────────────────────────────────────────────────────────────────────
+- name: TC11 - Run CL command DSPLIBL with OUTPUT parameter
+  when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+  block:
+    - name: TC11 Run CL command DSPLIBL with OUTPUT parameter
+      ibmi_cl_command:
+        cmd: DSPLIBL
+      register: dsplibl_result_1
 
-# Test output parameters
-- name: TC11 assert returned parameters
-  assert:
-    that:
-      - dsplibl_result_1.joblog == false
-      - dsplibl_result_1.cmd == "DSPLIBL"
-      - dsplibl_result_1.stderr == ""
-      - dsplibl_result_1.stderr_lines == []
-      - dsplibl_result_1.rc == 0
-      - dsplibl_result_1.job_log == [] 
-      - dsplibl_result_1.stdout != ""
+    - name: TC11 assert returned parameters
+      assert:
+        that:
+          - dsplibl_result_1.joblog == false
+          - dsplibl_result_1.cmd == "DSPLIBL"
+          - dsplibl_result_1.stderr == ""
+          - dsplibl_result_1.stderr_lines == []
+          - dsplibl_result_1.rc == 0
+          - dsplibl_result_1.job_log == []
+          - dsplibl_result_1.stdout != ""
 
-- name: TC11 run CL command DSPLIBL with OUTPUT parameter and joblog=True
-  ibmi_cl_command:
-    cmd: DSPLIBL OUTPUT(*)
-    joblog: True
-  register: dsplibl_result_2
-  ignore_errors: True
+    - name: TC11 run CL command DSPLIBL with OUTPUT parameter and joblog=True
+      ibmi_cl_command:
+        cmd: DSPLIBL OUTPUT(*)
+        joblog: true
+      register: dsplibl_result_2
+      ignore_errors: true
 
-# Test output parameters
-- name: TC11 assert returned parameters
-  assert:
-    that:
-      - dsplibl_result_2.joblog == true
-      - dsplibl_result_2.cmd == "DSPLIBL OUTPUT(*)"
-      - dsplibl_result_2.stderr == ""
-      - dsplibl_result_2.stderr_lines == []
-      - dsplibl_result_2.rc == 0
-      - dsplibl_result_2.stdout != ""
+    - name: TC11 assert returned parameters with joblog=True
+      assert:
+        that:
+          - dsplibl_result_2.joblog == true
+          - dsplibl_result_2.cmd == "DSPLIBL OUTPUT(*)"
+          - dsplibl_result_2.stderr == ""
+          - dsplibl_result_2.stderr_lines == []
+          - dsplibl_result_2.rc == 0
+          - dsplibl_result_2.stdout != ""
 
 # TODO: iasp testing. Need to create iasps for following include (see ibmi_iasp test set up).
 #- include: iasp.yml

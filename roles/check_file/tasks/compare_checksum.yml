@@ -10,7 +10,7 @@
 
 - name: Compose same_name
   ansible.builtin.set_fact:
-    same_name: true
+    check_file_same_name: true
 
 - name: Set check_file_same_files to false when checksum are not the same
   ansible.builtin.set_fact:

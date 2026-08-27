@@ -106,9 +106,9 @@ EXAMPLES = r'''
       - '5733SC1'
     src: '{{ fix_install_path }}'
     apply_type: '*DLYALL'
-    hiper_only: False
-    use_temp_path: True
-    rollback: True
+    hiper_only: false
+    use_temp_path: true
+    rollback: true
     virtual_image_name_list:
       - 'S2018V01.BIN'
     fix_omit_list:
@@ -215,7 +215,6 @@ need_action_ptf_list:
 '''
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
 
 import datetime
 import re
@@ -227,7 +226,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -477,7 +476,7 @@ def return_fix_information(db_connection, product_id, start_timestamp, end_times
 
     sql = sql + where_product_id
 
-    out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
+    out_result_set, err = db2i_tools.db2_sql_query(db_connection, sql)
 
     out = []
     if (out_result_set is not None):
@@ -486,8 +485,9 @@ def return_fix_information(db_connection, product_id, start_timestamp, end_times
                           "PTF_LOADED_STATUS": result[2], "PTF_SAVE_FILE": result[3],
                           "PTF_IPL_ACTION": result[4], "PTF_ACTION_PENDING": result[5],
                           "PTF_ACTION_REQUIRED": result[6], "PTF_IPL_REQUIRED": result[7],
-                          "PTF_STATUS_TIMESTAMP": result[8],
-                          "PTF_CREATION_TIMESTAMP": result[9], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[10]
+                          "PTF_STATUS_TIMESTAMP": str(result[8]) if result[8] is not None else None,
+                          "PTF_CREATION_TIMESTAMP": str(result[9]) if result[9] is not None else None,
+                          "PTF_TEMPORARY_APPLY_TIMESTAMP": str(result[10]) if result[10] is not None else None
                           }
             out.append(result_map)
     return out, err
@@ -501,7 +501,7 @@ def generate_object_name(db_connection, lib_name, type_name, obj_name_prefix):
         obj_stats_expression = "SELECT COUNT(*) " \
                                " FROM TABLE (QSYS2.OBJECT_STATISTICS('" + lib_name + "','" + type_name + "','"\
                                + cur_name + "')) X "
-        out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, obj_stats_expression)
+        out_result_set, err = db2i_tools.db2_sql_query(db_connection, obj_stats_expression)
         if err is None:
             if out_result_set[0][0] != 0:
                 i = i + 1
@@ -553,6 +553,10 @@ def main():
                                      become_user_password=become_user_password)
 
     db_conn = ibmi_module.get_connection()
+    if db_conn is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        module.fail_json(msg='No database connection available'
+                         + (': ' + conn_err if conn_err else ''))
 
     catalog_name = generate_object_name(db_conn, "QUSRSYS", "*IMGCLG", "ANSIBCLG")
     dev_name = generate_object_name(db_conn, "QSYS", "*DEVD", "ANSIBOPT")

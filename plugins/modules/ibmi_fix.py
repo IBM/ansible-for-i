@@ -264,14 +264,13 @@ load_fail_dict:
 '''
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
 
 import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_tools
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -389,7 +388,7 @@ def return_fix_information(db_connection, product_id, ptf_list):
         where_product_id = " AND UPPER(PTF_PRODUCT_ID) = UPPER('" + product_id + "') "
 
     sql = sql + where_ptf_list + where_product_id
-    out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
+    out_result_set, err = db2i_tools.db2_sql_query(db_connection, sql)
 
     out = []
     not_on_system = []
@@ -400,8 +399,9 @@ def return_fix_information(db_connection, product_id, ptf_list):
                           "PTF_LOADED_STATUS": result[2], "PTF_SAVE_FILE": result[3],
                           "PTF_IPL_ACTION": result[4], "PTF_ACTION_PENDING": result[5],
                           "PTF_ACTION_REQUIRED": result[6], "PTF_IPL_REQUIRED": result[7],
-                          "PTF_STATUS_TIMESTAMP": result[8],
-                          "PTF_CREATION_TIMESTAMP": result[9], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[10]
+                          "PTF_STATUS_TIMESTAMP": str(result[8]) if result[8] is not None else None,
+                          "PTF_CREATION_TIMESTAMP": str(result[9]) if result[9] is not None else None,
+                          "PTF_TEMPORARY_APPLY_TIMESTAMP": str(result[10]) if result[10] is not None else None
                           }
             on_system.append(result[1])
             out.append(result_map)
@@ -459,6 +459,10 @@ def main():
                                      become_user_password=become_user_password)
 
     db_conn = ibmi_module.get_connection()
+    if db_conn is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        module.fail_json(msg='No database connection available'
+                         + (': ' + conn_err if conn_err else ''))
 
     if operation in ['load_and_apply', 'load_only', 'apply_only']:
         operation_bool_map = {'load_and_apply': [False, False], 'load_only': [True, False], 'apply_only': [False, True]}

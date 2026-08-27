@@ -1,5 +1,20 @@
-# Create an iasp using async mode
-- name: create an iasp with all supported options
+# ── Part 1: verify the async submission path ──────────────────────────────────
+# Submit via SBMJOB (synchronous:false).  The module should return rc=0
+# immediately with CPC1221 in stdout.  The batch job will create the IASP
+# when host services are active (QUSRWRK / QBATCH).
+
+# Wait until disk_list[0] is confirmed non-configured before submitting.
+# primary.yml deleted ANSIIASP1 synchronously; CFGDEVASP's underlying
+# disk-release may not be instant, so we gate here.
+- name: wait until disk_list[0] is non-configured before async create
+  ibmi_get_nonconfigure_disks:
+  register: pre_create_disk_result
+  failed_when: false
+  until: disk_list[0] in pre_create_disk_result['disks'].split(' ')
+  retries: 20
+  delay: 30
+
+- name: create primary iasp asynchronously via SBMJOB
   ibmi_iasp:
     name: '{{new_iasp[0]}}'
     operation: 'create'
@@ -7,18 +22,56 @@
     primary_asp: 'abc'
     disks: '{{disk_list[0]}}'
     synchronous: false
-  register: iasp_result
+  register: iasp_async_result
 
-- name: pause a few minutes to wait for the iasp configured
-  pause:
-    minutes: 10
+- name: debug - show submitted job info from async create
+  debug:
+    msg:
+      - "SBMJOB cmd:    {{ iasp_async_result.cmd }}"
+      - "SBMJOB stdout: {{ iasp_async_result.stdout }}"
+      - "rc:            {{ iasp_async_result.rc }}"
 
-- name: display the iasp info
+- name: assert async create returns rc=0 and contains CPC1221 in stdout
+  assert:
+    that:
+      - iasp_async_result.rc == 0
+      - "'CPC1221' in iasp_async_result.stdout"
+      - "'submitted' in iasp_async_result.stdout"
+      - "'CFGDEVASP' in iasp_async_result.cmd"
+      - "'SBMJOB' in iasp_async_result.cmd"
+    fail_msg: >-
+      async create did not return expected SBMJOB submission output.
+      rc={{ iasp_async_result.rc }}, stdout={{ iasp_async_result.stdout }},
+      cmd={{ iasp_async_result.cmd }}
+
+# ── Part 2: wait for the async batch job to finish creating the primary IASP ──
+# Poll display until asp_info is non-empty (IASP created) or we exhaust
+# retries.  The batch job runs CFGDEVASP which takes ~30 s on average.
+- name: wait for async batch job to create primary iasp
+  ibmi_iasp:
+    name: '{{new_iasp[0]}}'
+    operation: 'display'
+  register: iasp_display_result
+  failed_when: false
+  until: iasp_display_result.rc == 0 and iasp_display_result.asp_info | length > 0
+  retries: 40
+  delay: 30
+
+- name: display the primary iasp info
   ibmi_iasp:
     name: '{{new_iasp[0]}}'
     operation: 'display'
   register: iasp_result
 
+- name: assert primary iasp exists
+  assert:
+    that:
+      - iasp_result.rc == 0
+      - iasp_result.asp_info | length == 1
+      - iasp_result.asp_info[0]['ASP_TYPE'] == 'PRIMARY'
+      - iasp_result.asp_info[0]['RESOURCE_NAME'] == new_iasp[0]
+
+# ── Part 3: secondary IASP tests ──────────────────────────────────────────────
 - name: create an secondary iasp
   ibmi_iasp:
     name: '{{new_iasp[1]}}'

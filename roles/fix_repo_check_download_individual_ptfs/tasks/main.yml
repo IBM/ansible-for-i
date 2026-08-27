@@ -2,18 +2,18 @@
 # Tasks file for fix_repo_check_download_individual_ptfs
 - name: Initialize list
   ansible.builtin.set_fact:
-    list: []
+    fix_repo_check_download_individual_ptfs_list: []
 
 - name: Compose list
   ansible.builtin.set_fact:
-    list: "{{ list | default([]) + [{'ptf_id': ptfs_list_parm_var}] }}"
+    fix_repo_check_download_individual_ptfs_list: "{{ fix_repo_check_download_individual_ptfs_list | default([]) + [{'ptf_id': ptfs_list_parm_var}] }}"
   loop: "{{ fix_repo_check_download_individual_ptfs_ptfs_list_parm }}"
   loop_control:
     loop_var: ptfs_list_parm_var
 
 - name: Initialize rc, check_fail_list, record_not_found_list, download_fail_list and download_success_list
   ansible.builtin.set_fact:
-    rc: 0
+    fix_repo_check_download_individual_ptfs_rc: 0
     fix_repo_check_download_individual_ptfs_check_fail_list: []
     fix_repo_check_download_individual_ptfs_record_not_found_list: []
     fix_repo_check_download_individual_ptfs_download_fail_list: []
@@ -23,30 +23,30 @@
   ibm.power_ibmi.ibmi_fix_repo:
     type: "single_ptf"
     action: "find"
-    parameters: "{{ list }}"
+    parameters: "{{ fix_repo_check_download_individual_ptfs_list }}"
     checksum: true
-  register: fix_repo_find_result
+  register: fix_repo_check_download_individual_ptfs_find_result
   delegate_to: "{{ fix_repo_check_download_individual_ptfs_repo_server }}"
 
 - name: Print the individual PTFs information in catalog
   ansible.builtin.debug:
-    var: fix_repo_find_result
+    var: fix_repo_check_download_individual_ptfs_find_result
 
 - name: Perform actions to download PTFs
-  when: fix_repo_find_result.fail_list is defined
+  when: fix_repo_check_download_individual_ptfs_find_result.fail_list is defined
   block:
     - name: Compose be downloaded ptfs list
       ansible.builtin.set_fact:
         fix_repo_check_download_individual_ptfs_record_not_found_list: "{{ fix_repo_check_download_individual_ptfs_record_not_found_list | default([]) +
           [fail_record] }}"
       when: fail_record.db_record == 'FILE_NOT_FOUND' or fail_record.db_record == 'RECORD_NOT_FOUND' or fail_record.db_record == 'MATCH_NOT_FOUND'
-      with_list: "{{ fix_repo_find_result.fail_list }}"
+      with_list: "{{ fix_repo_check_download_individual_ptfs_find_result.fail_list }}"
       loop_control:
         loop_var: fail_record
 
     - name: Compose check_fail_list with error reason
       ansible.builtin.set_fact:
-        fix_repo_check_download_individual_ptfs_check_fail_list: "{{ fix_repo_find_result.fail_list |
+        fix_repo_check_download_individual_ptfs_check_fail_list: "{{ fix_repo_check_download_individual_ptfs_find_result.fail_list |
           difference(fix_repo_check_download_individual_ptfs_record_not_found_list) }}"
 
     - name: Include download_individual_ptfs role to download a list of individual PTFs
@@ -71,7 +71,7 @@
             action: "add"
             checksum: true
             parameters: "{{ fix_repo_check_download_individual_ptfs_download_success_list }}"
-          register: fix_repo_add_result
+          register: fix_repo_check_download_individual_ptfs_add_result
           when: fix_repo_check_download_individual_ptfs_download_success_list != []
           delegate_to: "{{ fix_repo_check_download_individual_ptfs_repo_server }}"
 
@@ -99,7 +99,7 @@
             msg: "No ptf is successfully downloaded"
 
 - name: Note if no failures
-  when: fix_repo_find_result.fail_list is not defined
+  when: fix_repo_check_download_individual_ptfs_find_result.fail_list is not defined
   block:
     - name: End play when no ptf need to download
       ansible.builtin.debug:
@@ -109,7 +109,7 @@
   ibm.power_ibmi.ibmi_fix_repo:
     type: "single_ptf"
     action: "find"
-    parameters: "{{ list }}"
+    parameters: "{{ fix_repo_check_download_individual_ptfs_list }}"
     checksum: true
   register: fix_repo_check_download_individual_ptfs_final_find_result
   delegate_to: "{{ fix_repo_check_download_individual_ptfs_repo_server }}"

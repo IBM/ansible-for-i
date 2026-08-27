@@ -5,9 +5,11 @@ __metaclass__ = type
 import datetime
 import binascii
 import sys
+from decimal import Decimal
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
+HAS_PYODBC = True
+HAS_DIRECT_TRANSPORT = False
 
 try:
     from itoolkit import iToolKit
@@ -19,19 +21,40 @@ try:
     from itoolkit import iData
     from itoolkit import iDS
     from itoolkit.transport import DatabaseTransport as BaseDatabaseTransport
+    from itoolkit.transport import DirectTransport
 
     class DatabaseTransport(BaseDatabaseTransport):
         def _close(self):
             """Don't close connection, we'll manage it ourselves"""
             pass
 
+    HAS_DIRECT_TRANSPORT = True
+
 except ImportError:
     HAS_ITOOLKIT = False
 
 try:
-    import ibm_db_dbi as dbi
+    import pyodbc
+    HAS_PYODBC = True
 except ImportError:
-    HAS_IBM_DB = False
+    HAS_PYODBC = False
+
+# Map pyodbc SQL type constants to match prior ibm_db_dbi behavior
+# pyodbc uses different type constants, so we create compatibility mappings
+if HAS_PYODBC:
+    # String types
+    STRING = str
+    TEXT = str
+    XML = str
+    BINARY = bytes
+    # Numeric types
+    NUMBER = int
+    FLOAT = float
+    DECIMAL = float
+    # Date/Time types
+    DATE = str
+    TIME = str
+    DATETIME = str
 
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
@@ -159,38 +182,58 @@ class IBMiModule(object):
     def __init__(self, db_name=ibmi_util.SYSBAS, become_user_name=None, become_user_password=None):
         self.ibmi_logon = None
         self.conn = None
+        self.conn_error = None
+        self.direct_transport = None
+        self.db_name = db_name
         self.startd = datetime.datetime.now()
 
         if not HAS_ITOOLKIT:
             raise ImportError("itoolkit package is required.")
-        if not HAS_IBM_DB:
-            raise ImportError("ibm_db package is required.")
+        if not HAS_PYODBC:
+            raise ImportError("pyodbc package is required.")
         re_raise = False  # workaround to pass the raise-missing-from pylint issue
         exp_msg = ''
         try:
             ssh_client, ssh_connection, user, login = ibmi_util.get_ssh_client_and_user_info()
             ibmi_util.log_info(
                 f"ssh client: {ssh_client}, ssh connection: {ssh_connection}, login name: {user}, user: {login}")
+            # Build the connection string using the default local DSN.
+            # For IASP, Database= sets the ASP context for SQL queries at connect time
+            # (before the SQL thread is active); it does not affect CL command execution.
+            conn_str = "DSN=*LOCAL;CCSID=1208;"
             if db_name != ibmi_util.SYSBAS:
-                self.conn = dbi.connect(database=f'{db_name}')
-            else:
-                self.conn = dbi.connect()
+                conn_str = f"DSN=*LOCAL;CCSID=1208;Database={db_name};"
+            self.conn = pyodbc.connect(conn_str)
             job_name_info = self.get_current_job_name()
             ibmi_util.log_info(
                 f"Job of the connection to execute the task: {job_name_info}", "Connection Initialization")
         except Exception as inst:
             ibmi_util.log_info("Exception occured during IBMiModule _init_: " + str(inst))
             self.close_db_connection()
-            re_raise = True
-            exp_msg = f"Fail to connect to database {db_name}: {inst}."
-            if db_name != ibmi_util.SYSBAS:
-                exp_msg = exp_msg + f" Check if IASP {db_name} is exist and varied on."
+            # Fall back to DirectTransport when pyodbc.connect() fails, so that CL
+            # commands still work when the *DATABASE host server is unavailable.
+            # - For *SYSBAS: runs CL commands with no ASP group (normal *SYSBAS context).
+            # - For IASP: runs CL commands with SETASPGRP prepended in the same call,
+            #   providing the same IASP context as Database= would have given.
+            # become_user always requires DatabaseTransport (QSYGETPH/QWTSETP), so that
+            # case still raises regardless of db_name.
+            if (not become_user_name
+                    and HAS_DIRECT_TRANSPORT):
+                self.direct_transport = DirectTransport()
+                self.conn_error = str(inst)
+                ibmi_util.log_info(
+                    "pyodbc connect failed; using DirectTransport fallback: " + str(inst))
             else:
-                exp_msg = exp_msg + \
-                    "Possible reasons and solutions are:" + \
-                    "1. If the *LOCAL Relational Database Directory Entry(RDBDIRE) does not exist, create it. " + \
-                    "2. Apply the latest Cumulative PTF packages. " + \
-                    "3. Upgrade the Open Source package python3-ibm_db to latest version."
+                re_raise = True
+                exp_msg = f"Fail to connect to database {db_name}: {inst}."
+                if db_name != ibmi_util.SYSBAS:
+                    exp_msg = exp_msg + f" Check if IASP {db_name} is exist and varied on."
+                else:
+                    exp_msg = exp_msg + \
+                        "Possible reasons and solutions are:" + \
+                        "1. If the *LOCAL Relational Database Directory Entry(RDBDIRE) does not exist, create it. " + \
+                        "2. Apply the latest Cumulative PTF packages. " + \
+                        "3. Upgrade the Open Source package pyodbc to latest version."
         if re_raise:
             raise Exception(exp_msg)
 
@@ -234,9 +277,13 @@ class IBMiModule(object):
         self.close_db_connection()
 
     def itoolkit_get_job_log(self, time):
+        if not self.conn:
+            return []
         return self.get_job_log('*', str(time))
 
     def itoolkit_get_job_log_NLS(self, time):
+        if not self.conn:
+            return []
         # retreive current job ccsid
         rc, out, error = self.itoolkit_run_rtv_command('RTVJOBA', {'CCSID': 'number', 'DFTCCSID': 'number'})
         if rc:
@@ -282,8 +329,82 @@ class IBMiModule(object):
         job_log = self.get_job_log('*', self.startd)
         return rc, out_list, error, job_log
 
+    def _itoolkit_run_cl_with_direct(self, command, asp_name=None):
+        '''Run a CL command via DirectTransport (DB-server-down fallback).
+
+        Used when self.conn is None because the *DATABASE host server was unavailable
+        at init time.  When a SQL connection is available, DatabaseTransport is always
+        preferred — for IASP, Database= at connect time already sets ASPGRP correctly.
+
+        Uses a single stateless XMLSERVICE call containing:
+          1. RTVJOBA JOB(?) USER(?) NBR(?) — captures the execution job name
+          2. SETASPGRP ASPGRP({asp_name})  — only when asp_name is provided (IASP fallback)
+          3. The user CL command
+
+        With ipc='*na' (stateless), SETASPGRP and the command must be in the same
+        tk.call() — ASP group state does not persist between calls.
+
+        If SETASPGRP fails (e.g. IASP not varied on), the whole call is treated as an
+        error rather than running the command in the wrong ASP context.
+
+        Returns (rc, out, err, xmlsvc_job_name) where xmlsvc_job_name is the
+        number/user/name triple of the job that ran the command, or None.
+        '''
+        itool = iToolKit(iparm=0, iret=0, ids=1, irow=0)
+        itransport = self.direct_transport
+
+        # Capture the execution job identity in this same call so the caller can
+        # query the correct job log afterward (job log unavailable when conn is None,
+        # but the name is captured in case a future path has a SQL connection).
+        itool.add(iCmd('rtvjoba', 'RTVJOBA JOB(?) USER(?) NBR(?)'))
+
+        if asp_name:
+            itool.add(iCmd('setaspgrp', f'SETASPGRP ASPGRP({asp_name})'))
+
+        itool.add(iCmd('command', command))
+        itool.call(itransport)
+
+        # Parse execution job name
+        rtvjoba = itool.dict_out('rtvjoba')
+        xmlsvc_job_name = None
+        if 'success' in rtvjoba:
+            nbr = rtvjoba.get('NBR', '').strip()
+            user = rtvjoba.get('USER', '').strip()
+            job = rtvjoba.get('JOB', '').strip()
+            if nbr and user and job:
+                xmlsvc_job_name = f'{nbr}/{user}/{job}'
+
+        # If SETASPGRP was requested but failed, the command ran without the correct
+        # ASP context — treat the whole call as an error.
+        if asp_name:
+            setasp_out = itool.dict_out('setaspgrp')
+            if 'success' not in setasp_out:
+                ibmi_util.log_debug("SETASPGRP failed: " + str(setasp_out))
+                return (ibmi_util.IBMi_COMMAND_RC_ERROR, '',
+                        f'SETASPGRP ASPGRP({asp_name}) failed: {setasp_out}',
+                        xmlsvc_job_name)
+
+        command_output = itool.dict_out('command')
+        ibmi_util.log_debug("command to run: " + str(command))
+        if 'success' in command_output:
+            return ibmi_util.IBMi_COMMAND_RC_SUCCESS, str(command_output), '', xmlsvc_job_name
+        else:
+            return ibmi_util.IBMi_COMMAND_RC_ERROR, '', str(command_output), xmlsvc_job_name
+
     def itoolkit_run_command(self, command):
         '''IBM i XMLSERVICE call *CMD not returning *OUTPUT'''
+        # When self.conn is None the *DATABASE host server was down at init time.
+        # Use DirectTransport fallback:
+        # - *SYSBAS: no SETASPGRP needed.
+        # - IASP: prepend SETASPGRP so commands run in the correct ASP context.
+        # When self.conn is live, always use DatabaseTransport — for IASP the
+        # Database= keyword at connect time already set the correct ASPGRP on
+        # QZDASOINIT, so no SETASPGRP is needed there either.
+        if self.conn is None:
+            asp_name = self.db_name if self.db_name != ibmi_util.SYSBAS else None
+            rc, out, err, _unused = self._itoolkit_run_cl_with_direct(command, asp_name=asp_name)
+            return rc, out, err
+
         itool = iToolKit()
         itransport = DatabaseTransport(self.conn)
         itool.add(iCmd('command', command))
@@ -304,12 +425,25 @@ class IBMiModule(object):
 
     def itoolkit_run_command_once(self, command):
         '''This method equals to itoolkit_run_command and itoolkit_get_job_log'''
+        if self.conn is None:
+            asp_name = self.db_name if self.db_name != ibmi_util.SYSBAS else None
+            rc, out, error, _unused = self._itoolkit_run_cl_with_direct(command, asp_name=asp_name)
+            # No SQL connection available — return empty job log rather than raising.
+            job_log = []
+            return rc, out, error, job_log
+
         rc, out, error = self.itoolkit_run_command(command)
         job_log = self.get_job_log('*', self.startd)
         return rc, out, error, job_log
 
     def itoolkit_run_command5250(self, command):
         '''IBM i XMLSERVICE call 5250 *CMD returning *OUTPUT'''
+        # iCmd5250 uses the 5250 emulation path which requires DatabaseTransport.
+        # If only DirectTransport is available (DB server down), fall back to plain iCmd.
+        if self.conn is None:
+            rc, out, err, _unused = self._itoolkit_run_cl_with_direct(command)
+            return rc, out, err
+
         itool = iToolKit()
         itransport = DatabaseTransport(self.conn)
         if command:
@@ -334,13 +468,17 @@ class IBMiModule(object):
     def itoolkit_run_command5250_once(self, command):
         '''This method equals to itoolkit_run_command5250 and itoolkit_get_job_log'''
         rc, out, error = self.itoolkit_run_command5250(command)
+        if not self.conn:
+            return rc, out, error, []
         job_log = self.get_job_log('*', self.startd)
         return rc, out, error, job_log
 
     def itoolkit_run_rtv_command(self, command, args_dict):
         '''IBM i XMLSERVICE call *CMD with REXX'''
+        # Use DirectTransport only when DB server is down (self.conn is None).
+        # The REXX-style (?) retrieve syntax is supported by DirectTransport.
         itool = iToolKit(iparm=0, iret=0, ids=1, irow=0)
-        itransport = DatabaseTransport(self.conn)
+        itransport = self.direct_transport if self.conn is None else DatabaseTransport(self.conn)
         args = ' '
         for (k, v) in args_dict.items():
             parm = '(?) '
@@ -366,6 +504,8 @@ class IBMiModule(object):
     def itoolkit_run_rtv_command_once(self, command, args_dict):
         '''This method equals to itoolkit_run_rtv_command and itoolkit_get_job_log'''
         rc, out, error = self.itoolkit_run_rtv_command(command, args_dict)
+        if not self.conn:
+            return rc, out, error, []
         job_log = self.get_job_log('*', self.startd)
         return rc, out, error, job_log
 
@@ -373,6 +513,11 @@ class IBMiModule(object):
         '''returns the result list containing maps with column name as key, column value as value'''
         result_list = []
         ibmi_util.log_debug("sql to run: " + str(sql))
+        if self.conn is None:
+            err = 'No database connection available'
+            if self.conn_error:
+                err = err + ': ' + self.conn_error
+            return ibmi_util.IBMi_SQL_RC_ERROR, result_list, err
         try:
             # Already known hex column names
             known_hex_convert_columns = ['MESSAGE_KEY', 'ASSOCIATED_MESSAGE_KEY', 'INTERNAL_JOB_ID']
@@ -393,22 +538,32 @@ class IBMiModule(object):
                     # if not row[col_num]:
                     if row[col_num] is None:
                         row_map[str(k)] = ''
-                    elif col_type in [dbi.STRING, dbi.TEXT, dbi.XML, dbi.BINARY]:
+                    elif col_type in [STRING, TEXT, XML]:
                         try:
                             # Chang Le: convert the string which actually store a hex, like MESSAGE_KEY
+                            if str(k) in hex_convert_columns:
+                                raw = row[col_num].encode() if isinstance(row[col_num], str) else row[col_num]
+                                row_map[str(k)] = binascii.b2a_hex(raw).decode('utf-8').upper()
+                            else:
+                                row_map[str(k)] = str(row[col_num])
+                        except TypeError:
+                            row_map[str(k)] = str(row[col_num])
+                    elif col_type == BINARY or isinstance(row[col_num], bytes):
+                        try:
+                            # Handle binary data (like MESSAGE_KEY)
                             if str(k) in hex_convert_columns:
                                 row_map[str(k)] = binascii.b2a_hex(row[col_num]).decode('utf-8').upper()
                             else:
                                 row_map[str(k)] = str(row[col_num])
                         except TypeError:
                             row_map[str(k)] = str(row[col_num])
-                    elif col_type in [dbi.NUMBER]:
+                    elif col_type in [NUMBER] or isinstance(row[col_num], int):
                         row_map[str(k)] = int(row[col_num])
-                    # elif col_type in [dbi.BIGINT]:
+                    # elif col_type in [BIGINT]:
                     #     row_map[str(k)] = long(row[col_num])
-                    elif col_type in [dbi.FLOAT, dbi.DECIMAL]:
+                    elif col_type in [FLOAT, DECIMAL] or isinstance(row[col_num], (float, Decimal)):
                         row_map[str(k)] = float(row[col_num])
-                    elif col_type in [dbi.DATE, dbi.TIME, dbi.DATETIME]:
+                    elif col_type in [DATE, TIME, DATETIME]:
                         row_map[str(k)] = str(row[col_num])
                     else:
                         row_map[str(k)] = row[col_num]
@@ -431,7 +586,7 @@ class IBMiModule(object):
             column = column + 1
         return results
 
-    def ibm_dbi_sql_query(self, sql):
+    def db2_sql_query(self, sql):
         out = ''
         err = ''
         ibmi_util.log_debug("sql to run: " + str(sql))
@@ -474,7 +629,7 @@ class IBMiModule(object):
                   "MESSAGE_LIBRARY, MESSAGE_TEXT, MESSAGE_SECOND_LEVEL_TEXT " + \
                   "FROM TABLE(QSYS2.JOBLOG_INFO('" + job_name + \
                 "')) A ORDER BY ORDINAL_POSITION DESC"
-        out_result_set, err = self.ibm_dbi_sql_query(sql)
+        out_result_set, err = self.db2_sql_query(sql)
 
         out = []
         if (not out_result_set) and (not err):
@@ -487,7 +642,7 @@ class IBMiModule(object):
                               "MESSAGE_TYPE": result[2],
                               "MESSAGE_SUBTYPE": result[3],
                               "SEVERITY": result[4],
-                              "MESSAGE_TIMESTAMP": result[5],
+                              "MESSAGE_TIMESTAMP": str(result[5]),
                               "FROM_LIBRARY": result[6],
                               "FROM_PROGRAM": result[7],
                               "FROM_MODULE": result[8],
@@ -542,7 +697,7 @@ class IBMiModule(object):
               "JOB_NAME AS FULL_JOB_NAME " \
               "FROM TABLE (QSYS2.ACTIVE_JOB_INFO(JOB_NAME_FILTER => '*')) AS X"
 
-        out_result_set, err = self.ibm_dbi_sql_query(sql)
+        out_result_set, err = self.db2_sql_query(sql)
 
         out = []
         if (not out_result_set) and (not err):
@@ -567,7 +722,7 @@ class IBMiModule(object):
 
     def get_ibmi_release(self):
         sql = "SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO"
-        out_result_set, err = self.ibm_dbi_sql_query(sql)
+        out_result_set, err = self.db2_sql_query(sql)
         release_info = {"version": 7, "release": 0, "version_release": 7.0}
         if (not out_result_set) and (not err):
             err = "Nothing returned for OS version and release."

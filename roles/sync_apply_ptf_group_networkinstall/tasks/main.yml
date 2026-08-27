@@ -6,11 +6,11 @@
     operation: 'setup_only'
     rollback: true
   delegate_to: "{{ sync_apply_ptf_group_networkinstall_src_host }}"
-  register: network_install_server_setuponly_result
+  register: sync_apply_ptf_group_networkinstall_server_setuponly_result
 
 - name: Print network_install_server_setuponly_result
   ansible.builtin.debug:
-    var: network_install_server_setuponly_result
+    var: sync_apply_ptf_group_networkinstall_server_setuponly_result
 
 - name: Add image files to network install env
   ibm.power_ibmi.ibmi_fix_network_install_server:
@@ -19,15 +19,15 @@
     virtual_image_name_list:
       - "{{ sync_apply_ptf_group_networkinstall_ptf_group_info.file_path + '/*ALL' }}"
   delegate_to: "{{ sync_apply_ptf_group_networkinstall_src_host }}"
-  register: network_install_server_rmadd_result
+  register: sync_apply_ptf_group_networkinstall_server_rmadd_result
 
 - name: Print network_install_server_rmadd_result
   ansible.builtin.debug:
-    var: network_install_server_rmadd_result
+    var: sync_apply_ptf_group_networkinstall_server_rmadd_result
 
 - name: Set return value for sync_apply_ptf_group_networkinstall_server_result
   ansible.builtin.set_fact:
-    sync_apply_ptf_group_networkinstall_server_result: "{{ network_install_server_rmadd_result }}"
+    sync_apply_ptf_group_networkinstall_server_result: "{{ sync_apply_ptf_group_networkinstall_server_rmadd_result }}"
 
 - name: Using network install mechanism to install the PTF group on target system
   ibm.power_ibmi.ibmi_fix_network_install_client:

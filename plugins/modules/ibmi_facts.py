@@ -315,7 +315,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 import fnmatch
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def run_module():
@@ -351,39 +351,55 @@ def run_module():
             virtual_facts['version_release'] = system_release_info['version_release']
 
         if fnmatch.fnmatch('system_info', filter):
-            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM SYSIBMADM.ENV_SYS_INFO;")
-            virtual_facts['system_info'] = out[0]
+            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM SYSIBMADM.ENV_SYS_INFO")
+            if rc:
+                raise Exception(f'system_info query failed: {error}')
+            virtual_facts['system_info'] = out[0] if out else {}
 
         if fnmatch.fnmatch('system_values', filter):
-            sql = "SELECT SYSTEM_VALUE_NAME,CURRENT_NUMERIC_VALUE,CURRENT_CHARACTER_VALUE FROM QSYS2.SYSTEM_VALUE_INFO;"
+            sql = "SELECT SYSTEM_VALUE_NAME,CURRENT_NUMERIC_VALUE,CURRENT_CHARACTER_VALUE FROM QSYS2.SYSTEM_VALUE_INFO"
             rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once(sql)
+            if rc:
+                raise Exception(f'system_values query failed: {error}')
             system_values = {}
             for item in out:
                 system_values[item["SYSTEM_VALUE_NAME"]] = item["CURRENT_CHARACTER_VALUE"] if item["CURRENT_CHARACTER_VALUE"] else item["CURRENT_NUMERIC_VALUE"]
             virtual_facts["system_values"] = system_values
 
         if fnmatch.fnmatch('system_catalogs', filter):
-            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.SYSCATALOGS;")
+            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.SYSCATALOGS")
+            if rc:
+                raise Exception(f'system_catalogs query failed: {error}')
             virtual_facts['system_catalogs'] = out
 
         if fnmatch.fnmatch('system_status', filter):
-            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.SYSTEM_STATUS_INFO;")
-            virtual_facts['system_status'] = out[0]
+            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.SYSTEM_STATUS_INFO")
+            if rc:
+                raise Exception(f'system_status query failed: {error}')
+            virtual_facts['system_status'] = out[0] if out else {}
 
         if fnmatch.fnmatch('tcpip_info', filter):
-            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.NETSTAT_INTERFACE_INFO;")
+            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.NETSTAT_INTERFACE_INFO")
+            if rc:
+                raise Exception(f'tcpip_info query failed: {error}')
             virtual_facts['tcpip_info'] = out
 
         if fnmatch.fnmatch('group_ptf_info', filter):
-            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.GROUP_PTF_INFO;")
+            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.GROUP_PTF_INFO")
+            if rc:
+                raise Exception(f'group_ptf_info query failed: {error}')
             virtual_facts['group_ptf_info'] = out
 
         if fnmatch.fnmatch('dns_info', filter):
             rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT CAST(data as VARCHAR(100)) FROM QUSRSYS.QATOCTCPIP WHERE KEYWORD='RMTNAMESV'")
-            virtual_facts['dns_info'] = out[0]['00001'].split()
+            if rc:
+                raise Exception(f'dns_info query failed: {error}')
+            virtual_facts['dns_info'] = list(out[0].values())[0].split() if out else []
 
         if fnmatch.fnmatch('route_info', filter):
-            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.NETSTAT_ROUTE_INFO;")
+            rc, out, error, job_log = ibmi_module.itoolkit_run_sql_once("SELECT * FROM QSYS2.NETSTAT_ROUTE_INFO")
+            if rc:
+                raise Exception(f'route_info query failed: {error}')
             virtual_facts['route_info'] = out
 
         if fnmatch.fnmatch('system_name', filter):

@@ -105,7 +105,7 @@ EXAMPLES = r'''
     object_types: '*PGM *SRVPGM'
     savefile_name: 'archive'
     savefile_lib: 'archlib'
-    force_save: True
+    force_save: true
     target_release: 'V7R2M0'
     become_user: 'USER1'
     become_user_password: 'yourpassword'
@@ -240,7 +240,7 @@ import datetime
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def main():
@@ -271,7 +271,7 @@ def main():
         savefile_lib = module.params['savefile_lib']
         format = module.params['format']
         force_save = module.params['force_save']
-        target_release = module.params['target_release']
+        target_release = module.params['target_release'].strip().upper()
         joblog = module.params['joblog']
         asp_group = module.params['asp_group'].strip().upper()
         parameters = module.params['parameters']
@@ -294,8 +294,8 @@ def main():
         ibmi_util.log_debug("CRTSAVF: " + command, module._name)
         if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
             # SAVOBJ
-            command = f'QSYS/SAVOBJ OBJ({object_names}) LIB({object_lib}) DEV({format}) OBJTYPE({object_types}) \
-                SAVF({savefile_lib}/{savefile_name}) TGTRLS({target_release}) {parameters}'
+            command = (f'QSYS/SAVOBJ OBJ({object_names}) LIB({object_lib}) DEV({format}) OBJTYPE({object_types}) '
+                       f'SAVF({savefile_lib}/{savefile_name}) TGTRLS({target_release}) {parameters}')
             rc, out, error = ibmi_module.itoolkit_run_command(' '.join(command.split()))
         else:
             if 'CPF5813' in str(job_log):
@@ -306,8 +306,8 @@ def main():
                     rc, out, error = ibmi_module.itoolkit_run_command(command)
                     ibmi_util.log_debug("CLRSAVF: " + command, module._name)
                     if rc == ibmi_util.IBMi_COMMAND_RC_SUCCESS:
-                        command = f'QSYS/SAVOBJ OBJ({object_names}) LIB({object_lib}) DEV({format}) OBJTYPE({object_types}) \
-                            SAVF({savefile_lib}/{savefile_name}) TGTRLS({target_release}) {parameters}'
+                        command = (f'QSYS/SAVOBJ OBJ({object_names}) LIB({object_lib}) DEV({format}) OBJTYPE({object_types}) '
+                                   f'SAVF({savefile_lib}/{savefile_name}) TGTRLS({target_release}) {parameters}')
                         rc, out, error = ibmi_module.itoolkit_run_command(' '.join(command.split()))
                 else:
                     out = f'File {savefile_name} in library {savefile_lib} already exists. Set force_save to force save.'

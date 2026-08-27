@@ -73,7 +73,7 @@ EXAMPLES = r'''
   ibm.power_ibmi.ibmi_fix_check:
     groups:
       - "SF12345"
-    validate_certs: False
+    validate_certs: false
 '''
 
 RETURN = r'''
@@ -130,7 +130,7 @@ import time
 import re
 
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/ibm-i-group-ptfs-level"

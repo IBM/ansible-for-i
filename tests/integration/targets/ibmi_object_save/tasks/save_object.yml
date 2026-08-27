@@ -1,260 +1,347 @@
+# save_object.yml — core (non-iASP) test cases for ibmi_object_save
+#
+# TC IDs: TC01–TC21
+# Setup tasks (library creation, restore seed) always run — they are not gated
+# by tc_execute so the libraries exist for whichever TCs are selected.
+#
+# Execute/skip list usage (inherited from main.yml):
+#   tc_execute: optional list — only listed TCs run.
+#   tc_skip:    optional list — everything else runs.
+#   If neither is defined, all TCs run.
+
 - block:
-    - name: create libraries 
-      ibmi_cl_command: 
+    # ── Setup: create libraries and seed SAVRST with objects ─────────────────
+    - name: Setup - create test libraries
+      ibmi_cl_command:
         cmd: "crtlib lib({{item}})"
-      with_items: 
+      with_items:
         - SAVRST
         - ARCHLIB
 
-    - name: copy file to library
+    - name: Setup - copy save file to ARCHLIB
       command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB/'
-    
-    - name: restore objects to library
+
+    - name: Setup - restore seed objects into SAVRST
       ibmi_object_restore:
         object_lib: 'SAVRST'
         savefile_name: 'IBMISAVF'
         savefile_lib: 'ARCHLIB'
-      register: rstobj_result 
-      #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
+      register: rstobj_result
       failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC01 Save objects with only required options
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-      register: savobj_result
+    # ── TC01 - Save objects with only required options ────────────────────────
+    - name: TC01 - save objects with only required options
+      when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+      block:
+        - name: TC01 - save objects to ARCHLIB (required options only)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+          register: savobj_result
 
-    - name: TC01 assert the returned value of ibmi_object_save
-      assert:
-        that:
-          - savobj_result.start != ''
-          - savobj_result.end != ''
-          - savobj_result.delta != ''
-          - savobj_result.rc == 0
-          - savobj_result.stdout != ''
-          - savobj_result.stdout_lines != ''
+        - name: TC01 - assert returned values
+          assert:
+            that:
+              - savobj_result.start != ''
+              - savobj_result.end != ''
+              - savobj_result.delta != ''
+              - savobj_result.rc == 0
+              - savobj_result.stdout != ''
+              - savobj_result.stdout_lines != ''
 
-    - name: TC01 verify the objects can be restored
-      ibmi_object_restore:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
+        - name: TC01 - verify objects can be restored
+          ibmi_object_restore:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
 
-    - name: TC02 save objects to library with all supported options
-      ibmi_object_save:
-        object_names: "*ALL"
-        object_types: "*ALL"
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVRST7'
-        savefile_lib: 'ARCHLIB'
-        format: "*SAVF"
-        force_save: "true"
-        target_release: "*CURRENT"
-        joblog: 'false'
-        parameters: ''
+    # ── TC02 - Save objects with all supported options ────────────────────────
+    - name: TC02 - save objects with all supported options
+      when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+      block:
+        - name: TC02 - save with all options specified
+          ibmi_object_save:
+            object_names: "*ALL"
+            object_types: "*ALL"
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVRST7'
+            savefile_lib: 'ARCHLIB'
+            format: "*SAVF"
+            force_save: "true"
+            target_release: "*CURRENT"
+            joblog: 'false'
+            parameters: ''
 
-    - name: TC03 Save objects with object_names
-      ibmi_object_save:
-        object_names: "P*"
-        object_types: "*FILE" 
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: "true"
-      register: savobj_result
+    # ── TC03 - Save objects with object_names pattern ─────────────────────────
+    - name: TC03 - save objects with object_names pattern
+      when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+      block:
+        - name: TC03 - save with object_names=P* and object_types=*FILE
+          ibmi_object_save:
+            object_names: "P*"
+            object_types: "*FILE"
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            force_save: "true"
+          register: savobj_result
 
-    - name: TC04 Save objects with multiple object_names
-      ibmi_object_save:
-        object_names: "PGM* A*"
-        object_types: "*ALL" 
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: "true"
-      register: savobj_result
+    # ── TC04 - Save objects with multiple object_names ────────────────────────
+    - name: TC04 - save objects with multiple object_names
+      when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+      block:
+        - name: TC04 - save with object_names="PGM* A*"
+          ibmi_object_save:
+            object_names: "PGM* A*"
+            object_types: "*ALL"
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            force_save: "true"
+          register: savobj_result
 
-    - name: Save objects with object_types
-      ibmi_object_save:
-        object_names: "P*"
-        object_types: "*FILE *JRNRCV"  
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: "true"
-      register: savobj_result
+    # ── TC04B - Save objects with object_types list ───────────────────────────
+    - name: TC04B - save objects with multiple object_types
+      when: (tc_execute is not defined or 'TC04B' in tc_execute) and 'TC04B' not in (tc_skip | default([]))
+      block:
+        - name: TC04B - save with object_types="*FILE *JRNRCV"
+          ibmi_object_save:
+            object_names: "P*"
+            object_types: "*FILE *JRNRCV"
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            force_save: "true"
+          register: savobj_result
 
-    - name: TC05 save objects to library with target_release
-      ibmi_object_save:
-        object_types: "*FILE"
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: "true"
-        target_release: "V7R2M0"
-      register: savobj_result
+    # ── TC05 - Save objects with target_release ───────────────────────────────
+    - name: TC05 - save objects with target_release
+      when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+      block:
+        - name: TC05 - save with target_release=*PRV
+          ibmi_object_save:
+            object_types: "*FILE"
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            force_save: "true"
+            target_release: "*PRV"
+          register: savobj_result
 
-    - name: TC06 save objects to library with parameters
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: "true"
-        parameters: 'ASPDEV(*SYSBAS)'
+    # ── TC06 - Save objects with parameters ──────────────────────────────────
+    - name: TC06 - save objects with parameters
+      when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+      block:
+        - name: TC06 - save with parameters=ASPDEV(*SYSBAS)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            force_save: "true"
+            parameters: 'ASPDEV(*SYSBAS)'
 
-    - name: TC07 save objects to library with joblog
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: "true"
-        joblog: 'true'
+    # ── TC07 - Save objects with joblog=true ──────────────────────────────────
+    - name: TC07 - save objects with joblog enabled
+      when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+      block:
+        - name: TC07 - save with joblog=true
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            force_save: "true"
+            joblog: 'true'
 
-    # Test negative test cases
+    # ── TC08 - Negative: save file already exists (no force_save) ────────────
+    - name: TC08 - neg - save file exists and force_save not set
+      when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+      block:
+        - name: TC08 - save without force_save when SAVTEST already exists (expect CPF5813)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+          register: savobj_result
+          failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF5813') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC08 Save objects with save file only exists
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-      register: savobj_result
-      #failed_when: "'CPF5813' not in savobj_result.stderr"
-      failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF5813') | map(attribute='MESSAGE_ID') | list | length ==0"
+    # ── TC10 - Negative: non-existing object_names ────────────────────────────
+    - name: TC10 - neg - non-existing object_names
+      when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+      block:
+        - name: TC10 - save with object_names=ABC123 (expect CPF3770)
+          ibmi_object_save:
+            object_names: 'ABC123'
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            force_save: 'true'
+            joblog: 'true'
+          register: savobj_result
+          ignore_errors: true
 
-    - name: TC10 save objects with an not-existing object_names
-      ibmi_object_save:
-        object_names: 'ABC123'
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: 'true'
-        joblog: 'true'
-      register: savobj_result
-      ignore_errors: true
+        - name: TC10 - assert returned parameters
+          assert:
+            that:
+              - savobj_result.start != ''
+              - savobj_result.end != ''
+              - savobj_result.delta != ''
+              - savobj_result.rc != 0
+              - savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3770') | map(attribute='MESSAGE_ID') | list | length >=1
+              - savobj_result.stderr != ''
 
-    - name: TC10 assert the returned parameters of ibmi_object_save
-      assert:
-        that:
-          - savobj_result.start != ''
-          - savobj_result.end != ''
-          - savobj_result.delta != ''
-          - savobj_result.rc != 0
-          #- "'CPF3770' in savobj_result.stderr"
-          - savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3770') | map(attribute='MESSAGE_ID') | list | length >=1
-          - savobj_result.stderr != '' 
+    # ── TC11 - Negative: wrong object library ─────────────────────────────────
+    - name: TC11 - neg - wrong object library
+      when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+      block:
+        - name: TC11 - save with object_lib=ABC (expect CPF3781)
+          ibmi_object_save:
+            object_lib: 'ABC'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            force_save: 'true'
+          register: savobj_result
+          failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3781') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC11 save objects to library with wrong library 
-      ibmi_object_save:
-        object_lib: 'ABC'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: 'true'
-      register: savobj_result
-      #failed_when: "'ABC not found' not in savobj_result.stderr"
-      failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3781') | map(attribute='MESSAGE_ID') | list | length ==0"
+    # ── TC12 - Negative: wrong object_types ──────────────────────────────────
+    - name: TC12 - neg - wrong object_types
+      when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+      block:
+        - name: TC12 - save with object_types=ABC (expect CPD0084)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            object_types: 'ABC'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            joblog: 'true'
+            force_save: 'true'
+          register: savobj_result
+          failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC12 save objects to library with wrong object types 
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        object_types: 'ABC'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        joblog: 'true'
-        force_save: 'true'
-      register: savobj_result
-      #failed_when: "'CPD0084' not in savobj_result.stderr" 
-      failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length ==0"
+    # ── TC13 - Negative: wrong format value ──────────────────────────────────
+    - name: TC13 - neg - invalid format value
+      when: (tc_execute is not defined or 'TC13' in tc_execute) and 'TC13' not in (tc_skip | default([]))
+      block:
+        - name: TC13 - save with format=*MEDDFN (expect validation error)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            format: '*MEDDFN'
+            joblog: 'true'
+            force_save: 'true'
+          register: savobj_result
+          failed_when: "'value of format must be one of: *SAVF' not in savobj_result.msg"
 
-    - name: TC13 save objects to library from wrong format
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        format: '*MEDDFN'
-        joblog: 'true'
-        force_save: 'true'
-      register: savobj_result
-      failed_when: "'value of format must be one of: *SAVF' not in savobj_result.msg"
+    # ── TC14 - Negative: wrong joblog value ──────────────────────────────────
+    - name: TC14 - neg - invalid joblog value
+      when: (tc_execute is not defined or 'TC14' in tc_execute) and 'TC14' not in (tc_skip | default([]))
+      block:
+        - name: TC14 - save with joblog=abc (expect boolean error)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            joblog: 'abc'
+            force_save: 'true'
+          register: savobj_result
+          failed_when: "'is not a valid boolean' not in savobj_result.msg"
 
-    - name: TC14 save objects to library with wrong joblog
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        joblog: 'abc'
-        force_save: 'true'
-      register: savobj_result
-      failed_when: "'is not a valid boolean' not in savobj_result.msg"
+    # ── TC15 - Negative: wrong force_save value ───────────────────────────────
+    - name: TC15 - neg - invalid force_save value
+      when: (tc_execute is not defined or 'TC15' in tc_execute) and 'TC15' not in (tc_skip | default([]))
+      block:
+        - name: TC15 - save with force_save=abc (expect boolean error)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            force_save: 'abc'
+          register: savobj_result
+          failed_when: "'is not a valid boolean' not in savobj_result.msg"
 
-    - name: TC15 save objects to library with wrong force_save
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        force_save: 'abc'
-      register: savobj_result
-      failed_when: "'is not a valid boolean' not in savobj_result.msg"
+    # ── TC16 - Negative: wrong target_release value ───────────────────────────
+    - name: TC16 - neg - invalid target_release value
+      when: (tc_execute is not defined or 'TC16' in tc_execute) and 'TC16' not in (tc_skip | default([]))
+      block:
+        - name: TC16 - save with target_release=abc (expect CPD0084)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            target_release: 'abc'
+            joblog: 'true'
+            force_save: 'true'
+          register: savobj_result
+          failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC16 save objects to library with wrong target_release
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        target_release: 'abc'
-        joblog: 'true'
-        force_save: 'true'
-      register: savobj_result
-      #failed_when: "'not valid for parameter TGTRLS' not in savobj_result.stderr"
-      failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length == 0"
+    # ── TC17 - Negative: invalid parameters value ─────────────────────────────
+    - name: TC17 - neg - invalid parameters value
+      when: (tc_execute is not defined or 'TC17' in tc_execute) and 'TC17' not in (tc_skip | default([]))
+      block:
+        - name: TC17 - save with parameters=abc (expect CPF0001)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+            parameters: 'abc'
+            joblog: 'true'
+            force_save: 'true'
+          register: savobj_result
+          failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0001') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-    - name: TC17 save objects with an invalid parameters
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-        parameters: 'abc'
-        joblog: 'true'
-        force_save: 'true'
-      register: savobj_result
-      #failed_when: "'CPF0001' not in savobj_result.stderr"
-      failed_when: "savobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF0001') | map(attribute='MESSAGE_ID') | list | length == 0"
+    # ── TC18 - Negative: unsupported option ───────────────────────────────────
+    - name: TC18 - neg - unsupported option passed
+      when: (tc_execute is not defined or 'TC18' in tc_execute) and 'TC18' not in (tc_skip | default([]))
+      block:
+        - name: TC18 - save with unknown param abc (expect Unsupported parameters)
+          ibmi_object_save:
+            abc: '==-91'
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+          register: savobj_result
+          failed_when: "'Unsupported parameters' not in savobj_result.msg"
 
-    - name: TC18 save objects with an invalid option
-      ibmi_object_save:
-        abc: '==-91'
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-      register: savobj_result
-      failed_when: "'Unsupported parameters' not in savobj_result.msg"
+    # ── TC19 - Negative: missing required option object_lib ───────────────────
+    - name: TC19 - neg - missing required option object_lib
+      when: (tc_execute is not defined or 'TC19' in tc_execute) and 'TC19' not in (tc_skip | default([]))
+      block:
+        - name: TC19 - save without object_lib (expect missing required arguments)
+          ibmi_object_save:
+            savefile_name: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+          register: savobj_result
+          failed_when: "'missing required arguments: object_lib' not in savobj_result.msg"
 
-    - name: TC19 save objects without required options
-      ibmi_object_save:
-        savefile_name: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-      register: savobj_result
-      failed_when: "'missing required arguments: object_lib' not in savobj_result.msg"
+    # ── TC20 - Negative: missing required option savefile_name ────────────────
+    - name: TC20 - neg - missing required option savefile_name
+      when: (tc_execute is not defined or 'TC20' in tc_execute) and 'TC20' not in (tc_skip | default([]))
+      block:
+        - name: TC20 - save without savefile_name (expect missing required arguments)
+          ibmi_object_save:
+            object_lib: 'SAVTEST'
+            savefile_lib: 'ARCHLIB'
+          register: savobj_result
+          failed_when: "'missing required arguments: savefile_name' not in savobj_result.msg"
 
-    - name: TC20 save objects without required options
-      ibmi_object_save:
-        object_lib: 'SAVTEST'
-        savefile_lib: 'ARCHLIB'
-      register: savobj_result
-      failed_when: "'missing required arguments: savefile_name' not in savobj_result.msg"
-
-    - name: TC21 save objects without required options
-      ibmi_object_save:
-        object_lib: 'SAVRST'
-        savefile_name: 'SAVTEST'
-      register: savobj_result
-      failed_when: "'missing required arguments: savefile_lib' not in savobj_result.msg"
+    # ── TC21 - Negative: missing required option savefile_lib ────────────────
+    - name: TC21 - neg - missing required option savefile_lib
+      when: (tc_execute is not defined or 'TC21' in tc_execute) and 'TC21' not in (tc_skip | default([]))
+      block:
+        - name: TC21 - save without savefile_lib (expect missing required arguments)
+          ibmi_object_save:
+            object_lib: 'SAVRST'
+            savefile_name: 'SAVTEST'
+          register: savobj_result
+          failed_when: "'missing required arguments: savefile_lib' not in savobj_result.msg"
 
   always:
-    - name: delete libraries 
-      ibmi_cl_command: 
+    - name: Cleanup - delete test libraries
+      ibmi_cl_command:
         cmd: "dltlib lib({{item}})"
         joblog: 'true'
-      with_items: 
+      with_items:
         - SAVRST
         - ARCHLIB
       ignore_errors: true

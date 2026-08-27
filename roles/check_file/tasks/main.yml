@@ -10,11 +10,11 @@
     paths: "{{ check_file_target_file_path }}"
     recurse: true
     get_checksum: true
-  register: find_result_target
+  register: check_file_find_result_target
 
 - name: Print find_result
   ansible.builtin.debug:
-    var: find_result_target
+    var: check_file_find_result_target
 
 - name: Recursively find files on repo server
   ansible.builtin.find:
@@ -22,20 +22,20 @@
     recurse: true
     get_checksum: true
   delegate_to: "{{ check_file_repo_server }}"
-  register: find_result_repo
+  register: check_file_find_result_repo
 
 - name: Print find_result
   ansible.builtin.debug:
-    var: find_result_repo
+    var: check_file_find_result_repo
 
 - name: Check if target server dir or repo server dir is empty
   ansible.builtin.set_fact:
     check_file_same_files: false
-  when: find_result_repo.files == [] or find_result_target.files == []
+  when: check_file_find_result_repo.files == [] or check_file_find_result_target.files == []
 
 - name: Recursively compare the files' checksum between target server and repo server
   ansible.builtin.include_tasks: compare_path.yml
-  loop: "{{ find_result_repo.files }}"
+  loop: "{{ check_file_find_result_repo.files }}"
   loop_control:
     loop_var: find_result_repo_var
 

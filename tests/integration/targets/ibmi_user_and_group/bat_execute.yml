@@ -1,0 +1,56 @@
+# BAT (Build Acceptance Test) execute list for ibmi_user_and_group
+#
+# TC IDs are namespaced by sub-file so any combination can be run via tc_execute.
+#
+# ── display.yml ───────────────────────────────────────────────────────────────
+#   DISP_TC01   Display current SSH user profile; assert result_set fields.
+#   DISP_TC02   Display with extra options (must be ignored); assert same result.
+#
+# ── user_and_group.yml ────────────────────────────────────────────────────────
+#   TC03    Create group[0] with required options.
+#   TC04    Display group[0]; assert field values.
+#   TC05    Display group[0] members (empty); assert result_set empty.
+#   TC06    Create user[0] with all options.
+#   TC07    Display user[0]; assert all field values.
+#   TC08    Display group[0] members; assert user[0] is member.
+#   TC09    Create group[1] with all options; display and verify.
+#   TC10    Create for existing user[0] (idempotent); assert text updated.
+#   TC11    Change user[0] with required options; assert fields.
+#   TC12    Change user[0] with all options (move to group[1]).
+#   TC13    Display user[0]; assert all updated fields.
+#   TC14    Display group[0] members; assert empty.
+#   TC15    Display group[1] members; assert user[0] is member.
+#   TC16    Delete group[0] (no members); assert changed==true.
+#   TC16B   Delete group[0] again (idempotency); assert changed==false.
+#   TC17    Display deleted group[0]; expect "not found".
+#   TC18    Delete group[1] with member (expect CPF2258).
+#   TC19    Delete user[0]; assert changed==true.
+#   TC19A   Delete user[0] again (idempotency); assert changed==false.
+#   TC20    Delete group[1] (no members remaining); assert rc==0.
+#
+# ── negative_case.yml ─────────────────────────────────────────────────────────
+#   NEG_TC21   Display non-existing user; expect "not found".
+#   NEG_TC22   Invalid operation value.
+#   NEG_TC23   Invalid expire value.
+#   NEG_TC24   Invalid status value.
+#   NEG_TC25   Invalid user_class value.
+#   NEG_TC26   Invalid special_authority value.
+#   NEG_TC27   Invalid owner value.
+#   NEG_TC28   Invalid parameters (no specific check).
+#   NEG_TC29   Missing required user option.
+#   NEG_TC30   Missing required operation option.
+#   NEG_TC31   Unsupported option.
+#   NEG_TC33   Change non-existing user.
+#   NEG_TC35   Display group members for non-existing group.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ─────────────────
+
+tc_execute:
+  # display tests
+  - DISP_TC01
+
+  # create / change / delete tests
+  - TC03
+
+  # negative tests
+  - NEG_TC21

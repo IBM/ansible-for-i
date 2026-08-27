@@ -12,5 +12,16 @@
     file_path: '{{ tempfile_result.stdout }}/targets/ibmi_script/files'
 
 - ansible.builtin.include_tasks: cl.yml
+  when: >
+    tc_execute is not defined or
+    tc_execute | select('match', '^TC0[1-9]$') | list | length > 0
+
 - ansible.builtin.include_tasks: sql.yml
+  when: >
+    tc_execute is not defined or
+    tc_execute | select('match', '^TC1[0-3]$') | list | length > 0
+
 - ansible.builtin.include_tasks: iasp.yml
+  when: >
+    tc_execute is not defined or
+    tc_execute | select('match', '^TC1[4-7]$') | list | length > 0

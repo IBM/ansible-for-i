@@ -1,6 +1,25 @@
 ---
 # Negative test cases for ibmi_download_fix_from_cloud module
-# These tests verify proper error handling and validation
+# (c) IBM Corporation 2019, 2020
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['NTC01','NTC05']) — only those TCs run
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['NTC06']) — everything else runs
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency notes:
+#   All NTCs are independent negative/error tests — no server state created.
+#   NTC01  invalid credentials — hits the cloud API, fast (~2-5s)
+#   NTC02  missing ptf_id — Ansible parameter validation, instant
+#   NTC03  missing credentials — Ansible parameter validation, instant
+#   NTC04  missing directory — Ansible parameter validation, instant
+#   NTC05  invalid operation value — Ansible parameter validation, instant
+#   NTC06  invalid directory path (permission denied) — no download, instant
+#   NTC07  incomplete credentials dict — hits the cloud API, fast (~2-5s)
+#   NTC08  empty PTF ID — module validation, instant
+#   NTC09  invalid boolean for include_requisites — Ansible parameter validation, instant
+#
 
 - name: Set test variables for negative tests
   ansible.builtin.set_fact:
@@ -9,7 +28,7 @@
     test_credentials:
       machine_model: "HEX"
       machine_type: "9080"
-      serial_number: "XXXXXXX"
+      serial_number: "XXXXXXX"   # TODO: Replace variable needs to pass through Jenkins 
       country: "US"
     test_invalid_credentials:
       machine_model: "INVALID"
@@ -17,9 +36,11 @@
       serial_number: "0000000"
       country: "XX"
 
-- name: TC01 - Invalid credentials (entitlement check)
+# ─── NTC01 ────────────────────────────────────────────────────────────────────
+- name: NTC01 - Invalid credentials (entitlement check fails)
+  when: (tc_execute is not defined or 'NTC01' in tc_execute) and 'NTC01' not in (tc_skip | default([]))
   block:
-    - name: TC01 - Attempt download with invalid credentials
+    - name: NTC01 attempt download with invalid credentials
       ibm.power_ibmi.ibmi_download_fix_from_cloud:
         ptf_id: "{{ test_ptf_id }}"
         credentials: "{{ test_invalid_credentials }}"
@@ -29,7 +50,7 @@
       delegate_to: localhost
       failed_when: false
 
-    - name: Assert invalid credentials failed
+    - name: NTC01 assert invalid credentials failed
       ansible.builtin.assert:
         that:
           - invalid_cred_result is defined
@@ -38,21 +59,23 @@
         fail_msg: "Invalid credentials should have failed entitlement check"
         success_msg: "Invalid credentials correctly failed entitlement check"
 
-    - name: Display invalid credentials error
+    - name: NTC01 display invalid credentials error
       ansible.builtin.debug:
         var: invalid_cred_result
 
   always:
-    - name: Clean up (TC01)
+    - name: NTC01 clean up
       ansible.builtin.file:
         path: "{{ test_download_dir_neg }}_cred"
         state: absent
       delegate_to: localhost
       failed_when: false
 
-- name: TC02 - Missing required parameter (ptf_id)
+# ─── NTC02 ────────────────────────────────────────────────────────────────────
+- name: NTC02 - Missing required parameter (ptf_id)
+  when: (tc_execute is not defined or 'NTC02' in tc_execute) and 'NTC02' not in (tc_skip | default([]))
   block:
-    - name: TC02 - Attempt download without PTF ID
+    - name: NTC02 attempt download without PTF ID
       ibm.power_ibmi.ibmi_download_fix_from_cloud:
         credentials: "{{ test_credentials }}"
         operation: "download"
@@ -64,7 +87,7 @@
       tags:
         - skip_ansible_lint
 
-    - name: Assert missing PTF ID failed
+    - name: NTC02 assert missing PTF ID failed
       ansible.builtin.assert:
         that:
           - missing_ptf_result is defined
@@ -73,21 +96,23 @@
         fail_msg: "Missing PTF ID should have failed"
         success_msg: "Missing PTF ID correctly failed"
 
-    - name: Display missing parameter error
+    - name: NTC02 display missing parameter error
       ansible.builtin.debug:
         var: missing_ptf_result
 
   always:
-    - name: Clean up (TC02)
+    - name: NTC02 clean up
       ansible.builtin.file:
         path: "{{ test_download_dir_neg }}_missing"
         state: absent
       delegate_to: localhost
       failed_when: false
 
-- name: TC03 - Missing required parameter (credentials)
+# ─── NTC03 ────────────────────────────────────────────────────────────────────
+- name: NTC03 - Missing required parameter (credentials)
+  when: (tc_execute is not defined or 'NTC03' in tc_execute) and 'NTC03' not in (tc_skip | default([]))
   block:
-    - name: TC03 - Attempt download without credentials
+    - name: NTC03 attempt download without credentials
       ibm.power_ibmi.ibmi_download_fix_from_cloud:
         ptf_id: "{{ test_ptf_id }}"
         operation: "download"
@@ -99,7 +124,7 @@
       tags:
         - skip_ansible_lint
 
-    - name: Assert missing credentials failed
+    - name: NTC03 assert missing credentials failed
       ansible.builtin.assert:
         that:
           - missing_cred_result is defined
@@ -108,21 +133,23 @@
         fail_msg: "Missing credentials should have failed"
         success_msg: "Missing credentials correctly failed"
 
-    - name: Display missing credentials error
+    - name: NTC03 display missing credentials error
       ansible.builtin.debug:
         var: missing_cred_result
 
   always:
-    - name: Clean up (TC03)
+    - name: NTC03 clean up
       ansible.builtin.file:
         path: "{{ test_download_dir_neg }}_nocred"
         state: absent
       delegate_to: localhost
       failed_when: false
 
-- name: TC04 - Missing required parameter (directory for download operation)
+# ─── NTC04 ────────────────────────────────────────────────────────────────────
+- name: NTC04 - Missing required parameter (directory for download operation)
+  when: (tc_execute is not defined or 'NTC04' in tc_execute) and 'NTC04' not in (tc_skip | default([]))
   block:
-    - name: TC04 - Attempt download without directory
+    - name: NTC04 attempt download without directory
       ibm.power_ibmi.ibmi_download_fix_from_cloud:
         ptf_id: "{{ test_ptf_id }}"
         credentials: "{{ test_credentials }}"
@@ -134,7 +161,7 @@
       tags:
         - skip_ansible_lint
 
-    - name: Assert missing directory failed
+    - name: NTC04 assert missing directory failed
       ansible.builtin.assert:
         that:
           - missing_dir_result is defined
@@ -143,13 +170,15 @@
         fail_msg: "Missing directory should have failed"
         success_msg: "Missing directory correctly failed"
 
-    - name: Display missing directory error
+    - name: NTC04 display missing directory error
       ansible.builtin.debug:
         var: missing_dir_result
 
-- name: TC05 - Invalid operation value
+# ─── NTC05 ────────────────────────────────────────────────────────────────────
+- name: NTC05 - Invalid operation value
+  when: (tc_execute is not defined or 'NTC05' in tc_execute) and 'NTC05' not in (tc_skip | default([]))
   block:
-    - name: TC05 - Attempt operation with invalid value
+    - name: NTC05 attempt operation with invalid value
       ibm.power_ibmi.ibmi_download_fix_from_cloud:
         ptf_id: "{{ test_ptf_id }}"
         credentials: "{{ test_credentials }}"
@@ -159,7 +188,7 @@
       delegate_to: localhost
       failed_when: false
 
-    - name: Assert invalid operation failed
+    - name: NTC05 assert invalid operation failed
       ansible.builtin.assert:
         that:
           - invalid_op_result is defined
@@ -168,21 +197,23 @@
         fail_msg: "Invalid operation should have failed"
         success_msg: "Invalid operation correctly failed"
 
-    - name: Display invalid operation error
+    - name: NTC05 display invalid operation error
       ansible.builtin.debug:
         var: invalid_op_result
 
   always:
-    - name: Clean up (TC05)
+    - name: NTC05 clean up
       ansible.builtin.file:
         path: "{{ test_download_dir_neg }}_invalid_op"
         state: absent
       delegate_to: localhost
       failed_when: false
 
-- name: TC06 - Invalid directory path (permission denied)
+# ─── NTC06 ────────────────────────────────────────────────────────────────────
+- name: NTC06 - Invalid directory path (permission denied)
+  when: (tc_execute is not defined or 'NTC06' in tc_execute) and 'NTC06' not in (tc_skip | default([]))
   block:
-    - name: TC06 - Attempt download to restricted directory
+    - name: NTC06 attempt download to restricted directory
       ibm.power_ibmi.ibmi_download_fix_from_cloud:
         ptf_id: "{{ test_ptf_id }}"
         credentials: "{{ test_credentials }}"
@@ -193,7 +224,7 @@
       delegate_to: localhost
       failed_when: false
 
-    - name: Assert restricted directory failed
+    - name: NTC06 assert restricted directory failed
       ansible.builtin.assert:
         that:
           - restricted_dir_result is defined
@@ -204,20 +235,22 @@
         fail_msg: "Restricted directory should have failed"
         success_msg: "Restricted directory correctly failed"
 
-    - name: Display restricted directory error
+    - name: NTC06 display restricted directory error
       ansible.builtin.debug:
         var: restricted_dir_result
 
-- name: TC07 - Incomplete credentials dictionary
+# ─── NTC07 ────────────────────────────────────────────────────────────────────
+- name: NTC07 - Incomplete credentials dictionary
+  when: (tc_execute is not defined or 'NTC07' in tc_execute) and 'NTC07' not in (tc_skip | default([]))
   block:
-    - name: Set incomplete credentials
+    - name: NTC07 set incomplete credentials
       ansible.builtin.set_fact:
         incomplete_credentials:
           machine_model: "HEX"
           machine_type: "9080"
           # Missing serial_number and country
 
-    - name: TC07 - Attempt download with incomplete credentials
+    - name: NTC07 attempt download with incomplete credentials
       ibm.power_ibmi.ibmi_download_fix_from_cloud:
         ptf_id: "{{ test_ptf_id }}"
         credentials: "{{ incomplete_credentials }}"
@@ -227,7 +260,7 @@
       delegate_to: localhost
       failed_when: false
 
-    - name: Assert incomplete credentials failed
+    - name: NTC07 assert incomplete credentials failed
       ansible.builtin.assert:
         that:
           - incomplete_cred_result is defined
@@ -236,21 +269,23 @@
         fail_msg: "Incomplete credentials should have failed"
         success_msg: "Incomplete credentials correctly failed"
 
-    - name: Display incomplete credentials error
+    - name: NTC07 display incomplete credentials error
       ansible.builtin.debug:
         var: incomplete_cred_result
 
   always:
-    - name: Clean up (TC07)
+    - name: NTC07 clean up
       ansible.builtin.file:
         path: "{{ test_download_dir_neg }}_incomplete"
         state: absent
       delegate_to: localhost
       failed_when: false
 
-- name: TC08 - Empty PTF ID
+# ─── NTC08 ────────────────────────────────────────────────────────────────────
+- name: NTC08 - Empty PTF ID
+  when: (tc_execute is not defined or 'NTC08' in tc_execute) and 'NTC08' not in (tc_skip | default([]))
   block:
-    - name: TC08 - Attempt download with empty PTF ID
+    - name: NTC08 attempt download with empty PTF ID
       ibm.power_ibmi.ibmi_download_fix_from_cloud:
         ptf_id: ""
         credentials: "{{ test_credentials }}"
@@ -260,7 +295,7 @@
       delegate_to: localhost
       failed_when: false
 
-    - name: Assert empty PTF ID failed
+    - name: NTC08 assert empty PTF ID failed
       ansible.builtin.assert:
         that:
           - empty_ptf_result is defined
@@ -269,21 +304,23 @@
         fail_msg: "Empty PTF ID should have failed"
         success_msg: "Empty PTF ID correctly failed"
 
-    - name: Display empty PTF ID error
+    - name: NTC08 display empty PTF ID error
       ansible.builtin.debug:
         var: empty_ptf_result
 
   always:
-    - name: Clean up (TC08)
+    - name: NTC08 clean up
       ansible.builtin.file:
         path: "{{ test_download_dir_neg }}_empty"
         state: absent
       delegate_to: localhost
       failed_when: false
 
-- name: TC09 - Invalid boolean value for include_requisites
+# ─── NTC09 ────────────────────────────────────────────────────────────────────
+- name: NTC09 - Invalid boolean value for include_requisites
+  when: (tc_execute is not defined or 'NTC09' in tc_execute) and 'NTC09' not in (tc_skip | default([]))
   block:
-    - name: TC09 - Attempt download with invalid include_requisites value
+    - name: NTC09 attempt download with invalid include_requisites value
       ibm.power_ibmi.ibmi_download_fix_from_cloud:
         ptf_id: "{{ test_ptf_id }}"
         credentials: "{{ test_credentials }}"
@@ -294,7 +331,7 @@
       delegate_to: localhost
       failed_when: false
 
-    - name: Assert invalid boolean value failed
+    - name: NTC09 assert invalid boolean value failed
       ansible.builtin.assert:
         that:
           - invalid_bool_result is defined
@@ -303,12 +340,12 @@
         fail_msg: "Invalid boolean value should have failed"
         success_msg: "Invalid boolean value correctly failed"
 
-    - name: Display invalid boolean error
+    - name: NTC09 display invalid boolean error
       ansible.builtin.debug:
         var: invalid_bool_result
 
   always:
-    - name: Clean up (TC09)
+    - name: NTC09 clean up
       ansible.builtin.file:
         path: "{{ test_download_dir_neg }}_invalid_bool"
         state: absent

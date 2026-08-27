@@ -109,7 +109,7 @@ Examples
    - name: Run Check Product Option (CHKPRDOPT) command to verify that licensed programs are fully installed.
      ibm.power_ibmi.ibmi_cl_command:
        cmd: 'CHKPRDOPT *OPSYS'
-       is_cmd5250: True
+       is_cmd5250: true
 
 
 

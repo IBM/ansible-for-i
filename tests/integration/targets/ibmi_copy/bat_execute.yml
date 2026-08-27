@@ -1,0 +1,6 @@
+# BAT (Build Acceptance Test) execute list for ibmi_copy
+#
+# TC01 is the core happy-path test: copies a SAVF and verifies it can be restored.
+
+tc_execute:
+  - TC01

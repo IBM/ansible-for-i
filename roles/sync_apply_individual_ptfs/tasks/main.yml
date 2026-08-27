@@ -2,14 +2,18 @@
 # Role for sync_apply_individual_ptfs
 - name: Initialize sync_list
   ansible.builtin.set_fact:
-    sync_list: []
-    coverletter_list: []
+    sync_apply_individual_ptfs_sync_list: []
+    sync_apply_individual_ptfs_coverletter_list: []
 
 - name: Compose sync list and coverletter_list
   ansible.builtin.set_fact:
-    sync_list: "{{ sync_list | default([]) + [not_loaded_list_var | combine({'src': not_loaded_list_var.file_path})] }}"
-    coverletter_list: "{{ coverletter_list | default([]) + [not_loaded_list_var | combine({'src': '/qsys.lib/qgpl.lib/qapzcover.file/Q'
-      + not_loaded_list_var.ptf_id + '.mbr'})] }}"
+    sync_apply_individual_ptfs_sync_list: >-
+      {{ sync_apply_individual_ptfs_sync_list | default([])
+      + [not_loaded_list_var | combine({'src': not_loaded_list_var.file_path})] }}
+    sync_apply_individual_ptfs_coverletter_list: >-
+      {{ sync_apply_individual_ptfs_coverletter_list | default([])
+      + [not_loaded_list_var | combine({'src': '/qsys.lib/qgpl.lib/qapzcover.file/Q'
+      + not_loaded_list_var.ptf_id + '.mbr'})] }}
   loop: "{{ sync_apply_individual_ptfs_not_loaded_list }}"
   loop_control:
     loop_var: not_loaded_list_var
@@ -17,27 +21,27 @@
 - name: Transfer PTF savfs to target ibm i system
   ibm.power_ibmi.ibmi_synchronize_files:
     dest: "{{ sync_apply_individual_ptfs_dest }}"
-    src_list: "{{ sync_list }}"
-  when: sync_list != []
+    src_list: "{{ sync_apply_individual_ptfs_sync_list }}"
+  when: sync_apply_individual_ptfs_sync_list != []
   delegate_to: "{{ sync_apply_individual_ptfs_src_host }}"
   ignore_errors: true
-  register: sync_result
+  register: sync_apply_individual_ptfs_sync_result
 
 - name: Transfer PTFs' cover letter to target ibm i system
   ibm.power_ibmi.ibmi_synchronize_files:
     dest: "/qsys.lib/qgpl.lib/qapzcover.file"
-    src_list: "{{ coverletter_list }}"
-  when: coverletter_list != []
+    src_list: "{{ sync_apply_individual_ptfs_coverletter_list }}"
+  when: sync_apply_individual_ptfs_coverletter_list != []
   delegate_to: "{{ sync_apply_individual_ptfs_src_host }}"
   ignore_errors: true
-  register: sync_coverletter_result
+  register: sync_apply_individual_ptfs_sync_coverletter_result
 
 - name: Compose sync result list
   ansible.builtin.set_fact:
-    sync_apply_individual_ptfs_sync_success_list: "{{ sync_result.success_list | default([]) }}"
-    sync_apply_individual_ptfs_sync_fail_list: "{{ sync_result.fail_list | default([]) }}"
-    sync_coverletter_success_list: "{{ sync_coverletter_result.success_list | default([]) }}"
-    sync_coverletter_fail_list: "{{ sync_coverletter_result.fail_list | default([]) }}"
+    sync_apply_individual_ptfs_sync_success_list: "{{ sync_apply_individual_ptfs_sync_result.success_list | default([]) }}"
+    sync_apply_individual_ptfs_sync_fail_list: "{{ sync_apply_individual_ptfs_sync_result.fail_list | default([]) }}"
+    sync_apply_individual_ptfs_sync_coverletter_success_list: "{{ sync_apply_individual_ptfs_sync_coverletter_result.success_list | default([]) }}"
+    sync_apply_individual_ptfs_sync_coverletter_fail_list: "{{ sync_apply_individual_ptfs_sync_coverletter_result.fail_list | default([]) }}"
 
 - name: Print the list of successful sync
   ansible.builtin.debug:
@@ -49,11 +53,11 @@
 
 - name: Print the list of successful coverletter sync
   ansible.builtin.debug:
-    var: sync_coverletter_success_list
+    var: sync_apply_individual_ptfs_sync_coverletter_success_list
 
 - name: Print the list of failed coverletter sync
   ansible.builtin.debug:
-    var: sync_coverletter_fail_list
+    var: sync_apply_individual_ptfs_sync_coverletter_fail_list
 
 - name: Include load_apply_ptfs role to load and apply ptfs
   ansible.builtin.include_role:
@@ -84,19 +88,19 @@
   block:
     - name: Compose dest file path
       ansible.builtin.set_fact:
-        dest_file_list: "{{ dest_file_list | default([]) + [sync_success_list_var.file_path] }}"
+        sync_apply_individual_ptfs_dest_file_list: "{{ sync_apply_individual_ptfs_dest_file_list | default([]) + [sync_success_list_var.file_path] }}"
       loop: "{{ sync_apply_individual_ptfs_sync_success_list }}"
       loop_control:
         loop_var: sync_success_list_var
 
     - name: Print the list of dest file path
       ansible.builtin.debug:
-        var: dest_file_list
+        var: sync_apply_individual_ptfs_dest_file_list
 
     - name: Delete the dest file dir
       ansible.builtin.file:
         path: "{{ dest_file_list_var }}"
         state: absent
-      loop: "{{ dest_file_list }}"
+      loop: "{{ sync_apply_individual_ptfs_dest_file_list }}"
       loop_control:
         loop_var: dest_file_list_var

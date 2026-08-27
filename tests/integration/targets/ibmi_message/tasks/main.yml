@@ -2,29 +2,49 @@
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC05','TC15']) — only those TCs run.
+#               TC IDs TC01–TC04 are in no_reply.yml  (skipped if ANSI lib not pre-created).
+#               TC IDs TC05–TC12 are in qsysopr.yml   (QSYSOPR system queue — always available).
+#               TC IDs TC15–TC29 are in message.yml   (user-created ANSITEST queues).
+#   tc_skip:    optional list of TC IDs to skip — everything else runs.
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency notes:
+#   no_reply.yml  TC01–TC04 require ANSI lib and TRYMSG1/2/3 queues to be manually
+#                 pre-created on the system with inquiry messages already pending.
+#                 They are automatically skipped if those queues are not found.
+#   qsysopr.yml   TC05–TC12 are read-only queries against QSYS/QSYSOPR — always available.
+#   message.yml   TC15–TC29 use the ANSITEST lib and TRYMSGQ1/2 queues created in setup.
+#
+# The outer block/always creates ANSITEST lib+queues for message.yml and cleans up after.
+#
 
 - ansible.builtin.include_tasks: no_reply.yml
 - ansible.builtin.include_tasks: qsysopr.yml
-    
-- block: 
-    - set_fact:
+
+- block:
+    - name: Setup - set message queue facts
+      set_fact:
         msgq: ['TRYMSGQ1', 'TRYMSGQ2']
         msgq_lib: 'ANSITEST'
         info_msg_text: ["TRY FRIST ANSIBLE INFORMATION MESSAGE", "TRY SECOND ANSIBLE INFORMATION MESSAGE"]
         inq_msg_text: ["TRY FRIST ANSIBLE INQUIRY MESSAGE", "TRY SECOND ANSIBLE INQUIRY MESSAGE"]
 
-    - name: create a user defined message queue library
+    - name: Setup - create message queue library ANSITEST
       ibmi_cl_command:
-        cmd: "QSYS/CRTLIB {{msgq_lib}}"
-    
-    - name: create a user defined message queue
+        cmd: "QSYS/CRTLIB {{ msgq_lib }}"
+
+    - name: Setup - create user-defined message queues TRYMSGQ1 and TRYMSGQ2
       ibmi_cl_command:
-        cmd: "QSYS/CRTMSGQ MSGQ({{msgq_lib}}/{{item}})"
-      loop: "{{msgq}}"
+        cmd: "QSYS/CRTMSGQ MSGQ({{ msgq_lib }}/{{ item }})"
+      loop: "{{ msgq }}"
 
     - ansible.builtin.include_tasks: message.yml
 
   always:
-    - name: delete library
+    - name: Cleanup - delete ANSITEST library
       ibmi_cl_command:
-        cmd: "DLTLIB LIB({{msgq_lib}})"
+        cmd: "DLTLIB LIB({{ msgq_lib }})"
+      ignore_errors: true

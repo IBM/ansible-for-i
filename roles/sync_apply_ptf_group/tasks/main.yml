@@ -4,54 +4,59 @@
 # PTF group and return the result.
 - name: Initialize src_list and sync_apply_fail
   ansible.builtin.set_fact:
-    src_list: []
+    sync_apply_ptf_group_src_list: []
     sync_apply_ptf_group_sync_apply_fail: false
     sync_apply_ptf_group_sync_result: {}
     sync_apply_ptf_group_apply_result: {}
 
 - name: Compose target tmp dir str
   ansible.builtin.set_fact:
-    path: "{{ sync_apply_ptf_group_dest }}/{{ sync_apply_ptf_group_ptf_group_info.file_path | basename }}"
+
+    sync_apply_ptf_group_path: >-
+      {{ sync_apply_ptf_group_dest }}/{{ sync_apply_ptf_group_ptf_group_info.file_path | basename }}
 
 - name: Check if the folder is already exists
   ansible.builtin.stat:
-    path: "{{ path }}"
-  register: stat_result
+    path: "{{ sync_apply_ptf_group_path }}"
+  register: sync_apply_ptf_group_stat_result
   ignore_errors: true
 
 - name: Include check_file role to check if files are the same
   ansible.builtin.include_role:
     name: check_file
   vars:
-    check_file_target_file_path: "{{ path }}"
+    check_file_target_file_path: "{{ sync_apply_ptf_group_path }}"
     check_file_repo_file_path: "{{ sync_apply_ptf_group_ptf_group_info.file_path }}"
     check_file_repo_server: "{{ sync_apply_ptf_group_src_host }}"
-  when: stat_result.stat.exists
+  when: sync_apply_ptf_group_stat_result.stat.exists
 
 - name: Set up and transfer images
-  when: (check_file_same_files is defined and not check_file_same_files) or not stat_result.stat.exists
+  when: >
+    (check_file_same_files is defined and not check_file_same_files)
+    or not sync_apply_ptf_group_stat_result.stat.exists
+
   block:
     - name: Clear receive dir
       ansible.builtin.file:
-        path: "{{ path }}"
+        path: "{{ sync_apply_ptf_group_path }}"
         state: absent
-      register: clear_result
+      register: sync_apply_ptf_group_clear_result
       ignore_errors: true
 
     - name: Make receive dir
       ansible.builtin.file:
-        path: "{{ path }}"
+        path: "{{ sync_apply_ptf_group_path }}"
         state: directory
         mode: '0755'
-      register: file_result
+      register: sync_apply_ptf_group_file_result
       ignore_errors: true
 
     - name: Failure handling for receive dir
-      when: file_result.failed == 1
+      when: sync_apply_ptf_group_file_result.failed == 1
       block:
         - name: Skip when make receive dir fail
           ansible.builtin.debug:
-            msg: "{{ 'Make receive dir ' + path + ' fail, skip the rest of this role.' }}"
+            msg: "{{ 'Make receive dir ' + sync_apply_ptf_group_path + ' fail, skip the rest of this role.' }}"
 
         - name: Initialize sync_apply_fail
           ansible.builtin.set_fact:
@@ -64,23 +69,26 @@
             paths: "{{ sync_apply_ptf_group_ptf_group_info.file_path }}"
             recurse: true
           delegate_to: "{{ sync_apply_ptf_group_src_host }}"
-          register: find_result_repo
+          register: sync_apply_ptf_group_find_result_repo
 
         - name: Compose src_list
           ansible.builtin.set_fact:
-            src_list: "{{ src_list | default([]) + [{'src': find_result_repo_var.path}] }}"
-          loop: "{{ find_result_repo.files }}"
+            sync_apply_ptf_group_src_list: >-
+              {{ sync_apply_ptf_group_src_list | default([])
+              + [{'src': find_result_repo_var.path}] }}
+
+          loop: "{{ sync_apply_ptf_group_find_result_repo.files }}"
           loop_control:
             loop_var: find_result_repo_var
 
         - name: Debug src_list
           ansible.builtin.debug:
-            var: src_list
+            var: sync_apply_ptf_group_src_list
 
         - name: Transfer image to target_system
           ibm.power_ibmi.ibmi_synchronize_files:
-            dest: "{{ path }}"
-            src_list: "{{ src_list }}"
+            dest: "{{ sync_apply_ptf_group_path }}"
+            src_list: "{{ sync_apply_ptf_group_src_list }}"
           delegate_to: "{{ sync_apply_ptf_group_src_host }}"
           register: sync_apply_ptf_group_sync_result
 
@@ -90,7 +98,7 @@
 
         # Handle case when one or more files failed to transfer
         - name: Sync failure handling with file transfer failure
-          when: sync_apply_ptf_group_sync_result.fail_list != []
+          when: sync_apply_ptf_group_sync_result.fail_list | default([]) != []
           block:
             - name: Skip when transfer failed
               ansible.builtin.debug:
@@ -103,7 +111,7 @@
         # Handle case when there was nothing valid to sync, i.e., src_list == [], so note failure to skip apply step
         # TODO: Probably should short-circuit this case and skip calling ibmi_synchronize_files earlier
         - name: Sync failure handling if no valid files to sync
-          when: src_list == []
+          when: sync_apply_ptf_group_src_list == []
           block:
             - name: Skip when there are no valid files to sync
               ansible.builtin.debug:
@@ -118,21 +126,23 @@
   block:
     - name: Get the home dir on target server
       ansible.builtin.shell: 'echo $HOME'
-      register: home_dir
-      changed_when: home_dir == ''
+      register: sync_apply_ptf_group_home_dir
+      changed_when: sync_apply_ptf_group_home_dir == ''
 
-    - name: Compose path
+    - name: Adjust path when it includes the home directory specifier
       ansible.builtin.set_fact:
-        path: "{{ path | regex_replace('~', home_dir.stdout) }}"
-      when: path | regex_search("^~") | length > 0
+        sync_apply_ptf_group_path: >-
+          {{ sync_apply_ptf_group_path | regex_replace('~', sync_apply_ptf_group_home_dir.stdout) }}
+      when: sync_apply_ptf_group_path | regex_search("^~") | length > 0
+
 
     # - name: Debug path
     #   ansible.builtin.debug:
-    #     var: path
+    #     var: sync_apply_ptf_group_path
 
     - name: Apply PTF group
       ibm.power_ibmi.ibmi_fix_imgclg:
-        src: '{{ path }}'
+        src: '{{ sync_apply_ptf_group_path }}'
         fix_omit_list: '{{ sync_apply_ptf_group_ptf_omit_list | default([]) }}'
         apply_type: '{{ sync_apply_ptf_group_apply_type }}'
         rollback: true
@@ -144,6 +154,6 @@
 
 - name: Delete the dest file dir
   ansible.builtin.file:
-    path: "{{ path }}"
+    path: "{{ sync_apply_ptf_group_path }}"
     state: absent
   when: sync_apply_ptf_group_delete

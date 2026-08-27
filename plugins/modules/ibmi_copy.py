@@ -64,8 +64,8 @@ EXAMPLES = r'''
   ibm.power_ibmi.ibmi_copy:
     src: '/backup/test.file'
     lib_name: 'testlib'
-    force: True
-    backup: True
+    force: true
+    backup: true
 '''
 
 RETURN = r'''

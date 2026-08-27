@@ -71,7 +71,7 @@ EXAMPLES = r'''
   ibm.power_ibmi.ibmi_tcp_server_service:
     name_list: ['*HTTP']
     state: 'started'
-    joblog: True
+    joblog: true
 
 - name: Stop ssh server
   ibm.power_ibmi.ibmi_tcp_server_service:
@@ -170,7 +170,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 IBMi_STRSVR = "QSYS/STRTCPSVR"
 IBMi_ENDSVR = "QSYS/ENDTCPSVR"
 IBMi_TCP_SERVER_LIST = ["*ALL", "*AUTOSTART", "*BOOTP", "*DBG", "*DDM", "*DHCP", "*DIRSRV", "*DLFM", "*DNS",

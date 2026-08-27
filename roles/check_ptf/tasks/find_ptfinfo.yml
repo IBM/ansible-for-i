@@ -2,7 +2,7 @@
 # Tasks file for find_ptfinfo
 - name: Compose compose_list
   ansible.builtin.set_fact:
-    compose_list: "{{ compose_list | default([]) + [ptf_info] }}"
+    check_ptf_compose_list: "{{ check_ptf_compose_list | default([]) + [ptf_info] }}"
   when: ptf_info.ptf_id == ptf_id_var
   with_list: "{{ check_ptf_list }}"
   loop_control:

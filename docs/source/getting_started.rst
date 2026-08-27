@@ -22,6 +22,13 @@ Here is an example of an ansible.cfg
     action_plugins=~/.ansible/collections/ansible_collections/ibm/power_ibmi/plugins/action
     interpreter_python=/QOpenSys/pkgs/bin/python3
 
+Using python3 for interpreter_python will point to a specific python release,
+which is typically the latest installed python level. You may want to specify the
+level, such as python3.13, to ensure a specific level is utilized on the managed node(s).
+If the set of managed nodes spans different platforms beyond IBM i or if different python
+levels are desired for different managed nodes, then it is recommended
+to specify interpreter_python in the Ansible inventory file instead of the config file.
+ 
 Build your inventory
 ------------------------
 

@@ -140,7 +140,6 @@ stderr_lines:
 '''
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
 
 import datetime
 import re
@@ -149,7 +148,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -301,7 +300,7 @@ def main():
         ibmi_util.log_debug("job_status: " + returned_job_status, module._name)
         wait_for_certain_time(check_interval)
         current_time = datetime.datetime.now()
-        running_time = (current_time - startd).seconds
+        running_time = (current_time - startd).total_seconds()
         if running_time > time_out_in_seconds:
             break
 

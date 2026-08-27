@@ -3,6 +3,21 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['START_TC01','START_TC04'])
+#   tc_skip:    optional list of TC IDs to skip
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC descriptions:
+#   START_TC01   Start QBATCH with all supported options; assert rc==0 and job_log==[].
+#   START_TC02   Start QBATCH with default options and joblog=true; assert job_log!=[].
+#   START_TC03   Idempotency — start an already-running subsystem; assert rc==0.
+#   START_TC04   Neg — start a non-existing subsystem; expect CPF1013 in job_log.
+#   START_TC05   Neg — start QBATCH with a wrong library; expect CPF1080 in job_log.
+#   START_TC06   Neg — missing required subsystem option.
+#   START_TC07   Neg — missing required operation option.
+#   START_TC08   Neg — unsupported option provided.
+#
 - block:
     # Tests for start operation
 
@@ -12,7 +27,7 @@
 
     - name: Check whether QBATCH is running
       ibmi_sql_query:
-        sql: "SELECT * 
+        sql: "SELECT *
               FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
               SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
       register: sql_result
@@ -23,117 +38,143 @@
       when: sql_result.row | length == 1
 
     - name: Pause to wait for sbs end
-      pause: 
+      pause:
         seconds: 20
       when: sql_result.row | length == 1
 
-    - name: TC01 start subsystem QBATCH with all supported options
-      ibmi_subsystem:
-        operation: start
-        subsystem: QBATCH
-        library: QSYS
-      register: strsbs_result
+    # ─── START_TC01 - Start QBATCH with all supported options ────────────────────
+    - name: START_TC01 - start subsystem QBATCH with all supported options
+      when: (tc_execute is not defined or 'START_TC01' in tc_execute) and 'START_TC01' not in (tc_skip | default([]))
+      block:
+        - name: START_TC01 - start subsystem QBATCH with all supported options
+          ibmi_subsystem:
+            operation: start
+            subsystem: QBATCH
+            library: QSYS
+          register: strsbs_result
 
-    - name: TC01 assert the returned parameters
-      assert:
-        that: 
-          #- "'CPF0902' in strsbs_result.stdout"
-          #- strsbs_result.stderr is not defined
-          #- strsbs_result.stderr_lines is not defined 
-          - strsbs_result.stdout_lines is defined
-          - strsbs_result.rc == 0
-          - strsbs_result.job_log == []  
+        - name: START_TC01 - assert the returned parameters
+          assert:
+            that:
+              - strsbs_result.stdout_lines is defined
+              - strsbs_result.rc == 0
+              - strsbs_result.job_log == []
 
-    - name: TC01 check whether QBATCH is running
-      ibmi_sql_query:
-        sql: "SELECT * 
-              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result
-      until: sql_result.row | length == 1
-      retries: 5
-      delay: 60
+        - name: START_TC01 - check whether QBATCH is running
+          ibmi_sql_query:
+            sql: "SELECT *
+                  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                  SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+          register: sql_result
+          until: sql_result.row | length == 1
+          retries: 5
+          delay: 60
 
-    - name: TC01 end QBATCH if it is running
-      ibmi_cl_command:
-        cmd: 'ENDSBS SBS(QBATCH) OPTION(*IMMED)'
+        - name: START_TC01 - end QBATCH if it is running
+          ibmi_cl_command:
+            cmd: 'ENDSBS SBS(QBATCH) OPTION(*IMMED)'
 
-    - name: TC01 pause to wait for sbs end
-      pause: 
-        seconds: 20
+        - name: START_TC01 - pause to wait for sbs end
+          pause:
+            seconds: 20
 
-    - name: TC02 start QBATCH subsystem with default options
-      ibmi_subsystem:
-        operation: start
-        subsystem: QBATCH
-        joblog: true
-      register: strsbs_result
+    # ─── START_TC02 - Start QBATCH with default options and joblog ────────────────
+    - name: START_TC02 - start QBATCH subsystem with default options
+      when: (tc_execute is not defined or 'START_TC02' in tc_execute) and 'START_TC02' not in (tc_skip | default([]))
+      block:
+        - name: START_TC02 - start QBATCH subsystem with default options
+          ibmi_subsystem:
+            operation: start
+            subsystem: QBATCH
+            joblog: true
+          register: strsbs_result
 
-    - name: TC02 assert the returned parameters when joblog
-      assert:
-        that: 
-          #- "'CPF0902' in strsbs_result.stdout"
-          #- strsbs_result.stderr is not defined
-          #- strsbs_result.stderr_lines is not defined 
-          - strsbs_result.stdout_lines is defined
-          - strsbs_result.rc == 0
-          - strsbs_result.job_log != [] 
+        - name: START_TC02 - assert the returned parameters when joblog
+          assert:
+            that:
+              - strsbs_result.stdout_lines is defined
+              - strsbs_result.rc == 0
+              - strsbs_result.job_log != []
 
-    - name: TC03 start idempotency test. Start a running/active subsystem.
-      ibmi_subsystem:
-        operation: start
-        subsystem: QBATCH
-      register: strsbs_result
+    # ─── START_TC03 - Idempotency: start an already-running subsystem ─────────────
+    - name: START_TC03 - start idempotency test
+      when: (tc_execute is not defined or 'START_TC03' in tc_execute) and 'START_TC03' not in (tc_skip | default([]))
+      block:
+        - name: START_TC03 - start idempotency test. Start a running/active subsystem.
+          ibmi_subsystem:
+            operation: start
+            subsystem: QBATCH
+          register: strsbs_result
 
-    - name: TC03 assert the returned parameters
-      assert:
-        that:
-          - strsbs_result.stdout is defined
-          - strsbs_result.rc == 0
+        - name: START_TC03 - assert the returned parameters
+          assert:
+            that:
+              - strsbs_result.stdout is defined
+              - strsbs_result.rc == 0
 
-    - name: TC04 Negative start test. Start a non-existing sbs.
-      ibmi_subsystem:
-        operation: start
-        subsystem: abc
-        joblog: true
-      register: strsbs_result 
-      failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1013') | map(attribute='MESSAGE_ID') | list | length ==0"
+    # ─── START_TC04 - Neg: start a non-existing subsystem ────────────────────────
+    - name: START_TC04 - negative start test - non-existing sbs
+      when: (tc_execute is not defined or 'START_TC04' in tc_execute) and 'START_TC04' not in (tc_skip | default([]))
+      block:
+        - name: START_TC04 - negative start test. Start a non-existing sbs.
+          ibmi_subsystem:
+            operation: start
+            subsystem: abc
+            joblog: true
+          register: strsbs_result
+          failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1013') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC04 assert the returned parameters when joblog
-      assert:
-        that: 
-          - strsbs_result.job_log != [] 
+        - name: START_TC04 - assert the returned parameters when joblog
+          assert:
+            that:
+              - strsbs_result.job_log != []
 
-    - name: TC05 Negative start test. Start with a wrong lib for QBATCH
-      ibmi_subsystem:
-        operation: start
-        subsystem: QBATCH    
-        library: abc
-        joblog: true
-      register: strsbs_result 
-      failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1080') | map(attribute='MESSAGE_ID') | list | length ==0"
+    # ─── START_TC05 - Neg: start QBATCH with a wrong library ─────────────────────
+    - name: START_TC05 - negative start test - wrong library
+      when: (tc_execute is not defined or 'START_TC05' in tc_execute) and 'START_TC05' not in (tc_skip | default([]))
+      block:
+        - name: START_TC05 - negative start test. Start with a wrong lib for QBATCH.
+          ibmi_subsystem:
+            operation: start
+            subsystem: QBATCH
+            library: abc
+            joblog: true
+          register: strsbs_result
+          failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1080') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC04 assert the returned parameters when joblog
-      assert:
-        that: 
-          - strsbs_result.job_log != [] 
+        - name: START_TC05 - assert the returned parameters when joblog
+          assert:
+            that:
+              - strsbs_result.job_log != []
 
-    - name: TC06 start. Missing required option subsystem (negative test case)
-      ibmi_subsystem:
-        operation: start
-      register: strsbs_result
-      failed_when: "'missing required argument' not in strsbs_result.msg"
+    # ─── START_TC06 - Neg: missing required subsystem option ─────────────────────
+    - name: START_TC06 - start missing required option subsystem
+      when: (tc_execute is not defined or 'START_TC06' in tc_execute) and 'START_TC06' not in (tc_skip | default([]))
+      block:
+        - name: START_TC06 - start. Missing required option subsystem (negative test case).
+          ibmi_subsystem:
+            operation: start
+          register: strsbs_result
+          failed_when: "'missing required argument' not in strsbs_result.msg"
 
-    - name: TC07 start. Missing required option operation (negative test case)
-      ibmi_subsystem:
-        subsystem: QBATCH
-      register: strsbs_result
-      failed_when: "'missing required argument' not in strsbs_result.msg"
+    # ─── START_TC07 - Neg: missing required operation option ─────────────────────
+    - name: START_TC07 - start missing required option operation
+      when: (tc_execute is not defined or 'START_TC07' in tc_execute) and 'START_TC07' not in (tc_skip | default([]))
+      block:
+        - name: START_TC07 - start. Missing required option operation (negative test case).
+          ibmi_subsystem:
+            subsystem: QBATCH
+          register: strsbs_result
+          failed_when: "'missing required argument' not in strsbs_result.msg"
 
-    - name: TC08 Provide invalid option for start (negative test case)
-      ibmi_subsystem:
-        operation: start
-        subsystem: QBATCH 
-        abc: abc   
-      register: strsbs_result
-      failed_when: "'Unsupported parameters' not in strsbs_result.msg" 
+    # ─── START_TC08 - Neg: unsupported option ─────────────────────────────────────
+    - name: START_TC08 - start with invalid option
+      when: (tc_execute is not defined or 'START_TC08' in tc_execute) and 'START_TC08' not in (tc_skip | default([]))
+      block:
+        - name: START_TC08 - provide invalid option for start (negative test case).
+          ibmi_subsystem:
+            operation: start
+            subsystem: QBATCH
+            abc: abc
+          register: strsbs_result
+          failed_when: "'Unsupported parameters' not in strsbs_result.msg"

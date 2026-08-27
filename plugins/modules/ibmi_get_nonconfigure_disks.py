@@ -44,7 +44,7 @@ author:
 EXAMPLES = r'''
 - name: get all nonconfigure disks
   ibm.power_ibmi.ibmi_get_nonconfigure_disks:
-    joblog: True
+    joblog: true
 '''
 
 RETURN = r'''
@@ -130,7 +130,7 @@ except ImportError:
     HAS_ITOOLKIT = False
 
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def getNonconfigureDisk(imodule, time):
@@ -209,6 +209,11 @@ def main():
     except Exception as inst:
         message = f'Exception occurred: {inst}'
         module.fail_json(rc=999, msg=message)
+
+    if ibmi_module.get_connection() is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        module.fail_json(msg='No database connection available'
+                         + (': ' + conn_err if conn_err else ''))
 
     disk_list, job_log = getNonconfigureDisk(ibmi_module, startd)
     if not disk_list:

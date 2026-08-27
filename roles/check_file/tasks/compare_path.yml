@@ -2,7 +2,7 @@
 # Tasks file for compare_path
 - name: Compose same_name
   ansible.builtin.set_fact:
-    same_name: false
+    check_file_same_name: false
 
 - name: Compare path
   when: check_file_same_files
@@ -10,11 +10,11 @@
     - name: Recursively compare the files' path between target server and repo server one by one
       ansible.builtin.include_tasks: compare_checksum.yml
       when: find_result_target_var.path | basename == find_result_repo_var.path | basename
-      with_list: "{{ find_result_target.files }}"
+      with_list: "{{ check_file_find_result_target.files }}"
       loop_control:
         loop_var: find_result_target_var
 
     - name: Set check_file_same_files to false if no file has the same name on target server
       ansible.builtin.set_fact:
         check_file_same_files: false
-      when: not same_name
+      when: not check_file_same_name

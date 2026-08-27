@@ -111,11 +111,14 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def get_product_info(imodule, product_id, release_level, product_option, load_id):
     conn = imodule.get_connection()
+    if conn is None:
+        conn_err = getattr(imodule, 'conn_error', None)
+        return -1, None, 'No database connection available' + (': ' + conn_err if conn_err else '')
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(

@@ -194,7 +194,7 @@ ERROR = -1
 
 CLOUDINIT_METADATA_DIR = '/QOpenSys/pkgs/lib/cloudinit/cloud/seed/config_drive/openstack/latest'
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def get_mirror_state_text(state):
@@ -212,6 +212,8 @@ def get_mirror_state_text(state):
 
 def mrdb_retrieve_mirror_state(imodule):
     conn = imodule.get_connection()
+    if conn is None:
+        return ERROR
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -237,6 +239,8 @@ def mrdb_retrieve_mirror_state(imodule):
 
 def mrdb_set_cluster_config_state(imodule, state):
     conn = imodule.get_connection()
+    if conn is None:
+        return ERROR
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -262,6 +266,8 @@ def mrdb_set_cluster_config_state(imodule, state):
 
 def mrdb_set_mirror_config_state(imodule, state):
     conn = imodule.get_connection()
+    if conn is None:
+        return ERROR
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -287,6 +293,8 @@ def mrdb_set_mirror_config_state(imodule, state):
 
 def mrdb_set_nrg_config_state(imodule, state):
     conn = imodule.get_connection()
+    if conn is None:
+        return ERROR
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -310,6 +318,8 @@ def mrdb_set_nrg_config_state(imodule, state):
 
 def mrdb_start_warm_clone(imodule):
     conn = imodule.get_connection()
+    if conn is None:
+        return ERROR
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -333,6 +343,8 @@ def mrdb_start_warm_clone(imodule):
 
 def mrdb_start_engine(imodule):
     conn = imodule.get_connection()
+    if conn is None:
+        return ERROR
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -355,6 +367,9 @@ def mrdb_start_engine(imodule):
 
 def get_product_info(imodule, product_id, release_level, product_option, load_id):
     conn = imodule.get_connection()
+    if conn is None:
+        conn_err = getattr(imodule, 'conn_error', None)
+        return -1, None, 'No database connection available' + (': ' + conn_err if conn_err else '')
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(

@@ -1,0 +1,21 @@
+# BAT (Build Acceptance Test) execute list for ibmi_lib_save
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# TC01–TC17  System ASP tests (save_lib.yml).
+#   TC01  Required-options happy path + restore verification.  Core test.
+#   TC02  All supported options.
+#   TC03–TC05  Parameter variants (CL params, joblog, target_release).
+#   TC06  Negative — save file already exists without force_save (CPF5813).
+#   TC08–TC17  Negative — invalid values and missing required args.  All instant.
+#
+# TC18–TC26  iASP tests (iasp.yml) — automatically skipped if no iASP is
+#   available on the target system.  Include them here so they run on
+#   iASP-capable machines without any manual changes.
+#
+# Note: TC07 does not exist (numbering gap from original test suite).
+
+tc_execute:
+  - TC01
+

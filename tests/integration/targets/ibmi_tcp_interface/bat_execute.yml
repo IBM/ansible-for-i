@@ -1,0 +1,21 @@
+# BAT (Build Acceptance Test) execute list for ibmi_tcp_interface
+#
+# Dependency chain for positive tests:
+#   TC02 creates the test IFC used by TC03–TC16.
+#   TC04 changes the IFC alias (TC05 verifies the change).
+#   TC06 removes the IFC (TC07 verifies it is gone).
+#   TC08 re-creates the IFC used by TC09–TC16.
+#   TC09 starts the IFC (TC10 polls for ACTIVE).
+#   TC12 ends the IFC (TC13 asserts TC12 result; TC14 verifies INACTIVE).
+#   TC13 depends on tc12_result registered in TC12.
+#
+# NEG_TC18 creates the IFC used by NEG_TC19–NEG_TC34 (cleanup handles removal).
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ─────────────────
+
+tc_execute:
+  # positive tests
+  - TC01
+
+  # negative tests
+  - NEG_TC17

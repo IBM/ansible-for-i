@@ -1,0 +1,30 @@
+# BAT (Build Acceptance Test) execute list for ibmi_download_fix_from_cloud
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# ID prefix convention:
+#   PTC = positive test (positive_tests.yml)
+#   NTC = negative test (negative_tests.yml)
+#
+# PTC01  preview operation  — no download, no disk space, fast (~2-5s)
+# PTC02  validate operation — no download, no disk space, fast (~2-5s)
+# PTC03  download without requisites — downloads SJ08667 (small PTF); TIMING TBD
+#        Requires the test machine to have IBM EFD entitlement for SJ08667.
+#        If the machine is not entitled, PTC03 will fail with Client.Authentication.NotAuthorized.
+#        In that case, remove PTC03 from this list and keep only PTC01/PTC02.
+#
+# NTC02–NTC05  Ansible parameter validation failures — instant, no network call needed.
+#
+# NTC01 (invalid credentials) and NTC07 (incomplete credentials) are excluded from
+# BAT — they make a live cloud API call that may add latency and is redundant with
+# PTC01/PTC02 already exercising the credential path.
+
+tc_execute:
+  - PTC01
+  - PTC02
+  - PTC03
+  - NTC02
+  - NTC03
+  - NTC04
+  - NTC05

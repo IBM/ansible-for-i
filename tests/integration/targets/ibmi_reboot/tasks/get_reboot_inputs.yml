@@ -16,8 +16,8 @@
 
 - name: Get the input of PWRDWNSYS
   ibmi_sql_query:
-    sql: "select message_second_level_text  FROM 
-      TABLE(qsys2.history_log_info('{{ last_boot }}', (SELECT job_entered_system_time
+    sql: "select message_second_level_text FROM
+      TABLE(qsys2.history_log_info('{{ last_boot | replace('T', ' ') }}', (SELECT job_entered_system_time
       FROM TABLE(qsys2.job_info(job_status_filter => '*ACTIVE', job_user_filter
       => 'QSYS')) x
       WHERE job_name = '000000/QSYS/SCPF'))) x
