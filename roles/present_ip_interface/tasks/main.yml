@@ -11,11 +11,11 @@
 
 - name: Set a returned variable to indicate if the interface be configured successfully
   ansible.builtin.set_fact:
-    configured_result: pass
-    interface_exists: false
-    lind_exists: false
-    lind_active: false
-    resource_name: ''
+    present_ip_interface_configured_result: pass
+    present_ip_interface_interface_exists: false
+    present_ip_interface_lind_exists: false
+    present_ip_interface_lind_active: false
+    present_ip_interface_resource_name: ''
 
 - name: Query ip interfaces from source system
   ibm.power_ibmi.ibmi_sql_query:
@@ -23,10 +23,10 @@
       VIRTUAL_LAN_ID,PREFIX_LENGTH from QSYS2.NETSTAT_INTERFACE_INFO WHERE (INTERNET_ADDRESS =
       '{{ present_ip_interface_ip_address }}') AND (INTERFACE_LINE_TYPE = 'ELAN' OR INTERFACE_LINE_TYPE = 'VETH'
       OR LINE_DESCRIPTION = '*VIRTUALIP') AND INTERNET_ADDRESS not in ('*IP6SAC', '*IP4DHCP')"
-  register: existing_ip_interfaces
+  register: present_ip_interface_existing_ip_interfaces
 
 - name: Create a new IP interface when it doesn't exist
-  when: existing_ip_interfaces.row|length == 0
+  when: present_ip_interface_existing_ip_interfaces.row|length == 0
   block:
     - name: Print msg
       ansible.builtin.debug:
@@ -39,24 +39,24 @@
     - name: Run WRKCFGSTS
       ibm.power_ibmi.ibmi_cl_command:
         cmd: "QSYS/WRKCFGSTS CFGTYPE(*LIN)"
-      register: all_line_descriptions_result
+      register: present_ip_interface_all_line_descriptions_result
       when: present_ip_interface_line_description is undefined or present_ip_interface_line_description == None
 
     - name: Set default line_description
       ansible.builtin.set_fact:
-        default_line_description: 'DEF{{ resource_name }}'
+        present_ip_interface_default_line_description: 'DEF{{ present_ip_interface_resource_name }}'
 
     - name: Give a default name of the line_description if the input value is not correct
       ansible.builtin.set_fact:
-        present_ip_interface_line_description: "{{ default_line_description }}"
+        present_ip_interface_line_description: "{{ present_ip_interface_default_line_description }}"
       when: present_ip_interface_line_description is undefined or present_ip_interface_line_description == None
 
     - name: Find existing line description
       ansible.builtin.include_tasks: find_existing_line_description.yml
-      loop: '{{ all_line_descriptions_result.stdout_lines }}'
+      loop: '{{ present_ip_interface_all_line_descriptions_result.stdout_lines }}'
       loop_control:
         loop_var: lind_line
-      when: present_ip_interface_line_description == default_line_description
+      when: present_ip_interface_line_description == present_ip_interface_default_line_description
 
     - name: Debug present_ip_interface_line_description
       ansible.builtin.debug:
@@ -86,13 +86,13 @@
       ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT * FROM QSYS2.NETSTAT_ROUTE_INFO
           WHERE NEXT_HOP = '{{ present_ip_interface_next_hop }}'"
-      register: route_info
+      register: present_ip_interface_route_info
 
     - name: Create route if present_ip_interface_next_hop is provided.
       ibm.power_ibmi.ibmi_cl_command:
         cmd: "ADDTCPRTE RTEDEST('{{ present_ip_interface_route_destination }}') NEXTHOP('{{ present_ip_interface_next_hop }}')
               {{ present_ip_interface_addition_options_for_addtcprte }}"
-      when: present_ip_interface_next_hop and route_info.row | length == 0
+      when: present_ip_interface_next_hop and present_ip_interface_route_info.row | length == 0
 
 - name: Ensure the IP interface is active
   ibm.power_ibmi.ibmi_tcp_interface:

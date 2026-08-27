@@ -1,0 +1,19 @@
+# BAT (Build Acceptance Test) execute list for ibmi_submit_job
+#
+# TC descriptions:
+#   TC01   Submit job with all options.
+#   TC02   Submit job with only required options.
+#   TC03   Submit job with timeout_setting and status.
+#   TC04   Submit job with check_interval; asserts rc == 0.
+#   TC05   Submit job expected to exceed time_out before reaching final status.
+#          (runs a 10m job with a 6m timeout — long-running; exclude from quick BAT if needed)
+#   TC06   Neg — time_out fires; expects non-zero return code message.
+#   TC07   Neg — invalid status value.
+#   TC08   Neg — invalid time_out value.
+#   TC09   Neg — invalid parameters value.
+#   TC10   Neg — unsupported option.
+#   TC11   Neg — missing required cmd option.
+
+tc_execute:
+  - TC01
+

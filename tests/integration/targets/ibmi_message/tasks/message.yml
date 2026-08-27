@@ -2,205 +2,254 @@
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# tc_execute / tc_skip variables flow through automatically from main.yml.
+# ANSITEST lib, TRYMSGQ1, and TRYMSGQ2 are created by main.yml setup before this file runs.
 
-- name: send an info message to the message queue
+- name: Setup - send INFORMATIONAL messages to both queues
   ibmi_cl_command:
-    cmd: "QSYS/SNDMSG MSG('{{item[1]}}') TOMSGQ({{msgq_lib}}/{{item[0]}})"
-  with_nested: 
-    - "{{msgq}}"
-    - "{{info_msg_text}}"
+    cmd: "QSYS/SNDMSG MSG('{{ item[1] }}') TOMSGQ({{ msgq_lib }}/{{ item[0] }})"
+  with_nested:
+    - "{{ msgq }}"
+    - "{{ info_msg_text }}"
 
-- name: TC15 find message with all supported options
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_queue: '{{msgq[0]}}'
-    message_lib: '{{msgq_lib}}'
-    message_id: ''
-    message_text: 'TRY FRIST ANSIBLE INFORMATION MESSAGE'
-  register: find_result
+# ─── TC15 - Find INFORMATIONAL with all supported options ─────────────────────
+- name: TC15 - find INFORMATIONAL message with all supported options
+  when: (tc_execute is not defined or 'TC15' in tc_execute) and 'TC15' not in (tc_skip | default([]))
+  block:
+    - name: TC15 - find message in TRYMSGQ1 by text and type
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INFORMATIONAL'
+        message_queue: '{{ msgq[0] }}'
+        message_lib: '{{ msgq_lib }}'
+        message_id: ''
+        message_text: 'TRY FRIST ANSIBLE INFORMATION MESSAGE'
+      register: find_result
 
-- name: TC15 assert returned option
-  assert:
-    that:
-      - find_result.start is defined
-      - find_result.end is defined
-      - find_result.delta is defined
-      - find_result.stderr is defined
-      - find_result.message_info | length == 1
-      - find_result.message_info[0]['MESSAGE_TEXT'] == info_msg_text[0]
-      - find_result.message_info[0]['MESSAGE_TYPE'] == 'INFORMATIONAL'
+    - name: TC15 - assert returned fields and message content
+      assert:
+        that:
+          - find_result.start is defined
+          - find_result.end is defined
+          - find_result.delta is defined
+          - find_result.stderr is defined
+          - find_result.message_info | length == 1
+          - find_result.message_info[0]['MESSAGE_TEXT'] == info_msg_text[0]
+          - find_result.message_info[0]['MESSAGE_TYPE'] == 'INFORMATIONAL'
 
+# ─── TC16 - Find INFORMATIONAL with lowercase message_lib ─────────────────────
 # Low priority issue, may enhance in future
-- name: TC16 find message with lowercase message_lib
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_queue: '{{msgq[0]}}'
-    message_lib: '{{msgq_lib.lower()}}'
-    #message_id: ''
-  register: find_result
+- name: TC16 - find INFORMATIONAL with lowercase message_lib
+  when: (tc_execute is not defined or 'TC16' in tc_execute) and 'TC16' not in (tc_skip | default([]))
+  block:
+    - name: TC16 - find messages using lowercase lib name
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INFORMATIONAL'
+        message_queue: '{{ msgq[0] }}'
+        message_lib: '{{ msgq_lib.lower() }}'
+      register: find_result
 
-- name: TC16 assert returned option
-  assert:
-    that:
-      - find_result.message_info | length == 2
+    - name: TC16 - assert 2 messages found
+      assert:
+        that:
+          - find_result.message_info | length == 2
 
-- name: TC17 find message with lowercase message_queue
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_queue: '{{msgq[0].lower()}}'
-    message_lib: '{{msgq_lib}}'
-    #message_id: ''
-    message_text: 'TRY FRIST ANSIBLE'
-  register: find_result
+# ─── TC17 - Find INFORMATIONAL with lowercase message_queue ───────────────────
+- name: TC17 - find INFORMATIONAL with lowercase message_queue and text filter
+  when: (tc_execute is not defined or 'TC17' in tc_execute) and 'TC17' not in (tc_skip | default([]))
+  block:
+    - name: TC17 - find messages using lowercase queue name and partial text
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INFORMATIONAL'
+        message_queue: '{{ msgq[0].lower() }}'
+        message_lib: '{{ msgq_lib }}'
+        message_text: 'TRY FRIST ANSIBLE'
+      register: find_result
 
-- name: TC17 assert returned option
-  assert:
-    that:
-      - find_result.message_info | length == 1
+    - name: TC17 - assert 1 message found
+      assert:
+        that:
+          - find_result.message_info | length == 1
 
-- name: TC18 find message with only required options
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_lib: '{{msgq_lib}}'
-  register: find_result
+# ─── TC18 - Find INFORMATIONAL with only required options ─────────────────────
+- name: TC18 - find INFORMATIONAL with only required options (lib-wide)
+  when: (tc_execute is not defined or 'TC18' in tc_execute) and 'TC18' not in (tc_skip | default([]))
+  block:
+    - name: TC18 - find all informational messages in lib
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INFORMATIONAL'
+        message_lib: '{{ msgq_lib }}'
+      register: find_result
 
-- name: TC18 assert returned option
-  assert:
-    that:
-      - find_result.start is defined
-      - find_result.end is defined
-      - find_result.delta is defined
-      - find_result.stderr is defined
-      - find_result.message_info | length == 4
+    - name: TC18 - assert returned fields and 4 total messages
+      assert:
+        that:
+          - find_result.start is defined
+          - find_result.end is defined
+          - find_result.delta is defined
+          - find_result.stderr is defined
+          - find_result.message_info | length == 4
 
-- name: TC19 find message in two message queue
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_lib: '{{msgq_lib}}'
-    message_queue: '{{msgq}}'
-    message_text: 'TRY FRIST ANSIBLE INFORMATION MESSAGE'
-  register: find_result
+# ─── TC19/TC20 - Find INFORMATIONAL in two queues by text ─────────────────────
+- name: TC19 - find INFORMATIONAL in both queues filtered by text
+  when: (tc_execute is not defined or 'TC19' in tc_execute) and 'TC19' not in (tc_skip | default([]))
+  block:
+    - name: TC19 - find messages in TRYMSGQ1 and TRYMSGQ2 by text
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INFORMATIONAL'
+        message_lib: '{{ msgq_lib }}'
+        message_queue: '{{ msgq }}'
+        message_text: 'TRY FRIST ANSIBLE INFORMATION MESSAGE'
+      register: find_result
 
-- name: TC20 assert returned option
-  assert:
-    that:
-      - find_result.start is defined
-      - find_result.end is defined
-      - find_result.delta is defined
-      - find_result.stderr is defined
-      - find_result.message_info | length == 2
+    - name: TC20 - assert 2 messages found (one per queue)
+      assert:
+        that:
+          - find_result.start is defined
+          - find_result.end is defined
+          - find_result.delta is defined
+          - find_result.stderr is defined
+          - find_result.message_info | length == 2
 
-- name: TC21 find msg with invalid operation
-  ibmi_message:
-    operation: 'abc'
-    message_type: 'INQUIRY'
-    message_queue: '{{msgq[0]}}'
-    message_lib: '{{msgq_lib}}'
-    message_text: 'TRY FRIST ANSIBLE INFORMATION MESSAGE'
-  register: neg_result
-  failed_when: "'value of operation must be one of' not in neg_result.msg"
+# ─── TC21 - Negative: invalid operation value ────────────────────────────────
+- name: TC21 - negative - invalid operation value 'abc'
+  when: (tc_execute is not defined or 'TC21' in tc_execute) and 'TC21' not in (tc_skip | default([]))
+  block:
+    - name: TC21 - call with operation=abc (expect module parameter error)
+      ibmi_message:
+        operation: 'abc'
+        message_type: 'INQUIRY'
+        message_queue: '{{ msgq[0] }}'
+        message_lib: '{{ msgq_lib }}'
+        message_text: 'TRY FRIST ANSIBLE INFORMATION MESSAGE'
+      register: neg_result
+      failed_when: "'value of operation must be one of' not in neg_result.msg"
 
-- name: TC22 find msg with invalid messae type
-  ibmi_message:
-    operation: 'find'
-    message_type: 'abc'
-    message_queue: '{{msgq[0]}}'
-    message_lib: '{{msgq_lib}}'
-    message_text: 'TRY FRIST ANSIBLE INQUIRY MESSAGE'
-  register: neg_result
-  failed_when: "'value of message_type must be one of' not in neg_result.msg"
+# ─── TC22 - Negative: invalid message_type value ─────────────────────────────
+- name: TC22 - negative - invalid message_type value 'abc'
+  when: (tc_execute is not defined or 'TC22' in tc_execute) and 'TC22' not in (tc_skip | default([]))
+  block:
+    - name: TC22 - call with message_type=abc (expect module parameter error)
+      ibmi_message:
+        operation: 'find'
+        message_type: 'abc'
+        message_queue: '{{ msgq[0] }}'
+        message_lib: '{{ msgq_lib }}'
+        message_text: 'TRY FRIST ANSIBLE INQUIRY MESSAGE'
+      register: neg_result
+      failed_when: "'value of message_type must be one of' not in neg_result.msg"
 
-- name: TC23 find msg with not existing message queue
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INQUIRY'
-    message_queue: 'abc'
-    message_lib: '{{msgq_lib}}'
-  register: neg_result
-  ignore_errors: true
+# ─── TC23 - Negative: non-existing message_queue ─────────────────────────────
+- name: TC23 - negative - non-existing message_queue 'abc' (expect empty result)
+  when: (tc_execute is not defined or 'TC23' in tc_execute) and 'TC23' not in (tc_skip | default([]))
+  block:
+    - name: TC23 - find messages in non-existing queue
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INQUIRY'
+        message_queue: 'abc'
+        message_lib: '{{ msgq_lib }}'
+      register: neg_result
+      ignore_errors: true
 
-- name: TC23 assert returned option
-  assert:
-    that:
-      - neg_result.start is defined
-      - neg_result.end is defined
-      - neg_result.delta is defined
-      - neg_result.stderr is defined
-      - neg_result.message_info | length == 0 
+    - name: TC23 - assert empty result and fields defined
+      assert:
+        that:
+          - neg_result.start is defined
+          - neg_result.end is defined
+          - neg_result.delta is defined
+          - neg_result.stderr is defined
+          - neg_result.message_info | length == 0
 
-- name: TC24 find msg job with not existing library
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_queue: '{{msgq[0]}}'
-    message_lib: 'abcedfeg'
-  register: neg_result
-  ignore_errors: true
+# ─── TC24 - Negative: non-existing message_lib ───────────────────────────────
+- name: TC24 - negative - non-existing message_lib 'abcedfeg' (expect empty result)
+  when: (tc_execute is not defined or 'TC24' in tc_execute) and 'TC24' not in (tc_skip | default([]))
+  block:
+    - name: TC24 - find messages in non-existing lib
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INFORMATIONAL'
+        message_queue: '{{ msgq[0] }}'
+        message_lib: 'abcedfeg'
+      register: neg_result
+      ignore_errors: true
 
-- name: TC24 assert returned option
-  assert:
-    that:
-      #- "'Row not found' in neg_result.stderr"
-      - neg_result.message_info | length == 0
+    - name: TC24 - assert empty result
+      assert:
+        that:
+          - neg_result.message_info | length == 0
 
-- name: TC25 find msg job with not existing message text
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_queue: '{{msgq[0]}}'
-    message_lib: '{{msgq_lib}}'
-    message_id: ''
-    message_text: 'INVALID TEXT MESSAGE'
-  register: neg_result
-  ignore_errors: true
+# ─── TC25 - Negative: non-existing message_text ──────────────────────────────
+- name: TC25 - negative - non-existing message_text (expect empty result)
+  when: (tc_execute is not defined or 'TC25' in tc_execute) and 'TC25' not in (tc_skip | default([]))
+  block:
+    - name: TC25 - find messages with non-matching text
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INFORMATIONAL'
+        message_queue: '{{ msgq[0] }}'
+        message_lib: '{{ msgq_lib }}'
+        message_id: ''
+        message_text: 'INVALID TEXT MESSAGE'
+      register: neg_result
+      ignore_errors: true
 
-- name: TC25 assert returned option
-  assert:
-    that:
-      - neg_result.message_info | length == 0
-      #- "'Row not found' in neg_result.stderr"
+    - name: TC25 - assert empty result
+      assert:
+        that:
+          - neg_result.message_info | length == 0
 
-- name: TC26 find msg job with not-existing parameters
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_queue: '{{msgq[0]}}'
-    message_lib: '{{msgq_lib}}'
-    abc: abc
-  register: neg_result
-  failed_when: "'Unsupported parameters' not in neg_result.msg"
+# ─── TC26 - Negative: unsupported parameter ──────────────────────────────────
+- name: TC26 - negative - unsupported parameter abc
+  when: (tc_execute is not defined or 'TC26' in tc_execute) and 'TC26' not in (tc_skip | default([]))
+  block:
+    - name: TC26 - call with unsupported parameter (expect Unsupported parameters)
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INFORMATIONAL'
+        message_queue: '{{ msgq[0] }}'
+        message_lib: '{{ msgq_lib }}'
+        abc: abc
+      register: neg_result
+      failed_when: "'Unsupported parameters' not in neg_result.msg"
 
-- name: TC27 find msg job missing required parameters
-  ibmi_message:
-    operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_queue: '{{msgq[0]}}'
-    #message_lib: '{{msgq_lib}}'       
-  register: neg_result
-  failed_when: "'missing required arguments: message_lib' not in neg_result.msg"
+# ─── TC27 - Negative: missing required parameter message_lib ─────────────────
+- name: TC27 - negative - missing required parameter message_lib
+  when: (tc_execute is not defined or 'TC27' in tc_execute) and 'TC27' not in (tc_skip | default([]))
+  block:
+    - name: TC27 - call without message_lib
+      ibmi_message:
+        operation: 'find'
+        message_type: 'INFORMATIONAL'
+        message_queue: '{{ msgq[0] }}'
+      register: neg_result
+      failed_when: "'missing required arguments: message_lib' not in neg_result.msg"
 
-- name: TC28 find msg job missing required parameters
-  ibmi_message:
-    operation: 'find'
-    #message_type: 'INFORMATIONAL'
-    message_queue: '{{msgq[0]}}'
-    message_lib: '{{msgq_lib}}'       
-  register: neg_result
-  failed_when: "'missing required arguments: message_type' not in neg_result.msg"
+# ─── TC28 - Negative: missing required parameter message_type ────────────────
+- name: TC28 - negative - missing required parameter message_type
+  when: (tc_execute is not defined or 'TC28' in tc_execute) and 'TC28' not in (tc_skip | default([]))
+  block:
+    - name: TC28 - call without message_type
+      ibmi_message:
+        operation: 'find'
+        message_queue: '{{ msgq[0] }}'
+        message_lib: '{{ msgq_lib }}'
+      register: neg_result
+      failed_when: "'missing required arguments: message_type' not in neg_result.msg"
 
-- name: TC29 find msg job missing required parameters
-  ibmi_message:
-    #operation: 'find'
-    message_type: 'INFORMATIONAL'
-    message_queue: '{{msgq[0]}}'
-    message_lib: '{{msgq_lib}}'       
-  register: neg_result
-  failed_when: "'missing required arguments: operation' not in neg_result.msg"
-
-
- 
+# ─── TC29 - Negative: missing required parameter operation ───────────────────
+- name: TC29 - negative - missing required parameter operation
+  when: (tc_execute is not defined or 'TC29' in tc_execute) and 'TC29' not in (tc_skip | default([]))
+  block:
+    - name: TC29 - call without operation
+      ibmi_message:
+        message_type: 'INFORMATIONAL'
+        message_queue: '{{ msgq[0] }}'
+        message_lib: '{{ msgq_lib }}'
+      register: neg_result
+      failed_when: "'missing required arguments: operation' not in neg_result.msg"

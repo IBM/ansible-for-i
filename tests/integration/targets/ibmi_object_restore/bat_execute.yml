@@ -1,0 +1,10 @@
+# BAT (Build Acceptance Test) execute list for ibmi_object_restore
+#
+# TC00 (copy IBMISAVF.FILE, create SAVRST/SAVRST1/ARCHLIB) always runs unconditionally.
+#
+# Dependency note: TCPOS and TCNEG are independent — TCNEG calls dlt_crt_lib.yml
+# at the start to ensure a clean SAVRST state regardless of whether TCPOS ran.
+
+tc_execute:
+  - TCPOS
+  

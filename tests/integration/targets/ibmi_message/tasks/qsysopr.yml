@@ -3,95 +3,133 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-#Test dependent packages 
-- block: 
+#Test dependent packages
+#
+# tc_execute / tc_skip variables flow through automatically from main.yml.
+# TC05-TC12 query QSYS/QSYSOPR and QSYS/QCONSOLE — always available, read-only.
 
-    - name: find a workable message id in qsysopr
-      ibmi_sql_query:
-        sql: "SELECT MESSAGE_ID, MESSAGE_TYPE FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_QUEUE_LIBRARY = 'QSYS' and MESSAGE_QUEUE_NAME = 'QSYSOPR' and MESSAGE_ID != '';"
-      register: sql_result
+- block:
 
-    - set_fact:
-        msg_list: '{{sql_result.row | unique}}'
-        diag: ''
-        comp: ''
-        
-    - name: loop to set fact
-      ansible.builtin.include_tasks: find_msg_id.yml
-      loop: "{{ msg_list}}"
+  # ─── Setup: collect message IDs from QSYSOPR ─────────────────────────────────
+  - name: Setup - find workable message IDs in QSYSOPR
+    ibmi_sql_query:
+      sql: "SELECT MESSAGE_ID, MESSAGE_TYPE FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_QUEUE_LIBRARY = 'QSYS' and MESSAGE_QUEUE_NAME = 'QSYSOPR' and MESSAGE_ID != ''"
+    register: sql_result
 
-    - name: TC05 find message with message id
-      ibmi_message:
-        operation: 'find'
-        message_type: "DIAGNOSTIC"
-        message_queue: ['QSYSOPR', 'QCONSOLE']
-        message_lib: 'QSYS'
-        message_id: "{{diag.split(' ')[1:]}}"
-      register: find_result
+  - name: Setup - set msg_list fact
+    set_fact:
+      msg_list: "{{ sql_result.row | unique }}"
+      diag: ''
+      comp: ''
 
-    - name: TC05 assert returned option
-      assert:
-        that:
-          - find_result.start is defined
-          - find_result.end is defined
-          - find_result.delta is defined
-          - find_result.stderr is defined
-          - find_result.message_info | length >= diag.split(' ')[1:] | length 
+  - name: Setup - loop to collect DIAGNOSTIC and COMPLETION message IDs
+    ansible.builtin.include_tasks: find_msg_id.yml
+    loop: "{{ msg_list }}"
 
-    - name: TC06 find COMPLETION message with all supported options
-      ibmi_message:
-        operation: 'find'
-        message_type: "COMPLETION"
-        message_queue: 'QSYSOPR'
-        message_lib: 'QSYS'
-        message_id: "{{comp.split(' ').remove('')}}"
-      register: find_result
+  # ─── TC05 - Find DIAGNOSTIC messages by message_id ───────────────────────────
+  - name: TC05 - find DIAGNOSTIC messages in QSYSOPR and QCONSOLE by message_id
+    when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+    block:
+      - name: TC05 - find DIAGNOSTIC messages
+        ibmi_message:
+          operation: 'find'
+          message_type: "DIAGNOSTIC"
+          message_queue: ['QSYSOPR', 'QCONSOLE']
+          message_lib: 'QSYS'
+          message_id: "{{ diag.split(' ')[1:] }}"
+        register: find_result
 
-    - name: TC06 assert returned option
-      assert:
-        that:
-          - find_result.message_info | length >= comp.split(' ') | length
+      - name: TC05 - assert returned fields and message count
+        assert:
+          that:
+            - find_result.start is defined
+            - find_result.end is defined
+            - find_result.delta is defined
+            - find_result.stderr is defined
+            - find_result.message_info | length >= diag.split(' ')[1:] | length
 
-    - name: TC07 find REPLY message with all supported options
-      ibmi_message:
-        operation: 'find'
-        message_type: "REPLY"
-        message_queue: 'QSYSOPR'
-        message_lib: 'QSYS'
+  # ─── TC06 - Find COMPLETION messages by message_id ───────────────────────────
+  - name: TC06 - find COMPLETION messages in QSYSOPR by message_id
+    when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+    block:
+      - name: TC06 - find COMPLETION messages
+        ibmi_message:
+          operation: 'find'
+          message_type: "COMPLETION"
+          message_queue: 'QSYSOPR'
+          message_lib: 'QSYS'
+          message_id: "{{ comp.split(' ').remove('') }}"
+        register: find_result
 
-    - name: TC08 find ESCAPE message with all supported options
-      ibmi_message:
-        operation: 'find'
-        message_type: "ESCAPE"
-        message_queue: 'QSYSOPR'
-        message_lib: 'QSYS'
+      - name: TC06 - assert message count
+        assert:
+          that:
+            - find_result.message_info | length >= comp.split(' ') | length
 
-    - name: TC09 find NOTIFY message with all supported options
-      ibmi_message:
-        operation: 'find'
-        message_type: "NOTIFY"
-        message_queue: 'QSYSOPR'
-        message_lib: 'QSYS'
+  # ─── TC07 - Find REPLY messages ───────────────────────────────────────────────
+  - name: TC07 - find REPLY messages in QSYSOPR
+    when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+    block:
+      - name: TC07 - find REPLY messages
+        ibmi_message:
+          operation: 'find'
+          message_type: "REPLY"
+          message_queue: 'QSYSOPR'
+          message_lib: 'QSYS'
 
-    - name: TC10 find REQUEST message with all supported options
-      ibmi_message:
-        operation: 'find'
-        message_type: "REQUEST"
-        message_queue: 'QSYSOPR'
-        message_lib: 'QSYS'
+  # ─── TC08 - Find ESCAPE messages ──────────────────────────────────────────────
+  - name: TC08 - find ESCAPE messages in QSYSOPR
+    when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+    block:
+      - name: TC08 - find ESCAPE messages
+        ibmi_message:
+          operation: 'find'
+          message_type: "ESCAPE"
+          message_queue: 'QSYSOPR'
+          message_lib: 'QSYS'
 
-    - name: TC11 find SENDER message with all supported options
-      ibmi_message:
-        operation: 'find'
-        message_type: "SENDER"
-        message_queue: 'QSYSOPR'
-        message_lib: 'QSYS'
+  # ─── TC09 - Find NOTIFY messages ──────────────────────────────────────────────
+  - name: TC09 - find NOTIFY messages in QSYSOPR
+    when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+    block:
+      - name: TC09 - find NOTIFY messages
+        ibmi_message:
+          operation: 'find'
+          message_type: "NOTIFY"
+          message_queue: 'QSYSOPR'
+          message_lib: 'QSYS'
 
-    - name: TC12 find INQUIRY message with all supported options
-      ibmi_message:
-        operation: 'find'
-        message_type: "INQUIRY"
-        message_queue: 'QSYSOPR'
-        message_lib: 'QSYS'
-        message_id: "CPA7025"
-      register: org_result  
+  # ─── TC10 - Find REQUEST messages ─────────────────────────────────────────────
+  - name: TC10 - find REQUEST messages in QSYSOPR
+    when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+    block:
+      - name: TC10 - find REQUEST messages
+        ibmi_message:
+          operation: 'find'
+          message_type: "REQUEST"
+          message_queue: 'QSYSOPR'
+          message_lib: 'QSYS'
+
+  # ─── TC11 - Find SENDER messages ──────────────────────────────────────────────
+  - name: TC11 - find SENDER messages in QSYSOPR
+    when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+    block:
+      - name: TC11 - find SENDER messages
+        ibmi_message:
+          operation: 'find'
+          message_type: "SENDER"
+          message_queue: 'QSYSOPR'
+          message_lib: 'QSYS'
+
+  # ─── TC12 - Find INQUIRY messages by specific message_id ──────────────────────
+  - name: TC12 - find INQUIRY messages in QSYSOPR by message_id CPA7025
+    when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+    block:
+      - name: TC12 - find INQUIRY messages with message_id CPA7025
+        ibmi_message:
+          operation: 'find'
+          message_type: "INQUIRY"
+          message_queue: 'QSYSOPR'
+          message_lib: 'QSYS'
+          message_id: "CPA7025"
+        register: org_result

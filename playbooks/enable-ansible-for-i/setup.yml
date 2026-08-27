@@ -5,23 +5,32 @@
   hosts: all
   gather_facts: false
   vars:
-    is_python39_to_be_installed: true
+    # Default Python level. Override at runtime with: -e python_level=3.9
+    python_level: "3.13"
+    is_python313_to_be_installed: "{{ python_level == '3.13' }}"
+    is_python39_to_be_installed: "{{ python_level == '3.9' }}"
     python_interpreter_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
     python_version: "{{ ansible_python_interpreter.split('/')[-1].split('.')[0] }}"
 
   tasks:
-    - name: Set python39
+    - name: Set python3.13 when that level is selected
+      ansible.builtin.set_fact:
+        python_version: "python3.13"
+        python_interpreter_version: "python3.13"
+      when: is_python313_to_be_installed | bool
+
+    - name: Set python39 when that level is selected
       ansible.builtin.set_fact:
         python_version: "python39"
         python_interpreter_version: "python3.9"
-      when: is_python39_to_be_installed
+      when: is_python39_to_be_installed | bool
 
     - name: Initialize yum_installed
       ansible.builtin.set_fact:
         yum_installed: false
 
     - name: Check whether yum has been installed. If not, install it in following tasks.
-      ansible.builtin.raw: ls -l /QOpensys/pkgs/bin/yum
+      ansible.builtin.raw: ls -l /QOpenSys/pkgs/bin/yum
       args:
         executable: /qopensys/usr/bin/qsh
       changed_when: false
@@ -32,9 +41,19 @@
       ansible.builtin.include_tasks: ibmi-install-yum.yml
       when: "'No such' in default_yum_existance.stdout or 'Error found' in default_yum_existance.stdout"
 
+    - name: Install base Python interpreter
+      ansible.builtin.raw: /QOpensys/pkgs/bin/yum install {{ python_version }} -y
+      register: python_install_result
+      changed_when: "'Nothing to do' not in python_install_result.stdout"
+
+    - name: Install ibm-iaccess package
+      ansible.builtin.raw: /QOpensys/pkgs/bin/yum install ibm-iaccess -y
+      register: iaccess_install_result
+      changed_when: "'Nothing to do' not in iaccess_install_result.stdout"
+
     - name: Include task list
       vars:
-        required_rpms: [itoolkit, ibm_db]
+        required_rpms: [itoolkit, pyodbc]
       block:
         - name: Include task list from ibmi-install-rpm.yml
           ansible.builtin.include_tasks: ibmi-install-rpm.yml

@@ -3,146 +3,236 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC05']) — only those TCs run.
+#   tc_skip:    optional list of TC IDs to skip — everything else runs.
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC descriptions:
+#   TC01   Display a single system value (QCCSID); assert name, type, value range.
+#   TC02   Check a single system value (QMAXSIGN) with expected value; assert compliant.
+#   TC03   Display multiple system values (QCCSID, QMAXSIGN, QMAXSGNACN); assert all fields.
+#   TC04   Check multiple system values with expected values; assert all fields and ranges.
+#   TC05   Change QMAXSIGN to non-expected value; assert fail_list is populated correctly.
+#   TC06   Neg — display a non-existing system value; assert fail_list contains expected error.
+#
+# The outer block/always restores QMAXSIGN and QMAXSGNACN to their original values.
+#
 
 - block:
-  - name: TC01 - Display a system value 
-    ibmi_sysval:
-      sysvalue: 
-        - {'name':'QCCSID'}
-    register: dspsysval_ccsid_result
-    failed_when: dspsysval_ccsid_result.rc != 0
 
-  - name: TC01 - Display the returned parameters
-    debug: 
-      msg: "{{ dspsysval_ccsid_result.sysval }}"
-
-  - name: TC01 - Assert the returned parameters
-    assert:
-      that: 
-        - dspsysval_ccsid_result.sysval | length == 1
-        - dspsysval_ccsid_result.sysval[0].name == 'QCCSID'
-        - dspsysval_ccsid_result.sysval[0].type == '10i0'
-        - dspsysval_ccsid_result.sysval[0].value | int >= 0 and dspsysval_ccsid_result.sysval[0].value | int <= 65535
-
-
-  - name: TC02 - Check a system value with expected value
-    ibmi_sysval:
-      sysvalue: 
-        - {'name':'QMAXSIGN', 'expect':'000005'}
-    register: chksysval_qmaxsign_result
-
-  - name: TC02 - Display the returned parameters
-    debug: 
-      msg: "{{ chksysval_qmaxsign_result.sysval }}"
-      
-  - name: TC02 - Assert the returned parameters
-    assert:
-      that: 
-        - chksysval_qmaxsign_result.sysval | length == 1
-        - chksysval_qmaxsign_result.sysval[0].name == 'QMAXSIGN'
-        - chksysval_qmaxsign_result.sysval[0].type == '8A'
-        - chksysval_qmaxsign_result.sysval[0].value == chksysval_qmaxsign_result.sysval[0].expect
-        - chksysval_qmaxsign_result.sysval | selectattr('compliant', 'equalto', true) | list | length == 1
-        
-
-  - name: TC03 - Display many system values
-    ibmi_sysval:
-      sysvalue: 
-        - {'name':'QCCSID'}
-        - {'name':'QMAXSIGN'}
-        - {'name':'QMAXSGNACN'}
-    register: dissysval_result
-
-  - name: TC03 - Display the many returned parameters
-    debug: 
-      msg: "{{ dissysval_result.sysval }}"
-      
-  - name: TC03 - Assert the many returned parameters
-    assert:
-      that: 
-        - dissysval_result.sysval | length == 3
-        - dissysval_result.sysval[0].name == 'QCCSID'
-        - dissysval_result.sysval[0].type == '10i0'
-        - dissysval_result.sysval[0].value | int >= 0 and dissysval_result.sysval[0].value | int <= 65535
-        - dissysval_result.sysval[1].name == 'QMAXSIGN'
-        - dissysval_result.sysval[1].type == '8A'
-        - dissysval_result.sysval[2].name == 'QMAXSGNACN'
-        - dissysval_result.sysval[2].type == '4A'
-
-
-  - name: TC04 - Check many system values with expected values
-    ibmi_sysval:
-      sysvalue: 
-        - {'name':'QMAXSIGN', 'expect':'000005'}
-        - {'name':'QMAXSGNACN', 'expect':'3'}
-        - {'name':'QCCSID'}
-    register: chksysval_result
-
-  - name: TC04 - Display the many returned parameters
-    debug: 
-      msg: "{{ chksysval_result.sysval }}"
-      
-  - name: TC04 - Assert the many returned parameters
-    assert:
-      that: 
-        - chksysval_result.sysval | length == 3
-        - chksysval_result.sysval[0].name == 'QMAXSIGN'
-        - chksysval_result.sysval[0].type == '8A'
-        - chksysval_result.sysval[0].value | int >= 0 and chksysval_result.sysval[0].value | int <= 25
-        - chksysval_result.sysval[1].name == 'QMAXSGNACN'
-        - chksysval_result.sysval[1].type == '4A'
-        - chksysval_result.sysval[1].value | int >= 0 and chksysval_result.sysval[1].value | int <= 3
-        - chksysval_result.sysval[2].name == 'QCCSID'
-        - chksysval_result.sysval[2].type == '10i0'
-        - chksysval_result.sysval[2].value | int >= 0 and chksysval_result.sysval[2].value | int <= 65535
-
-  - name: TC05 - Check a system value with non-expected value - change a system value to non-exepected value
-    ibmi_cl_command:
-      cmd: CHGSYSVAL SYSVAL(QMAXSIGN) VALUE('000013') # change to a value that unlikely be set on user's system
-    failed_when: false
-
-  - name: TC05 - Check a system value with non-expected value
-    ibmi_sysval:
-      sysvalue: 
-        - {'name':'QMAXSIGN', 'expect':'000005'}
-    register: chksysval_qmaxsign_result
-    failed_when: chksysval_qmaxsign_result.rc == 0
-      
-  - name: TC05 - Assert the returned parameters
-    assert:
-      that: 
-        - chksysval_qmaxsign_result.fail_list | length == 1
-        - chksysval_qmaxsign_result.fail_list[0]['check'] == "equal"
-        - chksysval_qmaxsign_result.fail_list[0]['compliant'] == false
-        - chksysval_qmaxsign_result.fail_list[0]['expect'] == "000005"
-        - chksysval_qmaxsign_result.fail_list[0]['msg'] == "Compliant check failed"
-        - chksysval_qmaxsign_result.fail_list[0]['name'] == "QMAXSIGN"
-        - chksysval_qmaxsign_result.fail_list[0]['type'] == "8A"     
-        - chksysval_qmaxsign_result.fail_list[0]['rc'] == -2      
-        - chksysval_qmaxsign_result.fail_list[0]['value'] == "000013"     
-
-  - name: TC06 - Negative test - non-exist system value 
-    ibmi_sysval:
-      sysvalue: 
-        - {'name':'NONEXIST'}
-    register: dspsysval_nonexist_result
-    failed_when: dspsysval_nonexist_result.rc == 0
-
-  - name: TC05 - Negative test - non-exist system value, assert the expected failure prompts
-    assert:
-      that: 
-        - dspsysval_nonexist_result.fail_list[0]['msg'] == "Unknown System Value Name"
-        - dspsysval_nonexist_result.fail_list[0]['name'] == "NONEXIST"
-        - dspsysval_nonexist_result.fail_list[0]['rc'] == -1 
-
-  always:
-    - name: change system value back to original
-      ibmi_cl_command:
-        cmd: CHGSYSVAL SYSVAL(QMAXSIGN) VALUE('000005')
+    # ─── Save original values before any TC runs ──────────────────────────────────
+    # These are always restored, so the system is left in its original state
+    # regardless of which TCs were executed or whether any of them failed.
+    - name: save original QMAXSIGN and QMAXSGNACN values before test run
+      ibmi_sysval:
+        sysvalue:
+          - {'name': 'QMAXSIGN'}
+          - {'name': 'QMAXSGNACN'}
+      register: original_sysval_read
       failed_when: false
 
-    - name: change system value back to original
+    - name: set facts for original QMAXSIGN and QMAXSGNACN values
+      set_fact:
+        original_qmaxsign: "{{ original_sysval_read.sysval[0].value }}"
+        original_qmaxsgnacn: "{{ original_sysval_read.sysval[1].value }}"
+      when: original_sysval_read.sysval is defined and original_sysval_read.sysval | length == 2
+
+    # ─── TC01 - Display a single system value ─────────────────────────────────────
+    - name: TC01 - display a system value
+      when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+      block:
+        - name: TC01 - display a system value
+          ibmi_sysval:
+            sysvalue:
+              - {'name': 'QCCSID'}
+          register: dspsysval_ccsid_result
+          failed_when: dspsysval_ccsid_result.rc != 0
+
+        - name: TC01 - display the returned parameters
+          debug:
+            msg: "{{ dspsysval_ccsid_result.sysval }}"
+
+        - name: TC01 - assert the returned parameters
+          assert:
+            that:
+              - dspsysval_ccsid_result.sysval | length == 1
+              - dspsysval_ccsid_result.sysval[0].name == 'QCCSID'
+              - dspsysval_ccsid_result.sysval[0].type == '10i0'
+              - dspsysval_ccsid_result.sysval[0].value | int >= 0 and dspsysval_ccsid_result.sysval[0].value | int <= 65535
+
+    # ─── TC02 - Check a single system value with expected value ───────────────────
+    - name: TC02 - check a system value with expected value
+      when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+      block:
+        - name: TC02 - read current QMAXSIGN value
+          ibmi_sysval:
+            sysvalue:
+              - {'name': 'QMAXSIGN'}
+          register: tc02_read_result
+
+        - name: TC02 - set fact for current QMAXSIGN value
+          set_fact:
+            tc02_qmaxsign_value: "{{ tc02_read_result.sysval[0].value }}"
+
+        - name: TC02 - check a system value with expected value (uses live value)
+          ibmi_sysval:
+            sysvalue:
+              - {'name': 'QMAXSIGN', 'expect': '{{ tc02_qmaxsign_value }}'}
+          register: chksysval_qmaxsign_result
+
+        - name: TC02 - display the returned parameters
+          debug:
+            msg: "{{ chksysval_qmaxsign_result.sysval }}"
+
+        - name: TC02 - assert the returned parameters
+          assert:
+            that:
+              - chksysval_qmaxsign_result.sysval | length == 1
+              - chksysval_qmaxsign_result.sysval[0].name == 'QMAXSIGN'
+              - chksysval_qmaxsign_result.sysval[0].type == '8A'
+              - chksysval_qmaxsign_result.sysval[0].value == chksysval_qmaxsign_result.sysval[0].expect
+              - chksysval_qmaxsign_result.sysval | selectattr('compliant', 'equalto', true) | list | length == 1
+
+    # ─── TC03 - Display multiple system values ────────────────────────────────────
+    - name: TC03 - display many system values
+      when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+      block:
+        - name: TC03 - display many system values
+          ibmi_sysval:
+            sysvalue:
+              - {'name': 'QCCSID'}
+              - {'name': 'QMAXSIGN'}
+              - {'name': 'QMAXSGNACN'}
+          register: dissysval_result
+
+        - name: TC03 - display the many returned parameters
+          debug:
+            msg: "{{ dissysval_result.sysval }}"
+
+        - name: TC03 - assert the many returned parameters
+          assert:
+            that:
+              - dissysval_result.sysval | length == 3
+              - dissysval_result.sysval[0].name == 'QCCSID'
+              - dissysval_result.sysval[0].type == '10i0'
+              - dissysval_result.sysval[0].value | int >= 0 and dissysval_result.sysval[0].value | int <= 65535
+              - dissysval_result.sysval[1].name == 'QMAXSIGN'
+              - dissysval_result.sysval[1].type == '8A'
+              - dissysval_result.sysval[2].name == 'QMAXSGNACN'
+              - dissysval_result.sysval[2].type == '4A'
+
+    # ─── TC04 - Check multiple system values with expected values ─────────────────
+    - name: TC04 - check many system values with expected values
+      when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+      block:
+        - name: TC04 - read current QMAXSIGN and QMAXSGNACN values
+          ibmi_sysval:
+            sysvalue:
+              - {'name': 'QMAXSIGN'}
+              - {'name': 'QMAXSGNACN'}
+          register: tc04_read_result
+
+        - name: TC04 - set facts for current values
+          set_fact:
+            tc04_qmaxsign_value: "{{ tc04_read_result.sysval[0].value }}"
+            tc04_qmaxsgnacn_value: "{{ tc04_read_result.sysval[1].value }}"
+
+        - name: TC04 - check many system values with expected values (uses live values)
+          ibmi_sysval:
+            sysvalue:
+              - {'name': 'QMAXSIGN', 'expect': '{{ tc04_qmaxsign_value }}'}
+              - {'name': 'QMAXSGNACN', 'expect': '{{ tc04_qmaxsgnacn_value }}'}
+              - {'name': 'QCCSID'}
+          register: chksysval_result
+
+        - name: TC04 - display the many returned parameters
+          debug:
+            msg: "{{ chksysval_result.sysval }}"
+
+        - name: TC04 - assert the many returned parameters
+          assert:
+            that:
+              - chksysval_result.sysval | length == 3
+              - chksysval_result.sysval[0].name == 'QMAXSIGN'
+              - chksysval_result.sysval[0].type == '8A'
+              - chksysval_result.sysval[0].value | int >= 0 and chksysval_result.sysval[0].value | int <= 25
+              - chksysval_result.sysval[1].name == 'QMAXSGNACN'
+              - chksysval_result.sysval[1].type == '4A'
+              - chksysval_result.sysval[1].value | int >= 0 and chksysval_result.sysval[1].value | int <= 3
+              - chksysval_result.sysval[2].name == 'QCCSID'
+              - chksysval_result.sysval[2].type == '10i0'
+              - chksysval_result.sysval[2].value | int >= 0 and chksysval_result.sysval[2].value | int <= 65535
+
+    # ─── TC05 - Check system value with non-expected value ────────────────────────
+    - name: TC05 - check a system value with non-expected value
+      when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+      block:
+        - name: TC05 - change a system value to non-expected value
+          ibmi_cl_command:
+            cmd: "CHGSYSVAL SYSVAL(QMAXSIGN) VALUE('000013')"
+          register: tc05_change_result
+          failed_when: false
+
+        - name: TC05 - verify the change took effect
+          ibmi_sysval:
+            sysvalue:
+              - {'name': 'QMAXSIGN'}
+          register: tc05_verify_result
+
+        - name: TC05 - check a system value with non-expected value
+          ibmi_sysval:
+            sysvalue:
+              - {'name': 'QMAXSIGN', 'expect': '{{ original_qmaxsign }}'}
+          register: chksysval_qmaxsign_result
+          failed_when: chksysval_qmaxsign_result.rc == 0
+          when: tc05_verify_result.sysval[0].value == '000013'
+
+        - name: TC05 - assert the returned parameters
+          assert:
+            that:
+              - chksysval_qmaxsign_result.fail_list | length == 1
+              - chksysval_qmaxsign_result.fail_list[0]['check'] == "equal"
+              - chksysval_qmaxsign_result.fail_list[0]['compliant'] == false
+              - chksysval_qmaxsign_result.fail_list[0]['expect'] == original_qmaxsign
+              - chksysval_qmaxsign_result.fail_list[0]['msg'] == "Compliant check failed"
+              - chksysval_qmaxsign_result.fail_list[0]['name'] == "QMAXSIGN"
+              - chksysval_qmaxsign_result.fail_list[0]['type'] == "8A"
+              - chksysval_qmaxsign_result.fail_list[0]['rc'] == -2
+              - chksysval_qmaxsign_result.fail_list[0]['value'] == "000013"
+          when: tc05_verify_result.sysval[0].value == '000013'
+
+    # ─── TC06 - Neg: display a non-existing system value ─────────────────────────
+    - name: TC06 - negative test - non-existing system value
+      when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+      block:
+        - name: TC06 - negative test - non-exist system value
+          ibmi_sysval:
+            sysvalue:
+              - {'name': 'NONEXIST'}
+          register: dspsysval_nonexist_result
+          failed_when: dspsysval_nonexist_result.rc == 0
+
+        - name: TC06 - assert the expected failure prompts
+          assert:
+            that:
+              - dspsysval_nonexist_result.fail_list[0]['msg'] == "Unknown System Value Name"
+              - dspsysval_nonexist_result.fail_list[0]['name'] == "NONEXIST"
+              - dspsysval_nonexist_result.fail_list[0]['rc'] == -1
+
+  always:
+    # Restore QMAXSIGN and QMAXSGNACN to their values as captured before any TC ran.
+    # TC05 changes QMAXSIGN; TC04 does NOT change any values (read-only check).
+    # original_qmaxsign / original_qmaxsgnacn are always set at the top of the block,
+    # so these restores are safe regardless of which TCs were executed or skipped.
+    - name: restore QMAXSIGN to original value
       ibmi_cl_command:
-        cmd: CHGSYSVAL SYSVAL(QMAXSGNACN) VALUE('3')
+        cmd: "CHGSYSVAL SYSVAL(QMAXSIGN) VALUE('{{ original_qmaxsign }}')"
+      when: original_qmaxsign is defined
+      failed_when: false
+
+    - name: restore QMAXSGNACN to original value
+      ibmi_cl_command:
+        cmd: "CHGSYSVAL SYSVAL(QMAXSGNACN) VALUE('{{ original_qmaxsgnacn }}')"
+      when: original_qmaxsgnacn is defined
       failed_when: false

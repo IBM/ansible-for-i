@@ -1,0 +1,10 @@
+# BAT (Build Acceptance Test) execute list for ibmi_at
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# TC01 is independent — no dependency on any other TC.
+# The outer always: block still runs cleanup regardless of which TCs execute.
+
+tc_execute:
+  - TC01

@@ -1,33 +1,59 @@
-# test code for the ibmi_lib_restore module
+---
+# Integration tests for the ibmi_lib_restore module
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
-#
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-- block: 
-    ## Setup - Create libraries and objects on test systems
-    - copy: src="IBMISAVF.FILE" dest="/tmp/"
-    
-    - name: create libraries 
-      ibmi_cl_command: 
-        cmd: "crtlib lib({{item}})"
-      with_items: 
-        - SAVRST
-        - ARCHLIB
-        - DEF
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC02','TC05']) — only those TCs run.
+#               The setup block always runs regardless of this list.
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['TC04']) — everything else runs.
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency notes:
+#   Setup  Copies IBMISAVF.FILE into ARCHLIB, creates SAVRST/ARCHLIB/DEF libs,
+#          seeds SAVRST via ibmi_object_restore, then saves it to SAVTEST in ARCHLIB.
+#          Always runs — TC01–TC14 all depend on SAVTEST.FILE existing.
+#   TC01   Verify the initial object restore from setup succeeded.
+#   TC02–TC04  Positive restore tests.  Each calls dlt_crt_lib.yml first to wipe
+#              and recreate SAVRST so every restore starts from a clean lib.
+#   TC05–TC06  Negative: wrong/non-existing saved_lib.  Use dlt_crt_lib.yml to reset.
+#   TC08–TC14  Negative: invalid parameter values, missing required args.  Independent.
+#
+# Note: TC07 does not exist in the original test suite (numbering gap preserved).
+#
+# The outer block/always wraps everything so ARCHLIB/SAVRST/DEF cleanup always fires.
+# TC blocks and the dlt_crt_lib.yml reset helper live in restore_lib.yml.
+#
 
-    - name: copy file to library
-      command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB/'
-    
-    - ansible.builtin.include_tasks: restore_lib.yml
+- block:
+
+  # ─── Setup (always runs) ─────────────────────────────────────────────────────
+  - name: Setup - copy IBMISAVF.FILE save file to /tmp/ on IBM i
+    copy:
+      src: "IBMISAVF.FILE"
+      dest: "/tmp/"
+
+  - name: Setup - create test libraries SAVRST, ARCHLIB, DEF
+    ibmi_cl_command:
+      cmd: "crtlib lib({{ item }})"
+    with_items:
+      - SAVRST
+      - ARCHLIB
+      - DEF
+
+  - name: Setup - move IBMISAVF.FILE into ARCHLIB
+    command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB/'
+
+  - ansible.builtin.include_tasks: restore_lib.yml
 
   always:
-    - name: remove copied file
+    - name: Cleanup - remove copied IBMISAVF.FILE from /tmp/
       command: 'rm -rf /tmp/IBMISAVF.FILE'
 
-    - name: delete libraries 
-      ibmi_cl_command: 
-        cmd: "dltlib lib({{item}})"
-      with_items: 
+    - name: Cleanup - delete test libraries SAVRST, ARCHLIB, DEF
+      ibmi_cl_command:
+        cmd: "dltlib lib({{ item }})"
+      with_items:
         - SAVRST
         - ARCHLIB
         - DEF

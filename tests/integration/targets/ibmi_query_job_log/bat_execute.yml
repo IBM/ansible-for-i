@@ -1,0 +1,12 @@
+# BAT (Build Acceptance Test) execute list for ibmi_query_job_log
+#
+# TC01   Positive — query job log for a real active QPGMR *BATCH job; assert fields.
+# TC02   Negative — non-existent job number 999999; assert rc=301.
+# TC03   Negative — non-existent job user "dummyuser"; assert rc=301.
+# TC04   Negative — non-existent job name "dummyjob"; assert rc=301.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ────────────────
+
+tc_execute:
+  - TC01
+  

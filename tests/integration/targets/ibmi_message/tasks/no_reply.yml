@@ -11,79 +11,104 @@
 #  QSYS/SNDMSG MSG('inquiry three') TOMSGQ(ANSI/TRYMSG3) MSGTYPE(*INQ)
 #  QSYS/SNDMSG MSG('infor  one') TOMSGQ(ANSI/TRYMSG1) MSGTYPE(*INFO)
 #  QSYS/SNDMSG MSG('infor  one') TOMSGQ(ANSI/TRYMSG1) MSGTYPE(*INQ) Then "WRKMSGQ MSGQ(ANSI/TRYMSG1)" to find the message and reply it   
+#
+# tc_execute / tc_skip variables flow through automatically from main.yml.
+# TC01-TC04 are automatically skipped if the ANSI lib/queues are not found.
 
-- set_fact:
+- name: Setup - set manual message queue facts for no_reply tests
+  set_fact:
     manual_lib: 'ANSI'
     manual_msgq: ['TRYMSG1', 'TRYMSG2', 'TRYMSG3']
 
-- name: skip the no_reply testing if the defined manual_lib and manual_msgq don't exist 
+- name: Setup - check whether the manual ANSI lib and message queues exist
   ibmi_sql_query:
-    sql: "SELECT OBJNAME FROM TABLE (QSYS2.OBJECT_STATISTICS('{{manual_lib}}', '*MSGQ') ) AS X;"
+    sql: "SELECT OBJNAME FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ manual_lib }}', '*MSGQ') ) AS X"
   register: sql_result
 
-- set_fact:
+- name: Setup - set is_msgq_ready=true initially
+  set_fact:
     is_msgq_ready: true
-    existing_queue_list: "{{sql_result.row | map(attribute='OBJNAME') | join(',')}}"
+    existing_queue_list: "{{ sql_result.row | map(attribute='OBJNAME') | join(',') }}"
 
-- set_fact:
+- name: Setup - set is_msgq_ready=false if any required queue is missing
+  set_fact:
     is_msgq_ready: false
-  when: item not in existing_queue_list 
-  loop: '{{manual_msgq}}'
+  when: item not in existing_queue_list
+  loop: "{{ manual_msgq }}"
 
-- block: 
-  - name: TC01 find NO_REPLY message with all supported options
-    ibmi_message:
-      operation: 'find'
-      message_type: "NO_REPLY"
-      message_queue: '{{manual_msgq[0]}}'
-      message_lib: '{{manual_lib}}'
-    register: find_result  
+- name: Skip notice - manual queues not found, TC01-TC04 will be skipped
+  debug:
+    msg: "Created the message queues and send the required messages to the message queues before running the testing"
+  when: is_msgq_ready == false
 
-  - name: TC01 assert returned option
-    assert:
-      that:
-        - find_result.message_info | length == 2
+- block:
 
-  - name: TC02 find NO_REPLY message with all supported options
-    ibmi_message:
-      operation: 'find'
-      message_type: "NO_REPLY"
-      message_lib: '{{manual_lib}}'
-    register: find_result  
+  # ─── TC01 - Find NO_REPLY messages in a single queue ─────────────────────────
+  - name: TC01 - find NO_REPLY messages in TRYMSG1
+    when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+    block:
+      - name: TC01 - find NO_REPLY message with all supported options
+        ibmi_message:
+          operation: 'find'
+          message_type: "NO_REPLY"
+          message_queue: '{{ manual_msgq[0] }}'
+          message_lib: '{{ manual_lib }}'
+        register: find_result
 
-  - name: TC02 assert returned option
-    assert:
-      that:
-        - find_result.message_info | length == 6
+      - name: TC01 - assert 2 NO_REPLY messages found in TRYMSG1
+        assert:
+          that:
+            - find_result.message_info | length == 2
 
-  - name: TC03 find NO_REPLY message with all supported options
-    ibmi_message:
-      operation: 'find'
-      message_type: "NO_REPLY"
-      message_lib: '{{manual_lib}}'
-      message_text: 'two'
-    register: find_result  
+  # ─── TC02 - Find NO_REPLY messages across all queues in lib ──────────────────
+  - name: TC02 - find all NO_REPLY messages in ANSI lib
+    when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+    block:
+      - name: TC02 - find NO_REPLY messages lib-wide
+        ibmi_message:
+          operation: 'find'
+          message_type: "NO_REPLY"
+          message_lib: '{{ manual_lib }}'
+        register: find_result
 
-  - name: TC03 assert returned option
-    assert:
-      that:
-        - find_result.message_info | length == 3
+      - name: TC02 - assert 6 NO_REPLY messages found across all queues
+        assert:
+          that:
+            - find_result.message_info | length == 6
 
-  - name: TC04 find NO_REPLY message with all supported options
-    ibmi_message:
-      operation: 'find'
-      message_type: "NO_REPLY"
-      message_queue: '{{manual_msgq[:2]}}'
-      message_lib: '{{manual_lib}}'
-      message_text: 'two'
-    register: find_result  
+  # ─── TC03 - Find NO_REPLY messages filtered by message_text ──────────────────
+  - name: TC03 - find NO_REPLY messages containing text 'two'
+    when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+    block:
+      - name: TC03 - find NO_REPLY messages with message_text filter
+        ibmi_message:
+          operation: 'find'
+          message_type: "NO_REPLY"
+          message_lib: '{{ manual_lib }}'
+          message_text: 'two'
+        register: find_result
 
-  - name: TC04 assert returned option
-    assert:
-      that:
-        - find_result.message_info | length == 2
-  when: is_msgq_ready == true 
+      - name: TC03 - assert 3 messages match text 'two'
+        assert:
+          that:
+            - find_result.message_info | length == 3
 
-- debug: 
-    msg: "'Created the message queues and send the requird messages to the message queues before run the testing'"
-  when: is_msgq_ready == false 
+  # ─── TC04 - Find NO_REPLY messages in two queues filtered by text ─────────────
+  - name: TC04 - find NO_REPLY messages in first two queues containing 'two'
+    when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+    block:
+      - name: TC04 - find NO_REPLY messages in TRYMSG1 and TRYMSG2 with text 'two'
+        ibmi_message:
+          operation: 'find'
+          message_type: "NO_REPLY"
+          message_queue: '{{ manual_msgq[:2] }}'
+          message_lib: '{{ manual_lib }}'
+          message_text: 'two'
+        register: find_result
+
+      - name: TC04 - assert 2 messages match in the two queues
+        assert:
+          that:
+            - find_result.message_info | length == 2
+
+  when: is_msgq_ready == true

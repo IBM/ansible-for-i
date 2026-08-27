@@ -1,120 +1,197 @@
-- name: TC21 display a not existing user profile 
-  ibmi_user_and_group:
-    operation: 'display'
-    user: 'abc123456'
-  register: user_result
-  failed_when: "'User ABC123456 not found' not in user_result.msg"
+# test code for the ibmi_user_and_group module — negative test cases
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['NEG_TC21','NEG_TC29'])
+#   tc_skip:    optional list of TC IDs to skip
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC descriptions:
+#   NEG_TC21   Display a non-existing user; expect "not found" in msg.
+#   NEG_TC22   Run with invalid operation value; expect "value of operation must be one of".
+#   NEG_TC23   Run with invalid expire value; expect "value of expire must be one of".
+#   NEG_TC24   Run with invalid status value; expect "value of status must be one of".
+#   NEG_TC25   Run with invalid user_class value; expect "value of user_class must be one of".
+#   NEG_TC26   Run with invalid special_authority value; expect "value of special_authority must be one or more of".
+#   NEG_TC27   Run with invalid owner value; expect "value of owner must be one of".
+#   NEG_TC28   Run with invalid parameters; no specific failure check (runs with ignore_errors).
+#   NEG_TC29   Display with missing required user option; expect "missing required arguments: user".
+#   NEG_TC30   Run with missing required operation option; expect "missing required arguments: operation".
+#   NEG_TC31   Display with unsupported option; expect "Unsupported parameters".
+#   NEG_TC33   Change a non-existing user; expect "User profile ABC not found".
+#   NEG_TC35   Display group members for non-existing group; expect "Group profile ABC not found".
+#
 
-- name: TC22 run with invalid operation
-  ibmi_user_and_group:
-    operation: 'abc'
-    user: '{{ansible_ssh_user}}'
-  register: user_result
-  failed_when: "'value of operation must be one of:' not in user_result.msg"
+# ─── NEG_TC21 - Display a non-existing user ───────────────────────────────────
+- name: NEG_TC21 - display a non-existing user profile
+  when: (tc_execute is not defined or 'NEG_TC21' in tc_execute) and 'NEG_TC21' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC21 - display a not existing user profile
+      ibmi_user_and_group:
+        operation: 'display'
+        user: 'abc123456'
+      register: user_result
+      failed_when: "'User ABC123456 not found' not in user_result.msg"
 
-- name: TC23 run with invalid expire
-  ibmi_user_and_group:
-    operation: 'display'
-    user: '{{ansible_ssh_user}}'
-    expire: 'ABC'
-    status: '*ENABLED'
-    user_class: '*SECOFR'
-    special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
-    user_group: 'new_group[1]'
-    owner: '*USRPRF'
-    text: 'ANSIBLE TESTING'
-    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
-  register: user_result
-  failed_when: "'value of expire must be one of:' not in user_result.msg"
+# ─── NEG_TC22 - Invalid operation value ───────────────────────────────────────
+- name: NEG_TC22 - run with invalid operation
+  when: (tc_execute is not defined or 'NEG_TC22' in tc_execute) and 'NEG_TC22' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC22 - run with invalid operation
+      ibmi_user_and_group:
+        operation: 'abc'
+        user: '{{ansible_ssh_user}}'
+      register: user_result
+      failed_when: "'value of operation must be one of:' not in user_result.msg"
 
-- name: TC24 run with invalid status
-  ibmi_user_and_group:
-    operation: 'display'
-    user: '{{ansible_ssh_user}}'
-    status: 'abc'
-    user_class: '*SECOFR'
-    special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
-    user_group: 'new_group[1]'
-    owner: '*USRPRF'
-    text: 'ANSIBLE TESTING'
-    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
-  register: user_result
-  failed_when: "'value of status must be one of:' not in user_result.msg"
+# ─── NEG_TC23 - Invalid expire value ──────────────────────────────────────────
+- name: NEG_TC23 - run with invalid expire
+  when: (tc_execute is not defined or 'NEG_TC23' in tc_execute) and 'NEG_TC23' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC23 - run with invalid expire
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{ansible_ssh_user}}'
+        expire: 'ABC'
+        status: '*ENABLED'
+        user_class: '*SECOFR'
+        special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
+        user_group: 'new_group[1]'
+        owner: '*USRPRF'
+        text: 'ANSIBLE TESTING'
+        parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+      register: user_result
+      failed_when: "'value of expire must be one of:' not in user_result.msg"
 
-- name: TC25 run with invalid user_class
-  ibmi_user_and_group:
-    operation: 'display'
-    user: '{{ansible_ssh_user}}'
-    user_class: 'abc'
-    special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
-    user_group: 'new_group[1]'
-    owner: '*USRPRF'
-    text: 'ANSIBLE TESTING'
-    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
-  register: user_result
-  failed_when: "'value of user_class must be one of:' not in user_result.msg"
+# ─── NEG_TC24 - Invalid status value ──────────────────────────────────────────
+- name: NEG_TC24 - run with invalid status
+  when: (tc_execute is not defined or 'NEG_TC24' in tc_execute) and 'NEG_TC24' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC24 - run with invalid status
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{ansible_ssh_user}}'
+        status: 'abc'
+        user_class: '*SECOFR'
+        special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
+        user_group: 'new_group[1]'
+        owner: '*USRPRF'
+        text: 'ANSIBLE TESTING'
+        parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+      register: user_result
+      failed_when: "'value of status must be one of:' not in user_result.msg"
 
-- name: TC26 run with invalid special_authority
-  ibmi_user_and_group:
-    operation: 'display'
-    user: '{{ansible_ssh_user}}'
-    special_authority: ['abc']
-    user_group: 'new_group[1]'
-    owner: '*USRPRF'
-    text: 'ANSIBLE TESTING'
-    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
-  register: user_result
-  failed_when: "'value of special_authority must be one or more of:' not in user_result.msg"
+# ─── NEG_TC25 - Invalid user_class value ──────────────────────────────────────
+- name: NEG_TC25 - run with invalid user_class
+  when: (tc_execute is not defined or 'NEG_TC25' in tc_execute) and 'NEG_TC25' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC25 - run with invalid user_class
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{ansible_ssh_user}}'
+        user_class: 'abc'
+        special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
+        user_group: 'new_group[1]'
+        owner: '*USRPRF'
+        text: 'ANSIBLE TESTING'
+        parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+      register: user_result
+      failed_when: "'value of user_class must be one of:' not in user_result.msg"
 
-- name: TC27 run with invalid owner
-  ibmi_user_and_group:
-    operation: 'display'
-    user: '{{ansible_ssh_user}}'
-    owner: 'abc'
-    text: 'ANSIBLE TESTING'
-    parameters: "HOMEDIR('/home/{{new_user[0]}}')"
-  register: user_result
-  failed_when: "'value of owner must be one of:' not in user_result.msg"
+# ─── NEG_TC26 - Invalid special_authority value ────────────────────────────────
+- name: NEG_TC26 - run with invalid special_authority
+  when: (tc_execute is not defined or 'NEG_TC26' in tc_execute) and 'NEG_TC26' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC26 - run with invalid special_authority
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{ansible_ssh_user}}'
+        special_authority: ['abc']
+        user_group: 'new_group[1]'
+        owner: '*USRPRF'
+        text: 'ANSIBLE TESTING'
+        parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+      register: user_result
+      failed_when: "'value of special_authority must be one or more of:' not in user_result.msg"
 
-- name: TC28 run with invalid parameters
-  ibmi_user_and_group:
-    operation: 'display'
-    user: '{{ansible_ssh_user}}'
-    text: 'ANSIBLE TESTING'
-    parameters: "ABC('abc')"
-  register: user_result
-  #failed_when: "'value of operation must be one of:' not in user_result.msg"
+# ─── NEG_TC27 - Invalid owner value ───────────────────────────────────────────
+- name: NEG_TC27 - run with invalid owner
+  when: (tc_execute is not defined or 'NEG_TC27' in tc_execute) and 'NEG_TC27' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC27 - run with invalid owner
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{ansible_ssh_user}}'
+        owner: 'abc'
+        text: 'ANSIBLE TESTING'
+        parameters: "HOMEDIR('/home/{{new_user[0]}}')"
+      register: user_result
+      failed_when: "'value of owner must be one of:' not in user_result.msg"
 
-- name: TC29 display with missing required option
-  ibmi_user_and_group:
-    operation: 'display'
-  register: user_result
-  failed_when: "'missing required arguments: user' not in user_result.msg"
+# ─── NEG_TC28 - Invalid parameters ────────────────────────────────────────────
+- name: NEG_TC28 - run with invalid parameters
+  when: (tc_execute is not defined or 'NEG_TC28' in tc_execute) and 'NEG_TC28' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC28 - run with invalid parameters
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{ansible_ssh_user}}'
+        text: 'ANSIBLE TESTING'
+        parameters: "ABC('abc')"
+      register: user_result
 
-- name: TC30 display with missing required option
-  ibmi_user_and_group:
-    user: '{{ansible_ssh_user}}'
-  register: user_result
-  failed_when: "'missing required arguments: operation' not in user_result.msg"
+# ─── NEG_TC29 - Missing required user option ──────────────────────────────────
+- name: NEG_TC29 - display with missing required user option
+  when: (tc_execute is not defined or 'NEG_TC29' in tc_execute) and 'NEG_TC29' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC29 - display with missing required option
+      ibmi_user_and_group:
+        operation: 'display'
+      register: user_result
+      failed_when: "'missing required arguments: user' not in user_result.msg"
 
-- name: TC31 display with unsupported option
-  ibmi_user_and_group:
-    operation: 'display'
-    user: '{{ansible_ssh_user}}'
-    abc: abc
-  register: user_result
-  failed_when: "'Unsupported parameters' not in user_result.msg"
+# ─── NEG_TC30 - Missing required operation option ─────────────────────────────
+- name: NEG_TC30 - display with missing required operation option
+  when: (tc_execute is not defined or 'NEG_TC30' in tc_execute) and 'NEG_TC30' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC30 - display with missing required option
+      ibmi_user_and_group:
+        user: '{{ansible_ssh_user}}'
+      register: user_result
+      failed_when: "'missing required arguments: operation' not in user_result.msg"
 
-- name: TC33 change an not existing user profile
-  ibmi_user_and_group:
-    operation: 'change'
-    user: 'abc'
-  register: user_result
-  failed_when: "'User profile ABC not found' not in user_result.msg"
+# ─── NEG_TC31 - Unsupported option ────────────────────────────────────────────
+- name: NEG_TC31 - display with unsupported option
+  when: (tc_execute is not defined or 'NEG_TC31' in tc_execute) and 'NEG_TC31' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC31 - display with unsupported option
+      ibmi_user_and_group:
+        operation: 'display'
+        user: '{{ansible_ssh_user}}'
+        abc: abc
+      register: user_result
+      failed_when: "'Unsupported parameters' not in user_result.msg"
 
-- name: TC35 disply group member with an not exiting user group
-  ibmi_user_and_group:
-    operation: 'display_group_members'
-    user: 'abc'
-  register: user_result
-  failed_when: "'Group profile ABC not found' not in user_result.msg"
+# ─── NEG_TC33 - Change a non-existing user ────────────────────────────────────
+- name: NEG_TC33 - change a non-existing user profile
+  when: (tc_execute is not defined or 'NEG_TC33' in tc_execute) and 'NEG_TC33' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC33 - change an not existing user profile
+      ibmi_user_and_group:
+        operation: 'change'
+        user: 'abc'
+      register: user_result
+      failed_when: "'User profile ABC not found' not in user_result.msg"
+
+# ─── NEG_TC35 - Display group members for non-existing group ──────────────────
+- name: NEG_TC35 - display group members for non-existing group
+  when: (tc_execute is not defined or 'NEG_TC35' in tc_execute) and 'NEG_TC35' not in (tc_skip | default([]))
+  block:
+    - name: NEG_TC35 - display group member with a non-existing user group
+      ibmi_user_and_group:
+        operation: 'display_group_members'
+        user: 'abc'
+      register: user_result
+      failed_when: "'Group profile ABC not found' not in user_result.msg"

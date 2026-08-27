@@ -1,0 +1,29 @@
+# BAT (Build Acceptance Test) execute list for ibmi_message
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# TC split by file:
+#   TC01–TC04  no_reply.yml  — require ANSI lib + TRYMSG1/2/3 to be manually pre-created.
+#              Automatically skipped if those queues don't exist on the target system.
+#              Excluded from BAT default by default — uncomment to enable on prepared systems.
+#   TC05–TC12  qsysopr.yml  — read-only queries against QSYS/QSYSOPR, always available.
+#   TC15–TC29  message.yml  — use ANSITEST lib created by setup; fast, self-contained.
+#
+# TC13/TC14 do not exist (numbering gap from original test suite).
+
+tc_execute:
+  # TC01-TC04 require manual pre-setup on the IBM i — uncomment if ANSI/TRYMSG queues exist:
+  # - TC01
+  # - TC02
+  # - TC03
+  # - TC04
+  - TC05
+  - TC06
+  - TC07
+  - TC08
+  - TC09
+  - TC10
+  - TC11
+  - TC12
+ 

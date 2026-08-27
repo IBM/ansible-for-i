@@ -1,19 +1,38 @@
-- name: gather ibmi facts
+# test code for the ibmi_facts module
+# (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
+#
+# GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
+#
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01']) — only those TCs run
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['TC01']) — everything else runs
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency notes:
+#   TC01  gathers IBM i facts and asserts all expected keys are returned
+#         — read-only, no server state changes, fast (~2-5s)
+#
+
+- name: Setup gather ibmi facts
   ibmi_facts:
 
-- name: assert facts
-  assert:
-    that:
-      - "ansible_system == 'OS400'"
-      - "ansible_kernel_version != '' "
-      - "ansible_python_version != '' "
-      - "system_name is defined"
-      - version_release is defined
-      - system_info is defined and system_info != {}
-      - system_values is defined
-      - system_catalogs is defined
-      - system_status is defined
-      - tcpip_info is defined
-      - group_ptf_info is defined
-      - dns_info is defined
-      - route_info is defined
+# ─── TC01 ─────────────────────────────────────────────────────────────────────
+- name: TC01 - Assert all expected fact keys are returned
+  when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+  block:
+    - name: TC01 assert facts
+      assert:
+        that:
+          - "ansible_system == 'OS400'"
+          - "ansible_kernel_version != '' "
+          - "ansible_python_version != '' "
+          - "system_name is defined"
+          - version_release is defined
+          - system_info is defined and system_info != {}
+          - system_values is defined
+          - system_catalogs is defined
+          - system_status is defined
+          - tcpip_info is defined
+          - group_ptf_info is defined
+          - dns_info is defined
+          - route_info is defined

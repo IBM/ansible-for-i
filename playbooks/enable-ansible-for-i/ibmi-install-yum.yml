@@ -1,56 +1,51 @@
 # Copyright (c) IBM Corporation 2019, 2020
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/tasks.json
 ---
 
-- name: Create the installation script on IBM i
-  ansible.builtin.raw: "rm -rf /tmp/bootstrap.sql && touch -C 819 /tmp/bootstrap.sql"
+# Step 1: Download bootstrap files directly to IBM i
+
+# Note: We use ansible.builtin.get_url to allow downloading the files before yum is installed
+
+- name: Download bootstrap.sh directly to IBM i
+  ansible.builtin.get_url:
+    url: https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.sh
+    dest: /tmp/bootstrap.sh
+    mode: '0755'
+
+- name: Download bootstrap.tar.Z directly to IBM i
+  ansible.builtin.get_url:
+    url: https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.tar.Z
+    dest: /tmp/bootstrap.tar.Z
+    mode: '0644'
+
+
+# Step 2: Run bootstrap script on IBM i
+
+- name: Run bootstrap script to install yum
+  ansible.builtin.raw: |
+    cd /tmp && /QOpenSys/usr/bin/ksh bootstrap.sh
   args:
     executable: /qopensys/usr/bin/qsh
+  register: bootstrap_output
+  failed_when: >
+    bootstrap_output.rc != 0 and
+    "already been bootstrapped" not in bootstrap_output.stdout
   changed_when: true
 
-- name: Write the content to the installation script on IBM i
-  ansible.builtin.raw: "echo \"
-create or replace table qtemp.ftpcmd(cmd char(240)) on replace delete rows;
-create or replace table qtemp.ftplog(line char(240)) on replace delete rows;
 
-insert into qtemp.ftpcmd(CMD) values
-  ('anonymous anonymous@example.com')
-,('namefmt 1')
-,('lcd /tmp')
-,('cd /software/ibmi/products/pase/rpms')
-,('bin')
-,('get README.md (replace')
-,('get bootstrap.tar.Z (replace')
-,('get bootstrap.sh (replace')
-with nc
-;
+# Step 3: Verify yum installation
 
-CL:OVRDBF FILE(INPUT) TOFILE(QTEMP/FTPCMD) MBR(*FIRST) OVRSCOPE(*JOB);
-CL:OVRDBF FILE(OUTPUT) TOFILE(QTEMP/FTPLOG) MBR(*FIRST) OVRSCOPE(*JOB);
-
-CL:FTP RMTSYS('public.dhe.ibm.com');
-
-CL:QSH CMD('touch -C 819 /tmp/bootstrap.log; /QOpenSys/usr/bin/ksh /tmp/bootstrap.sh > /tmp/bootstrap.log 2>&1');
-\" >> /tmp/bootstrap.sql"
-  args:
-    executable: /qopensys/usr/bin/qsh
-  changed_when: true
-
-- name: Run the installation script to install yum
-  ansible.builtin.raw: system "RUNSQLSTM SRCSTMF('/tmp/bootstrap.sql')"
-  args:
-    executable: /qopensys/usr/bin/qsh
-  register: output_of_runsqlstm
-  failed_when: "'QSH0005' not in output_of_runsqlstm.stdout"
-  changed_when: "'QSH0005' in output_of_runsqlstm.stdout"
-
-- name: Run /QOpensys/pkgs/bin/yum to confirm yum has been installed properly
+- name: Check if yum was installed successfully
   ansible.builtin.raw: ls -l /QOpensys/pkgs/bin/yum
   args:
     executable: /qopensys/usr/bin/qsh
   register: output_of_yum
-  failed_when: "'No such path or directory' in output_of_yum"
+  failed_when: "'No such' in output_of_yum.stdout"
   changed_when: false
+
+
+# Step 4: Mark yum as installed
 
 - name: Note that yum is installed
   ansible.builtin.set_fact:

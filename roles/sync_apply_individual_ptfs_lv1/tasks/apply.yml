@@ -2,33 +2,33 @@
 # Task for apply.yml
 - name: Initialize
   ansible.builtin.set_fact:
-    path: "~/PTF/singleptf/{{ not_loaded_list_var.file_path | basename }}"
+    sync_apply_individual_ptfs_lv1_path: "~/PTF/singleptf/{{ not_loaded_list_var.file_path | basename }}"
 
 - name: Compose path
   ansible.builtin.set_fact:
-    path: "{{ path | regex_replace('~', home_dir.stdout) }}"
-  when: path | regex_search("^~") | length > 0
+    sync_apply_individual_ptfs_lv1_path: "{{ sync_apply_individual_ptfs_lv1_path | regex_replace('~', sync_apply_individual_ptfs_lv1_home_dir.stdout) }}"
+  when: sync_apply_individual_ptfs_lv1_path | regex_search("^~") | length > 0
 
 - name: Debug path
   ansible.builtin.debug:
-    var: path
+    var: sync_apply_individual_ptfs_lv1_path
 
 - name: Apply PTF
   block:
     - name: Apply PTF using bin file
       ibm.power_ibmi.ibmi_fix_imgclg:
-        src: '{{ path }}'
+        src: '{{ sync_apply_individual_ptfs_lv1_path }}'
         apply_type: "*IMMDLY"
         rollback: true
-      register: apply_result
+      register: sync_apply_individual_ptfs_lv1_apply_result
       ignore_errors: true
 
     - name: Print apply result
       ansible.builtin.debug:
-        var: apply_result
+        var: sync_apply_individual_ptfs_lv1_apply_result
 
     - name: Apply failure handling
-      when: apply_result.rc != 0
+      when: sync_apply_individual_ptfs_lv1_apply_result.rc != 0
       block:
         - name: Print apply fail result
           ansible.builtin.debug:
@@ -39,7 +39,7 @@
             sync_apply_individual_ptfs_lv1_apply_fail_list: "{{ sync_apply_individual_ptfs_lv1_apply_fail_list | default([]) + [not_loaded_list_var.ptf_id] }}"
 
     - name: Apply success
-      when: apply_result.rc == 0
+      when: sync_apply_individual_ptfs_lv1_apply_result.rc == 0
       block:
         - name: Print apply success result
           ansible.builtin.debug:

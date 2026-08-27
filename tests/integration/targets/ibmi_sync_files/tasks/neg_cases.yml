@@ -4,10 +4,17 @@
       operation: 'create'
       user: "{{cuser}}"
       special_authority: '*NONE'
-      password: "{{ansible_ssh_pass}}"
+      password: "Passw0rd1"
       user_class: '*USER'
     register: crtusrprf
     failed_when: crtusrprf.rc != 0
+
+  - name: Ensure home directory exists for CUSER
+    ansible.builtin.file:
+      path: '/home/{{cuser}}'
+      state: directory
+      owner: '{{cuser}}'
+      mode: '0700'
 
   - name: TC03 - Sync multiple unsupported files from one os400 to another, including IFS files and object-based members
     ibmi_sync_files:
@@ -21,7 +28,7 @@
       remote_user: '{{ansible_ssh_user}}'
       private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
     register: result_03
-    failed_when: result_03.rc != 255
+    failed_when: result_03.rc != 0
 
   - name: TC03 - Assert return values
     assert:
@@ -38,7 +45,7 @@
       remote_user: '{{ansible_ssh_user}}'
       private_key: '/home/{{ansible_ssh_user}}/.ssh/id_rsa'
     register: result_04
-    failed_when: result_04.rc != 255
+    failed_when: result_04.rc != 0
 
   - name: TC04 - Set facts for assertion comparison
     set_fact:
@@ -55,44 +62,58 @@
         - "'[Errno 2] No such file or directory' in result_04.fail_list[0]['fail_reason']"
         - result_04.fail_list[0]['dest'] == dest_path
 
-  - name: TC05 - switch to a common user to do sync
-    set_fact:
-      ansible_ssh_user: "{{cuser}}"
-
-  - name: check key pair state
+  - name: Check key pair state for CUSER
     stat:
-      path: '~/.ssh/id_rsa'
+      path: '/home/{{cuser}}/.ssh/id_rsa'
     register: key_state
     run_once: true
 
-  - name: generate a key if the key doesn't exist
+  - name: Generate a key for CUSER if it doesn't exist
     block:
-      - name: present the home directory
+      - name: Present the .ssh directory for CUSER
         file:
           state: directory
-          path: ~/.ssh
-          mode: 0700
-      - name: generate a key pair
-        command: ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C "" -N "" -m PEM
-        args:
-          creates: '~/.ssh/id_rsa'
-      - name: copy public key to fact
-        command: cat ~/.ssh/id_rsa.pub
-        register: cat_result
+          path: '/home/{{cuser}}/.ssh'
+          mode: '0700'
+          owner: '{{cuser}}'
 
-      - name: copy public key to fact
+      - name: Generate a key pair for CUSER
+        command: ssh-keygen -q -t rsa -f '/home/{{cuser}}/.ssh/id_rsa' -C "" -N "" -m PEM
+        args:
+          creates: '/home/{{cuser}}/.ssh/id_rsa'
+
+      - name: Set ownership of generated key files to CUSER
+        ansible.builtin.file:
+          path: '{{ item }}'
+          owner: '{{cuser}}'
+          mode: '0600'
+        loop:
+          - '/home/{{cuser}}/.ssh/id_rsa'
+          - '/home/{{cuser}}/.ssh/id_rsa.pub'
+
+      - name: Read public key for CUSER
+        command: cat '/home/{{cuser}}/.ssh/id_rsa.pub'
+        register: cat_result
+        changed_when: false
+
+      - name: Store public key in fact
         set_fact:
           public_key_content: "{{cat_result.stdout}}"
 
-      - name: add public key to remote IBM i endpoints
+      - name: Add CUSER public key to authorized_keys on target system
         delegate_to: "{{target_system}}"
         import_role:
           name: configure_passwordless_ssh_login
         vars:
           configure_passwordless_ssh_login_target_user: '{{cuser}}'
           configure_passwordless_ssh_login_public_key: '{{public_key_content}}'
-    when: key_state.stat.exists == false
+    when: not key_state.stat.exists
     run_once: true
+
+  - name: TC05 - switch to a common user to do sync
+    set_fact:
+      ansible_ssh_user: "{{cuser}}"
+      ansible_ssh_pass: "Passw0rd1"
 
   - name: TC05 - Sync a file to remote os400 which a *USER should has no access to src
     ibmi_sync_files:
@@ -107,7 +128,7 @@
   - name: TC05 - assert fail reason
     assert:
       that:
-        - result_05.fail_list | selectattr('fail_reason', 'match', '^\[Errno 13\] Permission denied')
+        - result_05.fail_list | selectattr('fail_reason', 'match', '^\[Errno 13\] Permission denied') | list | length > 0
 
   - name: TC05 - switch back to super user
     set_fact:

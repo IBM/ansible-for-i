@@ -1,189 +1,254 @@
-# test code for the ibmi_job module
+---
+# Integration tests for the ibmi_job module
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
-#
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-- block: 
-    - copy: src="sbmjob_script.sh" dest="/tmp/" mode="755"
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC06']) — only those TCs run.
+#               The setup block always runs regardless of this list.
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['TC04']) — everything else runs.
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency notes:
+#   Setup  Copies sbmjob_script.sh to /tmp/ on the IBM i.  Always runs.
+#   TC01   List jobs with default options — assert all returned fields present.  Independent.
+#   TC02   List jobs with various filter combinations (*ACTIVE/*BATCH/QSYSWRK/QSYS).
+#          Independent.  Leaves job_result populated for TC03.
+#   TC03   Query detailed info for a single job by name.  Requires TC02 (uses job_result).
+#   TC04   Submit a job via ibmi_submit_job and list it by name.  Independent.
+#          Leaves a completed job in *OUTQ for TC05.
+#   TC05   List *OUTQ jobs by current user, query detail, validate that other options
+#          are ignored when name is specified.  Best run after TC04 (more *OUTQ jobs).
+#   TC06   Negative — unsupported parameter.  Independent.
+#   TC07   Negative — invalid status value.  Independent.
+#   TC08   Negative — invalid type value.  Independent.
+#   TC09   Negative — invalid submitter value.  Independent.
+#   TC10   Negative — non-existing user / non-existing subsystem / invalid job name.  Independent.
+#
+# The outer block/always wraps everything so the script cleanup always fires.
+#
 
-    - name: List jobs with default options
-      ibmi_job: 
-      register: job_result
+- block:
 
-    - name: assert the returned options 
-      assert:
-        that:
-          - job_result.rc == 0 
-          - job_result.job_info[0].CCSID is defined
-          - job_result.job_info[0].COMPLETION_STATUS is defined
-          - job_result.job_info[0].JOB_ACCOUNTING_CODE is defined
-          - job_result.job_info[0].JOB_ACTIVE_TIME is defined
-          - job_result.job_info[0].JOB_DATE is defined
-          - job_result.job_info[0].JOB_DESCRIPTION is defined
-          - job_result.job_info[0].JOB_DESCRIPTION_LIBRARY is defined
-          - job_result.job_info[0].JOB_END_REASON is defined
-          - job_result.job_info[0].JOB_END_SEVERITY is defined
-          - job_result.job_info[0].JOB_END_TIME is defined
-          - job_result.job_info[0].JOB_ENTERED_SYSTEM_TIME is defined
-          - job_result.job_info[0].JOB_INFORMATION is defined
-          - job_result.job_info[0].JOB_NAME is defined
-          - job_result.job_info[0].JOB_QUEUE_LIBRARY is defined
-          - job_result.job_info[0].JOB_QUEUE_NAME is defined
-          - job_result.job_info[0].JOB_QUEUE_PRIORITY is defined
-          - job_result.job_info[0].JOB_QUEUE_STATUS is defined
-          - job_result.job_info[0].JOB_SCHEDULED_TIME is defined
-          - job_result.job_info[0].JOB_STATUS is defined
-          - job_result.job_info[0].JOB_SUBSYSTEM is defined
-          - job_result.job_info[0].JOB_TYPE is defined
-          - job_result.job_info[0].JOB_TYPE_ENHANCED is defined
-          - job_result.job_info[0].SUBMITTER_JOB_NAME is defined
-          - job_result.job_info[0].SUBMITTER_MESSAGE_QUEUE is defined
-          - job_result.job_info[0].SUBMITTER_MESSAGE_QUEUE_LIBRARY is defined
-          - job_result.stderr_lines is not defined
-          - job_result.stdout_lines is not defined
-          - job_result.stderr is not defined
-          - job_result.stdout is not defined 
+  # ─── Setup (always runs) ─────────────────────────────────────────────────────
+  - name: Setup - copy sbmjob_script.sh to /tmp/ on IBM i
+    copy:
+      src: "sbmjob_script.sh"
+      dest: "/tmp/"
+      mode: "755"
 
+  # ─── TC01 - List jobs with default options ────────────────────────────────────
+  - name: TC01 - list jobs with default options
+    when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+    block:
+      - name: TC01 - call ibmi_job with no parameters
+        ibmi_job:
+        register: job_result
 
-    - name: list job with all options other than default values
-      ibmi_job: 
-        status: "*ACTIVE"
-        type: '*BATCH'
-        #subsystem: "QSYSWRK"
-        #user: "QSYS"
-        submitter: "*USER"
-      register: job_result
+      - name: TC01 - assert all expected fields are returned
+        assert:
+          that:
+            - job_result.rc == 0
+            - job_result.job_info[0].CCSID is defined
+            - job_result.job_info[0].COMPLETION_STATUS is defined
+            - job_result.job_info[0].JOB_ACCOUNTING_CODE is defined
+            - job_result.job_info[0].JOB_ACTIVE_TIME is defined
+            - job_result.job_info[0].JOB_DATE is defined
+            - job_result.job_info[0].JOB_DESCRIPTION is defined
+            - job_result.job_info[0].JOB_DESCRIPTION_LIBRARY is defined
+            - job_result.job_info[0].JOB_END_REASON is defined
+            - job_result.job_info[0].JOB_END_SEVERITY is defined
+            - job_result.job_info[0].JOB_END_TIME is defined
+            - job_result.job_info[0].JOB_ENTERED_SYSTEM_TIME is defined
+            - job_result.job_info[0].JOB_INFORMATION is defined
+            - job_result.job_info[0].JOB_NAME is defined
+            - job_result.job_info[0].JOB_QUEUE_LIBRARY is defined
+            - job_result.job_info[0].JOB_QUEUE_NAME is defined
+            - job_result.job_info[0].JOB_QUEUE_PRIORITY is defined
+            - job_result.job_info[0].JOB_QUEUE_STATUS is defined
+            - job_result.job_info[0].JOB_SCHEDULED_TIME is defined
+            - job_result.job_info[0].JOB_STATUS is defined
+            - job_result.job_info[0].JOB_SUBSYSTEM is defined
+            - job_result.job_info[0].JOB_TYPE is defined
+            - job_result.job_info[0].JOB_TYPE_ENHANCED is defined
+            - job_result.job_info[0].SUBMITTER_JOB_NAME is defined
+            - job_result.job_info[0].SUBMITTER_MESSAGE_QUEUE is defined
+            - job_result.job_info[0].SUBMITTER_MESSAGE_QUEUE_LIBRARY is defined
+            - job_result.stderr_lines is not defined
+            - job_result.stdout_lines is not defined
+            - job_result.stderr is not defined
+            - job_result.stdout is not defined
 
-    - name: list job with all options other than default values
-      ibmi_job: 
-        status: "*ACTIVE"
-        type: '*BATCH'
-        subsystem: "QSYSWRK"
-        user: "QSYS"
-        #submitter: "*WRKSTN"
-      register: job_result
+  # ─── TC02 - List jobs with various filter combinations ────────────────────────
+  - name: TC02 - list jobs with various filter combinations
+    when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+    block:
+      - name: TC02A - filter by status *ACTIVE, type *BATCH, submitter *USER
+        ibmi_job:
+          status: "*ACTIVE"
+          type: '*BATCH'
+          submitter: "*USER"
+        register: job_result
 
-    - name: list job with all options other than default values
-      ibmi_job: 
-        submitter: "*JOB"
-      register: job_result
+      - name: TC02B - filter by status *ACTIVE, type *BATCH, subsystem QSYSWRK, user QSYS
+        ibmi_job:
+          status: "*ACTIVE"
+          type: '*BATCH'
+          subsystem: "QSYSWRK"
+          user: "QSYS"
+        register: job_result
 
-    - name: list job with all options other than default values
-      ibmi_job: 
-        status: "*ACTIVE"
-        type: '*BATCH'
-        subsystem: "QSYSWRK"
-        user: "QSYS"
-        submitter: "*ALL"
-      register: job_result
+      - name: TC02C - filter by submitter *JOB
+        ibmi_job:
+          submitter: "*JOB"
+        register: job_result
 
-    - name: assert the returned options 
-      assert:
-        that:
-          - job_result.job_info[0].JOB_NAME is defined
-          - job_result.job_info[0].JOB_STATUS == 'ACTIVE'
-          - job_result.job_info[0].JOB_SUBSYSTEM == 'QSYSWRK'
+      - name: TC02D - filter by all options with submitter *ALL
+        ibmi_job:
+          status: "*ACTIVE"
+          type: '*BATCH'
+          subsystem: "QSYSWRK"
+          user: "QSYS"
+          submitter: "*ALL"
+        register: job_result
 
-    - name: list the detailed info of one job
-      ibmi_job: 
-        name: "{{ job_result.job_info[0].JOB_NAME }}"
-      register: job_result  
-      failed_when: "job_result.job_info | length != 1"     
+      - name: TC02D - assert filtered results contain active QSYSWRK jobs
+        assert:
+          that:
+            - job_result.job_info[0].JOB_NAME is defined
+            - job_result.job_info[0].JOB_STATUS == 'ACTIVE'
+            - job_result.job_info[0].JOB_SUBSYSTEM == 'QSYSWRK'
 
+  # ─── TC03 - Query detailed info for a single job by name ──────────────────────
+  - name: TC03 - query detailed info for a single job by name
+    when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+    block:
+      - name: TC03 - query job detail by JOB_NAME from TC02
+        ibmi_job:
+          name: "{{ job_result.job_info[0].JOB_NAME }}"
+        register: job_detail_result
+        failed_when: "job_detail_result.job_info | length != 1"
 
-    - name: Submit a job with only required options
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
-        status: ['*COMPLETE', '*OUTQ']
-      register: sbmjob_result
+  # ─── TC04 - Submit a job and list it by name ──────────────────────────────────
+  - name: TC04 - submit a job and list it by name
+    when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+    block:
+      - name: TC04 - submit a batch job (wait for *COMPLETE or *OUTQ)
+        ibmi_submit_job:
+          cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
+          status: ['*COMPLETE', '*OUTQ']
+          check_interval: "10s"
+          time_out: "2m"
+          parameters: "JOBQ(QSYS/QSYSNOMAX)"
+        register: sbmjob_result
 
-    - name: list job with check_interval
-      ibmi_job: 
-        name: "{{ sbmjob_result.job_submitted }}"
+      - name: TC04 - list the submitted job by name
+        ibmi_job:
+          name: "{{ sbmjob_result.job_submitted }}"
 
-    - name: list job with all options other than default values
-      ibmi_job: 
-        status: "*OUTQ"
-        type: '*ALL'
-        subsystem: "*ALL"
-        user: "{{ansible_ssh_user}}"
-        #submitter: "{{ansible_ssh_user}}"
-      register: job_result
-      failed_when: "job_result.job_info | length == 0"
+  # ─── TC05 - List *OUTQ jobs and validate name-only query behaviour ────────────
+  - name: TC05 - list *OUTQ jobs for current user and validate name-only query
+    when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+    block:
+      - name: TC05 - list *OUTQ jobs for the current SSH user
+        ibmi_job:
+          status: "*OUTQ"
+          type: '*ALL'
+          subsystem: "*ALL"
+          user: "{{ ansible_ssh_user }}"
+        register: job_result
+        failed_when: "job_result.job_info | length == 0"
 
-    - name: query job detailed info
-      ibmi_job: 
-        name: "{{ job_result.job_info[0].JOB_NAME }}"
+      - name: TC05 - query job detail by name
+        ibmi_job:
+          name: "{{ job_result.job_info[0].JOB_NAME }}"
 
-    - name: validate that other options are ignored when name is specified
-      ibmi_job: 
-        name: "{{ job_result.job_info[0].JOB_NAME }}"
-        status: "*OUTQ"
-        type: '*ALL'
-        subsystem: "QSYSWRK"
-        user: "*ALL"
-        submitter: "*ALL"
-      register: job_detailed_result
-      failed_when: "job_detailed_result.job_info == {}"
+      - name: TC05 - validate that other filter options are ignored when name is specified
+        ibmi_job:
+          name: "{{ job_result.job_info[0].JOB_NAME }}"
+          status: "*OUTQ"
+          type: '*ALL'
+          subsystem: "QSYSWRK"
+          user: "*ALL"
+          submitter: "*ALL"
+        register: job_detailed_result
+        failed_when: "job_detailed_result.job_info == {}"
 
-    # test negative test cases
-    - name: list job with unsupported option 
-      ibmi_job: 
-        abc: "abcd"
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')" 
-      register: neg_result
-      failed_when: "'Unsupported parameters' not in neg_result.msg"
+  # ─── TC06 - Negative: unsupported parameter ───────────────────────────────────
+  - name: TC06 - negative - unsupported parameter
+    when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+    block:
+      - name: TC06 - call ibmi_job with unsupported parameter abc
+        ibmi_job:
+          abc: "abcd"
+          cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
+        register: neg_result
+        failed_when: "'Unsupported parameters' not in neg_result.msg"
 
-    - name: list job with invalid status
-      ibmi_job: 
-        name: ""
-        status: "ABC"
-        type: '*ALL'
-        subsystem: "QSYSWRK"
-      register: neg_result
-      failed_when: "'value of status must be one of' not in neg_result.msg"
+  # ─── TC07 - Negative: invalid status value ────────────────────────────────────
+  - name: TC07 - negative - invalid status value
+    when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+    block:
+      - name: TC07 - call ibmi_job with status=ABC
+        ibmi_job:
+          name: ""
+          status: "ABC"
+          type: '*ALL'
+          subsystem: "QSYSWRK"
+        register: neg_result
+        failed_when: "'value of status must be one of' not in neg_result.msg"
 
-    - name: list job with invalid type
-      ibmi_job: 
-        type: 'ABC'
-        subsystem: "QSYSWRK"
-      register: neg_result
-      failed_when: "'value of type must be one of' not in neg_result.msg"
+  # ─── TC08 - Negative: invalid type value ──────────────────────────────────────
+  - name: TC08 - negative - invalid type value
+    when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+    block:
+      - name: TC08 - call ibmi_job with type=ABC
+        ibmi_job:
+          type: 'ABC'
+          subsystem: "QSYSWRK"
+        register: neg_result
+        failed_when: "'value of type must be one of' not in neg_result.msg"
 
-    - name: list job with invalid submitter
-      ibmi_job: 
-        submitter: "abc"
-      register: neg_result
-      failed_when: "'value of submitter must be one of' not in neg_result.msg"
+  # ─── TC09 - Negative: invalid submitter value ─────────────────────────────────
+  - name: TC09 - negative - invalid submitter value
+    when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+    block:
+      - name: TC09 - call ibmi_job with submitter=abc
+        ibmi_job:
+          submitter: "abc"
+        register: neg_result
+        failed_when: "'value of submitter must be one of' not in neg_result.msg"
 
-    - name: list job info with not existing user
-      ibmi_job: 
-        status: "*OUTQ"
-        type: '*ALL'
-        subsystem: "QSYSWRK"
-        user: "ABC"
-      register: neg_result
-      #failed_when: "job_result.job_info | length == 0"
+  # ─── TC10 - Negative: non-existing user, subsystem, and invalid job name ──────
+  - name: TC10 - negative - non-existing user, subsystem, and invalid job name
+    when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+    block:
+      - name: TC10A - list jobs with non-existing user ABC
+        ibmi_job:
+          status: "*OUTQ"
+          type: '*ALL'
+          subsystem: "QSYSWRK"
+          user: "ABC"
+        register: neg_result
 
-    - name: list job info with not existing subsystem
-      ibmi_job: 
-        status: "*OUTQ"
-        type: '*ALL'
-        subsystem: "ABC"
-      register: neg_result
-      failed_when: "job_result.rc != 0"
+      - name: TC10B - list jobs with non-existing subsystem ABC (module raises SQL error - expected)
+        ibmi_job:
+          status: "*OUTQ"
+          type: '*ALL'
+          subsystem: "ABC"
+        register: neg_result
+        # The IBM i JOB_INFO table function throws SQLSTATE=22023 (SUBSYSTEM NOT ACTIVE)
+        # for a non-existent subsystem name — this is the expected negative behaviour.
+        # We just verify the module reports failure; rc value varies by OS release.
+        failed_when: neg_result.rc == 0
 
-    - name: query job info with invalid name
-      ibmi_job: 
-        name: "111111/WANGYUN/TEST"
-        status: "*OUTQ"
-        type: '*ALL'
-        subsystem: "QSYSWRK"
-      #register: neg_result
-      #failed_when: "job_result.job_info | length == 0"
-    
+      - name: TC10C - query job with invalid/non-existing job name
+        ibmi_job:
+          name: "111111/WANGYUN/TEST"
+          status: "*OUTQ"
+          type: '*ALL'
+          subsystem: "QSYSWRK"
+
   always:
-    - name: delete script file
+    - name: Cleanup - delete sbmjob_script.sh from /tmp/
       command: "rm -rf /tmp/sbmjob_script.sh"
-
- 

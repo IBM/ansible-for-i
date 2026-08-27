@@ -1,21 +1,21 @@
 - name: Generate a ramdom number
   ansible.builtin.set_fact:
-    random_postfix: '{{ 9999999 | random }}'
+    capture_server_via_powervc_random_postfix: '{{ 9999999 | random }}'
 
 - name: Compose image name
   ansible.builtin.set_fact:
-    image_name_to_be_created: '{{ capture_server_via_powervc_image_name }}_{{ random_postfix }}'
+    capture_server_via_powervc_image_name_to_be_created: '{{ capture_server_via_powervc_image_name }}_{{ capture_server_via_powervc_random_postfix }}'
 
 - name: Create VM snapshot
   ansible.builtin.shell: . /opt/ibm/powervc/powervcrc  && nova --os-username={{ ansible_ssh_user }} --os-password={{ ansible_ssh_pass }}
             --os-project-name={{ capture_server_via_powervc_project }}  --os-project-domain-name={{ capture_server_via_powervc_project_domain }}
             --os-user-domain-name={{ capture_server_via_powervc_user_domain }}
-            image-create {{ capture_server_via_powervc_vm_name }} {{ image_name_to_be_created }}
-  register: image_create_result
+            image-create {{ capture_server_via_powervc_vm_name }} {{ capture_server_via_powervc_image_name_to_be_created }}
+  register: capture_server_via_powervc_image_create_result
   no_log: true
-  changed_when: image_create_result.rc == 0
+  changed_when: capture_server_via_powervc_image_create_result.rc == 0
 
-- name: Gather information about a previously created image named {{ image_name_to_be_created }}
+- name: Gather information about a previously created image named {{ capture_server_via_powervc_image_name_to_be_created }}
   openstack.cloud.image_info:
     auth:
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
@@ -24,13 +24,9 @@
       project_name: '{{ capture_server_via_powervc_project }}'
       project_domain_name: '{{ capture_server_via_powervc_project_domain }}'
       user_domain_name: '{{ capture_server_via_powervc_user_domain }}'
-    image: '{{ image_name_to_be_created }}'
+    image: '{{ capture_server_via_powervc_image_name_to_be_created }}'
     validate_certs: '{{ capture_server_via_powervc_validate_certs }}'
-  register: image_info
-
-- name: Compose capture_server_via_powervc_images_info
-  ansible.builtin.set_fact:
-    capture_server_via_powervc_image_info: '{{ image_info }}'
+  register: capture_server_via_powervc_image_info
 
 - name: Display capture_server_via_powervc_images_info
   ansible.builtin.debug:

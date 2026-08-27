@@ -11,29 +11,29 @@
   ibm.power_ibmi.ibmi_user_and_group:
     operation: 'display'
     user: '{{ configure_passwordless_ssh_login_target_user }}'
-  register: user_result
+  register: configure_passwordless_ssh_login_user_result
 
 - name: Compose home_dir
   ansible.builtin.set_fact:
-    home_dir: "{{ user_result['result_set'][0]['HOME_DIRECTORY'] }}"
+    configure_passwordless_ssh_login_home_dir: "{{ configure_passwordless_ssh_login_user_result['result_set'][0]['HOME_DIRECTORY'] }}"
 
 - name: The authority of home directory has to be 0700
   ansible.builtin.file:
-    path: '{{ home_dir }}'
+    path: '{{ configure_passwordless_ssh_login_home_dir }}'
     state: directory
     mode: '0700'
     owner: '{{ configure_passwordless_ssh_login_target_user }}'
 
 - name: The authority of .ssh directory has to be 0700
   ansible.builtin.file:
-    path: '{{ home_dir }}/.ssh'
+    path: '{{ configure_passwordless_ssh_login_home_dir }}/.ssh'
     state: directory
     mode: '0700'
     owner: '{{ configure_passwordless_ssh_login_target_user }}'
 
 - name: The authority of authorized_keys has to be 0600
   ansible.builtin.file:
-    path: '{{ home_dir }}/.ssh/authorized_keys'
+    path: '{{ configure_passwordless_ssh_login_home_dir }}/.ssh/authorized_keys'
     state: file
     mode: '0600'
     owner: '{{ configure_passwordless_ssh_login_target_user }}'

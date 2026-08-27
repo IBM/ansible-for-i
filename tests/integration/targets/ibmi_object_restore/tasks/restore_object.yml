@@ -44,7 +44,7 @@
 
 - name: TC03 verify all objects have been restored
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 1
   register: sql_query_result
 
@@ -79,7 +79,7 @@
 
 - name: TC05 verify all objects have been restored
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST', '*ALL') ) AS X"
     expected_row_count: 2
   register: sql_query_result
 
@@ -117,12 +117,12 @@
 
 - name: TC07 verify all objects have been restored
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST1', '*ALL') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST1', '*ALL') ) AS X"
     expected_row_count: 2
 
 - name: TC07 verify all objects have been restored
   ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST1', '*FILE') ) AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('SAVRST1', '*FILE') ) AS X"
     expected_row_count: 2
 
 # Test negitive path

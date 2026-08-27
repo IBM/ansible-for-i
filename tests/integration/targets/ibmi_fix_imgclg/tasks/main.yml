@@ -48,7 +48,7 @@
   ibmi_sql_query:
     sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_LOADED_STATUS, A.*
     FROM QSYS2.PTF_INFO A
-    WHERE PTF_IDENTIFIER = '{{item}}';"
+    WHERE PTF_IDENTIFIER = '{{item}}'"
   register: ptf_result
   failed_when: "ptf_result.row | length != 0 and (ptf_result.row[0]['PTF_LOADED_STATUS'] == 'PERMANENTLY APPLIED' or ptf_result.row[0]['PTF_LOADED_STATUS'] == 'SUPERCEDED'  or ptf_result.row[0]['PTF_LOADED_STATUS'] == 'SUPERSEDED')"
   loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"

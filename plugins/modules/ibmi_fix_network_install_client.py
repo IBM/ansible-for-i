@@ -115,7 +115,7 @@ EXAMPLES = r'''
     operation: 'setup_only'
     server_address: '9.123.123.45'
     image_catalog_directory_name: '/tmp/PTFs'
-    rollback: True
+    rollback: true
     become_user: "QSECOFR"
     become_user_password: "yourpassword"
 '''
@@ -266,9 +266,8 @@ try:
 
 except ImportError:
     HAS_ITOOLKIT = False
-HAS_IBM_DB = True
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
 IBMi_COMMAND_RC_ERROR = 255
@@ -300,7 +299,7 @@ def check_object_existence(db_connection, lib_name, type_name, obj_name):
     obj_existence_expression = "SELECT COUNT(*) " \
                                " FROM TABLE (QSYS2.OBJECT_STATISTICS('" + lib_name + "','" + type_name + "','"\
                                + obj_name + "')) X "
-    out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, obj_existence_expression)
+    out_result_set, err = db2i_tools.db2_sql_query(db_connection, obj_existence_expression)
     if err is None:
         if out_result_set[0][0] != 0:
             # This object alreay exists
@@ -313,6 +312,9 @@ def check_object_existence(db_connection, lib_name, type_name, obj_name):
 
 def get_opt_device_info_basic(imodule, opt_device_name):
     conn = imodule.get_connection()
+    if conn is None:
+        conn_err = getattr(imodule, 'conn_error', None)
+        return 1, None, 'No database connection available' + (': ' + conn_err if conn_err else '')
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     # Reserved field need hex on because if any garbage characters in it
@@ -381,6 +383,9 @@ def get_opt_device_info_basic(imodule, opt_device_name):
 
 def get_opt_device_info(imodule, opt_device_name, number_of_sup_med_entries):
     conn = imodule.get_connection()
+    if conn is None:
+        conn_err = getattr(imodule, 'conn_error', None)
+        return 1, None, 'No database connection available' + (': ' + conn_err if conn_err else '')
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -460,7 +465,7 @@ def check_existing_opt_device(db_conn, ibmi_module, server_ip_address, image_cat
                         " WHERE OBJATTRIBUTE = 'OPT' and OBJNAME <> '" +\
                         opt_device_name + "'"
 
-    out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_conn, all_existing_devd)
+    out_result_set, err = db2i_tools.db2_sql_query(db_conn, all_existing_devd)
     if err is None:
         existing_devd_return = ""
         for result in out_result_set:
@@ -500,6 +505,9 @@ def setup_operation(ibmi_module, module, opt_device_name, server_ip_address, ima
         return 1, None, "missing image catalog directory", ""
 
     db_conn = ibmi_module.get_connection()
+    if db_conn is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        return 1, None, 'No database connection available' + (': ' + conn_err if conn_err else ''), ''
 
     command_map = {}
     command_log = "Command log of setup operation."
@@ -577,6 +585,9 @@ def setup_operation(ibmi_module, module, opt_device_name, server_ip_address, ima
 
 def get_optical_device_status(ibmi_module, module, opt_device_name):
     conn = ibmi_module.get_connection()
+    if conn is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        return ibmi_util.IBMi_COMMAND_RC_ERROR, {}, 'No database connection available' + (': ' + conn_err if conn_err else '')
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     rcommand = "QSYS/RTVCFGSTS CFGD(" + opt_device_name + ") CFGTYPE(*DEV) STSCDE(?N)"
@@ -669,6 +680,9 @@ def INSPTF_operation(ibmi_module, module, product_id, device_name, fix_omit_list
 
 def uninstall_operation(ibmi_module, module, device_name, rollback):
     db_conn = ibmi_module.get_connection()
+    if db_conn is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        return 1, None, 'No database connection available' + (': ' + conn_err if conn_err else ''), ''
 
     command_map = {}
     command_log = "Command log of uninstall operation."
@@ -769,7 +783,7 @@ def return_fix_information(db_connection, product_id, start_timestamp, end_times
 
     sql = sql + where_product_id
 
-    out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
+    out_result_set, err = db2i_tools.db2_sql_query(db_connection, sql)
 
     out = []
     if (out_result_set is not None):
@@ -778,8 +792,9 @@ def return_fix_information(db_connection, product_id, start_timestamp, end_times
                           "PTF_LOADED_STATUS": result[2], "PTF_SAVE_FILE": result[3],
                           "PTF_IPL_ACTION": result[4], "PTF_ACTION_PENDING": result[5],
                           "PTF_ACTION_REQUIRED": result[6], "PTF_IPL_REQUIRED": result[7],
-                          "PTF_STATUS_TIMESTAMP": result[8],
-                          "PTF_CREATION_TIMESTAMP": result[9], "PTF_TEMPORARY_APPLY_TIMESTAMP": result[10]
+                          "PTF_STATUS_TIMESTAMP": str(result[8]) if result[8] is not None else None,
+                          "PTF_CREATION_TIMESTAMP": str(result[9]) if result[9] is not None else None,
+                          "PTF_TEMPORARY_APPLY_TIMESTAMP": str(result[10]) if result[10] is not None else None
                           }
             out.append(result_map)
     return out, err

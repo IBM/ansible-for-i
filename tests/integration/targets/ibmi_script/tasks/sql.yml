@@ -8,66 +8,78 @@
       ibmi_cl_command: 
         cmd: QSYS/CRTJRN JRN(QGPL/ANSIJSNJRN) JRNRCV(QGPL/ANSIJSNRCV) TEXT('JOURNAL FOR ANSIBLE')   
 
-    - name: TC10 run sql script
-      ibmi_script:
-        src: 'sql1.txt'
-        type: 'SQL'
-        parameters: 'USRPRF(*USER)'
+    - name: TC10 - run sql script
+      when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+      block:
+        - name: TC10 run sql script
+          ibmi_script:
+            src: 'sql1.txt'
+            type: 'SQL'
+            parameters: 'USRPRF(*USER)'
 
-    - name: TC10 run the SQL command to query a table
-      ibmi_sql_query:
-        sql: "select * from qgpl.ansible"
-        expected_row_count: 1
-      register: sql_query_result
+        - name: TC10 run the SQL command to query a table
+          ibmi_sql_query:
+            sql: "select * from qgpl.ansible"
+            expected_row_count: 1
+          register: sql_query_result
 
-    - name: TC11 run sql script
-      ibmi_script:
-        src: '{{file_path}}/sql2.txt'
-        type: 'SQL'
-        severity_level: 20
-        parameters: 'USRPRF(*USER)'
-      ignore_errors: true
+    - name: TC11 - run sql script with severity_level 20
+      when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+      block:
+        - name: TC11 run sql script
+          ibmi_script:
+            src: '{{file_path}}/sql2.txt'
+            type: 'SQL'
+            severity_level: 20
+            parameters: 'USRPRF(*USER)'
+          ignore_errors: true
 
-    - name: TC11 run the SQL command to query the table and check row count
-      ibmi_sql_query:
-        sql: "select * from qgpl.ansible"
-        expected_row_count: 1
+        - name: TC11 run the SQL command to query the table and check row count
+          ibmi_sql_query:
+            sql: "select * from qgpl.ansible"
+            expected_row_count: 1
 
-    - name: TC12 run sql script
-      ibmi_script:
-        src: '{{file_path}}/sql2.txt'
-        type: 'SQL'
-        severity_level: 40
-        parameters: 'USRPRF(*USER)'
+    - name: TC12 - run sql script with severity_level 40
+      when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+      block:
+        - name: TC12 run sql script
+          ibmi_script:
+            src: '{{file_path}}/sql2.txt'
+            type: 'SQL'
+            severity_level: 40
+            parameters: 'USRPRF(*USER)'
 
-    - name: TC12 run the SQL command to query the table and check row count
-      ibmi_sql_query:
-        sql: "select * from qgpl.ansible"
-        expected_row_count: 2
+        - name: TC12 run the SQL command to query the table and check row count
+          ibmi_sql_query:
+            sql: "select * from qgpl.ansible"
+            expected_row_count: 2
 
-    - name: TC12 run sql script
-      ibmi_script:
-        src: '{{file_path}}/sql2.txt'
-        type: 'SQL'
-        severity_level: 40
-        parameters: "USRPRF({{ansible_ssh_user}})"
-      register: sql_result
-      #failed_when: "'not valid for parameter USRPRF' not in sql_result.stderr"
-      failed_when: "sql_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length ==0"
+        - name: TC12 run sql script
+          ibmi_script:
+            src: '{{file_path}}/sql2.txt'
+            type: 'SQL'
+            severity_level: 40
+            parameters: "USRPRF({{ansible_ssh_user}})"
+          register: sql_result
+          #failed_when: "'not valid for parameter USRPRF' not in sql_result.stderr"
+          failed_when: "sql_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0084') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC12 run the SQL command to query the table and check row count
-      ibmi_sql_query:
-        sql: "select * from qgpl.ansible"
-        expected_row_count: 2
+        - name: TC12 run the SQL command to query the table and check row count
+          ibmi_sql_query:
+            sql: "select * from qgpl.ansible"
+            expected_row_count: 2
 
-    - name: TC13 run sql script with unsupported severity
-      ibmi_script:
-        src: '{{file_path}}/sql2.txt'
-        type: 'SQL'
-        severity_level: 50
-        parameters: "USRPRF({{ansible_ssh_user}})"
-      register: sql_result
-      ignore_errors: true
+    - name: TC13 - run sql script with unsupported severity
+      when: (tc_execute is not defined or 'TC13' in tc_execute) and 'TC13' not in (tc_skip | default([]))
+      block:
+        - name: TC13 run sql script with unsupported severity
+          ibmi_script:
+            src: '{{file_path}}/sql2.txt'
+            type: 'SQL'
+            severity_level: 50
+            parameters: "USRPRF({{ansible_ssh_user}})"
+          register: sql_result
+          ignore_errors: true
 
   always:
     - name: end journal

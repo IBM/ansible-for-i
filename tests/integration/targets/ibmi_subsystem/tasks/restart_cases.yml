@@ -3,6 +3,22 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['RESTART_TC01','RESTART_TC03'])
+#   tc_skip:    optional list of TC IDs to skip
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC descriptions:
+#   RESTART_TC00   Setup — end QBATCH; wait until inactive; assert inactive.
+#   RESTART_TC01   Idempotency — restart an inactive QBATCH; assert rc==0.
+#   RESTART_TC02   Restart an active QBATCH subsystem; assert rc==0.
+#   RESTART_TC02A  Neg — end subsystem='*all'; expect "End all subsystems is NOT allowed".
+#   RESTART_TC03   Neg — restart a non-existing subsystem; expect CPF1054 in job_log.
+#   RESTART_TC04   Neg — restart QBATCH with a wrong library; expect CPF1080 in job_log.
+#   RESTART_TC05   Neg — missing required subsystem option.
+#   RESTART_TC06   Neg — missing required operation option.
+#   RESTART_TC07   Neg — unsupported option provided.
+#
 - block:
     # Tests for restart operation
 
@@ -10,103 +26,137 @@
       debug:
         msg: "Performing restart operation test cases"
 
-    # First ensure that QBATCH is inactive
-    - name: TC00 end the host server if it is running
-      ibmi_subsystem:
-        operation: end
-        subsystem: QBATCH
-        how_to_end: '*IMMED'
-        controlled_end_delay_time: 60
-        end_subsystem_option: '*DFT'
-        parameters: ''
-      register: endsbs_result
+    # ─── RESTART_TC00 - Setup: end QBATCH and wait for inactive ──────────────────
+    - name: RESTART_TC00 - setup end QBATCH and wait for inactive
+      when: (tc_execute is not defined or 'RESTART_TC00' in tc_execute) and 'RESTART_TC00' not in (tc_skip | default([]))
+      block:
+        - name: RESTART_TC00 - end the host server if it is running
+          ibmi_subsystem:
+            operation: end
+            subsystem: QBATCH
+            how_to_end: '*IMMED'
+            controlled_end_delay_time: 60
+            end_subsystem_option: '*DFT'
+            parameters: ''
+          register: endsbs_result
 
-    - name: TC00 assert the returned parameters
-      assert:
-        that: 
-          #- "'CPF0943' in endsbs_result.stdout"
-          - endsbs_result.stderr is defined
-          - endsbs_result.stderr_lines is defined 
-          - endsbs_result.stdout_lines is defined
-          - endsbs_result.rc == 0
-          - endsbs_result.job_log == []
-  
-    - name: TC00 pause 20 seconds to wait for sbs end
-      pause: 
-        seconds: 20
+        - name: RESTART_TC00 - assert the returned parameters
+          assert:
+            that:
+              - endsbs_result.stderr is defined
+              - endsbs_result.stderr_lines is defined
+              - endsbs_result.stdout_lines is defined
+              - endsbs_result.rc == 0
+              - endsbs_result.job_log == []
 
-    - name: TC00 check whether QBATCH is running
-      ibmi_sql_query:
-        sql: "SELECT * 
-              FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-              SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
-      register: sql_result
-      failed_when: sql_result.row | length != 0 
+        - name: RESTART_TC00 - pause 20 seconds to wait for sbs end
+          pause:
+            seconds: 20
 
-    - name: TC01 Idempotent restart case when inactive, restart an inactive BATCH subsystem
-      ibmi_subsystem:
-        operation: restart
-        subsystem: QBATCH
-      register: results
-      failed_when: results.rc != 0
+        - name: RESTART_TC00 - check whether QBATCH is running
+          ibmi_sql_query:
+            sql: "SELECT *
+                  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
+                  SUBSYSTEM_LIST_FILTER => 'QBATCH')) X"
+          register: sql_result
+          failed_when: sql_result.row | length != 0
 
-    - name: TC02 Restart active BATCH subsystem
-      ibmi_subsystem:
-        operation: restart
-        subsystem: QBATCH
-      register: results
-      failed_when: results.rc != 0
+    # ─── RESTART_TC01 - Idempotency: restart an inactive QBATCH ─────────────────
+    - name: RESTART_TC01 - idempotent restart case when inactive
+      when: (tc_execute is not defined or 'RESTART_TC01' in tc_execute) and 'RESTART_TC01' not in (tc_skip | default([]))
+      block:
+        - name: RESTART_TC01 - idempotent restart case when inactive, restart an inactive BATCH subsystem
+          ibmi_subsystem:
+            operation: restart
+            subsystem: QBATCH
+          register: results
+          failed_when: results.rc != 0
 
-    - name: TC02A restart negative, end all inactive subsystems
-      ibmi_subsystem:
-        operation: end
-        subsystem: '*all'
-      register: endsbs_result
-      failed_when: "'End all subsystems is NOT allowed' not in endsbs_result.msg"
+    # ─── RESTART_TC02 - Restart an active QBATCH ─────────────────────────────────
+    - name: RESTART_TC02 - restart active BATCH subsystem
+      when: (tc_execute is not defined or 'RESTART_TC02' in tc_execute) and 'RESTART_TC02' not in (tc_skip | default([]))
+      block:
+        - name: RESTART_TC02 - restart active BATCH subsystem
+          ibmi_subsystem:
+            operation: restart
+            subsystem: QBATCH
+          register: results
+          failed_when: results.rc != 0
 
-    - name: TC03 Negative restart test. Restart a non-existing sbs.
-      ibmi_subsystem:
-        operation: restart
-        subsystem: abc
-        joblog: true
-      register: strsbs_result 
-      failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1054') | map(attribute='MESSAGE_ID') | list | length ==0"
+    # ─── RESTART_TC02A - Neg: end subsystem='*all' ───────────────────────────────
+    - name: RESTART_TC02A - restart negative - end all subsystems
+      when: (tc_execute is not defined or 'RESTART_TC02A' in tc_execute) and 'RESTART_TC02A' not in (tc_skip | default([]))
+      block:
+        - name: RESTART_TC02A - restart negative, end all inactive subsystems
+          ibmi_subsystem:
+            operation: end
+            subsystem: '*all'
+          register: endsbs_result
+          failed_when: "'End all subsystems is NOT allowed' not in endsbs_result.msg"
 
-    - name: TC03 assert the returned parameters when joblog
-      assert:
-        that: 
-          - strsbs_result.job_log != [] 
+    # ─── RESTART_TC03 - Neg: restart a non-existing subsystem ────────────────────
+    - name: RESTART_TC03 - negative restart test - non-existing sbs
+      when: (tc_execute is not defined or 'RESTART_TC03' in tc_execute) and 'RESTART_TC03' not in (tc_skip | default([]))
+      block:
+        - name: RESTART_TC03 - negative restart test. Restart a non-existing sbs.
+          ibmi_subsystem:
+            operation: restart
+            subsystem: abc
+            joblog: true
+          register: strsbs_result
+          failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1054') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC04 Negative restart test. Restart with a wrong lib for QBATCH
-      ibmi_subsystem:
-        operation: restart
-        subsystem: QBATCH  
-        library: abc
-        joblog: true
-      register: strsbs_result 
-      failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1080') | map(attribute='MESSAGE_ID') | list | length ==0"
+        - name: RESTART_TC03 - assert the returned parameters when joblog
+          assert:
+            that:
+              - strsbs_result.job_log != []
 
-    - name: TC04 assert the returned parameters when joblog
-      assert:
-        that: 
-          - strsbs_result.job_log != [] 
+    # ─── RESTART_TC04 - Neg: restart QBATCH with a wrong library ─────────────────
+    - name: RESTART_TC04 - negative restart test - wrong library
+      when: (tc_execute is not defined or 'RESTART_TC04' in tc_execute) and 'RESTART_TC04' not in (tc_skip | default([]))
+      block:
+        - name: RESTART_TC04 - negative restart test. Restart with a wrong lib for QBATCH.
+          ibmi_subsystem:
+            operation: restart
+            subsystem: QBATCH
+            library: abc
+            joblog: true
+          register: strsbs_result
+          failed_when: "strsbs_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF1080') | map(attribute='MESSAGE_ID') | list | length ==0"
 
-    - name: TC05 restart. Missing required option subsystem (negative test case)
-      ibmi_subsystem:
-        operation: restart
-      register: strsbs_result
-      failed_when: "'missing required argument' not in strsbs_result.msg"
+        - name: RESTART_TC04 - assert the returned parameters when joblog
+          assert:
+            that:
+              - strsbs_result.job_log != []
 
-    - name: TC06 restart. Missing required option operation (negative test case)
-      ibmi_subsystem:
-        subsystem: QBATCH
-      register: strsbs_result
-      failed_when: "'missing required argument' not in strsbs_result.msg"
+    # ─── RESTART_TC05 - Neg: missing required subsystem option ───────────────────
+    - name: RESTART_TC05 - restart missing required option subsystem
+      when: (tc_execute is not defined or 'RESTART_TC05' in tc_execute) and 'RESTART_TC05' not in (tc_skip | default([]))
+      block:
+        - name: RESTART_TC05 - restart. Missing required option subsystem (negative test case).
+          ibmi_subsystem:
+            operation: restart
+          register: strsbs_result
+          failed_when: "'missing required argument' not in strsbs_result.msg"
 
-    - name: TC07 Provide invalid option for restart (negative test case)
-      ibmi_subsystem:
-        operation: restart
-        subsystem: QBATCH 
-        abc: abc   
-      register: strsbs_result
-      failed_when: "'Unsupported parameters' not in strsbs_result.msg" 
+    # ─── RESTART_TC06 - Neg: missing required operation option ───────────────────
+    - name: RESTART_TC06 - restart missing required option operation
+      when: (tc_execute is not defined or 'RESTART_TC06' in tc_execute) and 'RESTART_TC06' not in (tc_skip | default([]))
+      block:
+        - name: RESTART_TC06 - restart. Missing required option operation (negative test case).
+          ibmi_subsystem:
+            subsystem: QBATCH
+          register: strsbs_result
+          failed_when: "'missing required argument' not in strsbs_result.msg"
+
+    # ─── RESTART_TC07 - Neg: unsupported option ──────────────────────────────────
+    - name: RESTART_TC07 - restart with invalid option
+      when: (tc_execute is not defined or 'RESTART_TC07' in tc_execute) and 'RESTART_TC07' not in (tc_skip | default([]))
+      block:
+        - name: RESTART_TC07 - provide invalid option for restart (negative test case).
+          ibmi_subsystem:
+            operation: restart
+            subsystem: QBATCH
+            abc: abc
+          register: strsbs_result
+          failed_when: "'Unsupported parameters' not in strsbs_result.msg"

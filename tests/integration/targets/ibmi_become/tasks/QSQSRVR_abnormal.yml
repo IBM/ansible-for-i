@@ -13,23 +13,24 @@
   poll: 0
   register: script_sleeper
 
-- name: query QSQSRVR job
+- name: query QZDASOINIT job
   ibmi_sql_query:
-    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-        JOB_NAME_FILTER => 'QSQSRVR',
-        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+        JOB_NAME_FILTER => 'QZDASOINIT',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X"
   register: sql_result
   until: sql_result.row | length == 1
   retries: 10
   delay: 5
 
-- name: query QSQSRVR job
+- name: query python3 jobs for ansible_ssh_user
   ibmi_sql_query:
     sql: "SELECT JOB_NAME, AUTHORIZATION_NAME, FUNCTION
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-        JOB_NAME_FILTER => 'QP0ZSPWP',
-        CURRENT_USER_LIST_FILTER => '{{ansible_ssh_user.upper()}}')) X;"
+        JOB_NAME_FILTER => 'QP0ZSPWT',
+        CURRENT_USER_LIST_FILTER => '{{ansible_ssh_user.upper()}}')) X
+WHERE FUNCTION = 'python3.13'"
   register: sql_data
 
 - set_fact:
@@ -37,22 +38,21 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
     ansible_ssh_pass: '{{ansible_ssh_pass_org}}'
   no_log: true
 
-- name: search the python3 job
+- name: end python3.13 jobs for ansible_ssh_user
   ibmi_cl_command:
     cmd: 'ENDJOB JOB({{item.JOB_NAME}})  OPTION(*CNTRLD)'
   ignore_errors: true
-  when: "'python3' in item.FUNCTION"
   loop: '{{sql_data.row}}'
 
-- name: query QSQSRVR job
+- name: query QZDASOINIT job
   ibmi_sql_query:
-    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME 
+    sql: "SELECT JOB_NAME, AUTHORIZATION_NAME
 FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
-        JOB_NAME_FILTER => 'QSQSRVR',
-        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X;"
+        JOB_NAME_FILTER => 'QZDASOINIT',
+        CURRENT_USER_LIST_FILTER => '{{becomeuser.upper()}}')) X"
   register: result
   until: result.row | length == 0
-  retries: 5
+  retries: 20
   delay: 10
 
 - set_fact:

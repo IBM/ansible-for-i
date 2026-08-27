@@ -65,7 +65,7 @@ EXAMPLES = r'''
   ibm.power_ibmi.ibmi_fix_group_check:
     groups:
       - "SF12345"
-    validate_certs: False
+    validate_certs: false
 '''
 
 RETURN = r'''
@@ -114,7 +114,7 @@ import xml.etree.ElementTree as ET
 import re
 
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 PSP_URL = "https://public.dhe.ibm.com/services/us/igsc/PSP/xmldoc.xml"
 PTF_URL_TEMPLATE = "https://public.dhe.ibm.com/services/us/igsc/PSP/{}.xml"

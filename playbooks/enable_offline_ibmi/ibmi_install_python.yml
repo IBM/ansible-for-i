@@ -1,5 +1,6 @@
 # Copyright (c) IBM Corporation 2019, 2020
-# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/tasks.json
 
 # setup ibmi off line
 ---
@@ -63,6 +64,39 @@
       loop: "{{ required_rpms }}"
       loop_control:
         loop_var: dependency
+
+    - name: Check whether ibm-iaccess is already installed
+      ansible.builtin.raw: /QOpensys/pkgs/bin/rpm -qa ibm-iaccess
+      register: iaccess_query_result
+      changed_when: false
+
+    - name: Stage ibm-iaccess RPM for installation if not already installed
+      when: "'ibm-iaccess' not in iaccess_query_result.stdout"
+      block:
+        - name: Find ibm-iaccess installation package in package_path
+          ansible.builtin.shell: ls {{ package_path }}/ibm-iaccess*.rpm
+          delegate_to: localhost
+          register: iaccess_file_list
+          changed_when: false
+
+        - name: Add ibm-iaccess RPM to transfer list
+          ansible.builtin.set_fact:
+            rpm_list: "{{ rpm_list | default([]) + [rpm_full_path.split('/')[-1]] }}"
+          loop: "{{ iaccess_file_list.stdout_lines }}"
+          loop_control:
+            loop_var: rpm_full_path
+
+        - name: Transfer ibm-iaccess RPM files
+          ansible.builtin.include_tasks: transfer_files.yml
+          loop: "{{ iaccess_file_list.stdout_lines | map('basename') | list }}"
+          loop_control:
+            loop_var: package
+          vars:
+            target_path: "{{ remote_temp_dir }}"
+
+        - name: Note has rpm to install
+          ansible.builtin.set_fact:
+            has_rpm_to_be_installed: true
 
     - name: Install the package
       # raw: "/QOpensys/pkgs/bin/yum --disablerepo=ibm install {{ remote_temp_dir }}/*.rpm -y"

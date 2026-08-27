@@ -15,8 +15,12 @@
       msg: "{{os400_ver}}"  
   - set_fact:  # pre-define some ptfs/groups for each os version to test
                # IBM i Group PTFs with level --> https://www.ibm.com/support/pages/ibm-i-group-ptfs-level
+      ptfs: ['SJ09754', 'SJ10556', 'MJ09141']
+      ptf_grps: ['SF99963']  # group 1, group 2( with different levels) , group 3 - cum
+    when: os400_ver == "V7R6M0"
+  - set_fact:
       ptfs: ['SI69340', 'SI71891', 'SI69764']
-      ptf_grps: ['SF99667']  # group 1, group 2( with different levels) , group 3 - cum
+      ptf_grps: ['SF99667']
     when: os400_ver == "V7R4M0"
   - set_fact:  
       ptfs: ['SI70439', 'SI70668', 'SI68580']

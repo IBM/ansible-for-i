@@ -1,18 +1,18 @@
 enable_offline_ibmi
 =========
- So online yum update doesn't work on 'offline' IBM i systems. The playbook is to setup required packages by Ansible on the system, such as yum, python, itoolkit, ibmi-db. An 'Offline' IBM i means that the IBM i system can't connect to the public network, for example, https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/.
+Online yum update doesn't work on 'offline' IBM i systems. This playbook sets up the required packages for Ansible on the system, such as yum, python, itoolkit, and pyodbc. An 'offline' IBM i means that the IBM i system cannot connect to the public network, for example, https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/.
 
 Pre-requisites:
 -------------
 <br>1. Create a directory on the Ansible server, for example, /tmp/ibmi-packages.</br>
-<br>2. If yum is not installed on you IBM i systems, download those files and put them in the directory you just created </br>
+<br>2. If yum is not installed on your IBM i systems, download these files and put them in the directory you just created:</br>
 <br> bootstrap.sh
 https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.sh
 </br>
 <br> bootstrap.tar.Z
 https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.tar.Z
 </br>
-<br> python, libutil2, libncurses6, python-itoolkit, python-ibm_db, update-alternatives, libreadline8
+<br> python, libutil2, libncurses6, python-itoolkit, ibm-iaccess, python-pyodbc, update-alternatives, libreadline8
 https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/ppc64/
 </br>
 <br> python-six
@@ -21,16 +21,26 @@ https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/noarch/
 
 Variables
 --------------
-| Variable              | Type          | Description                                      |
-|-----------------------|---------------|--------------------------------------------------|
-| `package_path`      | str          | The directory you just created, for example,  /tmp/ibmi-packages                  |
-| `is_python39_to_be_installed`      | boolean          | Python 39 is going to be enabled by default. Specify it to false it you would like to enable python39.                |
+| Variable         | Type    | Description                                                                                      |
+|------------------|---------|--------------------------------------------------------------------------------------------------|
+| `package_path`   | str     | The directory containing the downloaded RPM packages, for example, `/tmp/ibmi-packages`.        |
+| `python_level`   | str     | Python version to install. Accepted values: `3.13` (default) or `3.9`. Only one level is active at a time; selecting one automatically disables the other. |
 
-Example 
+### Python version and package prefix
+
+| `python_level` value | Python installed | Package prefix |
+|---|---|---|
+| `3.13` *(default)* | python3.13 | `python3.13-` |
+| `3.9` | python39 | `python39-` |
+
+Example
 ----------------
-```
+```bash
+# Default: installs Python 3.13
 ansible-playbook -i path/to/inventory main.yml -e 'package_path=/tmp/ibmi-packages'
-ansible-playbook -i path/to/inventory main.yml -e "{'package_path':'/tmp/ibmi-packages', 'is_python39_to_be_installed':false}
+
+# Install Python 3.9 instead
+ansible-playbook -i path/to/inventory main.yml -e 'package_path=/tmp/ibmi-packages' -e python_level=3.9
 ```
 
 License

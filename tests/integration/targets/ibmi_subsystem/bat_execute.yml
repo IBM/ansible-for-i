@@ -1,0 +1,69 @@
+# BAT (Build Acceptance Test) execute list for ibmi_subsystem
+#
+# TC IDs are namespaced by operation so individual TCs across all sub-files
+# can be run in any combination via tc_execute.
+#
+# ── display_cases.yml ──────────────────────────────────────────────────────────
+#   DISPLAY_TC01   Display all subsystems with user='*all'.
+#   DISPLAY_TC02   Display all subsystems with default values.
+#   DISPLAY_TC03   Display all subsystems filtered by current user.
+#   DISPLAY_TC04   Setup — end QBATCH if running; wait for inactive state.
+#   DISPLAY_TC05   Setup — start QBATCH if inactive; wait for active state.
+#   DISPLAY_TC06   Display QBATCH for all users; assert active_jobs defined.
+#   DISPLAY_TC07   Submit sleep job; display QBATCH; assert all job fields present.
+#   DISPLAY_TC08   Display QBATCH filtered by current user; assert jobs found.
+#   DISPLAY_TC09   Neg — non-existing user; assert no jobs returned.
+#   DISPLAY_TC10   Neg — subsystem name > 10 chars.
+#   DISPLAY_TC11   Neg — user name > 10 chars.
+#   DISPLAY_TC12   Neg — non-existing subsystem name.
+#   DISPLAY_TC13   Neg — unsupported module option.
+#
+# ── start_cases.yml ───────────────────────────────────────────────────────────
+#   START_TC01   Start QBATCH with all supported options; assert rc==0, job_log==[].
+#   START_TC02   Start QBATCH with joblog=true; assert job_log!=[].
+#   START_TC03   Idempotency — start already-running subsystem; assert rc==0.
+#   START_TC04   Neg — non-existing subsystem; expect CPF1013.
+#   START_TC05   Neg — wrong library; expect CPF1080.
+#   START_TC06   Neg — missing required subsystem option.
+#   START_TC07   Neg — missing required operation option.
+#   START_TC08   Neg — unsupported option.
+#
+# ── end_cases.yml ─────────────────────────────────────────────────────────────
+#   END_TC01   Setup — ensure QBATCH is running before end tests.
+#   END_TC02   End QBATCH with all options; assert rc==0 and job_log==[].
+#   END_TC03   End with only required options and joblog; assert job_log!=[].
+#   END_TC04   End with *CNTRLD and option list; assert rc==0.
+#   END_TC05   Idempotency — end already-inactive subsystem; assert rc==0.
+#   END_TC06   Neg — end subsystem='*all'.
+#   END_TC07   Neg — end subsystem='*ALL'.
+#   END_TC08   Neg — end non-existing sbs; expect CPF1054.
+#   END_TC09   Neg — subsystem name > 10 chars.
+#   END_TC10   Neg — invalid how_to_end.
+#   END_TC11   Neg — invalid end_subsystem_option.
+#   END_TC12   Neg — invalid controlled_end_delay_time.
+#   END_TC13   Neg — missing required operation option.
+#   END_TC13B  Neg — missing required subsystem option.
+#   END_TC14   Neg — unsupported option.
+#
+# ── restart_cases.yml ─────────────────────────────────────────────────────────
+#   RESTART_TC00   Setup — end QBATCH; wait until inactive; assert inactive.
+#   RESTART_TC01   Idempotency — restart inactive QBATCH; assert rc==0.
+#   RESTART_TC02   Restart active QBATCH; assert rc==0.
+#   RESTART_TC02A  Neg — end subsystem='*all'.
+#   RESTART_TC03   Neg — non-existing sbs; expect CPF1054.
+#   RESTART_TC04   Neg — wrong library; expect CPF1080.
+#   RESTART_TC05   Neg — missing required subsystem option.
+#   RESTART_TC06   Neg — missing required operation option.
+#   RESTART_TC07   Neg — unsupported option.
+#
+# ── become.yml ────────────────────────────────────────────────────────────────
+#   BECOME_TC01   Setup — check/start QBATCH.
+#   BECOME_TC02   End QBATCH using become_user credentials.
+#   BECOME_TC03   Start QBATCH using elevated become_user credentials.
+#   BECOME_TC04   Restart QBATCH using elevated become_user credentials.
+#   BECOME_TC05   End QBATCH using become_user; assert subsystem inactive.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ─────────────────
+
+tc_execute:
+  - DISPLAY_TC01

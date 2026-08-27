@@ -73,13 +73,13 @@
     # Check if system name of source node equals to rbd name of source node.
     - name: Query system name of source node
       ibm.power_ibmi.ibmi_sql_query:
-        sql: 'SELECT HOST_NAME FROM QSYS2.SYSTEM_STATUS_INFO;'
+        sql: 'SELECT HOST_NAME FROM QSYS2.SYSTEM_STATUS_INFO'
       register: source_system_name
       delegate_to: source
 
     - name: Check system name and *LOCAL RDB name
       ibm.power_ibmi.ibmi_sql_query:
-        sql: 'SELECT RDB_NAME FROM QSYS2.ASP_INFO WHERE ASP_NUMBER=1;'
+        sql: 'SELECT RDB_NAME FROM QSYS2.ASP_INFO WHERE ASP_NUMBER=1'
       register: source_syscatalogs
       delegate_to: source
 
@@ -183,13 +183,13 @@
         deploy_vm_via_powervc_nic_list: '{{ nic_list }}'
         deploy_vm_via_powervc_validate_certs: '{{ verify_cert }}'
 
-    - name: Prepare warm clone on source node
+    - name: Resume warm clone on source node
       ibm.power_ibmi.ibmi_mirror_warm_clone_activity:
         operation: resume
       when: cloneType != 'COLD'
       delegate_to: source
 
-    - name: Include change_server_state_via_powervc role
+    - name: Include change_server_state_via_powervc role (start source)
       ansible.builtin.include_role:
         name: change_server_state_via_powervc
       vars:
@@ -245,7 +245,7 @@
           - {'name':'QDATETIME'}
       delegate_to: copy
 
-    - name: Reboot the system to wait for the system startup
+    - name: Reboot the copy node to wait for the system startup
       ibm.power_ibmi.ibmi_reboot:
       delegate_to: copy
 
@@ -255,11 +255,11 @@
         cmd: ENDTCPSVR SERVER(*NTP)
       delegate_to: copy
 
-    - name: Restart NTP on copy node
+    - name: Wait before restarting NTP on copy node
       ansible.builtin.pause:
         seconds: 60
 
-    - name: Restart NTP on copy node
+    - name: Start NTP on copy node
       ibm.power_ibmi.ibmi_cl_command:
         cmd: STRTCPSVR SERVER(*NTP) NTPSRV(*CLIENT)
       delegate_to: copy
@@ -270,11 +270,11 @@
         cmd: ENDTCPSVR SERVER(*NTP)
       delegate_to: source
 
-    - name: Restart NTP on source node
+    - name: Wait before restarting NTP on source node
       ansible.builtin.pause:
         seconds: 60
 
-    - name: Restart NTP on source node
+    - name: Start NTP on source node
       ibm.power_ibmi.ibmi_cl_command:
         cmd: STRTCPSVR SERVER(*NTP) NTPSRV(*CLIENT)
       delegate_to: source

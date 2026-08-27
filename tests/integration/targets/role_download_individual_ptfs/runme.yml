@@ -11,12 +11,11 @@
     - name: Add download server VM to Ansible in-memory inventory
       add_host:
         name: 'repo_server'
-        ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
+        ansible_ssh_host: ut23p84.rch.stglabs.ibm.com
         ansible_user: tester
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
-        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.13
     - ansible.builtin.import_tasks: cleanup.yml
       delegate_to: "repo_server"
 

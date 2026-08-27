@@ -1,0 +1,30 @@
+# BAT (Build Acceptance Test) execute list for ibmi_script
+#
+# CL tests (cl.yml — TC01-TC09):
+#   TC01   Run cl1.cl; assert return fields; verify object created.
+#   TC02   Run cl2.cl with separate char ":" and severity_level; verify object removed.
+#   TC03   Run cl3.txt with duplicated lib creation; assert CPF2111 in job_log.
+#   TC04   Run cl4.text with invalid separate char; assert CPD0018 in job_log.
+#   TC05   Neg — run non-existing script abc.text; assert file not found error.
+#   TC06   Neg — run without required option src; assert error message.
+#   TC07   Neg — run without required option type; assert error message.
+#   TC08   Neg — run with unsupported option abc; assert Invalid options error.
+#   TC09   Neg — run with unsupported type abc; assert type error.
+#
+# SQL tests (sql.yml — TC10-TC13):
+#   TC10   Run sql1.txt; verify 1 row in table.
+#   TC11   Run sql2.txt with severity_level=20; verify row count unchanged.
+#   TC12   Run sql2.txt with severity_level=40; verify row count increments; assert CPD0084.
+#   TC13   Run sql2.txt with unsupported severity_level=50; expect error.
+#
+# iASP tests (iasp.yml — TC14-TC17, skipped automatically if no iASP available):
+#   TC14   Run CL script with asp_group.                  (requires iASP)
+#   TC15   Run SQL script with asp_group; verify table.   (requires iASP)
+#   TC16   Neg — run SQL script without asp_group; assert SQL0204.  (requires iASP)
+#   TC17   Neg — run SQL script with invalid asp_group abc.         (requires iASP)
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ────────────────
+
+tc_execute:
+  - TC01
+

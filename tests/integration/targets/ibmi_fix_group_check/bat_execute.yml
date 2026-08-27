@@ -1,0 +1,28 @@
+# BAT (Build Acceptance Test) execute list for ibmi_fix_group_check
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# TC00 is excluded from BAT — it runs yum remove/install which is broken (see FIXME
+# in main.yml) and takes significant time even with ignore_errors.
+#
+# TC02 is excluded from BAT — it depends on TC01 having populated group_check_result
+# and asserts group_check_result_local.group_info == group_check_result.group_info.
+# Without TC01 running first, group_check_result is undefined.
+#
+# TC01  runs without options — queries all PTF groups, ~2-5s network call
+# TC03  queries first 3 groups from group_74 — fast
+# TC04  queries single PTF group — fast
+# TC06  invalid group name (string) — fast
+# TC07  invalid group name (list) — fast
+# TC08  groups from two releases — fast
+# TC09  one valid + one invalid group — fast
+
+tc_execute:
+  - TC01
+  - TC03
+  - TC04
+  - TC06
+  - TC07
+  - TC08
+  - TC09

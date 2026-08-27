@@ -1,0 +1,17 @@
+# BAT (Build Acceptance Test) execute list for ibmi_module_authority_check
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# All TCs are instant read-only authority lookups — no IBM i state changes,
+# no setup or cleanup required.
+#
+# TA01  Quick smoke test — 3 modules (2 valid, 1 invalid).
+# TA02  Full module list — asserts authority for all ~44 supported modules.
+# TB01  Single invalid module name.
+# TB02  Invalid option name (parameter validation).
+# TB03  Mixed valid/invalid in one call.
+
+tc_execute:
+  - TA01
+ 

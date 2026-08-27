@@ -3,154 +3,185 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-- name: TA01 positive check01 
-  ibmi_module_authority_check:
-    modulelist:
-      - 'ibmi_copy'
-      - 'ibmi_display_subsystem'
-      - 'ibmi_invaild_module'
-  register: module_result
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TA01','TB01']) — only those TCs run.
+#   tc_skip:    optional list of TC IDs to skip — everything else runs.
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency notes:
+#   All TCs are independent read-only authority queries — no setup or cleanup needed.
+#   TA01  Mixed valid/invalid module names — assert known authority values + invalid marker.
+#   TA02  Full module list — assert authority values for all supported modules.
+#   TB01  Single invalid module name — assert invalid marker returned.
+#   TB02  Invalid option name — assert module parameter error.
+#   TB03  Mix of valid and invalid module names — assert both paths in one call.
+#
 
-- name: TA01 result check
-  assert:
-    that: 
-      - module_result.rc == 0
-      - module_result.authority_result['ibmi_copy'] == ['*ALLOBJ']
-      - module_result.authority_result['ibmi_display_subsystem'] == ['*JOBCTL']
-      - module_result.authority_result['ibmi_invaild_module'] == 'this module name is invaild.'
+# ─── TA01 - Check authority for valid and invalid modules ────────────────────
+- name: TA01 - positive check with valid and invalid module names
+  when: (tc_execute is not defined or 'TA01' in tc_execute) and 'TA01' not in (tc_skip | default([]))
+  block:
+    - name: TA01 - call ibmi_module_authority_check with mixed module list
+      ibmi_module_authority_check:
+        modulelist:
+          - 'ibmi_copy'
+          - 'ibmi_display_subsystem'
+          - 'ibmi_invaild_module'
+      register: module_result
 
-- name: TA02 positive check02 
-  ibmi_module_authority_check:
-    modulelist:
-      - 'ibmi_at'
-      - 'ibmi_cl_command'
-      - 'ibmi_device_vary'
-      - 'ibmi_display_fix'
-      - 'ibmi_display_subsystem'
-      - 'ibmi_end_subsystem'
-      - 'ibmi_ethernet_port'
-      - 'ibmi_fetch'
-      - 'ibmi_fix'
-      - 'ibmi_fix_imgclg'
-      - 'ibmi_get_nonconfigure_disks'
-      - 'ibmi_host_server_service'
-      - 'ibmi_iasp'
-      - 'ibmi_install_product_from_savf'
-      - 'ibmi_job'
-      - 'ibmi_lib_restore'
-      - 'ibmi_lib_save'
-      - 'ibmi_message'
-      - 'ibmi_module_config'
-      - 'ibmi_nrg_link'
-      - 'ibmi_object_authority'
-      - 'ibmi_object_find'
-      - 'ibmi_object_restore'
-      - 'ibmi_object_save'
-      - 'ibmi_fix_repo'
-      - 'ibmi_query_job_log'
-      - 'ibmi_reboot'
-      - 'ibmi_reply_message'
-      - 'ibmi_save_product_to_savf'
-      - 'ibmi_script'
-      - 'ibmi_script_execute'
-      - 'ibmi_sql_execute'
-      - 'ibmi_sql_query'
-      - 'ibmi_start_subsystem'
-      - 'ibmi_submit_job'
-      - 'ibmi_sync'
-      - 'ibmi_sync_files'
-      - 'ibmi_synchronize'
-      - 'ibmi_synchronize_files'
-      - 'ibmi_sysval'
-      - 'ibmi_tcp_interface'
-      - 'ibmi_tcp_server_service'
-      - 'ibmi_uninstall_product'
-      - 'ibmi_user_compliance_check'
-  register: module_result
+    - name: TA01 - assert authority results
+      assert:
+        that:
+          - module_result.rc == 0
+          - module_result.authority_result['ibmi_copy'] == ['*ALLOBJ']
+          - module_result.authority_result['ibmi_display_subsystem'] == ['*JOBCTL']
+          - module_result.authority_result['ibmi_invaild_module'] == 'this module name is invaild.'
 
-- name: TA01 result check
-  assert:
-    that: 
-      - module_result.rc == 0
-      - module_result.authority_result['ibmi_at'] == ['*NONE']
-      - module_result.authority_result['ibmi_cl_command'] == ['Depend on authority of CL command']
-      - module_result.authority_result['ibmi_device_vary'] == ['*NONE']
-      - module_result.authority_result['ibmi_display_fix'] == ['*NONE']
-      - module_result.authority_result['ibmi_display_subsystem'] == ['*JOBCTL']
-      - module_result.authority_result['ibmi_end_subsystem'] == ['*JOBCTL']
-      - module_result.authority_result['ibmi_ethernet_port'] == ['*NONE']
-      - module_result.authority_result['ibmi_fetch'] == ['*SAVSYS']
-      - module_result.authority_result['ibmi_fix'] == ['*ALLOBJ']
-      - module_result.authority_result['ibmi_fix_imgclg'] == ['*ALLOBJ', '*IOSYSCFG']
-      - module_result.authority_result['ibmi_get_nonconfigure_disks'] == ['*NONE']
-      - module_result.authority_result['ibmi_host_server_service'] == ['NONE']
- 
-      - module_result.authority_result['ibmi_iasp'] == ['*IOSYSCFG', '*SERVICE']
-      - module_result.authority_result['ibmi_install_product_from_savf'] == ['*SECADM', '*ALLOBJ']
-      - module_result.authority_result['ibmi_lib_restore'] == ['*SAVSYS']
-      - module_result.authority_result['ibmi_lib_save'] == ['*SAVSYS']
-      - module_result.authority_result['ibmi_message'] == ['NONE']
-      - module_result.authority_result['ibmi_module_config'] == ['*NONE']
-      - module_result.authority_result['ibmi_nrg_link'] == ['*IOSYSCFG']
-      - module_result.authority_result['ibmi_object_authority'] == ['*ALLOBJ', '*OBJMGT']
-      - module_result.authority_result['ibmi_object_find'] == ['*NONE']
-      - module_result.authority_result['ibmi_object_restore'] == ['*SAVSYS']
-      - module_result.authority_result['ibmi_object_save'] == ['*SAVSYS']
-      - module_result.authority_result['ibmi_fix_repo'] == ['*NONE']
+# ─── TA02 - Check authority for all supported modules ────────────────────────
+- name: TA02 - positive check with full module list
+  when: (tc_execute is not defined or 'TA02' in tc_execute) and 'TA02' not in (tc_skip | default([]))
+  block:
+    - name: TA02 - call ibmi_module_authority_check with all known modules
+      ibmi_module_authority_check:
+        modulelist:
+          - 'ibmi_at'
+          - 'ibmi_cl_command'
+          - 'ibmi_device_vary'
+          - 'ibmi_display_fix'
+          - 'ibmi_display_subsystem'
+          - 'ibmi_end_subsystem'
+          - 'ibmi_ethernet_port'
+          - 'ibmi_fetch'
+          - 'ibmi_fix'
+          - 'ibmi_fix_imgclg'
+          - 'ibmi_get_nonconfigure_disks'
+          - 'ibmi_host_server_service'
+          - 'ibmi_iasp'
+          - 'ibmi_install_product_from_savf'
+          - 'ibmi_job'
+          - 'ibmi_lib_restore'
+          - 'ibmi_lib_save'
+          - 'ibmi_message'
+          - 'ibmi_module_config'
+          - 'ibmi_nrg_link'
+          - 'ibmi_object_authority'
+          - 'ibmi_object_find'
+          - 'ibmi_object_restore'
+          - 'ibmi_object_save'
+          - 'ibmi_fix_repo'
+          - 'ibmi_query_job_log'
+          - 'ibmi_reboot'
+          - 'ibmi_reply_message'
+          - 'ibmi_save_product_to_savf'
+          - 'ibmi_script'
+          - 'ibmi_script_execute'
+          - 'ibmi_sql_execute'
+          - 'ibmi_sql_query'
+          - 'ibmi_start_subsystem'
+          - 'ibmi_submit_job'
+          - 'ibmi_sync'
+          - 'ibmi_sync_files'
+          - 'ibmi_synchronize'
+          - 'ibmi_synchronize_files'
+          - 'ibmi_sysval'
+          - 'ibmi_tcp_interface'
+          - 'ibmi_tcp_server_service'
+          - 'ibmi_uninstall_product'
+          - 'ibmi_user_compliance_check'
+      register: module_result
 
-      - module_result.authority_result['ibmi_query_job_log'] == ['*NONE']
-      - module_result.authority_result['ibmi_reboot'] == ['*JOBCTL']
-      - module_result.authority_result['ibmi_reply_message'] == ['*NONE']
-      - module_result.authority_result['ibmi_save_product_to_savf'] == ['*ALLOBJ']
-      - module_result.authority_result['ibmi_script'] == ['Depend on CL/SQL commands']
-      - module_result.authority_result['ibmi_script_execute'] == ['Depend on CL/SQL commands']
-      - module_result.authority_result['ibmi_sql_execute'] == ['Depend on SQL procedure']
-      - module_result.authority_result['ibmi_sql_query'] == ['Depend on SQL query statements']
-      - module_result.authority_result['ibmi_start_subsystem'] == ['*JOBCTL']
-      - module_result.authority_result['ibmi_submit_job'] == ['*NONE']
-      - module_result.authority_result['ibmi_sync'] == ['*NONE'] 
+    - name: TA02 - assert authority results for all modules
+      assert:
+        that:
+          - module_result.rc == 0
+          - module_result.authority_result['ibmi_at'] == ['*NONE']
+          - module_result.authority_result['ibmi_cl_command'] == ['Depend on authority of CL command']
+          - module_result.authority_result['ibmi_device_vary'] == ['*NONE']
+          - module_result.authority_result['ibmi_display_fix'] == ['*NONE']
+          - module_result.authority_result['ibmi_display_subsystem'] == ['*JOBCTL']
+          - module_result.authority_result['ibmi_end_subsystem'] == ['*JOBCTL']
+          - module_result.authority_result['ibmi_ethernet_port'] == ['*NONE']
+          - module_result.authority_result['ibmi_fetch'] == ['*SAVSYS']
+          - module_result.authority_result['ibmi_fix'] == ['*ALLOBJ']
+          - module_result.authority_result['ibmi_fix_imgclg'] == ['*ALLOBJ', '*IOSYSCFG']
+          - module_result.authority_result['ibmi_get_nonconfigure_disks'] == ['*NONE']
+          - module_result.authority_result['ibmi_host_server_service'] == ['NONE']
+          - module_result.authority_result['ibmi_iasp'] == ['*IOSYSCFG', '*SERVICE']
+          - module_result.authority_result['ibmi_install_product_from_savf'] == ['*SECADM', '*ALLOBJ']
+          - module_result.authority_result['ibmi_lib_restore'] == ['*SAVSYS']
+          - module_result.authority_result['ibmi_lib_save'] == ['*SAVSYS']
+          - module_result.authority_result['ibmi_message'] == ['NONE']
+          - module_result.authority_result['ibmi_module_config'] == ['*NONE']
+          - module_result.authority_result['ibmi_nrg_link'] == ['*IOSYSCFG']
+          - module_result.authority_result['ibmi_object_authority'] == ['*ALLOBJ', '*OBJMGT']
+          - module_result.authority_result['ibmi_object_find'] == ['*NONE']
+          - module_result.authority_result['ibmi_object_restore'] == ['*SAVSYS']
+          - module_result.authority_result['ibmi_object_save'] == ['*SAVSYS']
+          - module_result.authority_result['ibmi_fix_repo'] == ['*NONE']
+          - module_result.authority_result['ibmi_query_job_log'] == ['*NONE']
+          - module_result.authority_result['ibmi_reboot'] == ['*JOBCTL']
+          - module_result.authority_result['ibmi_reply_message'] == ['*NONE']
+          - module_result.authority_result['ibmi_save_product_to_savf'] == ['*ALLOBJ']
+          - module_result.authority_result['ibmi_script'] == ['Depend on CL/SQL commands']
+          - module_result.authority_result['ibmi_script_execute'] == ['Depend on CL/SQL commands']
+          - module_result.authority_result['ibmi_sql_execute'] == ['Depend on SQL procedure']
+          - module_result.authority_result['ibmi_sql_query'] == ['Depend on SQL query statements']
+          - module_result.authority_result['ibmi_start_subsystem'] == ['*JOBCTL']
+          - module_result.authority_result['ibmi_submit_job'] == ['*NONE']
+          - module_result.authority_result['ibmi_sync'] == ['*NONE']
+          - module_result.authority_result['ibmi_sync_files'] == ['*NONE']
+          - module_result.authority_result['ibmi_synchronize'] == ['*NONE']
+          - module_result.authority_result['ibmi_synchronize_files'] == ['*NONE']
+          - module_result.authority_result['ibmi_sysval'] == ['Depends on specified system values']
+          - module_result.authority_result['ibmi_tcp_interface'] == ['*IOSYSCFG']
+          - module_result.authority_result['ibmi_tcp_server_service'] == ['*IOSYSCFG']
+          - module_result.authority_result['ibmi_uninstall_product'] == ['*ALLOBJ']
+          - module_result.authority_result['ibmi_user_compliance_check'] == ['*OBJOPR', '*READ']
 
-      - module_result.authority_result['ibmi_sync_files'] == ['*NONE']
-      - module_result.authority_result['ibmi_synchronize'] == ['*NONE']
-      - module_result.authority_result['ibmi_synchronize_files'] == ['*NONE']
-      - module_result.authority_result['ibmi_sysval'] == ['Depends on specified system values']
-      - module_result.authority_result['ibmi_tcp_interface'] == ['*IOSYSCFG']
-      - module_result.authority_result['ibmi_tcp_server_service'] ==['*IOSYSCFG']
-      - module_result.authority_result['ibmi_uninstall_product'] == ['*ALLOBJ']
-      - module_result.authority_result['ibmi_user_compliance_check'] == ['*OBJOPR', '*READ'] 
+# ─── TB01 - Negative: single invalid module name ─────────────────────────────
+- name: TB01 - negative - single invalid module name
+  when: (tc_execute is not defined or 'TB01' in tc_execute) and 'TB01' not in (tc_skip | default([]))
+  block:
+    - name: TB01 - call with non-existing module name
+      ibmi_module_authority_check:
+        modulelist:
+          - 'ibmi_no_module'
+      register: module_result
 
-- name: TB01 invalid module name 
-  ibmi_module_authority_check:
-    modulelist:
-      - 'ibmi_no_module'
-  register: module_result
+    - name: TB01 - assert invalid module marker returned
+      assert:
+        that:
+          - module_result.rc == 0
+          - module_result.authority_result['ibmi_no_module'] == 'this module name is invaild.'
 
-- name: TB01 check
-  assert: 
-    that: 
-      - module_result.rc == 0
-      - module_result.authority_result['ibmi_no_module'] == 'this module name is invaild.'
+# ─── TB02 - Negative: invalid option name ────────────────────────────────────
+- name: TB02 - negative - invalid option name 'modulea'
+  when: (tc_execute is not defined or 'TB02' in tc_execute) and 'TB02' not in (tc_skip | default([]))
+  block:
+    - name: TB02 - call with unsupported parameter name
+      ibmi_module_authority_check:
+        modulea:
+      register: module_result
+      failed_when:
+        - "'Unsupported parameters' not in module_result.msg"
+        - "'missing required arguments' not in module_result.msg"
 
-- name: TB02 invalid option
-  ibmi_module_authority_check:
-    modulea:
-  register: module_result
-  failed_when:
-    - "'Unsupported parameters' not in module_result.msg"
-    - "'missing required arguments' not in module_result.msg"
+# ─── TB03 - Mixed valid and invalid module names ──────────────────────────────
+- name: TB03 - mixed valid and invalid module names in one call
+  when: (tc_execute is not defined or 'TB03' in tc_execute) and 'TB03' not in (tc_skip | default([]))
+  block:
+    - name: TB03 - call with mix of valid and invalid module names
+      ibmi_module_authority_check:
+        modulelist:
+          - 'ibmi_at'
+          - 'ibmi_no_module'
+          - 'ibmi_user_compliance_check'
+      register: module_result
 
-- name: TB03 invalid module 
-  ibmi_module_authority_check:
-    modulelist:
-      - 'ibmi_at'
-      - 'ibmi_no_module'
-      - 'ibmi_user_compliance_check'
-  register: module_result
-
-- name: TB03 result check 
-  assert:
-    that: 
-      - module_result.rc == 0
-      - module_result.authority_result['ibmi_no_module'] == 'this module name is invaild.'
-      - module_result.authority_result['ibmi_at'] == ['*NONE']
-      - module_result.authority_result['ibmi_user_compliance_check'] == ['*OBJOPR','*READ']
+    - name: TB03 - assert valid modules return authority and invalid returns marker
+      assert:
+        that:
+          - module_result.rc == 0
+          - module_result.authority_result['ibmi_no_module'] == 'this module name is invaild.'
+          - module_result.authority_result['ibmi_at'] == ['*NONE']
+          - module_result.authority_result['ibmi_user_compliance_check'] == ['*OBJOPR', '*READ']

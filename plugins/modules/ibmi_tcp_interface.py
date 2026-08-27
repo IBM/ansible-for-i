@@ -350,7 +350,6 @@ interface_info:
 '''
 
 HAS_ITOOLKIT = True
-HAS_IBM_DB = True
 
 import datetime
 import time
@@ -359,7 +358,7 @@ from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import db2i_to
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 IBMi_COMMAND_RC_SUCCESS = 0
 IBMi_COMMAND_RC_UNEXPECTED = 999
@@ -383,7 +382,7 @@ def return_interface_information(db_connection, internet_address, alias_name):
           "MAXIMUM_TRANSMISSION_UNIT, CONFIGURED_MAXIMUM_TRANSMISSION_UNIT, AUTOSTART, ALIAS_NAME, " \
           "LAST_CHANGE_TIMESTAMP " \
           "FROM QSYS2.NETSTAT_INTERFACE_INFO " + where_condition
-    out_result_set, err = db2i_tools.ibm_dbi_sql_query(db_connection, sql)
+    out_result_set, err = db2i_tools.db2_sql_query(db_connection, sql)
 
     out = []
     for result in out_result_set:
@@ -394,7 +393,7 @@ def return_interface_information(db_connection, internet_address, alias_name):
                       "VIRTUAL_LAN_ID": result[8], "MAXIMUM_TRANSMISSION_UNIT": result[9],
                       "CONFIGURED_MAXIMUM_TRANSMISSION_UNIT": result[10],
                       "AUTOSTART": result[11], "ALIAS_NAME": result[12],
-                      "LAST_CHANGE_TIMESTAMP": result[13]
+                      "LAST_CHANGE_TIMESTAMP": str(result[13]) if result[13] is not None else None
                       }
         out.append(result_map)
     return out, err
@@ -450,6 +449,10 @@ def main():
                                      become_user_password=become_user_password)
 
     connection_id = ibmi_module.get_connection()
+    if connection_id is None:
+        conn_err = getattr(ibmi_module, 'conn_error', None)
+        module.fail_json(msg='No database connection available'
+                         + (': ' + conn_err if conn_err else ''))
 
     only_query = False
     cl_command = ""

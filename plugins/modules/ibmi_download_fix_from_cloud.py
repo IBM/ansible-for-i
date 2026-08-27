@@ -95,7 +95,7 @@ EXAMPLES = r'''
       'country': 'US'
     }
     directory: "~/PTFs/SJ08024"
-    include_requisites: False
+    include_requisites: false
 '''
 
 RETURN = r'''
@@ -291,7 +291,7 @@ import hashlib
 import base64
 import xml.etree.ElementTree as ET
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 # Defined Globals
 event_id = ""

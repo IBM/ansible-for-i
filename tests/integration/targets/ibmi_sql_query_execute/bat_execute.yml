@@ -1,0 +1,40 @@
+# BAT (Build Acceptance Test) execute list for ibmi_sql_query_execute
+#
+# main.yml tests (TC00-TC18):
+#   TC00   Query QSYS2.SYSCATALOGS; debug row output.
+#   TC01   Create table qgpl.ansible; start journal.
+#   TC02   Insert first row into table.
+#   TC03   Query table; assert row count = 1.
+#   TC04   Insert second row.
+#   TC05   Query table; assert row count = 2.
+#   TC06   Query QSYS2.SYSTEM_STATUS_INFO; assert sql/rc/row fields.
+#   TC07   Query QSYS2.SYSTEM_STATUS_INFO with expected_row_count=1; assert fields.
+#   TC08   Neg — sql execute on non-existing table QSYS2.ABC; assert SQL0204.
+#   TC09   Complex multi-line SQL query for IPL status; assert row count = 1.
+#   TC10   Neg — sql query on non-existing table QSYS2.ABC; assert SQL0204.
+#   TC11   Neg — sql query without sql option; assert missing required arguments.
+#   TC12   Neg — sql query with invalid sql value; assert rc != 0.
+#   TC13   Neg — sql query with invalid expected_row_count abc; assert convert error.
+#   TC14   Neg — sql query with wrong expected_row_count=10; assert Unexpected row count.
+#   TC15   Neg — sql query with invalid option invalid_opt; assert Unsupported parameters.
+#   TC16   Neg — sql execute without sql option; assert missing required arguments.
+#   TC17   Neg — sql execute with invalid sql value; assert rc != 0.
+#   TC18   Neg — sql execute with invalid option invalid_opt; assert Unsupported parameters.
+#
+# iASP tests (iasp.yml — TC19-TC27, skipped automatically if no iASP available):
+#   TC19   Create iASP table and start journal.          (requires iASP)
+#   TC20   Insert row into iASP table with database.     (requires iASP)
+#   TC21   Neg — insert without database; assert SQL0204.(requires iASP)
+#   TC22   Neg — insert with invalid database; assert Exception. (requires iASP)
+#   TC23   Query iASP table with database; assert row count = 1. (requires iASP)
+#   TC24   Neg — query iASP table without database; assert SQL0204. (requires iASP)
+#   TC25   Neg — query iASP table with invalid database; assert Exception. (requires iASP)
+#   TC26   Insert second row into iASP table.            (requires iASP)
+#   TC27   Query iASP table; assert row count = 2.       (requires iASP)
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ────────────────
+
+tc_execute:
+  - TC00
+  - TC01
+

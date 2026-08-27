@@ -1,68 +1,82 @@
 ---
 - name: Initialize the variables
   ansible.builtin.set_fact:
-    ptf_list: []
-    ptf_on_system: {}
-    ptf_info_list: "{{ product_info.success_list | default([]) }}"
+    check_ptfs_by_product_against_fix_repo_ptf_list: []
+    check_ptfs_by_product_against_fix_repo_ptf_on_system: {}
+    check_ptfs_by_product_against_fix_repo_ptf_info_list: "{{ check_ptfs_by_product_against_fix_repo_product_info.success_list | default([]) }}"
 
 - name: Query PTF information from target system
   ibm.power_ibmi.ibmi_sql_query:
-    sql: "SELECT PTF_IDENTIFIER, PTF_LOADED_STATUS FROM QSYS2.PTF_INFO WHERE PTF_PRODUCT_ID = '{{ ptf_info_list[0].product }}'"
-  register: result
+    sql: >-
+      SELECT PTF_IDENTIFIER, PTF_LOADED_STATUS FROM QSYS2.PTF_INFO
+      WHERE PTF_PRODUCT_ID = '{{ check_ptfs_by_product_against_fix_repo_ptf_info_list[0].product }}'
+  register: check_ptfs_by_product_against_fix_repo_result
 
 - name: Compose ptf_status
   ansible.builtin.set_fact:
     check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
-      [{'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'Product not installed on target system'}] }}"
-  when: result.row | length == 0
+      [{'PRODUCT': check_ptfs_by_product_against_fix_repo_ptf_info_list[0].product, 'PRODUCT_STATUS': 'Product not installed on target system'}] }}"
+  when: check_ptfs_by_product_against_fix_repo_result.row | length == 0
   no_log: true
 
 - name: Start to check PTFs
   block:
     - name: Compose PTF status list on target system
       ansible.builtin.set_fact:
-        ptf_on_system: "{{ ptf_on_system | default({}) | combine({record.PTF_IDENTIFIER: record.PTF_LOADED_STATUS}) }}"
-      with_list: "{{ result.row }}"
+        check_ptfs_by_product_against_fix_repo_ptf_on_system: >-
+          {{ check_ptfs_by_product_against_fix_repo_ptf_on_system | default({})
+          | combine({record.PTF_IDENTIFIER: record.PTF_LOADED_STATUS}) }}
+      with_list: "{{ check_ptfs_by_product_against_fix_repo_result.row }}"
       loop_control:
         loop_var: record
-      when: result.row | length > 0
+      when: check_ptfs_by_product_against_fix_repo_result.row | length > 0
       no_log: true
 
     - name: PTF does not exist
       ansible.builtin.set_fact:
-        ptf_list: "{{ ptf_list | default([]) + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT'}] }}"
-      when: ptf_on_system.get(ptf_info.ptf_id) is none
-      with_list: "{{ ptf_info_list }}"
+        check_ptfs_by_product_against_fix_repo_ptf_list: >-
+          {{ check_ptfs_by_product_against_fix_repo_ptf_list | default([])
+          + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT'}] }}
+      when: check_ptfs_by_product_against_fix_repo_ptf_on_system.get(ptf_info.ptf_id) is none
+      with_list: "{{ check_ptfs_by_product_against_fix_repo_ptf_info_list }}"
       loop_control:
         loop_var: ptf_info
 
     - name: PTF not applied
       ansible.builtin.set_fact:
-        ptf_list: "{{ ptf_list | default([]) + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id]}] }}"
+        check_ptfs_by_product_against_fix_repo_ptf_list: >-
+          {{ check_ptfs_by_product_against_fix_repo_ptf_list | default([])
+          + [{'PTF_IDENTIFIER': ptf_info.ptf_id,
+          'PTF_LOADED_STATUS': check_ptfs_by_product_against_fix_repo_ptf_on_system[ptf_info.ptf_id]}] }}
       when:
-        - ptf_on_system.get(ptf_info.ptf_id) is not none
-        - ptf_on_system[ptf_info.ptf_id] != 'APPLIED'
-        - ptf_on_system[ptf_info.ptf_id] != 'PERMANENTLY APPLIED'
-        - ptf_on_system[ptf_info.ptf_id] != 'SUPERSEDED'
-      with_list: "{{ ptf_info_list }}"
+        - check_ptfs_by_product_against_fix_repo_ptf_on_system.get(ptf_info.ptf_id) is not none
+        - check_ptfs_by_product_against_fix_repo_ptf_on_system[ptf_info.ptf_id] != 'APPLIED'
+        - check_ptfs_by_product_against_fix_repo_ptf_on_system[ptf_info.ptf_id] != 'PERMANENTLY APPLIED'
+        - check_ptfs_by_product_against_fix_repo_ptf_on_system[ptf_info.ptf_id] != 'SUPERSEDED'
+      with_list: "{{ check_ptfs_by_product_against_fix_repo_ptf_info_list }}"
       loop_control:
         loop_var: ptf_info
 
     - name: PTF applied
       ansible.builtin.set_fact:
-        ptf_list: "{{ ptf_list | default([]) + [{'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id]}] }}"
+        check_ptfs_by_product_against_fix_repo_ptf_list: >-
+          {{ check_ptfs_by_product_against_fix_repo_ptf_list | default([])
+          + [{'PTF_IDENTIFIER': ptf_info.ptf_id,
+          'PTF_LOADED_STATUS': check_ptfs_by_product_against_fix_repo_ptf_on_system[ptf_info.ptf_id]}] }}
       when:
-        - ptf_on_system.get(ptf_info.ptf_id) is not none
-        - ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or
-          ptf_on_system[ptf_info.ptf_id] == 'PERMANENTLY APPLIED' or
-          ptf_on_system[ptf_info.ptf_id] == 'SUPERSEDED'
-      with_list: "{{ ptf_info_list }}"
+        - check_ptfs_by_product_against_fix_repo_ptf_on_system.get(ptf_info.ptf_id) is not none
+        - check_ptfs_by_product_against_fix_repo_ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or
+          check_ptfs_by_product_against_fix_repo_ptf_on_system[ptf_info.ptf_id] == 'PERMANENTLY APPLIED' or
+          check_ptfs_by_product_against_fix_repo_ptf_on_system[ptf_info.ptf_id] == 'SUPERSEDED'
+      with_list: "{{ check_ptfs_by_product_against_fix_repo_ptf_info_list }}"
       loop_control:
         loop_var: ptf_info
 
     - name: Compose ptf_status
       ansible.builtin.set_fact:
-        check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
-          [{'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'OK', 'PTF_LIST': ptf_list}] }}"
+        check_ptfs_by_product_against_fix_repo_ptf_status: >-
+          {{ check_ptfs_by_product_against_fix_repo_ptf_status | default([])
+          + [{'PRODUCT': check_ptfs_by_product_against_fix_repo_ptf_info_list[0].product,
+          'PRODUCT_STATUS': 'OK', 'PTF_LIST': check_ptfs_by_product_against_fix_repo_ptf_list}] }}
       no_log: true
-      when: result.row | length > 0
+      when: check_ptfs_by_product_against_fix_repo_result.row | length > 0

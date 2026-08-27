@@ -1,14 +1,15 @@
 ---
 - name: Initialize the variables
   ansible.builtin.set_fact:
-    fix_list: []
-    ptfs_on_system: {}
-    product_list: []
-    ptf_not_installed: []
+    check_ptf_groups_against_fix_repo_fix_list: []
+    check_ptf_groups_against_fix_repo_ptfs_on_system: {}
+    check_ptf_groups_against_fix_repo_product_list: []
+    check_ptf_groups_against_fix_repo_ptf_not_installed: []
 
 - name: Compose the PTF number list
   ansible.builtin.set_fact:
-    fix_list: "{{ fix_list | default([]) + [ptf_info.ptf_id] }}"
+    check_ptf_groups_against_fix_repo_fix_list: >-
+      {{ check_ptf_groups_against_fix_repo_fix_list | default([]) + [ptf_info.ptf_id] }}
   with_list: "{{ group.ptf_list }}"
   loop_control:
     loop_var: ptf_info
@@ -16,48 +17,55 @@
 - name: Query PTF list from target system
   ibm.power_ibmi.ibmi_fix:
     operation: 'query'
-    fix_list: "{{ fix_list }}"
-  register: ptf_info
+    fix_list: "{{ check_ptf_groups_against_fix_repo_fix_list }}"
+  register: check_ptf_groups_against_fix_repo_ptf_info
 
 - name: Query product information from target system
   ibm.power_ibmi.ibmi_sql_query:
     sql: "SELECT DISTINCT PRODUCT_ID FROM QSYS2.LICENSE_INFO"
-  register: result
+  register: check_ptf_groups_against_fix_repo_result
 
 - name: Compose product list
   ansible.builtin.set_fact:
-    product_list: "{{ product_list | default([]) + [record.PRODUCT_ID] }}"
-  with_list: "{{ result.row }}"
+    check_ptf_groups_against_fix_repo_product_list: >-
+      {{ check_ptf_groups_against_fix_repo_product_list | default([]) + [record.PRODUCT_ID] }}
+  with_list: "{{ check_ptf_groups_against_fix_repo_result.row }}"
   loop_control:
     loop_var: record
 
 - name: Compose ptf status list on targret system
   ansible.builtin.set_fact:
-    ptfs_on_system: "{{ ptfs_on_system | default({}) | combine({ptf.PTF_IDENTIFIER: ptf.PTF_LOADED_STATUS}) }}"
-  with_list: "{{ ptf_info.ptf_list }}"
+    check_ptf_groups_against_fix_repo_ptfs_on_system: >-
+      {{ check_ptf_groups_against_fix_repo_ptfs_on_system | default({})
+      | combine({ptf.PTF_IDENTIFIER: ptf.PTF_LOADED_STATUS}) }}
+  with_list: "{{ check_ptf_groups_against_fix_repo_ptf_info.ptf_list }}"
   loop_control:
     loop_var: ptf
 
 - name: PTF does not exist
   ansible.builtin.set_fact:
-    ptf_not_installed: "{{ ptf_not_installed | default([]) + [{'PTF_IDENTIFIER': ptf.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT'}] }}"
+    check_ptf_groups_against_fix_repo_ptf_not_installed: >-
+      {{ check_ptf_groups_against_fix_repo_ptf_not_installed | default([])
+      + [{'PTF_IDENTIFIER': ptf.ptf_id, 'PTF_LOADED_STATUS': 'NON-EXISTENT'}] }}
   when:
-    - not ptfs_on_system.get(ptf.ptf_id)
-    - ptf.product in product_list
+    - not check_ptf_groups_against_fix_repo_ptfs_on_system.get(ptf.ptf_id)
+    - ptf.product in check_ptf_groups_against_fix_repo_product_list
   with_list: "{{ group.ptf_list }}"
   loop_control:
     loop_var: ptf
 
 - name: PTF exists but status is not APPLIED, PERMANENTLY APPLIED or SUPERSEDED
   ansible.builtin.set_fact:
-    ptf_not_installed: "{{ ptf_not_installed | default([]) + [{'PTF_IDENTIFIER': ptf.PTF_IDENTIFIER, 'PTF_LOADED_STATUS': ptf.PTF_LOADED_STATUS}] }}"
+    check_ptf_groups_against_fix_repo_ptf_not_installed: >-
+      {{ check_ptf_groups_against_fix_repo_ptf_not_installed | default([])
+      + [{'PTF_IDENTIFIER': ptf.PTF_IDENTIFIER, 'PTF_LOADED_STATUS': ptf.PTF_LOADED_STATUS}] }}
   when:
     - ptf.PTF_LOADED_STATUS != "APPLIED"
     - ptf.PTF_LOADED_STATUS != "PERMANENTLY APPLIED"
     - ptf.PTF_LOADED_STATUS != "SUPERSEDED"
     # There is an bug in 7.3 and before, but sqlservice won't change this in the future.
     - ptf.PTF_LOADED_STATUS != "SUPERCEDED"
-  with_list: "{{ ptf_info.ptf_list }}"
+  with_list: "{{ check_ptf_groups_against_fix_repo_ptf_info.ptf_list }}"
   loop_control:
     loop_var: ptf
 
@@ -65,4 +73,4 @@
   ansible.builtin.set_fact:
     check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([])
       + [{'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level,
-          'PTF_GROUP_STATUS': 'NOT INSTALLED', 'PTF_NOT_INSTALLED': ptf_not_installed}] }}"
+          'PTF_GROUP_STATUS': 'NOT INSTALLED', 'PTF_NOT_INSTALLED': check_ptf_groups_against_fix_repo_ptf_not_installed}] }}"

@@ -25,7 +25,7 @@
           register: create_table_result
           failed_when:
             - create_table_result.rc !=0
-            - create_table_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL7905') | map(attribute='MESSAGE_ID') | list | length ==0"
+            - create_table_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'SQL7905') | map(attribute='MESSAGE_ID') | list | length ==0
 
         - name: Task start journal
           ibm.power_ibmi.ibmi_cl_command:

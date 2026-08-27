@@ -1,0 +1,15 @@
+# BAT (Build Acceptance Test) execute list for ibmi_ethernet_port
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# All three TCs are read-only (no server state changes) and fast (~2-5s total).
+#
+# TC01  asserts all return fields are present — core smoke test
+# TC02  cross-checks each port's RESOURCE_NAME against DSPHDWRSC output
+# TC03  verifies explicit operation='display' parameter works without error
+
+tc_execute:
+  - TC01
+  - TC02
+  - TC03

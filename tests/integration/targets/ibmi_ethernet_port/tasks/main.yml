@@ -1,46 +1,75 @@
+# test code for the ibmi_ethernet_port module
 # (c) 2020, zhuljbj <zhuljbj@cn.ibm.com>
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-- name: retrieve hardware resource by command
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC02']) — only those TCs run
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['TC02']) — everything else runs
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC dependency notes:
+#   TC01  displays ethernet ports (no options) and asserts all return fields are present
+#   TC02  asserts each returned port's RESOURCE_NAME appears in the hardware list
+#         — depends on TC01 having populated ethernet_port_result
+#   TC03  calls ibmi_ethernet_port with explicit operation='display' — verifies no crash
+#         — independent of TC01/TC02
+#
+# The setup task (DSPHDWRSC) always runs unconditionally — it is required by TC02.
+# All three TCs are read-only with no server state changes.
+#
+
+- name: Setup retrieve hardware resource list for cross-check
   ibmi_cl_command:
     cmd: QSYS/DSPHDWRSC TYPE(*CMN)
   register: command_result
 
-- name: display ethernet ports
+- name: Setup display ethernet ports
   ibmi_ethernet_port:
   register: ethernet_port_result
 
-- name: TC01 assert the defined parameters are returned
-  assert:
-    that:
-      - ethernet_port_result.msg is defined
-      - ethernet_port_result.rc == 0
-      - ethernet_port_result.ethernet_ports | length >= 1 
-      - ethernet_port_result.ethernet_ports[0]["ADAPTER_ADDRESS"] is defined
-      - ethernet_port_result.ethernet_ports[0]["CARD_POSITION"] is defined
-      - ethernet_port_result.ethernet_ports[0]["DEFAULT_MAC_ADDRESS"] is defined
-      - ethernet_port_result.ethernet_ports[0]["EXPANDED_SERIAL_NUMBER"] is defined
-      - ethernet_port_result.ethernet_ports[0]["FRAME_ID"] is defined
-      - ethernet_port_result.ethernet_ports[0]["IO_BUS_ADDRESS"] is defined
-      - ethernet_port_result.ethernet_ports[0]["LAN_SPEED"] is defined
-      - ethernet_port_result.ethernet_ports[0]["LOCATION_CODE"] is defined
-      - ethernet_port_result.ethernet_ports[0]["PART_NUMBER"] is defined
-      - ethernet_port_result.ethernet_ports[0]["PORT_NUMBER"] is defined
-      - ethernet_port_result.ethernet_ports[0]["RESOURCE_NAME"] is defined
-      - ethernet_port_result.ethernet_ports[0]["SERIAL_NUMBER"] is defined
-      - ethernet_port_result.ethernet_ports[0]["SUPPORTS_LINK_AGGREGATION"] is defined
-      - ethernet_port_result.ethernet_ports[0]["SYSTEM_BOARD_NUMBER"] is defined
-      - ethernet_port_result.ethernet_ports[0]["SYSTEM_BUS_NUMBER"] is defined
-      - ethernet_port_result.ethernet_ports[0]["SYSTEM_CARD_NUMBER"] is defined
+# ─── TC01 ─────────────────────────────────────────────────────────────────────
+- name: TC01 - Assert all defined return fields are present
+  when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+  block:
+    - name: TC01 assert the defined parameters are returned
+      assert:
+        that:
+          - ethernet_port_result.msg is defined
+          - ethernet_port_result.rc == 0
+          - ethernet_port_result.ethernet_ports | length >= 1
+          - ethernet_port_result.ethernet_ports[0]["ADAPTER_ADDRESS"] is defined
+          - ethernet_port_result.ethernet_ports[0]["CARD_POSITION"] is defined
+          - ethernet_port_result.ethernet_ports[0]["DEFAULT_MAC_ADDRESS"] is defined
+          - ethernet_port_result.ethernet_ports[0]["EXPANDED_SERIAL_NUMBER"] is defined
+          - ethernet_port_result.ethernet_ports[0]["FRAME_ID"] is defined
+          - ethernet_port_result.ethernet_ports[0]["IO_BUS_ADDRESS"] is defined
+          - ethernet_port_result.ethernet_ports[0]["LAN_SPEED"] is defined
+          - ethernet_port_result.ethernet_ports[0]["LOCATION_CODE"] is defined
+          - ethernet_port_result.ethernet_ports[0]["PART_NUMBER"] is defined
+          - ethernet_port_result.ethernet_ports[0]["PORT_NUMBER"] is defined
+          - ethernet_port_result.ethernet_ports[0]["RESOURCE_NAME"] is defined
+          - ethernet_port_result.ethernet_ports[0]["SERIAL_NUMBER"] is defined
+          - ethernet_port_result.ethernet_ports[0]["SUPPORTS_LINK_AGGREGATION"] is defined
+          - ethernet_port_result.ethernet_ports[0]["SYSTEM_BOARD_NUMBER"] is defined
+          - ethernet_port_result.ethernet_ports[0]["SYSTEM_BUS_NUMBER"] is defined
+          - ethernet_port_result.ethernet_ports[0]["SYSTEM_CARD_NUMBER"] is defined
 
-- name: asser the returned ethernet port can be found in the CMN list
-  assert: 
-    that:
-      - item['RESOURCE_NAME'] in command_result.stdout 
-  loop: "{{ethernet_port_result['ethernet_ports']}}"
+# ─── TC02 ─────────────────────────────────────────────────────────────────────
+- name: TC02 - Assert each returned ethernet port appears in the hardware list
+  when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+  block:
+    - name: TC02 assert the returned ethernet port can be found in the CMN list
+      assert:
+        that:
+          - item['RESOURCE_NAME'] in command_result.stdout
+      loop: "{{ethernet_port_result['ethernet_ports']}}"
 
-- name: create a device description
-  ibmi_ethernet_port:
-    operation: 'display'
-  register: ethernet_port_result
+# ─── TC03 ─────────────────────────────────────────────────────────────────────
+- name: TC03 - Display ethernet ports with explicit operation parameter
+  when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+  block:
+    - name: TC03 display ethernet ports with explicit operation=display
+      ibmi_ethernet_port:
+        operation: 'display'
+      register: ethernet_port_result

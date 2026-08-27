@@ -1,7 +1,7 @@
 # Test when all dependent packages are in place  
 - name: Query the iASP existing
   ibmi_sql_query:
-    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1"
   register: iasp_list
 
 - block:

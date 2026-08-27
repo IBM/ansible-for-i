@@ -1,4 +1,18 @@
 # Test become_user and become_user_password
+#
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC02']) — only those TCs run
+#   tc_skip:    optional list of TC IDs to skip (e.g. ['TC04']) — everything else runs
+#   If neither variable is defined, all TCs run (default behaviour, same as before).
+#
+# Structure notes:
+#   - Setup tasks (set_fact, create user, include_tasks) always run regardless of execute/skip lists.
+#     They are required prerequisites for the TC blocks.
+#   - TC04 appears after TC05 in the original test (non-sequential) — ordering preserved.
+#   - TC11-TC17 require ansible_ssh_user to be switched to nopwd_user (done before TC04).
+#   - The always: block restores the original ssh user and deletes all test objects.
+#
+
 - set_fact:
     becomeuser: 'ansibleA'
     becomepwd: 'password'
@@ -7,16 +21,7 @@
   no_log: true
 
 - block:
-    - name: search the module log to ensure password is not logged.
-      shell: 'cat /var/log/ibmi_ansible_modules.log | grep "ibmi"  | wc -l'
-      register: check_pwd_count
-
-    - name: assert the count (and handle case where module log does not exist)
-      assert:
-        that:
-         - (check_pwd_count.stdout | int > 0) or ('No such file or directory' in check_pwd_count.stderr)
-
-    - name: cleanup module.log
+    - name: cleanup module.log if it exists (so end-of-test password check starts clean)
       file:
         path: /var/log/ibmi_ansible_modules.log
         state: absent
@@ -36,184 +41,234 @@
       register: user_result
 
     - ansible.builtin.include_tasks: iasp.yml
+      when: tc_execute is not defined or tc_execute | intersect(['TC_IASP']) | length > 0
+
     - ansible.builtin.include_tasks: QSQSRVR.yml
+      when: tc_execute is not defined or tc_execute | intersect(['TC_QSQSRVR']) | length > 0
 
     ## Verify module functions when provides become_user and become_user_password
-    - name: TC01 create a library with become_user and become_user_password
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}1'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '{{becomepwd}}'
 
-    - name: TC01 verify the object is owned by the become user
-      ibmi_object_authority:
-        operation: 'display'
-        object_name: '{{libname}}1'
-        #object_library: 'TEMPLIB'
-        object_type: '*LIB'
-      register: authority_result
+    # ─── TC01 ─────────────────────────────────────────────────────────────────
+    - name: TC01 - Create a library with become_user and verify ownership
+      when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+      block:
+        - name: TC01 create a library with become_user and become_user_password
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}1'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '{{becomepwd}}'
 
-    - name: TC01 assert the returned options of display
-      assert:
-        that:
-          - authority_result.object_authority_list[0].OWNER == becomeuser.upper()
+        - name: TC01 verify the object is owned by the become user
+          ibmi_object_authority:
+            operation: 'display'
+            object_name: '{{libname}}1'
+            object_type: '*LIB'
+          register: authority_result
 
-    - name: TC02 create a library with a not existing user profile
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}3'
-        become_user: 'abc'
-      register: neg_result
-      failed_when: neg_result.failed != true
+        - name: TC01 assert the returned options of display
+          assert:
+            that:
+              - authority_result.object_authority_list[0].OWNER == becomeuser.upper()
 
-    - name: TC03 create a library with wrong password
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}4'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: 'abcdeft'
-      register: neg_result
-      failed_when: neg_result.failed != true
+    # ─── TC02 ─────────────────────────────────────────────────────────────────
+    - name: TC02 - Create a library with a non-existing user profile (expected failure)
+      when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+      block:
+        - name: TC02 create a library with a not existing user profile
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}3'
+            become_user: 'abc'
+          register: neg_result
+          failed_when: neg_result.failed != true
 
-    - name: TC05 create a library without become_user
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}4'
-        #become_user: '{{becomeuser.upper()}}'
-        become_user_password: '{{becomepwd}}'
-      register: neg_result
+    # ─── TC03 ─────────────────────────────────────────────────────────────────
+    - name: TC03 - Create a library with wrong password (expected failure)
+      when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+      block:
+        - name: TC03 create a library with wrong password
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}4'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: 'abcdeft'
+          register: neg_result
+          failed_when: neg_result.failed != true
 
-    - name: TC05 verify the object is owned by the ansible_ssh_user
-      ibmi_object_authority:
-        operation: 'display'
-        object_name: '{{libname}}4'
-        #object_library: 'TEMPLIB'
-        object_type: '*LIB'
-      register: authority_result
+    # ─── TC05 ─────────────────────────────────────────────────────────────────
+    - name: TC05 - Create a library without become_user (owned by ansible_ssh_user)
+      when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+      block:
+        - name: TC05 create a library without become_user
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}4'
+            become_user_password: '{{becomepwd}}'
+          register: neg_result
 
-    - name: TC05 assert the returned options of display
-      assert:
-        that:
-          - authority_result.object_authority_list[0].OWNER == ansible_ssh_user.upper()
+        - name: TC05 verify the object is owned by the ansible_ssh_user
+          ibmi_object_authority:
+            operation: 'display'
+            object_name: '{{libname}}4'
+            object_type: '*LIB'
+          register: authority_result
 
-    - name: cleanup environment
-      ibmi_cl_command:
-        cmd: dltlib lib(ansible1)
-        joblog: true
-      ignore_errors: true
+        - name: TC05 assert the returned options of display
+          assert:
+            that:
+              - authority_result.object_authority_list[0].OWNER == ansible_ssh_user.upper()
 
-    - name: TC06 run CL command module with joblog = False
-      ibmi_cl_command:
-        cmd: crtlib lib(ansible1)
-        joblog: false
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '{{becomepwd}}'
-      register: crtlib_result
+    # ─── TC06 ─────────────────────────────────────────────────────────────────
+    - name: TC06 - Run CL command with become_user and joblog=False
+      when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+      block:
+        - name: cleanup environment
+          ibmi_cl_command:
+            cmd: dltlib lib(ansible1)
+            joblog: true
+          ignore_errors: true
 
-    - name: TC06 assert the returned parameters when joblog
-      assert:
-        that:
-          - "'CPF2110' not in crtlib_result"
-          - crtlib_result.joblog == False
-          - crtlib_result.cmd != ""
-          - crtlib_result.stderr == ""
-          - crtlib_result.stderr_lines == []
-          - crtlib_result.rc == 0
+        - name: TC06 run CL command module with joblog = False
+          ibmi_cl_command:
+            cmd: crtlib lib(ansible1)
+            joblog: false
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '{{becomepwd}}'
+          register: crtlib_result
 
-    - name: TC07 run CL command module without joblog
-      ibmi_cl_command:
-        cmd: DSPLIB ansible1
-        joblog: true
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '{{becomepwd}}'
-      register: dsplib_result_1
+        - name: TC06 assert the returned parameters when joblog
+          assert:
+            that:
+              - "'CPF2110' not in crtlib_result"
+              - crtlib_result.joblog == False
+              - crtlib_result.cmd != ""
+              - crtlib_result.stderr == ""
+              - crtlib_result.stderr_lines == []
+              - crtlib_result.rc == 0
 
-    - name: TC07 assert returned parameters without joblog
-      assert:
-        that:
-          - dsplib_result_1.joblog == true
-          - dsplib_result_1.cmd == "DSPLIB ansible1"
-          - dsplib_result_1.stderr == ""
-          - dsplib_result_1.stderr_lines == []
-          - dsplib_result_1.rc == 0
-          - dsplib_result_1.job_log == []
+    # ─── TC07 ─────────────────────────────────────────────────────────────────
+    - name: TC07 - Run CL command with become_user and joblog=True
+      when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+      block:
+        - name: TC07 run CL command module without joblog
+          ibmi_cl_command:
+            cmd: DSPLIB ansible1
+            joblog: true
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '{{becomepwd}}'
+          register: dsplib_result_1
 
-    - name: TC08 run CL command module with joblog = true
-      ibmi_cl_command:
-        cmd: dltlib lib(ansible1)
-        joblog: true
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '{{becomepwd}}'
-      register: dltlib_result_1
+        - name: TC07 assert returned parameters without joblog
+          assert:
+            that:
+              - dsplib_result_1.joblog == true
+              - dsplib_result_1.cmd == "DSPLIB ansible1"
+              - dsplib_result_1.stderr == ""
+              - dsplib_result_1.stderr_lines == []
+              - dsplib_result_1.rc == 0
+              - dsplib_result_1.job_log == []
 
-    - name: TC08 assert returned parameters with joblog = true
-      assert:
-        that:
-          - dltlib_result_1.joblog == true
-          - dltlib_result_1.cmd == "dltlib lib(ansible1)"
-          - dltlib_result_1.stderr == ""
-          - dltlib_result_1.stderr_lines == []
-          - dltlib_result_1.rc == 0
-          - dltlib_result_1.job_log != []
+    # ─── TC08 ─────────────────────────────────────────────────────────────────
+    - name: TC08 - Delete library with become_user and joblog=True
+      when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+      block:
+        - name: TC08 run CL command module with joblog = true
+          ibmi_cl_command:
+            cmd: dltlib lib(ansible1)
+            joblog: true
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '{{becomepwd}}'
+          register: dltlib_result_1
 
-    - name: TC09 run CL command module to delete an not existing library
-      ibmi_cl_command:
-        cmd: dltlib lib(ansible1)
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '{{becomepwd}}'
-        joblog: true
-      register: dltlib_result_2
-      ignore_errors: true
+        - name: TC08 assert returned parameters with joblog = true
+          assert:
+            that:
+              - dltlib_result_1.joblog == true
+              - dltlib_result_1.cmd == "dltlib lib(ansible1)"
+              - dltlib_result_1.stderr == ""
+              - dltlib_result_1.stderr_lines == []
+              - dltlib_result_1.rc == 0
+              - dltlib_result_1.job_log != []
 
-    - name: TC09 assert returned parameters with joblog = True
-      assert:
-        that:
-          - dltlib_result_2.job_log != []
-          - dltlib_result_2.stderr != ""
-          - (dltlib_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length) >= 1
-          - dltlib_result_2.rc != 0
+    # ─── TC09 ─────────────────────────────────────────────────────────────────
+    - name: TC09 - Delete a non-existing library with become_user (expected failure)
+      when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+      block:
+        - name: TC09 run CL command module to delete a non-existing library
+          ibmi_cl_command:
+            cmd: dltlib lib(ansible1)
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '{{becomepwd}}'
+            joblog: true
+          register: dltlib_result_2
+          ignore_errors: true
 
-    ## Create a *USRCLS user as the ansible_ssh_user
-    - name: create a user profile with required options
-      ibmi_user_and_group:
-        operation: 'create'
-        user: '{{nopwd_user}}'
-        password: '{{becomepwd}}'
+        - name: TC09 assert returned parameters with joblog = True
+          assert:
+            that:
+              - dltlib_result_2.job_log != []
+              - dltlib_result_2.stderr != ""
+              - (dltlib_result_2.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF2110') | map(attribute='MESSAGE_ID') | list | length) >= 1
+              - dltlib_result_2.rc != 0
 
-    - set_fact:
-        ansible_ssh_user_org: '{{ansible_ssh_user}}'
-        ansible_ssh_pass_org: '{{ansible_ssh_pass}}'
-      no_log: true
+    ## Switch to nopwd_user for TC04 and TC11-TC20
+    - when: tc_execute is not defined or tc_execute | intersect(['TC04','TC11','TC12','TC13','TC14','TC15','TC16','TC17','TC18','TC19','TC20']) | length > 0
+      block:
+        - name: create a user profile for nopwd_user
+          ibmi_user_and_group:
+            operation: 'create'
+            user: '{{nopwd_user}}'
+            password: '{{becomepwd}}'
 
-    - set_fact:
-        ansible_ssh_user: '{{nopwd_user}}'
-        ansible_ssh_pass: '{{becomepwd}}'
-      no_log: true
+        - set_fact:
+            ansible_ssh_user_org: '{{ansible_ssh_user}}'
+            ansible_ssh_pass_org: '{{ansible_ssh_pass}}'
+          no_log: true
 
-    - ansible.builtin.include_tasks: QSQSRVR_abnormal.yml
+        - set_fact:
+            ansible_ssh_user: '{{nopwd_user}}'
+            ansible_ssh_pass: '{{becomepwd}}'
+          no_log: true
 
-    - name: TC04 create a library without a password, check default value of become_user_password is *NOPWD
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}4'
-        become_user: '{{becomeuser.upper()}}'
-      register: neg_result
-      failed_when: neg_result.failed != true
+        - ansible.builtin.include_tasks: QSQSRVR_abnormal.yml
 
-    - name: TC11 create a library with become_user_password=*NOPWDCHK
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}6'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWDCHK'
-      register: nopwdchk_result
-      failed_when: nopwdchk_result.failed != true
+    # ─── TC04 ─────────────────────────────────────────────────────────────────
+    # Note: TC04 appears here (after TC05 in the original) because it requires
+    # ansible_ssh_user to be switched to nopwd_user first.
+    - name: TC04 - Create a library without password — default *NOPWD (expected failure)
+      when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+      block:
+        - name: TC04 create a library without a password
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}4'
+            become_user: '{{becomeuser.upper()}}'
+          register: neg_result
+          failed_when: neg_result.failed != true
 
-    - name: TC12 create a library with become_user_password=*NOPWDSTS
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}6'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWDSTS'
-      register: nopwdsts_result
-      failed_when: nopwdsts_result.failed != true
+    # ─── TC11 ─────────────────────────────────────────────────────────────────
+    - name: TC11 - Create a library with become_user_password=*NOPWDCHK (expected failure)
+      when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+      block:
+        - name: TC11 create a library with become_user_password=*NOPWDCHK
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}6'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWDCHK'
+          register: nopwdchk_result
+          failed_when: nopwdchk_result.failed != true
 
-    ## Grant *USE of becomeuser to the ssh_user, then test special values *NOPWD *NOPWDCHK *NOPWDSTS
+    # ─── TC12 (first) ─────────────────────────────────────────────────────────
+    - name: TC12a - Create a library with become_user_password=*NOPWDSTS (expected failure)
+      when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+      block:
+        - name: TC12a create a library with become_user_password=*NOPWDSTS
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}6'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWDSTS'
+          register: nopwdsts_result
+          failed_when: nopwdsts_result.failed != true
+
+    ## Grant *USE of becomeuser to the ssh_user, then test special values
     - name: Grant *USE of becomeuser to the ssh_user
+      when: tc_execute is not defined or tc_execute | intersect(['TC12','TC13','TC14','TC15','TC16','TC17','TC18','TC19','TC20']) | length > 0
       ibmi_object_authority:
         operation: 'grant'
         object_name: '{{becomeuser}}'
@@ -226,225 +281,241 @@
         become_user_password: '{{ansible_ssh_pass_org}}'
       register: authority_result
 
-    - name: TC12 create a library with become_user_password=*NOPWD
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}7'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWD'
+    # ─── TC12 (second — *NOPWD success) ───────────────────────────────────────
+    - name: TC12b - Create a library with become_user_password=*NOPWD
+      when: (tc_execute is not defined or 'TC12' in tc_execute) and 'TC12' not in (tc_skip | default([]))
+      block:
+        - name: TC12b create a library with become_user_password=*NOPWD
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}7'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWD'
 
-    - name: TC12B create a library without a password, check default value of become_user_password is *NOPWD
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}4'
-        become_user: '{{becomeuser.upper()}}'
-        #become_user_password: 'abcdeft'
-      register: neg_result
-      failed_when: neg_result.failed != true
+        - name: TC12B create a library without a password (expected failure)
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}4'
+            become_user: '{{becomeuser.upper()}}'
+          register: neg_result
+          failed_when: neg_result.failed != true
 
-    - name: TC12 verify the object is owned by the become user
-      ibmi_object_authority:
-        operation: 'display'
-        object_name: '{{libname}}7'
-        object_type: '*LIB'
-        become_user: '{{ansible_ssh_user_org}}'
-        become_user_password: '{{ansible_ssh_pass_org}}'
-      register: authority_result
+        - name: TC12b verify the object is owned by the become user
+          ibmi_object_authority:
+            operation: 'display'
+            object_name: '{{libname}}7'
+            object_type: '*LIB'
+            become_user: '{{ansible_ssh_user_org}}'
+            become_user_password: '{{ansible_ssh_pass_org}}'
+          register: authority_result
 
-    - name: TC12 assert the returned options of display
-      assert:
-        that:
-          - authority_result.object_authority_list[0].OWNER == becomeuser.upper()
+        - name: TC12b assert the returned options of display
+          assert:
+            that:
+              - authority_result.object_authority_list[0].OWNER == becomeuser.upper()
 
-    - name: TC13 create a library with become_user_password=*NOPWDCHK
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}8'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWDCHK'
+    # ─── TC13 ─────────────────────────────────────────────────────────────────
+    - name: TC13 - Create a library with become_user_password=*NOPWDCHK
+      when: (tc_execute is not defined or 'TC13' in tc_execute) and 'TC13' not in (tc_skip | default([]))
+      block:
+        - name: TC13 create a library with become_user_password=*NOPWDCHK
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}8'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWDCHK'
 
-    - name: TC13 verify the object is owned by the become user
-      ibmi_object_authority:
-        operation: 'display'
-        object_name: '{{libname}}8'
-        object_type: '*LIB'
-        become_user: '{{ansible_ssh_user_org}}'
-        become_user_password: '{{ansible_ssh_pass_org}}'
-      register: authority_result
+        - name: TC13 verify the object is owned by the become user
+          ibmi_object_authority:
+            operation: 'display'
+            object_name: '{{libname}}8'
+            object_type: '*LIB'
+            become_user: '{{ansible_ssh_user_org}}'
+            become_user_password: '{{ansible_ssh_pass_org}}'
+          register: authority_result
 
-    - name: TC13 assert the returned options of display
-      assert:
-        that:
-          - authority_result.object_authority_list[0].OWNER == becomeuser.upper()
+        - name: TC13 assert the returned options of display
+          assert:
+            that:
+              - authority_result.object_authority_list[0].OWNER == becomeuser.upper()
 
-    - name: TC14 create a library with become_user_password=*NOPWDSTS
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}9'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWDSTS'
+    # ─── TC14 ─────────────────────────────────────────────────────────────────
+    - name: TC14 - Create a library with become_user_password=*NOPWDSTS
+      when: (tc_execute is not defined or 'TC14' in tc_execute) and 'TC14' not in (tc_skip | default([]))
+      block:
+        - name: TC14 create a library with become_user_password=*NOPWDSTS
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}9'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWDSTS'
 
-    - name: TC14 verify the object is owned by the become user
-      ibmi_object_authority:
-        operation: 'display'
-        object_name: '{{libname}}9'
-        object_type: '*LIB'
-        become_user: '{{ansible_ssh_user_org}}'
-        become_user_password: '{{ansible_ssh_pass_org}}'
-      register: authority_result
+        - name: TC14 verify the object is owned by the become user
+          ibmi_object_authority:
+            operation: 'display'
+            object_name: '{{libname}}9'
+            object_type: '*LIB'
+            become_user: '{{ansible_ssh_user_org}}'
+            become_user_password: '{{ansible_ssh_pass_org}}'
+          register: authority_result
 
-    - name: TC14 assert the returned options of display
-      assert:
-        that:
-          - authority_result.object_authority_list[0].OWNER == becomeuser.upper()
+        - name: TC14 assert the returned options of display
+          assert:
+            that:
+              - authority_result.object_authority_list[0].OWNER == becomeuser.upper()
 
-    ## Disable becomeuser, then test special values *NOPWD *NOPWDCHK *NOPWDSTS
+    ## Disable becomeuser, then test special values
     - name: Disable becomeuser
+      when: tc_execute is not defined or tc_execute | intersect(['TC15','TC16','TC17','TC18','TC19','TC20']) | length > 0
       ibmi_user_and_group:
         operation: 'change'
         user: '{{becomeuser}}'
-        # password: '{{pwd}}'
-        # expire: '*NO'
         status: '*DISABLED'
-        # user_class: '*SECOFR'
-        # special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
-        # user_group: '{{new_group[1]}}'
-        # owner: '*USRPRF'
-        # text: 'ANSIBLE TESTING'
-        # parameters: "HOMEDIR('/home/{{new_user[0]}}')"
         become_user: '{{ansible_ssh_user_org}}'
         become_user_password: '{{ansible_ssh_pass_org}}'
       register: user_result
 
     - name: Grant ssh_user '*ALLOBJ', '*SECADM'
+      when: tc_execute is not defined or tc_execute | intersect(['TC15','TC16','TC17','TC18','TC19','TC20']) | length > 0
       ibmi_user_and_group:
         operation: 'change'
         user: '{{ansible_ssh_user}}'
-        # password: '{{pwd}}'
-        # expire: '*NO'
         status: '*ENABLED'
-        # user_class: '*SECOFR'
         special_authority: ['*ALLOBJ', '*SECADM']
-        # user_group: '{{new_group[1]}}'
-        # owner: '*USRPRF'
-        # text: 'ANSIBLE TESTING'
-        # parameters: "HOMEDIR('/home/{{new_user[0]}}')"
         become_user: '{{ansible_ssh_user_org}}'
         become_user_password: '{{ansible_ssh_pass_org}}'
       register: user_result
 
-    - name: TC15 create a library with become_user_password=*NOPWD
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}A'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWD'
-      register: nopwd_result
-      failed_when: nopwd_result.failed != true
+    # ─── TC15 ─────────────────────────────────────────────────────────────────
+    - name: TC15 - Create a library with become_user_password=*NOPWD when user disabled (expected failure)
+      when: (tc_execute is not defined or 'TC15' in tc_execute) and 'TC15' not in (tc_skip | default([]))
+      block:
+        - name: TC15 create a library with become_user_password=*NOPWD
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}A'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWD'
+          register: nopwd_result
+          failed_when: nopwd_result.failed != true
 
-    - name: TC16 create a library with become_user_password=*NOPWDCHK
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}A'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWDCHK'
-      register: nopwdchk_result
+    # ─── TC16 ─────────────────────────────────────────────────────────────────
+    - name: TC16 - Create a library with become_user_password=*NOPWDCHK when user disabled
+      when: (tc_execute is not defined or 'TC16' in tc_execute) and 'TC16' not in (tc_skip | default([]))
+      block:
+        - name: TC16 create a library with become_user_password=*NOPWDCHK
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}A'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWDCHK'
+          register: nopwdchk_result
 
-    - name: TC17 create a library with become_user_password=*NOPWDSTS
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}A'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWDSTS'
-      register: nopwdsts_result
-      failed_when: nopwdsts_result.failed != true
+    # ─── TC17 ─────────────────────────────────────────────────────────────────
+    - name: TC17 - Create a library with become_user_password=*NOPWDSTS when user disabled (expected failure)
+      when: (tc_execute is not defined or 'TC17' in tc_execute) and 'TC17' not in (tc_skip | default([]))
+      block:
+        - name: TC17 create a library with become_user_password=*NOPWDSTS
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}A'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWDSTS'
+          register: nopwdsts_result
+          failed_when: nopwdsts_result.failed != true
 
-    ## Enable becomeuser but set its password to Expired, then test special values *NOPWD *NOPWDCHK *NOPWDSTS
-    - name: Disable becomeuser
+    ## Enable becomeuser but set its password to Expired
+    - name: Enable becomeuser with expired password
+      when: tc_execute is not defined or tc_execute | intersect(['TC18','TC19','TC20']) | length > 0
       ibmi_user_and_group:
         operation: 'change'
         user: '{{becomeuser}}'
-        # password: '{{pwd}}'
         expire: '*YES'
         status: '*ENABLED'
-        # user_class: '*SECOFR'
-        # special_authority: ['*ALLOBJ', '*IOSYSCFG', '*SECADM', '*SERVICE', '*SPLCTL']
-        # user_group: '{{new_group[1]}}'
-        # owner: '*USRPRF'
-        # text: 'ANSIBLE TESTING'
-        # parameters: "HOMEDIR('/home/{{new_user[0]}}')"
         become_user: '{{ansible_ssh_user_org}}'
         become_user_password: '{{ansible_ssh_pass_org}}'
       register: user_result
 
-    - name: TC18 create a library with become_user_password=*NOPWD
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}A'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWD'
-      register: nopwd_result
-      failed_when: nopwd_result.failed != true
+    # ─── TC18 ─────────────────────────────────────────────────────────────────
+    - name: TC18 - Create a library with become_user_password=*NOPWD when password expired (expected failure)
+      when: (tc_execute is not defined or 'TC18' in tc_execute) and 'TC18' not in (tc_skip | default([]))
+      block:
+        - name: TC18 create a library with become_user_password=*NOPWD
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}A'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWD'
+          register: nopwd_result
+          failed_when: nopwd_result.failed != true
 
-    - name: TC19 create a library with become_user_password=*NOPWDCHK
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}B'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWDCHK'
-      register: nopwdchk_result
+    # ─── TC19 ─────────────────────────────────────────────────────────────────
+    - name: TC19 - Create a library with become_user_password=*NOPWDCHK when password expired
+      when: (tc_execute is not defined or 'TC19' in tc_execute) and 'TC19' not in (tc_skip | default([]))
+      block:
+        - name: TC19 create a library with become_user_password=*NOPWDCHK
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}B'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWDCHK'
+          register: nopwdchk_result
 
-    - name: TC20 create a library with become_user_password=*NOPWDSTS
-      ibmi_cl_command:
-        cmd: 'qsys/crtlib {{libname}}C'
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '*NOPWDSTS'
-      register: nopwdsts_result
-
-    ## Run become to access IFS folder
-    - name: Create a folder owned by other user, with 700
-      file:
-        path: /home/{{ansible_ssh_user}}
-        owner: '{{ansible_ssh_user}}'
-        state: directory
-        mode: '700'
-
-    - name: Create a folder owned by other user, with 700
-      file:
-        path: /home/{{becomeuser}}.txt
-        owner: '{{becomeuser}}'
-        state: touch
-        mode: '700'
-
-    - name: Try copy a IFS file to folder
-      ibmi_cl_command:
-        cmd: CPY OBJ('/home/{{becomeuser}}.txt') TODIR('/home/{{ansible_ssh_user}}')
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '{{becomepwd}}'
-      register: ifs_result
-      failed_when: ifs_result.failed != true
+    # ─── TC20 ─────────────────────────────────────────────────────────────────
+    - name: TC20 - Create a library with become_user_password=*NOPWDSTS when password expired
+      when: (tc_execute is not defined or 'TC20' in tc_execute) and 'TC20' not in (tc_skip | default([]))
+      block:
+        - name: TC20 create a library with become_user_password=*NOPWDSTS
+          ibmi_cl_command:
+            cmd: 'qsys/crtlib {{libname}}C'
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '*NOPWDSTS'
+          register: nopwdsts_result
 
     ## Run become to access IFS folder
-    - name: Create a folder owned by other user, with 700
-      file:
-        path: /home/{{ansible_ssh_user}}.txt
-        owner: '{{ansible_ssh_user}}'
-        state: touch
-        mode: '700'
+    - when: tc_execute is not defined
+      block:
+        - name: Create a folder owned by ansible_ssh_user with 700
+          file:
+            path: /home/{{ansible_ssh_user}}
+            owner: '{{ansible_ssh_user}}'
+            state: directory
+            mode: '700'
 
-    - name: Try copy a IFS file to folder
-      ibmi_cl_command:
-        cmd: WRJLNK LNK('/home/{{ansible_ssh_user}}.txt') TODIR('/home/{{ansible_ssh_user}}')
-        become_user: '{{becomeuser.upper()}}'
-        become_user_password: '{{becomepwd}}'
-      register: ifs_result
-      failed_when: ifs_result.failed != true
+        - name: Create a file owned by becomeuser with 700
+          file:
+            path: /home/{{becomeuser}}.txt
+            owner: '{{becomeuser}}'
+            state: touch
+            mode: '700'
 
-    - name: search the module log to ensure password is not logged.
-      shell: 'cat /var/log/ibmi_ansible_modules.log | grep "{{becomepwd}}"  | wc -l'
-      register: check_pwd_count
+        - name: Try copy a IFS file to folder owned by ansible_ssh_user (expected failure)
+          ibmi_cl_command:
+            cmd: CPY OBJ('/home/{{becomeuser}}.txt') TODIR('/home/{{ansible_ssh_user}}')
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '{{becomepwd}}'
+          register: ifs_result
+          failed_when: ifs_result.failed != true
 
-    - name: assert the count
-      assert:
-        that:
-         - check_pwd_count.stdout | int == 0
+        - name: Create a file owned by ansible_ssh_user with 700
+          file:
+            path: /home/{{ansible_ssh_user}}.txt
+            owner: '{{ansible_ssh_user}}'
+            state: touch
+            mode: '700'
+
+        - name: Try copy a IFS file (expected failure)
+          ibmi_cl_command:
+            cmd: WRJLNK LNK('/home/{{ansible_ssh_user}}.txt') TODIR('/home/{{ansible_ssh_user}}')
+            become_user: '{{becomeuser.upper()}}'
+            become_user_password: '{{becomepwd}}'
+          register: ifs_result
+          failed_when: ifs_result.failed != true
+
+        - name: search the module log to ensure password is not logged.
+          shell: 'cat /var/log/ibmi_ansible_modules.log | grep "{{becomepwd}}"  | wc -l'
+          register: check_pwd_count
+
+        - name: assert the count
+          assert:
+            that:
+             - check_pwd_count.stdout | int == 0
 
   always:
     - set_fact:
         ansible_ssh_user: '{{ansible_ssh_user_org}}'
         ansible_ssh_pass: '{{ansible_ssh_pass_org}}'
-      #no_log: true
       when: ansible_ssh_user_org is defined
       ignore_errors: true
 

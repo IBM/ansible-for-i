@@ -1,0 +1,13 @@
+# BAT (Build Acceptance Test) execute list for ibmi_tcp_server_service
+#
+# Dependency notes:
+#   TC01 starts *DIRSRV — TC02 depends on it being active.
+#   TC03 stops *DIRSRV — TC04 depends on it being inactive.
+#   TC05 starts *DIRSRV — TC06 stops it; both are independent of TC01–TC04 state.
+#   TC07 starts *DIRSRV+*HTTP — TC08 stops them; independent.
+#   TC09–TC17 are all negative tests that do not change server state.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ─────────────────
+
+tc_execute:
+  - TC01

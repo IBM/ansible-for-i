@@ -1,0 +1,17 @@
+# BAT (Build Acceptance Test) execute list for ibmi_job
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# TC dependency notes:
+#   TC01        Independent — list with default options, assert all fields.
+#   TC02 → TC03 TC03 uses job_result populated by TC02's final query.
+#   TC04 → TC05 TC05 looks for *OUTQ jobs; TC04 submits one first.
+#   TC06–TC10   All independent negative/parameter validation tests.
+#
+# TC04 submits a real batch job (QSH sleep 5s) and waits for completion —
+# this is the only TC with meaningful execution time (~10s).
+# All others are instant SQL/parameter-validation calls.
+
+tc_execute:
+  - TC01

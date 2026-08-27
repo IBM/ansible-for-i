@@ -1,0 +1,15 @@
+# BAT (Build Acceptance Test) execute list for ibmi_module_config
+#
+# TC00 always runs (creates *USER ZHYAO used by all other TCs). It is NOT listed
+# here because tc_execute does not control TC00 — it runs unconditionally.
+#
+# Dependency chain: TC01→TC02→TC02A→TC03→TC04→TC05x→TC06→TC07→TC08→TC09x→TC10→TC11
+# TC08 patches ibmi_message.py (always reverted in the always: cleanup block).
+#
+# NOTE: TC00 and TC11 require --password to be passed to run_bat_local.sh so that
+# ZHYAO can be created with a password and SSH can authenticate as that user.
+# Without --password those tasks are skipped automatically (ibmi_pass is undefined).
+
+tc_execute:
+  - TC01
+  

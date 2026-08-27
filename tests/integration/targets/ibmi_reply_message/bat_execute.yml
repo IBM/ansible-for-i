@@ -1,0 +1,13 @@
+# BAT (Build Acceptance Test) execute list for ibmi_reply_message
+#
+# TC00   Setup — creates test library and message queue (always runs).
+# TC01   Positive — send inquiry message and reply with valid option; assert rc=0.
+# TC02   Negative — reply with invalid message lib DUMMYLIB; assert CPF2403.
+# TC03   Negative — reply with invalid message key 9999; assert CPF2410.
+# TC04   Negative — reply with invalid message queue NONEXISTQ; assert CPF2403.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ────────────────
+
+tc_execute:
+  - TC01
+

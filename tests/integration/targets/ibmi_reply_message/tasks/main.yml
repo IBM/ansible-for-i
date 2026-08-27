@@ -23,98 +23,110 @@
     ibmi_cl_command:
       cmd: "CRTMSGQ MSGQ(CITST{{random_number}}/CITESTMSGQ)"
 
-  - name: TC01 - Send an inquiry message to messsage queue
+  - name: TC01 - send and reply an inquiry message
+    when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+    block:
+      - name: TC01 - Send an inquiry message to messsage queue
 
-    ibmi_cl_command:
-      cmd: "QSYS/SNDMSG MSG('Ansible test for replying an inquiry message {{random_number}}') TOMSGQ(CITST{{random_number}}/CITESTMSGQ) MSGTYPE(*INQ) RPYMSGQ(CITST{{random_number}}/CITESTMSGQ)"
+        ibmi_cl_command:
+          cmd: "QSYS/SNDMSG MSG('Ansible test for replying an inquiry message {{random_number}}') TOMSGQ(CITST{{random_number}}/CITESTMSGQ) MSGTYPE(*INQ) RPYMSGQ(CITST{{random_number}}/CITESTMSGQ)"
 
-  - name: TC01 - find the message sent just now
-    ibmi_message:
-      operation: 'find'
-      message_queue: 'CITESTMSGQ'
-      message_lib: 'CITST{{random_number}}'
-      message_type: 'INQUIRY'
-      message_text: 'Ansible test for replying an inquiry message {{random_number}}'
-    register: find_result
+      - name: TC01 - find the message sent just now
+        ibmi_message:
+          operation: 'find'
+          message_queue: 'CITESTMSGQ'
+          message_lib: 'CITST{{random_number}}'
+          message_type: 'INQUIRY'
+          message_text: 'Ansible test for replying an inquiry message {{random_number}}'
+        register: find_result
 
-  - set_fact:
-      returned_msg_key: "{{find_result.message_info[0]['MESSAGE_KEY']}}"
-      returned_msg_queue: "{{find_result.message_info[0]['MESSAGE_QUEUE_NAME']}}"
-      returned_msg_lib: "{{find_result.message_info[0]['MESSAGE_QUEUE_LIBRARY']}}"
-    when: find_result.message_info != []
+      - set_fact:
+          returned_msg_key: "{{find_result.message_info[0]['MESSAGE_KEY']}}"
+          returned_msg_queue: "{{find_result.message_info[0]['MESSAGE_QUEUE_NAME']}}"
+          returned_msg_lib: "{{find_result.message_info[0]['MESSAGE_QUEUE_LIBRARY']}}"
+        when: find_result.message_info != []
 
-  - name: TC01 - reply a valid option to inquery message
-    ibmi_reply_message:
-      message_key: "{{returned_msg_key}}"
-      message_queue: "{{returned_msg_queue}}"
-      message_lib: "{{returned_msg_lib}}"
-      reply: OK
-      remove_message: "*NO"
-      joblog: true
-    register: rpl_result
+      - name: TC01 - reply a valid option to inquery message
+        ibmi_reply_message:
+          message_key: "{{returned_msg_key}}"
+          message_queue: "{{returned_msg_queue}}"
+          message_lib: "{{returned_msg_lib}}"
+          reply: OK
+          remove_message: "*NO"
+          joblog: true
+        register: rpl_result
 
-  - name: TC01 - assert result
-    assert:
-      that:
-        - rpl_result.start is defined
-        - rpl_result.end is defined
-        - rpl_result.delta is defined
-        - rpl_result.stderr is defined
-        - rpl_result.rc == 0
-    #      - rpl_result.stdout_lines is defined
-    #      - rpl_result.stderr_lines is defined
-        - rpl_result.cmd is defined
+      - name: TC01 - assert result
+        assert:
+          that:
+            - rpl_result.start is defined
+            - rpl_result.end is defined
+            - rpl_result.delta is defined
+            - rpl_result.stderr is defined
+            - rpl_result.rc == 0
+        #      - rpl_result.stdout_lines is defined
+        #      - rpl_result.stderr_lines is defined
+            - rpl_result.cmd is defined
 
-  - name: TC02 - negative test - send reply to a non-exist inquiry message - invalid lib
-    ibmi_reply_message:
-      message_key: "{{returned_msg_key}}"
-      message_queue: "{{returned_msg_queue}}"
-      message_lib: "DUMMYLIB"
-      reply: BAD_MSGLIB
-      joblog: true
-    ignore_errors: true
-    register: neg_result
+  - name: TC02 - negative test - invalid lib
+    when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+    block:
+      - name: TC02 - negative test - send reply to a non-exist inquiry message - invalid lib
+        ibmi_reply_message:
+          message_key: "{{returned_msg_key}}"
+          message_queue: "{{returned_msg_queue}}"
+          message_lib: "DUMMYLIB"
+          reply: BAD_MSGLIB
+          joblog: true
+        ignore_errors: true
+        register: neg_result
 
-  - name: TC02 - assert result
-    assert:
-      that:
-        - neg_result.rc != 0
-        - neg_result.stderr != ""
-        - neg_result.job_log[0].MESSAGE_ID == "CPF2403"
+      - name: TC02 - assert result
+        assert:
+          that:
+            - neg_result.rc != 0
+            - neg_result.stderr != ""
+            - neg_result.job_log[0].MESSAGE_ID == "CPF2403"
 
-  - name: TC03 - negative test - send reply to a non-exist inquiry message - invalid key
-    ibmi_reply_message:
-      message_key: "9999"
-      message_queue: "{{returned_msg_queue}}"
-      message_lib: "{{returned_msg_lib}}"
-      reply: BAD_MSGKEY
-      joblog: true
-    ignore_errors: true
-    register: neg_result
+  - name: TC03 - negative test - invalid key
+    when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+    block:
+      - name: TC03 - negative test - send reply to a non-exist inquiry message - invalid key
+        ibmi_reply_message:
+          message_key: "9999"
+          message_queue: "{{returned_msg_queue}}"
+          message_lib: "{{returned_msg_lib}}"
+          reply: BAD_MSGKEY
+          joblog: true
+        ignore_errors: true
+        register: neg_result
 
-  - name: TC03 - assert result
-    assert:
-      that:
-        - neg_result.rc != 0
-        - neg_result.stderr != ""
-        - neg_result.job_log[0].MESSAGE_ID == "CPF2410"
+      - name: TC03 - assert result
+        assert:
+          that:
+            - neg_result.rc != 0
+            - neg_result.stderr != ""
+            - neg_result.job_log[0].MESSAGE_ID == "CPF2410"
 
-  - name: TC04 - negative test - send reply to a non-exist inquiry message - invalid msgq
-    ibmi_reply_message:
-      message_key: "{{returned_msg_key}}"
-      message_queue: "NONEXISTQ"
-      message_lib: "{{returned_msg_lib}}"
-      reply: BAD_MSGQ
-      joblog: true
-    ignore_errors: true
-    register: neg_result
+  - name: TC04 - negative test - invalid msgq
+    when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+    block:
+      - name: TC04 - negative test - send reply to a non-exist inquiry message - invalid msgq
+        ibmi_reply_message:
+          message_key: "{{returned_msg_key}}"
+          message_queue: "NONEXISTQ"
+          message_lib: "{{returned_msg_lib}}"
+          reply: BAD_MSGQ
+          joblog: true
+        ignore_errors: true
+        register: neg_result
 
-  - name: TC04 - assert result
-    assert:
-      that:
-        - neg_result.rc != 0
-        - neg_result.stderr != ""
-        - neg_result.job_log[0].MESSAGE_ID == "CPF2403"
+      - name: TC04 - assert result
+        assert:
+          that:
+            - neg_result.rc != 0
+            - neg_result.stderr != ""
+            - neg_result.job_log[0].MESSAGE_ID == "CPF2403"
 
   always:
     - name: clear test env

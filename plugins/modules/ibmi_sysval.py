@@ -169,7 +169,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 sysval_array = [
@@ -326,6 +326,12 @@ def get_system_value(imodule, sysvaluename, expect=None, check='equal'):
         return sysvalue
 
     conn = imodule.get_connection()
+    if conn is None:
+        conn_err = getattr(imodule, 'conn_error', None)
+        sysvalue['msg'] = ('No database connection available; cannot call QWCRSVAL API'
+                           + (': ' + conn_err if conn_err else ''))
+        sysvalue['rc'] = -1
+        return sysvalue
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(

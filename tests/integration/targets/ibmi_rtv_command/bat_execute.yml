@@ -1,0 +1,24 @@
+# BAT (Build Acceptance Test) execute list for ibmi_rtv_command
+#
+# Setup tasks in RTVAUTLE.yml (create users, authority list) and RTVNETA.yml
+# (call DSPNETA) always run when their TC group is included.
+#
+# RTVAUTLE tests (authority list):
+#   RTVAUTLE_TC01   Call RTVAUTLE for user ANSIUSER1; assert char vars returned correctly.
+#   RTVAUTLE_TC02   Call RTVAUTLE for *PUBLIC with joblog=true; assert job_log non-empty.
+#   RTVAUTLE_TC03   Call RTVAUTLE with char vars passed as number_vars (expect no assert).
+#   RTVAUTLE_TC04   Neg — call RTVAUTLE for user not in AUL; assert CPF22A7.
+#   RTVAUTLE_TC05   Neg — call RTVAUTLE with invalid variable ABC; assert CPD0043.
+#
+# RTVNETA tests (network attributes):
+#   RTVNETA_TC01    Call RTVNETA; assert char/number vars match DSPNETA output.
+#   RTVNETA_TC02    Neg — call RTVNETA with char vars in number_vars; assert CPD0069.
+#
+# Unsupported command:
+#   TC_UNSUPPORTED  Neg — call unsupported RTVTBLSRC; assert module fails.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ────────────────
+
+tc_execute:
+  - RTVAUTLE_TC01
+

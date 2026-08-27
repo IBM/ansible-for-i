@@ -3,93 +3,154 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
-- block: 
+# Execute/skip list usage:
+#   tc_execute: optional list of TC IDs to run  (e.g. ['TC01','TC06']) — only those TCs run.
+#   tc_skip:    optional list of TC IDs to skip — everything else runs.
+#   If neither variable is defined, all TCs run (default behaviour).
+#
+# TC descriptions:
+#   TC01   Submit job with all options.
+#   TC02   Submit job with only required options.
+#   TC03   Submit job with timeout_setting and status.
+#   TC04   Submit job with check_interval; asserts rc == 0.
+#   TC05   Submit job expected to time out before reaching final status.
+#   TC06   Neg — time_out fires; expects non-zero return code message.
+#   TC07   Neg — invalid status value.
+#   TC08   Neg — invalid time_out value.
+#   TC09   Neg — invalid parameters value.
+#   TC10   Neg — unsupported option.
+#   TC11   Neg — missing required cmd option.
+#
+# The outer block/always wraps everything so cleanup always fires regardless of failures.
+#
+
+- block:
+
     - copy: src="sbmjob_script.sh" dest="/tmp/" mode="755"
-  
-    - name: TC01 submit job with all options
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
-        time_out: "1m"
-        status: ['*NONE']
-        check_interval: "1m"
-        parameters: ""
 
-    - name: TC02 submit job with only required options
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
+    # ─── TC01 - Submit job with all options ──────────────────────────────────────
+    - name: TC01 - submit job with all options
+      when: (tc_execute is not defined or 'TC01' in tc_execute) and 'TC01' not in (tc_skip | default([]))
+      block:
+        - name: TC01 - submit job with all options
+          ibmi_submit_job:
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
+            time_out: "1m"
+            status: ['*NONE']
+            check_interval: "1m"
+            parameters: ""
 
-    - name: TC03 submit job with timeout_setting and status
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1m')"
-        time_out: "180s"
-        status: ['*OUTQ']
+    # ─── TC02 - Submit job with only required options ─────────────────────────────
+    - name: TC02 - submit job with only required options
+      when: (tc_execute is not defined or 'TC02' in tc_execute) and 'TC02' not in (tc_skip | default([]))
+      block:
+        - name: TC02 - submit job with only required options
+          ibmi_submit_job:
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 5s')"
 
-    - name: TC04 submit job with check_interval
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 2m')"
-        time_out: "6m"
-        status: ['*COMPLETE', '*OUTQ']
-        check_interval: "10s"
-      register: sbmjob_result
-  
-    - name: TC04 assert the returned options 
-      assert:
-        that:
-          - sbmjob_result.rc == 0 
+    # ─── TC03 - Submit job with timeout_setting and status ────────────────────────
+    - name: TC03 - submit job with timeout_setting and status
+      when: (tc_execute is not defined or 'TC03' in tc_execute) and 'TC03' not in (tc_skip | default([]))
+      block:
+        - name: TC03 - submit job with timeout_setting and status
+          ibmi_submit_job:
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 1m')"
+            time_out: "180s"
+            status: ['*OUTQ']
 
-    - name: TC05 submit job with check_interval
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 10m')"
-        time_out: "6m"
-        status: ['*OUTQ', '*ACTIVE', '*JOBQ']
-        check_interval: "9s"
-        parameters: "JOB(ANSIBLE)"
-      register: sbmjob_result
+    # ─── TC04 - Submit job with check_interval; assert rc == 0 ───────────────────
+    - name: TC04 - submit job with check_interval
+      when: (tc_execute is not defined or 'TC04' in tc_execute) and 'TC04' not in (tc_skip | default([]))
+      block:
+        - name: TC04 - submit job with check_interval
+          ibmi_submit_job:
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 2m')"
+            time_out: "6m"
+            status: ['*COMPLETE', '*OUTQ']
+            check_interval: "10s"
+          register: sbmjob_result
 
-    # test negative test cases
-    - name: TC06 submit job with time_out reported
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 5m')"
-        status: ['*COMPLETE']
-        time_out: "1s"
-      register: neg_result
-      failed_when: "'non-zero return code: The returned status of the submitted job is not expected' not in neg_result.msg"
+        - name: TC04 - assert the returned options
+          assert:
+            that:
+              - sbmjob_result.rc == 0
 
-    - name: TC07 submit job with invalid status
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
-        status: ['abc']
-      register: neg_result
-      failed_when: "'Value specified for status option is not valid' not in neg_result.msg"
+    # ─── TC05 - Submit job expected to exceed time_out ────────────────────────────
+    - name: TC05 - submit job with check_interval (expected to time out)
+      when: (tc_execute is not defined or 'TC05' in tc_execute) and 'TC05' not in (tc_skip | default([]))
+      block:
+        - name: TC05 - submit job with check_interval
+          ibmi_submit_job:
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 10m')"
+            time_out: "6m"
+            status: ['*OUTQ', '*ACTIVE', '*JOBQ']
+            check_interval: "9s"
+            parameters: "JOB(ANSIBLE)"
+          register: sbmjob_result
 
-    - name: TC08 submit job with invalid check_interval
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
-        time_out: "abc"
+    # ─── TC06 - Neg: time_out fires before job completes ─────────────────────────
+    - name: TC06 - submit job with time_out reported
+      when: (tc_execute is not defined or 'TC06' in tc_execute) and 'TC06' not in (tc_skip | default([]))
+      block:
+        - name: TC06 - submit job with time_out reported
+          ibmi_submit_job:
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 5m')"
+            status: ['*COMPLETE']
+            time_out: "1s"
+          register: neg_result
+          failed_when: "'non-zero return code: The returned status of the submitted job is not expected' not in neg_result.msg"
 
-    - name: TC09 submit job with invalid parameters 
-      ibmi_submit_job: 
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
-        parameters: "abc"
-      register: neg_result
-      failed_when: neg_result.failed != true
-      #failed_when: "'CPD0044' not in neg_result.stderr"
-      #failed_when: "neg_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPD0044') | map(attribute='MESSAGE_ID') | list | length ==0"
+    # ─── TC07 - Neg: invalid status value ─────────────────────────────────────────
+    - name: TC07 - submit job with invalid status
+      when: (tc_execute is not defined or 'TC07' in tc_execute) and 'TC07' not in (tc_skip | default([]))
+      block:
+        - name: TC07 - submit job with invalid status
+          ibmi_submit_job:
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
+            status: ['abc']
+          register: neg_result
+          failed_when: "'Value specified for status option is not valid' not in neg_result.msg"
 
-    - name: TC10 submit job with unsupported option 
-      ibmi_submit_job: 
-        abc: "abcd"
-        cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')" 
-      register: neg_result
-      failed_when: "'Unsupported parameters' not in neg_result.msg"
+    # ─── TC08 - Neg: invalid time_out value ──────────────────────────────────────
+    - name: TC08 - submit job with invalid time_out
+      when: (tc_execute is not defined or 'TC08' in tc_execute) and 'TC08' not in (tc_skip | default([]))
+      block:
+        - name: TC08 - submit job with invalid time_out
+          ibmi_submit_job:
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
+            time_out: "abc"
 
-    - name: TC11 submit job without required options
-      ibmi_submit_job:
-      register: neg_result
-      failed_when: "'missing required arguments: cmd' not in neg_result.msg"
+    # ─── TC09 - Neg: invalid parameters value ─────────────────────────────────────
+    - name: TC09 - submit job with invalid parameters
+      when: (tc_execute is not defined or 'TC09' in tc_execute) and 'TC09' not in (tc_skip | default([]))
+      block:
+        - name: TC09 - submit job with invalid parameters
+          ibmi_submit_job:
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
+            parameters: "abc"
+          register: neg_result
+          failed_when: neg_result.failed != true
+
+    # ─── TC10 - Neg: unsupported option ───────────────────────────────────────────
+    - name: TC10 - submit job with unsupported option
+      when: (tc_execute is not defined or 'TC10' in tc_execute) and 'TC10' not in (tc_skip | default([]))
+      block:
+        - name: TC10 - submit job with unsupported option
+          ibmi_submit_job:
+            abc: "abcd"
+            cmd: "QSH CMD('/tmp/sbmjob_script.sh 1s')"
+          register: neg_result
+          failed_when: "'Unsupported parameters' not in neg_result.msg"
+
+    # ─── TC11 - Neg: missing required cmd option ──────────────────────────────────
+    - name: TC11 - submit job without required options
+      when: (tc_execute is not defined or 'TC11' in tc_execute) and 'TC11' not in (tc_skip | default([]))
+      block:
+        - name: TC11 - submit job without required options
+          ibmi_submit_job:
+          register: neg_result
+          failed_when: "'missing required arguments: cmd' not in neg_result.msg"
 
   always:
     - name: delete script file
       command: "rm -rf /tmp/sbmjob_script.sh"
-
- 

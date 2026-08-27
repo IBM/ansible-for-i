@@ -1,0 +1,33 @@
+# BAT (Build Acceptance Test) execute list for ibmi_end_subsystem
+#
+# These test cases are run on every Jenkins build as a fast smoke test.
+# Only the TCs listed here will execute when this file is loaded as tc_execute.
+#
+# TC prefix convention:
+#   TC  = main.yml test cases
+#   BTC = become.yml test cases (require --password for SSH user switching)
+#
+# TC dependency chain (main.yml):
+#   TC02 → TC03 → TC04 → TC05 form a chain — each starts/stops QBATCH in sequence.
+#   Each TC in the chain includes a 20-second pause (~80s total for TC02–TC05).
+#   TC06–TC14 are independent negative/parameter validation tests.
+#
+# BTC tests are excluded from BAT — they switch the SSH user mid-test and
+# require --password, making them unsuitable for fast Jenkins smoke tests.
+#
+# TC05 is excluded from BAT — it depends on TC04 having left QBATCH inactive.
+# If TC04 is included in BAT and passes, TC05 can be added back.
+
+tc_execute:
+  - TC02
+  - TC03
+  - TC04
+  - TC06
+  - TC07
+  - TC08
+  - TC09
+  - TC10
+  - TC11
+  - TC12
+  - TC13
+  - TC14

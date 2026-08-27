@@ -38,7 +38,7 @@
     ibmi_sql_query:
       sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
       FROM QSYS2.PTF_INFO
-      WHERE PTF_IDENTIFIER = '{{item}}';"
+      WHERE PTF_IDENTIFIER = '{{item}}'"
     register: ptf_status
     failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'APPLIED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED')"
     loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
@@ -61,7 +61,7 @@
     ibmi_sql_query:
       sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
       FROM QSYS2.PTF_INFO
-      WHERE PTF_IDENTIFIER = '{{item}}';"
+      WHERE PTF_IDENTIFIER = '{{item}}'"
     register: ptf_status
     failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'APPLIED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED')"
     loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
@@ -70,9 +70,9 @@
 
   - name: Query the ptf status
     ibmi_sql_query:
-      sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED 
+      sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
       FROM QSYS2.PTF_INFO
-      WHERE PTF_IDENTIFIER = '{{item}}';"
+      WHERE PTF_IDENTIFIER = '{{item}}'"
     loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
 
   - name: install fix with default options, supposed the default apply_type is DLYALL
@@ -106,9 +106,9 @@
 
   - name: Query the ptf status
     ibmi_sql_query:
-      sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED 
+      sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
       FROM QSYS2.PTF_INFO
-      WHERE PTF_IDENTIFIER = '{{item}}';"
+      WHERE PTF_IDENTIFIER = '{{item}}'"
     loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
 
   - name: IPL the system to verify the PTF are applied.
@@ -119,7 +119,7 @@
     ibmi_sql_query:
       sql: "SELECT PTF_PRODUCT_ID, PTF_IDENTIFIER, PTF_IPL_ACTION, PTF_LOADED_STATUS, PTF_IPL_REQUIRED
       FROM QSYS2.PTF_INFO
-      WHERE PTF_IDENTIFIER = '{{item}}';"
+      WHERE PTF_IDENTIFIER = '{{item}}'"
     register: ptf_status
     failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0].PTF_LOADED_STATUS != 'APPLIED')"
     loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"

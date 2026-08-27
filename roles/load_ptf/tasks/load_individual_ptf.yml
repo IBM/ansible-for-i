@@ -8,23 +8,23 @@
     save_file_lib: '{{ load_ptf_remote_lib }}'
     operation: 'load_only'
   ignore_errors: true
-  register: load_result
+  register: load_ptf_load_result
 
 # - name:
 #   ansible.builtin.debug:
-#     var: load_result
+#     var: load_ptf_load_result
 
 - name: Log success in result
   ansible.builtin.set_fact:
     load_ptf_load_success_list: "{{ load_ptf_load_success_list | default([]) + [load_ptf] }}"
-  when: load_result.failed == 0
+  when: load_ptf_load_result.failed == 0
 
 - name: Log load_fail_dict in load_fail_list
   ansible.builtin.set_fact:
     load_ptf_load_fail_list: "{{ load_ptf_load_fail_list | default([]) + [load_ptf] }}"
     load_ptf_load_fail_dict: "{{ load_ptf_load_fail_dict | default({}) |
-      combine(load_result.load_fail_dict | default({'UNDEFINED': 'LOAD_FAIL'})) }}"
-  when: load_result.failed != 0
+      combine(load_ptf_load_result.load_fail_dict | default({'UNDEFINED': 'LOAD_FAIL'})) }}"
+  when: load_ptf_load_result.failed != 0
 
 # - name: Log fail dict in result
 #   ansible.builtin.include_tasks: log_load_fail_info.yml

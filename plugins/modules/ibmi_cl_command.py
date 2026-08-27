@@ -79,7 +79,7 @@ EXAMPLES = r'''
 - name: Run Check Product Option (CHKPRDOPT) command to verify that licensed programs are fully installed.
   ibm.power_ibmi.ibmi_cl_command:
     cmd: 'CHKPRDOPT *OPSYS'
-    is_cmd5250: True
+    is_cmd5250: true
 '''
 
 RETURN = r'''
@@ -176,7 +176,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def main():

@@ -17,7 +17,7 @@
 - block:
   - set_fact:
       superuser: "{{ansible_ssh_user}}"
-      nodeA: "9.5.162.123" # ut2026p8.rch.stglabs.ibm.com
+      nodeA: "9.5.80.170" # ut25cp50.rch.stglabs.ibm.com
       nodeB: "9.5.71.132" # ut23p84.rch.stglabs.ibm.com
       nodeC: "9.5.71.107" # ut23p79.rch.stglabs.ibm.com
       cuser: "CUSER" # common user with *USER authority, prepared on nodeC for permission test
@@ -29,8 +29,7 @@
       ansible_user: tester
       ansible_ssh_pass: passw0rd
       ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-      # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
-      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.13
 
   - name: Add VM to Ansible in-memory inventory
     add_host:
@@ -39,8 +38,7 @@
       ansible_user: tester
       ansible_ssh_pass: passw0rd
       ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-      # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
-      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.13
 
   - name: Add VM to Ansible in-memory inventory
     add_host:
@@ -49,8 +47,7 @@
       ansible_user: tester
       ansible_ssh_pass: passw0rd
       ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-      # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
-      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3.13
 
   - name: TC00 - install paramiko on os400 node A and B if not exists
     command:

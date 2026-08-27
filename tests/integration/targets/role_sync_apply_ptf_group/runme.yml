@@ -9,11 +9,11 @@
         group_72: 'SF99714'
         group_74: 'SF99663'
         group_75: 'SF99953'
-        group_76: 'SF99963'
+        group_76: 'SF99962'
 
     - name: Query the os version of target IBM i
       ibm.power_ibmi.ibmi_sql_query:
-        sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+        sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO'
       register: sql_query
 
     - name: Set the ptf group to be used
@@ -27,8 +27,7 @@
         ansible_user: tester
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
-        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.13
 
     - name: Check and download the latest level of PTF group on repo, get ready for sync
       delegate_to: "fix_repo"

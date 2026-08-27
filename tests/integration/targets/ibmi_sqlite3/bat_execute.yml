@@ -1,0 +1,21 @@
+# BAT (Build Acceptance Test) execute list for ibmi_sqlite3
+#
+# Note: TC10 requires ansible_ssh_pass to be defined (user password for profile creation).
+#       It will be skipped automatically if that variable is not set.
+#
+#   TC01   Create table PTFINFO; assert return fields.
+#   TC02   Insert 2 records; assert row_changed=2 and parameter values.
+#   TC03   Query table by ID; assert rows returned and parameter values.
+#   TC04   Update a record; assert row_changed=1.
+#   TC05   Delete a record; assert row_changed=1.
+#   TC06   Neg — insert into non-existing table; assert "no such table".
+#   TC07   Neg — create table that already exists; assert "table PTFINFO already exists".
+#   TC08   Neg — execute 2 statements at once; assert "only execute one statement at a time".
+#   TC09   Neg — insert invalid data type; assert "datatype mismatch".
+#   TC10   Permission test — create *USER profile and verify access denied; requires ansible_ssh_pass.
+#
+# ── Pick and choose: comment out any TC you do NOT want to run ────────────────
+
+tc_execute:
+  - TC01
+

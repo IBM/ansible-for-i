@@ -34,7 +34,7 @@
 
     - name: Query the os version of target IBM i
       ibm.power_ibmi.ibmi_sql_query:
-        sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+        sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO'
       register: sql_query
 
     - name: Set the ptf group to be used
@@ -51,12 +51,11 @@
     - name: Add VM to Ansible in-memory inventory
       ansible.builtin.add_host:
         name: "repo_server_name"
-        ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
+        ansible_ssh_host: ut23p84.rch.stglabs.ibm.com
         ansible_user: tester
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
-        # Use python 3.9 for now until python 3.13 issue resolved (no ibm_db)
-        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.9
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3.13
 
     - name: Include tasks
       ansible.builtin.include_tasks: cleanup.yml
@@ -133,7 +132,7 @@
     # Note that we are delegating to testhost, which should be a single host / alias in the inventory file
     - name: Query the os version of target IBM i
       ibm.power_ibmi.ibmi_sql_query:
-        sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO;'
+        sql: 'SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO'
       register: sql_query
       delegate_to: testhost
 

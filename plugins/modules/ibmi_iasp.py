@@ -219,7 +219,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_util
 from ansible_collections.ibm.power_ibmi.plugins.module_utils.ibmi import ibmi_module as imodule
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def main():
@@ -255,6 +255,19 @@ def main():
     joblog = module.params['joblog']
     become_user = module.params['become_user']
     become_user_password = module.params['become_user_password']
+
+    # Resolve the user to submit the batch job as.
+    # USER(*CURRENT) on SBMJOB resolves to the underlying QZDASOINIT job owner
+    # (QUSER_NC), not the authenticated user (e.g. TESTER) who switched into the
+    # connection via XMLSERVICE.  We must therefore pass the real username
+    # explicitly.  Priority: become_user > $USER env var > *CURRENT fallback.
+    sbmjob_user = '*CURRENT'
+    if become_user:
+        sbmjob_user = become_user
+    else:
+        _unused1, _unused2, env_user, _unused3 = ibmi_util.get_ssh_client_and_user_info()
+        if env_user and env_user != 'UNKNOWN':
+            sbmjob_user = env_user.upper()
 
     startd = datetime.datetime.now()
     try:
@@ -314,8 +327,14 @@ def main():
             error = out
     if command:
         if not synchronous:
-            command = "SBMJOB CMD(" + command + ")"
-        rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
+            # LOG(4 0 *SECLVL) forces the batch job log to be kept even when
+            # the job ends normally, so CFGDEVASP error messages are visible.
+            command = "SBMJOB CMD(" + command + ") USER(" + sbmjob_user + ") LOG(4 0 *SECLVL)"
+            # Use the 5250 emulation path so that the CPC1221 "job NNN/USER/NAME
+            # submitted" completion message appears in stdout.
+            rc, out, error, job_log = ibmi_module.itoolkit_run_command5250_once(command)
+        else:
+            rc, out, error, job_log = ibmi_module.itoolkit_run_command_once(command)
 
     endd = datetime.datetime.now()
     delta = endd - startd

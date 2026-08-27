@@ -18,37 +18,40 @@
       - 'download_date'
       - 'ordered_ptf'
   delegate_to: "{{ fix_repo_lv1_find_individual_ptf_src_host }}"
-  register: fix_repo_find_result
+  register: fix_repo_lv1_find_individual_ptf_find_result
 
 - name: Print the PTF find result
   ansible.builtin.debug:
-    var: fix_repo_find_result
+    var: fix_repo_lv1_find_individual_ptf_find_result
 
 - name: Print find success list in catalog
   ansible.builtin.debug:
-    var: fix_repo_find_result.success_list[0].query_result
-  when: fix_repo_find_result.success_list[0].query_result != []
+    var: fix_repo_lv1_find_individual_ptf_find_result.success_list[0].query_result
+  when: fix_repo_lv1_find_individual_ptf_find_result.success_list[0].query_result != []
 
 - name: Print find failed list in catalog
   ansible.builtin.debug:
-    var: fix_repo_find_result.fail_list
-  when: fix_repo_find_result.success_list[0].query_result == []
+    var: fix_repo_lv1_find_individual_ptf_find_result.fail_list
+  when: fix_repo_lv1_find_individual_ptf_find_result.success_list[0].query_result == []
 
 - name: Compose ptf_fail_list
   ansible.builtin.set_fact:
-    fix_repo_lv1_find_individual_ptf_ptf_fail_list: "{{ fix_repo_lv1_find_individual_ptf_ptf_fail_list | default([]) + [list_var.ptf] }}"
-  when: fix_repo_find_result.success_list[0].query_result == []
+    fix_repo_lv1_find_individual_ptf_ptf_fail_list: >-
+      {{ fix_repo_lv1_find_individual_ptf_ptf_fail_list | default([]) + [list_var.ptf] }}
+  when: fix_repo_lv1_find_individual_ptf_find_result.success_list[0].query_result == []
 
 - name: Compose ptf_success_list
   ansible.builtin.set_fact:
-    fix_repo_lv1_find_individual_ptf_ptf_success_list: "{{ fix_repo_lv1_find_individual_ptf_ptf_success_list | default([]) + [list_var.ptf] }}"
-  when: fix_repo_find_result.success_list[0].query_result != []
+    fix_repo_lv1_find_individual_ptf_ptf_success_list: >-
+      {{ fix_repo_lv1_find_individual_ptf_ptf_success_list | default([]) + [list_var.ptf] }}
+  when: fix_repo_lv1_find_individual_ptf_find_result.success_list[0].query_result != []
 
 - name: Compose ptf_find_result
   ansible.builtin.set_fact:
-    fix_repo_lv1_find_individual_ptf_ptf_find_result: "{{ fix_repo_lv1_find_individual_ptf_ptf_find_result | default([]) +
-                                                          [fix_repo_find_result.success_list[0]] }}"
-  when: fix_repo_find_result.success_list[0].query_result != []
+    fix_repo_lv1_find_individual_ptf_ptf_find_result: >-
+      {{ fix_repo_lv1_find_individual_ptf_ptf_find_result | default([])
+      + [fix_repo_lv1_find_individual_ptf_find_result.success_list[0]] }}
+  when: fix_repo_lv1_find_individual_ptf_find_result.success_list[0].query_result != []
 
 - name: Print ptf_find_result
   ansible.builtin.debug:

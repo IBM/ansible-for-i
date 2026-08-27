@@ -2,21 +2,23 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 try:
-    import ibm_db_dbi as dbi
-    HAS_IBM_DB = True
+    import pyodbc
+    HAS_PYODBC = True
 except ImportError:
-    HAS_IBM_DB = False
+    HAS_PYODBC = False
 
 
 # If your SQL is not passed by the user, you can use this function
 # This is a sample shows you how everything works
-# However, normally you need to use ibm_dbi_sql_query to pass in both sql and connection
-def ibm_dbi_sql_query_sample(sql):
+# However, normally you need to use db2_sql_query to pass in both sql and connection
+def db2_sql_query_sample(sql):
     out = []
     # Attempt To Establish A Connection To The Database Specified
     connection_id = None
     try:
-        connection_id = dbi.connect()
+        # Build the connection string using the default local DSN
+        conn_str = "DSN=*LOCAL;CCSID=1208;"
+        connection_id = pyodbc.connect(conn_str)
     except Exception:
         pass
 
@@ -64,7 +66,7 @@ def ibm_dbi_sql_query_sample(sql):
     return out, err
 
 
-def ibm_dbi_sql_query(connection_id, sql):
+def db2_sql_query(connection_id, sql):
     out = None
     # Attempt To Establish A Connection To The Database Specified
 
@@ -109,7 +111,7 @@ def get_job_log(connection_id, job_name, time=None):
               "TO_LIBRARY, TO_PROGRAM, TO_MODULE, TO_PROCEDURE, TO_INSTRUCTION, FROM_USER, MESSAGE_FILE, " + \
               "MESSAGE_LIBRARY, MESSAGE_TEXT, MESSAGE_SECOND_LEVEL_TEXT " + \
               "FROM TABLE(QSYS2.JOBLOG_INFO('" + job_name + "')) A ORDER BY ORDINAL_POSITION DESC"
-    out_result_set, err = ibm_dbi_sql_query(connection_id, sql)
+    out_result_set, err = db2_sql_query(connection_id, sql)
 
     out = []
     if (out_result_set is None) and (err is None):
@@ -122,7 +124,7 @@ def get_job_log(connection_id, job_name, time=None):
                           "MESSAGE_TYPE": result[2],
                           "MESSAGE_SUBTYPE": result[3],
                           "SEVERITY": result[4],
-                          "MESSAGE_TIMESTAMP": result[5],
+                          "MESSAGE_TIMESTAMP": str(result[5]),
                           "FROM_LIBRARY": result[6],
                           "FROM_PROGRAM": result[7],
                           "FROM_MODULE": result[8],
@@ -170,7 +172,7 @@ def get_job_log_NLS(imodule, connection_id, job_name, time=None):
               "cast(MESSAGE_TOKENS as varchar(2048) CCSID " + str(cast_ccsid) + ") as MESSAGE_TOKENS, " + \
               "MESSAGE_TEXT, MESSAGE_SECOND_LEVEL_TEXT " + \
               "FROM TABLE(QSYS2.JOBLOG_INFO('" + job_name + "')) A ORDER BY ORDINAL_POSITION DESC"
-    out_result_set, err = ibm_dbi_sql_query(connection_id, sql)
+    out_result_set, err = db2_sql_query(connection_id, sql)
 
     out = []
     if (out_result_set is None) and (err is None):
@@ -183,7 +185,7 @@ def get_job_log_NLS(imodule, connection_id, job_name, time=None):
                           "MESSAGE_TYPE": result[2],
                           "MESSAGE_SUBTYPE": result[3],
                           "SEVERITY": result[4],
-                          "MESSAGE_TIMESTAMP": result[5],
+                          "MESSAGE_TIMESTAMP": str(result[5]),
                           "FROM_LIBRARY": result[6],
                           "FROM_PROGRAM": result[7],
                           "FROM_MODULE": result[8],
@@ -212,7 +214,7 @@ def get_current_job_info(connection_id):
           "JOB_NAME AS FULL_JOB_NAME " \
           "FROM TABLE (QSYS2.ACTIVE_JOB_INFO(JOB_NAME_FILTER => '*')) AS X"
 
-    out_result_set, err = ibm_dbi_sql_query(connection_id, sql)
+    out_result_set, err = db2_sql_query(connection_id, sql)
 
     out = []
     if (out_result_set is None) and (err is None):
@@ -239,7 +241,7 @@ def get_current_job_name(connection_id):
 
 def get_ibmi_release(connection_id):
     sql = "SELECT OS_VERSION, OS_RELEASE FROM SYSIBMADM.ENV_SYS_INFO"
-    out_result_set, err = ibm_dbi_sql_query(connection_id, sql)
+    out_result_set, err = db2_sql_query(connection_id, sql)
     release_info = {"version": 7, "release": 0, "version_release": 7.0}
     if (out_result_set is None) and (err is None):
         err = "Nothing returned for OS version and release."

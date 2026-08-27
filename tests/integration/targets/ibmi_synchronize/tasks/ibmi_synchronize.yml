@@ -32,7 +32,7 @@
 
 - name: Confirm the object does exist on the remote lib
   ibm.power_ibmi.ibmi_sql_query:
-    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_restored_lib }}', '*ALL' ))  AS X;"
+    sql: "SELECT OBJNAME, OBJTYPE FROM TABLE (QSYS2.OBJECT_STATISTICS('{{ remote_restored_lib }}', '*ALL' ))  AS X"
   register: sql_result
   failed_when: sql_result.row | length == 0
 

@@ -2,13 +2,13 @@
 # Role for sync_apply_individual_ptfs_lv1
 - name: Initialize sync_list
   ansible.builtin.set_fact:
-    sync_list: []
-    sync_success_list: []
-    dest_file_path: []
+    sync_apply_individual_ptfs_lv1_sync_list: []
+    sync_apply_individual_ptfs_lv1_sync_success_list: []
+    sync_apply_individual_ptfs_lv1_dest_file_path: []
     sync_apply_individual_ptfs_lv1_apply_fail_list: []
     sync_apply_individual_ptfs_lv1_apply_success_list: []
-    apply_loaded_fail_list: []
-    apply_loaded_success_list: []
+    sync_apply_individual_ptfs_lv1_apply_loaded_fail_list: []
+    sync_apply_individual_ptfs_lv1_apply_loaded_success_list: []
 
 - name: Call copy.yml to copy ptf files to dest and get the result
   ansible.builtin.include_tasks: transfer.yml
@@ -19,7 +19,7 @@
 - name: Get the home dir on target server
   ansible.builtin.shell: 'echo $HOME'
   changed_when: false
-  register: home_dir
+  register: sync_apply_individual_ptfs_lv1_home_dir
 
 - name: Call apply.yml to apply not loaded ptfs on target system
   ansible.builtin.include_tasks: apply.yml
@@ -34,19 +34,21 @@
     loop_var: already_loaded_list_var
   when: sync_apply_individual_ptfs_lv1_already_loaded_list != []
 
-- name: Initialize sync_list
+- name: Initialize apply_fail_list
   ansible.builtin.set_fact:
-    sync_apply_individual_ptfs_lv1_apply_fail_list: "{{ sync_apply_individual_ptfs_lv1_apply_fail_list + apply_loaded_fail_list }}"
+    sync_apply_individual_ptfs_lv1_apply_fail_list: >-
+      {{ sync_apply_individual_ptfs_lv1_apply_fail_list + sync_apply_individual_ptfs_lv1_apply_loaded_fail_list }}
 
-- name: Initialize sync_list
+- name: Initialize apply_success_list
   ansible.builtin.set_fact:
-    sync_apply_individual_ptfs_lv1_apply_success_list: "{{ sync_apply_individual_ptfs_lv1_apply_success_list + apply_loaded_success_list }}"
+    sync_apply_individual_ptfs_lv1_apply_success_list: >-
+      {{ sync_apply_individual_ptfs_lv1_apply_success_list + sync_apply_individual_ptfs_lv1_apply_loaded_success_list }}
 
 - name: Delete the dest file dir
   ansible.builtin.file:
     path: "{{ dest_file_path_var }}"
     state: absent
-  loop: "{{ dest_file_path }}"
+  loop: "{{ sync_apply_individual_ptfs_lv1_dest_file_path }}"
   loop_control:
     loop_var: dest_file_path_var
   when: sync_apply_individual_ptfs_lv1_delete

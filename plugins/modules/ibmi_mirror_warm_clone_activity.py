@@ -109,11 +109,13 @@ MrdbConfigComplete = 2
 SUCCESS = 0
 ERROR = -1
 
-__ibmi_module_version__ = "3.4.0"
+__ibmi_module_version__ = "3.5.0"
 
 
 def mrdb_retrieve_mirror_state(imodule):
     conn = imodule.get_connection()
+    if conn is None:
+        return ERROR
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -138,6 +140,8 @@ def mrdb_retrieve_mirror_state(imodule):
 
 def mrdb_retrieve_config_state(imodule):
     conn = imodule.get_connection()
+    if conn is None:
+        return ERROR
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(
@@ -162,6 +166,8 @@ def mrdb_retrieve_config_state(imodule):
 
 def mrdb_start_engine(imodule):
     conn = imodule.get_connection()
+    if conn is None:
+        return ERROR
     itransport = DatabaseTransport(conn)
     itool = iToolKit()
     itool.add(

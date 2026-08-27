@@ -178,7 +178,7 @@ Examples
    - name: Setup IBM i Netwotk install server and add image files of group PTF for LPP 5733WQX
      ibm.power_ibmi.ibmi_fix_network_install_server:
        operation: 'setup_and_addimgclge'
-       rollback: True
+       rollback: true
        virtual_image_name_list:
          - "/tmp/5733WQXPTFs/SF99433_1.bin"
          - "/tmp/5733WQXPTFs/SF99433_2.bin"

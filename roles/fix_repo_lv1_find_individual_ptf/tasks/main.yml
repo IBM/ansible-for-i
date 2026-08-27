@@ -8,16 +8,16 @@
 
 - name: Compose ptf input list
   ansible.builtin.set_fact:
-    list: "{{ list | default([]) + [{'ptf': item}] }}"
+    fix_repo_lv1_find_individual_ptf_list: "{{ fix_repo_lv1_find_individual_ptf_list | default([]) + [{'ptf': item}] }}"
   loop: "{{ fix_repo_lv1_find_individual_ptf_ptfs_list }}"
 
 - name: Print PTF list
   ansible.builtin.debug:
-    var: list
+    var: fix_repo_lv1_find_individual_ptf_list
 
 - name: Call find_ptfinfo to get the ptf info in catalog
   ansible.builtin.include_tasks: find_ptfinfo.yml
-  with_list: "{{ list }}"
+  with_list: "{{ fix_repo_lv1_find_individual_ptf_list }}"
   loop_control:
     loop_var: list_var
 

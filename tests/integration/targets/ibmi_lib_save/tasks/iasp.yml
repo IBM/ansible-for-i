@@ -1,128 +1,187 @@
-# Test when all dependent packages are in place  
-- name: Query the iASP existing
+---
+# iASP test cases for ibmi_lib_save / ibmi_lib_restore
+# Called from main.yml after save_lib.yml.
+#
+# tc_execute / tc_skip variables flow through automatically from main.yml.
+#
+# All TCs in this file are skipped when no iASP is available on the system
+# (the outer block is gated by when: iasp_list.row_count != 0).
+#
+# TC dependency notes:
+#   TC18   Restore objects from sysbase ARCHLIB into iASP SAVRST.  Setup for TC19+.
+#   TC19   Save iASP SAVRST to sysbase SAVRST1.  Depends on TC18.
+#   TC20   Restore from sysbase SAVRST1 back to iASP SAVRST.  Depends on TC19.
+#   TC21   Save iASP SAVRST to iASP TEMPLIB.  Depends on TC18.
+#   TC22   Restore from iASP TEMPLIB to iASP SAVRST.  Depends on TC21.
+#   TC23   Save sysbase SAVRST1 to iASP SAVRST.  Depends on TC19.
+#   TC24   Restore from iASP SAVRST to sysbase SAVRST1.  Depends on TC23.
+#   TC25   Save sysbase SAVRST1 to sysbase ARCHLIB via iASP asp_group.  Depends on TC19.
+#   TC26   Restore from sysbase ARCHLIB to sysbase SAVRST1 via iASP asp_group.  Depends on TC25.
+
+- name: Query available iASPs
   ibmi_sql_query:
-    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1;"
+    sql: "SELECT * FROM QSYS2.ASP_INFO where ASP_STATE = 'AVAILABLE' and ASP_NUMBER != 1"
   register: iasp_list
 
 - block:
-  
-  - name: run CL command module with asp_group
+
+  # ─── Setup (always runs when iASP is available) ──────────────────────────────
+  - name: iASP Setup - create SAVRST and TEMPLIB in iASP
     ibmi_cl_command:
-      cmd: CRTLIB LIB({{item}}) ASP(*ASPDEV) ASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+      cmd: CRTLIB LIB({{ item }}) ASP(*ASPDEV) ASPDEV({{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }})
+      asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
       joblog: true
     with_items:
       - SAVRST
-      - TEMPLIB 
+      - TEMPLIB
 
-  - name: run CL command module with asp_group
+  - name: iASP Setup - create ARCHLIB and SAVRST1 in sysbase
     ibmi_cl_command:
-      cmd: CRTLIB LIB({{item}})
+      cmd: CRTLIB LIB({{ item }})
       joblog: true
     with_items:
       - ARCHLIB
       - SAVRST1
-      
-  - copy: src="IBMISAVF.FILE" dest="/tmp/"
-  - name: copy file to library
+
+  - name: iASP Setup - copy IBMISAVF.FILE to /tmp/
+    copy:
+      src: "IBMISAVF.FILE"
+      dest: "/tmp/"
+
+  - name: iASP Setup - move IBMISAVF.FILE into ARCHLIB
     command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB'
 
-  - name: TC18 restore objects to from sysbase lib to iasp library
-    ibmi_object_restore:
-      object_lib: 'SAVRST'
-      savefile_name: 'IBMISAVF'
-      savefile_lib: 'ARCHLIB'
-      parameters: "RSTASPDEV({{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}})"
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-      #joblog: true
-    register: rstobj_result
-    #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
-    failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
+  # ─── TC18 - Restore objects from sysbase ARCHLIB into iASP SAVRST ────────────
+  - name: TC18 - restore objects from sysbase ARCHLIB into iASP SAVRST
+    when: (tc_execute is not defined or 'TC18' in tc_execute) and 'TC18' not in (tc_skip | default([]))
+    block:
+      - name: TC18 - restore objects to iASP library
+        ibmi_object_restore:
+          object_lib: 'SAVRST'
+          savefile_name: 'IBMISAVF'
+          savefile_lib: 'ARCHLIB'
+          parameters: "RSTASPDEV({{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }})"
+          asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
+        register: rstobj_result
+        failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-  - name: TC19 save library with all supported options from iasp to sys
-    ibmi_lib_save:
-      lib_name: "SAVRST"
-      savefile_name: 'SAVTEST1'
-      savefile_lib: 'SAVRST1'
-      format: "*SAVF"
-      force_save: "true"
-      target_release: "*CURRENT"
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-      joblog: 'true'
-      parameters: ''
-    ignore_errors: true
+  # ─── TC19 - Save iASP SAVRST to sysbase SAVRST1 ──────────────────────────────
+  - name: TC19 - save iASP library to sysbase save file
+    when: (tc_execute is not defined or 'TC19' in tc_execute) and 'TC19' not in (tc_skip | default([]))
+    block:
+      - name: TC19 - save iASP SAVRST into sysbase SAVRST1
+        ibmi_lib_save:
+          lib_name: "SAVRST"
+          savefile_name: 'SAVTEST1'
+          savefile_lib: 'SAVRST1'
+          format: "*SAVF"
+          force_save: "true"
+          target_release: "*CURRENT"
+          asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
+          joblog: 'true'
+          parameters: ''
+        ignore_errors: true
 
-  - name: TC20 restore lib with all supported options from sys to iasp
-    ibmi_lib_restore:
-      saved_lib: 'SAVRST'
-      savefile_name: 'SAVTEST1'
-      savefile_lib: 'SAVRST1'
-      format: '*SAVF'
-      joblog: 'false'
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-      parameters: ''
-    register: rstlib_result
+  # ─── TC20 - Restore from sysbase SAVRST1 back to iASP SAVRST ─────────────────
+  - name: TC20 - restore from sysbase save file to iASP library
+    when: (tc_execute is not defined or 'TC20' in tc_execute) and 'TC20' not in (tc_skip | default([]))
+    block:
+      - name: TC20 - restore sysbase SAVRST1 into iASP SAVRST
+        ibmi_lib_restore:
+          saved_lib: 'SAVRST'
+          savefile_name: 'SAVTEST1'
+          savefile_lib: 'SAVRST1'
+          format: '*SAVF'
+          joblog: 'false'
+          asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
+          parameters: ''
+        register: rstlib_result
 
-  - name: TC21 save library with all supported options from iasp to iasp
-    ibmi_lib_save:
-      lib_name: "SAVRST"
-      savefile_name: 'SAVTEST2'
-      savefile_lib: 'TEMPLIB'
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+  # ─── TC21 - Save iASP SAVRST to iASP TEMPLIB ─────────────────────────────────
+  - name: TC21 - save iASP library to another iASP save file
+    when: (tc_execute is not defined or 'TC21' in tc_execute) and 'TC21' not in (tc_skip | default([]))
+    block:
+      - name: TC21 - save iASP SAVRST into iASP TEMPLIB
+        ibmi_lib_save:
+          lib_name: "SAVRST"
+          savefile_name: 'SAVTEST2'
+          savefile_lib: 'TEMPLIB'
+          asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
 
-  - name: TC22 restore lib with all supported options from iasp to iasp
-    ibmi_lib_restore:
-      saved_lib: 'SAVRST'
-      savefile_name: 'SAVTEST2'
-      savefile_lib: 'TEMPLIB'
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-    register: rstlib_result
+  # ─── TC22 - Restore from iASP TEMPLIB to iASP SAVRST ─────────────────────────
+  - name: TC22 - restore from iASP save file to iASP library
+    when: (tc_execute is not defined or 'TC22' in tc_execute) and 'TC22' not in (tc_skip | default([]))
+    block:
+      - name: TC22 - restore iASP TEMPLIB into iASP SAVRST
+        ibmi_lib_restore:
+          saved_lib: 'SAVRST'
+          savefile_name: 'SAVTEST2'
+          savefile_lib: 'TEMPLIB'
+          asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
+        register: rstlib_result
 
-  - name: TC23 save library with all supported options from sys to iasp
-    ibmi_lib_save:
-      lib_name: "SAVRST1"
-      savefile_name: 'SAVTEST3'
-      savefile_lib: 'SAVRST'
-      format: "*SAVF"
-      force_save: "true"
-      target_release: "*CURRENT"
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-      joblog: 'false'
-      parameters: ''
+  # ─── TC23 - Save sysbase SAVRST1 to iASP SAVRST ──────────────────────────────
+  - name: TC23 - save sysbase library to iASP save file
+    when: (tc_execute is not defined or 'TC23' in tc_execute) and 'TC23' not in (tc_skip | default([]))
+    block:
+      - name: TC23 - save sysbase SAVRST1 into iASP SAVRST
+        ibmi_lib_save:
+          lib_name: "SAVRST1"
+          savefile_name: 'SAVTEST3'
+          savefile_lib: 'SAVRST'
+          format: "*SAVF"
+          force_save: "true"
+          target_release: "*CURRENT"
+          asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
+          joblog: 'false'
+          parameters: ''
 
-  - name: TC24 restore lib with all supported options from iasp to sys
-    ibmi_lib_restore:
-      saved_lib: 'SAVRST1'
-      savefile_name: 'SAVTEST3'
-      savefile_lib: 'SAVRST'
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-    register: rstlib_result
+  # ─── TC24 - Restore from iASP SAVRST to sysbase SAVRST1 ──────────────────────
+  - name: TC24 - restore from iASP save file to sysbase library
+    when: (tc_execute is not defined or 'TC24' in tc_execute) and 'TC24' not in (tc_skip | default([]))
+    block:
+      - name: TC24 - restore iASP SAVRST into sysbase SAVRST1
+        ibmi_lib_restore:
+          saved_lib: 'SAVRST1'
+          savefile_name: 'SAVTEST3'
+          savefile_lib: 'SAVRST'
+          asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
+        register: rstlib_result
 
-  - name: TC25 save library with all supported options from sys to sys
-    ibmi_lib_save:
-      lib_name: "SAVRST1"
-      savefile_name: 'SAVTEST4'
-      savefile_lib: 'ARCHLIB'
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
+  # ─── TC25 - Save sysbase SAVRST1 to sysbase ARCHLIB via iASP asp_group ────────
+  - name: TC25 - save sysbase library to sysbase save file (with asp_group context)
+    when: (tc_execute is not defined or 'TC25' in tc_execute) and 'TC25' not in (tc_skip | default([]))
+    block:
+      - name: TC25 - save sysbase SAVRST1 into sysbase ARCHLIB
+        ibmi_lib_save:
+          lib_name: "SAVRST1"
+          savefile_name: 'SAVTEST4'
+          savefile_lib: 'ARCHLIB'
+          asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
 
-  - name: TC26 restore lib with all supported options from sys to sys
-    ibmi_lib_restore:
-      saved_lib: 'SAVRST1'
-      savefile_name: 'SAVTEST4'
-      savefile_lib: 'ARCHLIB'
-      asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-    register: rstlib_result
+  # ─── TC26 - Restore from sysbase ARCHLIB to sysbase SAVRST1 via iASP ─────────
+  - name: TC26 - restore from sysbase save file to sysbase library (with asp_group context)
+    when: (tc_execute is not defined or 'TC26' in tc_execute) and 'TC26' not in (tc_skip | default([]))
+    block:
+      - name: TC26 - restore sysbase ARCHLIB into sysbase SAVRST1
+        ibmi_lib_restore:
+          saved_lib: 'SAVRST1'
+          savefile_name: 'SAVTEST4'
+          savefile_lib: 'ARCHLIB'
+          asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
+        register: rstlib_result
+
   when: iasp_list.row_count != 0
 
   always:
-    - name: delete libraries 
-      ibmi_cl_command: 
-        cmd: "dltlib lib({{item}})"
+    - name: Cleanup - delete iASP and sysbase libraries
+      ibmi_cl_command:
+        cmd: "dltlib lib({{ item }})"
         joblog: 'true'
-        asp_group: "{{iasp_list.row[0]['DEVICE_DESCRIPTION_NAME']}}"
-      with_items: 
+        asp_group: "{{ iasp_list.row[0]['DEVICE_DESCRIPTION_NAME'] }}"
+      with_items:
         - SAVRST
-        - SAVRST1 
+        - SAVRST1
         - ARCHLIB
         - TEMPLIB
       ignore_errors: true
