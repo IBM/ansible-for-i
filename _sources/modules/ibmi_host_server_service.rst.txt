@@ -102,7 +102,7 @@ Examples
      ibm.power_ibmi.ibmi_host_server_service:
        name_list: ['*CENTRAL', '*DATABASE']
        state: 'started'
-       joblog: True
+       joblog: true
        become_user: 'USER1'
        become_user_password: 'yourpassword'
 

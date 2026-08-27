@@ -171,7 +171,7 @@ Examples
        object_types: '*PGM *SRVPGM'
        savefile_name: 'archive'
        savefile_lib: 'archlib'
-       force_save: True
+       force_save: true
        target_release: 'V7R2M0'
        become_user: 'USER1'
        become_user_password: 'yourpassword'

@@ -210,13 +210,13 @@
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check specific PTF groups</span>
 <span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_fix_group_check</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">groups</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;SF12345&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"SF12345"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check the PTF groups without certificate verification</span>
 <span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_fix_group_check</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">groups</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;SF12345&quot;</span>
-<span class="w">    </span><span class="nt">validate_certs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"SF12345"</span>
+<span class="w">    </span><span class="nt">validate_certs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </pre></div>
 </div>
 </section>
@@ -267,7 +267,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99738 - 740 Group Security&quot;</span><span class="p">,</span> <span class="s2">&quot;package_id&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">&quot;ptf_group_level&quot;</span><span class="p">:</span> <span class="mi">70</span><span class="p">,</span> <span class="s2">&quot;ptf_group_number&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99738&quot;</span><span class="p">,</span> <span class="s2">&quot;ptf_list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;SJ02177&quot;</span><span class="p">,</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;SI70103&quot;</span><span class="p">],</span> <span class="s2">&quot;release&quot;</span><span class="p">:</span> <span class="s2">&quot;R740&quot;</span><span class="p">,</span> <span class="s2">&quot;release_date&quot;</span><span class="p">:</span> <span class="s2">&quot;10/01/2024&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://public.dhe.ibm.com/services/us/igsc/PSP/SF99738.xml&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">"description"</span><span class="p">:</span> <span class="s2">"SF99738 - 740 Group Security"</span><span class="p">,</span> <span class="s2">"package_id"</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s2">"ptf_group_level"</span><span class="p">:</span> <span class="mi">70</span><span class="p">,</span> <span class="s2">"ptf_group_number"</span><span class="p">:</span> <span class="s2">"SF99738"</span><span class="p">,</span> <span class="s2">"ptf_list"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"SJ02177"</span><span class="p">,</span> <span class="s2">"..."</span><span class="p">,</span> <span class="s2">"SI70103"</span><span class="p">],</span> <span class="s2">"release"</span><span class="p">:</span> <span class="s2">"R740"</span><span class="p">,</span> <span class="s2">"release_date"</span><span class="p">:</span> <span class="s2">"10/01/2024"</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span> <span class="s2">"https://public.dhe.ibm.com/services/us/igsc/PSP/SF99738.xml"</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>

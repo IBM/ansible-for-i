@@ -99,6 +99,12 @@
 <span class="n">interpreter_python</span><span class="o">=/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python3</span>
 </pre></div>
 </div>
+<p>Using python3 for interpreter_python will point to a specific python release,
+which is typically the latest installed python level. You may want to specify the
+level, such as python3.13, to ensure a specific level is utilized on the managed node(s).
+If the set of managed nodes spans different platforms beyond IBM i or if different python
+levels are desired for different managed nodes, then it is recommended
+to specify interpreter_python in the Ansible inventory file instead of the config file.</p>
 </section>
 <section id="build-your-inventory">
 <h2>Build your inventory<a class="headerlink" href="#build-your-inventory" title="Link to this heading"></a></h2>
@@ -108,8 +114,8 @@
 <span class="n">your_ibmi_ip</span> <span class="n">ansible_ssh_user</span><span class="o">=</span><span class="n">your_user</span> <span class="n">ansible_ssh_pass</span><span class="o">=</span><span class="n">your_host_password</span>
 
 <span class="p">[</span><span class="n">ibmi</span><span class="p">:</span><span class="nb">vars</span><span class="p">]</span>
-<span class="n">ansible_python_interpreter</span><span class="o">=</span><span class="s2">&quot;/QOpensys/pkgs/bin/python3&quot;</span>
-<span class="n">ansible_ssh_common_args</span><span class="o">=</span><span class="s1">&#39;-o StrictHostKeyChecking=no&#39;</span>
+<span class="n">ansible_python_interpreter</span><span class="o">=</span><span class="s2">"/QOpensys/pkgs/bin/python3"</span>
+<span class="n">ansible_ssh_common_args</span><span class="o">=</span><span class="s1">'-o StrictHostKeyChecking=no'</span>
 </pre></div>
 </div>
 </section>
@@ -117,7 +123,7 @@
 <h2>Run your first command or playbook<a class="headerlink" href="#run-your-first-command-or-playbook" title="Link to this heading"></a></h2>
 <p>Refer to Ansible community doc to learn how to run Ansible command or playbook <a class="reference external" href="https://docs.ansible.com/ansible/latest/network/getting_started/first_playbook.html">https://docs.ansible.com/ansible/latest/network/getting_started/first_playbook.html</a></p>
 <p>Examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span> <span class="o">-</span><span class="n">i</span> <span class="n">inventory</span><span class="o">.</span><span class="n">ini</span> <span class="n">ibmi</span> <span class="o">-</span><span class="n">m</span> <span class="n">ibm</span><span class="o">.</span><span class="n">power_ibmi</span><span class="o">.</span><span class="n">ibmi_cl_command</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&quot;cmd=&#39;crtlib lib(demo111)&#39;&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span> <span class="o">-</span><span class="n">i</span> <span class="n">inventory</span><span class="o">.</span><span class="n">ini</span> <span class="n">ibmi</span> <span class="o">-</span><span class="n">m</span> <span class="n">ibm</span><span class="o">.</span><span class="n">power_ibmi</span><span class="o">.</span><span class="n">ibmi_cl_command</span> <span class="o">-</span><span class="n">a</span> <span class="s2">"cmd='crtlib lib(demo111)'"</span>
 <span class="n">ansible</span> <span class="o">-</span><span class="n">i</span> <span class="n">inventory</span><span class="o">.</span><span class="n">ini</span> <span class="n">ibmi</span> <span class="o">-</span><span class="n">m</span> <span class="n">ibm</span><span class="o">.</span><span class="n">power_ibmi</span><span class="o">.</span><span class="n">ibmi_reboot</span>
 </pre></div>
 </div>

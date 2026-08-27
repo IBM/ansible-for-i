@@ -220,13 +220,13 @@
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check specific PTF groups</span>
 <span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_fix_check</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">groups</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;SF12345&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"SF12345"</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check the PTF groups without certificate verification</span>
 <span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_fix_check</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">groups</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;SF12345&quot;</span>
-<span class="w">    </span><span class="nt">validate_certs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"SF12345"</span>
+<span class="w">    </span><span class="nt">validate_certs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </pre></div>
 </div>
 </section>
@@ -277,7 +277,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;PTF_GROUP_LEVEL&quot;</span><span class="p">:</span> <span class="s2">&quot;46&quot;</span><span class="p">,</span> <span class="s2">&quot;PTF_GROUP_NUMBER&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99115&quot;</span><span class="p">,</span> <span class="s2">&quot;RELEASE&quot;</span><span class="p">:</span> <span class="s2">&quot;R610&quot;</span><span class="p">,</span> <span class="s2">&quot;RELEASE_DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;09/28/2015&quot;</span><span class="p">,</span> <span class="s2">&quot;TITLE&quot;</span><span class="p">:</span> <span class="s2">&quot;610 IBM HTTP Server for i&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">"PTF_GROUP_LEVEL"</span><span class="p">:</span> <span class="s2">"46"</span><span class="p">,</span> <span class="s2">"PTF_GROUP_NUMBER"</span><span class="p">:</span> <span class="s2">"SF99115"</span><span class="p">,</span> <span class="s2">"RELEASE"</span><span class="p">:</span> <span class="s2">"R610"</span><span class="p">,</span> <span class="s2">"RELEASE_DATE"</span><span class="p">:</span> <span class="s2">"09/28/2015"</span><span class="p">,</span> <span class="s2">"TITLE"</span><span class="p">:</span> <span class="s2">"610 IBM HTTP Server for i"</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -291,7 +291,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;ptf_id&quot;</span><span class="p">:</span> <span class="s2">&quot;SI71691&quot;</span><span class="p">,</span> <span class="s2">&quot;req_list&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;ptf_id&quot;</span><span class="p">:</span> <span class="s2">&quot;SI70931&quot;</span><span class="p">,</span> <span class="s2">&quot;req_type&quot;</span><span class="p">:</span> <span class="s2">&quot;PRE&quot;</span><span class="p">}]}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">"ptf_id"</span><span class="p">:</span> <span class="s2">"SI71691"</span><span class="p">,</span> <span class="s2">"req_list"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"ptf_id"</span><span class="p">:</span> <span class="s2">"SI70931"</span><span class="p">,</span> <span class="s2">"req_type"</span><span class="p">:</span> <span class="s2">"PRE"</span><span class="p">}]}]</span>
 </pre></div>
 </div>
 </div></blockquote>

@@ -203,16 +203,16 @@
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check the fix order status</span>
 <span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_download_fix_status</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">order_list</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;2029604329&#39;</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;2020579181&#39;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'2029604329'</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'2020579181'</span>
 
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check the fix order status with become user</span>
 <span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_download_fix_status</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">order_list</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;2029604329&#39;</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;2020579181&#39;</span>
-<span class="w">    </span><span class="nt">become_user</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;USER1&#39;</span>
-<span class="w">    </span><span class="nt">become_user_password</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;yourpassword&#39;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'2029604329'</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">'2020579181'</span>
+<span class="w">    </span><span class="nt">become_user</span><span class="p">:</span><span class="w"> </span><span class="s">'USER1'</span>
+<span class="w">    </span><span class="nt">become_user_password</span><span class="p">:</span><span class="w"> </span><span class="s">'yourpassword'</span>
 </pre></div>
 </div>
 </section>
@@ -237,7 +237,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;complete_time&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-11-01 00:59:58&quot;</span><span class="p">,</span> <span class="s2">&quot;download_status&quot;</span><span class="p">:</span> <span class="s2">&quot;DOWNLOADED&quot;</span><span class="p">,</span> <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;/QIBM/UserData/OS/Service/ECS/PTF/2029604329&quot;</span><span class="p">,</span> <span class="s2">&quot;order_id&quot;</span><span class="p">:</span> <span class="s2">&quot;2029604329&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;complete_time&quot;</span><span class="p">:</span> <span class="s2">&quot;UNKNOWN&quot;</span><span class="p">,</span> <span class="s2">&quot;download_status&quot;</span><span class="p">:</span> <span class="s2">&quot;UNKNOWN&quot;</span><span class="p">,</span> <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;UNKNOWN&quot;</span><span class="p">,</span> <span class="s2">&quot;order_id&quot;</span><span class="p">:</span> <span class="s2">&quot;2020579181&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">"complete_time"</span><span class="p">:</span> <span class="s2">"2020-11-01 00:59:58"</span><span class="p">,</span> <span class="s2">"download_status"</span><span class="p">:</span> <span class="s2">"DOWNLOADED"</span><span class="p">,</span> <span class="s2">"file_path"</span><span class="p">:</span> <span class="s2">"/QIBM/UserData/OS/Service/ECS/PTF/2029604329"</span><span class="p">,</span> <span class="s2">"order_id"</span><span class="p">:</span> <span class="s2">"2029604329"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"complete_time"</span><span class="p">:</span> <span class="s2">"UNKNOWN"</span><span class="p">,</span> <span class="s2">"download_status"</span><span class="p">:</span> <span class="s2">"UNKNOWN"</span><span class="p">,</span> <span class="s2">"file_path"</span><span class="p">:</span> <span class="s2">"UNKNOWN"</span><span class="p">,</span> <span class="s2">"order_id"</span><span class="p">:</span> <span class="s2">"2020579181"</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
