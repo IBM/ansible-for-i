@@ -23,7 +23,8 @@ https://ibm.github.io/cloud-i-blog/archivers/2020_0602_automate_your_ibm_i_tasks
  - 5770DG1
  - python3
  - python3-itoolkit
- - python3-ibm_db
+ - ibm-iaccess (IBM i Access ODBC Driver)
+ - python3-pyodbc
 
 
 Features

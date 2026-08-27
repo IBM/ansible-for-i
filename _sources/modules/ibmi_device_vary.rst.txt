@@ -104,7 +104,7 @@ Examples
      ibm.power_ibmi.ibmi_device_vary:
        device_list: ['IASP1', 'IASP2']
        status: '*ON'
-       joblog: True
+       joblog: true
        become_user: 'USER1'
        become_user_password: 'yourpassword'
 

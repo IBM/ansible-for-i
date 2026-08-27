@@ -277,13 +277,13 @@
 <h2><a class="toc-backref" href="#id3" role="doc-backlink">Examples</a><a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
 <div class="highlight-yaml+jinja notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Setup IBM i Netwotk install server and add image files of group PTF for LPP 5733WQX</span>
 <span class="w">  </span><span class="nt">ibm.power_ibmi.ibmi_fix_network_install_server</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;setup_and_addimgclge&#39;</span>
-<span class="w">    </span><span class="nt">rollback</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">    </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">'setup_and_addimgclge'</span>
+<span class="w">    </span><span class="nt">rollback</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">virtual_image_name_list</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/tmp/5733WQXPTFs/SF99433_1.bin&quot;</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;/tmp/5733WQXPTFs/SF99433_2.bin&quot;</span>
-<span class="w">    </span><span class="nt">become_user</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;QSECOFR&quot;</span>
-<span class="w">    </span><span class="nt">become_user_password</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;yourpassword&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"/tmp/5733WQXPTFs/SF99433_1.bin"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"/tmp/5733WQXPTFs/SF99433_2.bin"</span>
+<span class="w">    </span><span class="nt">become_user</span><span class="p">:</span><span class="w"> </span><span class="s">"QSECOFR"</span>
+<span class="w">    </span><span class="nt">become_user_password</span><span class="p">:</span><span class="w"> </span><span class="s">"yourpassword"</span>
 </pre></div>
 </div>
 </section>
@@ -373,7 +373,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;+++ success CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;CRTIMGCLG IMGCLG(ANSIBCLG1) DIR(</span><span class="se">\u0027</span><span class="s2">/home/ansiblePTFInstallTemp/</span><span class="se">\u0027</span><span class="s2">) CRTDIR(*YES)&quot;</span><span class="p">]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">"CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)"</span><span class="p">,</span> <span class="s2">"+++ success CRTDEVOPT DEVD(ANSIBOPT2) RSRCNAME(*VRT) ONLINE(*YES) TEXT(</span><span class="se">\u0027</span><span class="s2">Created by Ansible for IBM i</span><span class="se">\u0027</span><span class="s2">)"</span><span class="p">,</span> <span class="s2">"CRTIMGCLG IMGCLG(ANSIBCLG1) DIR(</span><span class="se">\u0027</span><span class="s2">/home/ansiblePTFInstallTemp/</span><span class="se">\u0027</span><span class="s2">) CRTDIR(*YES)"</span><span class="p">]</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -387,7 +387,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;CPF2111:Library TESTLIB already exists.&quot;</span><span class="p">]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">"CPF2111:Library TESTLIB already exists."</span><span class="p">]</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -401,7 +401,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;FROM_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;318F&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QWTCHGJB&quot;</span><span class="p">,</span> <span class="s2">&quot;FROM_USER&quot;</span><span class="p">:</span> <span class="s2">&quot;CHANGLE&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_FILE&quot;</span><span class="p">:</span> <span class="s2">&quot;QCPFMSG&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;CPD0912&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SECOND_LEVEL_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Cause . . . . . :   This message is used by application programs as a general escape message.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_SUBTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TEXT&quot;</span><span class="p">:</span> <span class="s2">&quot;Printer device PRT01 not found.&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TIMESTAMP&quot;</span><span class="p">:</span> <span class="s2">&quot;2020-05-20-21.41.40.845897&quot;</span><span class="p">,</span> <span class="s2">&quot;MESSAGE_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;DIAGNOSTIC&quot;</span><span class="p">,</span> <span class="s2">&quot;ORDINAL_POSITION&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;SEVERITY&quot;</span><span class="p">:</span> <span class="s2">&quot;20&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_INSTRUCTION&quot;</span><span class="p">:</span> <span class="s2">&quot;9369&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_LIBRARY&quot;</span><span class="p">:</span> <span class="s2">&quot;QSYS&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_MODULE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROCEDURE&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">,</span> <span class="s2">&quot;TO_PROGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;QSQSRVR&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">"FROM_INSTRUCTION"</span><span class="p">:</span> <span class="s2">"318F"</span><span class="p">,</span> <span class="s2">"FROM_LIBRARY"</span><span class="p">:</span> <span class="s2">"QSYS"</span><span class="p">,</span> <span class="s2">"FROM_MODULE"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"FROM_PROCEDURE"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"FROM_PROGRAM"</span><span class="p">:</span> <span class="s2">"QWTCHGJB"</span><span class="p">,</span> <span class="s2">"FROM_USER"</span><span class="p">:</span> <span class="s2">"CHANGLE"</span><span class="p">,</span> <span class="s2">"MESSAGE_FILE"</span><span class="p">:</span> <span class="s2">"QCPFMSG"</span><span class="p">,</span> <span class="s2">"MESSAGE_ID"</span><span class="p">:</span> <span class="s2">"CPD0912"</span><span class="p">,</span> <span class="s2">"MESSAGE_LIBRARY"</span><span class="p">:</span> <span class="s2">"QSYS"</span><span class="p">,</span> <span class="s2">"MESSAGE_SECOND_LEVEL_TEXT"</span><span class="p">:</span> <span class="s2">"Cause . . . . . :   This message is used by application programs as a general escape message."</span><span class="p">,</span> <span class="s2">"MESSAGE_SUBTYPE"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"MESSAGE_TEXT"</span><span class="p">:</span> <span class="s2">"Printer device PRT01 not found."</span><span class="p">,</span> <span class="s2">"MESSAGE_TIMESTAMP"</span><span class="p">:</span> <span class="s2">"2020-05-20-21.41.40.845897"</span><span class="p">,</span> <span class="s2">"MESSAGE_TYPE"</span><span class="p">:</span> <span class="s2">"DIAGNOSTIC"</span><span class="p">,</span> <span class="s2">"ORDINAL_POSITION"</span><span class="p">:</span> <span class="s2">"5"</span><span class="p">,</span> <span class="s2">"SEVERITY"</span><span class="p">:</span> <span class="s2">"20"</span><span class="p">,</span> <span class="s2">"TO_INSTRUCTION"</span><span class="p">:</span> <span class="s2">"9369"</span><span class="p">,</span> <span class="s2">"TO_LIBRARY"</span><span class="p">:</span> <span class="s2">"QSYS"</span><span class="p">,</span> <span class="s2">"TO_MODULE"</span><span class="p">:</span> <span class="s2">"QSQSRVR"</span><span class="p">,</span> <span class="s2">"TO_PROCEDURE"</span><span class="p">:</span> <span class="s2">"QSQSRVR"</span><span class="p">,</span> <span class="s2">"TO_PROGRAM"</span><span class="p">:</span> <span class="s2">"QSQSRVR"</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -442,7 +442,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;SF99433_1.bin&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;SF99433_2.bin&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">"SF99433_1.bin"</span><span class="p">:</span> <span class="s2">"1"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"SF99433_2.bin"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -456,7 +456,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;add&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99433_1.bin&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;remove&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99433_2.bin&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">"add"</span><span class="p">:</span> <span class="s2">"SF99433_1.bin"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"remove"</span><span class="p">:</span> <span class="s2">"SF99433_2.bin"</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -470,7 +470,7 @@
 <div class="line"><strong>sample</strong>:</div>
 </div>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;add&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99433_1.bin&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;remove&quot;</span><span class="p">:</span> <span class="s2">&quot;SF99433_2.bin&quot;</span><span class="p">}]</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">"add"</span><span class="p">:</span> <span class="s2">"SF99433_1.bin"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"remove"</span><span class="p">:</span> <span class="s2">"SF99433_2.bin"</span><span class="p">}]</span>
 </pre></div>
 </div>
 </div></blockquote>

@@ -98,7 +98,7 @@ Examples
      ibm.power_ibmi.ibmi_tcp_server_service:
        name_list: ['*HTTP']
        state: 'started'
-       joblog: True
+       joblog: true
 
    - name: Stop ssh server
      ibm.power_ibmi.ibmi_tcp_server_service:

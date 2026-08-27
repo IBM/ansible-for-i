@@ -167,9 +167,9 @@ Examples
          - '5733SC1'
        src: '{{ fix_install_path }}'
        apply_type: '*DLYALL'
-       hiper_only: False
-       use_temp_path: True
-       rollback: True
+       hiper_only: false
+       use_temp_path: true
+       rollback: true
        virtual_image_name_list:
          - 'S2018V01.BIN'
        fix_omit_list:

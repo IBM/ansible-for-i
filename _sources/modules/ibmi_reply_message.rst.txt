@@ -140,7 +140,7 @@ Examples
        message_queue: QSECOFR
        message_lib: QUSRSYS
        reply: OK
-       joblog: True
+       joblog: true
 
 
 

@@ -180,7 +180,7 @@ Examples
        operation: 'setup_only'
        server_address: '9.123.123.45'
        image_catalog_directory_name: '/tmp/PTFs'
-       rollback: True
+       rollback: true
        become_user: "QSECOFR"
        become_user_password: "yourpassword"
 

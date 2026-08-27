@@ -66,7 +66,7 @@ Examples
    
    - name: get all nonconfigure disks
      ibm.power_ibmi.ibmi_get_nonconfigure_disks:
-       joblog: True
+       joblog: true
 
 
 

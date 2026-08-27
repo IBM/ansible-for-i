@@ -80,7 +80,7 @@ Examples
      ibm.power_ibmi.ibmi_fix_group_check:
        groups:
          - "SF12345"
-       validate_certs: False
+       validate_certs: false
 
 
 

@@ -107,11 +107,12 @@
 </ul>
 <section id="requirements-for-non-ibm-i-ansible-server-control-node">
 <h2>Requirements for non-IBM i Ansible Server / Control Node<a class="headerlink" href="#requirements-for-non-ibm-i-ansible-server-control-node" title="Link to this heading"></a></h2>
-<p>In order to use this Ansible collection at <strong>release 3.2.1</strong> and beyond, you must have the following pre-requisite software installed and available on your Ansible server / control node:</p>
+<p>In order to use this Ansible collection at the latest release levels, you must have the following pre-requisite software installed and available on your Ansible server / control node:</p>
 <p><strong>Python v3.10+</strong></p>
 <blockquote>
 <div><p>Python can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc).
-If you install Python from the package manager for your operating system, you must also install the development libraries (usually a package named <code class="docutils literal notranslate"><span class="pre">python3-devel</span></code>), as these are required when installing modules through <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
+If you install Python from the package manager for your operating system, you must also install the development libraries (usually a package named <code class="docutils literal notranslate"><span class="pre">python3-devel</span></code>), as these are required when installing modules through <code class="docutils literal notranslate"><span class="pre">pip</span></code>.
+Note that Redhat customers using the Ansible Automation platform with the certified collection image should use Execution Environments instead of pip install.</p>
 <ul class="simple">
 <li><p>The official Python website: <a class="reference external" href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></p></li>
 <li><p>The unofficial Python version manager: <a class="reference external" href="https://github.com/pyenv/pyenv">https://github.com/pyenv/pyenv</a></p></li>
@@ -127,17 +128,18 @@ If you install Python from the package manager for your operating system, you mu
 </ul>
 </div></blockquote>
 <p>Users of Ansible core 2.15 should remain at collection release 3.2.0 due to changes with the ibmi_reboot module that support the latest Ansible core versions.</p>
-<p>The full compatiblity or support matrix for Ansible Core versions and Python levels for the control node and targets is provided at <a class="reference external" href="https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html">https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html</a>.</p>
+<p>The full compatibility or support matrix for Ansible Core versions and Python levels for the control node and targets is provided at <a class="reference external" href="https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html">https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html</a>.</p>
 <p>Ansible can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc). You can also install it using <code class="docutils literal notranslate"><span class="pre">pip</span></code>, the package manager for Python:</p>
 <blockquote>
 <div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="n">ansible</span>
 </pre></div>
 </div>
 </div></blockquote>
+<p>Note that Redhat customers using the Ansible Automation platform with the certified collection image should use Execution Environments instead of pip install.</p>
 </section>
 <section id="requirements-for-ibm-i-ansible-server-control-node">
 <h2>Requirements for IBM i Ansible Server / Control Node<a class="headerlink" href="#requirements-for-ibm-i-ansible-server-control-node" title="Link to this heading"></a></h2>
-<p>In order to use this Ansible collection at <strong>release 3.2.1</strong> and beyond, you must have the following pre-requisite software installed and available on your Ansible server / control node:</p>
+<p>In order to use this Ansible collection at the latest release levels, you must have the following pre-requisite software installed and available on your Ansible server / control node:</p>
 <p><strong>Python v3.13</strong></p>
 <blockquote>
 <div><p>This level of python is provided through the IBM i Open Source Software packages.</p>
@@ -149,85 +151,180 @@ If you install Python from the package manager for your operating system, you mu
 </ul>
 </div></blockquote>
 <p>Users of Ansible core 2.15 should remain at collection release 3.2.0 due to changes in the ibmi_reboot module that support the latest Ansible core versions.</p>
-<p>For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm
-above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps should be executed
-in an SSH session to the IBM i when installing Ansible with pip. This will require the IBM i SSH Daemon to be started with the ‘’STRTCPSVR <a href="#id1"><span class="problematic" id="id2">*</span></a>SSHD’’ command
-if it is not already started.</p>
-<ol class="arabic">
-<li><p>Use Yum to install the following required open source packages if not already present.</p>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">install</span> <span class="n">git</span>
-<span class="n">yum</span> <span class="n">install</span> <span class="n">python3</span><span class="mf">.13</span><span class="o">-</span><span class="n">cryptography</span>
-<span class="n">yum</span> <span class="n">install</span> <span class="n">python3</span><span class="mf">.13</span><span class="o">-</span><span class="n">paramiko</span>
-<span class="n">yum</span> <span class="n">install</span> <span class="n">pase</span><span class="o">-</span><span class="n">utf8</span><span class="o">-</span><span class="n">locale</span>
-<span class="n">yum</span> <span class="n">install</span> <span class="n">sshpass</span>   <span class="c1"># allows specifying ssh password if desired</span>
+<p>For an IBM i Ansible control node, the latest levels of Ansible should be installed with Python pip because there is not a pre-packaged Ansible rpm above version 2.9. Ansible may also be installed from the GitHub source with a stable ansible branch. The following steps should be executed in an SSH session to the IBM i when installing Ansible with pip. This requires the IBM i SSH daemon to be started with the <code class="docutils literal notranslate"><span class="pre">STRTCPSVR</span> <span class="pre">*SSHD</span></code> command if it is not already started.</p>
+<p><strong>Note:</strong> These commands should be run in bash shell for best results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">bash</span>
 </pre></div>
 </div>
-</div></blockquote>
+<p>Then proceed with the installation steps.</p>
+<p><strong>Important: Set PATH First</strong></p>
+<p>Before running yum, python, or ansible commands, ensure that <code class="docutils literal notranslate"><span class="pre">/QOpenSys/pkgs/bin</span></code> is in your <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. You can verify your current path with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>echo $PATH
+</pre></div>
+</div>
+<p>If you are using a Python virtual environment, ensure that the virtual environment <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory is first in your <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PATH=/HOME/TESTER/ansible-venv/bin:/QOpenSys/pkgs/bin:$PATH
+</pre></div>
+</div>
+<p>If you are not using a virtual environment, either:</p>
+<ol class="loweralpha">
+<li><p>Use full paths:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">package</span><span class="o">-</span><span class="n">name</span>
+</pre></div>
+</div>
 </li>
-<li><p>Configure your ~/.profile (~/.bash_profile with bash) or execute the following commands to set the language environment variables.</p>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LANG</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+<li><p>Or set PATH temporarily:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PATH=/QOpenSys/pkgs/bin:$PATH
+</pre></div>
+</div>
+</li>
+<li><p>Or add to <code class="docutils literal notranslate"><span class="pre">~/.profile</span></code> permanently:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="s1">'export PATH=/QOpenSys/pkgs/bin:$PATH'</span> <span class="o">&gt;&gt;</span> <span class="o">~/.</span><span class="n">profile</span>
+<span class="n">source</span> <span class="o">~/.</span><span class="n">profile</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic">
+<li><p><strong>Create a Python Virtual Environment (Recommended)</strong></p>
+<p>Using a virtual environment isolates your Ansible installation and prevents conflicts with system packages.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create virtual environment with Python 3.13</span>
+<span class="n">python3</span><span class="mf">.13</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="o">~/</span><span class="n">ansible</span><span class="o">-</span><span class="n">venv</span>
+
+<span class="c1"># Activate the virtual environment</span>
+<span class="n">source</span> <span class="o">~/</span><span class="n">ansible</span><span class="o">-</span><span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+
+<span class="c1"># Verify you're using the venv Python</span>
+<span class="n">which</span> <span class="n">python</span>
+<span class="c1"># Should show: /HOME/YOURUSERNAME/ansible-venv/bin/python</span>
+</pre></div>
+</div>
+<p><strong>Note:</strong> After activating the venv, your prompt will change to show <code class="docutils literal notranslate"><span class="pre">(ansible-venv)</span></code> at the beginning.</p>
+</li>
+<li><p>Use yum to install the following required open source packages if not already present.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">git</span>
+<span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">python3</span><span class="mf">.13</span><span class="o">-</span><span class="n">cryptography</span>
+<span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">python3</span><span class="mf">.13</span><span class="o">-</span><span class="n">paramiko</span>
+<span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">pase</span><span class="o">-</span><span class="n">utf8</span><span class="o">-</span><span class="n">locale</span>
+<span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">sshpass</span>   <span class="c1"># allows specifying ssh password if desired</span>
+</pre></div>
+</div>
+<p><strong>Note:</strong> These packages are installed system-wide and will be available to your virtual environment.</p>
+</li>
+</ol>
+<ol class="arabic" start="2">
+<li><p>Configure your <code class="docutils literal notranslate"><span class="pre">~/.profile</span></code> (or <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code> when using bash) or execute the following commands to set the language environment variables.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LANG</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
 <span class="n">LC_ALL</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
 <span class="n">export</span> <span class="n">LANG</span>
 <span class="n">export</span> <span class="n">LC_ALL</span>
 </pre></div>
 </div>
-</div></blockquote>
 </li>
-<li><p>Verify the language environment with the ‘’locale’’ command.</p>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">locale</span>
+<li><p>Verify the language environment with the <code class="docutils literal notranslate"><span class="pre">locale</span></code> command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">locale</span>
 
 <span class="n">LANG</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
-<span class="n">LC_COLLATE</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
-<span class="n">LC_CTYPE</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
-<span class="n">LC_MONETARY</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
-<span class="n">LC_NUMERIC</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
-<span class="n">LC_TIME</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
-<span class="n">LC_MESSAGES</span><span class="o">=</span><span class="s2">&quot;C&quot;</span>
+<span class="n">LC_COLLATE</span><span class="o">=</span><span class="s2">"C"</span>
+<span class="n">LC_CTYPE</span><span class="o">=</span><span class="s2">"C"</span>
+<span class="n">LC_MONETARY</span><span class="o">=</span><span class="s2">"C"</span>
+<span class="n">LC_NUMERIC</span><span class="o">=</span><span class="s2">"C"</span>
+<span class="n">LC_TIME</span><span class="o">=</span><span class="s2">"C"</span>
+<span class="n">LC_MESSAGES</span><span class="o">=</span><span class="s2">"C"</span>
 <span class="n">LC_ALL</span><span class="o">=</span><span class="n">en_US</span><span class="o">.</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
 </pre></div>
 </div>
-</div></blockquote>
 </li>
-<li><p>Install Ansible. Either full ansible (a) or ansible-core (b).</p>
+<li><p>Install Ansible. Choose one installation method.</p>
 <ol class="loweralpha">
-<li><p>Install Ansible at 11.X level (v2.18 core) with pip (skip step 3b). For example, to install level 11.1 that includes v2.18.1 ansible-core use the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">ansible</span><span class="o">==</span><span class="mf">11.1</span>
+<li><p><strong>If using a Python virtual environment (Recommended):</strong></p>
+<p>Make sure your virtual environment is activated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="o">~/</span><span class="n">ansible</span><span class="o">-</span><span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
 </pre></div>
 </div>
-</li>
-<li><p>Alternatively ansible-core may be installed instead of full ansible, but some additional ibmi dependent collections may need to be installed via ansible-galaxy. For example, to install ansible core v2.18.1 use the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">ansible</span><span class="o">-</span><span class="n">core</span><span class="o">==</span><span class="mf">2.18.1</span>
-</pre></div>
-</div>
-</li>
-</ol>
-<p>Note that Ansible core v2.16 and v2.17 cannot be used with the currently available IBM i Python rpm packages on an IBM i server / control node.</p>
-<p>The pip command may also be used directly for installing Ansible. An alternative command for 4(b) is</p>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="n">ansible</span><span class="o">-</span><span class="n">core</span><span class="o">==</span><span class="mf">2.18.1</span>
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>Add the following commands to your ~/.profile or execute them to include the ansible executables in your PATH.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>PATH=~/.local/bin:$PATH
-export PATH
-</pre></div>
-</div>
-</li>
-</ol>
-<p>6. Ensure dependent collections are installed if only using ansible-core. Perform the following collection install commands if
-‘’ansible-galaxy collection list’’ doesn’t show these collections.</p>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">openstack</span><span class="o">.</span><span class="n">cloud</span>
+<p>Then install Ansible:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install full Ansible package (includes ansible-core 2.18.1)</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">ansible</span><span class="o">==</span><span class="mf">11.1</span>
 
+<span class="c1"># OR install ansible-core only (lighter weight)</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">ansible</span><span class="o">-</span><span class="n">core</span><span class="o">==</span><span class="mf">2.18.1</span>
+</pre></div>
+</div>
+<p><strong>Note:</strong> When the venv is activated, you can use <code class="docutils literal notranslate"><span class="pre">pip</span></code> directly instead of specifying the full path.</p>
+</li>
+<li><p><strong>If not using a virtual environment:</strong></p>
+<p>Install Ansible for the current user:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install full Ansible package</span>
+<span class="n">python3</span><span class="mf">.13</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">ansible</span><span class="o">==</span><span class="mf">11.1</span>
+
+<span class="c1"># OR install ansible-core only</span>
+<span class="n">python3</span><span class="mf">.13</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">ansible</span><span class="o">-</span><span class="n">core</span><span class="o">==</span><span class="mf">2.18.1</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p><strong>Important:</strong> Ansible core v2.16 and v2.17 cannot be used with the currently available IBM i Python rpm packages on an IBM i server / control node. Use v2.18 or v2.19.</p>
+</li>
+<li><p>Verify that the expected executables are being used.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Check Python version
+python --version
+# Should show: Python 3.13.x
+
+# Check Ansible location
+which ansible-playbook
+# If using venv: /HOME/YOURUSERNAME/ansible-venv/bin/ansible-playbook
+# If using --user: /HOME/YOURUSERNAME/.local/bin/ansible-playbook
+
+# Check Ansible version
+ansible --version
+# Should show: ansible [core 2.18.x] or ansible [core 2.19.x]
+
+# Verify locale is set correctly
+echo $LANG
+# Should show: en_US.UTF-8
+</pre></div>
+</div>
+</li>
+<li><p>Ensure dependent collections are installed if only using ansible-core. Perform the following collection install commands if <code class="docutils literal notranslate"><span class="pre">ansible-galaxy</span> <span class="pre">collection</span> <span class="pre">list</span></code> does not show these collections.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">openstack</span><span class="o">.</span><span class="n">cloud</span>
 <span class="n">ansible</span><span class="o">-</span><span class="n">galaxy</span> <span class="n">collection</span> <span class="n">install</span> <span class="n">ansible</span><span class="o">.</span><span class="n">posix</span>
 </pre></div>
 </div>
-</div></blockquote>
+</li>
+</ol>
+<p><strong>Complete Setup Verification</strong></p>
+<p>After completing all installation steps, verify your environment is correctly configured:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># 1. Check shell
+echo $BASH_VERSION
+# Should show: 5.2.x or similar
+
+# 2. Check PATH includes necessary directories
+echo $PATH
+# Should include: /HOME/YOURUSERNAME/ansible-venv/bin (if using venv)
+# Should include: /QOpenSys/pkgs/bin
+
+# 3. Check locale
+locale
+# LANG and LC_ALL should be en_US.UTF-8
+
+# 4. Check Python versions available
+which python3.13
+which python3.9
+# Both should be found in /QOpenSys/pkgs/bin
+
+# 5. Check Ansible
+ansible --version
+# Should show ansible-core 2.18.x or 2.19.x with Python 3.13
+
+# 6. Check YUM
+yum --version
+# Should show version 3.4.3 or similar
+
+# 7. Test Ansible connectivity (if managing itself)
+ansible localhost -m ping
+# Should return: localhost | SUCCESS =&gt; {"changed": false, "ping": "pong"}
+</pre></div>
+</div>
 </section>
 <section id="installing-using-ansible-galaxy">
 <h2>Installing using Ansible Galaxy<a class="headerlink" href="#installing-using-ansible-galaxy" title="Link to this heading"></a></h2>
@@ -268,44 +365,110 @@ export PATH
 <li><p>5770DG1</p></li>
 <li><p>python3</p></li>
 <li><p>python3-itoolkit</p></li>
-<li><p>python3-ibm_db</p></li>
+<li><p>ibm-iaccess (IBM i Access ODBC Driver)</p></li>
+<li><p>python3-pyodbc (Python ODBC interface)</p></li>
 </ul>
 </div></blockquote>
 <ol class="arabic simple">
-<li><p>5733SC1 and 5770DG1 are license programs, you can download them at <a class="reference external" href="http://www-304.ibm.com/servers/eserver/ess/index.wss">http://www-304.ibm.com/servers/eserver/ess/index.wss</a>.</p></li>
-<li><p>python3, python3-itoolkit, python3-ibm_db are open source packages. There are a few ways to install these packages and you could choose from one of them.
-To ensure a specific Python level, e.g., Python 3.9, that is compatible with the version of Ansible core on the control node,
-the python package prefix should instead specifiy the full Python level, e.g., python39 instead of python3, for installation.</p></li>
+<li><p>5733SC1 and 5770DG1 are license programs, you can download them at <a class="reference external" href="https://www-304.ibm.com/servers/eserver/ess/index.wss">https://www-304.ibm.com/servers/eserver/ess/index.wss</a>.</p></li>
+<li><p>python3, python3-itoolkit, ibm-iaccess, and python3-pyodbc are open source packages. There are a few ways to install these packages and you could choose from one of them.
+To ensure a specific Python level, e.g., Python 3.9 or Python 3.13, that is compatible with the version of Ansible core on the control node,
+the python package prefix should instead specify the full Python level, e.g., python39 or python3.13 instead of python3, for installation.</p></li>
 </ol>
-<dl class="simple">
-<dt><strong>Installing rpm packages manually</strong></dt><dd><p>Rpm packages can be installed via ‘yum’ packages manager on IBM i. However, yum is not shipped by IBM i by default.
-Refer the guide here to install yum <a class="reference external" href="https://bitbucket.org/ibmi/opensource/src/master/docs/yum/">https://bitbucket.org/ibmi/opensource/src/master/docs/yum/</a>. Then install these packages by below command:</p>
-</dd>
-</dl>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">python3</span> <span class="n">python3</span><span class="o">-</span><span class="n">itoolkit</span> <span class="n">python3</span><span class="o">-</span><span class="n">ibm_db</span>
+<p><strong>Installing YUM on IBM i (Required First Step)</strong></p>
+<p>Before you can install packages, YUM must be installed on IBM i.</p>
+<p><strong>Automatically enable with Ansible playbook on IBM i systems that have internet</strong></p>
+<ol class="arabic">
+<li><p><strong>Create an inventory file</strong> with your IBM i system information (e.g., <code class="docutils literal notranslate"><span class="pre">host_ibmi.ini</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">ibmi</span><span class="p">]</span>
+<span class="n">your</span><span class="o">-</span><span class="n">ibmi</span><span class="o">-</span><span class="n">hostname</span> <span class="n">ansible_ssh_user</span><span class="o">=</span><span class="n">youruser</span> <span class="n">ansible_ssh_pass</span><span class="o">=</span><span class="n">yourpassword</span>
 </pre></div>
 </div>
-<p><strong>Installing rpm packages automatically onto IBM i systems which can access internet</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="p">)</span> <span class="n">Make</span> <span class="n">sure</span> <span class="n">you</span> <span class="n">have</span> <span class="n">IBM</span> <span class="n">i</span> <span class="n">collection</span> <span class="n">installed</span> <span class="n">on</span> <span class="n">your</span> <span class="n">Ansible</span> <span class="n">server</span><span class="o">.</span>
-<span class="mi">2</span><span class="p">)</span> <span class="n">Issue</span> <span class="n">below</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">order</span> <span class="n">to</span> <span class="n">use</span> <span class="n">setup</span> <span class="n">playbook</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">IBM</span> <span class="n">i</span><span class="p">:</span>
-<span class="n">cd</span> <span class="o">~/.</span><span class="n">ansible</span><span class="o">/</span><span class="n">collections</span><span class="o">/</span><span class="n">ansible_collections</span><span class="o">/</span><span class="n">ibm</span><span class="o">/</span><span class="n">power_ibmi</span><span class="o">/</span><span class="n">playbooks</span>
-<span class="mi">3</span><span class="p">)</span> <span class="n">Input</span> <span class="n">information</span> <span class="n">of</span> <span class="n">target</span> <span class="n">IBM</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">host_ibmi</span><span class="o">.</span><span class="n">ini</span> <span class="ow">in</span> <span class="n">order</span> <span class="n">to</span> <span class="n">run</span> <span class="n">playbooks</span><span class="o">.</span>
-<span class="mi">4</span><span class="p">)</span> <span class="n">Run</span> <span class="n">setup</span> <span class="n">play</span> <span class="n">book</span> <span class="k">with</span> <span class="n">below</span> <span class="n">command</span><span class="p">:</span>
-<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">host_ibmi</span><span class="o">.</span><span class="n">ini</span> <span class="n">enable</span><span class="o">-</span><span class="n">ansible</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">i</span><span class="o">/</span><span class="n">setup</span><span class="o">.</span><span class="n">yml</span>
+<p>Or use SSH keys instead of password for better security.</p>
+</li>
+<li><p><strong>Run the setup playbook:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~/.</span><span class="n">ansible</span><span class="o">/</span><span class="n">collections</span><span class="o">/</span><span class="n">ansible_collections</span><span class="o">/</span><span class="n">ibm</span><span class="o">/</span><span class="n">power_ibmi</span><span class="o">/</span><span class="n">playbooks</span><span class="o">/</span><span class="n">enable</span><span class="o">-</span><span class="n">ansible</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">i</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">host_ibmi</span><span class="o">.</span><span class="n">ini</span> <span class="n">setup</span><span class="o">.</span><span class="n">yml</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Installing rpm packages automatically onto IBM i systems which are offline</strong></dt><dd><p>An ‘Offline’ IBM i means that the IBM i system cannot connect to the internet and is not able to access <a class="reference external" href="https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/">https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/</a>.
-Before installing them, you can download installation packages to Ansible server.</p>
-</dd>
-</dl>
+<p>The playbook will automatically:</p>
+<ul class="simple">
+<li><p>Download bootstrap files directly to the IBM i server (using Ansible’s get_url module)</p></li>
+<li><p>Check if YUM is already installed on IBM i</p></li>
+<li><p>Run the bootstrap script on IBM i to install YUM</p></li>
+<li><p>Install required Python packages (python3-itoolkit, ibm-iaccess, python3-pyodbc)</p></li>
+<li><p>Configure the IBM i environment for Ansible</p></li>
+</ul>
+<p><strong>No manual download required</strong> - the playbook handles everything automatically!</p>
+</li>
+</ol>
+<p><strong>Automatically enable with Ansible playbook on IBM i systems that are offline</strong></p>
+<p>An ‘Offline’ IBM i means that the IBM i system cannot connect to the internet and is not able to access <a class="reference external" href="https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/">https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/repo/</a>. Before installing them, you can download installation packages to Ansible server.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span><span class="p">)</span> <span class="n">Make</span> <span class="n">sure</span> <span class="n">you</span> <span class="n">have</span> <span class="n">IBM</span> <span class="n">i</span> <span class="n">collection</span> <span class="n">installed</span> <span class="n">on</span> <span class="n">your</span> <span class="n">Ansible</span> <span class="n">server</span><span class="o">.</span>
 <span class="mi">2</span><span class="p">)</span> <span class="n">Issue</span> <span class="n">below</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">order</span> <span class="n">to</span> <span class="n">use</span> <span class="n">setup</span> <span class="n">playbook</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">IBM</span> <span class="n">i</span><span class="p">:</span>
 <span class="n">cd</span> <span class="o">~/.</span><span class="n">ansible</span><span class="o">/</span><span class="n">collections</span><span class="o">/</span><span class="n">ansible_collections</span><span class="o">/</span><span class="n">ibm</span><span class="o">/</span><span class="n">power_ibmi</span><span class="o">/</span><span class="n">playbooks</span>
 <span class="mi">3</span><span class="p">)</span> <span class="n">Input</span> <span class="n">information</span> <span class="n">of</span> <span class="n">target</span> <span class="n">IBM</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">host_ibmi</span><span class="o">.</span><span class="n">ini</span> <span class="ow">in</span> <span class="n">order</span> <span class="n">to</span> <span class="n">run</span> <span class="n">playbooks</span><span class="o">.</span>
 <span class="mi">4</span><span class="p">)</span> <span class="n">Follow</span> <span class="n">the</span> <span class="n">steps</span> <span class="ow">in</span> <span class="o">~/.</span><span class="n">ansible</span><span class="o">/</span><span class="n">collections</span><span class="o">/</span><span class="n">ansible_collections</span><span class="o">/</span><span class="n">ibm</span><span class="o">/</span><span class="n">power_ibmi</span><span class="o">/</span><span class="n">playbooks</span><span class="o">/</span><span class="n">enable_offline_ibmi</span><span class="o">/</span><span class="n">README</span><span class="o">.</span><span class="n">md</span>
 <span class="mi">5</span><span class="p">)</span> <span class="n">Run</span> <span class="n">playbook</span> <span class="k">with</span> <span class="n">below</span> <span class="n">command</span><span class="o">.</span> <span class="n">The</span> <span class="n">command</span> <span class="n">assumes</span> <span class="n">that</span> <span class="n">the</span> <span class="n">installation</span> <span class="n">packages</span> <span class="n">are</span> <span class="ow">in</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ibmi</span><span class="o">-</span><span class="n">packages</span> <span class="n">directory</span> <span class="n">of</span> <span class="n">Ansible</span> <span class="n">server</span><span class="o">.</span>
-<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">inventory</span> <span class="n">enable_offline_ibmi</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;package_path=/tmp/ibmi-packages&#39;</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">-</span><span class="n">i</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">inventory</span> <span class="n">enable_offline_ibmi</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">e</span> <span class="s1">'package_path=/tmp/ibmi-packages'</span>
+</pre></div>
+</div>
+<p><strong>Installing YUM manually</strong></p>
+<p>If you prefer to install YUM manually, follow these steps:</p>
+<ol class="arabic">
+<li><p><strong>SSH to your IBM i system:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ssh</span> <span class="n">youruser</span><span class="nd">@your</span><span class="o">-</span><span class="n">ibmi</span><span class="o">-</span><span class="n">system</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Download bootstrap files directly on IBM i using Python:</strong></p>
+<p>Since curl is not available before yum is installed, use Python’s built-in HTTP capabilities:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Download bootstrap.sh</span>
+<span class="n">python3</span> <span class="o">-</span><span class="n">c</span> <span class="s2">"import urllib.request; urllib.request.urlretrieve('https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.sh', '/tmp/bootstrap.sh')"</span>
+
+<span class="c1"># Download bootstrap.tar.Z</span>
+<span class="n">python3</span> <span class="o">-</span><span class="n">c</span> <span class="s2">"import urllib.request; urllib.request.urlretrieve('https://public.dhe.ibm.com/software/ibmi/products/pase/rpms/bootstrap.tar.Z', '/tmp/bootstrap.tar.Z')"</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Make bootstrap.sh executable:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">bootstrap</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Run the bootstrap installation:</strong></p>
+<p>You can run this from either SSH or a 5250 terminal:</p>
+<p><strong>From SSH (ksh shell):</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">/</span><span class="n">tmp</span>
+<span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">ksh</span> <span class="n">bootstrap</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p><strong>From 5250 terminal:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">QSH</span> <span class="n">CMD</span><span class="p">(</span><span class="s1">'exec /QOpenSys/usr/bin/ksh -c "/QOpenSys/usr/bin/ksh /tmp/bootstrap.sh &gt; /tmp/bootstrap.log 2&gt;&amp;1"'</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Verify YUM installation:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="o">--</span><span class="n">version</span>
+</pre></div>
+</div>
+<p>Expected output should show YUM version 3.4.3 or similar.</p>
+</li>
+<li><p><strong>Add YUM to your PATH:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PATH=/QOpenSys/pkgs/bin:$PATH
+</pre></div>
+</div>
+</li>
+</ol>
+<dl class="simple">
+<dt><strong>Installing rpm packages manually</strong></dt><dd><p>Rpm packages can be installed via ‘yum’ packages manager on IBM i. However, yum is not shipped by IBM i by default.
+Refer the guide here to install yum <a class="reference external" href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-yum">https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-yum</a>.
+Then install the required packages at the desired levels by the below command(s):</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">python39</span> <span class="n">python39</span><span class="o">-</span><span class="n">itoolkit</span> <span class="n">ibm</span><span class="o">-</span><span class="n">iaccess</span> <span class="n">python39</span><span class="o">-</span><span class="n">pyodbc</span>
+<span class="c1"># and/or</span>
+<span class="o">/</span><span class="n">QOpenSys</span><span class="o">/</span><span class="n">pkgs</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">yum</span> <span class="n">install</span> <span class="n">python3</span><span class="mf">.13</span> <span class="n">python3</span><span class="mf">.13</span><span class="o">-</span><span class="n">itoolkit</span> <span class="n">ibm</span><span class="o">-</span><span class="n">iaccess</span> <span class="n">python3</span><span class="mf">.13</span><span class="o">-</span><span class="n">pyodbc</span>
 </pre></div>
 </div>
 </section>
