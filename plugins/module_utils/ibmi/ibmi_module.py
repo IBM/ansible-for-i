@@ -229,11 +229,33 @@ class IBMiModule(object):
                 if db_name != ibmi_util.SYSBAS:
                     exp_msg = exp_msg + f" Check if IASP {db_name} is exist and varied on."
                 else:
-                    exp_msg = exp_msg + \
-                        "Possible reasons and solutions are:" + \
-                        "1. If the *LOCAL Relational Database Directory Entry(RDBDIRE) does not exist, create it. " + \
-                        "2. Apply the latest Cumulative PTF packages. " + \
-                        "3. Upgrade the Open Source package pyodbc to latest version."
+                    if 'CWBNL0203' in str(inst):
+                        # CWBNL0203 means the IBM i Access ODBC Driver could not load its
+                        # message library. A stale or corrupted QZDASOINIT prestart job in
+                        # the *DATABASE host server pool may be the cause — for example
+                        # after a failed NLS initialisation or a stuck resource.
+                        # Recycling the prestart jobs may resolve it:
+                        #   ENDPJ SBS(QSERVER) PGM(QSYS/QZDASOINIT) OPTION(*IMMED)
+                        # or restart the host server:
+                        #   ENDHOSTSVR SERVER(*DATABASE)
+                        #   STRHOSTSVR SERVER(*DATABASE)
+                        exp_msg = exp_msg + \
+                            " CWBNL0203 indicates the IBM i Access ODBC Driver message library" \
+                            " could not be loaded. A stale or corrupted QZDASOINIT prestart" \
+                            " job in the *DATABASE host server pool may be the cause." \
+                            " To resolve: end the prestart jobs with" \
+                            " 'ENDPJ SBS(QSERVER) PGM(QSYS/QZDASOINIT) OPTION(*IMMED)'" \
+                            " or restart the host server with" \
+                            " 'ENDHOSTSVR SERVER(*DATABASE)' then 'STRHOSTSVR SERVER(*DATABASE)'."
+                    else:
+                        exp_msg = exp_msg + \
+                            " Possible reasons and solutions are:" \
+                            " 1. The *DATABASE host server is unavailable. Start up with:" \
+                            " 'STRHOSTSVR SERVER(*DATABASE)'" \
+                            " 2. If the *LOCAL Relational Database Directory Entry(RDBDIRE)" \
+                            " does not exist, create it." \
+                            " 3. Apply the latest Cumulative PTF packages." \
+                            " 4. Upgrade the Open Source package pyodbc to latest version."
         if re_raise:
             raise Exception(exp_msg)
 
@@ -304,6 +326,12 @@ class IBMiModule(object):
         return rc, out_list, error, job_log
 
     def itoolkit_sql_callproc(self, sql):
+        sql = sql.rstrip('; \t\n\r')
+        if self.conn is None:
+            err = 'No database connection available'
+            if self.conn_error:
+                err = err + ': ' + self.conn_error
+            return ibmi_util.IBMi_SQL_RC_ERROR, '', err
         itransport = DatabaseTransport(self.conn)
         itool = iToolKit(iparm=1)
         itool.add(iSqlQuery('query', sql))
@@ -525,7 +553,7 @@ class IBMiModule(object):
                 hex_convert_columns = []
             hex_convert_columns.extend(known_hex_convert_columns)
             cur = self.conn.cursor()
-            cur.execute(sql)
+            cur.execute(sql.rstrip('; \t\n\r'))
             field_map = self.db_get_fields_from_cursor(cur)
 
             for row in cur:
@@ -566,7 +594,9 @@ class IBMiModule(object):
                     elif col_type in [DATE, TIME, DATETIME]:
                         row_map[str(k)] = str(row[col_num])
                     else:
-                        row_map[str(k)] = row[col_num]
+                        # Unknown pyodbc column type — convert to str so Ansible's JSON
+                        # serializer never receives a raw non-serializable object.
+                        row_map[str(k)] = str(row[col_num])
                 result_list.append(row_map)
             cur.close()
             rc = ibmi_util.IBMi_COMMAND_RC_SUCCESS
@@ -593,14 +623,12 @@ class IBMiModule(object):
         try:
             cursor_id = self.conn.cursor()
 
-            result_set = cursor_id.execute(sql)
-            if not result_set:
-                err = "Failed to execute the SQL statement."
-                ibmi_util.log_debug("sql execute into error: " + str(err))
-                return out, err
+            # pyodbc.execute() returns the cursor object (always truthy); do not check it.
+            cursor_id.execute(sql)
 
             result_set = cursor_id.fetchall()
-            if not result_set:
+            # fetchall() returns [] for zero rows (valid), and None only on a driver error.
+            if result_set is None:
                 err = "Failed to fetch the result set."
                 ibmi_util.log_debug("sql fetch into error: " + str(err))
                 return out, err

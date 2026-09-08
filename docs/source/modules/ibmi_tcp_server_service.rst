@@ -104,13 +104,13 @@ Examples
      ibm.power_ibmi.ibmi_tcp_server_service:
        name_list: ['*SSH']
        state: 'stopped'
-       joblog: True
+       joblog: true
 
    - name: Restart ssh server (in the same playbook as stopping ssh server)
      ibm.power_ibmi.ibmi_tcp_server_service:
        name_list: ['*SSH']
        state: 'started'
-       joblog: True
+       joblog: true
 
 
 
