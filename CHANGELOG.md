@@ -1,5 +1,25 @@
 # Change Log
 
+## v3.5.1 (2026-09-08)
+
+This release has minor fixes or improvements with the pyodbc / ODBC path.
+
+Note that for release v3.5.0 and on that the collection uses pyodbc / ODBC
+instead of ibm_db and requires the IBM i managed nodes to have new ODBC packages
+installed (pyodbc and ibmi-iaccess); the collection will no longer work at all
+with ibm_db.
+
+### Improvements
+
+- Allow a single SQL statement to end with semi-colon. A terminating semi-colon is
+  stripped out prior to passing to pyodbc / ODBC path, so an error won't occur now
+  (same behavior as before with the ibm_db package).
+
+### Bug fixes
+
+- Fix a few bugs in the pyodbc/ODBC path along with improving messaging in a couple of
+  paths when the *DATABASE host server is not online.
+
 ## v3.5.0 (2026-08-28)
 
 This release focuses on supporting Python 3.13 for IBM i managed nodes by migrating from ibm_db to pyodbc / ODBC for the DB2 database interface. The README provides detailed information on the differences between

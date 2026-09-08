@@ -291,7 +291,7 @@ import hashlib
 import base64
 import xml.etree.ElementTree as ET
 
-__ibmi_module_version__ = "3.5.0"
+__ibmi_module_version__ = "3.5.1"
 
 # Defined Globals
 event_id = ""

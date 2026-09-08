@@ -76,11 +76,8 @@ def db2_sql_query(connection_id, sql):
 
     try:
         cursor_id = connection_id.cursor()
-        result_set = cursor_id.execute(sql)
-
-        if result_set is False:
-            err = "ERROR: Unable to execute the SQL statement specified."
-            return out, err
+        # pyodbc.execute() returns the cursor object (always truthy); do not check it.
+        cursor_id.execute(sql)
 
         result_set = cursor_id.fetchall()
 
